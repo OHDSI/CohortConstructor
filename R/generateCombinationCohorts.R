@@ -66,6 +66,18 @@ periodSplit <- function(x, start, end, id = "subject_id") {
     dplyr::select(-"a1b2c3") %>%
     CDMConnector::computeQuery()
 }
-getCohort <- function(mutuallyExclusive) {
-
+getCohortSetMutuallyEclusive <- function(names) {
+  lapply(names, function(x){c(0, 1)}) |>
+    expand.grid() |>
+    rlang::set_names(names) |>
+    dplyr::as_tibble() |>
+    dplyr::fi
+    dplyr::mutate("cohort_definition_id" = dplyr::row_number())
+}
+getCohortSetNotMutuallyEclusive <- function(names) {
+  lapply(names, function(x){c(0, 1)}) |>
+    expand.grid() |>
+    rlang::set_names(names) |>
+    dplyr::as_tibble() |>
+    dplyr::mutate("cohort_definition_id" = dplyr::row_number())
 }
