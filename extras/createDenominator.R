@@ -1,14 +1,13 @@
 generateAgeCohortSet <- function(cdm,
                                  name,
-                                 ageGroup = list(c(0, 150)),
+                                 ageGroup = list(c(0, 19), c(20, Inf)),
                                  targetCohortTable = NULL,
                                  targetCohortId = NULL,
                                  overwrite = FALSE) {
   ages <- unlist(ageGroup, recursive = TRUE)
-  ageStart <- ages[(num %% 2) == 0]
-  ageStart <- ages[(num %% 2) == 1]
-  ageMin <- min(unlist(ageGroup, recursive = TRUE))
-  ageMax <- max(unlist(ageGroup, recursive = TRUE))
+  ageBreak <- ages + rep(c(-1, 0), length(ages)/2)
+  ageBreak <- ifelse(ageBreak < 0, 0, ageBreak) |> unique()
+
   if (!is.null(targetCohortTable)) {
     x <- cdm[["observation_period"]] |>
       dplyr::select(
