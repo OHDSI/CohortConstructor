@@ -113,11 +113,77 @@ test_that("splitOverlap", {
         "2020-06-01"
       )),
       end_date = as.Date(c(
-        "2020-08-01", "2020-05-01", "2020-07-01", "2020-05-01", "2020-08-01",
-        "2020-07-01"
+        "2020-02-29", "2020-04-01", "2020-05-31", "2020-06-01", "2020-08-01",
+        "2020-05-01", "2020-07-01", "2020-03-31", "2020-05-01", "2020-07-01",
+        "2020-08-01"
       ))
     )
   )
 
   DBI::dbDisconnect(db, shutdown = TRUE)
+})
+
+test_that("generateCombinationCohortSet", {
+  cohort <- dplyr::tibble(
+    cohort_definition_id = c(1, 2, 3, 1, 2, 3, 1, 2),
+    subject_id = c(1, 1, 1, 2, 3, 3, 4, 4),
+    cohort_start_date = as.Date(c(
+      "2020-03-01", "2020-04-01", "2020-01-01", "2020-02-01", "2020-03-01",
+      "2020-04-01", "2020-02-01", "2020-06-01"
+    )),
+    cohort_end_date = as.Date(c(
+      "2020-05-01", "2020-06-01", "2020-05-01", "2020-05-01", "2020-05-01",
+      "2020-07-01", "2020-02-04", "2020-06-08"
+    ))
+  )
+  person <- dplyr::tibble(
+    person_id = c(1, 2, 3, 4),
+    gender_concept_id = c(8507, 8532, 8507, 8532),
+    year_of_birth = 2000,
+    month_of_birth = 1,
+    day_of_birth = 1
+  )
+  observation_period <- dplyr::tibble(
+    observation_period_id = 1:4,
+    person_id = 1:4,
+    observation_period_start_date = as.Date("2020-01-01"),
+    observation_period_end_date = as.Date("2020-12-31")
+  )
+  cdm <- PatientProfiles::mockPatientProfiles(
+    observation_period = observation_period, person = person, cohort1 = cohort
+  )
+
+  # mutually exclusive
+  expect_no_error(cdm <- generateCombinationCohortSet(
+    cdm = cdm, name = "cohort2", targetCohortName = "cohort1",
+    mutuallyExclusive = TRUE
+  ))
+  expect_true(all(CDMConnector::cohortSet(cdm$cohort2)$mutually_exclusive == TRUE))
+  expect_true(cdm$cohort2 %>% dplyr::tally() %>% dplyr::pull() == 10)
+  expect_true(all(
+    CDMConnector::cohortCount(cdm$cohort2) %>%
+      dplyr::arrange(.data$cohort_definition_id) %>%
+      dplyr::pull("number_records") == c(2, 3, 0, 2, 1, 1, 1)
+  ))
+
+  # not mutually exclusive
+  expect_no_error(cdm <- generateCombinationCohortSet(
+    cdm = cdm, name = "cohort3", targetCohortName = "cohort1",
+    mutuallyExclusive = FALSE
+  ))
+  expect_true(all(CDMConnector::cohortSet(cdm$cohort3)$mutually_exclusive == FALSE))
+  expect_true(cdm$cohort3 %>% dplyr::tally() %>% dplyr::pull() == 13)
+  expect_true(all(
+    CDMConnector::cohortCount(cdm$cohort3) %>%
+      dplyr::arrange(.data$cohort_definition_id) %>%
+      dplyr::pull("number_records") == c(3, 3, 1, 2, 1, 2, 1)
+  ))
+
+  # not enough cohorts provided
+  expect_warning(cdm <- generateCombinationCohortSet(
+    cdm = cdm, name = "cohort4", targetCohortName = "cohort1",
+    targetCohortId = 1
+  ))
+
+  CDMConnector::cdmDisconnect(cdm)
 })

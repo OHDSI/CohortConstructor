@@ -1,37 +1,161 @@
-# generateCombinationCohortSet <- function(cdm,
-#                                          name,
-#                                          targetCohortName,
-#                                          targetCohortId = NULL,
-#                                          mutuallyExclusive = FALSE) {
-#   # initial checks
-#   # checkInput()
-#
-#   # check targetCohortId
-#   if (is.null(targetCohortId)) {
-#     targetCohortId <- OMOPGenerics::cohortSet(cdm[[targetCohortName]]) %>%
-#       dplyr::pull("cohort_definition_id")
-#   }
-#   if (length(targetCohortId) < 2) {
-#     cli::cli_warn("At least 2 cohort id must be provided to do the combination")
-#     # update properly
-#     cdm[[name]] <- cdm[[targetCohortName]]
-#     return(cdm)
-#   }
-#
-#   # generate cohort
-#   names <- OMOPGenerics::cohortSet(cdm[[targetCohortName]]) %>%
-#     dplyr::filter(.data$cohort_definition_id %in% .env$targetCohortId) %>%
-#     dplyr::pull("cohort_definition_id")
-#   cohort <- periodSplit(cdm, targetCohortName, targetCohortId) %>%
-#     PatientProfiles::addCohortIntersectFlag(
-#       targetCohortTable = targetCohortName,
-#       targetCohortId = targetCohortId,
-#       indexDate = "start",
-#       window = c(0, 0),
-#       nameStyle = "{cohort_name}"
-#     ) %>%
-#     getCohort()
-# }
+#' Generate a combination cohort set between the intersection of different
+#' cohorts.
+#'
+#' @param cdm A cdm reference.
+#' @param name Name of the new generated cohort.
+#' @param targetCohortName Name of an existent cohort in the cdm to create the
+#' combinations.
+#' @param targetCohortId Ids to combine of the target cohort. If NULL all
+#' cohort present in the table will be used.
+#' @param mutuallyExclusive Wheather the generated cohorts are mutually
+#' exclusive or not.
+#'
+#' @export
+#'
+#' @return The cdm object with the new generated cohort set
+#'
+#' @examples
+#' \donttest{
+#' library(PatientProfiles)
+#'
+#' cdm <- mockPatientProfiles()
+#'
+#' cdm <- generateCombinationCohortSet(
+#'   cdm = cdm,
+#'   name = "cohort3",
+#'   targetCohortName = "cohort2"
+#' )
+#'
+#' cdm$cohort3
+#'
+#' CDMConnector::cohortSet(cdm$cohort3)
+#'
+#' }
+
+generateCombinationCohortSet <- function(cdm,
+                                         name,
+                                         targetCohortName,
+                                         targetCohortId = NULL,
+                                         mutuallyExclusive = FALSE) {
+  # initial checks
+  checkmate::checkClass(cdm, "cdm_reference")
+  checkmate::checkCharacter(name, len = 1, any.missing = FALSE, min.chars = 1)
+  checkmate::checkCharacter(targetCohortName, len = 1, any.missing = FALSE, min.chars = 1)
+  checkmate::checkTRUE(targetCohortName %in% names(cdm))
+  checkmate::checkIntegerish(targetCohortId, null.ok = TRUE, any.missing = FALSE)
+  checkmate::checkLogical(mutuallyExclusive, len = 1, any.missing = FALSE)
+
+  # check targetCohortId
+  if (is.null(targetCohortId)) {
+    targetCohortId <- CDMConnector::cohortSet(cdm[[targetCohortName]]) %>%
+      dplyr::pull("cohort_definition_id")
+  }
+  if (length(targetCohortId) < 2) {
+    cli::cli_warn("At least 2 cohort id must be provided to do the combination")
+    # update properly
+    cdm[[name]] <- CDMConnector::newGeneratedCohortSet(
+      cohortRef = cdm[[targetCohortName]] %>%
+        dplyr::filter(.data$cohort_definition_id == .env$targetCohortId) %>%
+        CDMConnector::computeQuery(
+          name = name,
+          temporary = FALSE,
+          schema = attr(cdm, "write_schema"),
+          overwrite = TRUE
+        ),
+      cohortSetRef = attr(cdm[[targetCohortName]], "cohort_set") %>%
+        dplyr::filter(.data$cohort_definition_id == .env$targetCohortId) %>%
+        CDMConnector::computeQuery(
+          name = paste0(name, "_set"),
+          temporary = FALSE,
+          schema = attr(cdm, "write_schema"),
+          overwrite = TRUE
+        ),
+      cohortAttritionRef = attr(cdm[[targetCohortName]], "cohort_attrition") %>%
+        dplyr::filter(.data$cohort_definition_id == .env$targetCohortId) %>%
+        CDMConnector::computeQuery(
+          name = paste0(name, "_attrition"),
+          temporary = FALSE,
+          schema = attr(cdm, "write_schema"),
+          overwrite = TRUE
+        ),
+      overwrite = TRUE
+    )
+    return(cdm)
+  }
+
+  # generate cohort
+  cohort <- cdm[[targetCohortName]] %>%
+    dplyr::filter(.data$cohort_definition_id %in% .env$targetCohortId) %>%
+    dplyr::select(-"cohort_definition_id") %>%
+    splitOverlap(by = "subject_id") %>%
+    PatientProfiles::addCohortIntersectFlag(
+      targetCohortTable = targetCohortName,
+      targetCohortId = targetCohortId,
+      window = c(0, 0),
+      nameStyle = "{cohort_name}"
+    )
+
+  # cretae cohort_definition_id
+  cohortNames <- CDMConnector::cohortSet(cdm[[targetCohortName]]) %>%
+    dplyr::filter(.data$cohort_definition_id %in% .env$targetCohortId) %>%
+    dplyr::pull("cohort_name")
+  x <- rep(list(c(0, 1)), length(cohortNames))
+  names(x) <- cohortNames
+  cohSet <- expand.grid(x) %>%
+    dplyr::as_tibble() %>%
+    dplyr::filter(dplyr::if_any(dplyr::everything(), ~ . != 0))
+
+  if (mutuallyExclusive) {
+    cohSet <- cohSet %>%
+      dplyr::mutate(cohort_definition_id = dplyr::row_number())
+  } else {
+    cohSet <- notMutuallyEclusiveCohortSet(cohSet)
+  }
+
+  # add cohort definition id
+  cohort <- cohort %>%
+    dplyr::inner_join(cohSet, copy = TRUE, by = cohortNames) %>%
+    dplyr::select(
+      "cohort_definition_id", "subject_id", "cohort_start_date",
+      "cohort_end_date"
+    )
+
+  if (!mutuallyExclusive) {
+    cohort <- joinOverlap(x = cohort, gap = 1)
+    cohSet <- cohSet %>%
+      dplyr::group_by(.data$cohort_definition_id) %>%
+      dplyr::mutate(dplyr::across(
+        dplyr::everything(),
+        ~ dplyr::if_else(dplyr::n_distinct(.x) == 1, 1, as.numeric(NA))
+      )) %>%
+      dplyr::ungroup() %>%
+      dplyr::distinct()
+  }
+
+  cohort <- cohort %>%
+    CDMConnector::computeQuery(
+      name = name,
+      temporary = FALSE,
+      schema = attr(cdm, "write_schema"),
+      overwrite = TRUE
+    )
+
+  cohSet <- addNames(cohSet) %>%
+    dplyr::mutate("mutually_exclusive" = mutuallyExclusive) %>%
+    dplyr::relocate(c("cohort_definition_id", "cohort_name"))
+
+  # TODO
+  # create attrition
+
+  cdm[[name]] <- CDMConnector::newGeneratedCohortSet(
+    cohortRef = cohort, cohortSetRef = cohSet, overwrite = TRUE
+  )
+
+  # TODO
+  # add a not exposed option cohort
+
+  return(cdm)
+}
 
 #' To split overlaping periods in non overlaping period.
 #'
@@ -69,7 +193,7 @@ splitOverlap <- function(x,
         dplyr::mutate(!!is := as.Date(!!CDMConnector::dateadd(is, 1)))
     ) %>%
     dplyr::distinct() %>%
-    dplyr::group_by(dplyr::across(by)) %>%
+    dplyr::group_by(dplyr::across(dplyr::all_of(by))) %>%
     dbplyr::window_order(.data[[is]]) %>%
     dplyr::mutate(!!id := dplyr::row_number()) %>%
     dbplyr::window_order() %>%
@@ -83,7 +207,7 @@ splitOverlap <- function(x,
             dplyr::mutate(!!ie := as.Date(!!CDMConnector::dateadd(ie, -1)))
         ) %>%
         dplyr::distinct() %>%
-        dplyr::group_by(dplyr::across(by)) %>%
+        dplyr::group_by(dplyr::across(dplyr::all_of(by))) %>%
         dbplyr::window_order(.data[[ie]]) %>%
         dplyr::mutate(!!id := dplyr::row_number() - 1) %>%
         dbplyr::window_order() %>%
@@ -197,22 +321,38 @@ getIdentifier <- function(x, len = 1, prefix = "", nchar = 5) {
 
   return(x)
 }
-getRandom <- function(n) {
-  sample(x = letters, size = n, replace = TRUE) |> paste0(collapse = "")
-}
 
-# getCohortSetMutuallyEclusive <- function(names) {
-#   lapply(names, function(x){c(0, 1)}) |>
-#     expand.grid() |>
-#     rlang::set_names(names) |>
-#     dplyr::as_tibble() |>
-#     dplyr::fi
-#     dplyr::mutate("cohort_definition_id" = dplyr::row_number())
-# }
-# getCohortSetNotMutuallyEclusive <- function(names) {
-#   lapply(names, function(x){c(0, 1)}) |>
-#     expand.grid() |>
-#     rlang::set_names(names) |>
-#     dplyr::as_tibble() |>
-#     dplyr::mutate("cohort_definition_id" = dplyr::row_number())
-# }
+getRandom <- function(n) {
+  sample(x = letters, size = n, replace = TRUE) %>% paste0(collapse = "")
+}
+addNames <- function(cs) {
+  cols <- colnames(cs)[colnames(cs) != "cohort_definition_id"]
+  cs <- cs %>% dplyr::mutate("cohort_name" = as.character(NA))
+  for (col in cols) {
+    cs <- cs %>%
+      dplyr::mutate("cohort_name" = dplyr::case_when(
+        .data[[col]] == 1 & is.na(.data$cohort_name) ~ .env$col,
+        .data[[col]] == 1 & !is.na(.data$cohort_name) ~ paste0(.data$cohort_name, "+", .env$col),
+        TRUE ~ .data$cohort_name
+      ))
+  }
+  return(cs)
+}
+notMutuallyEclusiveCohortSet <- function(cs) {
+  logic <- cs %>%
+    dplyr::mutate(cohort_definition_id = dplyr::row_number()) %>%
+    tidyr::pivot_longer(!"cohort_definition_id") %>%
+    dplyr::filter(.data$value == 1)
+  cohset <- list()
+  for (k in logic$cohort_definition_id) {
+    logi <- logic %>%
+      dplyr::filter(.data$cohort_definition_id == .env$k) %>%
+      tidyr::pivot_wider()
+    cohset[[k]] <- cs %>%
+      dplyr::inner_join(
+        logi, by = colnames(logi)[colnames(logi) != "cohort_definition_id"]
+      )
+  }
+  cs <- dplyr::bind_rows(cohset)
+  return(cs)
+}
