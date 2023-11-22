@@ -1,0 +1,54 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# CohortConstructor
+
+<!-- badges: start -->
+[![CRAN status](https://www.r-pkg.org/badges/version/CohortConstructor)](https://CRAN.R-project.org/package=CohortConstructor)
+[![codecov.io](https://codecov.io/github/oxford-pharmacoepi/CohortConstructor/coverage.svg?branch=main)](https://app.codecov.io/github/oxford-pharmacoepi/CohortConstructor?branch=main)
+[![R-CMD-check](https://github.com/oxford-pharmacoepi/CohortConstructor/workflows/R-CMD-check/badge.svg)](https://github.com/oxford-pharmacoepi/CohortConstructor/actions)
+[![Lifecycle:Experimental](https://img.shields.io/badge/Lifecycle-Experimental-339999)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+<!-- badges: end -->
+
+The goal of CohortConstructor is to help on the creation of cohorts in the OMOP Common Data Model.
+
+## Installation
+
+You can install the development version of CohortConstructor from [GitHub](https://github.com/) with:
+
+``` {r, eval = FALSE}
+# install.packages("devtools")
+devtools::install_github("oxford-pharmacoepi/CohortConstructor")
+```
+
+## Example
+
+Generate a combination cohort.
+
+```{r}
+library(PatientProfiles)
+library(CohortConstructor)
+library(CDMConnector)
+
+cdm <- mockPatientProfiles()
+cdm <- generateCombinationCohortSet(cdm = cdm, name = "cohort3", targetCohortName = "cohort2")
+
+cdm$cohort3
+
+cohortSet(cdm$cohort3)
+
+cdmDisconnect(cdm)
+```
+
