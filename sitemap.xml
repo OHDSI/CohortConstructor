@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/404.html</loc>
+  </url>
+  <url>
+    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/LICENSE.html</loc>
+  </url>
+  <url>
+    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/authors.html</loc>
+  </url>
+  <url>
+    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/index.html</loc>
+  </url>
+  <url>
+    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/reference/CohortConstructor-package.html</loc>
+  </url>
+  <url>
+    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/reference/generateCombinationCohortSet.html</loc>
+  </url>
+  <url>
+    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/reference/getIdentifier.html</loc>
+  </url>
+  <url>
+    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/reference/joinOverlap.html</loc>
+  </url>
+  <url>
+    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/reference/splitOverlap.html</loc>
+  </url>
+</urlset>
