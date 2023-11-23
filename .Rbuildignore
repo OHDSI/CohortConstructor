@@ -1,3 +1,8 @@
 ^CohortConstructor\.Rproj$
 ^\.Rproj\.user$
 ^extras$
+^LICENSE\.md$
+^README\.Rmd$
+^pkgdown$
+^\.github$
+^_pkgdown\.yml$
