@@ -28,6 +28,21 @@
     <loc>https://darwin-eu-dev.github.io/DrugUtilisation/reference/joinOverlap.html</loc>
   </url>
   <url>
+    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/reference/requireAge.html</loc>
+  </url>
+  <url>
+    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/reference/requireDemographics.html</loc>
+  </url>
+  <url>
+    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/reference/requireFutureObservation.html</loc>
+  </url>
+  <url>
+    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/reference/requirePriorObservation.html</loc>
+  </url>
+  <url>
+    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/reference/requireSex.html</loc>
+  </url>
+  <url>
     <loc>https://darwin-eu-dev.github.io/DrugUtilisation/reference/splitOverlap.html</loc>
   </url>
 </urlset>
