@@ -19,6 +19,7 @@ Imports:
     cli,
     dbplyr,
     dplyr,
+    glue,
     magrittr,
     PatientProfiles,
     rlang,

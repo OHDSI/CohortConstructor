@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 [![Lifecycle:Experimental](https://img.shields.io/badge/Lifecycle-Experimental-339999)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
 
-The goal of CohortConstructor is to help on the creation of cohorts in the OMOP Common Data Model.
+The goal of CohortConstructor is to help on the creation and manipulation of cohorts in the OMOP Common Data Model.
 
 ## Installation
 
@@ -33,21 +33,54 @@ You can install the development version of CohortConstructor from [GitHub](https
 devtools::install_github("oxford-pharmacoepi/CohortConstructor")
 ```
 
-## Example
+## Example usage
+
+``` {r}
+library(CDMConnector)
+library(PatientProfiles)
+library(CohortConstructor)
+
+con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomia_dir())
+cdm <- cdm_from_con(con, cdm_schema = "main", 
+                    write_schema = c(prefix = "my_study_", schema = "main"))
+```
+
+### Generating concept based cohorts
+``` {r}
+cdm <- generate_concept_cohort_set(cdm = cdm, 
+                            name = "medications",
+                            concept_set = list("diclofenac" = 1124300,
+                                               "acetaminophen" = 1127433))
+cohortSet(cdm$combinations)
+cohort_count(cdm$medications)
+cohort_attrition(cdm$medications)
+```
+
+### Applying demographic requirements
+``` {r}
+cdm$medications %>% 
+  requireDemographics(ageRange = list(c(40, 65)),
+                      sex = "Female")
+cohortSet(cdm$combinations)
+cohort_count(cdm$medications)
+cohort_attrition(cdm$medications)
+```
+
+
+### Combining cohorts
 
 Generate a combination cohort.
 
 ```{r}
-library(PatientProfiles)
-library(CohortConstructor)
-library(CDMConnector)
+cdm <- generateCombinationCohortSet(cdm = cdm, 
+                                    name = "combinations", 
+                                    targetCohortName = "medications")
 
-cdm <- mockPatientProfiles()
-cdm <- generateCombinationCohortSet(cdm = cdm, name = "cohort3", targetCohortName = "cohort2")
 
-cdm$cohort3
 
-cohortSet(cdm$cohort3)
+cohortSet(cdm$combinations)
+cohortCount(cdm$combinations)
+
 
 cdmDisconnect(cdm)
 ```
