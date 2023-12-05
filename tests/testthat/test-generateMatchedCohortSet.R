@@ -237,37 +237,66 @@ test_that("test exactMatchingCohort with a ratio bigger than 1", {
 
 test_that("test exactMatchingCohort with a ratio bigger than 1", {
   # Generate mock data
-  # cdm[["person"]] <- tibble::tibble("person_id" )
-  # # Generate mock data
-  # cdm[["person"]] <- tibble::tibble("person_id" = c(1,2))
-  # cdm <- DrugUtilisation::generateConceptCohortSet(
-  #   cdm = DrugUtilisation::mockDrugUtilisation(numberIndividuals = 1000),
-  #   conceptSet = list(c1 = 317009, c2 = 432526),
-  #   name = "cases",
-  #   end  = "observation_period_end_date",
-  #   requiredObservation = c(followback,followback),
-  #   overwrite = TRUE
-  # )
-  #
-  #
-  #
-  # expect_no_error(
-  #   a <- generateMatchedCohortSet(cdm,
-  #                                 name = "new_cohort",
-  #                                 targetCohortName = "cases",
-  #                                 targetCohortId = NULL,
-  #                                 matchSex = TRUE,
-  #                                 matchYearOfBirth = TRUE,
-  #                                 ratio = 5)
-  # )
+  cdmMock <- DrugUtilisation::mockDrugUtilisation(
+    numberIndividuals = 10,
+    person = tibble::tibble("person_id" = seq(1,10,1),
+                            "gender_concept_id" = rep(8532,10),
+                            "year_of_birth" = rep(1980, 10),
+                            "day_of_birth"  = rep(1, 10),
+                            "birth_date_time" = rep(as.Date(1980,04,01),10),
+                            "month_of_birth"  = rep(4, 10)),
+    condition_occurrence = tibble::tibble("condition_ocurrence_id" = seq(1,10,1),
+                                          "person_id" = seq(1,10,1),
+                                          "condition_concept_id" = c(317009,317009,4266367,4266367,rep(1,6)),
+                                          "condition_start_date" = as.Date(c("2017-10-30","2003-01-04","2014-12-15","2010-09-09","2004-08-26","1985-03-31","1985-03-13","1985-07-11","1983-11-07","2020-01-13")),
+                                          "condition_end_date"   = as.Date(c("2017-11-01","2003-01-05","2014-12-16","2010-09-10","2004-08-27","1985-04-01","1985-03-14","1985-07-12","1983-11-08","2020-01-14")),
+                                          "condition_type_concept_id" = rep(32020,10)),
+    observation_period = tibble::tibble("observation_period_id" = seq(1,10,1),
+                                        "person_id" = seq(1,10,1),
+                                        "observation_period_start_date" = as.Date(rep("1984-01-01",10)),
+                                        "observation_period_end_date"   = as.Date(rep("2021-01-01",10)),
+                                        "period_type_concept_id"        = 44814724)
+  )
+
+  cdm <- DrugUtilisation::generateConceptCohortSet(
+    cdm = cdmMock,
+    conceptSet = list(c1 = 317009, c2 = 4266367),
+    name = "cases",
+    end  = "observation_period_end_date",
+    requiredObservation = c(0,0),
+    overwrite = TRUE
+  )
+
+  a <- generateMatchedCohortSet(cdm,
+                                name = "new_cohort",
+                                targetCohortName = "cases",
+                                targetCohortId = NULL,
+                                matchSex = TRUE,
+                                matchYearOfBirth = TRUE,
+                                ratio = 4)
+
+  expect_true(a[["new_cohort"]] %>%
+                dplyr::filter(cohort_definition_id %in% c(1,3)) %>%
+                dplyr::summarise(subject_id) %>%
+                dplyr::distinct() %>% dplyr::pull() %>% length() == 10)
+  expect_true(a[["new_cohort"]] %>%
+                dplyr::filter(cohort_definition_id %in% c(2,4)) %>%
+                dplyr::summarise(subject_id) %>%
+                dplyr::distinct() %>% dplyr::pull() %>% length() == 10)
+  expect_true(a[["new_cohort"]] %>%
+                dplyr::filter(cohort_definition_id %in% c(1,3)) %>%
+                dplyr::summarise(cohort_start_date) %>%
+                dplyr::distinct() %>% dplyr::pull() %>% length() == 2)
+  expect_true(a[["new_cohort"]] %>%
+                dplyr::filter(cohort_definition_id %in% c(2,4)) %>%
+                dplyr::summarise(cohort_start_date) %>%
+                dplyr::distinct() %>% dplyr::pull() %>% length() == 2)
+
+
+  outc <- a[["new_cohort"]] %>%
+    dplyr::filter(subject_id == 5) %>% dplyr::summarise(cohort_start_date) %>% dplyr::pull() %in% c("2017-10-30","2003-01-04","2014-12-15","2010-09-09")
+  expect_true(unique(outc) == TRUE)
+
 })
 
-#
-#
-# a[["new_cohort"]] %>%
-#   dplyr::inner_join(a[["person"]] %>%
-#                       dplyr::select("subject_id" = "person_id", "gender_concept_id", "year_of_birth"),
-#                     by = "subject_id") %>%
-#   dplyr::filter(cohort_definition_id %in% c(1,3)) %>%
-#   dplyr::group_by(gender_concept_id, year_of_birth) %>%
-#   dplyr::mutate(n = dplyr::row_number()) %>% print(n = 100)
+
