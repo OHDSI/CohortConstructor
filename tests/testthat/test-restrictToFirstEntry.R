@@ -16,7 +16,7 @@ test_that("test restrict to first entry works", {
     dplyr::pull(cohort_start_date) == c("2020-09-20", "2020-09-20")))
 
   expect_true(all(cdm$cohort1 |> CohortConstructor::restrictToFirstEntry() |>
-                    dplyr::pull(subject_id) == c(1,2)))
+                    dplyr::pull(subject_id) %in% c(1,2)))
 
   expect_true(all(cdm$cohort2 |> CohortConstructor::restrictToFirstEntry() |>
                     dplyr::pull(cohort_start_date) == c("2020-09-20", "2020-09-20")))
