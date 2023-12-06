@@ -46,6 +46,9 @@
     <loc>https://darwin-eu-dev.github.io/DrugUtilisation/reference/requireSex.html</loc>
   </url>
   <url>
+    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/reference/restrictToFirstEntry.html</loc>
+  </url>
+  <url>
     <loc>https://darwin-eu-dev.github.io/DrugUtilisation/reference/splitOverlap.html</loc>
   </url>
 </urlset>
