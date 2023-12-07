@@ -71,7 +71,9 @@
 </h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://darwin-eu.github.io/CDMConnector/" class="external-link">CDMConnector</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: package 'CDMConnector' was built under R version 4.2.3</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://darwin-eu-dev.github.io/PatientProfiles/" class="external-link">PatientProfiles</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: package 'PatientProfiles' was built under R version 4.2.3</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">CohortConstructor</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">duckdb</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/duckdb/man/duckdb.html" class="external-link">duckdb</a></span><span class="op">(</span><span class="op">)</span>, dbdir <span class="op">=</span> <span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/eunomiaDir.html" class="external-link">eunomia_dir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
@@ -85,19 +87,19 @@
 <span>                            name <span class="op">=</span> <span class="st">"medications"</span>,</span>
 <span>                            concept_set <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"diclofenac"</span> <span class="op">=</span> <span class="fl">1124300</span>,</span>
 <span>                                               <span class="st">"acetaminophen"</span> <span class="op">=</span> <span class="fl">1127433</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/cohortSet.html" class="external-link">cohort_set</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">medications</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 2 × 6</span></span>
-<span><span class="co">#&gt;   cohort_definition_id cohort_name   limit prior_observation future_observation</span></span>
-<span><span class="co">#&gt;                  &lt;int&gt; &lt;chr&gt;         &lt;chr&gt;             &lt;dbl&gt;              &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1                    1 diclofenac    first                 0                  0</span></span>
-<span><span class="co">#&gt; 2                    2 acetaminophen first                 0                  0</span></span>
-<span><span class="co">#&gt; # ℹ 1 more variable: end &lt;chr&gt;</span></span>
 <span><span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/cohortCount.html" class="external-link">cohort_count</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">medications</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 2 × 3</span></span>
 <span><span class="co">#&gt;   cohort_definition_id number_records number_subjects</span></span>
 <span><span class="co">#&gt;                  &lt;int&gt;          &lt;dbl&gt;           &lt;dbl&gt;</span></span>
 <span><span class="co">#&gt; 1                    1            830             830</span></span>
-<span><span class="co">#&gt; 2                    2           2580            2580</span></span></code></pre></div>
+<span><span class="co">#&gt; 2                    2           2580            2580</span></span>
+<span><span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/cohortAttrition.html" class="external-link">cohort_attrition</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">medications</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 2 × 7</span></span>
+<span><span class="co">#&gt;   cohort_definition_id number_records number_subjects reason_id reason          </span></span>
+<span><span class="co">#&gt;                  &lt;int&gt;          &lt;dbl&gt;           &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;           </span></span>
+<span><span class="co">#&gt; 1                    1            830             830         1 Qualifying init…</span></span>
+<span><span class="co">#&gt; 2                    2           2580            2580         1 Qualifying init…</span></span>
+<span><span class="co">#&gt; # ℹ 2 more variables: excluded_records &lt;dbl&gt;, excluded_subjects &lt;dbl&gt;</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="applying-demographic-requirements">Applying demographic requirements<a class="anchor" aria-label="anchor" href="#applying-demographic-requirements"></a>
@@ -107,44 +109,75 @@
 <span>  <span class="fu"><a href="reference/requireDemographics.html">requireDemographics</a></span><span class="op">(</span>ageRange <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">40</span>, <span class="fl">65</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>                      sex <span class="op">=</span> <span class="st">"Female"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # Source:   SQL [?? x 4]</span></span>
-<span><span class="co">#&gt; # Database: DuckDB 0.8.1 [eburn@Windows 10 x64:R 4.2.1/C:\Users\eburn\AppData\Local\Temp\Rtmpqm0Jdd\file42405cf744a.duckdb]</span></span>
+<span><span class="co">#&gt; # Database: DuckDB 0.8.1 [eburn@Windows 10 x64:R 4.2.1/C:\Users\eburn\AppData\Local\Temp\RtmpIngDmK\file4f3841e26e9e.duckdb]</span></span>
 <span><span class="co">#&gt;    cohort_definition_id subject_id cohort_start_date cohort_end_date</span></span>
-<span><span class="co">#&gt;                   &lt;int&gt;      &lt;int&gt; &lt;date&gt;            &lt;date&gt;         </span></span>
-<span><span class="co">#&gt;  1                    1        730 2002-11-18        2018-12-16     </span></span>
-<span><span class="co">#&gt;  2                    1       1169 1975-12-23        2018-08-27     </span></span>
-<span><span class="co">#&gt;  3                    1       1808 2003-12-18        2019-06-05     </span></span>
-<span><span class="co">#&gt;  4                    1       2858 1953-05-26        2019-05-29     </span></span>
-<span><span class="co">#&gt;  5                    1       2909 1986-09-03        2007-07-23     </span></span>
-<span><span class="co">#&gt;  6                    1       2939 1997-10-31        2018-09-04     </span></span>
-<span><span class="co">#&gt;  7                    1       3175 1999-05-02        2018-09-04     </span></span>
-<span><span class="co">#&gt;  8                    1       5240 1984-05-31        2019-03-12     </span></span>
-<span><span class="co">#&gt;  9                    2       1338 1997-02-22        2019-06-21     </span></span>
-<span><span class="co">#&gt; 10                    2       2026 2009-02-11        2019-06-19     </span></span>
+<span><span class="co">#&gt;                   &lt;int&gt;      &lt;dbl&gt; &lt;date&gt;            &lt;date&gt;         </span></span>
+<span><span class="co">#&gt;  1                    1         18 2009-03-21        2018-11-07     </span></span>
+<span><span class="co">#&gt;  2                    1        893 1993-09-26        2019-05-06     </span></span>
+<span><span class="co">#&gt;  3                    1       2396 1961-08-30        2001-02-28     </span></span>
+<span><span class="co">#&gt;  4                    1       3159 2000-01-26        2018-10-18     </span></span>
+<span><span class="co">#&gt;  5                    1       3376 1994-05-06        2019-06-28     </span></span>
+<span><span class="co">#&gt;  6                    1       4071 1998-08-07        2018-12-27     </span></span>
+<span><span class="co">#&gt;  7                    1       4636 1986-10-26        2018-10-23     </span></span>
+<span><span class="co">#&gt;  8                    1       4690 2001-03-20        2018-10-14     </span></span>
+<span><span class="co">#&gt;  9                    1       4701 2011-07-10        2018-12-22     </span></span>
+<span><span class="co">#&gt; 10                    2       3951 1997-12-11        2019-04-13     </span></span>
 <span><span class="co">#&gt; # ℹ more rows</span></span>
-<span><span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/cohortSet.html" class="external-link">cohort_set</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">medications</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 2 × 6</span></span>
-<span><span class="co">#&gt;   cohort_definition_id cohort_name   limit prior_observation future_observation</span></span>
-<span><span class="co">#&gt;                  &lt;int&gt; &lt;chr&gt;         &lt;chr&gt;             &lt;dbl&gt;              &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1                    1 diclofenac    first                 0                  0</span></span>
-<span><span class="co">#&gt; 2                    2 acetaminophen first                 0                  0</span></span>
-<span><span class="co">#&gt; # ℹ 1 more variable: end &lt;chr&gt;</span></span>
 <span><span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/cohortCount.html" class="external-link">cohort_count</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">medications</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 2 × 3</span></span>
 <span><span class="co">#&gt;   cohort_definition_id number_records number_subjects</span></span>
 <span><span class="co">#&gt;                  &lt;int&gt;          &lt;dbl&gt;           &lt;dbl&gt;</span></span>
 <span><span class="co">#&gt; 1                    1            156             156</span></span>
-<span><span class="co">#&gt; 2                    2             76              76</span></span></code></pre></div>
+<span><span class="co">#&gt; 2                    2             76              76</span></span>
+<span><span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/cohortAttrition.html" class="external-link">cohort_attrition</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">medications</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 4 × 7</span></span>
+<span><span class="co">#&gt;   cohort_definition_id number_records number_subjects reason_id reason          </span></span>
+<span><span class="co">#&gt;                  &lt;int&gt;          &lt;dbl&gt;           &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;           </span></span>
+<span><span class="co">#&gt; 1                    1            830             830         1 Qualifying init…</span></span>
+<span><span class="co">#&gt; 2                    2           2580            2580         1 Qualifying init…</span></span>
+<span><span class="co">#&gt; 3                    2             76              76         2 Demographic req…</span></span>
+<span><span class="co">#&gt; 4                    1            156             156         2 Demographic req…</span></span>
+<span><span class="co">#&gt; # ℹ 2 more variables: excluded_records &lt;dbl&gt;, excluded_subjects &lt;dbl&gt;</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="require-presence-in-another-cohort">Require presence in another cohort<a class="anchor" aria-label="anchor" href="#require-presence-in-another-cohort"></a>
+</h3>
+<p>We can also require that individuals are in another cohort over some window. Here for example we require that study participants are in a GI bleed cohort any time prior up to their entry in the medications cohort.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/generateConceptCohortSet.html" class="external-link">generate_concept_cohort_set</a></span><span class="op">(</span>cdm <span class="op">=</span> <span class="va">cdm</span>, </span>
+<span>                            name <span class="op">=</span> <span class="st">"gibleed"</span>,</span>
+<span>                            concept_set <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"gibleed"</span> <span class="op">=</span> <span class="fl">192671</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">cdm</span><span class="op">$</span><span class="va">medications</span> <span class="op">&lt;-</span> <span class="va">cdm</span><span class="op">$</span><span class="va">medications</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="reference/requireCohortIntersectFlag.html">requireCohortIntersectFlag</a></span><span class="op">(</span>targetCohortTable <span class="op">=</span> <span class="st">"gibleed"</span>,</span>
+<span>                             window <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="cn">Inf</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/cohortCount.html" class="external-link">cohort_count</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">medications</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 2 × 3</span></span>
+<span><span class="co">#&gt;   cohort_definition_id number_records number_subjects</span></span>
+<span><span class="co">#&gt;                  &lt;int&gt;          &lt;dbl&gt;           &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1                    2             36              36</span></span>
+<span><span class="co">#&gt; 2                    1              0               0</span></span>
+<span><span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/cohortAttrition.html" class="external-link">cohort_attrition</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">medications</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 6 × 7</span></span>
+<span><span class="co">#&gt;   cohort_definition_id number_records number_subjects reason_id reason          </span></span>
+<span><span class="co">#&gt;                  &lt;int&gt;          &lt;dbl&gt;           &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;           </span></span>
+<span><span class="co">#&gt; 1                    1            830             830         1 Qualifying init…</span></span>
+<span><span class="co">#&gt; 2                    2           2580            2580         1 Qualifying init…</span></span>
+<span><span class="co">#&gt; 3                    2             76              76         2 Demographic req…</span></span>
+<span><span class="co">#&gt; 4                    1            156             156         2 Demographic req…</span></span>
+<span><span class="co">#&gt; 5                    2             36              36         3 In cohort gible…</span></span>
+<span><span class="co">#&gt; 6                    1              0               0         3 In cohort gible…</span></span>
+<span><span class="co">#&gt; # ℹ 2 more variables: excluded_records &lt;dbl&gt;, excluded_subjects &lt;dbl&gt;</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="combining-cohorts">Combining cohorts<a class="anchor" aria-label="anchor" href="#combining-cohorts"></a>
 </h3>
 <p>Generate a combination cohort.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/generateCombinationCohortSet.html">generateCombinationCohortSet</a></span><span class="op">(</span>cdm <span class="op">=</span> <span class="va">cdm</span>, </span>
 <span>                                    name <span class="op">=</span> <span class="st">"combinations"</span>, </span>
 <span>                                    targetCohortName <span class="op">=</span> <span class="st">"medications"</span><span class="op">)</span></span>
-<span></span>
-<span></span>
 <span></span>
 <span><span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/cohortSet.html" class="external-link">cohortSet</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">combinations</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 3 × 5</span></span>
@@ -157,9 +190,9 @@
 <span><span class="co">#&gt; # A tibble: 3 × 3</span></span>
 <span><span class="co">#&gt;   cohort_definition_id number_records number_subjects</span></span>
 <span><span class="co">#&gt;                  &lt;int&gt;          &lt;dbl&gt;           &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1                    1            830             830</span></span>
-<span><span class="co">#&gt; 2                    2           2580            2580</span></span>
-<span><span class="co">#&gt; 3                    3            805             805</span></span>
+<span><span class="co">#&gt; 1                    2             36              36</span></span>
+<span><span class="co">#&gt; 2                    1              0               0</span></span>
+<span><span class="co">#&gt; 3                    3              0               0</span></span>
 <span></span>
 <span></span>
 <span><span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/cdmDisconnect.html" class="external-link">cdmDisconnect</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">)</span></span></code></pre></div>
