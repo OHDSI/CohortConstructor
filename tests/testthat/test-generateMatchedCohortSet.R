@@ -295,7 +295,7 @@ test_that("test exactMatchingCohort with a ratio bigger than 1", {
 
   outc <- a[["new_cohort"]] %>%
     dplyr::filter(subject_id == 5) %>% dplyr::summarise(cohort_start_date) %>%
-    dplyr::pull() %in% c("2017-10-30","2003-01-04","2014-12-15","2010-09-09")
+    dplyr::pull() %in% as.Date(c("2017-10-30","2003-01-04","2014-12-15","2010-09-09"))
   expect_true(unique(outc) == TRUE)
 })
 
