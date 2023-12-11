@@ -187,3 +187,45 @@ test_that("generateCombinationCohortSet", {
 
   CDMConnector::cdmDisconnect(cdm)
 })
+
+
+
+
+test_that("only return comb", {
+  cohort <- dplyr::tibble(
+    cohort_definition_id = c(1, 2, 3),
+    subject_id = c(1, 1, 1),
+    cohort_start_date = as.Date(c(
+      "2020-03-01", "2020-01-01", "2020-03-01"
+    )),
+    cohort_end_date = as.Date(c(
+      "2020-05-01", "2020-05-02", "2020-04-01"
+    ))
+  )
+  person <- dplyr::tibble(
+    person_id = c(1, 2, 3, 4),
+    gender_concept_id = c(8507, 8532, 8507, 8532),
+    year_of_birth = 2000,
+    month_of_birth = 1,
+    day_of_birth = 1
+  )
+  observation_period <- dplyr::tibble(
+    observation_period_id = 1:4,
+    person_id = 1:4,
+    observation_period_start_date = as.Date("2020-01-01"),
+    observation_period_end_date = as.Date("2020-12-31")
+  )
+  cdm <- PatientProfiles::mockPatientProfiles(
+    observation_period = observation_period, person = person, cohort1 = cohort
+  )
+
+  cdm <- generateCombinationCohortSet(
+    cdm = cdm, name = "cohort2", targetCohortName = "cohort1",
+    mutuallyExclusive = FALSE, returnOnlyComb = TRUE
+  )
+
+  expect_true(all(cdm$cohort2 %>% dplyr::pull(cohort_start_date) == as.Date("2020-03-01")))
+
+  expect_true(all(cdm$cohort2 %>% dplyr::pull(cohort_end_date) == as.Date("2020-04-01")))
+
+})

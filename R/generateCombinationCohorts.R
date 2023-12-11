@@ -7,9 +7,9 @@
 #' combinations.
 #' @param targetCohortId Ids to combine of the target cohort. If NULL all
 #' cohort present in the table will be used.
-#' @param mutuallyExclusive Wheather the generated cohorts are mutually
+#' @param mutuallyExclusive Whether the generated cohorts are mutually
 #' exclusive or not.
-#'
+#' @param returnOnlyComb Whether to only get the combination cohort back
 #' @export
 #'
 #' @return The cdm object with the new generated cohort set
@@ -36,7 +36,8 @@ generateCombinationCohortSet <- function(cdm,
                                          name,
                                          targetCohortName,
                                          targetCohortId = NULL,
-                                         mutuallyExclusive = FALSE) {
+                                         mutuallyExclusive = FALSE,
+                                         returnOnlyComb = FALSE) {
   # initial checks
   checkmate::checkClass(cdm, "cdm_reference")
   checkmate::checkCharacter(name, len = 1, any.missing = FALSE, min.chars = 1)
@@ -95,7 +96,7 @@ generateCombinationCohortSet <- function(cdm,
       nameStyle = "{cohort_name}"
     )
 
-  # cretae cohort_definition_id
+  # create cohort_definition_id
   cohortNames <- CDMConnector::cohortSet(cdm[[targetCohortName]]) %>%
     dplyr::filter(.data$cohort_definition_id %in% .env$targetCohortId) %>%
     dplyr::pull("cohort_name")
@@ -112,13 +113,22 @@ generateCombinationCohortSet <- function(cdm,
     cohSet <- notMutuallyEclusiveCohortSet(cohSet)
   }
 
+
+  if (returnOnlyComb) {
+  cohSet <- cohSet %>%
+    dplyr::rowwise() %>%
+    dplyr::mutate(product = prod(dplyr::c_across(-"cohort_definition_id"), na.rm = TRUE)) %>%
+    dplyr::filter(.data$product == 1) %>%
+    dplyr::select(-"product")
+  }
+
+
   # add cohort definition id
   cohort <- cohort %>%
     dplyr::inner_join(cohSet, copy = TRUE, by = cohortNames) %>%
     dplyr::select(
       "cohort_definition_id", "subject_id", "cohort_start_date",
-      "cohort_end_date"
-    )
+      "cohort_end_date")
 
   if (!mutuallyExclusive) {
     cohort <- joinOverlap(x = cohort, gap = 1)
@@ -132,7 +142,8 @@ generateCombinationCohortSet <- function(cdm,
       dplyr::distinct()
   }
 
-  cohort <- cohort %>%
+
+    cohort <- cohort %>%
     CDMConnector::computeQuery(
       name = name,
       temporary = FALSE,
