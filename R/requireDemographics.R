@@ -222,9 +222,9 @@ demographicsFilter <- function(cohort,
   # join later
 
   working_cohort <- cohort %>%
-    dplyr::select(c("cohort_definition_id", "subject_id",
+    dplyr::select(dplyr::all_of(c("cohort_definition_id", "subject_id",
                     "cohort_start_date", "cohort_end_date",
-                    indexDate)) %>%
+                    indexDate))) %>%
     PatientProfiles::addDemographics(indexDate = indexDate) %>%
     dplyr::filter(.data$age >= .env$minAge,
                   .data$age <= .env$maxAge,
@@ -234,8 +234,9 @@ demographicsFilter <- function(cohort,
 
   cohort <- cohort %>%
     dplyr::inner_join(working_cohort  %>%
-                        dplyr::select(c("cohort_definition_id", "subject_id",
-                                        "cohort_start_date", "cohort_end_date")),
+                        dplyr::select(dplyr::all_of(c("cohort_definition_id",
+                                                      "subject_id",
+                                        "cohort_start_date", "cohort_end_date"))),
                       by = c("cohort_definition_id", "subject_id",
                              "cohort_start_date", "cohort_end_date"))
   cohort

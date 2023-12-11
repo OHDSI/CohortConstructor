@@ -243,7 +243,7 @@ test_that("test exactMatchingCohort with a ratio bigger than 1", {
                             "gender_concept_id" = rep(8532,10),
                             "year_of_birth" = rep(1980, 10),
                             "day_of_birth"  = rep(1, 10),
-                            "birth_date_time" = rep(as.Date(1980,04,01),10),
+                            "birth_date_time" = as.Date(rep("1980-04-01",10)),
                             "month_of_birth"  = rep(4, 10)),
     condition_occurrence = tibble::tibble("condition_ocurrence_id" = seq(1,10,1),
                                           "person_id" = seq(1,10,1),
@@ -294,7 +294,8 @@ test_that("test exactMatchingCohort with a ratio bigger than 1", {
 
 
   outc <- a[["new_cohort"]] %>%
-    dplyr::filter(subject_id == 5) %>% dplyr::summarise(cohort_start_date) %>% dplyr::pull() %in% c("2017-10-30","2003-01-04","2014-12-15","2010-09-09")
+    dplyr::filter(subject_id == 5) %>% dplyr::summarise(cohort_start_date) %>%
+    dplyr::pull() %in% as.Date(c("2017-10-30","2003-01-04","2014-12-15","2010-09-09"))
   expect_true(unique(outc) == TRUE)
 })
 

@@ -51,7 +51,6 @@ cdm <- generate_concept_cohort_set(cdm = cdm,
                             name = "medications",
                             concept_set = list("diclofenac" = 1124300,
                                                "acetaminophen" = 1127433))
-cohortSet(cdm$combinations)
 cohort_count(cdm$medications)
 cohort_attrition(cdm$medications)
 ```
@@ -61,7 +60,21 @@ cohort_attrition(cdm$medications)
 cdm$medications %>% 
   requireDemographics(ageRange = list(c(40, 65)),
                       sex = "Female")
-cohortSet(cdm$combinations)
+cohort_count(cdm$medications)
+cohort_attrition(cdm$medications)
+```
+
+### Require presence in another cohort
+We can also require that individuals are in another cohort over some window. Here for example we require that study participants are in a GI bleed cohort any time prior up to their entry in the medications cohort.
+```{r}
+cdm <- generate_concept_cohort_set(cdm = cdm, 
+                            name = "gibleed",
+                            concept_set = list("gibleed" = 192671))
+
+cdm$medications <- cdm$medications %>% 
+  requireCohortIntersectFlag(targetCohortTable = "gibleed",
+                             window = c(-Inf, 0))
+
 cohort_count(cdm$medications)
 cohort_attrition(cdm$medications)
 ```
@@ -75,8 +88,6 @@ Generate a combination cohort.
 cdm <- generateCombinationCohortSet(cdm = cdm, 
                                     name = "combinations", 
                                     targetCohortName = "medications")
-
-
 
 cohortSet(cdm$combinations)
 cohortCount(cdm$combinations)
