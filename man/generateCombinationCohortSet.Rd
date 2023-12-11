@@ -10,7 +10,8 @@ generateCombinationCohortSet(
   name,
   targetCohortName,
   targetCohortId = NULL,
-  mutuallyExclusive = FALSE
+  mutuallyExclusive = FALSE,
+  returnOnlyComb = FALSE
 )
 }
 \arguments{
@@ -24,8 +25,10 @@ combinations.}
 \item{targetCohortId}{Ids to combine of the target cohort. If NULL all
 cohort present in the table will be used.}
 
-\item{mutuallyExclusive}{Wheather the generated cohorts are mutually
+\item{mutuallyExclusive}{Whether the generated cohorts are mutually
 exclusive or not.}
+
+\item{returnOnlyComb}{Whether to only get the combination cohort back}
 }
 \value{
 The cdm object with the new generated cohort set
