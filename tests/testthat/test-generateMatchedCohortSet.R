@@ -128,16 +128,31 @@ test_that("check that we obtain expected result when ratio is 1", {
                                               matchSex = TRUE,
                                               matchYearOfBirth = TRUE,
                                               ratio = 1)
-  expect_true(
-    length(CDMConnector::cohort_count(matched_cohorts[["new_cohort"]]) %>%
-             dplyr::select("number_records") %>%
-             dplyr::pull() %>%
-             unique()) == 3
-  )
 
-  # Everybody has a matched
+  expect_true(nrow(CDMConnector::cohort_count(matched_cohorts$new_cohort) %>%
+    dplyr::left_join(CDMConnector::cohort_set(matched_cohorts$new_cohort),
+                     by = "cohort_definition_id") %>%
+    dplyr::filter(stringr::str_detect(cohort_name, "c1"))  %>%
+      dplyr::select("number_records") %>%
+      dplyr::distinct()) == 1)
+  expect_true(nrow(CDMConnector::cohort_count(matched_cohorts$new_cohort) %>%
+                     dplyr::left_join(CDMConnector::cohort_set(matched_cohorts$new_cohort),
+                                      by = "cohort_definition_id") %>%
+                     dplyr::filter(stringr::str_detect(cohort_name, "c2"))  %>%
+                     dplyr::select("number_records") %>%
+                     dplyr::distinct()) == 1)
+  expect_true(nrow(CDMConnector::cohort_count(matched_cohorts$new_cohort) %>%
+                     dplyr::left_join(CDMConnector::cohort_set(matched_cohorts$new_cohort),
+                                      by = "cohort_definition_id") %>%
+                     dplyr::filter(stringr::str_detect(cohort_name, "c3"))  %>%
+                     dplyr::select("number_records") %>%
+                     dplyr::distinct()) == 1)
+
+
+
+  # Everybody has a match
   n <- matched_cohorts[["new_cohort"]] %>%
-    dplyr::summarise(n = max(.data$cohort_definition_id)/2) %>%
+    dplyr::summarise(n = max(.data$cohort_definition_id, na.rm = TRUE)/2) %>%
     dplyr::pull()
 
   cohorts <- matched_cohorts[["new_cohort"]] %>%

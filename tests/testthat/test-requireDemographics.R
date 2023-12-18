@@ -142,29 +142,6 @@ test_that("ignore existing cohort extra variables", {
 })
 
 
-
-test_that("requireDateRange", {
-  # one person, one observation periods
-
-  cohortTable <- dplyr::tibble(
-    cohort_definition_id = c(1, 1, 1),
-    subject_id = c("1", "2", "3"),
-    cohort_start_date = as.Date(c("2010-06-06", "2010-06-06", "2010-06-08")),
-    cohort_end_date = as.Date(c("2013-06-06", "2013-06-06", "2013-02-01"))
-  )
-
-  cdm <- PatientProfiles::mockPatientProfiles(cohort1 = cohortTable)
-  cdm$cohort1 <- cdm$cohort1 %>%
-    requireDateRange(cohortDateRange = as.Date(c("2010-06-06", "2013-02-01")))
-
-  expect_true(all(cdm$cohort1 %>% dplyr::pull(cohort_start_date) ==
-    as.Date(c("2010-06-06", "2010-06-06", "2010-06-08"))))
-
-  CDMConnector::cdm_disconnect(cdm)
-})
-
-
-
 test_that("external columns kept after requireDemographics", {
   cdm <- PatientProfiles::mockPatientProfiles(
     patient_size = 100,

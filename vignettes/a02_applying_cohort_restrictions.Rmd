@@ -1,0 +1,19 @@
+---
+title: "a02_applying_cohort_restrictions"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{a02_applying_cohort_restrictions}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(CohortConstructor)
+```
