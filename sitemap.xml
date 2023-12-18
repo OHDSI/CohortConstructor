@@ -7,6 +7,21 @@
     <loc>https://darwin-eu-dev.github.io/DrugUtilisation/LICENSE.html</loc>
   </url>
   <url>
+    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/articles/a01_building_concept_cohorts.html</loc>
+  </url>
+  <url>
+    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/articles/a02_applying_cohort_restrictions.html</loc>
+  </url>
+  <url>
+    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/articles/a03_age_sex_matching.html</loc>
+  </url>
+  <url>
+    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/articles/a04_cohort_timing.html</loc>
+  </url>
+  <url>
+    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/articles/index.html</loc>
+  </url>
+  <url>
     <loc>https://darwin-eu-dev.github.io/DrugUtilisation/authors.html</loc>
   </url>
   <url>
@@ -43,6 +58,9 @@
     <loc>https://darwin-eu-dev.github.io/DrugUtilisation/reference/requireFutureObservation.html</loc>
   </url>
   <url>
+    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/reference/requireInDateRange.html</loc>
+  </url>
+  <url>
     <loc>https://darwin-eu-dev.github.io/DrugUtilisation/reference/requirePriorObservation.html</loc>
   </url>
   <url>
@@ -53,5 +71,8 @@
   </url>
   <url>
     <loc>https://darwin-eu-dev.github.io/DrugUtilisation/reference/splitOverlap.html</loc>
+  </url>
+  <url>
+    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/reference/trimToDateRange.html</loc>
   </url>
 </urlset>
