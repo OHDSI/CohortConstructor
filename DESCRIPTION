@@ -28,7 +28,12 @@ Suggests:
     DBI,
     DrugUtilisation,
     duckdb,
+    knitr,
+    rmarkdown,
     testthat (>= 3.0.0),
-    tibble
+    tibble,
+    stringr,
+    IncidencePrevalence
 Config/testthat/edition: 3
 Config/testthat/parallel: true
+VignetteBuilder: knitr

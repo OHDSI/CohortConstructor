@@ -141,8 +141,8 @@ randomPrefix <- function(n = 5) {
 getNumberOfCohorts <- function(cdm, targetCohortName){
   # Read number of cohorts
   n <- cdm[[targetCohortName]] %>%
-    dplyr::summarise(v = max(.data$cohort_definition_id)) %>%
-    dplyr::pull(.data$v) # number of different cohorts
+    dplyr::summarise(v = max(.data$cohort_definition_id, na.rm = TRUE)) %>%
+    dplyr::pull("v") # number of different cohorts
 
   if(is.na(n)){# Empty table, number of cohorts is 0
     n <- 0
@@ -343,7 +343,7 @@ infiniteMatching <- function(cdm, name, targetCohortId){
       cdm[[name]] %>%
         dplyr::filter(.data$cohort_definition_id %in% .env$targetCohortId) %>%
         dplyr::group_by(.data$cohort_definition_id, .data$group_id) %>%
-        dplyr::mutate(max_cases = max(.data$pair_id)) %>%
+        dplyr::mutate(max_cases = max(.data$pair_id, na.rm = TRUE)) %>%
         dplyr::ungroup() %>%
         dplyr::select("group_id", "target_definition_id", "max_cases"),
       by = c("group_id", "target_definition_id")

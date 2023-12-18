@@ -1,0 +1,19 @@
+---
+title: "a03_age_sex_matching"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{a03_age_sex_matching}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(CohortConstructor)
+```
