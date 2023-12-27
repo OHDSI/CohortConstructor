@@ -16,9 +16,21 @@ requirePriorObservation(
 \item{indexDate}{Variable in cohort that contains the date to compute the
 demographics characteristics on which to restrict on.}
 
-\item{minPriorObservation}{A mimimum number of prior observation days in
+\item{minPriorObservation}{A minimum number of prior observation days in
 the database.}
+}
+\value{
+The cohort table with only records for individuals satisfying the
+prior observation requirement
 }
 \description{
 Restrict cohort on prior observation
+}
+\examples{
+library(DrugUtilisation)
+library(CohortConstructor)
+cdm <- mockDrugUtilisation(numberIndividuals = 100)
+cdm$cohort1 \%>\%
+  requirePriorObservation(indexDate = "cohort_start_date",
+                          minPriorObservation = 365)
 }

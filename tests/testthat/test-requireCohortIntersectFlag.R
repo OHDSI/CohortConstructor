@@ -54,4 +54,29 @@ test_that("requiring presence in another cohort", {
 
   })
 
+test_that("requiring absence in another cohort", {
 
+cdm <- PatientProfiles::mockPatientProfiles(patient_size = 100,
+                                              drug_exposure_size = 100)
+
+cdm$cohort3_inclusion <-  requireCohortIntersectFlag(x = cdm$cohort1,
+                                             targetCohortTable = "cohort2",
+                                             targetCohortId = 1,
+                                             window = c(-Inf, Inf))
+cdm$cohort3_exclusion <-  requireCohortIntersectFlag(x = cdm$cohort1,
+                                                     targetCohortTable = "cohort2",
+                                                     targetCohortId = 1,
+                                                     window = c(-Inf, Inf),
+                                                     negate = TRUE)
+
+in_both <- intersect(cdm$cohort3_inclusion %>%
+  dplyr::pull("subject_id") %>%
+  unique(),
+  cdm$cohort3_exclusion %>%
+  dplyr::pull("subject_id") %>%
+  unique())
+expect_true(length(in_both) == 0)
+
+CDMConnector::cdm_disconnect(cdm)
+
+})

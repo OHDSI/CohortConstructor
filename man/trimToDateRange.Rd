@@ -21,6 +21,21 @@ trimToDateRange(
 \item{dateRange}{A window of time during which the index date must have
 been observed}
 }
+\value{
+The cohort table with record timings updated to only be within the
+date range. Any records with all time outside of the range will have
+been dropped.
+}
 \description{
 Trim cohort dates to be within a date range
+}
+\examples{
+library(DrugUtilisation)
+library(CohortConstructor)
+cdm <- mockDrugUtilisation(numberIndividuals = 100)
+cdm$cohort1 \%>\%
+  trimToDateRange(startDate = "cohort_start_date",
+                  endDate = "cohort_end_date",
+                  dateRange = as.Date(c("2015-01-01",
+                                        "2015-12-31")))
 }

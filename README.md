@@ -5,9 +5,6 @@
 
 <!-- badges: start -->
 
-[![CRAN
-status](https://www.r-pkg.org/badges/version/CohortConstructor)](https://CRAN.R-project.org/package=CohortConstructor)
-[![codecov.io](https://codecov.io/github/oxford-pharmacoepi/CohortConstructor/coverage.svg?branch=main)](https://app.codecov.io/github/oxford-pharmacoepi/CohortConstructor?branch=main)
 [![R-CMD-check](https://github.com/oxford-pharmacoepi/CohortConstructor/workflows/R-CMD-check/badge.svg)](https://github.com/oxford-pharmacoepi/CohortConstructor/actions)
 [![Lifecycle:Experimental](https://img.shields.io/badge/Lifecycle-Experimental-339999)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
@@ -214,7 +211,7 @@ Both diclofenac and acetaminophen
 Generate a combination cohort.
 
 ``` r
-cdm <- generateCombinationCohortSet(cdm = cdm, 
+cdm <- generateIntersectCohortSet(cdm = cdm, 
                                     name = "combinations", 
                                     targetCohortName = "medications")
 

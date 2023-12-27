@@ -14,6 +14,18 @@ demographics characteristics on which to restrict on.}
 
 \item{ageRange}{A list of minimum and maximum age}
 }
+\value{
+The cohort table with only records for individuals satisfying the
+age requirement
+}
 \description{
 Restrict cohort on age
+}
+\examples{
+library(DrugUtilisation)
+library(CohortConstructor)
+cdm <- mockDrugUtilisation(numberIndividuals = 100)
+cdm$cohort1 \%>\%
+  requireAge(indexDate = "cohort_start_date",
+             ageRange = list(c(18, 65)))
 }

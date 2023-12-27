@@ -20,7 +20,7 @@
 #'
 #' cdm <- mockPatientProfiles()
 #'
-#' cdm <- generateCombinationCohortSet(
+#' cdm <- generateIntersectCohortSet(
 #'   cdm = cdm,
 #'   name = "cohort3",
 #'   targetCohortName = "cohort2"
@@ -32,7 +32,7 @@
 #'
 #' }
 
-generateCombinationCohortSet <- function(cdm,
+generateIntersectCohortSet <- function(cdm,
                                          name,
                                          targetCohortName,
                                          targetCohortId = NULL,
@@ -178,7 +178,7 @@ generateCombinationCohortSet <- function(cdm,
 #' @export
 #'
 #' @return Table in the cdm with start, end and by as columns. Periods are not
-#' going to overlpa between each other.
+#' going to overlap between each other.
 #'
 splitOverlap <- function(x,
                          start = "cohort_start_date",
@@ -244,7 +244,7 @@ splitOverlap <- function(x,
 #' @export
 #'
 #' @return Table in the cdm with start, end and by as columns. Periods are not
-#' going to overlpa between each other.
+#' going to overlap between each other.
 #'
 joinOverlap <- function(x,
                         start = "cohort_start_date",
@@ -302,7 +302,7 @@ joinOverlap <- function(x,
     CDMConnector::computeQuery()
 }
 
-#' Get ramdon identifies not present in a table based on a prefix.
+#' Get random identifiers not present in a table based on a prefix.
 #'
 #' @param x Table.
 #' @param len Number of identifiers.

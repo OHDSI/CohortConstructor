@@ -4,9 +4,9 @@
 \name{CohortConstructor-package}
 \alias{CohortConstructor}
 \alias{CohortConstructor-package}
-\title{CohortConstructor: Generate Cohorts of Individuals in the OMOP Common Data Model}
+\title{CohortConstructor: Work With Cohorts Using a Common Data Model}
 \description{
-This package aims to provide functionalities to create cohorts in the OMOP Common Data Model.
+This package aims to provide functionalities to manipulate and evaluate cohorts in data mapped to the Observational Medical Outcomes Partnership Common Data Model.
 }
 \author{
 \strong{Maintainer}: Edward Burn \email{edward.burn@ndorms.ox.ac.uk} (\href{https://orcid.org/0000-0002-9286-1128}{ORCID})
@@ -14,6 +14,8 @@ This package aims to provide functionalities to create cohorts in the OMOP Commo
 Authors:
 \itemize{
   \item Marti Catala \email{marti.catalasabate@ndorms.ox.ac.uk} (\href{https://orcid.org/0000-0003-3308-9905}{ORCID})
+  \item Marta Alcalde \email{marta.alcaldeherraiz@ndorms.ox.ac.uk} (\href{https://orcid.org/0000-0000-0000-0000}{ORCID})
+  \item Yuchen Guo \email{yuchen.guo@ndorms.ox.ac.uk} (\href{https://orcid.org/0000-0002-0847-4855}{ORCID})
 }
 
 }

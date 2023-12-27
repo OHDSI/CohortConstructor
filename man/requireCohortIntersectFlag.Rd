@@ -11,7 +11,8 @@ requireCohortIntersectFlag(
   indexDate = "cohort_start_date",
   targetStartDate = "cohort_start_date",
   targetEndDate = "cohort_end_date",
-  window = list(c(0, Inf))
+  window = list(c(0, Inf)),
+  negate = FALSE
 )
 }
 \arguments{
@@ -30,11 +31,24 @@ intersection.}
 \item{targetEndDate}{date of reference in cohort table, either for end
 (overlap) or NULL (if incidence)}
 
-\item{window}{window to consider events of}
+\item{window}{window to consider events over}
+
+\item{negate}{If set as TRUE, criteria will be applied as exclusion
+rather than inclusion (i.e. require absence in another cohort)}
 }
 \value{
 Cohort table with only those in the other cohort kept
 }
 \description{
 Require cohort subjects are present in another cohort
+}
+\examples{
+library(DrugUtilisation)
+library(CohortConstructor)
+cdm <- mockDrugUtilisation(numberIndividuals = 100)
+cdm$cohort1 \%>\%
+  requireCohortIntersectFlag(targetCohortTable = "cohort2",
+                             targetCohortId = 1,
+                             indexDate = "cohort_start_date",
+                             window = c(-Inf, 0))
 }

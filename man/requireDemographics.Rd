@@ -24,12 +24,27 @@ demographics characteristics on which to restrict on.}
 \item{sex}{Can be "Both", "Male" or "Female". If one of the latter, only
 those with that sex will be included.}
 
-\item{minPriorObservation}{A mimimum number of prior observation days in
+\item{minPriorObservation}{A minimum number of prior observation days in
 the database.}
 
 \item{minFutureObservation}{A minimum number of future observation days in
 the database.}
 }
+\value{
+The cohort table with only records for individuals satisfying the
+demographic requirements
+}
 \description{
 Restrict cohort on patient demographics
+}
+\examples{
+library(DrugUtilisation)
+library(CohortConstructor)
+cdm <- mockDrugUtilisation(numberIndividuals = 100)
+cdm$cohort1 \%>\%
+  requireDemographics(indexDate = "cohort_start_date",
+                      ageRange = list(c(18, 65)),
+                      sex = "Female",
+                      minPriorObservation = 365)
+
 }
