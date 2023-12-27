@@ -16,7 +16,7 @@ requirePriorObservation(
 \item{indexDate}{Variable in cohort that contains the date to compute the
 demographics characteristics on which to restrict on.}
 
-\item{minPriorObservation}{A mimimum number of prior observation days in
+\item{minPriorObservation}{A minimum number of prior observation days in
 the database.}
 }
 \value{

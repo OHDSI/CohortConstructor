@@ -24,7 +24,7 @@ demographics characteristics on which to restrict on.}
 \item{sex}{Can be "Both", "Male" or "Female". If one of the latter, only
 those with that sex will be included.}
 
-\item{minPriorObservation}{A mimimum number of prior observation days in
+\item{minPriorObservation}{A minimum number of prior observation days in
 the database.}
 
 \item{minFutureObservation}{A minimum number of future observation days in

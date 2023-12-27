@@ -2,7 +2,7 @@
 % Please edit documentation in R/generateIntersectCohorts.R
 \name{getIdentifier}
 \alias{getIdentifier}
-\title{Get ramdon identifies not present in a table based on a prefix.}
+\title{Get random identifiers not present in a table based on a prefix.}
 \usage{
 getIdentifier(x, len = 1, prefix = "", nchar = 5)
 }
@@ -19,5 +19,5 @@ getIdentifier(x, len = 1, prefix = "", nchar = 5)
 Character vector of identifiers not present in x.
 }
 \description{
-Get ramdon identifies not present in a table based on a prefix.
+Get random identifiers not present in a table based on a prefix.
 }

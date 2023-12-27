@@ -8,7 +8,7 @@
 #' @param ageRange A list of minimum and maximum age
 #' @param sex Can be "Both", "Male" or "Female". If one of the latter, only
 #' those with that sex will be included.
-#' @param minPriorObservation A mimimum number of prior observation days in
+#' @param minPriorObservation A minimum number of prior observation days in
 #' the database.
 #' @param minFutureObservation A minimum number of future observation days in
 #' the database.
@@ -147,7 +147,7 @@ requireSex <- function(cohort,
 #' @param cohort A cohort table in a cdm reference
 #' @param indexDate Variable in cohort that contains the date to compute the
 #' demographics characteristics on which to restrict on.
-#' @param minPriorObservation A mimimum number of prior observation days in
+#' @param minPriorObservation A minimum number of prior observation days in
 #' the database.
 #'
 #' @return The cohort table with only records for individuals satisfying the

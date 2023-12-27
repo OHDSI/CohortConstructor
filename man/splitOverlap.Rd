@@ -22,7 +22,7 @@ splitOverlap(
 }
 \value{
 Table in the cdm with start, end and by as columns. Periods are not
-going to overlpa between each other.
+going to overlap between each other.
 }
 \description{
 To split overlaping periods in non overlaping period.
