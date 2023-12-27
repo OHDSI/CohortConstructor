@@ -7,7 +7,9 @@ Authors@R: c(
     person("Marti", "Catala", , "marti.catalasabate@ndorms.ox.ac.uk", 
     role = c("aut"), comment = c(ORCID = "0000-0003-3308-9905")),
     person("Marta", "Alcalde", , "marta.alcaldeherraiz@ndorms.ox.ac.uk", 
-    role = c("aut"), comment = c(ORCID = "0000-0000-0000-0000"))
+    role = c("aut"), comment = c(ORCID = "0000-0000-0000-0000")),
+    person("Yuchen", "Guo", email = "yuchen.guo@ndorms.ox.ac.uk", 
+    role = c("aut"), comment = c(ORCID = "0000-0002-0847-4855"))
     )
 Description: This package aims to provide functionalities to manipulate
     and evaluate cohorts in data mapped to the Observational Medical 
