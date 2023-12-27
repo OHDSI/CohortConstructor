@@ -123,7 +123,7 @@ test_that("splitOverlap", {
   DBI::dbDisconnect(db, shutdown = TRUE)
 })
 
-test_that("generateCombinationCohortSet", {
+test_that("generateIntersectCohortSet", {
   cohort <- dplyr::tibble(
     cohort_definition_id = c(1, 2, 3, 1, 2, 3, 1, 2),
     subject_id = c(1, 1, 1, 2, 3, 3, 4, 4),
@@ -154,7 +154,7 @@ test_that("generateCombinationCohortSet", {
   )
 
   # mutually exclusive
-  expect_no_error(cdm <- generateCombinationCohortSet(
+  expect_no_error(cdm <- generateIntersectCohortSet(
     cdm = cdm, name = "cohort2", targetCohortName = "cohort1",
     mutuallyExclusive = TRUE
   ))
@@ -167,7 +167,7 @@ test_that("generateCombinationCohortSet", {
   ))
 
   # not mutually exclusive
-  expect_no_error(cdm <- generateCombinationCohortSet(
+  expect_no_error(cdm <- generateIntersectCohortSet(
     cdm = cdm, name = "cohort3", targetCohortName = "cohort1",
     mutuallyExclusive = FALSE
   ))
@@ -180,7 +180,7 @@ test_that("generateCombinationCohortSet", {
   ))
 
   # not enough cohorts provided
-  expect_warning(cdm <- generateCombinationCohortSet(
+  expect_warning(cdm <- generateIntersectCohortSet(
     cdm = cdm, name = "cohort4", targetCohortName = "cohort1",
     targetCohortId = 1
   ))
@@ -219,7 +219,7 @@ test_that("only return comb", {
     observation_period = observation_period, person = person, cohort1 = cohort
   )
 
-  cdm <- generateCombinationCohortSet(
+  cdm <- generateIntersectCohortSet(
     cdm = cdm, name = "cohort2", targetCohortName = "cohort1",
     mutuallyExclusive = FALSE, returnOnlyComb = TRUE
   )

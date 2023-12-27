@@ -20,7 +20,7 @@
 #'
 #' cdm <- mockPatientProfiles()
 #'
-#' cdm <- generateCombinationCohortSet(
+#' cdm <- generateIntersectCohortSet(
 #'   cdm = cdm,
 #'   name = "cohort3",
 #'   targetCohortName = "cohort2"
@@ -32,7 +32,7 @@
 #'
 #' }
 
-generateCombinationCohortSet <- function(cdm,
+generateIntersectCohortSet <- function(cdm,
                                          name,
                                          targetCohortName,
                                          targetCohortId = NULL,

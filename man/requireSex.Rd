@@ -12,6 +12,17 @@ requireSex(cohort, sex = c("Both"))
 \item{sex}{Can be "Both", "Male" or "Female". If one of the latter, only
 those with that sex will be included.}
 }
+\value{
+The cohort table with only records for individuals satisfying the
+sex requirement
+}
 \description{
 Restrict cohort on sex
+}
+\examples{
+library(DrugUtilisation)
+library(CohortConstructor)
+cdm <- mockDrugUtilisation(numberIndividuals = 100)
+cdm$cohort1 \%>\%
+  requireSex(sex = "Female")
 }

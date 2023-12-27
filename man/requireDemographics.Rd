@@ -30,6 +30,21 @@ the database.}
 \item{minFutureObservation}{A minimum number of future observation days in
 the database.}
 }
+\value{
+The cohort table with only records for individuals satisfying the
+demographic requirements
+}
 \description{
 Restrict cohort on patient demographics
+}
+\examples{
+library(DrugUtilisation)
+library(CohortConstructor)
+cdm <- mockDrugUtilisation(numberIndividuals = 100)
+cdm$cohort1 \%>\%
+  requireDemographics(indexDate = "cohort_start_date",
+                      ageRange = list(c(18, 65)),
+                      sex = "Female",
+                      minPriorObservation = 365)
+
 }

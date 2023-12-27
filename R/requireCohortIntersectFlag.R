@@ -11,19 +11,30 @@
 #' (in overlap) or on its own (for incidence)
 #' @param targetEndDate date of reference in cohort table, either for end
 #' (overlap) or NULL (if incidence)
-#' @param window window to consider events of
+#' @param window window to consider events over
+#' @param negate If set as TRUE, criteria will be applied as exclusion
+#' rather than inclusion (i.e. require absence in another cohort)
 #'
 #' @return Cohort table with only those in the other cohort kept
 #' @export
 #'
 #' @examples
+#' library(DrugUtilisation)
+#' library(CohortConstructor)
+#' cdm <- mockDrugUtilisation(numberIndividuals = 100)
+#' cdm$cohort1 %>%
+#'   requireCohortIntersectFlag(targetCohortTable = "cohort2",
+#'                              targetCohortId = 1,
+#'                              indexDate = "cohort_start_date",
+#'                              window = c(-Inf, 0))
 requireCohortIntersectFlag <- function(x,
                                        targetCohortTable,
                                        targetCohortId = NULL,
                                        indexDate = "cohort_start_date",
                                        targetStartDate = "cohort_start_date",
                                        targetEndDate = "cohort_end_date",
-                                       window = list(c(0, Inf))){
+                                       window = list(c(0, Inf)),
+                                       negate = FALSE){
 
 cols <- unique(c("cohort_definition_id", "subject_id",
           "cohort_start_date", "cohort_end_date",
@@ -67,9 +78,19 @@ subsetCohort <- x %>%
     targetEndDate = targetEndDate,
     window = window,
     nameStyle = "intersect_cohort"
-  ) %>%
-  dplyr::filter(.data$intersect_cohort == 1) %>%
-  dplyr::select(!"intersect_cohort")
+  )
+
+if(isFALSE(negate)){
+  subsetCohort <- subsetCohort %>%
+    dplyr::filter(.data$intersect_cohort == 1) %>%
+    dplyr::select(!"intersect_cohort")
+} else {
+  # ie require absence instead of presence
+  subsetCohort <- subsetCohort %>%
+    dplyr::filter(.data$intersect_cohort != 1) %>%
+    dplyr::select(!"intersect_cohort")
+}
+
 
 x %>%
   dplyr::inner_join(subsetCohort,

@@ -13,10 +13,20 @@
 #' @param minFutureObservation A minimum number of future observation days in
 #' the database.
 #'
-#' @return
+#' @return The cohort table with only records for individuals satisfying the
+#' demographic requirements
 #' @export
 #'
 #' @examples
+#' library(DrugUtilisation)
+#' library(CohortConstructor)
+#' cdm <- mockDrugUtilisation(numberIndividuals = 100)
+#' cdm$cohort1 %>%
+#'   requireDemographics(indexDate = "cohort_start_date",
+#'                       ageRange = list(c(18, 65)),
+#'                       sex = "Female",
+#'                       minPriorObservation = 365)
+#'
 requireDemographics <- function(cohort,
                                 indexDate = "cohort_start_date",
                                 ageRange = list(c(0, 150)),
@@ -63,10 +73,17 @@ requireDemographics <- function(cohort,
 #' demographics characteristics on which to restrict on.
 #' @param ageRange A list of minimum and maximum age
 #'
-#' @return
+#' @return The cohort table with only records for individuals satisfying the
+#' age requirement
 #' @export
 #'
 #' @examples
+#' library(DrugUtilisation)
+#' library(CohortConstructor)
+#' cdm <- mockDrugUtilisation(numberIndividuals = 100)
+#' cdm$cohort1 %>%
+#'   requireAge(indexDate = "cohort_start_date",
+#'              ageRange = list(c(18, 65)))
 requireAge <- function(cohort,
                        indexDate = "cohort_start_date",
                        ageRange = list(c(0, 150))) {
@@ -94,10 +111,16 @@ requireAge <- function(cohort,
 #' @param sex Can be "Both", "Male" or "Female". If one of the latter, only
 #' those with that sex will be included.
 #'
-#' @return
+#' @return The cohort table with only records for individuals satisfying the
+#' sex requirement
 #' @export
 #'
 #' @examples
+#' library(DrugUtilisation)
+#' library(CohortConstructor)
+#' cdm <- mockDrugUtilisation(numberIndividuals = 100)
+#' cdm$cohort1 %>%
+#'   requireSex(sex = "Female")
 requireSex <- function(cohort,
                        sex = c("Both")) {
   cohort <- demographicsFilter(
@@ -127,10 +150,17 @@ requireSex <- function(cohort,
 #' @param minPriorObservation A mimimum number of prior observation days in
 #' the database.
 #'
-#' @return
+#' @return The cohort table with only records for individuals satisfying the
+#' prior observation requirement
 #' @export
 #'
 #' @examples
+#' library(DrugUtilisation)
+#' library(CohortConstructor)
+#' cdm <- mockDrugUtilisation(numberIndividuals = 100)
+#' cdm$cohort1 %>%
+#'   requirePriorObservation(indexDate = "cohort_start_date",
+#'                           minPriorObservation = 365)
 requirePriorObservation <- function(cohort,
                                     indexDate = "cohort_start_date",
                                     minPriorObservation = 0) {
@@ -160,10 +190,18 @@ requirePriorObservation <- function(cohort,
 #' @param minFutureObservation A minimum number of future observation days in
 #' the database.
 #'
-#' @return
+#' @return The cohort table with only records for individuals satisfying the
+#' future observation requirement
+#'
 #' @export
 #'
 #' @examples
+#' library(DrugUtilisation)
+#' library(CohortConstructor)
+#' cdm <- mockDrugUtilisation(numberIndividuals = 100)
+#' cdm$cohort1 %>%
+#'   requireFutureObservation(indexDate = "cohort_start_date",
+#'                            minFutureObservation = 30)
 requireFutureObservation <- function(cohort,
                                      indexDate = "cohort_start_date",
                                      minFutureObservation = 0) {

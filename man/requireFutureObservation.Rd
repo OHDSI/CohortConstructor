@@ -19,6 +19,18 @@ demographics characteristics on which to restrict on.}
 \item{minFutureObservation}{A minimum number of future observation days in
 the database.}
 }
+\value{
+The cohort table with only records for individuals satisfying the
+future observation requirement
+}
 \description{
 Restrict cohort on future observation
+}
+\examples{
+library(DrugUtilisation)
+library(CohortConstructor)
+cdm <- mockDrugUtilisation(numberIndividuals = 100)
+cdm$cohort1 \%>\%
+  requireFutureObservation(indexDate = "cohort_start_date",
+                           minFutureObservation = 30)
 }

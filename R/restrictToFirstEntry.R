@@ -30,10 +30,11 @@ restrictToFirstEntry <- function(cohort,
   #restrict to first entry
   indexDateSym <- rlang::sym(indexDate)
 
-  cohort <- cohort |> dplyr::group_by(.data$subject_id,.data$cohort_definition_id) |>
-    dplyr::filter(!!indexDateSym == min(!!indexDateSym, na.rm = TRUE)) |>
-    dplyr::ungroup() |>
-    CDMConnector::recordCohortAttrition("restrict to first entry")
+  cohort <- cohort %>%
+    dplyr::group_by(.data$subject_id,.data$cohort_definition_id) %>%
+    dplyr::filter(!!indexDateSym == min(!!indexDateSym, na.rm = TRUE)) %>%
+    dplyr::ungroup() %>%
+    CDMConnector::recordCohortAttrition("Restricted to first entry")
 
   return(cohort)
 

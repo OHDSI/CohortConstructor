@@ -130,7 +130,7 @@ Both diclofenac and acetaminophen
 Generate a combination cohort.
 
 ```{r}
-cdm <- generateCombinationCohortSet(cdm = cdm, 
+cdm <- generateIntersectCohortSet(cdm = cdm, 
                                     name = "combinations", 
                                     targetCohortName = "medications")
 
