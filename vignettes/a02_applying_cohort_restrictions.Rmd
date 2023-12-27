@@ -27,9 +27,14 @@ cdm <- cdm_from_con(con, cdm_schema = "main",
 ```
 
 ```{r, include = FALSE}
-if (Sys.getenv("EUNOMIA_DATA_FOLDER") == "") Sys.setenv("EUNOMIA_DATA_FOLDER" = file.path(tempdir(), "eunomia"))
-if (!dir.exists(Sys.getenv("EUNOMIA_DATA_FOLDER"))) dir.create(Sys.getenv("EUNOMIA_DATA_FOLDER"))
-if (!eunomia_is_available()) downloadEunomiaData()
+if (Sys.getenv("EUNOMIA_DATA_FOLDER") == "") {
+Sys.setenv("EUNOMIA_DATA_FOLDER" = file.path(tempdir(), "eunomia"))  
+} 
+if (!dir.exists(Sys.getenv("EUNOMIA_DATA_FOLDER"))){ dir.create(Sys.getenv("EUNOMIA_DATA_FOLDER"))
+}
+if (!CDMConnector::eunomia_is_available()) {
+CDMConnector::downloadEunomiaData(pathToData = Sys.getenv("EUNOMIA_DATA_FOLDER"))  
+}
 ```
 
 Let's start by creating two drug cohorts, one for users of diclofenac and another for users of acetaminophen. We'll use the `generateDrugUtilisationCohortSet()` from the DrugUtilisation package so that we can specify a gap era when creating the cohort.
