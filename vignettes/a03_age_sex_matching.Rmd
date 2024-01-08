@@ -20,7 +20,7 @@ CohortConstructor packages includes a function to obtain an age and sex matched 
 ## Create mock data
 We will first use `mockDrugUtilisation()` functin from DrugUtilisation package to create mock data.
 
-```{r setup}
+```{r, include = FALSE}
 library(CohortConstructor)
 library(dplyr)
 library(DrugUtilisation)
@@ -30,7 +30,7 @@ cdm <- mockDrugUtilisation(numberIndividual  = 200)
 
 As we will use `cohort1` to explore `generateMatchedCohortSet()`, let us first use `cohort_attrition()` from CDMConnector package to explore the this cohort:
 
-```{r setup}
+```{r, include = FALSE}
 CDMConnector::cohort_set(cdm$cohort1)
 ```
 Notice that there are three cohorts within this tibble, with id's going from 1 to 3. 
@@ -38,7 +38,7 @@ Notice that there are three cohorts within this tibble, with id's going from 1 t
 # Use `generateMatchedCohortSet()` to create an age-sex matched cohort
 Let us first see an example of how this function works. For its usage, we need to provide a `cdm` object, the `targetCohortName`, which is the name of the table containing the cohort of interest, and the `name` of the new table that will be created containing the cohort and the matching cohort. We will also use the argument `targetCohortId` to specify that we only want a matching cohort for `cohort_definition_id = 1`.
 
-```{r setup}
+```{r, include = FALSE}
 cdm <- generateMatchedCohortSet(cdm  = cdm,
                            name = "matched_cohort1",
                            targetCohortName = "cohort1",
@@ -54,11 +54,11 @@ Notice that in the generated tibble, there are two cohorts: `cohort_definition_i
 
 The default matching ratio is 1:1. Use `cohort_counts()` from CDMConnector to check if the matching has been done as desired.
 
-```{r setup}
+```{r, include = FALSE}
 CDMConnector::cohort_count(cdm$matched_cohort1)
 ```
 To have more information about the exclusion criteria applied to perform the matching, use `cohort_attrition()` from CDMConnector package:
-```{r setup}
+```{r, include = FALSE}
 # Original cohort
 CDMConnector::cohort_attrition(cdm$matched_cohort1) %>% filter(cohort_definition_id == 1)
 
@@ -69,7 +69,7 @@ Briefly, from the original cohort, we exclude first those individuals that do no
 
 You can modify the `ratio` parameter to tailor your matched cohort.
 
-```{r setup}
+```{r, include = FALSE}
 cdm <- generateMatchedCohortSet(cdm  = cdm,
                            name = "matched_cohort1",
                            targetCohortName = "cohort1",
