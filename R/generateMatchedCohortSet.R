@@ -63,7 +63,7 @@ generateMatchedCohortSet <- function(cdm,
     cdm <- checkRatio(cdm, name, ratio, targetCohortId, n)
 
     # Check cohort set ref
-    cdm <- checkCohortSetRef(cdm, name, matchSex, matchYearOfBirth, targetCohortId, n)
+    cdm <- checkCohortSetRef(cdm, name, targetCohortName, matchSex, matchYearOfBirth, targetCohortId, n)
   }
   # Return
   return(cdm)
@@ -416,10 +416,10 @@ checkRatio <- function(cdm, name, ratio, targetCohortId, n){
 }
 
 
-checkCohortSetRef <- function(cdm, name, matchSex, matchYearOfBirth, targetCohortId, n){
+checkCohortSetRef <- function(cdm, name, targetCohortName, matchSex, matchYearOfBirth, targetCohortId, n){
   cohort_set_ref <- cdm[[name]] %>%
     CDMConnector::cohort_set() %>%
-    dplyr::mutate(target_cohort_name  = .env$name) %>%
+    dplyr::mutate(target_cohort_name  = .env$targetCohortName) %>%
     dplyr::mutate(match_sex           = .env$matchSex) %>%
     dplyr::mutate(match_year_of_birth = .env$matchYearOfBirth) %>%
     dplyr::mutate(match_status        = dplyr::if_else(.data$cohort_definition_id %in% .env$targetCohortId, "target", "matched")) %>%
