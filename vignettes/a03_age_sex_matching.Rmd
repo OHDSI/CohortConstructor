@@ -33,7 +33,6 @@ As we will use `cohort1` to explore `generateMatchedCohortSet()`, let us first u
 ```{r}
 CDMConnector::cohort_set(cdm$cohort1)
 ```
-Notice that there are three cohorts within this tibble, with id's going from 1 to 3. 
 
 # Use generateMatchedCohortSet() to create an age-sex matched cohort
 Let us first see an example of how this function works. For its usage, we need to provide a `cdm` object, the `targetCohortName`, which is the name of the table containing the cohort of interest, and the `name` of the new generated tibble containing the cohort and the matched cohort. We will also use the argument `targetCohortId` to specify that we only want a matched cohort for `cohort_definition_id = 1`.

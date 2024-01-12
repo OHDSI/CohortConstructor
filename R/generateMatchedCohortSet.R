@@ -19,13 +19,17 @@
 #' @examples
 #' library(DrugUtilisation)
 #' library(CohortConstructor)
+#' library(dplyr)
 #' cdm <- mockDrugUtilisation(numberIndividuals = 100)
-#' cdm$cohort1 %>%
-#'   requireCohortIntersectFlag(targetCohortTable = "cohort2",
-#'                              targetCohortId = 1,
-#'                              indexDate = "cohort_start_date",
-#'                              window = c(-Inf, 0))
-
+#' cdm <- cdm %>%
+#'   generateMatchedCohortSet(name = "new_matched_cohort",
+#'                            targetCohortName = "cohort1",
+#'                            targetCohortId = c(1,2),
+#'                            matchSex = TRUE,
+#'                            matchYearOfBirth = TRUE,
+#'                            ratio = 2)
+#' cdm$new_matched_cohort
+#'
 generateMatchedCohortSet <- function(cdm,
                                      name,
                                      targetCohortName,
@@ -75,7 +79,7 @@ generateMatchedCohortSet <- function(cdm,
     cdm <- checkCohortSetRef(cdm, name, targetCohortName, matchSex, matchYearOfBirth, targetCohortId, n)
 
     # Rename cohort definition ids
-    cdm <- renameCohortDefinitionIds(cdm)
+    cdm <- renameCohortDefinitionIds(cdm, name)
   }
   # Return
   return(cdm)
@@ -456,46 +460,46 @@ checkCohortSetRef <- function(cdm, name, targetCohortName, matchSex, matchYearOf
 renameCohortDefinitionIds <- function(cdm, name){
   new_cohort_set <- cdm[[name]] %>%
     CDMConnector::cohort_set() %>%
-    dplyr::mutate(cohort_definition_id_new = target_cohort_id) %>%
-    arrange(cohort_definition_id_new) %>%
+    dplyr::mutate(cohort_definition_id_new = .data$target_cohort_id) %>%
+    dplyr::arrange(.data$cohort_definition_id_new) %>%
     dplyr::mutate(cohort_definition_id_new = dplyr::row_number())
 
   new_cohort_attrition <- cdm[[name]] %>%
     CDMConnector::cohort_attrition() %>%
-    inner_join(
+    dplyr::inner_join(
       new_cohort_set %>% dplyr::select("cohort_definition_id","cohort_definition_id_new"),
       by = "cohort_definition_id"
     ) %>%
     dplyr::select(-"cohort_definition_id") %>%
     dplyr::rename("cohort_definition_id" = "cohort_definition_id_new") %>%
-    dplyr::relocate(cohort_definition_id)
+    dplyr::relocate(.data$cohort_definition_id)
 
   new_cohort_count <- cdm[[name]] %>%
     CDMConnector::cohort_count() %>%
-    inner_join(
+    dplyr::inner_join(
       new_cohort_set %>% dplyr::select("cohort_definition_id","cohort_definition_id_new"),
       by = "cohort_definition_id"
     ) %>%
     dplyr::select(-"cohort_definition_id") %>%
     dplyr::rename("cohort_definition_id" = "cohort_definition_id_new") %>%
-    dplyr::relocate(cohort_definition_id)
+    dplyr::relocate(.data$cohort_definition_id)
 
   new_cohort <- cdm[[name]] %>%
-    inner_join(
+    dplyr::inner_join(
       new_cohort_set %>% dplyr::select("cohort_definition_id","cohort_definition_id_new"),
       by = "cohort_definition_id",
       copy = TRUE
     ) %>%
     dplyr::select(-"cohort_definition_id") %>%
     dplyr::rename("cohort_definition_id" = "cohort_definition_id_new") %>%
-    dplyr::relocate(cohort_definition_id) %>%
+    dplyr::relocate(.data$cohort_definition_id) %>%
     CDMConnector::compute_query() %>%
     CDMConnector::compute_query(name = name, temporary = FALSE, schema = attr(cdm, "write_schema"), overwrite = TRUE)
 
   new_cohort_set <- new_cohort_set %>%
     dplyr::select(-"cohort_definition_id") %>%
     dplyr::rename("cohort_definition_id" = "cohort_definition_id_new") %>%
-    dplyr::relocate(cohort_definition_id)
+    dplyr::relocate(.data$cohort_definition_id)
 
   cdm[[name]] <- CDMConnector::new_generated_cohort_set(
     cohort_ref = new_cohort,
@@ -503,4 +507,6 @@ renameCohortDefinitionIds <- function(cdm, name){
     cohort_set_ref = new_cohort_set,
     cohort_count_ref = new_cohort_count,
     overwrite = TRUE)
+
+  return(cdm)
 }
