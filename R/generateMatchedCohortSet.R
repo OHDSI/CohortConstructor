@@ -125,6 +125,13 @@ validateInput <- function(cdm,
       errorMessage$push(glue::glue("- {name} table does not containg '{targetCohortId}' as a cohort_definition_id"))
     }
   }
+  # Check if ratio is > 0
+  ratio_check <- ratio > 0
+  checkmate::assertTRUE(ratio_check, add = errorMessage)
+  if(!isTRUE(ratio_check)){
+    errorMessage$push(glue::glue("- ratio parameter must be > 0 "))
+  }
+
   checkmate::reportAssertions(collection = errorMessage)
   return(invisible(TRUE))
 }
