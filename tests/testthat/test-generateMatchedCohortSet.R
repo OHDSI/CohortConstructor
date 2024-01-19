@@ -291,19 +291,19 @@ test_that("test exactMatchingCohort with a ratio bigger than 1", {
                                 ratio = 4)
 
   expect_true(a[["new_cohort"]] %>%
-                dplyr::filter(cohort_definition_id %in% c(1,3)) %>%
+                dplyr::filter(cohort_definition_id %in% c(1,2)) %>%
                 dplyr::summarise(subject_id) %>%
                 dplyr::distinct() %>% dplyr::pull() %>% length() == 10)
   expect_true(a[["new_cohort"]] %>%
-                dplyr::filter(cohort_definition_id %in% c(2,4)) %>%
+                dplyr::filter(cohort_definition_id %in% c(3,4)) %>%
                 dplyr::summarise(subject_id) %>%
                 dplyr::distinct() %>% dplyr::pull() %>% length() == 10)
   expect_true(a[["new_cohort"]] %>%
-                dplyr::filter(cohort_definition_id %in% c(1,3)) %>%
+                dplyr::filter(cohort_definition_id %in% c(1,2)) %>%
                 dplyr::summarise(cohort_start_date) %>%
                 dplyr::distinct() %>% dplyr::pull() %>% length() == 2)
   expect_true(a[["new_cohort"]] %>%
-                dplyr::filter(cohort_definition_id %in% c(2,4)) %>%
+                dplyr::filter(cohort_definition_id %in% c(3,4)) %>%
                 dplyr::summarise(cohort_start_date) %>%
                 dplyr::distinct() %>% dplyr::pull() %>% length() == 2)
 

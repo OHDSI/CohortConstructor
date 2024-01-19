@@ -41,3 +41,18 @@ Generate a new cohort matched cohort from a preexisting target cohort. The
 new cohort will contain individuals not included in the target cohort with
 same year of birth (matchYearOfBirth = TRUE) and same sex (matchSex = TRUE).
 }
+\examples{
+library(DrugUtilisation)
+library(CohortConstructor)
+library(dplyr)
+cdm <- mockDrugUtilisation(numberIndividuals = 100)
+cdm <- cdm \%>\%
+  generateMatchedCohortSet(name = "new_matched_cohort",
+                           targetCohortName = "cohort1",
+                           targetCohortId = c(1,2),
+                           matchSex = TRUE,
+                           matchYearOfBirth = TRUE,
+                           ratio = 2)
+cdm$new_matched_cohort
+
+}
