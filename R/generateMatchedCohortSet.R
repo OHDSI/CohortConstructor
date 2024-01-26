@@ -192,7 +192,7 @@ getNewCohort <- function(cdm, name, targetCohortName, targetCohortId, n){
                                                                            temporary = FALSE,
                                                                            name = name,
                                                                            overwrite = TRUE),
-      cohort_attrition_ref = cdm[[targetCohortName]] %>% CDMConnector::cohort_attrition(),
+      cohort_attrition_ref = cdm[[targetCohortName]] %>% CDMConnector::cohort_attrition() %>% dplyr::as_tibble(),
       cohort_set_ref = cdm[[targetCohortName]] %>% CDMConnector::cohort_set(),
       overwrite = TRUE)
   }else{
@@ -236,7 +236,7 @@ getNewCohort <- function(cdm, name, targetCohortName, targetCohortId, n){
 
     cdm[[name]] <- CDMConnector::new_generated_cohort_set(
       cohort_ref = all,
-      cohort_attrition_ref = cohort_attrition,
+      cohort_attrition_ref = cohort_attrition %>% dplyr::as_tibble(),
       cohort_set_ref = cohort_set_ref,
       overwrite = TRUE)
   }
@@ -450,7 +450,7 @@ checkCohortSetRef <- function(cdm, name, targetCohortName, matchSex, matchYearOf
 
   cdm[[name]] <- CDMConnector::new_generated_cohort_set(
     cohort_ref = cdm[[name]],
-    cohort_attrition_ref = cdm[[name]] %>% CDMConnector::cohort_attrition(),
+    cohort_attrition_ref = cdm[[name]] %>% CDMConnector::cohort_attrition() %>% dplyr::as_tibble(),
     cohort_set_ref = cohort_set_ref,
     overwrite = TRUE)
 
@@ -503,7 +503,7 @@ renameCohortDefinitionIds <- function(cdm, name){
 
   cdm[[name]] <- CDMConnector::new_generated_cohort_set(
     cohort_ref = new_cohort,
-    cohort_attrition_ref =  new_cohort_attrition ,
+    cohort_attrition_ref =  new_cohort_attrition %>% dplyr::as_tibble(),
     cohort_set_ref = new_cohort_set,
     cohort_count_ref = new_cohort_count,
     overwrite = TRUE)
