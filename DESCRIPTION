@@ -17,7 +17,7 @@ Description: This package aims to provide functionalities to manipulate
 License: Apache License (>= 2)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 Imports: 
     CDMConnector,
     checkmate,
@@ -26,6 +26,7 @@ Imports:
     dplyr,
     glue,
     magrittr,
+    omopgenerics (>= 0.0.2),
     PatientProfiles,
     rlang,
     tidyr
