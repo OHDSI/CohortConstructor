@@ -30,7 +30,7 @@ knitr::opts_chunk$set(
 ```
 
 For this example we'll use the Eunomia synthetic data from the CDMConnector package.
-```{r}
+```{r, eval = FALSE}
 library(CDMConnector)
 library(DrugUtilisation)
 library(CohortConstructor)
@@ -40,7 +40,7 @@ cdm <- cdm_from_con(con, cdm_schema = "main",
 ```
 
 Let's start by creating two drug cohorts, one for users of diclofenac and another for users of acetaminophen. We'll use the `generateDrugUtilisationCohortSet()` from the DrugUtilisation package so that we can specify a gap era when creating the cohort.
-```{r}
+```{r, eval = FALSE}
 cdm <- generateDrugUtilisationCohortSet(cdm = cdm,  
                                         name = "medications",
                                         conceptSet = list("diclofenac" = 1124300,
@@ -50,7 +50,7 @@ cohortCount(cdm$medications)
 ```
 
 As well as our medication cohorts, let's also make another cohort containing individuals with a record of a GI bleed. For this cohort we can use `generateConceptCohortSet()` from the CDMConnector package. Later we'll use this cohort when specifying inclusion/ exclusion criteria.
-```{r}
+```{r, eval = FALSE}
 cdm <- generateConceptCohortSet(cdm = cdm,  
                                    name = "gi_bleed", 
                                    conceptSet = list("gi_bleed" = 192671))
@@ -58,7 +58,7 @@ cdm <- generateConceptCohortSet(cdm = cdm,
 
 ## Keep only the first record per person
 Individuals can contribute multiple records per cohort. However now we'll keep only their earliest cohort entry of the remaining records using `restrictToFirstEntry()` from CohortConstructor. We can see that after this we have one record per person for each cohort.
-```{r}
+```{r, eval = FALSE}
 cdm$medications <- cdm$medications %>% 
   restrictToFirstEntry(indexDate = "cohort_start_date")
 
@@ -69,7 +69,7 @@ Note, applying this criteria later after applying other criteria would result in
 
 ## Applying restrictions on patient demographics
 Using `requireDemographics()` we'll require that individuals in our medications cohort are female and, relative to their cohort start date, are between 18 and 85 with at least 30 days of prior observation time in the database. 
-```{r}
+```{r, eval = FALSE}
 cdm$medications <- cdm$medications %>% 
   requireDemographics(indexDate = "cohort_start_date", 
                       ageRange = list(c(18, 85)),
@@ -78,7 +78,7 @@ cdm$medications <- cdm$medications %>%
 ```
 
 We can then see how many people have people have been excluded based on these demographic requirements.
-```{r}
+```{r, eval = FALSE}
 cohort_attrition(cdm$medications) %>% 
   dplyr::filter(reason == "Demographic requirements") %>% 
   dplyr::glimpse()
@@ -87,14 +87,14 @@ cohort_attrition(cdm$medications) %>%
 
 ## Restrictions on calendar dates
 Next we can use `requireInDateRange()` to keep only those records where cohort entry was between a particular date range.
-```{r}
+```{r, eval = FALSE}
 cdm$medications <- cdm$medications %>% 
   requireInDateRange(indexDate = "cohort_start_date", 
                      dateRange = as.Date(c("2000-01-01", "2015-01-01")))
 ```
 
 Again, we can track cohort attrition
-```{r}
+```{r, eval = FALSE}
 cohort_attrition(cdm$medications) %>% 
   dplyr::filter(reason == "cohort_start_date between 2000-01-01 and 2015-01-01") %>% 
   dplyr::glimpse()
@@ -104,7 +104,7 @@ cohort_attrition(cdm$medications) %>%
 ## Restrictions on cohort presence
 We could require that individuals in our medication cohorts have a history of GI bleed. To do this we can use the `requireCohortIntersectFlag()` function.
 
-```{r}
+```{r, eval = FALSE}
 cdm$medications_gi_bleed <- cdm$medications  %>%
   requireCohortIntersectFlag(targetCohortTable = "gi_bleed", 
                              targetCohortId = 1,
@@ -115,7 +115,7 @@ cohort_count(cdm$medications_gi_bleed)
 
 Instead of requiring that individuals have history of GI bleed, we could instead require that they are don't have any history of it. In this case we can again use the `requireCohortIntersectFlag()` function, but this time set the negate argument to FALSE to require individuals' absence in this other cohort rather than their presence in it.
 
-```{r}
+```{r, eval = FALSE}
 cdm$medications_no_gi_bleed <- cdm$medications %>%
   requireCohortIntersectFlag(targetCohortTable = "gi_bleed", 
                              targetCohortId = 1,
