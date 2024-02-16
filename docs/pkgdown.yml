@@ -1,0 +1,13 @@
+pandoc: 3.1.1
+pkgdown: 2.0.7
+pkgdown_sha: ~
+articles:
+  a01_building_concept_cohorts: a01_building_concept_cohorts.html
+  a02_applying_cohort_restrictions: a02_applying_cohort_restrictions.html
+  a03_age_sex_matching: a03_age_sex_matching.html
+  a04_cohort_timing: a04_cohort_timing.html
+last_built: 2024-02-16T15:27Z
+urls:
+  reference: https://darwin-eu-dev.github.io/DrugUtilisation/reference
+  article: https://darwin-eu-dev.github.io/DrugUtilisation/articles
+
