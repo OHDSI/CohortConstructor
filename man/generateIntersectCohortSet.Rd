@@ -51,7 +51,7 @@ cdm <- generateIntersectCohortSet(
 
 cdm$cohort3
 
-CDMConnector::cohortSet(cdm$cohort3)
+CDMConnector::settings(cdm$cohort3)
 
 }
 }

@@ -113,7 +113,7 @@ test_that("check that we obtain expected result when ratio is 1", {
 
   cdm <- DrugUtilisation::generateConceptCohortSet(
     cdm = DrugUtilisation::mockDrugUtilisation(numberIndividuals = 200),
-    conceptSet = list(c1 = 317009, c2 = 432526, c3 = 4141052),
+    conceptSet = list(c_1 = 317009, c_2 = 432526, c_3 = 4141052),
     name = "cohort",
     end  = "observation_period_end_date",
     requiredObservation = c(followback,followback),
@@ -129,22 +129,22 @@ test_that("check that we obtain expected result when ratio is 1", {
                                               matchYearOfBirth = TRUE,
                                               ratio = 1)
 
-  expect_true(nrow(CDMConnector::cohort_count(matched_cohorts$new_cohort) %>%
-    dplyr::left_join(CDMConnector::cohort_set(matched_cohorts$new_cohort),
+  expect_true(nrow(omopgenerics::cohortCount(matched_cohorts$new_cohort) %>%
+    dplyr::left_join(omopgenerics::settings(matched_cohorts$new_cohort),
                      by = "cohort_definition_id") %>%
-    dplyr::filter(stringr::str_detect(cohort_name, "c1"))  %>%
+    dplyr::filter(stringr::str_detect(cohort_name, "c_1"))  %>%
       dplyr::select("number_records") %>%
       dplyr::distinct()) == 1)
-  expect_true(nrow(CDMConnector::cohort_count(matched_cohorts$new_cohort) %>%
-                     dplyr::left_join(CDMConnector::cohort_set(matched_cohorts$new_cohort),
+  expect_true(nrow(omopgenerics::cohortCount(matched_cohorts$new_cohort) %>%
+                     dplyr::left_join(omopgenerics::settings(matched_cohorts$new_cohort),
                                       by = "cohort_definition_id") %>%
-                     dplyr::filter(stringr::str_detect(cohort_name, "c2"))  %>%
+                     dplyr::filter(stringr::str_detect(cohort_name, "c_2"))  %>%
                      dplyr::select("number_records") %>%
                      dplyr::distinct()) == 1)
-  expect_true(nrow(CDMConnector::cohort_count(matched_cohorts$new_cohort) %>%
-                     dplyr::left_join(CDMConnector::cohort_set(matched_cohorts$new_cohort),
+  expect_true(nrow(omopgenerics::cohortCount(matched_cohorts$new_cohort) %>%
+                     dplyr::left_join(omopgenerics::settings(matched_cohorts$new_cohort),
                                       by = "cohort_definition_id") %>%
-                     dplyr::filter(stringr::str_detect(cohort_name, "c3"))  %>%
+                     dplyr::filter(stringr::str_detect(cohort_name, "c_3"))  %>%
                      dplyr::select("number_records") %>%
                      dplyr::distinct()) == 1)
 
@@ -162,7 +162,6 @@ test_that("check that we obtain expected result when ratio is 1", {
         dplyr::select("person_id", "gender_concept_id", "year_of_birth"),
       by = "person_id"
     )
-
 
   expect_true(is.na(nrow(cohorts %>%
                            dplyr::filter(.data$cohort_definition_id %in% c(1,2,3)) %>%
@@ -204,13 +203,12 @@ test_that("test exactMatchingCohort works if one of the cohorts does not have an
   followback  <- 180
   cdm <- DrugUtilisation::generateConceptCohortSet(
     cdm = DrugUtilisation::mockDrugUtilisation(numberIndividuals = 200),
-    conceptSet = list(c1 = 317009, c2 = 1),
+    conceptSet = list(c_1 = 317009, c_2 = 1),
     name = "cases",
     end  = "observation_period_end_date",
     requiredObservation = c(followback,followback),
     overwrite = TRUE
   )
-
 
   expect_no_error(
     generateMatchedCohortSet(cdm,
@@ -229,14 +227,12 @@ test_that("test exactMatchingCohort with a ratio bigger than 1", {
   followback  <- 180
   cdm <- DrugUtilisation::generateConceptCohortSet(
     cdm = DrugUtilisation::mockDrugUtilisation(numberIndividuals = 1000),
-    conceptSet = list(c1 = 317009, c2 = 432526),
+    conceptSet = list(c_1 = 317009, c_2 = 432526),
     name = "cases",
     end  = "observation_period_end_date",
     requiredObservation = c(followback,followback),
     overwrite = TRUE
   )
-
-
 
   expect_no_error(
     a <- generateMatchedCohortSet(cdm,
@@ -259,8 +255,10 @@ test_that("test exactMatchingCohort with a ratio bigger than 1", {
                             "year_of_birth" = rep(1980, 10),
                             "day_of_birth"  = rep(1, 10),
                             "birth_date_time" = as.Date(rep("1980-04-01",10)),
-                            "month_of_birth"  = rep(4, 10)),
-    condition_occurrence = tibble::tibble("condition_ocurrence_id" = seq(1,10,1),
+                            "month_of_birth"  = rep(4, 10),
+                            "race_concept_id" = NA_character_,
+                            "ethnicity_concept_id" = NA_character_),
+    condition_occurrence = tibble::tibble("condition_occurrence_id" = seq(1,10,1),
                                           "person_id" = seq(1,10,1),
                                           "condition_concept_id" = c(317009,317009,4266367,4266367,rep(1,6)),
                                           "condition_start_date" = as.Date(c("2017-10-30","2003-01-04","2014-12-15","2010-09-09","2004-08-26","1985-03-31","1985-03-13","1985-07-11","1983-11-07","2020-01-13")),
@@ -275,7 +273,7 @@ test_that("test exactMatchingCohort with a ratio bigger than 1", {
 
   cdm <- DrugUtilisation::generateConceptCohortSet(
     cdm = cdmMock,
-    conceptSet = list(c1 = 317009, c2 = 4266367),
+    conceptSet = list(c_1 = 317009, c_2 = 4266367),
     name = "cases",
     end  = "observation_period_end_date",
     requiredObservation = c(0,0),
@@ -306,7 +304,6 @@ test_that("test exactMatchingCohort with a ratio bigger than 1", {
                 dplyr::filter(cohort_definition_id %in% c(3,4)) %>%
                 dplyr::summarise(cohort_start_date) %>%
                 dplyr::distinct() %>% dplyr::pull() %>% length() == 2)
-
 
   outc <- a[["new_cohort"]] %>%
     dplyr::filter(subject_id == 5) %>% dplyr::summarise(cohort_start_date) %>%

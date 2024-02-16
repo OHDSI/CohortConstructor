@@ -3,9 +3,10 @@ test_that("requiring presence in another cohort", {
                                               drug_exposure_size = 100)
 
   cdm$cohort3 <-  requireCohortIntersectFlag(x = cdm$cohort1,
-                             targetCohortTable = "cohort2",
-                             targetCohortId = 1,
-                             window = c(-Inf, Inf))
+                                             targetCohortTable = "cohort2",
+                                             targetCohortId = 1,
+                                             window = c(-Inf, Inf)) |>
+    dplyr::compute(name = "cohort3", temporary = FALSE)
 
  expect_true(all(cdm$cohort3  %>%
     dplyr::distinct(subject_id) %>%
@@ -21,7 +22,8 @@ test_that("requiring presence in another cohort", {
  cdm$cohort4 <-  requireCohortIntersectFlag(x = cdm$cohort1,
                                             targetCohortTable = "cohort2",
                                             targetCohortId = 2,
-                                            window = c(-Inf, Inf))
+                                            window = c(-Inf, Inf)) |>
+   dplyr::compute(name = "cohort4", temporary = FALSE)
  expect_true(all(cdm$cohort4 %>%
                    dplyr::distinct(subject_id) %>%
                    dplyr::pull() %in%
@@ -62,12 +64,14 @@ cdm <- PatientProfiles::mockPatientProfiles(patient_size = 100,
 cdm$cohort3_inclusion <-  requireCohortIntersectFlag(x = cdm$cohort1,
                                              targetCohortTable = "cohort2",
                                              targetCohortId = 1,
-                                             window = c(-Inf, Inf))
+                                             window = c(-Inf, Inf)) |>
+  dplyr::compute(name = "cohort3_inclusion", temporary = FALSE)
 cdm$cohort3_exclusion <-  requireCohortIntersectFlag(x = cdm$cohort1,
                                                      targetCohortTable = "cohort2",
                                                      targetCohortId = 1,
                                                      window = c(-Inf, Inf),
-                                                     negate = TRUE)
+                                                     negate = TRUE) |>
+  dplyr::compute(name = "cohort3_exclusion", temporary = FALSE)
 
 in_both <- intersect(cdm$cohort3_inclusion %>%
   dplyr::pull("subject_id") %>%
