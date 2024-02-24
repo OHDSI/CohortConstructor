@@ -97,7 +97,7 @@ x %>%
                     by = c(cols)) %>%
   CDMConnector::recordCohortAttrition(reason =
                                         glue::glue("In cohort {target_name} between ",
-                                                   "{window_start} and ",
+                                                   "{window_start} & ",
                                                    "{window_end} days relative to ",
                                                    "{indexDate}"))
 

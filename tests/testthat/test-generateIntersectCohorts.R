@@ -232,17 +232,31 @@ test_that("only return comb", {
     mutuallyExclusive = FALSE, returnOnlyComb = TRUE
   )
 
-  expect_equal(cdm$cohort2 %>% dplyr::arrange(cohort_start_date) %>% dplyr::pull(cohort_start_date),
-               as.Date(c("2020-03-01", "2020-03-01", "2020-03-01", "2020-03-01")))
+  expect_equal(
+    cdm$cohort2 |>
+      dplyr::collect() %>%
+      dplyr::arrange(cohort_start_date) %>%
+      dplyr::pull(cohort_start_date),
+    as.Date(c("2020-03-01", "2020-03-01", "2020-03-01", "2020-03-01"))
+  )
 
-  expect_equal(cdm$cohort2 %>% dplyr::arrange(cohort_end_date) %>% dplyr::pull(cohort_end_date),
-               as.Date(c("2020-04-01", "2020-04-01", "2020-04-01", "2020-05-01")))
+  expect_equal(
+    cdm$cohort2 |>
+      dplyr::collect() %>%
+      dplyr::arrange(cohort_end_date) %>%
+      dplyr::pull(cohort_end_date),
+    as.Date(c("2020-04-01", "2020-04-01", "2020-04-01", "2020-05-01"))
+  )
 
   cdm <- generateIntersectCohortSet(
     cdm = cdm, name = "cohort3", targetCohortName = "cohort1",
     mutuallyExclusive = TRUE, returnOnlyComb = TRUE
   )
 
-  expect_equal(cdm$cohort3 %>% omopgenerics::cohortCount() %>% dplyr::pull(number_records),
-              c(1, 1, 0, 0))
+  expect_equal(
+    cdm$cohort3 %>%
+      cohortCount() %>%
+      dplyr::pull(number_records),
+    c(1, 1, 0, 0)
+  )
 })
