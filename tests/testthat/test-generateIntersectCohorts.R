@@ -141,13 +141,17 @@ test_that("generateIntersectCohortSet", {
     gender_concept_id = c(8507, 8532, 8507, 8532),
     year_of_birth = 2000,
     month_of_birth = 1,
-    day_of_birth = 1
+    day_of_birth = 1,
+    race_concept_id = NA_character_,
+    ethnicity_concept_id = NA_character_
+
   )
   observation_period <- dplyr::tibble(
     observation_period_id = 1:4,
     person_id = 1:4,
-    observation_period_start_date = as.Date("2020-01-01"),
-    observation_period_end_date = as.Date("2020-12-31")
+    observation_period_start_date = as.Date("2010-01-01"),
+    observation_period_end_date = as.Date("2020-12-31"),
+    period_type_concept_id = 32880
   )
   cdm <- PatientProfiles::mockPatientProfiles(
     observation_period = observation_period, person = person, cohort1 = cohort
@@ -158,7 +162,7 @@ test_that("generateIntersectCohortSet", {
     cdm = cdm, name = "cohort2", targetCohortName = "cohort1",
     mutuallyExclusive = TRUE
   ))
-  expect_true(all(CDMConnector::cohortSet(cdm$cohort2)$mutually_exclusive == TRUE))
+  expect_true(all(CDMConnector::settings(cdm$cohort2)$mutually_exclusive == TRUE))
   expect_true(cdm$cohort2 %>% dplyr::tally() %>% dplyr::pull() == 10)
   expect_true(all(
     CDMConnector::cohortCount(cdm$cohort2) %>%
@@ -171,7 +175,7 @@ test_that("generateIntersectCohortSet", {
     cdm = cdm, name = "cohort3", targetCohortName = "cohort1",
     mutuallyExclusive = FALSE
   ))
-  expect_true(all(CDMConnector::cohortSet(cdm$cohort3)$mutually_exclusive == FALSE))
+  expect_true(all(CDMConnector::settings(cdm$cohort3)$mutually_exclusive == FALSE))
   expect_true(cdm$cohort3 %>% dplyr::tally() %>% dplyr::pull() == 13)
   expect_true(all(
     CDMConnector::cohortCount(cdm$cohort3) %>%
@@ -183,13 +187,14 @@ test_that("generateIntersectCohortSet", {
   expect_warning(cdm <- generateIntersectCohortSet(
     cdm = cdm, name = "cohort4", targetCohortName = "cohort1",
     targetCohortId = 1
-  ))
-
+  ), "At least 2 cohort id must be provided to do the combination")
+  expect_equal(cdm$cohort1 %>%
+                 omopgenerics::settings() %>%
+                 dplyr::filter(cohort_definition_id == 1),
+               cdm$cohort4 %>%
+                 omopgenerics::settings())
   CDMConnector::cdmDisconnect(cdm)
 })
-
-
-
 
 test_that("only return comb", {
   cohort <- dplyr::tibble(
@@ -207,13 +212,16 @@ test_that("only return comb", {
     gender_concept_id = c(8507, 8532, 8507, 8532),
     year_of_birth = 2000,
     month_of_birth = 1,
-    day_of_birth = 1
+    day_of_birth = 1,
+    race_concept_id = NA_character_,
+    ethnicity_concept_id = NA_character_
   )
   observation_period <- dplyr::tibble(
     observation_period_id = 1:4,
     person_id = 1:4,
-    observation_period_start_date = as.Date("2020-01-01"),
-    observation_period_end_date = as.Date("2020-12-31")
+    observation_period_start_date = as.Date("2010-01-01"),
+    observation_period_end_date = as.Date("2022-12-31"),
+    period_type_concept_id = 32880
   )
   cdm <- PatientProfiles::mockPatientProfiles(
     observation_period = observation_period, person = person, cohort1 = cohort
@@ -224,8 +232,31 @@ test_that("only return comb", {
     mutuallyExclusive = FALSE, returnOnlyComb = TRUE
   )
 
-  expect_true(all(cdm$cohort2 %>% dplyr::pull(cohort_start_date) == as.Date("2020-03-01")))
+  expect_equal(
+    cdm$cohort2 |>
+      dplyr::collect() %>%
+      dplyr::arrange(cohort_start_date) %>%
+      dplyr::pull(cohort_start_date),
+    as.Date(c("2020-03-01", "2020-03-01", "2020-03-01", "2020-03-01"))
+  )
 
-  expect_true(all(cdm$cohort2 %>% dplyr::pull(cohort_end_date) == as.Date("2020-04-01")))
+  expect_equal(
+    cdm$cohort2 |>
+      dplyr::collect() %>%
+      dplyr::arrange(cohort_end_date) %>%
+      dplyr::pull(cohort_end_date),
+    as.Date(c("2020-04-01", "2020-04-01", "2020-04-01", "2020-05-01"))
+  )
 
+  cdm <- generateIntersectCohortSet(
+    cdm = cdm, name = "cohort3", targetCohortName = "cohort1",
+    mutuallyExclusive = TRUE, returnOnlyComb = TRUE
+  )
+
+  expect_equal(
+    cdm$cohort3 %>%
+      cohortCount() %>%
+      dplyr::pull(number_records),
+    c(1, 1, 0, 0)
+  )
 })

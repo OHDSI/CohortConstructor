@@ -96,13 +96,16 @@ test_that("restrictions applied to single cohort", {
     gender_concept_id = c("8507", "8532", "8507"),
     year_of_birth = c(2000, 2005, 2010),
     month_of_birth = 01,
-    day_of_birth = 01
+    day_of_birth = 01,
+    race_concept_id = NA_character_,
+    ethnicity_concept_id = NA_character_
   )
   observationPeriodTable <- dplyr::tibble(
     observation_period_id = c("1", "2", "3"),
     person_id = c("1", "2", "3"),
-    observation_period_start_date = as.Date("2010-01-01"),
-    observation_period_end_date = as.Date("2015-06-01")
+    observation_period_start_date = as.Date("2008-01-01"),
+    observation_period_end_date = as.Date("2020-06-01"),
+    period_type_concept_id = NA
   )
   cohortTable <- dplyr::tibble(
     cohort_definition_id = c(1, 1, 1),

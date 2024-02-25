@@ -55,7 +55,7 @@ if(is.null(cdm[[targetCohortTable]])){
 }
 
 if(is.null(targetCohortId)){
-targetCohortId <- CDMConnector::cohortSet(cdm[[targetCohortTable]]) %>%
+targetCohortId <- CDMConnector::settings(cdm[[targetCohortTable]]) %>%
     dplyr::pull("cohort_definition_id")
 }
 
@@ -63,14 +63,14 @@ if(length(targetCohortId) > 1){
   cli::cli_abort("Only one target cohort is currently supported")
 }
 
-target_name <- CDMConnector::cohort_set(cdm[[targetCohortTable]]) %>%
+target_name <- cdm[[targetCohortTable]] %>%
+  omopgenerics::settings() %>%
   dplyr::filter(.data$cohort_definition_id == .env$targetCohortId) %>%
   dplyr::pull("cohort_name")
 
 subsetCohort <- x %>%
   dplyr::select(dplyr::all_of(.env$cols)) %>%
   PatientProfiles::addCohortIntersectFlag(
-    cdm = cdm,
     targetCohortTable = targetCohortTable,
     targetCohortId = targetCohortId,
     indexDate = indexDate,
@@ -97,7 +97,7 @@ x %>%
                     by = c(cols)) %>%
   CDMConnector::recordCohortAttrition(reason =
                                         glue::glue("In cohort {target_name} between ",
-                                                   "{window_start} and ",
+                                                   "{window_start} & ",
                                                    "{window_end} days relative to ",
                                                    "{indexDate}"))
 

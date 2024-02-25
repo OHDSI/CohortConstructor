@@ -29,7 +29,7 @@ requireInDateRange <- function(cohort,
                     .data[[indexDate]] <= !!dateRange[2]) %>%
     CDMConnector::recordCohortAttrition(reason = paste0(
       indexDate,
-      " between ", dateRange[1], " and ", dateRange[2]
+      " between ", dateRange[1], " & ", dateRange[2]
     ))
 
   cohort

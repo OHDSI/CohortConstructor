@@ -6,8 +6,18 @@ test_that("requireDateRange", {
     cohort_start_date = as.Date(c("2010-06-06", "2011-06-06", "2012-06-08")),
     cohort_end_date = as.Date(c("2013-06-06", "2013-06-06", "2013-02-01"))
   )
+  observation_period <- dplyr::tibble(
+    observation_period_id = 1:3,
+    person_id = 1:3,
+    observation_period_start_date = as.Date("2005-01-01"),
+    observation_period_end_date = as.Date("2022-12-31"),
+    period_type_concept_id = 32880
+  )
 
-  cdm <- PatientProfiles::mockPatientProfiles(cohort1 = cohortTable)
+  cdm <- PatientProfiles::mockPatientProfiles(
+    cohort1 = cohortTable,
+    observation_period = observation_period
+  )
   cdm$cohort1 <- cdm$cohort1 %>%
     requireInDateRange(dateRange = as.Date(c("2010-01-01", "2011-01-01")))
 
@@ -35,8 +45,19 @@ test_that("trim cohort dates", {
     cohort_start_date = as.Date(c("2010-06-06", "2011-06-06", "2012-06-08")),
     cohort_end_date = as.Date(c("2013-06-06", "2011-09-06", "2013-02-01"))
   )
+  observation_period <- dplyr::tibble(
+    observation_period_id = 1:3,
+    person_id = 1:3,
+    observation_period_start_date = as.Date("2005-01-01"),
+    observation_period_end_date = as.Date("2022-12-31"),
+    period_type_concept_id = 32880
+  )
 
-  cdm <- PatientProfiles::mockPatientProfiles(cohort1 = cohortTable)
+  cdm <- PatientProfiles::mockPatientProfiles(
+    cohort1 = cohortTable,
+    observation_period = observation_period
+  )
+
   cdm$cohort1 <- cdm$cohort1 %>%
     trimToDateRange(dateRange = as.Date(c("2011-01-01", "2012-01-01")))
 
