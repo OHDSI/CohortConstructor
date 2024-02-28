@@ -22,7 +22,7 @@ summariseCohortOverlap <- function(cohort,
 
   # add cohort names
   cdm <- omopgenerics::cdmReference(cohort)
-  name <- omopgenerics:::getTableName(cohort) # change to tableName when og is released
+  name <- attr(cohort, "tbl_name") # change to omopgenerics::getTableName(cohort)  when og is released
 
   cdm[[name]] <- PatientProfiles::addCohortName(cdm[[name]])
 
