@@ -29,7 +29,8 @@ Imports:
     omopgenerics (>= 0.0.2),
     PatientProfiles,
     rlang,
-    tidyr
+    tidyr,
+    utils
 Suggests: 
     DBI,
     DrugUtilisation,

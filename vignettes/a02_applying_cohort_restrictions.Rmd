@@ -9,15 +9,15 @@ vignette: >
 
 ```{r, include = FALSE}
 library(CDMConnector)
-if (Sys.getenv("EUNOMIA_DATA_FOLDER") == "") {
-Sys.setenv("EUNOMIA_DATA_FOLDER" = file.path(tempdir(), "eunomia"))  
-} 
-if (!dir.exists(file.path(tempdir(), "eunomia"))){ dir.create(file.path(tempdir(), "eunomia"))
-}
-if (!eunomia_is_available()) {
-downloadEunomiaData(pathToData = file.path(tempdir(), "eunomia"))  
-}
-
+# if (Sys.getenv("EUNOMIA_DATA_FOLDER") == "") {
+# Sys.setenv("EUNOMIA_DATA_FOLDER" = file.path(tempdir(), "eunomia"))  
+# } 
+# if (!dir.exists(file.path(tempdir(), "eunomia"))){ dir.create(file.path(tempdir(), "eunomia"))
+# }
+# if (!eunomia_is_available()) {
+# downloadEunomiaData(pathToData = file.path(tempdir(), "eunomia"))  
+# }
+# 
 eunomia_available <- eunomia_is_available()
 
 knitr::opts_chunk$set(

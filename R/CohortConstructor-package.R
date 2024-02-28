@@ -6,5 +6,6 @@
 #' @importFrom rlang .data
 #' @importFrom rlang .env
 #' @importFrom rlang :=
+#' @importFrom utils data
 ## usethis namespace: end
 NULL
