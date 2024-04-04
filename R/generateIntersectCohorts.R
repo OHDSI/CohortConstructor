@@ -33,11 +33,11 @@
 #' }
 
 generateIntersectCohortSet <- function(cdm,
-                                         name,
-                                         targetCohortName,
-                                         targetCohortId = NULL,
-                                         mutuallyExclusive = FALSE,
-                                         returnOnlyComb = FALSE) {
+                                       name,
+                                       targetCohortName,
+                                       targetCohortId = NULL,
+                                       mutuallyExclusive = FALSE,
+                                       returnOnlyComb = FALSE) {
   # initial checks
   checkmate::checkClass(cdm, "cdm_reference")
   checkmate::checkCharacter(name, len = 1, any.missing = FALSE, min.chars = 1)
