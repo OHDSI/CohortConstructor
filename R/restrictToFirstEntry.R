@@ -1,14 +1,14 @@
 #' Restrict cohort to first entry by index date
 #'
-#' @param cohort A cohort table in a cdm reference
+#' @param cohort A cohort table in a cdm reference.
 #' @param cohortId Vector of cohort definition ids to include. If NULL, all
 #' cohort definition ids will be used.
-#' @param indexDate indexDate variable in cohort that contains the date to
-#' restrict on
-#' @return A cohort table in a cdm reference
+#' @param indexDate Column name in cohort that contains the date to restrict on.
+#' @param name Name of the new cohort with the restriction.
+#' @return A cohort table in a cdm reference.
 #' @export
 #'
-#'#' @examples
+#' @examples
 #' \donttest{
 #' library(CohortConstructor)
 #' library(omock)
@@ -30,10 +30,10 @@ restrictToFirstEntry <- function(cohort,
   assertCharacter(name)
 
   # validate input
+  cdm <- omopgenerics::cdmReference(cohort)
   if (!isTRUE(inherits(cdm, "cdm_reference"))) {
     cli::cli_abort("cohort must be part of a cdm reference")
   }
-  cdm <- omopgenerics::cdmReference(cohort)
 
   if(!"cohort_table" %in% class(cohort) ||
      !all(c("cohort_definition_id", "subject_id",
