@@ -211,6 +211,7 @@ test_that("test exactMatchingCohort works if one of the cohorts does not have an
   # )
 
   ### generates overlapping cohorts --> issue CohortConstructor #53
+  # expect_no_error(
   #   generateMatchedCohortSet(cdm,
   #                            name = "new_cohort",
   #                            targetCohortName = "cases",
