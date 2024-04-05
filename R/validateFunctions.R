@@ -26,7 +26,7 @@ validateCohortId <- function(cohortId, ids) {
     cohortId <- ids
   } else {
     indNot <- !cohortId %in% ids
-    if (length(indNot)>0) {
+    if (sum(indNot)>0) {
       cli::cli_warn("{paste0(cohortId[indNot], collapse = ', ')} {?is/are} not in the cohort table and won't be used.")
       cohortId <- cohortId[!indNot]
     }

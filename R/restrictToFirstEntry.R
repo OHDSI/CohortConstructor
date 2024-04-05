@@ -37,7 +37,7 @@ restrictToFirstEntry <- function(cohort,
   indexDateSym <- rlang::sym(indexDate)
 
   if (all(ids %in% cohortId)) {
-    cdm[[name]] <- cohort |>
+    cohort <- cohort |>
       dplyr::group_by(.data$subject_id,.data$cohort_definition_id) |>
       dplyr::filter(!!indexDateSym == min(!!indexDateSym, na.rm = TRUE)) |>
       dplyr::ungroup() |>
@@ -45,7 +45,7 @@ restrictToFirstEntry <- function(cohort,
       omopgenerics::newCohortTable() |>
       CDMConnector::recordCohortAttrition("Restricted to first entry")
   } else {
-    cdm[[name]] <- cohort |>
+    cohort <- cohort |>
       dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>
       dplyr::group_by(.data$subject_id,.data$cohort_definition_id) |>
       dplyr::filter(!!indexDateSym == min(!!indexDateSym, na.rm = TRUE)) |>
@@ -59,5 +59,5 @@ restrictToFirstEntry <- function(cohort,
       CDMConnector::recordCohortAttrition("Restricted to first entry", cohortId = cohortId)
   }
 
-  return(cdm[[name]])
+  return(cohort)
 }

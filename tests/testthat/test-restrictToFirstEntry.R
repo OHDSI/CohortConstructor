@@ -1,5 +1,4 @@
 test_that("test restrict to first entry works", {
-  set.seed(123)
   cdm <- omock::mockCdmReference() |>
     omock::mockPerson(n = 3) |>
     omock::mockObservationPeriod() |>
@@ -22,7 +21,6 @@ test_that("test restrict to first entry works", {
 })
 
 test_that("restrictToFirstEntry, cohortIds & name arguments", {
-  set.seed(123)
   cdm <- omock::mockCdmReference() |>
     omock::mockPerson(n = 3) |>
     omock::mockObservationPeriod() |>
@@ -64,7 +62,6 @@ test_that("restrictToFirstEntry, cohortIds & name arguments", {
 
 
 test_that("restrictToFirstEntry, index date + errors", {
-  set.seed(123)
   cdm <- omock::mockCdmReference() |>
     omock::mockPerson(n = 3) |>
     omock::mockObservationPeriod() |>
@@ -81,7 +78,7 @@ test_that("restrictToFirstEntry, index date + errors", {
 
   expect_error(cdm$cohort |> restrictToFirstEntry(indexDate = "a"))
   expect_error(cdm$cohort |> restrictToFirstEntry(name = 1))
-  expect_error(cdm$cohort1 <- cdm$cohort |> restrictToFirstEntry())
+  expect_error(cdm$cohort1 <- cdm$cohort |> restrictToFirstEntry(name = "cohort2"))
   expect_error(cdm$cohort |> restrictToFirstEntry(cohortId = Inf))
   expect_error(cdm$cohort |> dplyr::collect() |> restrictToFirstEntry())
   expect_warning(cdm$cohort |> restrictToFirstEntry(cohortId = c(1, 5)))
