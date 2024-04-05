@@ -6,7 +6,6 @@
 \alias{cohortCount}
 \alias{settings}
 \alias{attrition}
-\alias{newCohortTable}
 \title{Objects exported from other packages}
 \keyword{internal}
 \description{
@@ -14,6 +13,6 @@ These objects are imported from other packages. Follow the links
 below to see their documentation.
 
 \describe{
-  \item{omopgenerics}{\code{\link[omopgenerics]{attrition}}, \code{\link[omopgenerics]{cohortCount}}, \code{\link[omopgenerics]{newCohortTable}}, \code{\link[omopgenerics]{settings}}}
+  \item{omopgenerics}{\code{\link[omopgenerics]{attrition}}, \code{\link[omopgenerics]{cohortCount}}, \code{\link[omopgenerics]{settings}}}
 }}
 
