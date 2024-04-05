@@ -6,20 +6,22 @@
 \usage{
 requireDemographics(
   cohort,
+  cohortId = NULL,
   indexDate = "cohort_start_date",
   ageRange = list(c(0, 150)),
   sex = c("Both"),
   minPriorObservation = 0,
-  minFutureObservation = 0
+  minFutureObservation = 0,
+  name = omopgenerics::tableName(cohort)
 )
 }
 \arguments{
-\item{cohort}{A cohort table in a cdm reference}
+\item{cohort}{A cohort table in a cdm reference.}
 
 \item{indexDate}{Variable in cohort that contains the date to compute the
 demographics characteristics on which to restrict on.}
 
-\item{ageRange}{A list of minimum and maximum age}
+\item{ageRange}{A list of minimum and maximum age.}
 
 \item{sex}{Can be "Both", "Male" or "Female". If one of the latter, only
 those with that sex will be included.}
@@ -29,6 +31,8 @@ the database.}
 
 \item{minFutureObservation}{A minimum number of future observation days in
 the database.}
+
+\item{name}{Name of the new cohort with the demographic requirements.}
 }
 \value{
 The cohort table with only records for individuals satisfying the

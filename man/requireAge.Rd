@@ -4,15 +4,26 @@
 \alias{requireAge}
 \title{Restrict cohort on age}
 \usage{
-requireAge(cohort, indexDate = "cohort_start_date", ageRange = list(c(0, 150)))
+requireAge(
+  cohort,
+  cohortId = NULL,
+  ageRange = list(c(0, 150)),
+  indexDate = "cohort_start_date",
+  name = omopgenerics::tableName(cohort)
+)
 }
 \arguments{
-\item{cohort}{A cohort table in a cdm reference}
+\item{cohort}{A cohort table in a cdm reference.}
+
+\item{cohortId}{Vector of cohort definition ids to include. If NULL, all
+cohort definition ids will be used.}
+
+\item{ageRange}{A list of minimum and maximum age.}
 
 \item{indexDate}{Variable in cohort that contains the date to compute the
 demographics characteristics on which to restrict on.}
 
-\item{ageRange}{A list of minimum and maximum age}
+\item{name}{Name of the new cohort with the age requirement.}
 }
 \value{
 The cohort table with only records for individuals satisfying the
