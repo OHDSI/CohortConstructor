@@ -25,42 +25,17 @@ restrictToFirstEntry <- function(cohort,
                                  name = omopgenerics::tableName(cohort)){
 
   # checks
-  assertCharacter(indexDate)
-  assertNumeric(cohortId, null = TRUE, integerish = TRUE)
   assertCharacter(name)
-
-  # validate input
+  validateCohortTable(cohort)
   cdm <- omopgenerics::cdmReference(cohort)
-  if (!isTRUE(inherits(cdm, "cdm_reference"))) {
-    cli::cli_abort("cohort must be part of a cdm reference")
-  }
-
-  if(!"cohort_table" %in% class(cohort) ||
-     !all(c("cohort_definition_id", "subject_id",
-            "cohort_start_date", "cohort_end_date") %in%
-          colnames(cohort))){
-    cli::cli_abort("cohort must be a `cohort_table`")
-  }
-
-  if(!indexDate %in% colnames(cohort)){
-    cli::cli_abort("indexDate must be a date column in the cohort table")
-  }
-
+  validateCDM(cdm)
+  validateIndexDate(indexDate, cohort)
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
-  if (is.null(cohortId)) {
-    cohortId <- ids
-  } else {
-    indNot <- which(!cohortId %in% ids)
-    if (length(indNot)>0) {
-      cli::cli_warn("{paste0(cohortId[indNot], collapse = ', ')} {?is/are} not in the cohort table and won't be used.")
-      cohortId <- cohortId[!indNot]
-    }
-  }
+  cohortId <- validateCohortId(cohortId, ids)
 
   # restrict to first entry
   indexDateSym <- rlang::sym(indexDate)
 
-  # TO DO : if cohort id son tots no fer filtres
   if (all(ids %in% cohortId)) {
     cdm[[name]] <- cohort |>
       dplyr::group_by(.data$subject_id,.data$cohort_definition_id) |>

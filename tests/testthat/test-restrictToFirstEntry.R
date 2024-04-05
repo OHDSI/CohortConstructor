@@ -63,7 +63,7 @@ test_that("restrictToFirstEntry, cohortIds & name arguments", {
 })
 
 
-test_that("restrictToFirstEntry, index date", {
+test_that("restrictToFirstEntry, index date + errors", {
   set.seed(123)
   cdm <- omock::mockCdmReference() |>
     omock::mockPerson(n = 3) |>
@@ -78,4 +78,11 @@ test_that("restrictToFirstEntry, index date", {
 
   expect_true(all(cdm$cohort |> restrictToFirstEntry(indexDate = "index_date") |>
                     dplyr::pull(index_date) == c("2001-05-29", "1999-07-30", "1999-07-30")))
+
+  expect_error(cdm$cohort |> restrictToFirstEntry(indexDate = "a"))
+  expect_error(cdm$cohort |> restrictToFirstEntry(name = 1))
+  expect_error(cdm$cohort1 <- cdm$cohort |> restrictToFirstEntry())
+  expect_error(cdm$cohort |> restrictToFirstEntry(cohortId = Inf))
+  expect_error(cdm$cohort |> dplyr::collect() |> restrictToFirstEntry())
+  expect_warning(cdm$cohort |> restrictToFirstEntry(cohortId = c(1, 5)))
 })
