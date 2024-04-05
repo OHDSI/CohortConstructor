@@ -30,9 +30,9 @@ test_that("test it works and expected errors", {
   expect_true("cohort_table" %in% class(cdm$cohort))
   expect_equal(omopgenerics::attrition(cdm$cohort),
                omopgenerics::attrition(cdm$cohort1))
-  expect_true(all(cdm$cohort |> dplyr::pull("subject_id") == c(1, 3, 4, 1)))
+  expect_true(all(cdm$cohort |> dplyr::pull("subject_id") == c(1, 1, 3, 4)))
   expect_true(all(cdm$cohort |> dplyr::pull("cohort_start_date") ==
-                    c("2003-05-02", "2015-01-27", "1996-06-30", "2001-05-30")))
+                    c("2001-05-30", "2003-05-02", "2015-01-27", "1996-06-30")))
 
   # expect errors
   expect_error(requireDemographics(cohort = "cohort"))

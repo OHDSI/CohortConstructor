@@ -39,14 +39,6 @@ requireDemographics <- function(cohort,
                                 minFutureObservation = 0,
                                 name = omopgenerics::tableName(cohort)) {
 
-  external_cols <- cohort %>%
-    dplyr::select(-c(
-      "cohort_definition_id", "subject_id",
-      "cohort_start_date", "cohort_end_date",
-      indexDate
-    )) %>%
-    colnames()
-
   cohort <- demographicsFilter(
     cohort = cohort,
     cohortId = cohortId,
@@ -61,15 +53,6 @@ requireDemographics <- function(cohort,
     attritionPriorObservation = TRUE,
     attritionFutureObservation = TRUE
   )
-
-  if (length(external_cols) > 0) {
-    if (!all(external_cols %in% (cohort %>% colnames()))) {
-      cli::cli_abort(paste0(
-        "Missing original column ",
-        setdiff(external_cols, cohort %>% colnames())
-      ))
-    }
-  }
 
   return(cohort)
 }
@@ -378,9 +361,9 @@ demographicsFilter <- function(cohort,
   cohort <- cohort |>
     dplyr::inner_join(
       workingTable |>
-        dplyr::select(dplyr::all_of(
+        dplyr::select(
           c("cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date")
-        )),
+        ),
       by = c("cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date")
     ) |>
     dplyr::compute(name = name, temporary = FALSE) %>%
