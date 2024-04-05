@@ -61,7 +61,7 @@ restrictToFirstEntry <- function(cohort,
   indexDateSym <- rlang::sym(indexDate)
 
   # TO DO : if cohort id son tots no fer filtres
-  if (all(ids) %in% cohortId) {
+  if (all(ids %in% cohortId)) {
     cdm[[name]] <- cohort |>
       dplyr::group_by(.data$subject_id,.data$cohort_definition_id) |>
       dplyr::filter(!!indexDateSym == min(!!indexDateSym, na.rm = TRUE)) |>
