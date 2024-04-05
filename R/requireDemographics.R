@@ -3,6 +3,8 @@
 #' Restrict cohort on patient demographics
 #'
 #' @param cohort A cohort table in a cdm reference.
+#' @param cohortId Vector of cohort definition ids to include. If NULL, all
+#' cohort definition ids will be used.
 #' @param indexDate Variable in cohort that contains the date to compute the
 #' demographics characteristics on which to restrict on.
 #' @param ageRange A list of minimum and maximum age.

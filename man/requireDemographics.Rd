@@ -18,6 +18,9 @@ requireDemographics(
 \arguments{
 \item{cohort}{A cohort table in a cdm reference.}
 
+\item{cohortId}{Vector of cohort definition ids to include. If NULL, all
+cohort definition ids will be used.}
+
 \item{indexDate}{Variable in cohort that contains the date to compute the
 demographics characteristics on which to restrict on.}
 
