@@ -147,16 +147,16 @@ test_that("generateIntersectCohortSet", {
   expect_true(nrow(omopgenerics::settings(cdm$cohort2)) == 3)
   expect_true(all(
     cdm$cohort2 %>%
-      dplyr::arrange(.data$cohort_start_date) %>%
-      dplyr::pull("cohort_start_date") ==
-      c("2000-06-23", "2001-03-30", "2001-07-16", "2001-12-04", "2003-06-15",
-        "2005-11-24", "2015-03-05", "2015-03-25", "2015-04-15", "1997-10-22")
+      dplyr::pull("cohort_start_date") %>%
+      sort() ==
+      c("1997-10-22", "2000-06-23", "2001-03-30" ,"2001-07-16", "2001-12-04",
+        "2003-06-15", "2005-11-24", "2015-03-05", "2015-03-25", "2015-04-15")
   ))
 
-  # not mutually exclusive
+  # not mutually exclusive and gap
   expect_no_error(cdm <- generateIntersectCohortSet(
     cdm = cdm, name = "cohort3", targetCohortName = "cohort1",
-    mutuallyExclusive = FALSE
+    mutuallyExclusive = FALSE, gap = 1
   ))
   expect_true(all(CDMConnector::settings(cdm$cohort3)$mutually_exclusive == FALSE))
   expect_true(cdm$cohort3 %>% dplyr::tally() %>% dplyr::pull() == 7)
@@ -168,9 +168,9 @@ test_that("generateIntersectCohortSet", {
   expect_true(nrow(omopgenerics::settings(cdm$cohort3)) == 3)
   expect_true(all(
     cdm$cohort3 %>%
-      dplyr::arrange(.data$cohort_start_date) %>%
-      dplyr::pull("cohort_start_date") ==
-      c("2001-03-30", "2015-03-25", "2015-03-05", "2015-03-25", "1997-10-22", "2001-03-30", "2000-06-23")
+      dplyr::pull("cohort_start_date") %>%
+      sort() ==
+      c("1997-10-22", "2000-06-23", "2001-03-30", "2001-03-30", "2015-03-05", "2015-03-25", "2015-03-25")
   ))
 
   # not enough cohorts provided
@@ -192,6 +192,8 @@ test_that("only return comb", {
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
     omock::mockCohort(tableName = c("cohort1"), numberCohorts = 2, seed = 2)
+  cdm_local$cohort1 <- cdm_local$cohort1 |>
+    dplyr::filter(cohort_end_date != as.Date("2015-04-17"))
   cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
                                    cdm = cdm_local,
                                    schema = "main")
@@ -200,7 +202,7 @@ test_that("only return comb", {
     cdm = cdm, name = "cohort2", targetCohortName = "cohort1",
     mutuallyExclusive = FALSE, returnOnlyComb = TRUE
   )
-  expect_true(is.null(cdm$cohort2))
+  expect_true(nrow(dplyr::collect(cdm$cohort2)) == 0)
 
   # not null combination
   cdm_local <- omock::mockCdmReference() |>
@@ -212,7 +214,7 @@ test_that("only return comb", {
                                    schema = "main")
   cdm <- generateIntersectCohortSet(
     cdm = cdm, name = "cohort3", targetCohortName = "cohort1",
-    mutuallyExclusive = FALSE, returnOnlyComb = TRUE
+    mutuallyExclusive = FALSE, returnOnlyComb = TRUE, gap = 1
   )
   expect_equal(
     cdm$cohort3 |>
@@ -236,7 +238,7 @@ test_that("only return comb", {
 
   cdm <- generateIntersectCohortSet(
     cdm = cdm, name = "cohort4", targetCohortName = "cohort1",
-    mutuallyExclusive = TRUE, returnOnlyComb = TRUE
+    mutuallyExclusive = TRUE, returnOnlyComb = TRUE, gap = 1
   )
 
   expect_equal(
@@ -244,16 +246,14 @@ test_that("only return comb", {
       dplyr::collect() %>%
       dplyr::arrange(.data$cohort_start_date) %>%
       dplyr::pull(.data$cohort_start_date),
-    as.Date(c("1997-10-22", "2001-03-30", "2001-07-16", "2001-12-04", "2003-06-15",
-              "2015-03-05", "2015-03-25", "2015-04-15"))
+    as.Date(c("1997-10-22", "2001-03-30", "2015-03-05", "2015-03-25", "2015-04-15"))
   )
   expect_equal(
     cdm$cohort4 |>
       dplyr::collect() %>%
       dplyr::arrange(cohort_end_date) %>%
       dplyr::pull(cohort_end_date),
-    as.Date(c("1999-05-28", "2001-07-15", "2001-12-03", "2003-06-14", "2005-11-23",
-              "2015-03-24", "2015-04-14", "2015-07-06"))
+    as.Date(c("1999-05-28", "2005-11-23", "2015-03-24", "2015-04-14", "2015-07-06"))
   )
   expect_true(nrow(omopgenerics::settings(cdm$cohort4)) == 4)
   expect_true(all(omopgenerics::settings(cdm$cohort4)$cohort_1 == c(1, 1, 1, 0)))

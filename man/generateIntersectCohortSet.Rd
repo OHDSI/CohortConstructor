@@ -10,6 +10,7 @@ generateIntersectCohortSet(
   name,
   targetCohortName,
   targetCohortId = NULL,
+  gap = 0,
   mutuallyExclusive = FALSE,
   returnOnlyComb = FALSE
 )
@@ -24,6 +25,9 @@ combinations.}
 
 \item{targetCohortId}{Ids to combine of the target cohort. If NULL all
 cohort present in the table will be used.}
+
+\item{gap}{Number of days between two subsequent cohort entries to be merged
+in a single cohort record.}
 
 \item{mutuallyExclusive}{Whether the generated cohorts are mutually
 exclusive or not.}
