@@ -189,13 +189,12 @@ test_that("test exactMatchingCohort works if there are no subjects", {
     overwrite = TRUE
   )
   cdm$cases <- cdm$cases %>% dplyr::filter(subject_id == 0)
-  expect_no_error(
-    generateMatchedCohortSet(
-      cdm,
-      name = "new_cohort",
-      targetCohortName = "cases",
-    )
+  cdm <- generateMatchedCohortSet(
+    cdm,
+    name = "new_cohort",
+    targetCohortName = "cases",
   )
+  expect_true(cdm$new_cohort %>% dplyr::tally() %>% dplyr::pull(n) == 0)
 })
 
 
@@ -220,8 +219,6 @@ test_that("test exactMatchingCohort works if one of the cohorts does not have an
                              ratio = 1)
   )
 })
-
-
 
 test_that("test exactMatchingCohort with a ratio bigger than 1", {
   followback  <- 180

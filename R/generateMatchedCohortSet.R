@@ -96,8 +96,6 @@ generateMatchedCohortSet <- function(cdm,
       # Rename cohort definition ids
       cdm <- renameCohortDefinitionIds(cdm, name)
 
-    } else {
-      # TO DO
     }
   }
   # Return
