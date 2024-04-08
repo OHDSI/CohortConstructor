@@ -140,7 +140,7 @@ generateIntersectCohortSet <- function(cdm,
       dplyr::group_by(.data$cohort_definition_id, .data$cohort_name) %>%
       dplyr::mutate(dplyr::across(
         dplyr::everything(),
-        ~ dplyr::if_else(dplyr::n_distinct(.x) == 1, 1, as.numeric(NA))
+        ~ dplyr::if_else(dplyr::n_distinct(.x) == 1, 1, 0)
       )) %>%
       dplyr::ungroup() %>%
       dplyr::distinct()

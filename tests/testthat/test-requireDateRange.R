@@ -1,4 +1,12 @@
 test_that("requireDateRange", {
+    cdm_local <- omock::mockCdmReference() |>
+    omock::mockPerson(n = 4) |>
+    omock::mockObservationPeriod() |>
+    omock::mockCohort(tableName = c("cohort1"), numberCohorts = 2) |>
+    omock::mockCohort(tableName = c("cohort2"), numberCohorts = 2, seed = 2)
+  cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
+                                   cdm = cdm_local,
+                                   schema = "main")
   # one person, one observation periods
   cohortTable <- dplyr::tibble(
     cohort_definition_id = c(1, 1, 1),

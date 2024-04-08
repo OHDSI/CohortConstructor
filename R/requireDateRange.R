@@ -1,9 +1,12 @@
 #' Require that an index date is within a date range
 #'
-#' @param cohort A cohort table in a cdm reference
-#' @param indexDate Variable in cohort that contains the index date of interest
+#' @param cohort A cohort table in a cdm reference.
+#' @param cohortId Vector of cohort definition ids to include. If NULL, all
+#' cohort definition ids will be used.
 #' @param dateRange A window of time during which the index date must have
-#' been observed
+#' been observed.
+#' @param indexDate Variable in cohort that contains the index date of interest
+#' @param name Name of the new cohort with the restriction.
 #'
 #' @return The cohort table with any cohort entries outside of the date range
 #' dropped
@@ -17,16 +20,19 @@
 #'   requireInDateRange(indexDate = "cohort_start_date",
 #'                      dateRange = as.Date(c("2010-01-01", "2019-01-01")))
 requireInDateRange <- function(cohort,
-                             indexDate = "cohort_start_date",
-                             dateRange = as.Date(c(NA, NA))) {
+                               cohortId = NULL,
+                               dateRange = as.Date(c(NA, NA)),
+                               indexDate = "cohort_start_date",
+                               name = omopgenerics::tableName(cohort)) {
 
   checkCohort(cohort)
   checkDateVariable(cohort = cohort, dateVar = indexDate)
   checkDateRange(dateRange)
 
-  cohort <- cohort %>%
+  cohort <- cohort |>
     dplyr::filter(.data[[indexDate]] >= !!dateRange[1] &
-                    .data[[indexDate]] <= !!dateRange[2]) %>%
+                    .data[[indexDate]] <= !!dateRange[2]) |>
+    dplyr::compute(name = name, temporary = FALSE) |>
     CDMConnector::recordCohortAttrition(reason = paste0(
       indexDate,
       " between ", dateRange[1], " & ", dateRange[2]
