@@ -27,7 +27,7 @@ Imports:
     glue,
     magrittr,
     omopgenerics (>= 0.1.2),
-    PatientProfiles(>= 0.8.0),
+    PatientProfiles (>= 0.8.0),
     rlang,
     tidyr,
     utils
