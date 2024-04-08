@@ -172,9 +172,9 @@ randomPrefix <- function(n = 5) {
 
 getNumberOfCohorts <- function(cdm, targetCohortName){
   # Read number of cohorts
-  n <- cdm[[targetCohortName]] %>%
+  n <- settings(cdm[[targetCohortName]]) %>%
     dplyr::summarise(v = max(.data$cohort_definition_id, na.rm = TRUE)) %>%
-    dplyr::pull("v") # number of different cohorts
+    dplyr::pull("v")
 
   if(is.na(n)){# Empty table, number of cohorts is 0
     n <- 0
@@ -256,7 +256,9 @@ getNewCohort <- function(cdm, name, targetCohortName, targetCohortId, n){
     dplyr::slice(rep(1:dplyr::n(), times = 2)) %>%
     dplyr::group_by(.data$cohort_definition_id) %>%
     dplyr::mutate(
-      cohort_name = dplyr::if_else(dplyr::row_number() == 2, paste0(.data$cohort_name,"_matched"), .data$cohort_name),
+      cohort_name = dplyr::if_else(dplyr::row_number() == 2, paste0(.data$cohort_name,"_matched"), .data$cohort_name)
+    ) %>%
+    dplyr::mutate(
       cohort_definition_id = dplyr::if_else(dplyr::row_number() == 2, .data$cohort_definition_id+.env$n, .data$cohort_definition_id)
     ) %>%
     dplyr::ungroup()
@@ -435,7 +437,6 @@ checkObservationPeriod <- function(cdm, name, targetCohortId, n){
   return(cdm)
 }
 
-
 checkRatio <- function(cdm, name, ratio, targetCohortId, n){
   if (ratio == Inf) {
     cdm[[name]] <- cdm[[name]] %>%
@@ -454,7 +455,6 @@ checkRatio <- function(cdm, name, ratio, targetCohortId, n){
 
   return(cdm)
 }
-
 
 checkCohortSetRef <- function(cdm, name, targetCohortName, matchSex, matchYearOfBirth, targetCohortId, n){
   cohort_set_ref <- cdm[[name]] %>%
