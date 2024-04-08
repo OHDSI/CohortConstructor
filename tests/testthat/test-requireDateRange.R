@@ -86,12 +86,12 @@ test_that("trim cohort dates", {
   expect_true(omopgenerics::cohortCount(cdm$cohort3)$number_records[1] == 1)
   expect_equal(sort(cdm$cohort3 %>%
                       dplyr::pull("subject_id")), c(1, 3, 3, 3, 4))
-  expect_equal(sort(omopgenerics::attrition(cdm$cohort3)$reason[
-      omopgenerics::attrition(cdm$cohort3)$cohort_definition_id == 1]),
-      c("cohort_end_date <= 2005-01-01", "cohort_start_date >= 2001-01-01", "Initial qualifying events")
+  expect_equal(omopgenerics::attrition(cdm$cohort3)$reason[
+      omopgenerics::attrition(cdm$cohort3)$cohort_definition_id == 1],
+      c("Initial qualifying events", "cohort_start_date >= 2001-01-01", "cohort_end_date <= 2005-01-01")
     )
-  expect_equal(sort(omopgenerics::attrition(cdm$cohort3)$reason[
-    omopgenerics::attrition(cdm$cohort3)$cohort_definition_id == 2]),
+  expect_equal(omopgenerics::attrition(cdm$cohort3)$reason[
+    omopgenerics::attrition(cdm$cohort3)$cohort_definition_id == 2],
     "Initial qualifying events"
   )
 
