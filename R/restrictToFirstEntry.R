@@ -1,41 +1,63 @@
 #' Restrict cohort to first entry by index date
 #'
-#' @param cohort A cohort table in a cdm reference
-#' @param indexDate indexDate Variable in cohort that contains the date to
-#' restrict on
-#' @return a cohort table in a cdm reference
+#' @param cohort A cohort table in a cdm reference.
+#' @param cohortId Vector of cohort definition ids to include. If NULL, all
+#' cohort definition ids will be used.
+#' @param indexDate Column name in cohort that contains the date to restrict on.
+#' @param name Name of the new cohort with the restriction.
+#' @return A cohort table in a cdm reference.
 #' @export
 #'
+#' @examples
+#' \donttest{
+#' library(CohortConstructor)
+#' library(omock)
+#' cdm <- mockCdmReference() |>
+#'   mockPerson(nPerson = 2) |>
+#'   mockObservationPeriod() |>
+#'   mockCohort(recordPerson = 2)
+#' cdm <- restrictToFirstEntry(cdm$cohort)
+#' }
 #'
 restrictToFirstEntry <- function(cohort,
-                                 indexDate = "cohort_start_date"){
+                                 cohortId = NULL,
+                                 indexDate = "cohort_start_date",
+                                 name = omopgenerics::tableName(cohort)){
 
-  cdm <- attr(cohort, "cdm_reference")
-  #validate input
-  if (!isTRUE(inherits(cdm, "cdm_reference"))) {
-    cli::cli_abort("cohort must be part of a cdm reference")
-  }
+  # checks
+  assertCharacter(name)
+  validateCohortTable(cohort)
+  cdm <- omopgenerics::cdmReference(cohort)
+  validateCDM(cdm)
+  validateIndexDate(indexDate, cohort)
+  ids <- omopgenerics::settings(cohort)$cohort_definition_id
+  cohortId <- validateCohortId(cohortId, ids)
 
-  if(!"GeneratedCohortSet" %in% class(cohort) ||
-     !all(c("cohort_definition_id", "subject_id",
-            "cohort_start_date", "cohort_end_date") %in%
-          colnames(cohort))){
-    cli::cli_abort("cohort must be a GeneratedCohortSet")
-  }
-
-  if(!indexDate %in% colnames(cohort)){
-    cli::cli_abort("indexDate must be a date column in the cohort table")
-  }
-
-  #restrict to first entry
+  # restrict to first entry
   indexDateSym <- rlang::sym(indexDate)
 
-  cohort <- cohort %>%
-    dplyr::group_by(.data$subject_id,.data$cohort_definition_id) %>%
-    dplyr::filter(!!indexDateSym == min(!!indexDateSym, na.rm = TRUE)) %>%
-    dplyr::ungroup() %>%
-    CDMConnector::recordCohortAttrition("Restricted to first entry")
+  if (all(ids %in% cohortId)) {
+    cohort <- cohort |>
+      dplyr::group_by(.data$subject_id,.data$cohort_definition_id) |>
+      dplyr::filter(!!indexDateSym == min(!!indexDateSym, na.rm = TRUE)) |>
+      dplyr::ungroup() |>
+      dplyr::compute(name = name, temporary = FALSE) |>
+      omopgenerics::newCohortTable() |>
+      CDMConnector::recordCohortAttrition("Restricted to first entry")
+  } else {
+    cohort <- cohort |>
+      dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>
+      dplyr::group_by(.data$subject_id,.data$cohort_definition_id) |>
+      dplyr::filter(!!indexDateSym == min(!!indexDateSym, na.rm = TRUE)) |>
+      dplyr::ungroup() |>
+      dplyr::union_all(
+        cohort |>
+          dplyr::filter(!.data$cohort_definition_id %in% .env$cohortId)
+      ) |>
+      dplyr::compute(name = name, temporary = FALSE) |>
+      omopgenerics::newCohortTable() |>
+      CDMConnector::recordCohortAttrition("Restricted to first entry", cohortId = cohortId)
+  }
 
   return(cohort)
-
 }
