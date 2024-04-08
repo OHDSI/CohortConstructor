@@ -37,6 +37,8 @@ generateMatchedCohortSet <- function(cdm,
                                      matchSex = TRUE,
                                      matchYearOfBirth = TRUE,
                                      ratio = 1){
+  cli::cli_inform("Starting matching")
+
   # validate initial input
   validateInput(
     cdm = cdm, name = name, targetCohortName = targetCohortName,
@@ -58,6 +60,7 @@ generateMatchedCohortSet <- function(cdm,
   } else {
     # get target cohort id
     targetCohortId <- getTargetCohortId(cdm, targetCohortId, targetCohortName)
+    cli::cli_inform(c("*" = paste0(length(targetCohortId), " cohorts to be matched.")))
 
     # Create the cohort name with cases and controls of the targetCohortId
     cdm <- getNewCohort(cdm, name, targetCohortName, targetCohortId, n)
@@ -67,19 +70,25 @@ generateMatchedCohortSet <- function(cdm,
 
     # get matched tables
     matchCols <- getMatchCols(matchSex, matchYearOfBirth)
+    for(i in matchCols){
+      cli::cli_inform(c("*" = paste0("Matching by ", i)))
+    }
 
     if(!is.null(matchCols)){
       # Exclude individuals without any match
       cdm <- excludeNoMatchedIndividuals(cdm, name, matchCols, n)
+      cli::cli_inform(c("*" = "Not matched individuals excluded"))
 
       # Match as ratio was infinite
       cdm <- infiniteMatching(cdm, name, targetCohortId)
 
       # Delete controls that are not in observation
       cdm <- checkObservationPeriod(cdm, name, targetCohortId, n)
+      cli::cli_inform(c("*" = "Removing pairs that were not in observation at index date"))
 
       # Check ratio
       cdm <- checkRatio(cdm, name, ratio, targetCohortId, n)
+      cli::cli_inform(c("*" = "Adjusting ratio"))
 
       # Check cohort set ref
       cdm <- checkCohortSetRef(cdm, name, targetCohortName, matchSex, matchYearOfBirth, targetCohortId, n)
@@ -92,6 +101,7 @@ generateMatchedCohortSet <- function(cdm,
     }
   }
   # Return
+  cli::cli_inform(c("v" = "Done"))
   return(cdm)
 }
 
