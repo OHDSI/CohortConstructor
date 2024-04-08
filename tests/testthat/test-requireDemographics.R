@@ -3,6 +3,9 @@ test_that("test it works and expected errors", {
     omock::mockPerson(n = 10) |>
     omock::mockObservationPeriod() |>
     omock::mockCohort()
+  # to remove in new omock
+  cdm_local$person <- cdm_local$person |>
+    dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
   cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
                                    cdm = cdm_local,
                                    schema = "main")
@@ -108,6 +111,9 @@ test_that("restrictions applied to single cohort", {
     omock::mockPerson(n = 1) |>
     omock::mockObservationPeriod() |>
     omock::mockCohort(recordPerson = 3)
+  # to remove in new omock
+  cdm_local$person <- cdm_local$person |>
+    dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
   cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
                                    cdm = cdm_local,
                                    schema = "main")
@@ -141,6 +147,9 @@ test_that("ignore existing cohort extra variables", {
     omock::mockPerson(n = 1) |>
     omock::mockObservationPeriod() |>
     omock::mockCohort(recordPerson = 3)
+  # to remove in new omock
+  cdm_local$person <- cdm_local$person |>
+    dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
   cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
                                    cdm = cdm_local,
                                    schema = "main")
@@ -179,6 +188,9 @@ test_that("external columns kept after requireDemographics", {
       col_extra2 = as.numeric(subject_id) + 2,
       new_index_date = cohort_start_date + 1
     )
+  # to remove in new omock
+  cdm_local$person <- cdm_local$person |>
+    dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
   cdm <- CDMConnector::copy_cdm_to(
     con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
     cdm = cdm_local,
@@ -195,6 +207,9 @@ test_that("cohortIds", {
     omock::mockPerson(n = 3) |>
     omock::mockObservationPeriod() |>
     omock::mockCohort(numberCohorts = 3)
+  # to remove in new omock
+  cdm_local$person <- cdm_local$person |>
+    dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
   cdm <- CDMConnector::copy_cdm_to(
     con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
     cdm = cdm_local,
