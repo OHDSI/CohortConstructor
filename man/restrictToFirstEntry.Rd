@@ -4,17 +4,38 @@
 \alias{restrictToFirstEntry}
 \title{Restrict cohort to first entry by index date}
 \usage{
-restrictToFirstEntry(cohort, indexDate = "cohort_start_date")
+restrictToFirstEntry(
+  cohort,
+  cohortId = NULL,
+  indexDate = "cohort_start_date",
+  name = omopgenerics::tableName(cohort)
+)
 }
 \arguments{
-\item{cohort}{A cohort table in a cdm reference}
+\item{cohort}{A cohort table in a cdm reference.}
 
-\item{indexDate}{indexDate Variable in cohort that contains the date to
-restrict on}
+\item{cohortId}{Vector of cohort definition ids to include. If NULL, all
+cohort definition ids will be used.}
+
+\item{indexDate}{Column name in cohort that contains the date to restrict on.}
+
+\item{name}{Name of the new cohort with the restriction.}
 }
 \value{
-a cohort table in a cdm reference
+A cohort table in a cdm reference.
 }
 \description{
 Restrict cohort to first entry by index date
+}
+\examples{
+\donttest{
+library(CohortConstructor)
+library(omock)
+cdm <- mockCdmReference() |>
+  mockPerson(nPerson = 2) |>
+  mockObservationPeriod() |>
+  mockCohort(recordPerson = 2)
+cdm <- restrictToFirstEntry(cdm$cohort)
+}
+
 }
