@@ -425,7 +425,7 @@ checkObservationPeriod <- function(cdm, name, targetCohortId, n){
     dplyr::mutate(cohort_end_date = dplyr::if_else(
       .data$cohort_definition_id %in% .env$targetCohortId,
       .data$cohort_end_date,
-      !!CDMConnector::dateadd("cohort_start_date", "future_observation")
+      as.Date(!!CDMConnector::dateadd("cohort_start_date", "future_observation"))
     )) %>%
     dplyr::select(-"future_observation") %>%
     dplyr::group_by(.data$target_definition_id, .data$group_id, .data$pair_id) %>%

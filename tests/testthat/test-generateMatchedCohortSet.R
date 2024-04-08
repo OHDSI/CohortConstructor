@@ -210,7 +210,6 @@ test_that("test exactMatchingCohort works if one of the cohorts does not have an
     overwrite = TRUE
   )
 
-  ### generates overlapping cohorts --> issue CohortConstructor #53
   expect_no_error(
     cdm <- generateMatchedCohortSet(cdm,
                              name = "new_cohort",
