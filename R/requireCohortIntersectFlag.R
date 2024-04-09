@@ -1,19 +1,17 @@
-
-
 #' Require cohort subjects are present in another cohort
 #'
-#' @param x Cohort table
-#' @param targetCohortTable name of the cohort that we want to check for overlap
-#' @param targetCohortId vector of cohort definition ids to include
+#' @param x Cohort table.
+#' @param targetCohortTable Name of the cohort that we want to check for overlap.
+#' @param targetCohortId Vector of cohort definition ids to include.
 #' @param indexDate Variable in x that contains the date to compute the
 #' intersection.
-#' @param targetStartDate date of reference in cohort table, either for start
-#' (in overlap) or on its own (for incidence)
-#' @param targetEndDate date of reference in cohort table, either for end
-#' (overlap) or NULL (if incidence)
-#' @param window window to consider events over
+#' @param targetStartDate Date of reference in cohort table, either for start
+#' (in overlap) or on its own (for incidence).
+#' @param targetEndDate Date of reference in cohort table, either for end
+#' (overlap) or NULL (if incidence).
+#' @param window Window to consider events over.
 #' @param negate If set as TRUE, criteria will be applied as exclusion
-#' rather than inclusion (i.e. require absence in another cohort)
+#' rather than inclusion (i.e. require absence in another cohort).
 #'
 #' @return Cohort table with only those in the other cohort kept
 #' @export

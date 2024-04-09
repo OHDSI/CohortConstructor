@@ -16,7 +16,7 @@ validateCohortTable <- function(cohort) {
 validateIndexDate <- function(indexDate, cohort) {
   assertCharacter(indexDate)
   if(!indexDate %in% colnames(cohort)){
-    cli::cli_abort("indexDate must be a date column in the cohort table")
+    cli::cli_abort("{indexDate} must be a date column in the cohort table")
   }
 }
 
@@ -32,4 +32,17 @@ validateCohortId <- function(cohortId, ids) {
     }
   }
   return(cohortId)
+}
+
+validateDateRange<-function(dateRange){
+  if(!"Date" %in% class(dateRange)){
+    cli::cli_abort("dateRange is not a date")
+  }
+  if(length(dateRange) != 2){
+    cli::cli_abort("dateRange must be length two")
+  }
+  if(dateRange[1]>dateRange[2]){
+    cli::cli_abort("First date in dateRange cannot be after second")
+  }
+  return(invisible(dateRange))
 }

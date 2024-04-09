@@ -6,17 +6,24 @@
 \usage{
 requireInDateRange(
   cohort,
+  cohortId = NULL,
+  dateRange = as.Date(c(NA, NA)),
   indexDate = "cohort_start_date",
-  dateRange = as.Date(c(NA, NA))
+  name = omopgenerics::tableName(cohort)
 )
 }
 \arguments{
-\item{cohort}{A cohort table in a cdm reference}
+\item{cohort}{A cohort table in a cdm reference.}
+
+\item{cohortId}{Vector of cohort definition ids to include. If NULL, all
+cohort definition ids will be used.}
+
+\item{dateRange}{A window of time during which the index date must have
+been observed.}
 
 \item{indexDate}{Variable in cohort that contains the index date of interest}
 
-\item{dateRange}{A window of time during which the index date must have
-been observed}
+\item{name}{Name of the new cohort with the restriction.}
 }
 \value{
 The cohort table with any cohort entries outside of the date range

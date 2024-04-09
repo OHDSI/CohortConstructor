@@ -16,25 +16,25 @@ requireCohortIntersectFlag(
 )
 }
 \arguments{
-\item{x}{Cohort table}
+\item{x}{Cohort table.}
 
-\item{targetCohortTable}{name of the cohort that we want to check for overlap}
+\item{targetCohortTable}{Name of the cohort that we want to check for overlap.}
 
-\item{targetCohortId}{vector of cohort definition ids to include}
+\item{targetCohortId}{Vector of cohort definition ids to include.}
 
 \item{indexDate}{Variable in x that contains the date to compute the
 intersection.}
 
-\item{targetStartDate}{date of reference in cohort table, either for start
-(in overlap) or on its own (for incidence)}
+\item{targetStartDate}{Date of reference in cohort table, either for start
+(in overlap) or on its own (for incidence).}
 
-\item{targetEndDate}{date of reference in cohort table, either for end
-(overlap) or NULL (if incidence)}
+\item{targetEndDate}{Date of reference in cohort table, either for end
+(overlap) or NULL (if incidence).}
 
-\item{window}{window to consider events over}
+\item{window}{Window to consider events over.}
 
 \item{negate}{If set as TRUE, criteria will be applied as exclusion
-rather than inclusion (i.e. require absence in another cohort)}
+rather than inclusion (i.e. require absence in another cohort).}
 }
 \value{
 Cohort table with only those in the other cohort kept

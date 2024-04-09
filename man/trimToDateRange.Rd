@@ -6,20 +6,27 @@
 \usage{
 trimToDateRange(
   cohort,
+  cohortId = NULL,
+  dateRange = as.Date(c(NA, NA)),
   startDate = "cohort_start_date",
   endDate = "cohort_end_date",
-  dateRange = as.Date(c(NA, NA))
+  name = omopgenerics::tableName(cohort)
 )
 }
 \arguments{
-\item{cohort}{A cohort table in a cdm reference}
+\item{cohort}{A cohort table in a cdm reference.}
 
-\item{startDate}{Variable with earliest date}
-
-\item{endDate}{Variable with latest date}
+\item{cohortId}{Vector of cohort definition ids to include. If NULL, all
+cohort definition ids will be used.}
 
 \item{dateRange}{A window of time during which the index date must have
-been observed}
+been observed.}
+
+\item{startDate}{Variable with earliest date.}
+
+\item{endDate}{Variable with latest date.}
+
+\item{name}{Name of the new cohort with the restriction.}
 }
 \value{
 The cohort table with record timings updated to only be within the

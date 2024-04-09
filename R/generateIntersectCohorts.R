@@ -7,6 +7,8 @@
 #' combinations.
 #' @param targetCohortId Ids to combine of the target cohort. If NULL all
 #' cohort present in the table will be used.
+#' @param gap Number of days between two subsequent cohort entries to be merged
+#' in a single cohort record.
 #' @param mutuallyExclusive Whether the generated cohorts are mutually
 #' exclusive or not.
 #' @param returnOnlyComb Whether to only get the combination cohort back
@@ -36,6 +38,7 @@ generateIntersectCohortSet <- function(cdm,
                                        name,
                                        targetCohortName,
                                        targetCohortId = NULL,
+                                       gap = 0,
                                        mutuallyExclusive = FALSE,
                                        returnOnlyComb = FALSE) {
   # initial checks
@@ -105,18 +108,18 @@ generateIntersectCohortSet <- function(cdm,
   }
 
   if (returnOnlyComb) {
-  toEliminate <- cohSet %>%
-    dplyr::rowwise() %>%
-    dplyr::mutate(
-      sum = sum(dplyr::c_across(-dplyr::all_of(c("cohort_definition_id", "cohort_name"))),
-                na.rm = TRUE)
-    ) %>%
-    dplyr::filter(.data$sum == 1) %>%
-    dplyr::pull("cohort_definition_id")
-  cohSet <- cohSet |>
-    dplyr::filter(!.data$cohort_definition_id %in% .env$toEliminate) %>%
-    dplyr::group_by(.data$cohort_name) %>%
-    dplyr::mutate(cohort_definition_id = dplyr::cur_group_id())
+    toEliminate <- cohSet %>%
+      dplyr::rowwise() %>%
+      dplyr::mutate(
+        sum = sum(dplyr::c_across(-dplyr::all_of(c("cohort_definition_id", "cohort_name"))),
+                  na.rm = TRUE)
+      ) %>%
+      dplyr::filter(.data$sum == 1) %>%
+      dplyr::pull("cohort_definition_id")
+    cohSet <- cohSet |>
+      dplyr::filter(!.data$cohort_definition_id %in% .env$toEliminate) %>%
+      dplyr::group_by(.data$cohort_name) %>%
+      dplyr::mutate(cohort_definition_id = dplyr::cur_group_id())
   }
 
   # add cohort definition id
@@ -134,16 +137,19 @@ generateIntersectCohortSet <- function(cdm,
 
 
   if (!mutuallyExclusive) {
-    cohort <- joinOverlap(x = cohort, gap = 1) %>%
-      dplyr::compute(name = name, temporary = FALSE)
     cohSet <- cohSet %>%
       dplyr::group_by(.data$cohort_definition_id, .data$cohort_name) %>%
       dplyr::mutate(dplyr::across(
         dplyr::everything(),
-        ~ dplyr::if_else(dplyr::n_distinct(.x) == 1, 1, as.numeric(NA))
+        ~ dplyr::if_else(dplyr::n_distinct(.x) == 1, 1, 0)
       )) %>%
       dplyr::ungroup() %>%
       dplyr::distinct()
+  }
+
+  if (cohort |> dplyr::tally() |> dplyr::pull("n") > 0) {
+    cohort <- joinOverlap(x = cohort, gap = gap) %>%
+      dplyr::compute(name = name, temporary = FALSE)
   }
 
   # TODO
