@@ -16,7 +16,7 @@ validateCohortTable <- function(cohort) {
 validateIndexDate <- function(indexDate, cohort) {
   assertCharacter(indexDate)
   if(!indexDate %in% colnames(cohort)){
-    cli::cli_abort(paste0(substitute(indexDate), " must be a date column in the cohort table"))
+    cli::cli_abort("{indexDate} must be a date column in the cohort table")
   }
 }
 
