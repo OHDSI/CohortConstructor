@@ -189,40 +189,36 @@ test_that("test exactMatchingCohort works if there are no subjects", {
     overwrite = TRUE
   )
   cdm$cases <- cdm$cases %>% dplyr::filter(subject_id == 0)
-  expect_no_error(
-    generateMatchedCohortSet(
-      cdm,
-      name = "new_cohort",
-      targetCohortName = "cases",
-    )
+  cdm <- generateMatchedCohortSet(
+    cdm,
+    name = "new_cohort",
+    targetCohortName = "cases",
   )
+  expect_true(cdm$new_cohort %>% dplyr::tally() %>% dplyr::pull(n) == 0)
 })
 
 
 test_that("test exactMatchingCohort works if one of the cohorts does not have any people", {
-  # followback  <- 180
-  # cdm <- DrugUtilisation::generateConceptCohortSet(
-  #   cdm = DrugUtilisation::mockDrugUtilisation(numberIndividuals = 200),
-  #   conceptSet = list(c_1 = 317009, c_2 = 8505),
-  #   name = "cases",
-  #   end  = "observation_period_end_date",
-  #   requiredObservation = c(followback,followback),
-  #   overwrite = TRUE
-  # )
+  followback  <- 180
+  cdm <- DrugUtilisation::generateConceptCohortSet(
+    cdm = DrugUtilisation::mockDrugUtilisation(numberIndividuals = 200),
+    conceptSet = list(c_1 = 317009, c_2 = 8505),
+    name = "cases",
+    end  = "observation_period_end_date",
+    requiredObservation = c(followback,followback),
+    overwrite = TRUE
+  )
 
-  ### generates overlapping cohorts --> issue CohortConstructor #53
-  # expect_no_error(
-  #   generateMatchedCohortSet(cdm,
-  #                            name = "new_cohort",
-  #                            targetCohortName = "cases",
-  #                            targetCohortId = NULL,
-  #                            matchSex = TRUE,
-  #                            matchYearOfBirth = TRUE,
-  #                            ratio = 1)
-  # )
+  expect_no_error(
+    cdm <- generateMatchedCohortSet(cdm,
+                             name = "new_cohort",
+                             targetCohortName = "cases",
+                             targetCohortId = NULL,
+                             matchSex = TRUE,
+                             matchYearOfBirth = TRUE,
+                             ratio = 1)
+  )
 })
-
-
 
 test_that("test exactMatchingCohort with a ratio bigger than 1", {
   followback  <- 180
