@@ -9,7 +9,9 @@ Authors@R: c(
     person("Marta", "Alcalde", , "marta.alcaldeherraiz@ndorms.ox.ac.uk", 
     role = c("aut"), comment = c(ORCID = "0000-0000-0000-0000")),
     person("Yuchen", "Guo", email = "yuchen.guo@ndorms.ox.ac.uk", 
-    role = c("aut"), comment = c(ORCID = "0000-0002-0847-4855"))
+    role = c("aut"), comment = c(ORCID = "0000-0002-0847-4855")),
+    person("Nuria", "Mercade-Besora", , "nuria.mercadebesora@ndorms.ox.ac.uk", 
+    role = c("ctb"), comment = c(ORCID = "0009-0006-7948-3747")),
     )
 Description: This package aims to provide functionalities to manipulate
     and evaluate cohorts in data mapped to the Observational Medical 
@@ -47,3 +49,5 @@ Config/testthat/parallel: true
 VignetteBuilder: knitr
 Remotes:
     darwin-eu-dev/PatientProfiles
+Depends: 
+    R (>= 4.10)
