@@ -5,6 +5,13 @@ validateCDM <- function(cdm) {
   return(invisible(cdm))
 }
 
+validateCdm <- function(cdm) {
+  if (!isTRUE(inherits(cdm, "cdm_reference"))) {
+    cli::cli_abort("cdm must be a cdm_reference object.")
+  }
+  return(invisible(cdm))
+}
+
 validateCohortTable <- function(cohort) {
   if(!"cohort_table" %in% class(cohort) ||
      !all(c("cohort_definition_id", "subject_id",
@@ -66,4 +73,11 @@ validateName <- function(name) {
 
 validateConceptSet <- function(conceptSet) {
   omopgenerics::newCodelist(conceptSet)
+}
+
+validateVerbose <- function(verbose) {
+  if (!is.logical(verbose) | length(verbose) != 1 | is.na(verbose)) {
+    cli::cli_abort("verbose must be TRUE or FALSE.")
+  }
+  return(invisible(verbose))
 }

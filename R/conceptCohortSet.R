@@ -15,8 +15,9 @@ conceptCohortSet <- function(cdm,
                              name = "cohort",
                              verbose = TRUE) {
   # initial input validation
-  cdm <- validateCDM(cdm)
+  cdm <- validateCdm(cdm)
   name <- validateName(name)
+  verbose <- validateVerbose(verbose)
   if (length(conceptSet) == 0) {
     if (verbose) {
       cli::cli_inform(c("i" = "Empty codelist provided, returning empty cohort"))
@@ -58,7 +59,7 @@ conceptCohortSet <- function(cdm,
     dplyr::distinct() |>
     dplyr::pull()
 
-  cohort <- list()
+  cohorts <- list()
   for (k in seq_along(domains)) {
     domain <- domains[k]
     table <- domainsData$table[domainsData$domain_id == domain]
@@ -77,7 +78,7 @@ conceptCohortSet <- function(cdm,
           "i" = "Subsetting table {.strong {table}} using {n} concept{?s} with domain: {.strong {domain}}."
         ))
       }
-      cohort[[k]] <- cdm[[table]] |>
+      cohorts[[k]] <- cdm[[table]] |>
         dplyr::select(
           "subject_id" = "person_id",
           "concept_id" = dplyr::all_of(concept),
@@ -97,7 +98,7 @@ conceptCohortSet <- function(cdm,
     }
   }
 
-  if (length(cohort) == 0) {
+  if (length(cohorts) == 0) {
     if (verbose) {
       cli::cli_inform(c("i" = "No table could be subsetted, returning empty cohort."))
     }
@@ -114,14 +115,22 @@ conceptCohortSet <- function(cdm,
   if (verbose) {
     cli::cli_inform(c("i" = "Subsetting tables."))
   }
-  cohort <- Reduce(dplyr::union_all, cohort) |>
+  cohort <- cohorts[[1]]
+  if (length(cohorts) > 1) {
+    for (k in 2:length(cohorts)) {
+      cohort <- cohort |> dplyr::union_all(cohorts[[k]])
+    }
+  }
+  cohort <- cohort |>
     dplyr::compute(name = name, temporary = FALSE)
 
   if (verbose) {
     cli::cli_inform(c("i" = "Collapsing records."))
   }
-  cohort <- cohort |>
-    collapseGap(gap = 0) |>
+  # assign to cdm so we keep class, to be removed when https://github.com/darwin-eu-dev/omopgenerics/issues/256
+  cdm[[name]] <- cohort |>
+    collapseGap(gap = 0)
+  cohort <- cdm[[name]] |>
     dplyr::compute(name = name, temporary = FALSE)
 
   if (verbose) {
@@ -150,13 +159,16 @@ addDomains <- function(cohortCodelist, cdm) {
     cdm = cdm, name = tmpName, table = cohortCodelist
   )
   cdm[[tmpName]] <- cdm[[tmpName]] |> dplyr::compute()
-  omopgenerics::dropTable(cdm = cdm, name = tmpName)
 
-  cdm[["concept"]] |>
+  cohortCodelist <- cdm[["concept"]] |>
     dplyr::select("concept_id", "domain_id") |>
     dplyr::right_join(cdm[[tmpName]], by = "concept_id") |>
     dplyr::mutate("domain_id" = tolower(.data$domain_id)) |>
     dplyr::compute()
+
+  omopgenerics::dropTable(cdm = cdm, name = tmpName)
+
+  return(cohortCodelist)
 }
 collapseGap <- function(cohort, gap) {
   start <- cohort |>
@@ -166,29 +178,29 @@ collapseGap <- function(cohort, gap) {
     dplyr::mutate("date_id" = -1)
   end <- cohort |>
     dplyr::select(
-      "cohort_definition_id", "subject_id", "date" = "cohort_start_date"
+      "cohort_definition_id", "subject_id", "date" = "cohort_end_date"
     ) |>
     dplyr::mutate("date_id" = 1)
   start |>
     dplyr::union_all(end) |>
-    dplyr::group_by(.data$cohort_definition_id, .data$subject_id) %>%
-    dplyr::arrange(.data$date, .data$date_id) %>%
-    dplyr::mutate("cum_id" = cumsum(.data$date_id)) %>%
+    dplyr::group_by(.data$cohort_definition_id, .data$subject_id) |>
+    dplyr::arrange(.data$date, .data$date_id) |>
+    dplyr::mutate("cum_id" = cumsum(.data$date_id)) |>
     dplyr::filter(
-      .data$cum_id == 0 || (.data$cum_id == -1 && .data$date_id == -1)
-    ) %>%
+      .data$cum_id == 0 | (.data$cum_id == -1 & .data$date_id == -1)
+    ) |>
     dplyr::mutate(
       "name" = dplyr::if_else(
         .data$date_id == -1, "cohort_start_date", "cohort_end_date"
       ),
       "era_id" = dplyr::if_else(.data$date_id == -1, 1, 0)
-    ) %>%
-    dplyr::mutate("era_id" = cumsum(as.numeric(.data$era_id))) %>%
-    dplyr::ungroup() %>%
-    dplyr::arrange() %>%
+    ) |>
+    dplyr::mutate("era_id" = cumsum(as.numeric(.data$era_id))) |>
+    dplyr::ungroup() |>
+    dplyr::arrange() |>
     dplyr::select(
       "cohort_definition_id", "subject_id", "era_id", "name", "date"
-    ) %>%
-    tidyr::pivot_wider(names_from = "name", values_from = "date") %>%
+    ) |>
+    tidyr::pivot_wider(names_from = "name", values_from = "date") |>
     dplyr::select(-"era_id")
 }
