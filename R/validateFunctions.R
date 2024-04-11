@@ -74,10 +74,3 @@ validateName <- function(name) {
 validateConceptSet <- function(conceptSet) {
   omopgenerics::newCodelist(conceptSet)
 }
-
-validateVerbose <- function(verbose) {
-  if (!is.logical(verbose) | length(verbose) != 1 | is.na(verbose)) {
-    cli::cli_abort("verbose must be TRUE or FALSE.")
-  }
-  return(invisible(verbose))
-}

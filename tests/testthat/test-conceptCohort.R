@@ -17,26 +17,26 @@ test_that("expected errors and messages", {
   )
 
   # not a cdm reference
-  expect_error(conceptCohortSet(cdm = NULL))
+  expect_error(conceptCohort(cdm = NULL, name = "cohort", conceptSet = NULL))
 
   # wrong naming
-  expect_error(conceptCohortSet(cdm = cdm, name = NA))
-  expect_error(conceptCohortSet(cdm = cdm, name = 1))
-  expect_error(conceptCohortSet(cdm = cdm, name = c("ass", "asdf")))
-  expect_error(conceptCohortSet(cdm = cdm, name = "AAAA"))
-  expect_no_error(x <- conceptCohortSet(cdm = cdm, name = "my_cohort"))
+  expect_error(conceptCohort(cdm = cdm, name = NA, conceptSet = NULL))
+  expect_error(conceptCohort(cdm = cdm, name = 1, conceptSet = NULL))
+  expect_error(conceptCohort(cdm = cdm, name = c("ass", "asdf"), conceptSet = NULL))
+  expect_error(conceptCohort(cdm = cdm, name = "AAAA", conceptSet = NULL))
+  expect_no_error(x <- conceptCohort(cdm = cdm, name = "my_cohort", conceptSet = NULL))
   expect_true("my_cohort" == omopgenerics::tableName(x))
 
   # empty cohort
-  expect_no_error(x <- conceptCohortSet(cdm = cdm, conceptSet = NULL))
+  expect_no_error(x <- conceptCohort(cdm = cdm, conceptSet = NULL, name = "cohort"))
   expect_true(inherits(x, "cohort_table"))
   expect_true(x |> dplyr::collect() |> nrow() == 0)
 
   # not codelist
-  expect_error(x <- conceptCohortSet(cdm = cdm, conceptSet = 1))
-  expect_error(x <- conceptCohortSet(cdm = cdm, conceptSet = list(1)))
+  expect_error(x <- conceptCohort(cdm = cdm, conceptSet = 1, name = "cohort"))
+  expect_error(x <- conceptCohort(cdm = cdm, conceptSet = list(1), name = "cohort"))
   expect_message(expect_message(
-    x <- conceptCohortSet(cdm = cdm, conceptSet = list(a = 1))
+    x <- conceptCohort(cdm = cdm, conceptSet = list(a = 1), name = "cohort")
   ))
   expect_true(inherits(x, "cohort_table"))
   expect_true(x |> dplyr::collect() |> nrow() == 0)
@@ -52,13 +52,8 @@ test_that("expected errors and messages", {
     cohortCodelist(x, 1), omopgenerics::newCodelist(list())
   ))
   expect_message(expect_message(
-    x <- conceptCohortSet(cdm = cdm, conceptSet = list(a = 2))
+    x <- conceptCohort(cdm = cdm, conceptSet = list(a = 2), name = "cohort")
   ))
-
-  # verbose
-  expect_error(x <- conceptCohortSet(cdm = cdm, verbose = "my_cohort"))
-  expect_error(x <- conceptCohortSet(cdm = cdm, verbose = c(T, F)))
-  expect_error(x <- conceptCohortSet(cdm = cdm, verbose = as.logical(NA)))
 
 })
 
@@ -97,7 +92,7 @@ test_that("simple example", {
       )
   )
 
-  expect_no_error(cohort <- conceptCohortSet(cdm = cdm, conceptSet = list(a = 1)))
+  expect_no_error(cohort <- conceptCohort(cdm = cdm, conceptSet = list(a = 1), name = "cohort"))
 
   expect_true(cohort |> dplyr::tally() |> dplyr::pull() == 4)
   expect_true(cohortCount(cohort)$number_records == 4)
@@ -164,7 +159,7 @@ test_that("simple example duckdb", {
 
   cdm <- CDMConnector::copyCdmTo(con = DBI::dbConnect(duckdb::duckdb()), cdm = cdm, schema = "main")
 
-  expect_no_error(cohort <- conceptCohortSet(cdm = cdm, conceptSet = list(a = 1)))
+  expect_no_error(cohort <- conceptCohort(cdm = cdm, conceptSet = list(a = 1), name = "cohort"))
 
   expect_true(cohort |> dplyr::tally() |> dplyr::pull() == 4)
   expect_true(cohortCount(cohort)$number_records == 4)

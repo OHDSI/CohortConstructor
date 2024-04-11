@@ -4,24 +4,19 @@
 #' @param conceptSet A conceptSet, can either be a list of concepts, a codelist
 #' or a conceptSetExpression (TO DO).
 #' @param name Name of the cohort in the cdm object.
-#' @param verbose Whether to print intermediate progress messages.
 #'
 #' @export
 #'
 #' @return A cohort_table object.
 #'
-conceptCohortSet <- function(cdm,
-                             conceptSet = NULL,
-                             name = "cohort",
-                             verbose = TRUE) {
+conceptCohort <- function(cdm,
+                          conceptSet,
+                          name) {
   # initial input validation
   cdm <- validateCdm(cdm)
   name <- validateName(name)
-  verbose <- validateVerbose(verbose)
   if (length(conceptSet) == 0) {
-    if (verbose) {
-      cli::cli_inform(c("i" = "Empty codelist provided, returning empty cohort"))
-    }
+    cli::cli_inform(c("i" = "Empty codelist provided, returning empty cohort"))
     cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name)
     return(cdm[[name]])
   }
@@ -37,17 +32,15 @@ conceptCohortSet <- function(cdm,
     dplyr::mutate("type" = "index event") |>
     addDomains(cdm)
 
-  if (verbose) {
-    ud <- cohortCodelist |>
-      dplyr::group_by(.data$domain_id) |>
-      dplyr::tally() |>
-      dplyr::collect() |>
-      dplyr::filter(!.data$domain_id %in% domainsData$domain_id)
-    for (k in seq_len(nrow(ud))) {
-      cli::cli_inform(c(
-        "x" = "Domain {.strong {ud$domain_id[k]}} ({ud$n[k]} concept{?s}) excluded because it is not supported."
-      ))
-    }
+  ud <- cohortCodelist |>
+    dplyr::group_by(.data$domain_id) |>
+    dplyr::tally() |>
+    dplyr::collect() |>
+    dplyr::filter(!.data$domain_id %in% domainsData$domain_id)
+  for (k in seq_len(nrow(ud))) {
+    cli::cli_inform(c(
+      "x" = "Domain {.strong {ud$domain_id[k]}} ({ud$n[k]} concept{?s}) excluded because it is not supported."
+    ))
   }
 
   cohortCodelist <- cohortCodelist |>
@@ -66,18 +59,14 @@ conceptCohortSet <- function(cdm,
     concept <- domainsData$concept[domainsData$domain_id == domain]
     start <- domainsData$start[domainsData$domain_id == domain]
     end <- domainsData$end[domainsData$domain_id == domain]
-    if (verbose) {
-      n <- cohortCodelist |>
-        dplyr::filter(.data$domain_id %in% .env$domain) |>
-        dplyr::tally() |>
-        dplyr::pull()
-    }
+    n <- cohortCodelist |>
+      dplyr::filter(.data$domain_id %in% .env$domain) |>
+      dplyr::tally() |>
+      dplyr::pull()
     if (table %in% names(cdm)) {
-      if (verbose) {
-        cli::cli_inform(c(
-          "i" = "Subsetting table {.strong {table}} using {n} concept{?s} with domain: {.strong {domain}}."
-        ))
-      }
+      cli::cli_inform(c(
+        "i" = "Subsetting table {.strong {table}} using {n} concept{?s} with domain: {.strong {domain}}."
+      ))
       cohorts[[k]] <- cdm[[table]] |>
         dplyr::select(
           "subject_id" = "person_id",
@@ -91,7 +80,7 @@ conceptCohortSet <- function(cdm,
             dplyr::select("concept_id", "cohort_definition_id"),
           by = "concept_id"
         )
-    } else if (verbose) {
+    } else {
       cli::cli_inform(c(
         "x" = "Domain {.strong {domain}} ({n} concept{?s}) excluded because table {table} is not present in the cdm."
       ))
@@ -99,9 +88,7 @@ conceptCohortSet <- function(cdm,
   }
 
   if (length(cohorts) == 0) {
-    if (verbose) {
-      cli::cli_inform(c("i" = "No table could be subsetted, returning empty cohort."))
-    }
+    cli::cli_inform(c("i" = "No table could be subsetted, returning empty cohort."))
     cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name)
     cdm[[name]] <- cdm[[name]] |>
       omopgenerics::newCohortTable(
@@ -112,9 +99,7 @@ conceptCohortSet <- function(cdm,
     return(cdm[[name]])
   }
 
-  if (verbose) {
-    cli::cli_inform(c("i" = "Subsetting tables."))
-  }
+  cli::cli_inform(c("i" = "Subsetting tables."))
   cohort <- cohorts[[1]]
   if (length(cohorts) > 1) {
     for (k in 2:length(cohorts)) {
@@ -124,18 +109,14 @@ conceptCohortSet <- function(cdm,
   cohort <- cohort |>
     dplyr::compute(name = name, temporary = FALSE)
 
-  if (verbose) {
-    cli::cli_inform(c("i" = "Collapsing records."))
-  }
+  cli::cli_inform(c("i" = "Collapsing records."))
   # assign to cdm so we keep class, to be removed when https://github.com/darwin-eu-dev/omopgenerics/issues/256
   cdm[[name]] <- cohort |>
     collapseGap(gap = 0)
   cohort <- cdm[[name]] |>
     dplyr::compute(name = name, temporary = FALSE)
 
-  if (verbose) {
-    cli::cli_inform(c("i" = "Creating cohort attributes."))
-  }
+  cli::cli_inform(c("i" = "Creating cohort attributes."))
   cdm[[name]] <- cohort |>
     omopgenerics::newCohortTable(
       cohortSetRef = cohortSet,
@@ -145,9 +126,7 @@ conceptCohortSet <- function(cdm,
         dplyr::collect()
     )
 
-  if (verbose) {
-    cli::cli_inform(c("v" = "Cohort {.strong {name}} created."))
-  }
+  cli::cli_inform(c("v" = "Cohort {.strong {name}} created."))
 
   return(cdm[[name]])
 }
