@@ -13,6 +13,7 @@
 #' @param window Window to consider events over.
 #' @param negate If set as TRUE, criteria will be applied as exclusion
 #' rather than inclusion (i.e. require absence in another cohort).
+#' @param name Name of the new cohort with the future observation restriction.
 #'
 #' @return Cohort table with only those in the other cohort kept
 #' @export

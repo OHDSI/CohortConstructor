@@ -37,6 +37,8 @@ column date of x.}
 
 \item{negate}{If set as TRUE, criteria will be applied as exclusion
 rather than inclusion (i.e. require absence in another cohort).}
+
+\item{name}{Name of the new cohort with the future observation restriction.}
 }
 \value{
 Cohort table with only those in the other cohort kept
