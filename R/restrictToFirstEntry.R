@@ -11,12 +11,9 @@
 #' @examples
 #' \donttest{
 #' library(CohortConstructor)
-#' library(omock)
-#' cdm <- mockCdmReference() |>
-#'   mockPerson(nPerson = 2) |>
-#'   mockObservationPeriod() |>
-#'   mockCohort(recordPerson = 2)
-#' cdm <- restrictToFirstEntry(cdm$cohort)
+#' library(PatientProfiles)
+#' cdm <- mockPatientProfiles()
+#' cdm$cohort1 <- restrictToFirstEntry(cdm$cohort1)
 #' }
 #'
 restrictToFirstEntry <- function(cohort,
