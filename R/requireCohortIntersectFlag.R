@@ -39,7 +39,7 @@ requireCohortIntersectFlag <- function(x,
                                        negate = FALSE,
                                        name = omopgenerics::tableName(x)){
   # checks
-  assertCharacter(name)
+  assertCharacter(name, length = 1)
   assertLogical(negate, length = 1)
   validateCohortTable(x)
   cdm <- omopgenerics::cdmReference(x)
@@ -95,16 +95,19 @@ requireCohortIntersectFlag <- function(x,
     subsetCohort <- subsetCohort %>%
       dplyr::filter(.data$intersect_cohort == 1) %>%
       dplyr::select(!"intersect_cohort")
+    # attrition reason
+    reason <- glue::glue("In cohort {target_name} between {window_start} & ",
+                         "{window_end} days relative to {indexDate}")
   } else {
     # ie require absence instead of presence
     subsetCohort <- subsetCohort %>%
       dplyr::filter(.data$intersect_cohort != 1) %>%
       dplyr::select(!"intersect_cohort")
+    # attrition reason
+    reason <- glue::glue("Not in cohort {target_name} between {window_start} & ",
+                         "{window_end} days relative to {indexDate}")
   }
 
-  # attrition reason
-  reason <- glue::glue("In cohort {target_name} between {window_start} & ",
-                       "{window_end} days relative to {indexDate}")
   if (!is.null(censorDate)) {
     reason <- glue::glue("{reason}, censoring at {censorDate}")
   }
@@ -117,6 +120,5 @@ requireCohortIntersectFlag <- function(x,
 
   return(x)
 }
-
 
 

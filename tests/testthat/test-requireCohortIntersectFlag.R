@@ -111,15 +111,14 @@ test_that("requiring absence in another cohort", {
   cdm$cohort3_inclusion <-  requireCohortIntersectFlag(x = cdm$cohort1,
                                                        targetCohortTable = "cohort2",
                                                        targetCohortId = 1,
-                                                       window = c(-Inf, Inf)) |>
-    dplyr::compute(name = "cohort3_inclusion", temporary = FALSE)
+                                                       window = c(-Inf, Inf),
+                                                       name = "cohort3_inclusion")
   cdm$cohort3_exclusion <-  requireCohortIntersectFlag(x = cdm$cohort1,
                                                        targetCohortTable = "cohort2",
                                                        targetCohortId = 1,
                                                        window = c(-Inf, Inf),
-                                                       negate = TRUE) |>
-    dplyr::compute(name = "cohort3_exclusion", temporary = FALSE)
-
+                                                       negate = TRUE,
+                                                       name = "cohort3_exclusion")
   in_both <- intersect(cdm$cohort3_inclusion %>%
                          dplyr::pull("subject_id") %>%
                          unique(),
@@ -127,6 +126,11 @@ test_that("requiring absence in another cohort", {
                          dplyr::pull("subject_id") %>%
                          unique())
   expect_true(length(in_both) == 0)
+  expect_true(all(omopgenerics::attrition(cdm$cohort3_exclusion)$reason ==
+                    c("Initial qualifying events",
+                      "Not in cohort cohort_1 between -Inf & Inf days relative to cohort_start_date",
+                      "Initial qualifying events",
+                      "Not in cohort cohort_1 between -Inf & Inf days relative to cohort_start_date")))
 
   CDMConnector::cdm_disconnect(cdm)
 })

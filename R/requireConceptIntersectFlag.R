@@ -1,7 +1,7 @@
 #' Require cohort subjects are present in another cohort
 #'
 #' @param x Cohort table.
-#' @param tableName Name of the table that we want to check for intersect.
+#' @param targetTable Name of the table that we want to check for intersect.
 #' @param indexDate Variable in x that contains the date to compute the
 #' intersection.
 #' @param targetStartDate Date of reference in cohort table, either for start
@@ -22,18 +22,19 @@
 #' library(CohortConstructor)
 #' cdm <- mockDrugUtilisation(numberIndividuals = 100)
 #' cdm$cohort1 %>%
-#'   requireTableIntersectFlag(tableName = "visit_ocurrence",
+#'   requireCohortIntersectFlag(targetCohortTable = "cohort2",
+#'                              targetCohortId = 1,
 #'                              indexDate = "cohort_start_date",
 #'                              window = c(-Inf, 0))
-requireTableIntersectFlag <- function(x,
-                                      tableName,
-                                      indexDate = "cohort_start_date",
-                                      targetStartDate = startDateColumn(tableName),
-                                      targetEndDate = endDateColumn(tableName),
-                                      censorDate = NULL,
-                                      window = list(c(0, Inf)),
-                                      negate = FALSE,
-                                      name = omopgenerics::tableName(x)){
+requireConceptIntersectFlag <- function(x,
+                                        conceptSet,
+                                        indexDate = "cohort_start_date",
+                                        targetStartDate = startDateColumn(tableName),
+                                        targetEndDate = endDateColumn(tableName),
+                                        censorDate = NULL,
+                                        window = list(c(0, Inf)),
+                                        negate = FALSE,
+                                        name = omopgenerics::tableName(x)){
   # checks
   assertCharacter(name, length = 1)
   assertLogical(negate, length = 1)
@@ -56,39 +57,36 @@ requireTableIntersectFlag <- function(x,
 
   cdm <- omopgenerics::cdmReference(x)
 
-  if(is.null(cdm[[tableName]])){
-    cli::cli_abort("{tableName} not found in cdm reference")
-  }
-
   subsetCohort <- x %>%
     dplyr::select(dplyr::all_of(.env$cols)) %>%
-    PatientProfiles::addTableIntersectFlag(
-      tableName = tableName,
+    PatientProfiles::addConceptIntersectFlag(
+      conceptSet = conceptSet,
       indexDate = indexDate,
       targetStartDate = targetStartDate,
       targetEndDate = targetEndDate,
       window = window,
       censorDate = censorDate,
-      nameStyle = "intersect_table"
+      nameStyle = "intersect_concept"
     )
+
+
 
   if(isFALSE(negate)){
     subsetCohort <- subsetCohort %>%
-      dplyr::filter(.data$intersect_table == 1) %>%
-      dplyr::select(!"intersect_table")
+      dplyr::filter(.data$intersect_concept == 1) %>%
+      dplyr::select(!"intersect_concept")
     # attrition reason
-    reason <- glue::glue("In table {tableName} between {window_start} & ",
+    reason <- glue::glue("Concept {conceptSet} between {window_start} & ",
                          "{window_end} days relative to {indexDate}")
   } else {
     # ie require absence instead of presence
     subsetCohort <- subsetCohort %>%
-      dplyr::filter(.data$intersect_table != 1) %>%
-      dplyr::select(!"intersect_table")
+      dplyr::filter(.data$intersect_concept != 1) %>%
+      dplyr::select(!"intersect_concept")
     # attrition reason
-    reason <- glue::glue("Not in table {tableName} between {window_start} & ",
+    reason <- glue::glue("Not in concept {conceptSet} between {window_start} & ",
                          "{window_end} days relative to {indexDate}")
   }
-
 
   if (!is.null(censorDate)) {
     reason <- glue::glue("{reason}, censoring at {censorDate}")
