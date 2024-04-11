@@ -1,5 +1,3 @@
-
-
 #' Restrict cohort on patient demographics
 #'
 #' @param cohort A cohort table in a cdm reference.
@@ -377,5 +375,3 @@ demographicsFilter <- function(cohort,
 
   return(cohort)
 }
-
-

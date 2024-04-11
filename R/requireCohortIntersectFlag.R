@@ -121,4 +121,3 @@ requireCohortIntersectFlag <- function(x,
   return(x)
 }
 
-

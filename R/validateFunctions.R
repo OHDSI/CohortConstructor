@@ -19,6 +19,7 @@ validateCohortTable <- function(cohort) {
           colnames(cohort))){
     cli::cli_abort("cohort must be a `cohort_table`")
   }
+  return(invisible(cohort))
 }
 
 validateIndexDate <- function(indexDate, cohort) {
@@ -73,4 +74,8 @@ validateName <- function(name) {
 
 validateConceptSet <- function(conceptSet) {
   omopgenerics::newCodelist(conceptSet)
+}
+
+validateGap <- function(gap) {
+  assertNumeric(gap, integerish = TRUE, min = 0)
 }

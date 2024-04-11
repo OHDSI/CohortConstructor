@@ -1,17 +1,16 @@
 #' Generate a combination cohort set between the intersection of different
 #' cohorts.
 #'
-#' @param cdm A cdm reference.
-#' @param name Name of the new generated cohort.
-#' @param targetCohortName Name of an existent cohort in the cdm to create the
-#' combinations.
-#' @param targetCohortId Ids to combine of the target cohort. If NULL all
-#' cohort present in the table will be used.
+#' @param cohort A cohort table in a cdm reference.
+#' @param cohortId Vector of cohort definition ids to include. If NULL, all
+#' cohort definition ids will be used.
 #' @param gap Number of days between two subsequent cohort entries to be merged
 #' in a single cohort record.
 #' @param mutuallyExclusive Whether the generated cohorts are mutually
 #' exclusive or not.
 #' @param returnOnlyComb Whether to only get the combination cohort back
+#' @param name Name of the new cohort with the demographic requirements.
+#'
 #' @export
 #'
 #' @return The cdm object with the new generated cohort set
@@ -22,10 +21,9 @@
 #'
 #' cdm <- mockPatientProfiles()
 #'
-#' cdm <- generateIntersectCohortSet(
-#'   cdm = cdm,
+#' cdm$cohort3 <- intersectCohort(
+#'   cohort = cdm$cohort1,
 #'   name = "cohort3",
-#'   targetCohortName = "cohort2"
 #' )
 #'
 #' cdm$cohort3
@@ -34,60 +32,63 @@
 #'
 #' }
 
-generateIntersectCohortSet <- function(cdm,
-                                       name,
-                                       targetCohortName,
-                                       targetCohortId = NULL,
-                                       gap = 0,
-                                       mutuallyExclusive = FALSE,
-                                       returnOnlyComb = FALSE) {
-  # initial checks
-  checkmate::checkClass(cdm, "cdm_reference")
-  checkmate::checkCharacter(name, len = 1, any.missing = FALSE, min.chars = 1)
-  checkmate::checkCharacter(targetCohortName, len = 1, any.missing = FALSE, min.chars = 1)
-  checkmate::checkTRUE(targetCohortName %in% names(cdm))
-  checkmate::checkIntegerish(targetCohortId, null.ok = TRUE, any.missing = FALSE)
-  checkmate::checkLogical(mutuallyExclusive, len = 1, any.missing = FALSE)
+intersectCohort <- function(cohort,
+                            cohortId = NULL,
+                            gap = 0,
+                            mutuallyExclusive = FALSE,
+                            returnOnlyComb = FALSE,
+                            name = omopgenerics::tableName(cohort)) {
+
+  # checks
+  assertCharacter(name)
+  validateCohortTable(cohort)
+  cdm <- omopgenerics::cdmReference(cohort)
+  validateCDM(cdm)
+  ids <- omopgenerics::settings(cohort)$cohort_definition_id
+  cohortId <- validateCohortId(cohortId, ids)
+  assertNumeric(gap, integerish = TRUE, min = 0, length = 1)
+  assertLogical(mutuallyExclusive, length = 1)
+  assertLogical(returnOnlyComb, length = 1)
 
   # check targetCohortId
-  if (is.null(targetCohortId)) {
-    targetCohortId <- CDMConnector::settings(cdm[[targetCohortName]]) %>%
+  if (is.null(cohortId)) {
+    cohortId <- CDMConnector::settings(cohort) %>%
       dplyr::pull("cohort_definition_id")
   }
-  if (length(targetCohortId) < 2) {
+  if (length(cohortId) < 2) {
     cli::cli_warn("At least 2 cohort id must be provided to do the combination")
     # update properly
-    cdm[[name]] <- cdm[[targetCohortName]] %>%
-      dplyr::filter(.data$cohort_definition_id == .env$targetCohortId) %>%
+    cohort <- cohort %>%
+      dplyr::filter(.data$cohort_definition_id == .env$cohortId) %>%
       dplyr::compute(name = name, temporary = FALSE) %>%
       omopgenerics::newCohortTable(
-        cohortSetRef = cdm[[targetCohortName]] %>%
+        cohortSetRef = cohort %>%
           omopgenerics::settings() %>%
-          dplyr::filter(.data$cohort_definition_id == .env$targetCohortId) %>%
+          dplyr::filter(.data$cohort_definition_id == .env$cohortId) %>%
           dplyr::compute(name = paste0(name, "_set"), temporary = FALSE),
-        cohortAttritionRef = cdm[[targetCohortName]] %>%
+        cohortAttritionRef = cohort %>%
           omopgenerics::attrition() %>%
-          dplyr::filter(.data$cohort_definition_id == .env$targetCohortId) %>%
+          dplyr::filter(.data$cohort_definition_id == .env$cohortId) %>%
           dplyr::compute(name = paste0(name, "_attrition"), temporary = FALSE)
       )
-    return(cdm)
+    return(cohort)
   }
 
   # generate cohort
-  cohort <- cdm[[targetCohortName]] %>%
-    dplyr::filter(.data$cohort_definition_id %in% .env$targetCohortId) %>%
+  cohortOut <- cohort %>%
+    dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) %>%
     dplyr::select(-"cohort_definition_id") %>%
     splitOverlap(by = "subject_id") %>%
     PatientProfiles::addCohortIntersectFlag(
-      targetCohortTable = targetCohortName,
-      targetCohortId = targetCohortId,
+      targetCohortTable = omopgenerics::tableName(cohort),
+      targetCohortId = cohortId,
       window = c(0, 0),
       nameStyle = "{cohort_name}"
     )
 
   # create cohort_definition_id
-  cohortNames <- omopgenerics::settings(cdm[[targetCohortName]]) %>%
-    dplyr::filter(.data$cohort_definition_id %in% .env$targetCohortId) %>%
+  cohortNames <- omopgenerics::settings(cohort) %>%
+    dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) %>%
     dplyr::pull("cohort_name")
   x <- rep(list(c(0, 1)), length(cohortNames))
   names(x) <- cohortNames
@@ -123,9 +124,9 @@ generateIntersectCohortSet <- function(cdm,
   }
 
   # add cohort definition id
-  tempName <- "tmp_cohset"
+  tempName <- omopgenerics::uniqueTableName()
   cdm <- omopgenerics::insertTable(cdm = cdm, name = tempName, table = cohSet)
-  cohort <- cohort %>%
+  cohortOut <- cohortOut %>%
     dplyr::inner_join(cdm[[tempName]], by = cohortNames) %>%
     dplyr::select(
       "cohort_definition_id", "subject_id", "cohort_start_date",
@@ -134,7 +135,6 @@ generateIntersectCohortSet <- function(cdm,
     dplyr::compute(name = name, temporary = FALSE)
 
   cdm <- omopgenerics::dropTable(cdm = cdm, name = tempName)
-
 
   if (!mutuallyExclusive) {
     cohSet <- cohSet %>%
@@ -147,27 +147,47 @@ generateIntersectCohortSet <- function(cdm,
       dplyr::distinct()
   }
 
-  if (cohort |> dplyr::tally() |> dplyr::pull("n") > 0) {
-    cohort <- joinOverlap(x = cohort, gap = gap) %>%
+  if (cohortOut |> dplyr::tally() |> dplyr::pull("n") > 0) {
+    cohortOut <- joinOverlap(x = cohortOut, gap = gap) %>%
       dplyr::compute(name = name, temporary = FALSE)
   }
 
-  # TODO
-  # create attrition
+  # attrition
+  cohAtt <- cohSet |>
+    tidyr::pivot_longer(cols = dplyr::all_of(cohortNames)) |>
+    dplyr::filter(.data$value == 1) |>
+    dplyr::group_by(.data$cohort_definition_id) |>
+    dplyr::arrange(.data$name) |>
+    dplyr::mutate(value = dplyr::row_number()) |>
+    dplyr::inner_join(
+      omopgenerics::attrition(cohort) |>
+        dplyr::inner_join(omopgenerics::settings(cohort) |>
+                            dplyr::select("cohort_definition_id", "name" = "cohort_name"),
+                          by = "cohort_definition_id") |>
+        dplyr::select(-"cohort_definition_id"),
+      by = "name",
+      relationship = "many-to-many"
+    ) |>
+    dplyr::group_by(.data$cohort_definition_id) |>
+    dplyr::arrange(.data$value, .data$reason_id) |>
+    dplyr::mutate(
+      reason_id = dplyr::row_number()
+    ) |>
+    addIntersectReason(
+      cohort = cohortOut,
+      mutuallyExclusive = mutuallyExclusive,
+      returnOnlyComb = returnOnlyComb
+    )
 
   cohSet <- cohSet %>%
     dplyr::mutate("mutually_exclusive" = mutuallyExclusive) %>%
     dplyr::relocate(c("cohort_definition_id", "cohort_name"))
 
-  cdm[[name]] <- omopgenerics::newCohortTable(
-    table = cohort, cohortSetRef = cohSet, cohortAttritionRef = NULL
+  cohortOut <- omopgenerics::newCohortTable(
+    table = cohortOut, cohortSetRef = cohSet, cohortAttritionRef = cohAtt
   )
 
-
-  # TODO
-  # add a not exposed option cohort
-
-  return(cdm)
+  return(cohortOut)
 }
 
 #' To split overlaping periods in non overlaping period.
@@ -247,7 +267,6 @@ splitOverlap <- function(x,
 #'
 #' @return Table in the cdm with start, end and by as columns. Periods are not
 #' going to overlap between each other.
-#'
 joinOverlap <- function(x,
                         start = "cohort_start_date",
                         end = "cohort_end_date",
@@ -368,4 +387,117 @@ notMutuallyEclusiveCohortSet <- function(cs) {
   }
   cs <- dplyr::bind_rows(cohset)
   return(cs)
+}
+
+addIntersectReason <- function(x, cohort, mutuallyExclusive, returnOnlyComb) {
+  # combination cohorts
+  idsCombinations <- x |>
+    dplyr::filter(.data$value > 1) |>
+    dplyr::pull(.data$cohort_definition_id) |>
+    unique()
+  newAttrition <- x |>
+    dplyr::mutate(reason = dplyr::if_else(
+      .data$cohort_definition_id %in% idsCombinations,
+      paste0("[", .data$name, "] ", .data$reason),
+      .data$reason)) |>
+    dplyr::select(dplyr::all_of(omopgenerics::cohortColumns("cohort_attrition"))) |>
+    dplyr::bind_rows(
+      newAttritionRow(
+        attr = x,
+        cohort = cohort,
+        ids = idsCombinations,
+        reason = dplyr::expr(getIntersectReason(x, .data$cohort_definition_id))
+      )
+    ) |>
+    dplyr::arrange(.data$cohort_definition_id, .data$reason_id)
+  # individual cohorts
+  if (mutuallyExclusive & !returnOnlyComb) {
+    idsTarget <- x |>
+      dplyr::filter(! .data$cohort_definition_id %in% idsCombinations) |>
+      dplyr::distinct(.data$cohort_definition_id) |>
+      dplyr::pull(.data$cohort_definition_id)
+    newAttrition <- newAttrition |>
+      dplyr::select(dplyr::all_of(omopgenerics::cohortColumns("cohort_attrition"))) |>
+      dplyr::bind_rows(
+        newAttritionRow(
+          attr = x,
+          cohort = cohort,
+          ids = idsTarget,
+          reason = dplyr::expr(paste0("Exclusive in ", .data$cohort_name))
+        )
+      ) |>
+      dplyr::arrange(.data$cohort_definition_id, .data$reason_id)
+  }
+  return(newAttrition)
+}
+
+newAttritionRow <- function(attr, cohort, ids, reason) {
+  counts <- cohort |>
+    dplyr::group_by(.data$cohort_definition_id) |>
+    dplyr::summarise(
+      "number_records" = dplyr::n(),
+      "number_subjects" = dplyr::n_distinct(.data$subject_id)
+    ) |>
+    dplyr::collect()
+  lapply(as.list(ids), function(id, x = attr, cohortCount = counts, reasonExp = reason) {
+    cohortCount.id <- cohortCount |> dplyr::filter(.data$cohort_definition_id == .env$id)
+    if (nrow(cohortCount.id) > 0) {
+      newRow <- cohortCount.id |>
+        dplyr::mutate(
+          dplyr::across(
+            dplyr::all_of(c("number_records", "number_subjects")),
+            ~ dplyr::if_else(is.na(.x), as.integer(0), as.integer(.x))
+          )) |>
+        dplyr::inner_join(x |> getPriorCohortCount(id), by = "cohort_definition_id") |>
+        dplyr::mutate(
+          "excluded_records" = .data$previous_number_records - .data$number_records,
+          "excluded_subjects" = .data$previous_number_subjects - .data$number_subjects
+        ) |>
+        dplyr::inner_join(
+          x |>
+            dplyr::filter(.data$cohort_definition_id == id, .data$reason_id == max(.data$reason_id)) |>
+            dplyr::select("cohort_definition_id", "cohort_name", "reason_id") |>
+            dplyr::rowwise() |>
+            dplyr::mutate(
+              "reason_id" = .data$reason_id + 1,
+              "reason" = !!reasonExp
+            ),
+          by = "cohort_definition_id"
+        ) |>
+        dplyr::select(dplyr::all_of(omopgenerics::cohortColumns("cohort_attrition")))
+    } else {
+      x |>
+        dplyr::filter(.data$cohort_definition_id == id, .data$reason_id == max(.data$reason_id)) |>
+        dplyr::inner_join(x |> getPriorCohortCount(id), by = "cohort_definition_id") |>
+        dplyr::mutate(
+          "reason_id" = .data$reason_id + 1,
+          "reason" = !!reasonExp,
+          "excluded_records" = .data$previous_number_records,
+          "excluded_subjects" = .data$previous_number_subjects,
+          "number_records" = 0,
+          "number_subjects" = 0
+        ) |>
+        dplyr::select(dplyr::all_of(omopgenerics::cohortColumns("cohort_attrition")))
+    }
+  }) |>
+    dplyr::bind_rows()
+}
+
+getPriorCohortCount <- function(attr, ids) {
+  attr |>
+    dplyr::filter(.data$cohort_definition_id %in% ids) |>
+    dplyr::group_by(.data$cohort_definition_id, .data$name) |>
+    dplyr::filter(.data$reason_id == max(.data$reason_id)) |>
+    dplyr::ungroup("name") |>
+    dplyr::summarise(
+      "previous_number_records" = sum(.data$number_records),
+      "previous_number_subjects" = sum(.data$number_subjects),
+      .groups = "drop"
+    )
+}
+
+getIntersectReason <- function(x, id) {
+  names <- unique(x$name[x$cohort_definition_id %in% id])
+  names <- paste0(paste0(names[1:(length(names) - 1)], collapse = ", "), " and ", names[length(names)])
+  return(paste0("Cohort intersect: ", names))
 }

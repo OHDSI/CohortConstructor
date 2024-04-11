@@ -13,3 +13,7 @@ omopgenerics::attrition
 #' @importFrom omopgenerics cohortCodelist
 #' @export
 omopgenerics::cohortCodelist
+
+#' @importFrom omopgenerics tableName
+#' @export
+omopgenerics::tableName

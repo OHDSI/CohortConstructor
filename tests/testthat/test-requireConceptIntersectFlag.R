@@ -1,3 +1,6 @@
 test_that("require flag in concept", {
-  expect_equal(2 * 2, 4)
+  cdm <- DrugUtilisation::mockDrugUtilisation()
+  conceptSet <- CodelistGenerator::getCandidateCodes("Influenza")
+
+  requireConceptIntersectFlag(cdm$cohort1, conceptSet)
 })
