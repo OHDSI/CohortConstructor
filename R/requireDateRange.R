@@ -20,8 +20,8 @@
 #'   requireInDateRange(indexDate = "cohort_start_date",
 #'                      dateRange = as.Date(c("2010-01-01", "2019-01-01")))
 requireInDateRange <- function(cohort,
+                               dateRange,
                                cohortId = NULL,
-                               dateRange = as.Date(c(NA, NA)),
                                indexDate = "cohort_start_date",
                                name = omopgenerics::tableName(cohort)) {
 
@@ -87,8 +87,8 @@ requireInDateRange <- function(cohort,
 #'                   dateRange = as.Date(c("2015-01-01",
 #'                                         "2015-12-31")))
 trimToDateRange <- function(cohort,
+                            dateRange,
                             cohortId = NULL,
-                            dateRange = as.Date(c(NA, NA)),
                             startDate = "cohort_start_date",
                             endDate = "cohort_end_date",
                             name = omopgenerics::tableName(cohort)) {
