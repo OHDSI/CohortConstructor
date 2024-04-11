@@ -1,7 +1,7 @@
 #' Require cohort subjects are present in another cohort
 #'
 #' @param x Cohort table.
-#' @param tableName Name of the table that we want to check for intersect.
+#' @param tableName Name of the table to check for intersect.
 #' @param indexDate Variable in x that contains the date to compute the
 #' intersection.
 #' @param targetStartDate Date of reference in cohort table, either for start
@@ -18,13 +18,13 @@
 #' @export
 #'
 #' @examples
-#' library(DrugUtilisation)
+#' library(PatientProfiles)
 #' library(CohortConstructor)
-#' cdm <- mockDrugUtilisation(numberIndividuals = 100)
+#' cdm <- mockPatientProfiles()
 #' cdm$cohort1 %>%
-#'   requireTableIntersectFlag(tableName = "visit_ocurrence",
-#'                              indexDate = "cohort_start_date",
-#'                              window = c(-Inf, 0))
+#'   requireTableIntersectFlag(tableName = "drug_exposure",
+#'                             indexDate = "cohort_start_date",
+#'                             window = c(-Inf, 0))
 requireTableIntersectFlag <- function(x,
                                       tableName,
                                       indexDate = "cohort_start_date",
@@ -37,6 +37,7 @@ requireTableIntersectFlag <- function(x,
   # checks
   assertCharacter(name, length = 1)
   assertLogical(negate, length = 1)
+  assertCharacter(tableName)
   validateCohortTable(x)
   cdm <- omopgenerics::cdmReference(x)
   validateCDM(cdm)
@@ -46,7 +47,7 @@ requireTableIntersectFlag <- function(x,
                    "cohort_start_date", "cohort_end_date",
                    indexDate))
 
-  if(is.list(window)){
+  if (is.list(window)) {
     window_start <- window[[1]][1]
     window_end <- window[[1]][2]
   } else {
@@ -56,8 +57,12 @@ requireTableIntersectFlag <- function(x,
 
   cdm <- omopgenerics::cdmReference(x)
 
-  if(is.null(cdm[[tableName]])){
+  if (is.null(cdm[[tableName]])) {
     cli::cli_abort("{tableName} not found in cdm reference")
+  }
+
+  if (length(tableName) > 1) {
+    cli::cli_abort("Currently just one table supported.")
   }
 
   subsetCohort <- x %>%
@@ -72,7 +77,7 @@ requireTableIntersectFlag <- function(x,
       nameStyle = "intersect_table"
     )
 
-  if(isFALSE(negate)){
+  if (isFALSE(negate)) {
     subsetCohort <- subsetCohort %>%
       dplyr::filter(.data$intersect_table == 1) %>%
       dplyr::select(!"intersect_table")

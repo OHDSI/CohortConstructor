@@ -1,7 +1,7 @@
 #' Require cohort subjects are present in another cohort
 #'
 #' @param x Cohort table.
-#' @param targetTable Name of the table that we want to check for intersect.
+#' @param conceptSet Concept set list.
 #' @param indexDate Variable in x that contains the date to compute the
 #' intersection.
 #' @param targetStartDate Date of reference in cohort table, either for start
@@ -18,19 +18,30 @@
 #' @export
 #'
 #' @examples
-#' library(DrugUtilisation)
+#' library(PatientProfiles)
 #' library(CohortConstructor)
-#' cdm <- mockDrugUtilisation(numberIndividuals = 100)
-#' cdm$cohort1 %>%
-#'   requireCohortIntersectFlag(targetCohortTable = "cohort2",
-#'                              targetCohortId = 1,
-#'                              indexDate = "cohort_start_date",
-#'                              window = c(-Inf, 0))
+#' cdm <- mockPatientProfiles()
+#' cdm <- CDMConnector::insertTable(cdm, name = "concept",
+#'                                  table = dplyr::tibble(
+#'                                    "concept_id" = 1,
+#'                                    "concept_name" = "my concept",
+#'                                    "domain_id" = "Drug",
+#'                                    "vocabulary_id" = NA,
+#'                                    "concept_class_id" = NA,
+#'                                    "concept_code" = NA,
+#'                                    "valid_start_date" = NA,
+#'                                    "valid_end_date" = NA
+#'                                   ))
+#' cdm$cohort2 <-  requireConceptIntersectFlag(
+#'   x = cdm$cohort1,
+#'   conceptSet = list(a = 1),
+#'   window = c(-Inf, 0),
+#'   name = "cohort2")
 requireConceptIntersectFlag <- function(x,
                                         conceptSet,
                                         indexDate = "cohort_start_date",
-                                        targetStartDate = startDateColumn(tableName),
-                                        targetEndDate = endDateColumn(tableName),
+                                        targetStartDate = "event_start_date",
+                                        targetEndDate = "event_end_date",
                                         censorDate = NULL,
                                         window = list(c(0, Inf)),
                                         negate = FALSE,
@@ -42,6 +53,7 @@ requireConceptIntersectFlag <- function(x,
   cdm <- omopgenerics::cdmReference(x)
   validateCDM(cdm)
   validateIndexDate(indexDate, x)
+  assertList(conceptSet)
 
   cols <- unique(c("cohort_definition_id", "subject_id",
                    "cohort_start_date", "cohort_end_date",
@@ -53,6 +65,10 @@ requireConceptIntersectFlag <- function(x,
   } else {
     window_start <- window[1]
     window_end <- window[2]
+  }
+
+  if (length(conceptSet) > 1) {
+    cli::cli_abort("We currently suport 1 concept set.")
   }
 
   cdm <- omopgenerics::cdmReference(x)
@@ -69,14 +85,12 @@ requireConceptIntersectFlag <- function(x,
       nameStyle = "intersect_concept"
     )
 
-
-
   if(isFALSE(negate)){
     subsetCohort <- subsetCohort %>%
       dplyr::filter(.data$intersect_concept == 1) %>%
       dplyr::select(!"intersect_concept")
     # attrition reason
-    reason <- glue::glue("Concept {conceptSet} between {window_start} & ",
+    reason <- glue::glue("Concept {names(conceptSet)} between {window_start} & ",
                          "{window_end} days relative to {indexDate}")
   } else {
     # ie require absence instead of presence
@@ -84,7 +98,7 @@ requireConceptIntersectFlag <- function(x,
       dplyr::filter(.data$intersect_concept != 1) %>%
       dplyr::select(!"intersect_concept")
     # attrition reason
-    reason <- glue::glue("Not in concept {conceptSet} between {window_start} & ",
+    reason <- glue::glue("Not in concept {names(conceptSet)} between {window_start} & ",
                          "{window_end} days relative to {indexDate}")
   }
 

@@ -57,6 +57,19 @@ test_that("requiring presence in another table", {
                  "Initial qualifying events",
                  "In table table between -Inf & 0 days relative to cohort_start_date, censoring at cohort_end_date"))
 
+  # expected errors
+  # currently just 1 table suported´
+  expect_error(
+    requireTableIntersectFlag(x = cdm$cohort1,
+                              tableName = c("table", "observation_period"),
+                              window = c(-Inf, Inf))
+  )
+  expect_error(
+    requireTableIntersectFlag(x = cdm$cohort1,
+                              tableName = cdm$table,
+                              window = c(-Inf, Inf))
+  )
+
   CDMConnector::cdm_disconnect(cdm)
 })
 
