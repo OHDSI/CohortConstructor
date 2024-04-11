@@ -2,9 +2,9 @@
 
 export(attrition)
 export(cohortCount)
-export(generateIntersectCohortSet)
 export(generateMatchedCohortSet)
 export(getIdentifier)
+export(intersectCohort)
 export(joinOverlap)
 export(requireAge)
 export(requireCohortIntersectFlag)
