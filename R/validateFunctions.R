@@ -19,6 +19,7 @@ validateCohortTable <- function(cohort) {
           colnames(cohort))){
     cli::cli_abort("cohort must be a `cohort_table`")
   }
+  return(invisible(cohort))
 }
 
 validateIndexDate <- function(indexDate, cohort) {

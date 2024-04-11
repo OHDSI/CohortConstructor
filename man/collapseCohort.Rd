@@ -13,6 +13,8 @@ collapseCohort(cohort, cohortId = NULL, gap = 0, name = tableName(cohort))
 definition ids are used.}
 
 \item{gap}{number of days to join consecutive records.}
+
+\item{name}{Name of the resultant cohort.}
 }
 \value{
 A cohort_table object.
