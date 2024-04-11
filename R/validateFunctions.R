@@ -74,3 +74,7 @@ validateName <- function(name) {
 validateConceptSet <- function(conceptSet) {
   omopgenerics::newCodelist(conceptSet)
 }
+
+validateGap <- function(gap) {
+  assertNumeric(gap, integerish = TRUE, min = 0)
+}
