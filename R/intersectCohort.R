@@ -202,12 +202,6 @@ intersectCohort <- function(cohort,
 #' @return Table in the cdm with start, end and by as columns. Periods are not
 #' going to overlap between each other.
 #'
-#' @example
-#' library(CohortConstructor)
-#' library(PatientProfiles)
-#' cdm <- mockPatientProfiles()
-#' cdm$cohort <- splitOverlap(cdm$cohort1)
-#'
 splitOverlap <- function(x,
                          start = "cohort_start_date",
                          end = "cohort_end_date",
