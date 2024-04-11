@@ -19,6 +19,7 @@ validateCohortTable <- function(cohort) {
           colnames(cohort))){
     cli::cli_abort("cohort must be a `cohort_table`")
   }
+  return(invisible(cohort))
 }
 
 validateIndexDate <- function(indexDate, cohort) {
@@ -26,6 +27,7 @@ validateIndexDate <- function(indexDate, cohort) {
   if(!indexDate %in% colnames(cohort)){
     cli::cli_abort("{indexDate} must be a date column in the cohort table")
   }
+  return(invisible(indexDate))
 }
 
 validateCohortId <- function(cohortId, ids) {
@@ -73,4 +75,50 @@ validateName <- function(name) {
 
 validateConceptSet <- function(conceptSet) {
   omopgenerics::newCodelist(conceptSet)
+}
+
+validateAgeRange <- function(ageRange) {
+  err <- "ageRange must be a list of pairs of age ranges, example: list(c(0, 9), c(10, 19))"
+  if (is.null(ageRange)) {
+    return(invisible(ageRange))
+  }
+  if (!is.list(ageRange)) {
+    ageRange <- list(ageRange)
+  }
+  assertList(ageRange, class = c("numeric", "integer"))
+  l <- lengths(ageRange)
+  if (!all(l == 2)) {
+    cli::cli_abort(err)
+  }
+  if (!all(unlist(ageRange) >= 0)) {
+    cli::cli_abort(err)
+  }
+  min <- lapply(ageRange, function(x) {x[1]}) |> unlist()
+  max <- lapply(ageRange, function(x) {x[2]}) |> unlist()
+  if (!all(min <= max)) {
+    cli::cli_abort(err)
+  }
+  return(invisible(ageRange))
+}
+
+validateSex <- function(sex) {
+  assertChoice(sex, c("Both", "Female", "Male"), null = TRUE)
+  return(invisible(sex))
+}
+
+validateMinPriorObservation <- function(minPriorObservation) {
+  assertNumeric(minPriorObservation, integerish = TRUE, min = 0, null = T)
+  minPriorObservation <- minPriorObservation |> sort()
+  return(invisible(minPriorObservation))
+}
+
+validateMinFutureObservation <- function(minFutureObservation) {
+  assertNumeric(minFutureObservation, integerish = TRUE, min = 0, null = T)
+  minFutureObservation <- minFutureObservation |> sort()
+  return(invisible(minFutureObservation))
+}
+
+validateOrder <- function(order) {
+  assertChoice(order, c("sex", "age", "prior_observation", "future_observation"), length = 4)
+  return(invisible(order))
 }
