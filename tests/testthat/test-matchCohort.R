@@ -1,4 +1,4 @@
-test_that("generateMatchedCohortSet runs without errors", {
+test_that("matchCohort runs without errors", {
   # Create cdm object
   cdm <- DrugUtilisation::generateConceptCohortSet(
     cdm = DrugUtilisation::mockDrugUtilisation(numberIndividuals = 200),
@@ -8,10 +8,10 @@ test_that("generateMatchedCohortSet runs without errors", {
     requiredObservation = c(180, 180),
     overwrite = TRUE)
 
-  expect_no_error(a <- generateMatchedCohortSet(cdm,
-                                                name = "new_cohort",
-                                                targetCohortName = "cases",
-                                                ratio = 2))
+  expect_no_error(a <- matchCohort(cdm,
+                                   name = "new_cohort",
+                                   targetCohortName = "cases",
+                                   ratio = 2))
 
   cdm <- DrugUtilisation::generateConceptCohortSet(
     cdm = DrugUtilisation::mockDrugUtilisation(numberIndividuals = 200),
@@ -21,50 +21,50 @@ test_that("generateMatchedCohortSet runs without errors", {
     requiredObservation = c(10,10),
     overwrite = TRUE)
 
-  expect_no_error(generateMatchedCohortSet(cdm,
-                                           name = "new_cohort",
-                                           targetCohortName = "cases"))
+  expect_no_error(matchCohort(cdm,
+                              name = "new_cohort",
+                              targetCohortName = "cases"))
 
-  expect_no_error(generateMatchedCohortSet(cdm,
-                                           name = "new_cohort",
-                                           targetCohortName = "cases",
-                                           ratio = 3))
+  expect_no_error(matchCohort(cdm,
+                              name = "new_cohort",
+                              targetCohortName = "cases",
+                              ratio = 3))
 
-  expect_no_error(generateMatchedCohortSet(cdm,
-                                           name = "new_cohort",
-                                           targetCohortName = "cases",
-                                           ratio = Inf))
+  expect_no_error(matchCohort(cdm,
+                              name = "new_cohort",
+                              targetCohortName = "cases",
+                              ratio = Inf))
 
-  expect_no_error(generateMatchedCohortSet(cdm,
-                                           name = "new_cohort",
-                                           matchSex = FALSE,
-                                           matchYearOfBirth = TRUE,
-                                           targetCohortName = "cases"))
+  expect_no_error(matchCohort(cdm,
+                              name = "new_cohort",
+                              matchSex = FALSE,
+                              matchYearOfBirth = TRUE,
+                              targetCohortName = "cases"))
 
-  expect_no_error(generateMatchedCohortSet(cdm,
-                                           name = "new_cohort",
-                                           matchSex = TRUE,
-                                           matchYearOfBirth = FALSE,
-                                           targetCohortName = "cases"))
+  expect_no_error(matchCohort(cdm,
+                              name = "new_cohort",
+                              matchSex = TRUE,
+                              matchYearOfBirth = FALSE,
+                              targetCohortName = "cases"))
 
-  expect_no_error(b <- generateMatchedCohortSet(cdm,
-                                                name = "new_cohort",
-                                                matchSex = FALSE,
-                                                matchYearOfBirth = FALSE,
-                                                targetCohortName = "cases"))
+  expect_no_error(b <- matchCohort(cdm,
+                                   name = "new_cohort",
+                                   matchSex = FALSE,
+                                   matchYearOfBirth = FALSE,
+                                   targetCohortName = "cases"))
 
-  expect_no_error(a <- generateMatchedCohortSet(cdm,
-                                                name = "new_cohort",
-                                                targetCohortName = "cases",
-                                                targetCohortId = c(1,2),
-                                                matchSex = TRUE,
-                                                matchYearOfBirth = TRUE,
-                                                ratio = 2))
+  expect_no_error(a <- matchCohort(cdm,
+                                   name = "new_cohort",
+                                   targetCohortName = "cases",
+                                   targetCohortId = c(1,2),
+                                   matchSex = TRUE,
+                                   matchYearOfBirth = TRUE,
+                                   ratio = 2))
 
 })
 
 
-test_that("generateMatchedCohortSet, no duplicated people within a cohort", {
+test_that("matchCohort, no duplicated people within a cohort", {
   followback <- 180
 
   cdm <- DrugUtilisation::generateConceptCohortSet(
@@ -76,13 +76,13 @@ test_that("generateMatchedCohortSet, no duplicated people within a cohort", {
     overwrite = TRUE
   )
 
-  a <- generateMatchedCohortSet(cdm,
-                                name = "new_cohort",
-                                targetCohortName = "cohort",
-                                targetCohortId = NULL,
-                                matchSex = TRUE,
-                                matchYearOfBirth = TRUE,
-                                ratio = 1)
+  a <- matchCohort(cdm,
+                   name = "new_cohort",
+                   targetCohortName = "cohort",
+                   targetCohortId = NULL,
+                   matchSex = TRUE,
+                   matchYearOfBirth = TRUE,
+                   ratio = 1)
 
   p1 <- a$new_cohort %>%
     dplyr::filter(cohort_definition_id == 1) %>%
@@ -92,13 +92,13 @@ test_that("generateMatchedCohortSet, no duplicated people within a cohort", {
   expect_true(length(p1) == length(unique(p1)))
 
 
-  a <- generateMatchedCohortSet(cdm,
-                                name = "new_cohort",
-                                targetCohortName = "cohort",
-                                targetCohortId = NULL,
-                                matchSex = TRUE,
-                                matchYearOfBirth = TRUE,
-                                ratio = 5)
+  a <- matchCohort(cdm,
+                   name = "new_cohort",
+                   targetCohortName = "cohort",
+                   targetCohortId = NULL,
+                   matchSex = TRUE,
+                   matchYearOfBirth = TRUE,
+                   ratio = 5)
   p1 <- a$new_cohort %>%
     dplyr::filter(cohort_definition_id == 2) %>%
     dplyr::select(subject_id) %>%
@@ -121,20 +121,20 @@ test_that("check that we obtain expected result when ratio is 1", {
   )
 
   # Number of counts for the initial cohorts are the same as in the matched cohorts
-  matched_cohorts <- generateMatchedCohortSet(cdm,
-                                              name = "new_cohort",
-                                              targetCohortName = "cohort",
-                                              targetCohortId = NULL,
-                                              matchSex = TRUE,
-                                              matchYearOfBirth = TRUE,
-                                              ratio = 1)
+  matched_cohorts <- matchCohort(cdm,
+                                 name = "new_cohort",
+                                 targetCohortName = "cohort",
+                                 targetCohortId = NULL,
+                                 matchSex = TRUE,
+                                 matchYearOfBirth = TRUE,
+                                 ratio = 1)
 
   expect_true(nrow(omopgenerics::cohortCount(matched_cohorts$new_cohort) %>%
-    dplyr::left_join(omopgenerics::settings(matched_cohorts$new_cohort),
-                     by = "cohort_definition_id") %>%
-    dplyr::filter(stringr::str_detect(cohort_name, "c_1"))  %>%
-      dplyr::select("number_records") %>%
-      dplyr::distinct()) == 1)
+                     dplyr::left_join(omopgenerics::settings(matched_cohorts$new_cohort),
+                                      by = "cohort_definition_id") %>%
+                     dplyr::filter(stringr::str_detect(cohort_name, "c_1"))  %>%
+                     dplyr::select("number_records") %>%
+                     dplyr::distinct()) == 1)
   expect_true(nrow(omopgenerics::cohortCount(matched_cohorts$new_cohort) %>%
                      dplyr::left_join(omopgenerics::settings(matched_cohorts$new_cohort),
                                       by = "cohort_definition_id") %>%
@@ -189,7 +189,7 @@ test_that("test exactMatchingCohort works if there are no subjects", {
     overwrite = TRUE
   )
   cdm$cases <- cdm$cases %>% dplyr::filter(subject_id == 0)
-  cdm <- generateMatchedCohortSet(
+  cdm <- matchCohort(
     cdm,
     name = "new_cohort",
     targetCohortName = "cases",
@@ -210,13 +210,13 @@ test_that("test exactMatchingCohort works if one of the cohorts does not have an
   )
 
   expect_no_error(
-    cdm <- generateMatchedCohortSet(cdm,
-                             name = "new_cohort",
-                             targetCohortName = "cases",
-                             targetCohortId = NULL,
-                             matchSex = TRUE,
-                             matchYearOfBirth = TRUE,
-                             ratio = 1)
+    cdm <- matchCohort(cdm,
+                       name = "new_cohort",
+                       targetCohortName = "cases",
+                       targetCohortId = NULL,
+                       matchSex = TRUE,
+                       matchYearOfBirth = TRUE,
+                       ratio = 1)
   )
 })
 
@@ -232,13 +232,13 @@ test_that("test exactMatchingCohort with a ratio bigger than 1", {
   )
 
   expect_no_error(
-    a <- generateMatchedCohortSet(cdm,
-                                  name = "new_cohort",
-                                  targetCohortName = "cases",
-                                  targetCohortId = NULL,
-                                  matchSex = TRUE,
-                                  matchYearOfBirth = TRUE,
-                                  ratio = 5)
+    a <- matchCohort(cdm,
+                     name = "new_cohort",
+                     targetCohortName = "cases",
+                     targetCohortId = NULL,
+                     matchSex = TRUE,
+                     matchYearOfBirth = TRUE,
+                     ratio = 5)
   )
 })
 
@@ -277,13 +277,13 @@ test_that("test exactMatchingCohort with a ratio bigger than 1", {
     overwrite = TRUE
   )
 
-  a <- generateMatchedCohortSet(cdm,
-                                name = "new_cohort",
-                                targetCohortName = "cases",
-                                targetCohortId = NULL,
-                                matchSex = TRUE,
-                                matchYearOfBirth = TRUE,
-                                ratio = 4)
+  a <- matchCohort(cdm,
+                   name = "new_cohort",
+                   targetCohortName = "cases",
+                   targetCohortId = NULL,
+                   matchSex = TRUE,
+                   matchYearOfBirth = TRUE,
+                   ratio = 4)
 
   expect_true(a[["new_cohort"]] %>%
                 dplyr::filter(cohort_definition_id %in% c(1,2)) %>%
