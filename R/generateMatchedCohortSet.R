@@ -37,6 +37,8 @@ generateMatchedCohortSet <- function(cdm,
                                      matchSex = TRUE,
                                      matchYearOfBirth = TRUE,
                                      ratio = 1){
+  cli::cli_inform("Starting matching")
+
   # validate initial input
   validateInput(
     cdm = cdm, name = name, targetCohortName = targetCohortName,
@@ -58,6 +60,7 @@ generateMatchedCohortSet <- function(cdm,
   } else {
     # get target cohort id
     targetCohortId <- getTargetCohortId(cdm, targetCohortId, targetCohortName)
+    cli::cli_inform(c("*" = paste0(length(targetCohortId), " cohorts to be matched.")))
 
     # Create the cohort name with cases and controls of the targetCohortId
     cdm <- getNewCohort(cdm, name, targetCohortName, targetCohortId, n)
@@ -67,19 +70,25 @@ generateMatchedCohortSet <- function(cdm,
 
     # get matched tables
     matchCols <- getMatchCols(matchSex, matchYearOfBirth)
+    for(i in matchCols){
+      cli::cli_inform(c("*" = paste0("Matching by ", i)))
+    }
 
     if(!is.null(matchCols)){
       # Exclude individuals without any match
       cdm <- excludeNoMatchedIndividuals(cdm, name, matchCols, n)
+      cli::cli_inform(c("*" = "Not matched individuals excluded"))
 
       # Match as ratio was infinite
       cdm <- infiniteMatching(cdm, name, targetCohortId)
 
       # Delete controls that are not in observation
       cdm <- checkObservationPeriod(cdm, name, targetCohortId, n)
+      cli::cli_inform(c("*" = "Removing pairs that were not in observation at index date"))
 
       # Check ratio
       cdm <- checkRatio(cdm, name, ratio, targetCohortId, n)
+      cli::cli_inform(c("*" = "Adjusting ratio"))
 
       # Check cohort set ref
       cdm <- checkCohortSetRef(cdm, name, targetCohortName, matchSex, matchYearOfBirth, targetCohortId, n)
@@ -87,11 +96,10 @@ generateMatchedCohortSet <- function(cdm,
       # Rename cohort definition ids
       cdm <- renameCohortDefinitionIds(cdm, name)
 
-    } else {
-      # TO DO
     }
   }
   # Return
+  cli::cli_inform(c("v" = "Done"))
   return(cdm)
 }
 
@@ -172,9 +180,9 @@ randomPrefix <- function(n = 5) {
 
 getNumberOfCohorts <- function(cdm, targetCohortName){
   # Read number of cohorts
-  n <- cdm[[targetCohortName]] %>%
+  n <- settings(cdm[[targetCohortName]]) %>%
     dplyr::summarise(v = max(.data$cohort_definition_id, na.rm = TRUE)) %>%
-    dplyr::pull("v") # number of different cohorts
+    dplyr::pull("v")
 
   if(is.na(n)){# Empty table, number of cohorts is 0
     n <- 0
@@ -256,7 +264,9 @@ getNewCohort <- function(cdm, name, targetCohortName, targetCohortId, n){
     dplyr::slice(rep(1:dplyr::n(), times = 2)) %>%
     dplyr::group_by(.data$cohort_definition_id) %>%
     dplyr::mutate(
-      cohort_name = dplyr::if_else(dplyr::row_number() == 2, paste0(.data$cohort_name,"_matched"), .data$cohort_name),
+      cohort_name = dplyr::if_else(dplyr::row_number() == 2, paste0(.data$cohort_name,"_matched"), .data$cohort_name)
+    ) %>%
+    dplyr::mutate(
       cohort_definition_id = dplyr::if_else(dplyr::row_number() == 2, .data$cohort_definition_id+.env$n, .data$cohort_definition_id)
     ) %>%
     dplyr::ungroup()
@@ -423,7 +433,7 @@ checkObservationPeriod <- function(cdm, name, targetCohortId, n){
     dplyr::mutate(cohort_end_date = dplyr::if_else(
       .data$cohort_definition_id %in% .env$targetCohortId,
       .data$cohort_end_date,
-      !!CDMConnector::dateadd("cohort_start_date", "future_observation")
+      as.Date(!!CDMConnector::dateadd("cohort_start_date", "future_observation"))
     )) %>%
     dplyr::select(-"future_observation") %>%
     dplyr::group_by(.data$target_definition_id, .data$group_id, .data$pair_id) %>%
@@ -434,7 +444,6 @@ checkObservationPeriod <- function(cdm, name, targetCohortId, n){
     CDMConnector::record_cohort_attrition("Exclude individuals that their only pair is not in observation", cohortId = targetCohortId)
   return(cdm)
 }
-
 
 checkRatio <- function(cdm, name, ratio, targetCohortId, n){
   if (ratio == Inf) {
@@ -454,7 +463,6 @@ checkRatio <- function(cdm, name, ratio, targetCohortId, n){
 
   return(cdm)
 }
-
 
 checkCohortSetRef <- function(cdm, name, targetCohortName, matchSex, matchYearOfBirth, targetCohortId, n){
   cohort_set_ref <- cdm[[name]] %>%
