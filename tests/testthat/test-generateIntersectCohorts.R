@@ -134,7 +134,7 @@ test_that("intersectCohort", {
 
   # mutually exclusive
   expect_no_error(cdm$cohort2 <- intersectCohort(
-    cdm = cdm, name = "cohort2", targetCohortName = "cohort1",
+    cohort = cdm$cohort1, name = "cohort2",
     mutuallyExclusive = TRUE
   ))
   expect_true(all(omopgenerics::settings(cdm$cohort2)$mutually_exclusive == TRUE))
@@ -167,7 +167,7 @@ test_that("intersectCohort", {
 
   # not mutually exclusive and gap
   expect_no_error(cdm$cohort3 <- intersectCohort(
-    cdm = cdm, name = "cohort3", targetCohortName = "cohort1",
+    cohort = cdm$cohort1, name = "cohort3",
     mutuallyExclusive = FALSE, gap = 1
   ))
   expect_true(all(CDMConnector::settings(cdm$cohort3)$mutually_exclusive == FALSE))
@@ -208,8 +208,8 @@ test_that("intersectCohort", {
 
   # not enough cohorts provided
   expect_warning(cdm$cohort4 <- intersectCohort(
-    cdm = cdm, name = "cohort4", targetCohortName = "cohort1",
-    targetCohortId = 1
+    cohort = cdm$cohort1, name = "cohort4",
+    cohortId = 1
   ), "At least 2 cohort id must be provided to do the combination")
   expect_equal(cdm$cohort1 %>%
                  omopgenerics::settings() %>%
@@ -232,7 +232,7 @@ test_that("only return comb", {
                                    schema = "main")
 
   cdm$cohort2 <- intersectCohort(
-    cdm = cdm, name = "cohort2", targetCohortName = "cohort1",
+    cohort = cdm$cohort1, name = "cohort2",
     mutuallyExclusive = FALSE, returnOnlyComb = TRUE
   )
   expect_true(nrow(dplyr::collect(cdm$cohort2)) == 0)
@@ -256,7 +256,7 @@ test_that("only return comb", {
                                    cdm = cdm_local,
                                    schema = "main")
   cdm$cohort3 <- intersectCohort(
-    cdm = cdm, name = "cohort3", targetCohortName = "cohort1",
+    cohort = cdm$cohort1, name = "cohort3",
     mutuallyExclusive = FALSE, returnOnlyComb = TRUE, gap = 1
   )
   expect_equal(
@@ -300,7 +300,7 @@ test_that("only return comb", {
                     c(0, 0, 3, 0, 0, 0, 7, 0, 0, 4, 0, 0, 4)))
 
   cdm$cohort4 <- intersectCohort(
-    cdm = cdm, name = "cohort4", targetCohortName = "cohort1",
+    cohort = cdm$cohort1, name = "cohort4",
     mutuallyExclusive = TRUE, returnOnlyComb = TRUE, gap = 1
   )
 
@@ -342,8 +342,8 @@ test_that("attrition and cohortId", {
     requireAge(ageRange = list(c(0,40)))
 
   cdm$cohort1 <- intersectCohort(
-    cdm = cdm, targetCohortId = 1:2,
-    name = "cohort1", targetCohortName = "cohort1", mutuallyExclusive = TRUE
+    cohort = cdm$cohort1, cohortId = 1:2,
+    name = "cohort1", mutuallyExclusive = TRUE
   )
   expect_true(all(
     omopgenerics::attrition(cdm$cohort1)$reason ==

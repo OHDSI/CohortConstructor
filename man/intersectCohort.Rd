@@ -6,25 +6,19 @@
 cohorts.}
 \usage{
 intersectCohort(
-  cdm,
-  name,
-  targetCohortName,
-  targetCohortId = NULL,
+  cohort,
+  cohortId = NULL,
   gap = 0,
   mutuallyExclusive = FALSE,
-  returnOnlyComb = FALSE
+  returnOnlyComb = FALSE,
+  name = omopgenerics::tableName(cohort)
 )
 }
 \arguments{
-\item{cdm}{A cdm reference.}
+\item{cohort}{A cohort table in a cdm reference.}
 
-\item{name}{Name of the new generated cohort.}
-
-\item{targetCohortName}{Name of an existent cohort in the cdm to create the
-combinations.}
-
-\item{targetCohortId}{Ids to combine of the target cohort. If NULL all
-cohort present in the table will be used.}
+\item{cohortId}{Vector of cohort definition ids to include. If NULL, all
+cohort definition ids will be used.}
 
 \item{gap}{Number of days between two subsequent cohort entries to be merged
 in a single cohort record.}
@@ -33,6 +27,8 @@ in a single cohort record.}
 exclusive or not.}
 
 \item{returnOnlyComb}{Whether to only get the combination cohort back}
+
+\item{name}{Name of the new cohort with the demographic requirements.}
 }
 \value{
 The cdm object with the new generated cohort set
@@ -48,9 +44,8 @@ library(PatientProfiles)
 cdm <- mockPatientProfiles()
 
 cdm$cohort3 <- intersectCohort(
-  cdm = cdm,
+  cohort = cdm$cohort1,
   name = "cohort3",
-  targetCohortName = "cohort2"
 )
 
 cdm$cohort3
