@@ -2,6 +2,14 @@ validateCDM <- function(cdm) {
   if (!isTRUE(inherits(cdm, "cdm_reference"))) {
     cli::cli_abort("cohort must be part of a cdm reference")
   }
+  return(invisible(cdm))
+}
+
+validateCdm <- function(cdm) {
+  if (!isTRUE(inherits(cdm, "cdm_reference"))) {
+    cli::cli_abort("cdm must be a cdm_reference object.")
+  }
+  return(invisible(cdm))
 }
 
 validateCohortTable <- function(cohort) {
@@ -45,4 +53,24 @@ validateDateRange<-function(dateRange){
     cli::cli_abort("First date in dateRange cannot be after second")
   }
   return(invisible(dateRange))
+}
+
+validateName <- function(name) {
+  em <- c(
+    "x" = "{name} it is not a valida value for name.",
+    "i" = "It must be:",
+    "*" = "lowercase character vector of length 1",
+    "*" = "NA or NULL values are not allowed"
+  )
+  if (!is.character(name) | length(name) != 1 | is.na(name)) {
+    cli::cli_abort(em)
+  }
+  if (tolower(name) != name){
+    cli::cli_abort(em)
+  }
+  return(invisible(name))
+}
+
+validateConceptSet <- function(conceptSet) {
+  omopgenerics::newCodelist(conceptSet)
 }

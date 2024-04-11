@@ -22,7 +22,7 @@
 #' library(dplyr)
 #' cdm <- mockDrugUtilisation(numberIndividuals = 100)
 #' cdm <- cdm %>%
-#'   generateMatchedCohortSet(name = "new_matched_cohort",
+#'   matchCohort(name = "new_matched_cohort",
 #'                            targetCohortName = "cohort1",
 #'                            targetCohortId = c(1,2),
 #'                            matchSex = TRUE,
@@ -30,13 +30,13 @@
 #'                            ratio = 2)
 #' cdm$new_matched_cohort
 #'
-generateMatchedCohortSet <- function(cdm,
-                                     name,
-                                     targetCohortName,
-                                     targetCohortId = NULL,
-                                     matchSex = TRUE,
-                                     matchYearOfBirth = TRUE,
-                                     ratio = 1){
+matchCohort <- function(cdm,
+                        name,
+                        targetCohortName,
+                        targetCohortId = NULL,
+                        matchSex = TRUE,
+                        matchYearOfBirth = TRUE,
+                        ratio = 1){
   cli::cli_inform("Starting matching")
 
   # validate initial input
