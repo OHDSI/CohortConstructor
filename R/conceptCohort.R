@@ -160,7 +160,13 @@ collapseGap <- function(cohort, gap) {
       "cohort_definition_id", "subject_id", "date" = "cohort_end_date"
     ) |>
     dplyr::mutate("date_id" = 1)
-  start |>
+  if (gap > 0) {
+    end <- end %>%
+      dplyr::mutate("date" = as.Date(!!CDMConnector::dateadd(
+        date = "date", number = gap, interval = "day"
+      )))
+  }
+  x <- start |>
     dplyr::union_all(end) |>
     dplyr::group_by(.data$cohort_definition_id, .data$subject_id) |>
     dplyr::arrange(.data$date, .data$date_id) |>
@@ -182,4 +188,11 @@ collapseGap <- function(cohort, gap) {
     ) |>
     tidyr::pivot_wider(names_from = "name", values_from = "date") |>
     dplyr::select(-"era_id")
+  if (gap > 0) {
+    x <- x %>%
+      dplyr::mutate("cohort_end_date" = as.Date(!!CDMConnector::dateadd(
+        date = "cohort_end_date", number = -gap, interval = "day"
+      )))
+  }
+  return(x)
 }
