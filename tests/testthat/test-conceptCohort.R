@@ -1,5 +1,4 @@
 test_that("expected errors and messages", {
-
   cdm <- omock::mockCdmReference() |>
     omock::mockPerson() |>
     omock::mockObservationPeriod()
@@ -186,6 +185,88 @@ test_that("simple example duckdb", {
       "cohort_end_date" = as.Date(c(800, 1600, 1804, 2000), origin = "2020-01-01")
     )
   )
+
+  CDMConnector::cdmDisconnect(cdm = cdm)
+})
+
+test_that("out of observation", {
+  cdm_local <- omock::mockCdmReference() |>
+    omock::mockPerson(n = 4) |>
+    omock::mockObservationPeriod()
+  cdm_local$concept <- dplyr::tibble(
+    "concept_id" = c(1, 2),
+    "concept_name" = c("my concept 1", "my concept 2"),
+    "domain_id" = "Drug",
+    "vocabulary_id" = NA,
+    "concept_class_id" = NA,
+    "concept_code" = NA,
+    "valid_start_date" = NA,
+    "valid_end_date" = NA
+  )
+  cdm_local$drug_exposure <- dplyr::tibble(
+    "drug_exposure_id" = 1:13,
+    "person_id" = c(1, 1, 1, 1, 2, 2, 3, 1, 1, 1, 1, 4, 4),
+    "drug_concept_id" = c(1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 2),
+    "drug_exposure_start_date" = c(0, 300, 1500, 750, 10, 800, 150, 1800, 1801, 1802, 1803, 430, -10),
+    "drug_exposure_end_date" = c(400, 800, 1600, 1550, 2000, 1000, 600, 1801, 1802, 1803, 1804, 400, -100),
+    "drug_type_concept_id" = 1
+  ) |>
+    dplyr::mutate(
+      "drug_exposure_start_date" = as.Date(.data$drug_exposure_start_date, origin = "2010-01-01"),
+      "drug_exposure_end_date" = as.Date(.data$drug_exposure_end_date, origin = "2010-01-01")
+    )
+
+  cdm <- CDMConnector::copyCdmTo(con = DBI::dbConnect(duckdb::duckdb()),
+                                 cdm = cdm_local, schema = "main")
+
+  # start end after (subject 2, and some of 1)
+  # start end before (subject 3)
+  # end event < start event (subject 4)
+  cdm$cohort1 <- conceptCohort(cdm = cdm, conceptSet = list(a = 1, b = 2), name = "cohort1")
+  expect_true(all(c("cohort_table", "cdm_table") %in% class(cdm$cohort1)))
+  expect_true(cdm$cohort1 |> dplyr::pull("subject_id") == 1)
+  expect_true(cdm$cohort1 |> dplyr::pull("cohort_start_date") == "2010-01-01")
+  expect_true(cdm$cohort1 |> dplyr::pull("cohort_end_date") == "2012-03-11")
+  expect_true(all(omopgenerics::settings(cdm$cohort1)$cohort_name == c("a", "b")))
+  expect_true(cohortCodelist(cdm$cohort1, 1)$a == 1)
+  expect_true(cohortCodelist(cdm$cohort1, 2)$b == 2)
+
+
+  # event starts in, ends out (subject 1)
+  # event starts out, end in (subject 3)
+  # no concept 2
+  cdm_local <- omock::mockCdmReference() |>
+    omock::mockPerson(n = 4) |>
+    omock::mockObservationPeriod()
+  cdm_local$concept <- dplyr::tibble(
+    "concept_id" = c(1, 2),
+    "concept_name" = c("my concept 1", "my concept 2"),
+    "domain_id" = "Drug",
+    "vocabulary_id" = NA,
+    "concept_class_id" = NA,
+    "concept_code" = NA,
+    "valid_start_date" = NA,
+    "valid_end_date" = NA
+  )
+  cdm_local$drug_exposure <- dplyr::tibble(
+    "drug_exposure_id" = 1:4,
+    "person_id" = c(1, 3, 4, 2),
+    "drug_concept_id" = 1,
+    "drug_exposure_start_date" = as.Date(c("2004-01-01", "2014-01-01", "2001-01-01", "2000-01-01")),
+    "drug_exposure_end_date" = as.Date(c("2015-01-01", "2015-05-01", "2002-01-01", "2000-02-02")),
+    "drug_type_concept_id" = 1
+  )
+  cdm <- CDMConnector::copyCdmTo(con = DBI::dbConnect(duckdb::duckdb()),
+                                 cdm = cdm_local, schema = "main")
+
+  cdm$cohort2 <- conceptCohort(cdm = cdm, conceptSet = list(a = 1, b = 2), name = "cohort2")
+  expect_true(all(c("cohort_table", "cdm_table") %in% class(cdm$cohort2)))
+  expect_true(all(cdm$cohort2 |> dplyr::pull("subject_id") == c(2, 4)))
+  expect_true(all(cdm$cohort2 |> dplyr::pull("cohort_start_date") == c("2000-01-01", "2001-01-01")))
+  expect_true(all(cdm$cohort2 |> dplyr::pull("cohort_end_date") == c("2000-02-02", "2002-01-01")))
+  expect_true(all(omopgenerics::settings(cdm$cohort2)$cohort_name == c("a", "b")))
+  expect_true(cohortCodelist(cdm$cohort2, 1)$a == 1)
+  expect_true(cohortCodelist(cdm$cohort2, 2)$b == 2)
 
   CDMConnector::cdmDisconnect(cdm = cdm)
 })

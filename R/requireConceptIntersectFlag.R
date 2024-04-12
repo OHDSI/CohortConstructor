@@ -75,45 +75,45 @@ requireConceptIntersectFlag <- function(x,
   }
 
   cdm <- omopgenerics::cdmReference(x)
-
-  subsetCohort <- x %>%
-    dplyr::select(dplyr::all_of(.env$cols)) %>%
-    PatientProfiles::addConceptIntersectFlag(
-      conceptSet = conceptSet,
-      indexDate = indexDate,
-      targetStartDate = targetStartDate,
-      targetEndDate = targetEndDate,
-      window = window,
-      censorDate = censorDate,
-      nameStyle = "intersect_concept"
-    )
-
-  if(isFALSE(negate)){
-    subsetCohort <- subsetCohort %>%
-      dplyr::filter(.data$intersect_concept == 1) %>%
-      dplyr::select(!"intersect_concept")
-    # attrition reason
-    reason <- glue::glue("Concept {names(conceptSet)} between {window_start} & ",
-                         "{window_end} days relative to {indexDate}")
+  if (length(conceptSet) == 0) {
+    cli::cli_inform(c("i" = "Empty codelist provided, returning input cohort"))
   } else {
-    # ie require absence instead of presence
-    subsetCohort <- subsetCohort %>%
-      dplyr::filter(.data$intersect_concept != 1) %>%
-      dplyr::select(!"intersect_concept")
-    # attrition reason
-    reason <- glue::glue("Not in concept {names(conceptSet)} between {window_start} & ",
-                         "{window_end} days relative to {indexDate}")
+    subsetCohort <- x %>%
+      dplyr::select(dplyr::all_of(.env$cols)) %>%
+      PatientProfiles::addConceptIntersectFlag(
+        conceptSet = conceptSet,
+        indexDate = indexDate,
+        targetStartDate = targetStartDate,
+        targetEndDate = targetEndDate,
+        window = window,
+        censorDate = censorDate,
+        nameStyle = "intersect_concept"
+      )
+    if(isFALSE(negate)){
+      subsetCohort <- subsetCohort %>%
+        dplyr::filter(.data$intersect_concept == 1) %>%
+        dplyr::select(!"intersect_concept")
+      # attrition reason
+      reason <- glue::glue("Concept {names(conceptSet)} between {window_start} & ",
+                           "{window_end} days relative to {indexDate}")
+    } else {
+      # ie require absence instead of presence
+      subsetCohort <- subsetCohort %>%
+        dplyr::filter(.data$intersect_concept != 1) %>%
+        dplyr::select(!"intersect_concept")
+      # attrition reason
+      reason <- glue::glue("Not in concept {names(conceptSet)} between {window_start} & ",
+                           "{window_end} days relative to {indexDate}")
+    }
+    if (!is.null(censorDate)) {
+      reason <- glue::glue("{reason}, censoring at {censorDate}")
+    }
+    x <- x %>%
+      dplyr::inner_join(subsetCohort,
+                        by = c(cols)) %>%
+      dplyr::compute(name = name, temporary = FALSE) %>%
+      CDMConnector::recordCohortAttrition(reason = reason)
   }
-
-  if (!is.null(censorDate)) {
-    reason <- glue::glue("{reason}, censoring at {censorDate}")
-  }
-
-  x <- x %>%
-    dplyr::inner_join(subsetCohort,
-                      by = c(cols)) %>%
-    dplyr::compute(name = name, temporary = FALSE) %>%
-    CDMConnector::recordCohortAttrition(reason = reason)
 
   return(x)
 }
