@@ -112,7 +112,7 @@ conceptCohort <- function(cdm,
   cli::cli_inform(c("i" = "Collapsing records."))
   # assign to cdm so we keep class, to be removed when https://github.com/darwin-eu-dev/omopgenerics/issues/256
   cdm[[name]] <- cohort |>
-    collapseGap(gap = 0)
+    joinOverlap(gap = 0)
   cohort <- cdm[[name]] |>
     dplyr::compute(name = name, temporary = FALSE)
 
