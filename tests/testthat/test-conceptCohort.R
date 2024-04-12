@@ -261,10 +261,10 @@ test_that("out of observation", {
 
   cdm$cohort2 <- conceptCohort(cdm = cdm, conceptSet = list(a = 1, b = 2), name = "cohort2")
   expect_true(all(c("cohort_table", "cdm_table") %in% class(cdm$cohort2)))
-  expect_true(all(cdm$cohort2 |> dplyr::pull("subject_id") == c(2, 4)))
-  expect_true(all(cdm$cohort2 |> dplyr::pull("cohort_start_date") == c("2000-01-01", "2001-01-01")))
-  expect_true(all(cdm$cohort2 |> dplyr::pull("cohort_end_date") == c("2000-02-02", "2002-01-01")))
-  expect_true(all(omopgenerics::settings(cdm$cohort2)$cohort_name == c("a", "b")))
+  expect_true(all(cdm$cohort2 |> dplyr::pull("subject_id") |> sort() == c(2, 4)))
+  expect_true(all(cdm$cohort2 |> dplyr::pull("cohort_start_date") |> sort() == c("2000-01-01", "2001-01-01")))
+  expect_true(all(cdm$cohort2 |> dplyr::pull("cohort_end_date") |> sort() == c("2000-02-02", "2002-01-01")))
+  expect_true(all(omopgenerics::settings(cdm$cohort2)$cohort_name |> sort() == c("a", "b")))
   expect_true(cohortCodelist(cdm$cohort2, 1)$a == 1)
   expect_true(cohortCodelist(cdm$cohort2, 2)$b == 2)
 

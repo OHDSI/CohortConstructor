@@ -18,7 +18,6 @@ collapseCohort <- function(cohort,
   cohort <- validateCohortTable(cohort)
   cohortId <- validateCohortId(cohortId, settings(cohort)$cohort_definition_id)
   gap <- validateGap(gap)
-  name <- validateName(name)
 
   # warning
   extraColumns <- colnames(cohort)
