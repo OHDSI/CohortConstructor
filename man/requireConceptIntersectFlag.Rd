@@ -41,7 +41,8 @@ rather than inclusion (i.e. require absence in another cohort).}
 \item{name}{Name of the new cohort with the future observation restriction.}
 }
 \value{
-Cohort table with only those in the other cohort kept
+Cohort table with only those  with the events in the concept list
+kept (or those without the event if nagate = TRUE)
 }
 \description{
 Require cohort subjects to have events of a concept list

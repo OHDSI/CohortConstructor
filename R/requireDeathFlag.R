@@ -10,7 +10,9 @@
 #' rather than inclusion (i.e. require absence in another cohort).
 #' @param name Name of the new cohort with the future observation restriction.
 #'
-#' @return Cohort table with only those in the other cohort kept
+#' @return Cohort table with only those with a death event kept (or without
+#' if negate = TRUE)
+#'
 #' @export
 #'
 #' @examples

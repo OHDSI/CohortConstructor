@@ -17,7 +17,9 @@
 #' rather than inclusion (i.e. require absence in another cohort).
 #' @param name Name of the new cohort with the future observation restriction.
 #'
-#' @return Cohort table with only those in the other cohort kept
+#' @return Cohort table with only those in the other cohort kept (or those that
+#' are not in the cohort if negate = TRUE)
+#'
 #' @export
 #'
 #' @examples

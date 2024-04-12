@@ -15,7 +15,9 @@
 #' rather than inclusion (i.e. require absence in another cohort).
 #' @param name Name of the new cohort with the future observation restriction.
 #'
-#' @return Cohort table with only those in the other cohort kept
+#' @return Cohort table with only those  with the events in the concept list
+#' kept (or those without the event if nagate = TRUE)
+#'
 #' @export
 #'
 #' @examples
