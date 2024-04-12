@@ -12,13 +12,32 @@ validateCdm <- function(cdm) {
   return(invisible(cdm))
 }
 
-validateCohortTable <- function(cohort) {
+validateCohortTable <- function(cohort, dropExtraColumns = FALSE) {
   if(!"cohort_table" %in% class(cohort) ||
      !all(c("cohort_definition_id", "subject_id",
             "cohort_start_date", "cohort_end_date") %in%
           colnames(cohort))){
     cli::cli_abort("cohort must be a `cohort_table`")
   }
+  if (dropExtraColumns) {
+    extraColumns <- colnames(cohort)
+    extraColumns <- extraColumns[!extraColumns %in% c(
+      "cohort_definition_id", "subject_id", "cohort_start_date",
+      "cohort_end_date"
+    )]
+    if (length(extraColumns) > 0) {
+      cli::cli_inform(c(
+        "!" = "extra columns will be dropped from cohort table:
+        {paste0(extraColumns, collapse = ', ')}."
+      ))
+      cohort <- cohort |>
+        dplyr::select(
+          "cohort_definition_id", "subject_id", "cohort_start_date",
+          "cohort_end_date"
+        )
+    }
+  }
+
   return(invisible(cohort))
 }
 
