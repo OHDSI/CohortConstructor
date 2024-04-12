@@ -116,7 +116,7 @@ test_that("restrictToLastEntry", {
   expect_true(all(cdm$new_cohort |> dplyr::pull(subject_id) ==
                     c(1, 2, 3, 1, 1, 2, 2, 2, 3, 3, 1, 2, 2, 2)))
   expect_true(all(omopgenerics::attrition(cdm$new_cohort)$reason == c(
-    c("Initial qualifying events", "Restricted to first entry", "Initial qualifying events",
+    c("Initial qualifying events", "Restricted to last entry", "Initial qualifying events",
       "Initial qualifying events"))
   ))
 
@@ -137,9 +137,9 @@ test_that("restrictToLastEntry", {
                     c("2004-01-07", "2001-10-02", "2015-04-13", "2009-03-19", "2001-04-01",
                       "2015-06-11", "2008-10-13", "2000-04-01")))
   expect_true(all(omopgenerics::attrition(cdm$cohort)$reason == c(
-    c("Initial qualifying events", "Restricted to first entry",
-      "Initial qualifying events", "Restricted to first entry",
-      "Initial qualifying events", "Restricted to first entry")
+    c("Initial qualifying events", "Restricted to last entry",
+      "Initial qualifying events", "Restricted to last entry",
+      "Initial qualifying events", "Restricted to last entry")
   )))
 
   # errors
