@@ -41,7 +41,8 @@ rather than inclusion (i.e. require absence in another cohort).}
 \item{name}{Name of the new cohort with the future observation restriction.}
 }
 \value{
-Cohort table with only those in the other cohort kept
+Cohort table with only those in the other table kept (or those that
+are not in the table if negate = TRUE)
 }
 \description{
 Require cohort subjects are present in another table
