@@ -1,4 +1,4 @@
-#' Require cohort subjects are present in another cohort
+#' Require cohort subjects to have events of a concept list
 #'
 #' @param x Cohort table.
 #' @param conceptSet Concept set list.

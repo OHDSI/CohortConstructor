@@ -2,7 +2,7 @@
 % Please edit documentation in R/requireConceptIntersectFlag.R
 \name{requireConceptIntersectFlag}
 \alias{requireConceptIntersectFlag}
-\title{Require cohort subjects are present in another cohort}
+\title{Require cohort subjects to have events of a concept list}
 \usage{
 requireConceptIntersectFlag(
   x,
@@ -44,7 +44,7 @@ rather than inclusion (i.e. require absence in another cohort).}
 Cohort table with only those in the other cohort kept
 }
 \description{
-Require cohort subjects are present in another cohort
+Require cohort subjects to have events of a concept list
 }
 \examples{
 library(PatientProfiles)

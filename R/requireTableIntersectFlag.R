@@ -1,4 +1,4 @@
-#' Require cohort subjects are present in another cohort
+#' Require cohort subjects are present in another table
 #'
 #' @param x Cohort table.
 #' @param tableName Name of the table to check for intersect.

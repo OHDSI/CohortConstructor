@@ -2,7 +2,7 @@
 % Please edit documentation in R/requireDeathFlag.R
 \name{requireDeathFlag}
 \alias{requireDeathFlag}
-\title{Require cohort subjects are present in another cohort}
+\title{Require cohort subjects' death at a certain time window}
 \usage{
 requireDeathFlag(
   x,
@@ -33,7 +33,7 @@ rather than inclusion (i.e. require absence in another cohort).}
 Cohort table with only those in the other cohort kept
 }
 \description{
-Require cohort subjects are present in another cohort
+Require cohort subjects' death at a certain time window
 }
 \examples{
 library(PatientProfiles)

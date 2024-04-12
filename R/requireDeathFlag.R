@@ -1,5 +1,4 @@
-
-#' Require cohort subjects are present in another cohort
+#' Require cohort subjects' death at a certain time window
 #'
 #' @param x Cohort table.
 #' @param indexDate Variable in x that contains the date to compute the

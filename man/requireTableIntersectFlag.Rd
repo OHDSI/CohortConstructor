@@ -2,7 +2,7 @@
 % Please edit documentation in R/requireTableIntersectFlag.R
 \name{requireTableIntersectFlag}
 \alias{requireTableIntersectFlag}
-\title{Require cohort subjects are present in another cohort}
+\title{Require cohort subjects are present in another table}
 \usage{
 requireTableIntersectFlag(
   x,
@@ -44,7 +44,7 @@ rather than inclusion (i.e. require absence in another cohort).}
 Cohort table with only those in the other cohort kept
 }
 \description{
-Require cohort subjects are present in another cohort
+Require cohort subjects are present in another table
 }
 \examples{
 library(PatientProfiles)
