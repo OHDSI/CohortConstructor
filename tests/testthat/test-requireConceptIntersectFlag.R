@@ -67,7 +67,15 @@ test_that("require flag in concept", {
                       "Initial qualifying events",
                       "Concept a between -Inf & Inf days relative to cohort_start_date")))
 
-
+  # empty concept
+  cdm$cohort1 <-  requireConceptIntersectFlag(x = cdm$cohort1,
+                                              conceptSet = list(),
+                                              window = c(-Inf, Inf))
+  expect_true(all(omopgenerics::attrition(cdm$cohort1)$reason ==
+                    c("Initial qualifying events",
+                      "Concept a between -Inf & Inf days relative to cohort_start_date",
+                      "Initial qualifying events",
+                      "Concept a between -Inf & Inf days relative to cohort_start_date")))
 
   # expected errors
   # only support one concept at the moment
