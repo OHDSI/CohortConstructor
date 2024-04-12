@@ -247,7 +247,7 @@ demographicsFilter <- function(cohort,
                                attritionFutureObservation
                                ) {
   # checks
-  assertCharacter(name)
+  name <- validateName(name)
   assertChoice(sex, choices = c("Both", "Male", "Female"), length = 1)
   validateCohortTable(cohort)
   cdm <- omopgenerics::cdmReference(cohort)

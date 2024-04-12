@@ -50,7 +50,7 @@ requireConceptIntersectFlag <- function(x,
                                         negate = FALSE,
                                         name = omopgenerics::tableName(x)){
   # checks
-  assertCharacter(name, length = 1)
+  name <- validateName(name)
   assertLogical(negate, length = 1)
   validateCohortTable(x)
   cdm <- omopgenerics::cdmReference(x)

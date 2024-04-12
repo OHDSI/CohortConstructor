@@ -22,7 +22,7 @@ restrictToFirstEntry <- function(cohort,
                                  name = omopgenerics::tableName(cohort)){
 
   # checks
-  assertCharacter(name)
+  name <- validateName(name)
   validateCohortTable(cohort)
   cdm <- omopgenerics::cdmReference(cohort)
   validateCDM(cdm)
@@ -83,7 +83,7 @@ restrictToLastEntry <- function(cohort,
                                 name = omopgenerics::tableName(cohort)){
 
   # checks
-  assertCharacter(name)
+  name <- validateName(name)
   validateCohortTable(cohort)
   cdm <- omopgenerics::cdmReference(cohort)
   validateCDM(cdm)
