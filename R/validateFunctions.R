@@ -37,7 +37,6 @@ validateCohortTable <- function(cohort, dropExtraColumns = FALSE) {
         )
     }
   }
-
   return(invisible(cohort))
 }
 
@@ -141,4 +140,8 @@ validateMinFutureObservation <- function(minFutureObservation) {
 validateOrder <- function(order) {
   assertChoice(order, c("sex", "age", "prior_observation", "future_observation"), length = 4)
   return(invisible(order))
+}
+
+validateGap <- function(gap) {
+  assertNumeric(gap, integerish = TRUE, min = 0)
 }

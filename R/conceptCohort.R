@@ -112,12 +112,23 @@ conceptCohort <- function(cdm,
   cli::cli_inform(c("i" = "Collapsing records."))
   # assign to cdm so we keep class, to be removed when https://github.com/darwin-eu-dev/omopgenerics/issues/256
   cdm[[name]] <- cohort |>
-    collapseGap(gap = 0)
-  cohort <- cdm[[name]] |>
+    dplyr::inner_join(cdm$observation_period |>
+                        dplyr::select("subject_id" = "person_id",
+                                      "observation_period_start_date",
+                                      "observation_period_end_date"),
+                      by = "subject_id") |>
+    dplyr::filter(
+      .data$observation_period_start_date <= .data$cohort_start_date,
+      .data$observation_period_end_date >= .data$cohort_end_date,
+      .data$cohort_start_date <= .data$cohort_end_date
+    ) |>
+    dplyr::select(-"observation_period_start_date", -"observation_period_end_date") |>
+    collapseGap(gap = 0) |>
     dplyr::compute(name = name, temporary = FALSE)
 
   cli::cli_inform(c("i" = "Creating cohort attributes."))
-  cdm[[name]] <- cohort |>
+
+  cdm[[name]] <- cdm[[name]] |>
     omopgenerics::newCohortTable(
       cohortSetRef = cohortSet,
       cohortAttritionRef = NULL,
@@ -160,7 +171,13 @@ collapseGap <- function(cohort, gap) {
       "cohort_definition_id", "subject_id", "date" = "cohort_end_date"
     ) |>
     dplyr::mutate("date_id" = 1)
-  start |>
+  if (gap > 0) {
+    end <- end %>%
+      dplyr::mutate("date" = as.Date(!!CDMConnector::dateadd(
+        date = "date", number = gap, interval = "day"
+      )))
+  }
+  x <- start |>
     dplyr::union_all(end) |>
     dplyr::group_by(.data$cohort_definition_id, .data$subject_id) |>
     dplyr::arrange(.data$date, .data$date_id) |>
@@ -182,4 +199,11 @@ collapseGap <- function(cohort, gap) {
     ) |>
     tidyr::pivot_wider(names_from = "name", values_from = "date") |>
     dplyr::select(-"era_id")
+  if (gap > 0) {
+    x <- x %>%
+      dplyr::mutate("cohort_end_date" = as.Date(!!CDMConnector::dateadd(
+        date = "cohort_end_date", number = -gap, interval = "day"
+      )))
+  }
+  return(x)
 }
