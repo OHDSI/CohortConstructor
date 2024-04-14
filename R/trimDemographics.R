@@ -126,7 +126,7 @@ trimDemographics <- function(cohort,
       cli::cli_inform(c("Trim age"))
       cohort <- cohort %>%
         dplyr::mutate(
-          !!!caseAge(age),
+          !!!caseAge(ageRange),
           "cohort_start_date" = dplyr::if_else(
             .data$cohort_start_date <= .data$new_cohort_start_date,
             .data$new_cohort_start_date,
