@@ -121,7 +121,8 @@ validateAgeRange <- function(ageRange) {
 }
 
 validateSex <- function(sex) {
-  assertChoice(sex, c("Both", "Female", "Male"), null = TRUE)
+  sex <- tolower(sex)
+  assertChoice(sex, c("both", "female", "male"), null = TRUE)
   return(invisible(sex))
 }
 

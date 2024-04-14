@@ -39,26 +39,28 @@ trimDemographics <- function(cohort,
   cdm <- omopgenerics::cdmReference(cohort)
   tablePrefix <- omopgenerics::tmpPrefix()
 
+  cli::cli_inform(c("i" = "Building new trimmed cohort"))
+
   cohort <- cohort |>
     dplyr::filter(.data$cohort_definition_id %in% .env$cohortId)
 
   if (!is.null(ageRange)) {
-    qAge <- datesAgeRange(ageRange)
+    cli::cli_inform(c("Adding birth date"))
     cohort <- cohort |>
       PatientProfiles::addDateOfBirth(name = "date_0") %>%
-      dplyr::mutate(!!!qAge)
+      dplyr::mutate(!!!datesAgeRange(ageRange))
   }
   if (!is.null(minPriorObservation) |
       !is.null(minFutureObservation) |
       !is.null(sex)) {
-    obs <- !is.null(minPriorObservation) | !is.null(minFutureObservation)
+    cli::cli_inform(c("Adding demographics information"))
     cohort <- cohort |>
       PatientProfiles::addDemographics(
         age = FALSE,
         sex = !is.null(sex),
-        priorObservation = obs,
+        priorObservation = !is.null(minPriorObservation),
         priorObservationType = "date",
-        futureObservation = obs,
+        futureObservation = !is.null(minFutureObservation),
         futureObservationType = "date"
       )
   }
@@ -75,10 +77,12 @@ trimDemographics <- function(cohort,
     name = nm,
     table = newSettings |> dplyr::select(dplyr::any_of(c(
       "cohort_definition_id", "require_min_age", "require_max_age",
-      "require_sex", "new_cohort_definition_id"
+      "require_sex", "require_min_prior_observation",
+      "require_min_future_observation", "new_cohort_definition_id"
     )))
   )
 
+  cli::cli_inform(c("Creating initial cohort"))
   cohort <- cohort |>
     dplyr::inner_join(cdm[[nm]], by = "cohort_definition_id") |>
     dplyr::select(-"cohort_definition_id") |>
@@ -109,25 +113,78 @@ trimDemographics <- function(cohort,
 
   for (cond in order) {
     if (cond == "sex") {
+      cli::cli_inform(c("Trim sex"))
       cohort <- cohort |>
         dplyr::filter(
-          tolower(.data$sex) == tolower(.data$require_sex) |
+          tolower(.data$sex) == .data$require_sex |
             tolower(.data$require_sex) == "both"
         ) |>
+        dplyr::select(-c("sex", "require_sex")) |>
         dplyr::compute(name = name, temporary = FALSE) |>
         omopgenerics::recordCohortAttrition("Restrict sex")
     } else if (cond == "age") {
-      cohort <- cohort |>
+      cli::cli_inform(c("Trim age"))
+      cohort <- cohort %>%
         dplyr::mutate(
+          !!!caseAge(age),
           "cohort_start_date" = dplyr::if_else(
-            .data[["date_", .data$require_min_age]] < .data$cohort_start_date,
-            .data$cohort_start_date,
-            .data[["date_", .data$require_min_age]]
+            .data$cohort_start_date <= .data$new_cohort_start_date,
+            .data$new_cohort_start_date,
+            .data$cohort_start_date
+          ),
+          "cohort_end_date" = dplyr::if_else(
+            .data$cohort_end_date <= .data$new_cohort_end_date,
+            .data$cohort_end_date,
+            .data$new_cohort_end_date
           )
-        )
+        ) |>
+        dplyr::select(-c(
+          dplyr::starts_with("date_"), "require_min_age", "require_max_age",
+          "new_cohort_start_date", "new_cohort_end_date"
+        )) |>
+        dplyr::filter(.data$cohort_start_date <= .data$cohort_end_date) |>
+        dplyr::compute(name = name, temporary = FALSE) |>
+        omopgenerics::recordCohortAttrition("Trim age_group")
+    } else if (cond == "prior_observation") {
+      cli::cli_inform(c("Trim prior observation"))
+      cohort <- cohort %>%
+        dplyr::mutate(
+          "new_cohort_start_date" = as.Date(!!CDMConnector::dateadd(
+            date = "prior_observation",
+            number = "require_min_prior_observation",
+            interval = "day"
+          )),
+          "cohort_start_date" = dplyr::if_else(
+            .data$new_cohort_start_date >= .data$cohort_start_date,
+            .data$new_cohort_start_date,
+            .data$cohort_start_date
+          )
+        ) |>
+        dplyr::filter(.data$cohort_start_date <= .data$cohort_end_date) |>
+        dplyr::select(-c("require_min_prior_observation", "prior_observation", "new_cohort_start_date")) |>
+        dplyr::compute(name = name, temporary = FALSE) |>
+        omopgenerics::recordCohortAttrition("Trim prior_observation")
+    } else if (cond == "future_observation") {
+      cli::cli_inform(c("Trim future observation"))
+      cohort <- cohort %>%
+        dplyr::filter(
+          !!CDMConnector::datediff(
+            start = "cohort_start_date",
+            end = "future_observation",
+            interval = "day"
+          ) >=
+            .data$require_min_future_observation
+        ) |>
+        dplyr::select(-c("require_min_future_observation", "future_observation")) |>
+        dplyr::compute(name = name, temporary = FALSE) |>
+        omopgenerics::recordCohortAttrition("Require future_observation")
     }
   }
 
+  # TODO update attrition names to be more coherent with the age groups, sex and so
+
+  cli::cli_inform(c("v" = "Cohort trimmed"))
+  return(cohort)
 }
 
 datesAgeRange <- function(ageRange) {
@@ -140,19 +197,25 @@ datesAgeRange <- function(ageRange) {
     unique()
   values <- values[!is.infinite(values)]
   values <- values[values != 0]
-  for (val in values) {
-    qA[[paste0("date_", val)]] <- glue::glue(
-      "as.Date(local(CDMConnector::dateadd('date_0', {val}, interval = 'year')))"
-    ) |>
-      rlang::parse_expr()
-  }
-  return(qA)
+  glue::glue("as.Date(local(CDMConnector::dateadd('date_0', {values}, interval = 'year')))") |>
+    rlang::parse_exprs() |>
+    rlang::set_names(glue::glue("date_{values}"))
 }
 getNewSettings <- function(set, cohortId, age, sex, prior, future) {
   if (length(age) == 0) {
     ageId <- NULL
   } else {
     ageId <- seq_along(age)
+  }
+  if (length(prior) == 0) {
+    prior <- NULL
+  } else {
+    prior <- as.integer(prior)
+  }
+  if (length(future) == 0) {
+    future <- NULL
+  } else {
+    future <- as.integer(future)
   }
   sets <- tidyr::expand_grid(
     "cohort_definition_id" = cohortId,
@@ -214,4 +277,35 @@ getNewSettings <- function(set, cohortId, age, sex, prior, future) {
   sets <- sets |>
     dplyr::mutate("cohort_name" = omopgenerics:::toSnakeCase(.data$cohort_name))
   return(sets)
+}
+caseAge <- function(age) {
+  prepareColStart <- function(x, col) {
+    num <- x |> unlist() |> unique() |> as.character() |> tolower()
+    x <- paste0("date_", num)
+    x <- paste0(".data$", col, " == ", num, " ~ .data$", x) |>
+      paste0(collapse = ",")
+    x <- paste0("dplyr::case_when(", x, ")") |>
+      rlang::parse_exprs() |>
+      rlang::set_names(c("new_cohort_start_date"))
+    return(x)
+  }
+  prepareColEnd <- function(x, col) {
+    num <- unique(unlist(x))
+    infFlag <- any(is.infinite(num))
+    num <- num[!is.infinite(num)]
+    x <- paste0(".data$", col, " == ", as.character(num), " ~ as.Date(local(CDMConnector::dateadd(date = 'date_", as.character(num+1) ,"', number = -1, interval = 'day')))")
+    if (infFlag) {
+      x <- c(x, paste0("is.infinite(.data$", col, ") ~ .data$cohort_end_date"))
+    }
+    x <- paste0(x, collapse = ", ")
+    x <- paste0("dplyr::case_when(", x, ")") |>
+      rlang::parse_exprs() |>
+      rlang::set_names("new_cohort_end_date")
+    return(x)
+  }
+  ageMin <- lapply(age, function(x){x[1]}) |>
+    prepareColStart("require_min_age")
+  ageMax <- lapply(age, function(x){x[2]}) |>
+    prepareColEnd("require_max_age")
+  c(ageMin, ageMax)
 }
