@@ -79,7 +79,13 @@ conceptCohort <- function(cdm,
             dplyr::filter(.data$domain_id %in% .env$domain) |>
             dplyr::select("concept_id", "cohort_definition_id"),
           by = "concept_id"
-        )
+        ) |>
+        dplyr::filter(!is.na(.data$cohort_start_date)) |>
+        dplyr::mutate(cohort_end_date = dplyr::if_else(
+          is.na(.data$cohort_end_date),
+          .data$cohort_start_date,
+          .data$cohort_end_date
+        ))
     } else {
       cli::cli_inform(c(
         "x" = "Domain {.strong {domain}} ({n} concept{?s}) excluded because table {table} is not present in the cdm."
@@ -99,11 +105,15 @@ conceptCohort <- function(cdm,
     return(cdm[[name]])
   }
 
-  cli::cli_inform(c("i" = "Subsetting tables."))
+  if (length(cohorts) == 1) {
   cohort <- cohorts[[1]]
-  if (length(cohorts) > 1) {
+  } else {
+  cli::cli_inform(c("i" = "Combining tables."))
+  cohort <- cohorts[[1]] |> dplyr::compute()
     for (k in 2:length(cohorts)) {
-      cohort <- cohort |> dplyr::union_all(cohorts[[k]])
+      cohort <- cohort |>
+        dplyr::union_all(cohorts[[k]]) |>
+        dplyr::compute()
     }
   }
   cohort <- cohort |>
