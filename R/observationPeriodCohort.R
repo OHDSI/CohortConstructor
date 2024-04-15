@@ -18,6 +18,10 @@ observationPeriodCohort <- function(cdm,
   cohortName <- assertCharacter(cohortName, length = 1)
 
   cdm[[name]] <- cdm$observation_period |>
+    dplyr::inner_join(
+      cdm$person |> dplyr::select("person_id") |> dplyr::distinct(),
+      by = "person_id"
+    ) |>
     dplyr::select(
       "subject_id" = "person_id",
       "cohort_start_date" = "observation_period_start_date",
