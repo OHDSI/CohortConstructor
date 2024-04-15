@@ -210,7 +210,8 @@ intersectCohorts <- function(cohort,
           copy = TRUE,
           by = "cohort_definition_id") |>
         dplyr::select(-"cohort_definition_id"),
-      by = "cohort_name"
+      by = "cohort_name",
+      relationship = "many-to-many"
       ) |>
     dplyr::select("cohort_definition_id", "codelist_name", "concept_id", "type")
 

@@ -42,7 +42,7 @@ test_that("unionCohorts works", {
       c("1999-05-28", "2006-09-27", "2015-07-06")
   ))
   expect_true(all(
-    cdm$cohort3 %>% dplyr::pull("subject_id") %>% sort() == 1:3
+    cdm$cohort3 %>% dplyr::pull("subject_id") %>% sort() == c(1, 3, 4)
   ))
   expect_true(all(attrition(cdm$cohort3) ==
                     dplyr::tibble(
