@@ -21,8 +21,8 @@ cohort definition ids will be used.}
 \item{gap}{Number of days between two subsequent cohort entries of a subject
 that will be merged in a single cohort entry}
 
-\item{cohortName}{Name of the returned cohort. If NULL a the name will be
-created by collapsing the individual cohort names, separated by "_".}
+\item{cohortName}{Name of the returned cohort. If NULL, the cohort name will
+be created by collapsing the individual cohort names, separated by "_".}
 
 \item{name}{Name of the new cohort table.}
 }
@@ -37,9 +37,8 @@ Generate cohort from the union of different cohorts
 library(PatientProfiles)
 
 cdm <- mockPatientProfiles()
-
-
-CDMConnector::settings(cdm$cohort3)
+cdm$cohort2 <- cdm$cohort2 |> unionCohort()
+CDMConnector::settings(cdm$cohort2)
 
 }
 }
