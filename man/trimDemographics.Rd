@@ -11,7 +11,6 @@ trimDemographics(
   sex = NULL,
   minPriorObservation = NULL,
   minFutureObservation = NULL,
-  order = c("sex", "age", "prior_observation", "future_observation"),
   name = tableName(cohort)
 )
 }
@@ -31,8 +30,6 @@ the database.}
 
 \item{minFutureObservation}{A minimum number of future observation days in
 the database.}
-
-\item{order}{Order of restrictions.}
 
 \item{name}{Name of the new cohort with the demographic requirements.}
 }

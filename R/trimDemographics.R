@@ -10,7 +10,6 @@
 #' the database.
 #' @param minFutureObservation A minimum number of future observation days in
 #' the database.
-#' @param order Order of restrictions.
 #' @param name Name of the new cohort with the demographic requirements.
 #'
 #' @return The cohort table with only records for individuals satisfying the
@@ -24,7 +23,6 @@ trimDemographics <- function(cohort,
                              sex = NULL,
                              minPriorObservation = NULL,
                              minFutureObservation = NULL,
-                             order = c("sex", "age", "prior_observation", "future_observation"),
                              name = tableName(cohort)) {
   # initial validation
   cohort <- validateCohortTable(cohort, TRUE)
@@ -33,7 +31,6 @@ trimDemographics <- function(cohort,
   sex <- validateSex(sex)
   minPriorObservation <- validateMinPriorObservation(minPriorObservation)
   minFutureObservation <- validateMinFutureObservation(minFutureObservation)
-  order <- validateOrder(order)
   name <- validateName(name)
 
   cdm <- omopgenerics::cdmReference(cohort)
@@ -111,74 +108,75 @@ trimDemographics <- function(cohort,
         dplyr::rename("cohort_definition_id" = "new_cohort_definition_id")
     )
 
-  for (cond in order) {
-    if (cond == "sex") {
-      cli::cli_inform(c("Trim sex"))
-      cohort <- cohort |>
-        dplyr::filter(
-          tolower(.data$sex) == .data$require_sex |
-            tolower(.data$require_sex) == "both"
-        ) |>
-        dplyr::select(-c("sex", "require_sex")) |>
-        dplyr::compute(name = name, temporary = FALSE) |>
-        omopgenerics::recordCohortAttrition("Restrict sex")
-    } else if (cond == "age") {
-      cli::cli_inform(c("Trim age"))
-      cohort <- cohort %>%
-        dplyr::mutate(
-          !!!caseAge(ageRange),
-          "cohort_start_date" = dplyr::if_else(
-            .data$cohort_start_date <= .data$new_cohort_start_date,
-            .data$new_cohort_start_date,
-            .data$cohort_start_date
-          ),
-          "cohort_end_date" = dplyr::if_else(
-            .data$cohort_end_date <= .data$new_cohort_end_date,
-            .data$cohort_end_date,
-            .data$new_cohort_end_date
-          )
-        ) |>
-        dplyr::select(-c(
-          dplyr::starts_with("date_"), "require_min_age", "require_max_age",
-          "new_cohort_start_date", "new_cohort_end_date"
-        )) |>
-        dplyr::filter(.data$cohort_start_date <= .data$cohort_end_date) |>
-        dplyr::compute(name = name, temporary = FALSE) |>
-        omopgenerics::recordCohortAttrition("Trim age_group")
-    } else if (cond == "prior_observation") {
-      cli::cli_inform(c("Trim prior observation"))
-      cohort <- cohort %>%
-        dplyr::mutate(
-          "new_cohort_start_date" = as.Date(!!CDMConnector::dateadd(
-            date = "prior_observation",
-            number = "require_min_prior_observation",
-            interval = "day"
-          )),
-          "cohort_start_date" = dplyr::if_else(
-            .data$new_cohort_start_date >= .data$cohort_start_date,
-            .data$new_cohort_start_date,
-            .data$cohort_start_date
-          )
-        ) |>
-        dplyr::filter(.data$cohort_start_date <= .data$cohort_end_date) |>
-        dplyr::select(-c("require_min_prior_observation", "prior_observation", "new_cohort_start_date")) |>
-        dplyr::compute(name = name, temporary = FALSE) |>
-        omopgenerics::recordCohortAttrition("Trim prior_observation")
-    } else if (cond == "future_observation") {
-      cli::cli_inform(c("Trim future observation"))
-      cohort <- cohort %>%
-        dplyr::filter(
-          !!CDMConnector::datediff(
-            start = "cohort_start_date",
-            end = "future_observation",
-            interval = "day"
-          ) >=
-            .data$require_min_future_observation
-        ) |>
-        dplyr::select(-c("require_min_future_observation", "future_observation")) |>
-        dplyr::compute(name = name, temporary = FALSE) |>
-        omopgenerics::recordCohortAttrition("Require future_observation")
-    }
+  if (!is.null(sex)) {
+    cli::cli_inform(c("Trim sex"))
+    cohort <- cohort |>
+      dplyr::filter(
+        tolower(.data$sex) == .data$require_sex |
+          tolower(.data$require_sex) == "both"
+      ) |>
+      dplyr::select(-c("sex", "require_sex")) |>
+      dplyr::compute(name = name, temporary = FALSE) |>
+      omopgenerics::recordCohortAttrition("Restrict sex")
+  }
+  if (!is.null(ageRange)) {
+    cli::cli_inform(c("Trim age"))
+    cohort <- cohort %>%
+      dplyr::mutate(
+        !!!caseAge(ageRange),
+        "cohort_start_date" = dplyr::if_else(
+          .data$cohort_start_date <= .data$new_cohort_start_date,
+          .data$new_cohort_start_date,
+          .data$cohort_start_date
+        ),
+        "cohort_end_date" = dplyr::if_else(
+          .data$cohort_end_date <= .data$new_cohort_end_date,
+          .data$cohort_end_date,
+          .data$new_cohort_end_date
+        )
+      ) |>
+      dplyr::select(-c(
+        dplyr::starts_with("date_"), "require_min_age", "require_max_age",
+        "new_cohort_start_date", "new_cohort_end_date"
+      )) |>
+      dplyr::filter(.data$cohort_start_date <= .data$cohort_end_date) |>
+      dplyr::compute(name = name, temporary = FALSE) |>
+      omopgenerics::recordCohortAttrition("Trim age_group")
+  }
+  if (is.null(minPriorObservation)) {
+    cli::cli_inform(c("Trim prior observation"))
+    cohort <- cohort %>%
+      dplyr::mutate(
+        "new_cohort_start_date" = as.Date(!!CDMConnector::dateadd(
+          date = "prior_observation",
+          number = "require_min_prior_observation",
+          interval = "day"
+        )),
+        "cohort_start_date" = dplyr::if_else(
+          .data$new_cohort_start_date >= .data$cohort_start_date,
+          .data$new_cohort_start_date,
+          .data$cohort_start_date
+        )
+      ) |>
+      dplyr::filter(.data$cohort_start_date <= .data$cohort_end_date) |>
+      dplyr::select(-c("require_min_prior_observation", "prior_observation", "new_cohort_start_date")) |>
+      dplyr::compute(name = name, temporary = FALSE) |>
+      omopgenerics::recordCohortAttrition("Trim prior_observation")
+  }
+  if (!is.null(minFutureObservation)) {
+    cli::cli_inform(c("Trim future observation"))
+    cohort <- cohort %>%
+      dplyr::filter(
+        !!CDMConnector::datediff(
+          start = "cohort_start_date",
+          end = "future_observation",
+          interval = "day"
+        ) >=
+          .data$require_min_future_observation
+      ) |>
+      dplyr::select(-c("require_min_future_observation", "future_observation")) |>
+      dplyr::compute(name = name, temporary = FALSE) |>
+      omopgenerics::recordCohortAttrition("Require future_observation")
   }
 
   # TODO update attrition names to be more coherent with the age groups, sex and so
