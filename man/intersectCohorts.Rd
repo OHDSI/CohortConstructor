@@ -43,7 +43,7 @@ library(PatientProfiles)
 
 cdm <- mockPatientProfiles()
 
-cdm$cohort3 <- intersectCohort(
+cdm$cohort3 <- intersectCohorts(
   cohort = cdm$cohort1,
   name = "cohort3",
 )

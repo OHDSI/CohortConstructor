@@ -108,27 +108,29 @@ test_that("gap and name works", {
    # names
   cdm$cohort <- unionCohorts(cdm$cohort, gap = 2,  cohortName = "test")
   expect_true(all(
-    cdm$cohort2 %>% dplyr::pull("cohort_start_date") %>% sort() ==
-      c("2000-07-01", "2000-07-10")
+    cdm$cohort %>% dplyr::pull("cohort_start_date") %>% sort() ==
+      c("1991-10-17", "1991-12-11", "1993-02-17", "1999-04-12", "1999-08-23",
+        "1999-09-19", "2001-12-27", "2015-03-02", "2015-03-17")
   ))
   expect_true(all(
-    cdm$cohort2 %>% dplyr::pull("cohort_end_date") %>% sort() ==
-      c("2000-07-02", "2000-08-22")
+    cdm$cohort %>% dplyr::pull("cohort_end_date") %>% sort() ==
+      c("1991-10-19", "1992-10-12", "1999-07-18", "1999-08-24", "2001-03-19",
+        "2001-06-05", "2008-08-28", "2015-03-09", "2015-03-25")
   ))
   expect_true(all(
-    cdm$cohort2 %>% dplyr::pull("subject_id") %>% sort() == 1
+    cdm$cohort %>% dplyr::pull("subject_id") %>% sort() == c(1, rep(2, 3), rep(3, 2), rep(4, 3))
   ))
-  expect_true(all(attrition(cdm$cohort2) ==
+  expect_true(all(attrition(cdm$cohort) ==
                     dplyr::tibble(
                       cohort_definition_id = 1,
-                      number_records = 2,
-                      number_subjects = 1,
+                      number_records = 9,
+                      number_subjects = 4,
                       reason_id = 1,
                       reason = "Initial qualifying events",
                       excluded_records = 0,
                       excluded_subjects = 0
                     )))
-  expect_true(settings(cdm$cohort2)$cohort_name == "test")
+  expect_true(settings(cdm$cohort)$cohort_name == "test")
 })
 
 test_that("Expected behaviour", {
@@ -234,10 +236,10 @@ test_that("test codelist", {
     cdm$cohort2 %>% dplyr::pull("subject_id") %>% sort() == c(1, 1, 2, 3, 3, 4)
   ))
   codes <- attr(cdm$cohort2, "cohort_codelist")
-  expect_true(all(codes$codelist_name == c("c1", "c1", "c2")))
-  expect_true(all(codes$concept_id == 1:3))
-  expect_true(all(codes$type == c("index event", "index event", "index event")))
-  expect_true(all(codes$cohort_definition_id == c(1, 1, 1)))
+  expect_true(all(codes |> dplyr::pull("codelist_name") |> sort() == c(rep("c1", 2), "c2")))
+  expect_true(all(codes |> dplyr::pull("concept_id") |> sort() == c(1, 2, 3)))
+  expect_true(all(codes |> dplyr::pull("type") |> sort() == rep("index event", 3)))
+  expect_true(all(codes |> dplyr::pull("cohort_definition_id") |> sort() == c(1, 1, 1)))
 
   # union concept + non concept cohorts
   cdm <- omopgenerics::bind(cdm$cohort, cdm$cohort1, name = "cohort3")
@@ -255,10 +257,10 @@ test_that("test codelist", {
   ))
   # TODO: omopgenerics issue #260
   # codes <- attr(cdm$cohort4, "cohort_codelist")
-  # expect_true(all(codes$codelist_name == c("c1", "c1", "c2")))
-  # expect_true(all(codes$concept_id == 1:3))
-  # expect_true(all(codes$type == c("index event", "index event", "index event")))
-  # expect_true(all(codes$cohort_definition_id == c(1, 1, 1)))
+  # expect_true(all(codes |> dplyr::pull("codelist_name") |> sort() == c(rep("c1", 2), "c2")))
+  # expect_true(all(codes |> dplyr::pull("concept_id") |> sort() == c(1, 2, 3)))
+  # expect_true(all(codes |> dplyr::pull("type") |> sort() == rep("index event", 3)))
+  # expect_true(all(codes |> dplyr::pull("cohort_definition_id") |> sort() == c(1, 1, 1))
 })
 
 

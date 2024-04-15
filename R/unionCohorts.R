@@ -18,7 +18,7 @@
 #' library(PatientProfiles)
 #'
 #' cdm <- mockPatientProfiles()
-#' cdm$cohort2 <- cdm$cohort2 |> unionCohort()
+#' cdm$cohort2 <- cdm$cohort2 |> unionCohorts()
 #' CDMConnector::settings(cdm$cohort2)
 #'
 #' }
