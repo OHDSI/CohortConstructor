@@ -32,7 +32,7 @@
 #'
 #' }
 
-intersectCohort <- function(cohort,
+intersectCohorts <- function(cohort,
                             cohortId = NULL,
                             gap = 0,
                             mutuallyExclusive = FALSE,
@@ -201,7 +201,7 @@ intersectCohort <- function(cohort,
   codelist <- cohSet |>
     dplyr::select(dplyr::all_of(c(cohortNames, "cohort_definition_id"))) |>
     tidyr::pivot_longer(cols = dplyr::all_of(cohortNames), names_to = "cohort_name") |>
-    dplyr::filter(value == 1) |>
+    dplyr::filter(.data$value == 1) |>
     dplyr::select("cohort_definition_id", "cohort_name") |>
     dplyr::inner_join(
       settings(cohort) |>
@@ -436,7 +436,7 @@ intersectCohortAttrition <- function(cohort, cohortSet, counts, returnOnlyComb, 
     dplyr::filter(.data$sum > 1) |>
     dplyr::pull("cohort_definition_id")
   cohAtt <- counts |>
-    dplyr::filter(.data$cohort_definition_id %in% intersectId) |>
+    dplyr::filter(.data$cohort_definition_id %in% .env$intersectId) |>
     dplyr::mutate(
       "reason_id" = 1,
       "reason" = "Initial qualifying events",
@@ -445,7 +445,7 @@ intersectCohortAttrition <- function(cohort, cohortSet, counts, returnOnlyComb, 
     )
   if (!returnOnlyComb) {
     # individual cohorts
-    individualId <- cohortSet$cohort_definition_id[!cohortSet$cohort_definition_id %in% intersectId]
+    individualId <- cohortSet$cohort_definition_id[!cohortSet$cohort_definition_id %in% .env$intersectId]
     cohAtt <- cohAtt |>
       dplyr::union_all(
         cohortSet |>
@@ -463,7 +463,7 @@ intersectCohortAttrition <- function(cohort, cohortSet, counts, returnOnlyComb, 
     if (mutuallyExclusive) {
       cohAtt <- cohAtt %>%
         addAttritionReason(
-          counts = counts, id = individualId,
+          counts = counts, ids = individualId,
           reason = "Mutually exclusive cohorts"
         )
     }

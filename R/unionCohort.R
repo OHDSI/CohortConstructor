@@ -22,7 +22,7 @@
 #' CDMConnector::settings(cdm$cohort2)
 #'
 #' }
-unionCohort <- function(cohort,
+unionCohorts <- function(cohort,
                         cohortId = NULL,
                         gap = 0,
                         cohortName = NULL,

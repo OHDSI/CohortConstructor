@@ -1,4 +1,4 @@
-test_that("unionCohort works", {
+test_that("unionCohorts works", {
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
@@ -7,7 +7,7 @@ test_that("unionCohort works", {
                                    cdm = cdm_local,
                                    schema = "main")
   # simple example
-  cdm$cohort2 <- unionCohort(cdm$cohort1, name = "cohort2")
+  cdm$cohort2 <- unionCohorts(cdm$cohort1, name = "cohort2")
   expect_true(all(
     cdm$cohort2 %>% dplyr::pull("cohort_start_date") %>% sort() ==
       c("1994-02-19", "1999-08-24", "2000-06-23", "2015-01-19")
@@ -32,7 +32,7 @@ test_that("unionCohort works", {
   expect_true(settings(cdm$cohort2)$cohort_name == "cohort_1_cohort_2_cohort_3_cohort_4")
 
   # choose cohort Id
-  cdm$cohort3 <- unionCohort(cdm$cohort1, cohortId = 1:2, name = "cohort3")
+  cdm$cohort3 <- unionCohorts(cdm$cohort1, cohortId = 1:2, name = "cohort3")
   expect_true(all(
     cdm$cohort3 %>% dplyr::pull("cohort_start_date") %>% sort() ==
       c("1997-10-22", "2000-06-23", "2015-03-05")
@@ -80,7 +80,7 @@ test_that("gap and name works", {
   cdm$cohort1 <- cdm$cohort1 |> omopgenerics::newCohortTable()
 
   # gap
-  cdm$cohort2 <- unionCohort(cdm$cohort1, gap = 2,  name = "cohort2")
+  cdm$cohort2 <- unionCohorts(cdm$cohort1, gap = 2,  name = "cohort2")
   expect_true(all(
     cdm$cohort2 %>% dplyr::pull("cohort_start_date") %>% sort() ==
       c("2000-07-01", "2000-07-10")
@@ -106,7 +106,7 @@ test_that("gap and name works", {
 
 
    # names
-  cdm$cohort <- unionCohort(cdm$cohort, gap = 2,  cohortName = "test")
+  cdm$cohort <- unionCohorts(cdm$cohort, gap = 2,  cohortName = "test")
   expect_true(all(
     cdm$cohort2 %>% dplyr::pull("cohort_start_date") %>% sort() ==
       c("2000-07-01", "2000-07-10")
@@ -140,7 +140,7 @@ test_that("Expected behaviour", {
                                    cdm = cdm_local,
                                    schema = "main")
   expect_warning(
-    cohort <- unionCohort(cdm$cohort,
+    cohort <- unionCohorts(cdm$cohort,
                           cohortId = 1,
                           gap = 0,
                           cohortName = NULL,
@@ -149,35 +149,35 @@ test_that("Expected behaviour", {
   expect_true(cohort |> dplyr::anti_join(cdm$cohort, by = colnames(cohort)) |>
                 dplyr::tally() |> dplyr::pull("n") == 0)
   expect_error(
-    cohort <- unionCohort(cdm$cohort,
+    cohort <- unionCohorts(cdm$cohort,
                           cohortId = NULL,
                           gap = -1,
                           cohortName = NULL,
                           name = "cohort1")
   )
   expect_error(
-    cohort <- unionCohort(cdm$cohort,
+    cohort <- unionCohorts(cdm$cohort,
                           cohortId = NULL,
                           gap = NA,
                           cohortName = NULL,
                           name = "cohort1")
   )
   expect_error(
-    cohort <- unionCohort(cdm$cohort,
+    cohort <- unionCohorts(cdm$cohort,
                           cohortId = NULL,
                           gap = Inf,
                           cohortName = NULL,
                           name = "cohort1")
   )
   expect_error(
-    cohort <- unionCohort(cdm$cohort,
+    cohort <- unionCohorts(cdm$cohort,
                           cohortId = "1",
                           gap = 1,
                           cohortName = NULL,
                           name = "cohort1")
   )
   expect_warning(
-    cohort <- unionCohort(cdm$cohort,
+    cohort <- unionCohorts(cdm$cohort,
                           cohortId = NULL,
                           gap = 1,
                           cohortName = "hOLA",
@@ -221,7 +221,7 @@ test_that("test codelist", {
   cdm$cohort1 <- conceptCohort(cdm, conceptSet = list(c1 = c(1,3), c2 = c(2)), name = "cohort1")
 
   # Union concept generated cohort
-  cdm$cohort2 <- unionCohort(cdm$cohort1, name = "cohort2")
+  cdm$cohort2 <- unionCohorts(cdm$cohort1, name = "cohort2")
   expect_true(all(
     cdm$cohort2 %>% dplyr::pull("cohort_start_date") %>% sort() ==
       c("2009-12-22", "2010-01-01", "2010-01-11", "2010-05-31", "2012-09-27", "2014-12-06")
@@ -241,7 +241,7 @@ test_that("test codelist", {
 
   # union concept + non concept cohorts
   cdm <- omopgenerics::bind(cdm$cohort, cdm$cohort1, name = "cohort3")
-  cdm$cohort4 <- unionCohort(cdm$cohort3, name = "cohort4")
+  cdm$cohort4 <- unionCohorts(cdm$cohort3, name = "cohort4")
   expect_true(all(
     cdm$cohort4 %>% dplyr::pull("cohort_start_date") %>% sort() ==
       c("1997-10-22", "2001-03-30", "2003-06-15", "2009-12-22", "2010-01-01", "2010-01-11", "2010-05-31", "2012-09-27", "2014-12-06", "2015-03-25")

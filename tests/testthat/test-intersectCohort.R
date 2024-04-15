@@ -123,7 +123,7 @@ test_that("splitOverlap", {
   DBI::dbDisconnect(db, shutdown = TRUE)
 })
 
-test_that("intersectCohort", {
+test_that("intersectCohorts", {
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
@@ -133,7 +133,7 @@ test_that("intersectCohort", {
                                    schema = "main")
 
   # mutually exclusive
-  expect_no_error(cdm$cohort2 <- intersectCohort(
+  expect_no_error(cdm$cohort2 <- intersectCohorts(
     cohort = cdm$cohort1, name = "cohort2",
     mutuallyExclusive = TRUE
   ))
@@ -166,7 +166,7 @@ test_that("intersectCohort", {
   ))
 
   # not mutually exclusive and gap
-  expect_no_error(cdm$cohort3 <- intersectCohort(
+  expect_no_error(cdm$cohort3 <- intersectCohorts(
     cohort = cdm$cohort1, name = "cohort3",
     mutuallyExclusive = FALSE, gap = 1
   ))
@@ -206,7 +206,7 @@ test_that("intersectCohort", {
   expect_true(all(omopgenerics::attrition(cdm$cohort3)$excluded_subjects ==  c(0, 0, 0)))
 
   # not enough cohorts provided
-  expect_warning(cdm$cohort4 <- intersectCohort(
+  expect_warning(cdm$cohort4 <- intersectCohorts(
     cohort = cdm$cohort1, name = "cohort4",
     cohortId = 1
   ), "At least 2 cohort id must be provided to do the combination")
@@ -230,7 +230,7 @@ test_that("only return comb", {
                                    cdm = cdm_local,
                                    schema = "main")
 
-  cdm$cohort2 <- intersectCohort(
+  cdm$cohort2 <- intersectCohorts(
     cohort = cdm$cohort1, name = "cohort2",
     mutuallyExclusive = FALSE, returnOnlyComb = TRUE
   )
@@ -246,7 +246,7 @@ test_that("only return comb", {
   expect_true(omopgenerics::attrition(cdm$cohort2)$excluded_subjects == 0)
 
   # nUll combination, return individuals
-  cdm$cohort4 <- intersectCohort(
+  cdm$cohort4 <- intersectCohorts(
     cohort = cdm$cohort1, name = "cohort4",
     mutuallyExclusive = FALSE, returnOnlyComb = FALSE
   )
@@ -270,7 +270,7 @@ test_that("only return comb", {
   cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
                                    cdm = cdm_local,
                                    schema = "main")
-  cdm$cohort3 <- intersectCohort(
+  cdm$cohort3 <- intersectCohorts(
     cohort = cdm$cohort1, name = "cohort3",
     mutuallyExclusive = FALSE, returnOnlyComb = TRUE, gap = 1
   )
@@ -304,7 +304,7 @@ test_that("only return comb", {
   expect_true(all(omopgenerics::attrition(cdm$cohort3)$excluded_records == c(0, 0, 0, 0)))
   expect_true(all(omopgenerics::attrition(cdm$cohort3)$excluded_subjects == c(0, 0, 0, 0)))
 
-  cdm$cohort4 <- intersectCohort(
+  cdm$cohort4 <- intersectCohorts(
     cohort = cdm$cohort1, name = "cohort4",
     mutuallyExclusive = TRUE, returnOnlyComb = TRUE, gap = 1
   )
@@ -346,7 +346,7 @@ test_that("attrition and cohortId", {
     requireSex(sex = "Female") |>
     requireAge(ageRange = list(c(0,40)))
 
-  cdm$cohort1 <- intersectCohort(
+  cdm$cohort1 <- intersectCohorts(
     cohort = cdm$cohort1, cohortId = 1:2,
     name = "cohort1", mutuallyExclusive = TRUE
   )
@@ -406,7 +406,7 @@ test_that("codelist", {
   cdm$cohort1 <- conceptCohort(cdm, conceptSet = list(c1 = c(1,3), c2 = c(2)), name = "cohort1")
 
   # intersect concept generated cohort
-  cdm$cohort2 <- intersectCohort(cdm$cohort1, name = "cohort2")
+  cdm$cohort2 <- intersectCohorts(cdm$cohort1, name = "cohort2")
   expect_true(all(
     cdm$cohort2 %>% dplyr::pull("cohort_start_date") %>% sort() ==
       c("2009-12-22", "2010-01-01", "2010-01-11", "2010-05-31", "2012-01-21",
@@ -427,7 +427,7 @@ test_that("codelist", {
   expect_true(all(codes |> dplyr::pull("cohort_definition_id") |> sort() == c(1, 1, 2, 3, 3, 3)))
 
   # mutually esclusive
-  cdm$cohort3 <- intersectCohort(cdm$cohort1, mutuallyExclusive = TRUE, name = "cohort3")
+  cdm$cohort3 <- intersectCohorts(cdm$cohort1, mutuallyExclusive = TRUE, name = "cohort3")
   expect_true(all(
     cdm$cohort3 %>% dplyr::pull("cohort_start_date") %>% sort() ==
       c("2009-12-22", "2010-01-01", "2010-01-11", "2010-05-31", "2012-01-21",
@@ -448,7 +448,7 @@ test_that("codelist", {
   expect_true(all(codes |> dplyr::pull("cohort_definition_id") |> sort() == c(1, 1, 2, 3, 3, 3)))
 
   # only comb
-  cdm$cohort4 <- intersectCohort(cdm$cohort1, returnOnlyComb = TRUE, name = "cohort4")
+  cdm$cohort4 <- intersectCohorts(cdm$cohort1, returnOnlyComb = TRUE, name = "cohort4")
   expect_true(all(
     cdm$cohort4 %>% dplyr::pull("cohort_start_date") %>% sort() ==
       c("2012-01-21", "2014-02-09")
@@ -469,7 +469,7 @@ test_that("codelist", {
   # union concept + non concept cohorts
   # TODO when omopgenerics issue #260
   # cdm <- omopgenerics::bind(cdm$cohort, cdm$cohort1, name = "cohort3")
-  # cdm$cohort4 <- intersectCohort(cdm$cohort3, name = "cohort4")
+  # cdm$cohort4 <- intersectCohorts(cdm$cohort3, name = "cohort4")
 
 
 })
