@@ -1,4 +1,4 @@
-test_that("gteIdentifier", {
+test_that("getIdentifier", {
   x <- dplyr::tibble(a = 1)
 
   expect_no_error(id <- getIdentifier(x))
