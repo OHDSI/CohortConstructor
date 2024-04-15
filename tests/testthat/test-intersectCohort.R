@@ -209,7 +209,7 @@ test_that("intersectCohorts", {
   expect_warning(cdm$cohort4 <- intersectCohorts(
     cohort = cdm$cohort1, name = "cohort4",
     cohortId = 1
-  ), "At least 2 cohort id must be provided to do the combination")
+  ), "At least 2 cohort id must be provided to do the intersection.")
   expect_equal(cdm$cohort1 %>%
                  omopgenerics::settings() %>%
                  dplyr::filter(cohort_definition_id == 1),

@@ -445,7 +445,7 @@ intersectCohortAttrition <- function(cohort, cohortSet, counts, returnOnlyComb, 
     )
   if (!returnOnlyComb) {
     # individual cohorts
-    individualId <- cohortSet$cohort_definition_id[!cohortSet$cohort_definition_id %in% .env$intersectId]
+    individualId <- cohortSet$cohort_definition_id[!cohortSet$cohort_definition_id %in% intersectId]
     cohAtt <- cohAtt |>
       dplyr::union_all(
         cohortSet |>
