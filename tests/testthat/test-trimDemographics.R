@@ -54,4 +54,12 @@ test_that("simple duckdb checks", {
       )
   )
 
+  expect_no_error(
+    cdm$cohort4 <- cdm$cohort1 |>
+      trimDemographics(
+        sex = c("FEMale", "malE", "bOTh"),
+        name = "cohort4"
+      )
+  )
+
 })

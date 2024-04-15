@@ -143,7 +143,7 @@ trimDemographics <- function(cohort,
       dplyr::compute(name = name, temporary = FALSE) |>
       omopgenerics::recordCohortAttrition("Trim age_group")
   }
-  if (is.null(minPriorObservation)) {
+  if (!is.null(minPriorObservation)) {
     cli::cli_inform(c("Trim prior observation"))
     cohort <- cohort %>%
       dplyr::mutate(
