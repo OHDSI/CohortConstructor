@@ -40,12 +40,14 @@ validateCohortTable <- function(cohort, dropExtraColumns = FALSE) {
   return(invisible(cohort))
 }
 
-validateIndexDate <- function(indexDate, cohort) {
-  assertCharacter(indexDate)
-  if(!indexDate %in% colnames(cohort)){
-    cli::cli_abort("{indexDate} must be a date column in the cohort table")
+validateCohortColumn <- function(columns, cohort) {
+  for (column in columns) {
+    assertCharacter(column)
+    if(!column %in% colnames(cohort)){
+      cli::cli_abort("{column} must be a date column in the cohort table.")
+    }
   }
-  return(invisible(indexDate))
+  return(invisible(columns))
 }
 
 validateCohortId <- function(cohortId, ids) {

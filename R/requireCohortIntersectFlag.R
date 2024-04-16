@@ -47,7 +47,7 @@ requireCohortIntersectFlag <- function(x,
   validateCohortTable(x)
   cdm <- omopgenerics::cdmReference(x)
   validateCDM(cdm)
-  validateIndexDate(indexDate, x)
+  validateCohortColumn(indexDate, x)
 
   cols <- unique(c("cohort_definition_id", "subject_id",
                    "cohort_start_date", "cohort_end_date",
