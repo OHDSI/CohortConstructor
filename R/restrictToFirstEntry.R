@@ -13,10 +13,10 @@
 #' library(CohortConstructor)
 #' library(PatientProfiles)
 #' cdm <- mockPatientProfiles()
-#' cdm$cohort1 <- restrictToFirstEntry(cdm$cohort1)
+#' cdm$cohort1 <- requireIsFirstEntry(cdm$cohort1)
 #' }
 #'
-restrictToFirstEntry <- function(cohort,
+requireIsFirstEntry <- function(cohort,
                                  cohortId = NULL,
                                  indexDate = "cohort_start_date",
                                  name = omopgenerics::tableName(cohort)){
@@ -26,7 +26,7 @@ restrictToFirstEntry <- function(cohort,
   validateCohortTable(cohort)
   cdm <- omopgenerics::cdmReference(cohort)
   validateCDM(cdm)
-  validateIndexDate(indexDate, cohort)
+  validateCohortColumn(indexDate, cohort)
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
   cohortId <- validateCohortId(cohortId, ids)
 
@@ -74,10 +74,10 @@ restrictToFirstEntry <- function(cohort,
 #' library(CohortConstructor)
 #' library(PatientProfiles)
 #' cdm <- mockPatientProfiles()
-#' cdm$cohort1 <- restrictToLastEntry(cdm$cohort1)
+#' cdm$cohort1 <- requireIsLastEntry(cdm$cohort1)
 #' }
 #'
-restrictToLastEntry <- function(cohort,
+requireIsLastEntry <- function(cohort,
                                 cohortId = NULL,
                                 indexDate = "cohort_start_date",
                                 name = omopgenerics::tableName(cohort)){
@@ -87,7 +87,7 @@ restrictToLastEntry <- function(cohort,
   validateCohortTable(cohort)
   cdm <- omopgenerics::cdmReference(cohort)
   validateCDM(cdm)
-  validateIndexDate(indexDate, cohort)
+  validateCohortColumn(indexDate, cohort)
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
   cohortId <- validateCohortId(cohortId, ids)
 

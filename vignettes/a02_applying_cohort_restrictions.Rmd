@@ -54,10 +54,10 @@ cdm <- generateConceptCohortSet(cdm = cdm,
 ```
 
 ## Keep only the first record per person
-Individuals can contribute multiple records per cohort. However now we'll keep only their earliest cohort entry of the remaining records using `restrictToFirstEntry()` from CohortConstructor. We can see that after this we have one record per person for each cohort.
+Individuals can contribute multiple records per cohort. However now we'll keep only their earliest cohort entry of the remaining records using `requireIsFirstEntry()` from CohortConstructor. We can see that after this we have one record per person for each cohort.
 ```{r}
 cdm$medications <- cdm$medications %>% 
-  restrictToFirstEntry(indexDate = "cohort_start_date")
+  requireIsFirstEntry(indexDate = "cohort_start_date")
 
 cohortCount(cdm$medications)
 ```
