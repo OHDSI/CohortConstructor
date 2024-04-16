@@ -27,9 +27,9 @@ test_that("joinOverlap", {
   x <- dplyr::tbl(db, "x")
 
   # gap = 0
-  expect_no_error(
+  expect_warning(
     res <- joinOverlap(
-      x, start = "start_date", end = "end_date", by = c("pid", "def_id")
+      x, startDate = "start_date", endDate = "end_date", by = c("pid", "def_id")
     ) |>
       dplyr::collect() |>
       dplyr::arrange(.data$pid, .data$def_id, .data$start_date)
@@ -52,7 +52,7 @@ test_that("joinOverlap", {
   )
 
   # gap = 1
-  expect_no_error(
+  expect_warning(
     res <- joinOverlap(
       x, start = "start_date", end = "end_date", by = c("pid", "def_id"), gap = 1
     ) |>

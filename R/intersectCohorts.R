@@ -295,70 +295,64 @@ splitOverlap <- function(x,
 #' Join overlapping periods in single periods.
 #'
 #' @param x Table in the cdm.
-#' @param start Column that indicates the start of periods.
-#' @param end Column that indicates the end of periods.
+#' @param startDate Column that indicates the start of periods.
+#' @param endDate Column that indicates the end of periods.
 #' @param by Variables to group by.
 #' @param gap Distance between exposures to consider that they overlap.
 #'
 #' @noRd
 #'
-#' @return Table in the cdm with start, end and by as columns. Periods are not
+#' @return Table in the cdm with startDate, endDate and by as columns. Periods are not
 #' going to overlap between each other.
 #'
-joinOverlap <- function(x,
-                        start = "cohort_start_date",
-                        end = "cohort_end_date",
+joinOverlap <- function(cohort,
+                        startDate = "cohort_start_date",
+                        endDate = "cohort_end_date",
                         by = c("cohort_definition_id", "subject_id"),
                         gap = 0) {
-  # initial checks
-  checkmate::assertCharacter(start, len = 1, min.chars = 1, any.missing = FALSE)
-  checkmate::assertCharacter(end, len = 1, min.chars = 1, any.missing = FALSE)
-  checkmate::assertCharacter(by, min.len = 1, min.chars = 1, any.missing = FALSE)
-  checkmate::assertNumeric(gap, lower = 0, len = 1, any.missing = FALSE)
-  checkmate::assertClass(x, "tbl")
-  checkmate::assertTRUE(all(c(start, end, by) %in% colnames(x)))
-
-  ids <- getIdentifier(x, 5)
-  dat <- ids[1]
-  id <- ids[2]
-  cid <- ids[3]
-  nam <- ids[4]
-  era <- ids[5]
-
-  x %>%
-    dplyr::select(dplyr::all_of(by), !!dat := dplyr::all_of(start)) %>%
-    dplyr::mutate(!!id := -1) %>%
-    dplyr::union_all(
-      x %>%
-        dplyr::mutate(
-          !!dat := as.Date(!!CDMConnector::dateadd(
-            date = end, number = gap
-          )),
-          !!id := 1
-        ) %>%
-        dplyr::select(dplyr::all_of(c(by, dat, id)))
-    ) %>%
-    dplyr::group_by(dplyr::across(dplyr::all_of(by))) %>%
-    dbplyr::window_order(.data[[dat]], .data[[id]]) %>%
-    dplyr::mutate(!!cid := cumsum(.data[[id]])) %>%
+  start <- cohort |>
+    dplyr::rename("date" := !!startDate) |>
+    dplyr::select(dplyr::all_of(c(by, "date"))) |>
+    dplyr::mutate("date_id" = -1)
+  end <- cohort |>
+    dplyr::rename("date" := !!endDate) |>
+    dplyr::select(dplyr::all_of(c(by, "date"))) |>
+    dplyr::mutate("date_id" = 1)
+  if (gap > 0) {
+    end <- end %>%
+      dplyr::mutate("date" = as.Date(!!CDMConnector::dateadd(
+        date = "date", number = gap, interval = "day"
+      )))
+  }
+  x <- start |>
+    dplyr::union_all(end) |>
+    dplyr::group_by_at(by) |>
+    dplyr::arrange(.data$date, .data$date_id) |>
+    dplyr::mutate("cum_id" = cumsum(.data$date_id)) |>
     dplyr::filter(
-      .data[[cid]] == 0 | (.data[[cid]] == -1 & .data[[id]] == -1)
-    ) %>%
+      .data$cum_id == 0 | (.data$cum_id == -1 & .data$date_id == -1)
+    ) |>
     dplyr::mutate(
-      !!nam := dplyr::if_else(.data[[id]] == -1, .env$start, .env$end),
-      !!era := dplyr::if_else(.data[[id]] == -1, 1, 0)
-    ) %>%
-    dplyr::mutate(!!era := cumsum(as.numeric(.data[[era]]))) %>%
-    dplyr::ungroup() %>%
-    dbplyr::window_order() %>%
-    dplyr::select(dplyr::all_of(c(by, era, nam, dat))) %>%
-    tidyr::pivot_wider(names_from = .env$nam, values_from = .env$dat) %>%
-    dplyr::mutate(!!end := as.Date(!!CDMConnector::dateadd(
-      date = end,
-      number = -gap
-    ))) %>%
-    dplyr::select(dplyr::all_of(c(by, start, end))) %>%
-    dplyr::compute()
+      "name" = dplyr::if_else(
+        .data$date_id == -1, .env$startDate, .env$endDate
+      ),
+      "era_id" = dplyr::if_else(.data$date_id == -1, 1, 0)
+    ) |>
+    dplyr::mutate("era_id" = cumsum(as.numeric(.data$era_id))) |>
+    dplyr::ungroup() |>
+    dplyr::arrange() |>
+    dplyr::select(
+      dplyr::all_of(c(by, "era_id", "name", "date"))
+    ) |>
+    tidyr::pivot_wider(names_from = "name", values_from = "date") |>
+    dplyr::select(-"era_id")
+  if (gap > 0) {
+    x <- x %>%
+      dplyr::mutate(!!endDate:= as.Date(!!CDMConnector::dateadd(
+        date = endDate, number = -gap, interval = "day"
+      )))
+  }
+  return(x)
 }
 
 #' Get random identifiers not present in a table based on a prefix.
@@ -368,7 +362,7 @@ joinOverlap <- function(x,
 #' @param prefix Character vector with the prefix of the identifiers.
 #' @param nchar Number of random characters added to the prefix.
 #'
-#' @export
+#' @noRd
 #'
 #' @return Character vector of identifiers not present in x.
 #'
