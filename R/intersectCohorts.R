@@ -170,7 +170,7 @@ intersectCohorts <- function(cohort,
   cdm <- omopgenerics::dropTable(cdm = cdm, name = tempName)
 
   if (cohortOut |> dplyr::tally() |> dplyr::pull("n") > 0) {
-    cohortOut <- joinOverlap(x = cohortOut, gap = gap) %>%
+    cohortOut <- joinOverlap(cohort = cohortOut, gap = gap) %>%
       dplyr::compute(name = name, temporary = FALSE)
   }
 
