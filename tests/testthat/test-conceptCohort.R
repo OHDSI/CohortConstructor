@@ -90,7 +90,6 @@ test_that("simple example", {
         "drug_exposure_end_date" = as.Date(.data$drug_exposure_end_date, origin = "2020-01-01")
       )
   )
-  cdm <- CDMConnector::copyCdmTo(con = DBI::dbConnect(duckdb::duckdb()), cdm = cdm, schema = "main")
 
   expect_no_error(cohort <- conceptCohort(cdm = cdm, conceptSet = list(a = 1), name = "cohort"))
 

@@ -10,10 +10,10 @@
 #'
 #' @return A cohort_table object.
 #'
-erafy <- function(cohort,
-                  cohortId = NULL,
-                  gap = 0,
-                  name = tableName(cohort)) {
+collapseCohort <- function(cohort,
+                           cohortId = NULL,
+                           gap = 0,
+                           name = tableName(cohort)) {
   # input validation
   cohort <- validateCohortTable(cohort)
   cohortId <- validateCohortId(cohortId, settings(cohort)$cohort_definition_id)
@@ -42,7 +42,7 @@ erafy <- function(cohort,
   if (gap > 0) {
     cl <- class(cohort)
     oldAttributes <- keepAttributes(cohort, cl)
-    cohort <- cohort |> joinOverlap(gap = gap)
+    cohort <- cohort |> collapseGap(gap = gap)
     # due to issue: https://github.com/darwin-eu-dev/omopgenerics/issues/256
     cohort <- restoreClass(cohort, cl)
     cohort <- restoreAttributes(cohort, oldAttributes)

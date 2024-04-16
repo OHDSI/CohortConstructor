@@ -133,7 +133,7 @@ conceptCohort <- function(cdm,
       .data$cohort_start_date <= .data$cohort_end_date
     ) |>
     dplyr::select(-"observation_period_start_date", -"observation_period_end_date") |>
-    joinOverlap(gap = 0) |>
+    collapseGap(gap = 0) |>
     dplyr::compute(name = name, temporary = FALSE)
 
   cli::cli_inform(c("i" = "Creating cohort attributes."))
@@ -169,4 +169,51 @@ addDomains <- function(cohortCodelist, cdm) {
   omopgenerics::dropTable(cdm = cdm, name = tmpName)
 
   return(cohortCodelist)
+}
+collapseGap <- function(cohort, gap) {
+  start <- cohort |>
+    dplyr::select(
+      "cohort_definition_id", "subject_id", "date" = "cohort_start_date"
+    ) |>
+    dplyr::mutate("date_id" = -1)
+  end <- cohort |>
+    dplyr::select(
+      "cohort_definition_id", "subject_id", "date" = "cohort_end_date"
+    ) |>
+    dplyr::mutate("date_id" = 1)
+  if (gap > 0) {
+    end <- end %>%
+      dplyr::mutate("date" = as.Date(!!CDMConnector::dateadd(
+        date = "date", number = gap, interval = "day"
+      )))
+  }
+  x <- start |>
+    dplyr::union_all(end) |>
+    dplyr::group_by(.data$cohort_definition_id, .data$subject_id) |>
+    dplyr::arrange(.data$date, .data$date_id) |>
+    dplyr::mutate("cum_id" = cumsum(.data$date_id)) |>
+    dplyr::filter(
+      .data$cum_id == 0 | (.data$cum_id == -1 & .data$date_id == -1)
+    ) |>
+    dplyr::mutate(
+      "name" = dplyr::if_else(
+        .data$date_id == -1, "cohort_start_date", "cohort_end_date"
+      ),
+      "era_id" = dplyr::if_else(.data$date_id == -1, 1, 0)
+    ) |>
+    dplyr::mutate("era_id" = cumsum(as.numeric(.data$era_id))) |>
+    dplyr::ungroup() |>
+    dplyr::arrange() |>
+    dplyr::select(
+      "cohort_definition_id", "subject_id", "era_id", "name", "date"
+    ) |>
+    tidyr::pivot_wider(names_from = "name", values_from = "date") |>
+    dplyr::select(-"era_id")
+  if (gap > 0) {
+    x <- x %>%
+      dplyr::mutate("cohort_end_date" = as.Date(!!CDMConnector::dateadd(
+        date = "cohort_end_date", number = -gap, interval = "day"
+      )))
+  }
+  return(x)
 }

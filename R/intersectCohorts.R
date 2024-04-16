@@ -13,7 +13,7 @@
 #'
 #' @export
 #'
-#' @return A cohort table.
+#' @return The cdm object with the new generated cohort set
 #'
 #' @examples
 #' \donttest{
@@ -31,6 +31,7 @@
 #' CDMConnector::settings(cdm$cohort3)
 #'
 #' }
+
 intersectCohorts <- function(cohort,
                             cohortId = NULL,
                             gap = 0,
@@ -234,7 +235,7 @@ intersectCohorts <- function(cohort,
 #' @param end Column that indicates the end of periods.
 #' @param by Variables to group by.
 #'
-#' @noRd
+#' @export
 #'
 #' @return Table in the cdm with start, end and by as columns. Periods are not
 #' going to overlap between each other.
@@ -300,11 +301,10 @@ splitOverlap <- function(x,
 #' @param by Variables to group by.
 #' @param gap Distance between exposures to consider that they overlap.
 #'
-#' @noRd
+#' @export
 #'
 #' @return Table in the cdm with start, end and by as columns. Periods are not
 #' going to overlap between each other.
-#'
 joinOverlap <- function(x,
                         start = "cohort_start_date",
                         end = "cohort_end_date",

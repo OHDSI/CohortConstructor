@@ -27,7 +27,7 @@ be created by collapsing the individual cohort names, separated by "_".}
 \item{name}{Name of the new cohort table.}
 }
 \value{
-A cohort table.
+The cdm object with the new generated cohort set
 }
 \description{
 Generate cohort from the union of different cohorts

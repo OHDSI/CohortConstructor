@@ -11,7 +11,7 @@
 #'
 #' @export
 #'
-#' @return A cohort table.
+#' @return The cdm object with the new generated cohort set
 #'
 #' @examples
 #' \donttest{

@@ -37,7 +37,7 @@ test_that("simple example", {
 
   expect_no_error(cohort <- conceptCohort(cdm = cdm, conceptSet = list(a = 1), name = "cohort"))
 
-  expect_no_error(sameCohort <- cohort |> erafy(gap = 0, name = "new_cohort"))
+  expect_no_error(sameCohort <- cohort |> collapseCohort(gap = 0, name = "new_cohort"))
   expect_identical(settings(sameCohort), settings(cohort))
   expect_identical(cohortCount(sameCohort), cohortCount(cohort))
   expect_identical(
@@ -58,7 +58,7 @@ test_that("simple example", {
     omopgenerics::tableSource(sameCohort), omopgenerics::tableSource(cohort)
   )
 
-  expect_no_error(newCohort <- cohort |> erafy(gap = 1, name = "my_cohort"))
+  expect_no_error(newCohort <- cohort |> collapseCohort(gap = 1, name = "my_cohort"))
   expect_identical(settings(newCohort), settings(cohort))
   expect_identical(cohortCount(newCohort), dplyr::tibble(
     "cohort_definition_id" = 1L, "number_records" = 4L, "number_subjects" = 2L
@@ -122,7 +122,7 @@ test_that("out of observation", {
 
   expect_no_error(cohort <- conceptCohort(cdm = cdm, conceptSet = list(a = 1), name = "cohort"))
 
-  expect_no_error(sameCohort <- cohort |> erafy(gap = 0, name = "new_cohort"))
+  expect_no_error(sameCohort <- cohort |> collapseCohort(gap = 0, name = "new_cohort"))
   expect_identical(settings(sameCohort), settings(cohort))
   expect_identical(cohortCount(sameCohort), cohortCount(cohort))
   expect_identical(
@@ -143,7 +143,7 @@ test_that("out of observation", {
     omopgenerics::tableSource(sameCohort), omopgenerics::tableSource(cohort)
   )
 
-  expect_no_error(newCohort <- cohort |> erafy(gap = 1, name = "my_cohort"))
+  expect_no_error(newCohort <- cohort |> collapseCohort(gap = 1, name = "my_cohort"))
   expect_identical(settings(newCohort), settings(cohort))
   expect_identical(cohortCount(newCohort), dplyr::tibble(
     "cohort_definition_id" = 1L, "number_records" = 4L, "number_subjects" = 2L

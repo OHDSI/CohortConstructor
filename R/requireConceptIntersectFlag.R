@@ -55,7 +55,7 @@ requireConceptIntersectFlag <- function(x,
   validateCohortTable(x)
   cdm <- omopgenerics::cdmReference(x)
   validateCDM(cdm)
-  validateCohortColumn(indexDate, x)
+  validateIndexDate(indexDate, x)
   assertList(conceptSet)
 
   cols <- unique(c("cohort_definition_id", "subject_id",

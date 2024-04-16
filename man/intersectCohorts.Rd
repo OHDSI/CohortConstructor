@@ -31,7 +31,7 @@ exclusive or not.}
 \item{name}{Name of the new cohort with the demographic requirements.}
 }
 \value{
-A cohort table.
+The cdm object with the new generated cohort set
 }
 \description{
 Generate a combination cohort set between the intersection of different
