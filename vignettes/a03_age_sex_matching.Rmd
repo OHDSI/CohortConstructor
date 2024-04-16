@@ -38,10 +38,10 @@ CDMConnector::cohort_set(cdm$cohort1)
 Let us first see an example of how this function works. For its usage, we need to provide a `cdm` object, the `targetCohortName`, which is the name of the table containing the cohort of interest, and the `name` of the new generated tibble containing the cohort and the matched cohort. We will also use the argument `targetCohortId` to specify that we only want a matched cohort for `cohort_definition_id = 1`.
 
 ```{r, eval = FALSE}
-cdm <- generateMatchedCohortSet(cdm  = cdm,
-                           name = "matched_cohort1",
-                           targetCohortName = "cohort1",
-                           targetCohortId = 1)
+cdm$matched_cohort1 <- matchCohorts(
+  cohort = cdm$cohort1,
+  cohortId = 1,
+  name = "matched_cohort1")
 
 CDMConnector::cohort_set(cdm$matched_cohort1)
 ```
@@ -77,11 +77,11 @@ CDMConnector::cohort_count(cdm$matched_cohort1)
 You can modify the `ratio` parameter to tailor your matched cohort. `ratio` can adopt values from 1 to Inf.
 
 ```{r, eval = FALSE}
-cdm <- generateMatchedCohortSet(cdm  = cdm,
-                           name = "matched_cohort2",
-                           targetCohortName = "cohort1",
-                           targetCohortId = 1,
-                           ratio = Inf)
+cdm$matched_cohort2 <- matchCohorts(
+  cohort = cdm$cohort1,
+  cohortId = 1,
+  name = "matched_cohort2",
+  ratio = Inf)
 
 CDMConnector::cohort_count(cdm$matched_cohort2)
 ```
@@ -90,11 +90,11 @@ CDMConnector::cohort_count(cdm$matched_cohort2)
 All these functionalities can be implemented across multiple cohorts simultaneously. Specify in `targetCohortId` parameter which are the cohorts of interest. If set to NULL, all the cohorts present in `targetCohortName` will be matched. 
 
 ```{r, eval = FALSE}
-cdm <- generateMatchedCohortSet(cdm  = cdm,
-                           name = "matched_cohort3",
-                           targetCohortName = "cohort1",
-                           targetCohortId = c(1,3),
-                           ratio = 2)
+cdm$matched_cohort3 <- matchCohorts(
+  cohort = cdm$cohort1,
+  cohortId = c(1,3),
+  name = "matched_cohort3",
+  ratio = 2)
 
 CDMConnector::cohort_set(cdm$matched_cohort3) %>% arrange(cohort_definition_id)
 

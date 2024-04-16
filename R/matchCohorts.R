@@ -2,47 +2,64 @@
 #' new cohort will contain individuals not included in the target cohort with
 #' same year of birth (matchYearOfBirth = TRUE) and same sex (matchSex = TRUE).
 #'
-#' @param cdm A cdm reference object.
-#' @param name Name of the new generated cohort set.
-#' @param targetCohortName Name of the target cohort to match.
-#' @param targetCohortId Cohort definition id to match from the target cohort.
+#' @param cohort A cohort table in a cdm reference.
+#' @param cohortId Cohort definition id to match from the target cohort.
 #' If NULL all the cohort definition id present in the target cohort will be
 #' matched.
 #' @param matchSex Whether to match in sex.
 #' @param matchYearOfBirth Whether to match in year of birth.
 #' @param ratio Number of allowed matches per individual in the target cohort.
+#' @param name Name of the new generated cohort set.
 #'
-#' @return A cdm reference object that contains the new generated cohort set.
+#' @return A cohort table.
 #'
 #' @export
 #'
 #' @examples
-#' library(DrugUtilisation)
+#' library(PatientProfiles)
 #' library(CohortConstructor)
 #' library(dplyr)
-#' cdm <- mockDrugUtilisation(numberIndividuals = 100)
-#' cdm <- cdm %>%
-#'   matchCohort(name = "new_matched_cohort",
-#'                            targetCohortName = "cohort1",
-#'                            targetCohortId = c(1,2),
-#'                            matchSex = TRUE,
-#'                            matchYearOfBirth = TRUE,
-#'                            ratio = 2)
+#' cdm <- mockPatientProfiles(
+#'   person = tibble(
+#'     person_id = 1:3,
+#'     gender_concept_id = c(8532, 8532, 8507),
+#'     year_of_birth = 1992,
+#'     month_of_birth = 1,
+#'     day_of_birth = 1,
+#'     race_concept_id = 0,
+#'     ethnicity_concept_id = 0
+#'   ),
+#'   observation_period = tibble(
+#'     observation_period_id = 1:3,
+#'       person_id = 1:3,
+#'       observation_period_start_date = as.Date("1950-01-01"),
+#'       observation_period_end_date = as.Date("2023-01-01"),
+#'       period_type_concept_id = 0
+#'   )
+#' )
+#' cdm$new_matched_cohort <- cdm$cohort2 %>%
+#'   matchCohorts(
+#'     name = "new_matched_cohort",
+#'     cohortId = 2,
+#'     matchSex = TRUE,
+#'     matchYearOfBirth = TRUE,
+#'     ratio = 1)
 #' cdm$new_matched_cohort
 #'
-matchCohort <- function(cdm,
-                        name,
-                        targetCohortName,
-                        targetCohortId = NULL,
-                        matchSex = TRUE,
-                        matchYearOfBirth = TRUE,
-                        ratio = 1){
+matchCohorts <- function(cohort,
+                         cohortId = NULL,
+                         matchSex = TRUE,
+                         matchYearOfBirth = TRUE,
+                         ratio = 1,
+                         name = omopgenerics::tableName(cohort)) {
   cli::cli_inform("Starting matching")
 
   # validate initial input
+  cdm <- omopgenerics::cdmReference(cohort)
+  targetCohortName <- omopgenerics::tableName(cohort)
   validateInput(
     cdm = cdm, name = name, targetCohortName = targetCohortName,
-    targetCohortId = targetCohortId, matchSex = matchSex,
+    cohortId = cohortId, matchSex = matchSex,
     matchYearOfBirth = matchYearOfBirth, ratio = ratio
   )
 
@@ -59,14 +76,14 @@ matchCohort <- function(cdm,
 
   } else {
     # get target cohort id
-    targetCohortId <- getTargetCohortId(cdm, targetCohortId, targetCohortName)
-    cli::cli_inform(c("*" = paste0(length(targetCohortId), " cohorts to be matched.")))
+    cohortId <- getcohortId(cdm, cohortId, targetCohortName)
+    cli::cli_inform(c("*" = paste0(length(cohortId), " cohorts to be matched.")))
 
-    # Create the cohort name with cases and controls of the targetCohortId
-    cdm <- getNewCohort(cdm, name, targetCohortName, targetCohortId, n)
+    # Create the cohort name with cases and controls of the cohortId
+    cdm <- getNewCohort(cdm, name, targetCohortName, cohortId, n)
 
     # Exclude cases from controls
-    cdm <- excludeCases(cdm, name, targetCohortId, n)
+    cdm <- excludeCases(cdm, name, cohortId, n)
 
     # get matched tables
     matchCols <- getMatchCols(matchSex, matchYearOfBirth)
@@ -80,18 +97,18 @@ matchCohort <- function(cdm,
       cli::cli_inform(c("*" = "Not matched individuals excluded"))
 
       # Match as ratio was infinite
-      cdm <- infiniteMatching(cdm, name, targetCohortId)
+      cdm <- infiniteMatching(cdm, name, cohortId)
 
       # Delete controls that are not in observation
-      cdm <- checkObservationPeriod(cdm, name, targetCohortId, n)
+      cdm <- checkObservationPeriod(cdm, name, cohortId, n)
       cli::cli_inform(c("*" = "Removing pairs that were not in observation at index date"))
 
       # Check ratio
-      cdm <- checkRatio(cdm, name, ratio, targetCohortId, n)
+      cdm <- checkRatio(cdm, name, ratio, cohortId, n)
       cli::cli_inform(c("*" = "Adjusting ratio"))
 
       # Check cohort set ref
-      cdm <- checkCohortSetRef(cdm, name, targetCohortName, matchSex, matchYearOfBirth, targetCohortId, n)
+      cdm <- checkCohortSetRef(cdm, name, targetCohortName, matchSex, matchYearOfBirth, cohortId, n)
 
       # Rename cohort definition ids
       cdm <- renameCohortDefinitionIds(cdm, name)
@@ -100,14 +117,14 @@ matchCohort <- function(cdm,
   }
   # Return
   cli::cli_inform(c("v" = "Done"))
-  return(cdm)
+  return(cdm[[name]])
 }
 
 #' @noRd
 validateInput <- function(cdm,
                           name,
                           targetCohortName,
-                          targetCohortId,
+                          cohortId,
                           matchSex,
                           matchYearOfBirth,
                           ratio) {
@@ -142,21 +159,21 @@ validateInput <- function(cdm,
   if(!isTRUE(observation_period_check)){
     errorMessage$push(glue::glue("- cdm input has not table named 'observation_period'"))
   }
-  # Check if targetCohortId is a numeric value
-  if(!is.null(targetCohortId)){
-    targetCohortId_format_check <- any(class(targetCohortId) %in% c("numeric","double","integer"))
-    checkmate::assertTRUE(targetCohortId_format_check, add = errorMessage)
-    if(!isTRUE(targetCohortId_format_check)){
-      errorMessage$push(glue::glue("- targetCohortId input must be numeric"))
+  # Check if cohortId is a numeric value
+  if(!is.null(cohortId)){
+    cohortId_format_check <- any(class(cohortId) %in% c("numeric","double","integer"))
+    checkmate::assertTRUE(cohortId_format_check, add = errorMessage)
+    if(!isTRUE(cohortId_format_check)){
+      errorMessage$push(glue::glue("- cohortId input must be numeric"))
     }
   }
-  # Check if targetCohortId is in the cohort_definition_id
-  if(!is.null(targetCohortId)){
-    rows <- cdm[[targetCohortName]] %>% dplyr::filter(.data$cohort_definition_id %in% targetCohortId) %>% dplyr::tally() %>% dplyr::pull()
-    targetCohortId_check <- rows != 0
-    checkmate::assertTRUE(targetCohortId_check, add = errorMessage)
-    if(!isTRUE(targetCohortId_check)){
-      errorMessage$push(glue::glue("- {name} table does not containg '{targetCohortId}' as a cohort_definition_id"))
+  # Check if cohortId is in the cohort_definition_id
+  if(!is.null(cohortId)){
+    rows <- cdm[[targetCohortName]] %>% dplyr::filter(.data$cohort_definition_id %in% cohortId) %>% dplyr::tally() %>% dplyr::pull()
+    cohortId_check <- rows != 0
+    checkmate::assertTRUE(cohortId_check, add = errorMessage)
+    if(!isTRUE(cohortId_check)){
+      errorMessage$push(glue::glue("- {name} table does not containg '{cohortId}' as a cohort_definition_id"))
     }
   }
   # Check if ratio is > 0
@@ -190,15 +207,15 @@ getNumberOfCohorts <- function(cdm, targetCohortName){
   return(n)
 }
 
-getTargetCohortId <- function(cdm, targetCohortId, targetCohortName){
-  if(is.null(targetCohortId)){
-    targetCohortId <-cdm[[targetCohortName]] %>%
+getcohortId <- function(cdm, cohortId, targetCohortName){
+  if(is.null(cohortId)){
+    cohortId <-cdm[[targetCohortName]] %>%
       omopgenerics::settings() %>%
       dplyr::arrange(.data$cohort_definition_id) %>%
       dplyr::pull("cohort_definition_id")
   }
 
-  return(targetCohortId)
+  return(cohortId)
 }
 
 setInitialControlAttriton <- function(cdm, ids) {
@@ -222,13 +239,13 @@ setInitialControlAttriton <- function(cdm, ids) {
   )
 }
 
-getNewCohort <- function(cdm, name, targetCohortName, targetCohortId, n){
+getNewCohort <- function(cdm, name, targetCohortName, cohortId, n){
   # Create controls cohort
   temp_name <- "temp_ctr_ids"
   cdm <- omopgenerics::insertTable(
     cdm = cdm,
     name = temp_name,
-    table = dplyr::tibble(cohort_definition_id = targetCohortId+n)
+    table = dplyr::tibble(cohort_definition_id = cohortId+n)
   )
   controls <- cdm[[temp_name]] %>%
     dplyr::cross_join(cdm[["person"]] %>%
@@ -236,7 +253,7 @@ getNewCohort <- function(cdm, name, targetCohortName, targetCohortId, n){
     dplyr::compute()
   cdm <- omopgenerics::dropTable(cdm, temp_name)
 
-  # Create table with controls + cases (all cases existing in the cohort, without considering the targetCohortId)
+  # Create table with controls + cases (all cases existing in the cohort, without considering the cohortId)
   all <- controls %>%
     dplyr::inner_join(
       cdm$observation_period %>%
@@ -253,14 +270,14 @@ getNewCohort <- function(cdm, name, targetCohortName, targetCohortId, n){
     ) %>%
     dplyr::union_all(
       cdm[[targetCohortName]] %>%
-        dplyr::filter(.data$cohort_definition_id %in% .env$targetCohortId)
+        dplyr::filter(.data$cohort_definition_id %in% .env$cohortId)
     ) %>%
     dplyr::compute(name = name, temporary = FALSE)
 
   # settings
   cohort_set_ref <- cdm[[targetCohortName]] %>%
     omopgenerics::settings() %>%
-    dplyr::filter(.data$cohort_definition_id %in% .env$targetCohortId) %>%
+    dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) %>%
     dplyr::slice(rep(1:dplyr::n(), times = 2)) %>%
     dplyr::group_by(.data$cohort_definition_id) %>%
     dplyr::mutate(
@@ -274,8 +291,8 @@ getNewCohort <- function(cdm, name, targetCohortName, targetCohortId, n){
   # attrition
   cohort_attrition <- cdm[[targetCohortName]] %>%
     omopgenerics::attrition() %>%
-    dplyr::filter(.data$cohort_definition_id %in% .env$targetCohortId) %>%
-    dplyr::union_all(setInitialControlAttriton(cdm, targetCohortId+n))
+    dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) %>%
+    dplyr::union_all(setInitialControlAttriton(cdm, cohortId+n))
 
   cdm[[name]] <- omopgenerics::newCohortTable(
     table = all,
@@ -286,25 +303,25 @@ getNewCohort <- function(cdm, name, targetCohortName, targetCohortId, n){
   return(cdm)
 }
 
-excludeCases <- function(cdm, name, targetCohortId, n){
+excludeCases <- function(cdm, name, cohortId, n){
   # For each target cohort id
-  for(targetCohortId_i in targetCohortId){
+  for(cohortId_i in cohortId){
     # Controls
     controls <- cdm[[name]] %>%
-      dplyr::filter(.data$cohort_definition_id == targetCohortId_i+.env$n) %>%
+      dplyr::filter(.data$cohort_definition_id == cohortId_i+.env$n) %>%
       dplyr::anti_join(
         # Cases
         cdm[[name]] %>%
           dplyr::select("subject_id","cohort_definition_id") %>%
-          dplyr::filter(.data$cohort_definition_id == targetCohortId_i) %>%
-          dplyr::mutate(cohort_definition_id = targetCohortId_i + .env$n),
+          dplyr::filter(.data$cohort_definition_id == cohortId_i) %>%
+          dplyr::mutate(cohort_definition_id = cohortId_i + .env$n),
         by = c("subject_id", "cohort_definition_id")
       ) %>%
       dplyr::compute()
 
     cdm[[name]] <- cdm[[name]] %>%
       # Delete the controls
-      dplyr::filter(.data$cohort_definition_id != targetCohortId_i + .env$n) %>%
+      dplyr::filter(.data$cohort_definition_id != cohortId_i + .env$n) %>%
       # Add the new controls set
       dplyr::union_all(controls) %>%
       dplyr::compute(name = name, temporary = FALSE)
@@ -313,7 +330,7 @@ excludeCases <- function(cdm, name, targetCohortId, n){
   # Record attrition
   cdm[[name]] <- cdm[[name]] %>%
     CDMConnector::record_cohort_attrition("Exclude cases",
-                                          cohortId = c(targetCohortId+n))%>%
+                                          cohortId = c(cohortId+n))%>%
     dplyr::compute(name = name, temporary = FALSE)
 
   return(cdm)
@@ -381,7 +398,7 @@ excludeNoMatchedIndividuals <- function(cdm, name, matchCols, n){
   return(cdm)
 }
 
-infiniteMatching <- function(cdm, name, targetCohortId){
+infiniteMatching <- function(cdm, name, cohortId){
   # Create pair id to perform a random match
   cdm[[name]] <- cdm[[name]] %>%
     dplyr::mutate(id = dbplyr::sql("random()")) %>%
@@ -396,7 +413,7 @@ infiniteMatching <- function(cdm, name, targetCohortId){
     dplyr::inner_join(
       # Calculate the maximum number of cases per group
       cdm[[name]] %>%
-        dplyr::filter(.data$cohort_definition_id %in% .env$targetCohortId) %>%
+        dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) %>%
         dplyr::group_by(.data$cohort_definition_id, .data$group_id) %>%
         dplyr::mutate(max_cases = max(.data$pair_id, na.rm = TRUE)) %>%
         dplyr::ungroup() %>%
@@ -416,7 +433,7 @@ infiniteMatching <- function(cdm, name, targetCohortId){
     dplyr::inner_join(
       # Cohort start date and end date of cases
       cdm[[name]] %>%
-        dplyr::filter(.data$cohort_definition_id %in% targetCohortId) %>%
+        dplyr::filter(.data$cohort_definition_id %in% cohortId) %>%
         dplyr::select("pair_id", "group_id", "target_definition_id", "cohort_start_date", "cohort_end_date"),
       by = c("pair_id", "group_id", "target_definition_id")
     ) %>%
@@ -426,12 +443,12 @@ infiniteMatching <- function(cdm, name, targetCohortId){
   return(cdm)
 }
 
-checkObservationPeriod <- function(cdm, name, targetCohortId, n){
+checkObservationPeriod <- function(cdm, name, cohortId, n){
   cdm[[name]] <- cdm[[name]] %>%
     PatientProfiles::addFutureObservation() %>%
     dplyr::filter(!is.na(.data$future_observation)) %>%
     dplyr::mutate(cohort_end_date = dplyr::if_else(
-      .data$cohort_definition_id %in% .env$targetCohortId,
+      .data$cohort_definition_id %in% .env$cohortId,
       .data$cohort_end_date,
       as.Date(!!CDMConnector::dateadd("cohort_start_date", "future_observation"))
     )) %>%
@@ -440,12 +457,12 @@ checkObservationPeriod <- function(cdm, name, targetCohortId, n){
     dplyr::filter(dplyr::n() > 1) %>%
     dplyr::ungroup() %>%
     dplyr::compute(name = name, temporary = FALSE) %>%
-    CDMConnector::record_cohort_attrition("Exclude individuals that are not in observation", cohortId = targetCohortId + n) %>%
-    CDMConnector::record_cohort_attrition("Exclude individuals that their only pair is not in observation", cohortId = targetCohortId)
+    CDMConnector::record_cohort_attrition("Exclude individuals that are not in observation", cohortId = cohortId + n) %>%
+    CDMConnector::record_cohort_attrition("Exclude individuals that their only pair is not in observation", cohortId = cohortId)
   return(cdm)
 }
 
-checkRatio <- function(cdm, name, ratio, targetCohortId, n){
+checkRatio <- function(cdm, name, ratio, cohortId, n){
   if (ratio == Inf) {
     cdm[[name]] <- cdm[[name]] %>%
       dplyr::select("cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date") %>%
@@ -458,20 +475,20 @@ checkRatio <- function(cdm, name, ratio, targetCohortId, n){
       dplyr::ungroup() %>%
       dplyr::select("cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date") %>%
       dplyr::compute(name = name, temporary = FALSE) %>%
-      CDMConnector::record_cohort_attrition("Exclude individuals that do not fulfil the ratio", cohortId = targetCohortId+n)
+      CDMConnector::record_cohort_attrition("Exclude individuals that do not fulfil the ratio", cohortId = cohortId+n)
   }
 
   return(cdm)
 }
 
-checkCohortSetRef <- function(cdm, name, targetCohortName, matchSex, matchYearOfBirth, targetCohortId, n){
+checkCohortSetRef <- function(cdm, name, targetCohortName, matchSex, matchYearOfBirth, cohortId, n){
   cohort_set_ref <- cdm[[name]] %>%
     omopgenerics::settings() %>%
     dplyr::mutate(target_cohort_name  = .env$targetCohortName) %>%
     dplyr::mutate(match_sex           = .env$matchSex) %>%
     dplyr::mutate(match_year_of_birth = .env$matchYearOfBirth) %>%
-    dplyr::mutate(match_status        = dplyr::if_else(.data$cohort_definition_id %in% .env$targetCohortId, "target", "matched")) %>%
-    dplyr::mutate(target_cohort_id    = dplyr::if_else(.data$cohort_definition_id %in% .env$targetCohortId, .data$cohort_definition_id, .data$cohort_definition_id-n))
+    dplyr::mutate(match_status        = dplyr::if_else(.data$cohort_definition_id %in% .env$cohortId, "target", "matched")) %>%
+    dplyr::mutate(target_cohort_id    = dplyr::if_else(.data$cohort_definition_id %in% .env$cohortId, .data$cohort_definition_id, .data$cohort_definition_id-n))
 
   cdm[[name]] <- omopgenerics::newCohortTable(
     table = cdm[[name]],

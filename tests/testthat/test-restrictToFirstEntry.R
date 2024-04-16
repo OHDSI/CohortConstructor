@@ -5,29 +5,29 @@ test_that("test restrict to first entry works", {
     omock::mockCohort(tableName = "cohort1", numberCohorts = 1, recordPerson = 2) |>
     omock::mockCohort(tableName = "cohort2", numberCohorts = 2, recordPerson = 2)
 
-  expect_true(all(cdm$cohort1 |> CohortConstructor::restrictToFirstEntry() |>
+  expect_true(all(cdm$cohort1 |> CohortConstructor::requireIsFirstEntry() |>
     dplyr::pull(cohort_start_date) == c("2001-05-29", "1999-07-30", "2015-01-23")))
 
-  expect_true(all(cdm$cohort1 |> CohortConstructor::restrictToFirstEntry() |>
+  expect_true(all(cdm$cohort1 |> CohortConstructor::requireIsFirstEntry() |>
                     dplyr::pull(subject_id) %in% 1:3))
 
-  expect_true(all(cdm$cohort2 |> CohortConstructor::restrictToFirstEntry() |>
+  expect_true(all(cdm$cohort2 |> CohortConstructor::requireIsFirstEntry() |>
                     dplyr::pull(cohort_start_date) ==
                     c("2001-05-29", "1999-07-30", "2015-01-23", "2002-10-09", "1999-04-16")))
 
-  expect_true(all(cdm$cohort2 |> CohortConstructor::restrictToFirstEntry() |>
+  expect_true(all(cdm$cohort2 |> CohortConstructor::requireIsFirstEntry() |>
                     dplyr::pull(subject_id) == c(1:3, 1:2)))
 
 })
 
-test_that("restrictToFirstEntry, cohortIds & name arguments", {
+test_that("requireIsFirstEntry, cohortIds & name arguments", {
   cdm <- omock::mockCdmReference() |>
     omock::mockPerson(n = 3) |>
     omock::mockObservationPeriod() |>
     omock::mockCohort(numberCohorts = 3, recordPerson = 2)
 
   expect_no_error(
-    cdm$new_cohort <- CohortConstructor::restrictToFirstEntry(
+    cdm$new_cohort <- CohortConstructor::requireIsFirstEntry(
       cohort = cdm$cohort,
       cohortId = 1,
       name = "new_cohort")
@@ -53,7 +53,7 @@ test_that("restrictToFirstEntry, cohortIds & name arguments", {
   expect_true(all(cdm$new_cohort |> dplyr::pull(subject_id) == c(1, 2, 3, 1, 1, 2, 2, 2, 3, 3, 1, 2, 2, 2)))
 
   expect_no_error(
-    cdm$cohort <- CohortConstructor::restrictToFirstEntry(
+    cdm$cohort <- CohortConstructor::requireIsFirstEntry(
       cohort = cdm$cohort,
       cohortId = NULL)
   )
@@ -61,7 +61,7 @@ test_that("restrictToFirstEntry, cohortIds & name arguments", {
 })
 
 
-test_that("restrictToFirstEntry, index date + errors", {
+test_that("requireIsFirstEntry, index date + errors", {
   cdm <- omock::mockCdmReference() |>
     omock::mockPerson(n = 3) |>
     omock::mockObservationPeriod() |>
@@ -73,25 +73,25 @@ test_that("restrictToFirstEntry, index date + errors", {
       min(cohort_start_date),
       cohort_start_date))
 
-  expect_true(all(cdm$cohort |> restrictToFirstEntry(indexDate = "index_date") |>
+  expect_true(all(cdm$cohort |> requireIsFirstEntry(indexDate = "index_date") |>
                     dplyr::pull(index_date) == c("2001-05-29", "1999-07-30", "1999-07-30")))
 
-  expect_error(cdm$cohort |> restrictToFirstEntry(indexDate = "a"))
-  expect_error(cdm$cohort |> restrictToFirstEntry(name = 1))
-  expect_error(cdm$cohort1 <- cdm$cohort |> restrictToFirstEntry(name = "cohort2"))
-  expect_error(cdm$cohort |> restrictToFirstEntry(cohortId = Inf))
-  expect_error(cdm$cohort |> dplyr::collect() |> restrictToFirstEntry())
-  expect_warning(cdm$cohort |> restrictToFirstEntry(cohortId = c(1, 5)))
+  expect_error(cdm$cohort |> requireIsFirstEntry(indexDate = "a"))
+  expect_error(cdm$cohort |> requireIsFirstEntry(name = 1))
+  expect_error(cdm$cohort1 <- cdm$cohort |> requireIsFirstEntry(name = "cohort2"))
+  expect_error(cdm$cohort |> requireIsFirstEntry(cohortId = Inf))
+  expect_error(cdm$cohort |> dplyr::collect() |> requireIsFirstEntry())
+  expect_warning(cdm$cohort |> requireIsFirstEntry(cohortId = c(1, 5)))
 })
 
 
-test_that("restrictToLastEntry", {
+test_that("requireIsLastEntry", {
   cdm <- omock::mockCdmReference() |>
     omock::mockPerson(n = 3) |>
     omock::mockObservationPeriod() |>
     omock::mockCohort(numberCohorts = 3, recordPerson = 2)
 
-  cdm$new_cohort <- CohortConstructor::restrictToLastEntry(
+  cdm$new_cohort <- CohortConstructor::requireIsLastEntry(
     cohort = cdm$cohort,
     cohortId = 1,
     name = "new_cohort")
@@ -127,7 +127,7 @@ test_that("restrictToLastEntry", {
                                  as.Date("1999-01-01"), cohort_start_date)
     )
 
-  cdm$cohort <- CohortConstructor::restrictToLastEntry(cohort = cdm$cohort,
+  cdm$cohort <- CohortConstructor::requireIsLastEntry(cohort = cdm$cohort,
                                                        indexDate = "new_index")
   expect_true(all(cdm$cohort |> dplyr::pull(subject_id) == c(1:3, 1:3, 1:2)))
   expect_true(all(cdm$cohort |>  dplyr::pull(cohort_start_date) ==
@@ -143,10 +143,10 @@ test_that("restrictToLastEntry", {
   )))
 
   # errors
-  expect_error(cdm$cohort |> restrictToLastEntry(indexDate = "a"))
-  expect_error(cdm$cohort |> restrictToLastEntry(name = 1))
-  expect_error(cdm$cohort1 <- cdm$cohort |> restrictToLastEntry(name = "cohort2"))
-  expect_error(cdm$cohort |> restrictToLastEntry(cohortId = Inf))
-  expect_error(cdm$cohort |> dplyr::collect() |> restrictToLastEntry())
-  expect_warning(cdm$cohort |> restrictToLastEntry(cohortId = c(1, 5)))
+  expect_error(cdm$cohort |> requireIsLastEntry(indexDate = "a"))
+  expect_error(cdm$cohort |> requireIsLastEntry(name = 1))
+  expect_error(cdm$cohort1 <- cdm$cohort |> requireIsLastEntry(name = "cohort2"))
+  expect_error(cdm$cohort |> requireIsLastEntry(cohortId = Inf))
+  expect_error(cdm$cohort |> dplyr::collect() |> requireIsLastEntry())
+  expect_warning(cdm$cohort |> requireIsLastEntry(cohortId = c(1, 5)))
 })
