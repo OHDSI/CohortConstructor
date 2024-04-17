@@ -1,0 +1,31 @@
+#' Generate a cohort table using a subset of cohorts from another table.
+#'
+#' @param cohort A cohort table in a cdm reference.
+#' @param cohortId Vector of cohort definition ids to include. If NULL all
+#' cohort will be selected.
+#' @param name Name of the new cohort with the demographic requirements.
+#'
+#' @return Cohort table with only cohorts in cohortId.
+#'
+#' @export
+#'
+subsetCohorts <- function(cohort,
+                          cohortId,
+                          name = tableName(cohort)) {
+  # checks
+  cohort <- validateCohortTable(cohort, TRUE)
+  cohortId <- validateCohortId(cohortId, settings(cohort)$cohort_definition_id)
+  name <- validateName(name)
+
+
+  cohort <- cohort |>
+    dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>
+    dplyr::compute(name = name, temporary = FALSE) |>
+    omopgenerics::newCohortTable(
+      cohortSetRef = settings(cohort) |> dplyr::filter(.data$cohort_definition_id %in% .env$cohortId),
+      cohortAttritionRef = attrition(cohort) |> dplyr::filter(.data$cohort_definition_id %in% .env$cohortId),
+      cohortCodelistRef = attr(cohort, "cohort_codelist") |> dplyr::filter(.data$cohort_definition_id %in% .env$cohortId),
+    )
+
+  return(cohort)
+}
