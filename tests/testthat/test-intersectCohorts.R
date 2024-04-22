@@ -468,8 +468,8 @@ test_that("codelist", {
 
   # union concept + non concept cohorts
   # TODO when omopgenerics issue #260
-  # cdm <- omopgenerics::bind(cdm$cohort, cdm$cohort1, name = "cohort3")
-  # cdm$cohort4 <- intersectCohorts(cdm$cohort3, name = "cohort4")
+  cdm <- omopgenerics::bind(cdm$cohort, cdm$cohort1, name = "cohort3")
+  cdm$cohort4 <- intersectCohorts(cdm$cohort3, name = "cohort4")
 
 
 })
