@@ -28,7 +28,7 @@ test_that("require flag in concept", {
   cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
                                    cdm = cdm_local,
                                    schema = "main")
-  cdm$cohort3 <-  requireConceptIntersectFlag(x = cdm$cohort1,
+  cdm$cohort3 <-  requireConceptIntersectFlag(cohort = cdm$cohort1,
                                               conceptSet = list(a = 1),
                                               window = c(-Inf, Inf),
                                               name = "cohort3")
@@ -45,7 +45,7 @@ test_that("require flag in concept", {
                       "Concept a between -Inf & Inf days relative to cohort_start_date")))
 
   # censor date
-  cdm$cohort5 <- requireConceptIntersectFlag(x = cdm$cohort1,
+  cdm$cohort5 <- requireConceptIntersectFlag(cohort = cdm$cohort1,
                                              conceptSet = list(a = 1),
                                              window = c(-Inf, Inf),
                                              censorDate = "cohort_end_date",
@@ -58,7 +58,7 @@ test_that("require flag in concept", {
                       "Concept a between -Inf & Inf days relative to cohort_start_date, censoring at cohort_end_date")))
 
   # name
-  cdm$cohort1 <-  requireConceptIntersectFlag(x = cdm$cohort1,
+  cdm$cohort1 <-  requireConceptIntersectFlag(cohort = cdm$cohort1,
                                               conceptSet = list(a = 1),
                                               window = c(-Inf, Inf))
   expect_true(all(omopgenerics::attrition(cdm$cohort1)$reason ==
@@ -68,7 +68,7 @@ test_that("require flag in concept", {
                       "Concept a between -Inf & Inf days relative to cohort_start_date")))
 
   # empty concept
-  cdm$cohort1 <-  requireConceptIntersectFlag(x = cdm$cohort1,
+  cdm$cohort1 <-  requireConceptIntersectFlag(cohort = cdm$cohort1,
                                               conceptSet = list(),
                                               window = c(-Inf, Inf))
   expect_true(all(omopgenerics::attrition(cdm$cohort1)$reason ==
@@ -80,12 +80,12 @@ test_that("require flag in concept", {
   # expected errors
   # only support one concept at the moment
  expect_error(
-   requireConceptIntersectFlag(x = cdm$cohort1,
+   requireConceptIntersectFlag(cohort = cdm$cohort1,
                                conceptSet = list(a = 1, b = 2),
                                window = c(-Inf, Inf))
  )
  expect_error(
-   requireConceptIntersectFlag(x = cdm$cohort1,
+   requireConceptIntersectFlag(cohort = cdm$cohort1,
                                conceptSet = NULL,
                                window = c(-Inf, Inf))
  )
@@ -124,11 +124,11 @@ test_that("requiring absence in another cohort", {
                                    cdm = cdm_local,
                                    schema = "main")
 
-  cdm$cohort3_inclusion <-  requireConceptIntersectFlag(x = cdm$cohort1,
+  cdm$cohort3_inclusion <-  requireConceptIntersectFlag(cohort = cdm$cohort1,
                                                        conceptSet = list(a = 1),
                                                        window = c(-Inf, Inf),
                                                        name = "cohort3_inclusion")
-  cdm$cohort3_exclusion <-  requireConceptIntersectFlag(x = cdm$cohort1,
+  cdm$cohort3_exclusion <-  requireConceptIntersectFlag(cohort = cdm$cohort1,
                                                        conceptSet = list(a = 1),
                                                        window = c(-Inf, Inf),
                                                        negate = TRUE,
