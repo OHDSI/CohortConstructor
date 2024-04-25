@@ -49,5 +49,6 @@ Config/testthat/parallel: true
 VignetteBuilder: knitr
 Remotes:
     darwin-eu-dev/PatientProfiles
+    darwin-eu-dev/CDMConnector
 Depends: 
     R (>= 4.1)
