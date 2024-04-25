@@ -55,7 +55,6 @@ test_that("matchCohorts runs without errors", {
 
 })
 
-
 test_that("matchCohorts, no duplicated people within a cohort", {
   followback <- 180
 
@@ -162,8 +161,6 @@ test_that("check that we obtain expected result when ratio is 1", {
                            ))))
 })
 
-
-
 test_that("test exactMatchingCohort works if there are no subjects", {
   followback  <- 180
   cdm <- DrugUtilisation::generateConceptCohortSet(
@@ -181,7 +178,6 @@ test_that("test exactMatchingCohort works if there are no subjects", {
   )
   expect_true(cdm$new_cohort %>% dplyr::tally() %>% dplyr::pull(n) == 0)
 })
-
 
 test_that("test exactMatchingCohort works if one of the cohorts does not have any people", {
   followback  <- 180
@@ -222,7 +218,6 @@ test_that("test exactMatchingCohort with a ratio bigger than 1", {
                       ratio = 5)
   )
 })
-
 
 test_that("test exactMatchingCohort with a ratio bigger than 1", {
   # Generate mock data
