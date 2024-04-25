@@ -118,12 +118,12 @@ requireConceptIntersectFlag <- function(cohort,
     if (!is.null(censorDate)) {
       reason <- glue::glue("{reason}, censoring at {censorDate}")
     }
-    x <- cohort %>%
+    cohort <- cohort %>%
       dplyr::inner_join(subsetCohort,
                         by = c(cols)) %>%
       dplyr::compute(name = name, temporary = FALSE) %>%
       CDMConnector::recordCohortAttrition(reason = reason, cohortId = cohortId)
   }
 
-  return(x)
+  return(cohort)
 }
