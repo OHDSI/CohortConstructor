@@ -12,7 +12,7 @@ test_that("requiring presence in another table", {
                                    cdm = cdm_local,
                                    schema = "main")
 
-  cdm$cohort2 <-  requireTableIntersectFlag(x = cdm$cohort1,
+  cdm$cohort2 <-  requireTableIntersectFlag(cohort = cdm$cohort1,
                                             tableName = "table",
                                             targetStartDate = "date_start",
                                             targetEndDate = "date_end",
@@ -27,7 +27,7 @@ test_that("requiring presence in another table", {
                  "Initial qualifying events",
                  "In table table between -Inf & Inf days relative to cohort_start_date"))
 
-  cdm$cohort3 <-  requireTableIntersectFlag(x = cdm$cohort1,
+  cdm$cohort3 <-  requireTableIntersectFlag(cohort = cdm$cohort1,
                                             tableName = "table",
                                             targetStartDate = "date_start",
                                             targetEndDate = "date_end",
@@ -42,7 +42,8 @@ test_that("requiring presence in another table", {
                  "Initial qualifying events",
                  "In table table between 0 & Inf days relative to cohort_start_date"))
 
-  cdm$cohort4 <-  requireTableIntersectFlag(x = cdm$cohort1,
+  # censor date
+  cdm$cohort4 <-  requireTableIntersectFlag(cohort = cdm$cohort1,
                                             tableName = "table",
                                             targetStartDate = "date_start",
                                             targetEndDate = "date_end",
@@ -57,15 +58,32 @@ test_that("requiring presence in another table", {
                  "Initial qualifying events",
                  "In table table between -Inf & 0 days relative to cohort_start_date, censoring at cohort_end_date"))
 
+  # cohrot Id
+  cdm$cohort5 <-  requireTableIntersectFlag(cohort = cdm$cohort1,
+                                            cohortId = 1,
+                                            tableName = "table",
+                                            targetStartDate = "date_start",
+                                            targetEndDate = "date_end",
+                                            window = c(-Inf, 0),
+                                            censorDate = "cohort_end_date",
+                                            name = "cohort5")
+  expect_true(all(cdm$cohort5 |> dplyr::pull("subject_id") == c(1, 1, 1, 1, 3)))
+  expect_true(all(cdm$cohort5 |> dplyr::pull("cohort_start_date") |> sort() ==
+                    c("2000-06-23", "2001-07-16", "2001-12-04", "2003-06-15", "2015-03-05")))
+  expect_equal(omopgenerics::attrition(cdm$cohort5)$reason,
+               c("Initial qualifying events",
+                 "In table table between -Inf & 0 days relative to cohort_start_date, censoring at cohort_end_date",
+                 "Initial qualifying events"))
+
   # expected errors
   # currently just 1 table suported´
   expect_error(
-    requireTableIntersectFlag(x = cdm$cohort1,
+    requireTableIntersectFlag(cohort = cdm$cohort1,
                               tableName = c("table", "observation_period"),
                               window = c(-Inf, Inf))
   )
   expect_error(
-    requireTableIntersectFlag(x = cdm$cohort1,
+    requireTableIntersectFlag(cohort = cdm$cohort1,
                               tableName = cdm$table,
                               window = c(-Inf, Inf))
   )
@@ -87,7 +105,7 @@ test_that("requiring absence in another table", {
                                    cdm = cdm_local,
                                    schema = "main")
 
-  cdm$cohort2 <-  requireTableIntersectFlag(x = cdm$cohort1,
+  cdm$cohort2 <-  requireTableIntersectFlag(cohort = cdm$cohort1,
                                             tableName = "table",
                                             targetStartDate = "date_start",
                                             targetEndDate = "date_end",
@@ -102,7 +120,7 @@ test_that("requiring absence in another table", {
                  "Initial qualifying events",
                  "Not in table table between -Inf & Inf days relative to cohort_start_date"))
 
-  cdm$cohort3 <-  requireTableIntersectFlag(x = cdm$cohort1,
+  cdm$cohort3 <-  requireTableIntersectFlag(cohort = cdm$cohort1,
                                             tableName = "table",
                                             targetStartDate = "date_start",
                                             targetEndDate = "date_end",
@@ -117,7 +135,8 @@ test_that("requiring absence in another table", {
                  "Initial qualifying events",
                  "Not in table table between 0 & Inf days relative to cohort_start_date"))
 
-  cdm$cohort4 <-  requireTableIntersectFlag(x = cdm$cohort1,
+  # censor date
+  cdm$cohort4 <-  requireTableIntersectFlag(cohort = cdm$cohort1,
                                             tableName = "table",
                                             targetStartDate = "date_start",
                                             targetEndDate = "date_end",
@@ -133,6 +152,23 @@ test_that("requiring absence in another table", {
                  "Not in table table between -Inf & 0 days relative to cohort_start_date, censoring at cohort_end_date",
                  "Initial qualifying events",
                  "Not in table table between -Inf & 0 days relative to cohort_start_date, censoring at cohort_end_date"))
+
+  # cohort Id and name
+  cdm$cohort1 <-  requireTableIntersectFlag(cohort = cdm$cohort1,
+                                            cohortId = 1,
+                                            tableName = "table",
+                                            targetStartDate = "date_start",
+                                            targetEndDate = "date_end",
+                                            window = c(0, Inf),
+                                            censorDate = NULL,
+                                            negate = TRUE)
+  expect_true(all(cdm$cohort1 |> dplyr::pull("subject_id") |> sort() == c(1, 1, 1, 1, 3)))
+  expect_true(all((cdm$cohort1 |> dplyr::pull("cohort_start_date") |> sort() ==
+                     c("2000-06-23", "2001-07-16", "2001-12-04", "2003-06-15", "2015-03-05"))))
+  expect_equal(omopgenerics::attrition(cdm$cohort1)$reason,
+               c("Initial qualifying events",
+                 "Not in table table between 0 & Inf days relative to cohort_start_date",
+                 "Initial qualifying events"))
 
   CDMConnector::cdm_disconnect(cdm)
 })

@@ -5,7 +5,8 @@
 \title{Require cohort subjects are present in another table}
 \usage{
 requireTableIntersectFlag(
-  x,
+  cohort,
+  cohortId = NULL,
   tableName,
   indexDate = "cohort_start_date",
   targetStartDate = startDateColumn(tableName),
@@ -13,11 +14,14 @@ requireTableIntersectFlag(
   censorDate = NULL,
   window = list(c(0, Inf)),
   negate = FALSE,
-  name = omopgenerics::tableName(x)
+  name = omopgenerics::tableName(cohort)
 )
 }
 \arguments{
-\item{x}{Cohort table.}
+\item{cohort}{A cohort table in a cdm reference.}
+
+\item{cohortId}{Vector of cohort definition ids to include. If NULL, all
+cohort definition ids will be used.}
 
 \item{tableName}{Name of the table to check for intersect.}
 

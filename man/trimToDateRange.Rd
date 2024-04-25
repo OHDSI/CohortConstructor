@@ -6,8 +6,8 @@
 \usage{
 trimToDateRange(
   cohort,
-  dateRange,
   cohortId = NULL,
+  dateRange,
   startDate = "cohort_start_date",
   endDate = "cohort_end_date",
   name = omopgenerics::tableName(cohort)
@@ -16,11 +16,11 @@ trimToDateRange(
 \arguments{
 \item{cohort}{A cohort table in a cdm reference.}
 
-\item{dateRange}{A window of time during which the index date must have
-been observed.}
-
 \item{cohortId}{Vector of cohort definition ids to include. If NULL, all
 cohort definition ids will be used.}
+
+\item{dateRange}{A window of time during which the index date must have
+been observed.}
 
 \item{startDate}{Variable with earliest date.}
 

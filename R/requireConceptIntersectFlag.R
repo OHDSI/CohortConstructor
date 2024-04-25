@@ -51,14 +51,14 @@ requireConceptIntersectFlag <- function(cohort,
                                         censorDate = NULL,
                                         window = list(c(0, Inf)),
                                         negate = FALSE,
-                                        name = omopgenerics::tableName(x)){
+                                        name = omopgenerics::tableName(cohort)){
   # checks
   name <- validateName(name)
   assertLogical(negate, length = 1)
   validateCohortTable(cohort)
   cdm <- omopgenerics::cdmReference(cohort)
   validateCDM(cdm)
-  validateIndexDate(indexDate, cohort)
+  validateCohortColumn(indexDate, cohort, class = "Date")
   assertList(conceptSet)
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
   cohortId <- validateCohortId(cohortId, ids)

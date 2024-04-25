@@ -11,6 +11,7 @@ test_that("requireDateRange", {
     requireInDateRange(dateRange = as.Date(c("2010-01-01", "2011-01-01")))
   expect_true(all(cohortCount(cdm$cohort1)$number_records == c(0, 0)))
   expect_true(all(cohortCount(cdm$cohort1)$number_subjects == c(0, 0)))
+  expect_true(cdm$cohort1 |> dplyr::tally() |> dplyr::pull("n") == 0)
 
   cdm$cohort1 <- cdm$cohort2 %>%
     requireInDateRange(dateRange = as.Date(c("2010-01-01", "2020-01-01")),
@@ -42,6 +43,8 @@ test_that("requireDateRange", {
                       "Initial qualifying events")))
   expect_true(all(cohortCount(cdm$cohort4)$number_records == c(1,4)))
   expect_true(all(cohortCount(cdm$cohort4)$number_subjects == c(1,2)))
+  expect_true(all(cdm$cohort4 |> dplyr::pull("cohort_start_date") |> sort() ==
+                c("1993-01-06", "2000-03-06", "2015-02-02", "2015-02-08", "2015-02-23")))
 
   # expect error
   expect_error(requireInDateRange(cohort = "a"))
@@ -52,6 +55,14 @@ test_that("requireDateRange", {
                                              "2009-01-01"))))
   expect_error(cdm$cohort1 %>%
     requireInDateRange(dateRange = c("a", "b")))
+  expect_error(
+    cdm$cohort1 %>%
+      requireInDateRange(dateRange = c(NA, NA))
+  )
+  expect_error(
+    cdm$cohort1 %>%
+      requireInDateRange(dateRange = as.Date(c("2010-01-01", "2010-01-01")), indexDate = "subject_id")
+  )
 
   CDMConnector::cdm_disconnect(cdm)
 })

@@ -30,7 +30,7 @@ requireInDateRange <- function(cohort,
   validateCohortTable(cohort)
   cdm <- omopgenerics::cdmReference(cohort)
   validateCDM(cdm)
-  validateCohortColumn(indexDate, cohort)
+  validateCohortColumn(indexDate, cohort, class = "Date")
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
   cohortId <- validateCohortId(cohortId, ids)
   validateDateRange(dateRange)
@@ -88,8 +88,8 @@ trimToDateRange <- function(cohort,
   validateCohortTable(cohort)
   cdm <- omopgenerics::cdmReference(cohort)
   validateCDM(cdm)
-  validateCohortColumn(startDate, cohort)
-  validateCohortColumn(endDate, cohort)
+  validateCohortColumn(startDate, cohort, class = "Date")
+  validateCohortColumn(endDate, cohort, class = "Date")
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
   cohortId <- validateCohortId(cohortId, ids)
   validateDateRange(dateRange)
@@ -137,7 +137,7 @@ trimStartDate <- function(cohort,
       )) %>%
       dplyr::filter(
         .data[[startDate]] <= .data[[endDate]] |
-         (!.data$cohort_definition_id %in% .env$requirementId)
+         (!.data$cohort_definition_id %in% .env$requirementIds)
       )
   }
   return(cohort)

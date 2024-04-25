@@ -51,13 +51,12 @@ test_that("requireIsFirstEntry, cohortIds & name arguments", {
                       "2000-03-08", "2000-05-04", "2001-04-01", "2015-03-23", "2015-06-11",
                       "2008-10-13", "1999-12-13", "1999-12-23", "2000-04-01")))
   expect_true(all(cdm$new_cohort |> dplyr::pull(subject_id) == c(1, 2, 3, 1, 1, 2, 2, 2, 3, 3, 1, 2, 2, 2)))
+  expect_true(all(
+    omopgenerics::attrition(cdm$new_cohort)$reason  ==
+      c("Initial qualifying events", "Restricted to first entry",
+        "Initial qualifying events", "Initial qualifying events")
+  ))
 
-  expect_no_error(
-    cdm$cohort <- CohortConstructor::requireIsFirstEntry(
-      cohort = cdm$cohort,
-      cohortId = NULL)
-  )
-  expect_true(all(cdm$cohort |> dplyr::pull(subject_id) == c(1:3, 1:3, 1:2)))
 })
 
 

@@ -5,16 +5,20 @@
 \title{Require cohort subjects' death at a certain time window}
 \usage{
 requireDeathFlag(
-  x,
+  cohort,
+  cohortId = NULL,
   indexDate = "cohort_start_date",
   censorDate = NULL,
   window = list(c(0, Inf)),
   negate = FALSE,
-  name = omopgenerics::tableName(x)
+  name = omopgenerics::tableName(cohort)
 )
 }
 \arguments{
-\item{x}{Cohort table.}
+\item{cohort}{A cohort table in a cdm reference.}
+
+\item{cohortId}{Vector of cohort definition ids to include. If NULL, all
+cohort definition ids will be used.}
 
 \item{indexDate}{Variable in x that contains the date to compute the
 intersection.}
