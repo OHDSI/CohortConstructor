@@ -259,22 +259,42 @@ test_that("test exactMatchingCohort with a ratio bigger than 1", {
                                  matchYearOfBirth = TRUE,
                                  ratio = 4)
 
-  expect_true(cdm[["new_cohort"]] %>%
-                dplyr::filter(cohort_definition_id %in% c(1,2)) %>%
-                dplyr::summarise(subject_id) %>%
-                dplyr::distinct() %>% dplyr::pull() %>% length() == 10)
-  expect_true(cdm[["new_cohort"]] %>%
-                dplyr::filter(cohort_definition_id %in% c(3,4)) %>%
-                dplyr::summarise(subject_id) %>%
-                dplyr::distinct() %>% dplyr::pull() %>% length() == 10)
-  expect_true(cdm[["new_cohort"]] %>%
-                dplyr::filter(cohort_definition_id %in% c(1,2)) %>%
-                dplyr::summarise(cohort_start_date) %>%
-                dplyr::distinct() %>% dplyr::pull() %>% length() == 2)
-  expect_true(cdm[["new_cohort"]] %>%
-                dplyr::filter(cohort_definition_id %in% c(3,4)) %>%
-                dplyr::summarise(cohort_start_date) %>%
-                dplyr::distinct() %>% dplyr::pull() %>% length() == 2)
+  expect_true(
+    cdm[["new_cohort"]] %>%
+      cohortCount() |>
+      dplyr::filter(.data$cohort_definition_id %in% omopgenerics::getCohortId(
+        cdm$new_cohort, "c_1"
+      )) %>%
+      dplyr::pull("number_subjects") |>
+      sum() == 2
+  )
+  expect_true(
+    cdm[["new_cohort"]] %>%
+      cohortCount() |>
+      dplyr::filter(.data$cohort_definition_id %in% omopgenerics::getCohortId(
+        cdm$new_cohort, "c_1_matched"
+      )) %>%
+      dplyr::pull("number_subjects") |>
+      sum() == 8
+  )
+  expect_true(
+    cdm[["new_cohort"]] %>%
+      cohortCount() |>
+      dplyr::filter(.data$cohort_definition_id %in% omopgenerics::getCohortId(
+        cdm$new_cohort, "c_2"
+      )) %>%
+      dplyr::pull("number_subjects") |>
+      sum() == 2
+  )
+  expect_true(
+    cdm[["new_cohort"]] %>%
+      cohortCount() |>
+      dplyr::filter(.data$cohort_definition_id %in% omopgenerics::getCohortId(
+        cdm$new_cohort, "c_2_matched"
+      )) %>%
+      dplyr::pull("number_subjects") |>
+      sum() == 8
+  )
 
   outc <- cdm[["new_cohort"]] %>%
     dplyr::filter(subject_id == 5) %>% dplyr::summarise(cohort_start_date) %>%

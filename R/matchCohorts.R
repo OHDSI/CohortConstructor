@@ -118,11 +118,23 @@ matchCohorts <- function(cohort,
       cohortSetRef = settings(cdm[[control]]) |>
         dplyr::select("cohort_definition_id", "cohort_name") |>
         dplyr::mutate(
-          "target_cohort_name" = .env$targetCohortName,
+          "target_table_name" = .env$targetCohortName,
+          "target_cohort_id" = .data$cohort_definition_id,
           "match_sex" = .env$matchSex,
           "match_year_of_birth" = .env$matchYearOfBirth,
-          "match_status" = "control",
-          "target_cohort_id" = .data$cohort_definition_id
+          "match_status" = "control"
+        ) |>
+        dplyr::left_join(
+          settings(cdm[[target]]) |>
+            dplyr::select(
+              "cohort_definition_id", "target_cohort_name" = "cohort_name"
+            ),
+          by = "cohort_definition_id"
+        ) |>
+        dplyr::select(
+          "cohort_definition_id", "cohort_name", "target_table_name",
+          "target_cohort_id", "target_cohort_name", "match_sex",
+          "match_year_of_birth", "match_status"
         )
       ,
       .softValidation = TRUE
@@ -132,11 +144,12 @@ matchCohorts <- function(cohort,
       cohortSetRef = settings(cdm[[target]]) |>
         dplyr::select("cohort_definition_id", "cohort_name") |>
         dplyr::mutate(
-          "target_cohort_name" = .env$targetCohortName,
+          "target_table_name" = .env$targetCohortName,
+          "target_cohort_id" = .data$cohort_definition_id,
+          "target_cohort_name" = .data$cohort_name,
           "match_sex" = .env$matchSex,
           "match_year_of_birth" = .env$matchYearOfBirth,
-          "match_status" = "target",
-          "target_cohort_id" = .data$cohort_definition_id
+          "match_status" = "target"
         )
       ,
       .softValidation = TRUE
@@ -144,7 +157,7 @@ matchCohorts <- function(cohort,
 
   # Bind both cohorts
   cli::cli_inform(c("Binding both cohorts"))
-  cdm <- omopgenerics::bind(cdm[[control]], cdm[[target]], name = name)
+  cdm <- omopgenerics::bind(cdm[[target]], cdm[[control]], name = name)
 
   # drop tmp tables
   omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with(tablePrefix))
