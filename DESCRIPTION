@@ -50,6 +50,6 @@ VignetteBuilder: knitr
 Remotes:
     darwin-eu-dev/PatientProfiles,
     darwin-eu-dev/CDMConnector,
-    darwin-eu-dev/ompogenerics
+    darwin-eu-dev/omopgenerics
 Depends: 
     R (>= 4.1)
