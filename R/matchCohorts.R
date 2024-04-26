@@ -426,7 +426,7 @@ addClusterId <- function(x, u) {
 }
 clusterId <- function(x) {
   x |>
-    dplyr::select(.data$group_id, .data$pair_id) |>
+    dplyr::select("group_id", "pair_id") |>
     dplyr::distinct() |>
     dplyr::arrange(.data$group_id, .data$pair_id) |>
     dplyr::mutate("cluster_id" = dplyr::row_number())
