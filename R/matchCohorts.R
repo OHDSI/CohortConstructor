@@ -64,57 +64,104 @@ matchCohorts <- function(cohort,
   )
 
   # table prefix
-  #tablePrefix <- randomPrefix()
+  tablePrefix <- omopgenerics::tmpPrefix()
+  target <- omopgenerics::uniqueTableName(tablePrefix)
+  control <- omopgenerics::uniqueTableName(tablePrefix)
 
-  # get the number of cohorts
-  n <- getNumberOfCohorts(cdm, targetCohortName)
-
-  if (n == 0) {
-    cdm[[name]] <- cdm[[targetCohortName]] %>%
+  if (cohort |> settings() |> nrow() == 0) {
+    cdm[[name]] <- cdm[[targetCohortName]] |>
       dplyr::compute(name = name, temporary = FALSE) |>
       omopgenerics::newCohortTable()
-
-  } else {
-    # get target cohort id
-    cohortId <- getcohortId(cdm, cohortId, targetCohortName)
-    cli::cli_inform(c("*" = paste0(length(cohortId), " cohorts to be matched.")))
-
-    # Create the cohort name with cases and controls of the cohortId
-    cdm <- getNewCohort(cdm, name, targetCohortName, cohortId, n)
-
-    # Exclude cases from controls
-    cdm <- excludeCases(cdm, name, cohortId, n)
-
-    # get matched tables
-    matchCols <- getMatchCols(matchSex, matchYearOfBirth)
-    for(i in matchCols){
-      cli::cli_inform(c("*" = paste0("Matching by ", i)))
-    }
-
-    if(!is.null(matchCols)){
-      # Exclude individuals without any match
-      cdm <- excludeNoMatchedIndividuals(cdm, name, matchCols, n)
-      cli::cli_inform(c("*" = "Not matched individuals excluded"))
-
-      # Match as ratio was infinite
-      cdm <- infiniteMatching(cdm, name, cohortId)
-
-      # Delete controls that are not in observation
-      cdm <- checkObservationPeriod(cdm, name, cohortId, n)
-      cli::cli_inform(c("*" = "Removing pairs that were not in observation at index date"))
-
-      # Check ratio
-      cdm <- checkRatio(cdm, name, ratio, cohortId, n)
-      cli::cli_inform(c("*" = "Adjusting ratio"))
-
-      # Check cohort set ref
-      cdm <- checkCohortSetRef(cdm, name, targetCohortName, matchSex, matchYearOfBirth, cohortId, n)
-
-      # Rename cohort definition ids
-      cdm <- renameCohortDefinitionIds(cdm, name)
-
-    }
+    return(cdm[[name]])
   }
+
+  # create target cohort
+  cli::cli_inform(c("i" = "Creating copy of target cohort."))
+  cdm[[target]] <- subsetCohorts(
+    cohort = cohort, cohortId = cohortId, name = target
+  )
+
+  # get target cohort id
+  cohortId <- cdm[[target]] |> settings() |> dplyr::pull("cohort_definition_id")
+  cli::cli_inform(c("*" = "{length(cohortId)} cohort{?s} to be matched."))
+
+  # Create match cohort
+  cli::cli_inform(c("i" = "Creating controls cohorts."))
+  cdm[[control]] <- getNewCohort(cdm[[target]], cohortId, control)
+
+  # Exclude cases from controls
+  cli::cli_inform(c("i" = "Excluding cases from controls"))
+  cdm[[control]] <- excludeCases(cdm, target, control)
+
+  # get matched tables
+  matchCols <- getMatchCols(matchSex, matchYearOfBirth)
+
+  # Exclude individuals without any match
+  cli::cli_inform(c("*" = "Matching by {matchCols}"))
+  cdm <- excludeNoMatchedIndividuals(cdm, target, control, matchCols, tablePrefix)
+
+  # Match as ratio was infinite
+  cdm <- infiniteMatching(cdm, target, control)
+
+  # Delete controls that are not in observation
+  cli::cli_inform(c("*" = "Removing pairs that were not in observation at index date"))
+  cdm[[control]] <- observationControl(cdm[[control]])
+  cdm[[target]] <- observationTarget(cdm, target, control)
+
+  # Check ratio
+  cli::cli_inform(c("*" = "Adjusting ratio"))
+  cdm[[control]] <- checkRatio(cdm[[control]], ratio)
+
+  # update settings
+  cdm[[control]] <- cdm[[control]] |>
+    omopgenerics::newCohortTable(
+      cohortSetRef = settings(cdm[[control]]) |>
+        dplyr::select("cohort_definition_id", "cohort_name") |>
+        dplyr::mutate(
+          "target_table_name" = .env$targetCohortName,
+          "target_cohort_id" = .data$cohort_definition_id,
+          "match_sex" = .env$matchSex,
+          "match_year_of_birth" = .env$matchYearOfBirth,
+          "match_status" = "control"
+        ) |>
+        dplyr::left_join(
+          settings(cdm[[target]]) |>
+            dplyr::select(
+              "cohort_definition_id", "target_cohort_name" = "cohort_name"
+            ),
+          by = "cohort_definition_id"
+        ) |>
+        dplyr::select(
+          "cohort_definition_id", "cohort_name", "target_table_name",
+          "target_cohort_id", "target_cohort_name", "match_sex",
+          "match_year_of_birth", "match_status"
+        )
+      ,
+      .softValidation = TRUE
+    )
+  cdm[[target]] <- cdm[[target]] |>
+    omopgenerics::newCohortTable(
+      cohortSetRef = settings(cdm[[target]]) |>
+        dplyr::select("cohort_definition_id", "cohort_name") |>
+        dplyr::mutate(
+          "target_table_name" = .env$targetCohortName,
+          "target_cohort_id" = .data$cohort_definition_id,
+          "target_cohort_name" = .data$cohort_name,
+          "match_sex" = .env$matchSex,
+          "match_year_of_birth" = .env$matchYearOfBirth,
+          "match_status" = "target"
+        )
+      ,
+      .softValidation = TRUE
+    )
+
+  # Bind both cohorts
+  cli::cli_inform(c("Binding both cohorts"))
+  cdm <- omopgenerics::bind(cdm[[target]], cdm[[control]], name = name)
+
+  # drop tmp tables
+  omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with(tablePrefix))
+
   # Return
   cli::cli_inform(c("v" = "Done"))
   return(cdm[[name]])
@@ -187,8 +234,6 @@ validateInput <- function(cdm,
   return(invisible(TRUE))
 }
 
-
-
 randomPrefix <- function(n = 5) {
   paste0(
     "temp_", paste0(sample(letters, 5, TRUE), collapse = ""), "_", collapse = ""
@@ -239,101 +284,63 @@ setInitialControlAttriton <- function(cdm, ids) {
   )
 }
 
-getNewCohort <- function(cdm, name, targetCohortName, cohortId, n){
+getNewCohort <- function(cohort, cohortId, control){
+  cdm <- omopgenerics::cdmReference(cohort)
   # Create controls cohort
-  temp_name <- "temp_ctr_ids"
+  temp_name <- omopgenerics::uniqueTableName()
   cdm <- omopgenerics::insertTable(
     cdm = cdm,
     name = temp_name,
-    table = dplyr::tibble(cohort_definition_id = cohortId+n)
+    table = dplyr::tibble("cohort_definition_id" = cohortId)
   )
   controls <- cdm[[temp_name]] %>%
-    dplyr::cross_join(cdm[["person"]] %>%
-                        dplyr::select("subject_id" = "person_id")) %>%
-    dplyr::compute()
+    dplyr::cross_join(
+      cdm[["person"]] %>%
+        dplyr::select("subject_id" = "person_id") |>
+        dplyr::inner_join(
+          cdm[["observation_period"]] |>
+            dplyr::select(
+              "subject_id" = "person_id",
+              "cohort_start_date" = "observation_period_start_date",
+              "cohort_end_date" = "observation_period_end_date"
+            ) |>
+            dplyr::group_by(.data$subject_id) |>
+            dplyr::filter(.data$cohort_start_date == min(.data$cohort_start_date, na.rm = TRUE)) |>
+            dplyr::ungroup(),
+          by = "subject_id"
+        )
+    ) %>%
+    dplyr::compute(name = control, temporary = FALSE)
   cdm <- omopgenerics::dropTable(cdm, temp_name)
 
-  # Create table with controls + cases (all cases existing in the cohort, without considering the cohortId)
-  all <- controls %>%
-    dplyr::inner_join(
-      cdm$observation_period %>%
-        dplyr::group_by(.data$person_id) %>%
-        dplyr::filter(.data$observation_period_start_date == min(.data$observation_period_start_date, na.rm = TRUE)) %>%
-        dplyr::filter(.data$observation_period_end_date == max(.data$observation_period_end_date, na.rm = TRUE)) %>%
-        dplyr::ungroup() %>%
-        dplyr::select(
-          "subject_id" = "person_id",
-          "cohort_start_date" = "observation_period_start_date",
-          "cohort_end_date" = "observation_period_end_date"
-        ),
-      by = "subject_id"
-    ) %>%
-    dplyr::union_all(
-      cdm[[targetCohortName]] %>%
-        dplyr::filter(.data$cohort_definition_id %in% .env$cohortId)
-    ) %>%
-    dplyr::compute(name = name, temporary = FALSE)
+  controls <- controls |>
+    omopgenerics::newCohortTable(
+      cohortSetRef = settings(cohort) |>
+        dplyr::mutate("cohort_name" = paste0(.data$cohort_name, "_matched")),
+      cohortAttritionRef = dplyr::tibble(
+        "cohort_definition_id" = as.integer(cohortId),
+        "number_records" = controls |> dplyr::tally() |> dplyr::pull(),
+        "number_subjects" = controls |>
+          dplyr::summarise(dplyr::n_distinct(.data$subject_id)) |>
+          dplyr::pull(),
+        "reason_id" = 1L,
+        "reason" = "First observation per person",
+        "excluded_records" = 0L,
+        "excluded_subjects" = 0L
+      ),
+      cohortCodelistRef = NULL
+    )
 
-  # settings
-  cohort_set_ref <- cdm[[targetCohortName]] %>%
-    omopgenerics::settings() %>%
-    dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) %>%
-    dplyr::slice(rep(1:dplyr::n(), times = 2)) %>%
-    dplyr::group_by(.data$cohort_definition_id) %>%
-    dplyr::mutate(
-      cohort_name = dplyr::if_else(dplyr::row_number() == 2, paste0(.data$cohort_name,"_matched"), .data$cohort_name)
-    ) %>%
-    dplyr::mutate(
-      cohort_definition_id = dplyr::if_else(dplyr::row_number() == 2, .data$cohort_definition_id+.env$n, .data$cohort_definition_id)
-    ) %>%
-    dplyr::ungroup()
-
-  # attrition
-  cohort_attrition <- cdm[[targetCohortName]] %>%
-    omopgenerics::attrition() %>%
-    dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) %>%
-    dplyr::union_all(setInitialControlAttriton(cdm, cohortId+n))
-
-  cdm[[name]] <- omopgenerics::newCohortTable(
-    table = all,
-    cohortAttritionRef = cohort_attrition %>% dplyr::as_tibble(),
-    cohortSetRef = cohort_set_ref
-  )
-
-  return(cdm)
+  return(controls)
 }
 
-excludeCases <- function(cdm, name, cohortId, n){
-  # For each target cohort id
-  for(cohortId_i in cohortId){
-    # Controls
-    controls <- cdm[[name]] %>%
-      dplyr::filter(.data$cohort_definition_id == cohortId_i+.env$n) %>%
-      dplyr::anti_join(
-        # Cases
-        cdm[[name]] %>%
-          dplyr::select("subject_id","cohort_definition_id") %>%
-          dplyr::filter(.data$cohort_definition_id == cohortId_i) %>%
-          dplyr::mutate(cohort_definition_id = cohortId_i + .env$n),
-        by = c("subject_id", "cohort_definition_id")
-      ) %>%
-      dplyr::compute()
-
-    cdm[[name]] <- cdm[[name]] %>%
-      # Delete the controls
-      dplyr::filter(.data$cohort_definition_id != cohortId_i + .env$n) %>%
-      # Add the new controls set
-      dplyr::union_all(controls) %>%
-      dplyr::compute(name = name, temporary = FALSE)
-  }
-
-  # Record attrition
-  cdm[[name]] <- cdm[[name]] %>%
-    CDMConnector::record_cohort_attrition("Exclude cases",
-                                          cohortId = c(cohortId+n))%>%
-    dplyr::compute(name = name, temporary = FALSE)
-
-  return(cdm)
+excludeCases <- function(cdm, target, control){
+  cdm[[control]] |>
+    dplyr::anti_join(
+      cdm[[target]], by = c("subject_id", "cohort_definition_id")
+    ) |>
+    dplyr::compute(name = control, temporary = FALSE) |>
+    omopgenerics::recordCohortAttrition("Exclude cases from controls")
 }
 
 getMatchCols <- function(matchSex, matchYearOfBirth){
@@ -348,204 +355,163 @@ getMatchCols <- function(matchSex, matchYearOfBirth){
   return(matchCols)
 }
 
-excludeNoMatchedIndividuals <- function(cdm, name, matchCols, n){
-  cdm[[name]] <- cdm[[name]] %>%
-    # Append matchcols
+addMatchCols <- function(x, matchCols) {
+  x |>
     dplyr::left_join(
-      cdm[["person"]] %>%
+      omopgenerics::cdmReference(x)[["person"]] |>
         dplyr::select("subject_id" = "person_id", dplyr::all_of(matchCols)),
       by = c("subject_id")
-    ) %>%
-    dplyr::compute(name = name, temporary = FALSE)
-
-  # Create column group id
-  cdm[[name]] <- cdm[[name]] %>%
+    ) |>
+    dplyr::compute(name = omopgenerics::tableName(x), temporary = FALSE)
+}
+excludeIndividualsWithNoMatch <- function(cohort, groups, matchCols) {
+  cohort %>%
     dplyr::inner_join(
-      cdm[[name]] %>%
-        dplyr::select(dplyr::all_of(matchCols)) %>%
-        dplyr::distinct() %>%
-        dplyr::mutate(group_id = dplyr::row_number()),
-      by = c(matchCols)
+      groups, by = c("cohort_definition_id", matchCols)
     ) %>%
-    dplyr::select(-dplyr::all_of(matchCols)) %>%
-    # Create target definition id column
-    dplyr::mutate(target_definition_id =
-                    dplyr::if_else(
-                      .data$cohort_definition_id <= .env$n,
-                      .data$cohort_definition_id,
-                      .data$cohort_definition_id - .env$n
-                    )) %>%
-    dplyr::compute(name = name, temporary = FALSE)
+    dplyr::select(!dplyr::all_of(matchCols)) |>
+    dplyr::compute(name = omopgenerics::tableName(cohort), temporary = FALSE) |>
+    omopgenerics::recordCohortAttrition(
+      "Exclude individuals that do not have any match"
+    )
+}
+excludeNoMatchedIndividuals <- function(cdm, target, control, matchCols, tablePrefix) {
+  # add columns to match
+  cdm[[target]] <- cdm[[target]] |> addMatchCols(matchCols)
+  cdm[[control]] <- cdm[[control]] |> addMatchCols(matchCols)
+
+  # create groups
+  groups <- cdm[[target]] |>
+    dplyr::select("cohort_definition_id", dplyr::all_of(matchCols)) |>
+    dplyr::distinct() |>
+    dplyr::inner_join(
+      cdm[[control]] |>
+        dplyr::select("cohort_definition_id", dplyr::all_of(matchCols)) |>
+        dplyr::distinct(),
+      by = c("cohort_definition_id", matchCols)
+    ) |>
+    dplyr::arrange(dplyr::across(dplyr::all_of(c(
+      "cohort_definition_id", matchCols
+    )))) |>
+    dplyr::mutate("group_id" = dplyr::row_number()) |>
+    dplyr::arrange() |>
+    dplyr::compute(
+      name = omopgenerics::uniqueTableName(tablePrefix), temporary = FALSE
+    )
 
   # Exclude individuals that do not have any match
-  cdm[[name]] <- cdm[[name]] %>%
-    dplyr::inner_join(
-      cdm[[name]] %>%
-        dplyr::mutate(
-          "cohort_definition_id" = dplyr::if_else(
-            .data$target_definition_id == .data$cohort_definition_id,
-            .data$cohort_definition_id + .env$n,
-            .data$cohort_definition_id - .env$n
-          )
-        ) %>%
-        dplyr::select("cohort_definition_id", "target_definition_id", "group_id") %>%
-        dplyr::distinct(),
-      by = c("target_definition_id", "group_id", "cohort_definition_id")
-    ) %>%
-    dplyr::compute(name = name, temporary = FALSE) %>%
-    CDMConnector::record_cohort_attrition("Exclude individuals that do not have any match")
+  cdm[[target]] <- cdm[[target]] %>%
+    excludeIndividualsWithNoMatch(groups, matchCols)
+  cdm[[control]] <- cdm[[control]] %>%
+    excludeIndividualsWithNoMatch(groups, matchCols)
 
   return(cdm)
 }
 
-infiniteMatching <- function(cdm, name, cohortId){
-  # Create pair id to perform a random match
-  cdm[[name]] <- cdm[[name]] %>%
-    dplyr::mutate(id = dbplyr::sql("random()")) %>%
-    dplyr::group_by(.data$cohort_definition_id, .data$group_id) %>%
-    dbplyr::window_order(.data$id) %>%
-    dplyr::mutate(pair_id = dplyr::row_number()) %>%
+addRandPairId <- function(x) {
+  x %>%
+    dplyr::mutate("id" = stats::runif()) %>%
+    dplyr::group_by(.data$group_id) %>%
+    dplyr::arrange(.data$id) %>%
+    dplyr::mutate("pair_id" = dplyr::row_number()) %>%
     dplyr::select(-"id") %>%
     dplyr::ungroup() %>%
-    dplyr::compute(name = name, temporary = FALSE)
+    dplyr::compute(name = omopgenerics::tableName(x), temporary = FALSE)
+}
+addClusterId <- function(x, u) {
+  x |>
+    dplyr::inner_join(u, by = c("pair_id", "group_id")) |>
+    dplyr::select(-"pair_id", -"group_id") |>
+    dplyr::compute(name = omopgenerics::tableName(x), temporary = FALSE)
+}
+clusterId <- function(x) {
+  x |>
+    dplyr::select("group_id", "pair_id") |>
+    dplyr::distinct() |>
+    dplyr::arrange(.data$group_id, .data$pair_id) |>
+    dplyr::mutate("cluster_id" = dplyr::row_number())
+}
+infiniteMatching <- function(cdm, target, control){
+  # Create pair id to perform a random match
+  cdm[[target]] <- cdm[[target]] %>% addRandPairId()
+  cdm[[control]] <- cdm[[control]] %>% addRandPairId()
 
-  cdm[[name]] <- cdm[[name]] %>%
+  cdm[[control]] <- cdm[[control]] %>%
     dplyr::inner_join(
       # Calculate the maximum number of cases per group
-      cdm[[name]] %>%
-        dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) %>%
-        dplyr::group_by(.data$cohort_definition_id, .data$group_id) %>%
-        dplyr::mutate(max_cases = max(.data$pair_id, na.rm = TRUE)) %>%
-        dplyr::ungroup() %>%
-        dplyr::select("group_id", "target_definition_id", "max_cases") %>%
-        dplyr::distinct(),
-      by = c("group_id", "target_definition_id")
+      cdm[[target]] %>%
+        dplyr::group_by(.data$group_id) %>%
+        dplyr::summarise(
+          "max_id" = max(.data$pair_id, na.rm = TRUE), .groups = "drop"
+        ),
+      by = c("group_id")
     ) %>%
     # Calculate the maximum ratio per group
-    dplyr::mutate(id = (.data$pair_id-1) %% .data$max_cases + 1) %>%
-    dplyr::mutate(pair_id = .data$id) %>%
-    dplyr::select(-"max_cases", -"id") %>%
-    dplyr::compute(name = name, temporary = FALSE)
+    dplyr::mutate("pair_id" = ((.data$pair_id-1) %% .data$max_id) + 1) %>%
+    dplyr::select(-"max_id") %>%
+    dplyr::compute(name = control, temporary = FALSE)
 
-  # Perform random matches with ratio 1:Inf
-  cdm[[name]] <- cdm[[name]] %>%
-    dplyr::select(-"cohort_start_date", -"cohort_end_date") %>%
+  clusterId <- clusterId(cdm[[target]])
+  cdm[[control]] <- cdm[[control]] |> addClusterId(clusterId)
+  cdm[[target]] <- cdm[[target]] |> addClusterId(clusterId)
+
+  # assign cohort_start_date and cohort end date to controls
+  cdm[[control]] <- cdm[[control]] %>%
     dplyr::inner_join(
       # Cohort start date and end date of cases
-      cdm[[name]] %>%
-        dplyr::filter(.data$cohort_definition_id %in% cohortId) %>%
-        dplyr::select("pair_id", "group_id", "target_definition_id", "cohort_start_date", "cohort_end_date"),
-      by = c("pair_id", "group_id", "target_definition_id")
+      cdm[[target]] %>%
+        dplyr::select("cluster_id", "index_date" = "cohort_start_date"),
+      by = c("cluster_id")
     ) %>%
-    dplyr::distinct() %>%
-    dplyr::compute(name = name, temporary = FALSE)
+    dplyr::compute(name = control, temporary = FALSE)
 
   return(cdm)
 }
 
-checkObservationPeriod <- function(cdm, name, cohortId, n){
-  cdm[[name]] <- cdm[[name]] %>%
-    PatientProfiles::addFutureObservation() %>%
-    dplyr::filter(!is.na(.data$future_observation)) %>%
-    dplyr::mutate(cohort_end_date = dplyr::if_else(
-      .data$cohort_definition_id %in% .env$cohortId,
-      .data$cohort_end_date,
-      as.Date(!!CDMConnector::dateadd("cohort_start_date", "future_observation"))
-    )) %>%
-    dplyr::select(-"future_observation") %>%
-    dplyr::group_by(.data$target_definition_id, .data$group_id, .data$pair_id) %>%
-    dplyr::filter(dplyr::n() > 1) %>%
-    dplyr::ungroup() %>%
-    dplyr::compute(name = name, temporary = FALSE) %>%
-    CDMConnector::record_cohort_attrition("Exclude individuals that are not in observation", cohortId = cohortId + n) %>%
-    CDMConnector::record_cohort_attrition("Exclude individuals that their only pair is not in observation", cohortId = cohortId)
-  return(cdm)
+observationControl <- function(x) {
+  x |>
+    dplyr::select(-"cohort_start_date", -"cohort_end_date") |>
+    PatientProfiles::addInObservation(indexDate = "index_date") |>
+    dplyr::filter(.data$in_observation == 1) |>
+    dplyr::select(
+      "cohort_definition_id", "subject_id", "cohort_start_date" = "index_date",
+      "cluster_id"
+    ) |>
+    PatientProfiles::addFutureObservation(
+      futureObservationName = "cohort_end_date", futureObservationType = "date"
+    ) |>
+    dplyr::compute(name = tableName(x), temporary = FALSE) |>
+    omopgenerics::recordCohortAttrition(
+      reason = "Exclude individuals not in observation"
+    )
+}
+observationTarget <- function(cdm, target, control) {
+  cdm[[target]] |>
+    dplyr::inner_join(
+      cdm[[control]] |> dplyr::select("cluster_id") |> dplyr::distinct(),
+      by = "cluster_id"
+    ) |>
+    dplyr::compute(name = target, temporary = FALSE) |>
+    omopgenerics::recordCohortAttrition(
+      reason = "No possible pairs in observation"
+    )
 }
 
-checkRatio <- function(cdm, name, ratio, cohortId, n){
-  if (ratio == Inf) {
-    cdm[[name]] <- cdm[[name]] %>%
-      dplyr::select("cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date") %>%
-      dplyr::compute(name = name, temporary = FALSE)
-  } else {
-    cdm[[name]] <- cdm[[name]] %>%
-      dplyr::group_by(.data$pair_id, .data$group_id, .data$target_definition_id) %>%
-      dbplyr::window_order(.data$cohort_definition_id) %>%
-      dplyr::filter(dplyr::row_number() <= .env$ratio+1) %>%
+checkRatio <- function(x, ratio) {
+  if (!is.infinite(ratio)) {
+    x <- x %>%
+      dplyr::mutate("id" = stats::runif()) %>%
+      dplyr::group_by(.data$cluster_id) %>%
+      dplyr::arrange(.data$id) %>%
+      dplyr::filter(dplyr::row_number() <= .env$ratio) %>%
       dplyr::ungroup() %>%
-      dplyr::select("cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date") %>%
-      dplyr::compute(name = name, temporary = FALSE) %>%
-      CDMConnector::record_cohort_attrition("Exclude individuals that do not fulfil the ratio", cohortId = cohortId+n)
+      dplyr::arrange() |>
+      dplyr::select(-"id") |>
+      dplyr::compute(name = tableName(x), temporary = FALSE) %>%
+      omopgenerics::recordCohortAttrition(
+        "Exclude individuals to fulfil the ratio"
+      )
   }
-
-  return(cdm)
+  return(x)
 }
 
-checkCohortSetRef <- function(cdm, name, targetCohortName, matchSex, matchYearOfBirth, cohortId, n){
-  cohort_set_ref <- cdm[[name]] %>%
-    omopgenerics::settings() %>%
-    dplyr::mutate(target_cohort_name  = .env$targetCohortName) %>%
-    dplyr::mutate(match_sex           = .env$matchSex) %>%
-    dplyr::mutate(match_year_of_birth = .env$matchYearOfBirth) %>%
-    dplyr::mutate(match_status        = dplyr::if_else(.data$cohort_definition_id %in% .env$cohortId, "target", "matched")) %>%
-    dplyr::mutate(target_cohort_id    = dplyr::if_else(.data$cohort_definition_id %in% .env$cohortId, .data$cohort_definition_id, .data$cohort_definition_id-n))
-
-  cdm[[name]] <- omopgenerics::newCohortTable(
-    table = cdm[[name]],
-    cohortSetRef = cohort_set_ref
-  )
-
-  return(cdm)
-}
-
-renameCohortDefinitionIds <- function(cdm, name){
-  new_cohort_set <- cdm[[name]] %>%
-    omopgenerics::settings() %>%
-    dplyr::mutate(cohort_definition_id_new = .data$target_cohort_id) %>%
-    dplyr::arrange(.data$cohort_definition_id_new) %>%
-    dplyr::mutate(cohort_definition_id_new = dplyr::row_number())
-
-  new_cohort_attrition <- cdm[[name]] %>%
-    omopgenerics::attrition() %>%
-    dplyr::inner_join(
-      new_cohort_set %>% dplyr::select("cohort_definition_id","cohort_definition_id_new"),
-      by = "cohort_definition_id"
-    ) %>%
-    dplyr::select(-"cohort_definition_id") %>%
-    dplyr::rename("cohort_definition_id" = "cohort_definition_id_new") %>%
-    dplyr::relocate("cohort_definition_id")
-
-  new_cohort_count <- cdm[[name]] %>%
-    omopgenerics::cohortCount() %>%
-    dplyr::inner_join(
-      new_cohort_set %>% dplyr::select("cohort_definition_id","cohort_definition_id_new"),
-      by = "cohort_definition_id"
-    ) %>%
-    dplyr::select(-"cohort_definition_id") %>%
-    dplyr::rename("cohort_definition_id" = "cohort_definition_id_new") %>%
-    dplyr::relocate("cohort_definition_id")
-
-  new_cohort <- cdm[[name]] %>%
-    dplyr::inner_join(
-      new_cohort_set %>% dplyr::select("cohort_definition_id","cohort_definition_id_new"),
-      by = "cohort_definition_id",
-      copy = TRUE
-    ) %>%
-    dplyr::select(-"cohort_definition_id") %>%
-    dplyr::rename("cohort_definition_id" = "cohort_definition_id_new") %>%
-    dplyr::relocate("cohort_definition_id") %>%
-    dplyr::compute(name = name, temporary = FALSE)
-
-  new_cohort_set <- new_cohort_set %>%
-    dplyr::select(-"cohort_definition_id") %>%
-    dplyr::rename("cohort_definition_id" = "cohort_definition_id_new") %>%
-    dplyr::relocate("cohort_definition_id")
-
-  cdm[[name]] <- omopgenerics::newCohortTable(
-    table = new_cohort,
-    cohortAttritionRef =  new_cohort_attrition,
-    cohortSetRef = new_cohort_set
-  )
-
-  return(cdm)
-}

@@ -55,7 +55,6 @@ test_that("matchCohorts runs without errors", {
 
 })
 
-
 test_that("matchCohorts, no duplicated people within a cohort", {
   followback <- 180
 
@@ -162,8 +161,6 @@ test_that("check that we obtain expected result when ratio is 1", {
                            ))))
 })
 
-
-
 test_that("test exactMatchingCohort works if there are no subjects", {
   followback  <- 180
   cdm <- DrugUtilisation::generateConceptCohortSet(
@@ -181,7 +178,6 @@ test_that("test exactMatchingCohort works if there are no subjects", {
   )
   expect_true(cdm$new_cohort %>% dplyr::tally() %>% dplyr::pull(n) == 0)
 })
-
 
 test_that("test exactMatchingCohort works if one of the cohorts does not have any people", {
   followback  <- 180
@@ -223,7 +219,6 @@ test_that("test exactMatchingCohort with a ratio bigger than 1", {
   )
 })
 
-
 test_that("test exactMatchingCohort with a ratio bigger than 1", {
   # Generate mock data
   cdmMock <- DrugUtilisation::mockDrugUtilisation(
@@ -264,22 +259,42 @@ test_that("test exactMatchingCohort with a ratio bigger than 1", {
                                  matchYearOfBirth = TRUE,
                                  ratio = 4)
 
-  expect_true(cdm[["new_cohort"]] %>%
-                dplyr::filter(cohort_definition_id %in% c(1,2)) %>%
-                dplyr::summarise(subject_id) %>%
-                dplyr::distinct() %>% dplyr::pull() %>% length() == 10)
-  expect_true(cdm[["new_cohort"]] %>%
-                dplyr::filter(cohort_definition_id %in% c(3,4)) %>%
-                dplyr::summarise(subject_id) %>%
-                dplyr::distinct() %>% dplyr::pull() %>% length() == 10)
-  expect_true(cdm[["new_cohort"]] %>%
-                dplyr::filter(cohort_definition_id %in% c(1,2)) %>%
-                dplyr::summarise(cohort_start_date) %>%
-                dplyr::distinct() %>% dplyr::pull() %>% length() == 2)
-  expect_true(cdm[["new_cohort"]] %>%
-                dplyr::filter(cohort_definition_id %in% c(3,4)) %>%
-                dplyr::summarise(cohort_start_date) %>%
-                dplyr::distinct() %>% dplyr::pull() %>% length() == 2)
+  expect_true(
+    cdm[["new_cohort"]] %>%
+      cohortCount() |>
+      dplyr::filter(.data$cohort_definition_id %in% omopgenerics::getCohortId(
+        cdm$new_cohort, "c_1"
+      )) %>%
+      dplyr::pull("number_subjects") |>
+      sum() == 2
+  )
+  expect_true(
+    cdm[["new_cohort"]] %>%
+      cohortCount() |>
+      dplyr::filter(.data$cohort_definition_id %in% omopgenerics::getCohortId(
+        cdm$new_cohort, "c_1_matched"
+      )) %>%
+      dplyr::pull("number_subjects") |>
+      sum() == 8
+  )
+  expect_true(
+    cdm[["new_cohort"]] %>%
+      cohortCount() |>
+      dplyr::filter(.data$cohort_definition_id %in% omopgenerics::getCohortId(
+        cdm$new_cohort, "c_2"
+      )) %>%
+      dplyr::pull("number_subjects") |>
+      sum() == 2
+  )
+  expect_true(
+    cdm[["new_cohort"]] %>%
+      cohortCount() |>
+      dplyr::filter(.data$cohort_definition_id %in% omopgenerics::getCohortId(
+        cdm$new_cohort, "c_2_matched"
+      )) %>%
+      dplyr::pull("number_subjects") |>
+      sum() == 8
+  )
 
   outc <- cdm[["new_cohort"]] %>%
     dplyr::filter(subject_id == 5) %>% dplyr::summarise(cohort_start_date) %>%
