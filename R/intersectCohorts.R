@@ -352,6 +352,9 @@ joinOverlap <- function(cohort,
         date = endDate, number = -gap, interval = "day"
       )))
   }
+
+  x <- x |>
+    dplyr::relocate(dplyr::all_of(c(by, startDate, endDate)))
   return(x)
 }
 
