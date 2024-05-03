@@ -1,6 +1,8 @@
 #' Require cohort subjects are present in another table
 #'
-#' @param x Cohort table.
+#' @param cohort A cohort table in a cdm reference.
+#' @param cohortId Vector of cohort definition ids to include. If NULL, all
+#' cohort definition ids will be used.
 #' @param tableName Name of the table to check for intersect.
 #' @param indexDate Variable in x that contains the date to compute the
 #' intersection.
@@ -28,7 +30,8 @@
 #'   requireTableIntersectFlag(tableName = "drug_exposure",
 #'                             indexDate = "cohort_start_date",
 #'                             window = c(-Inf, 0))
-requireTableIntersectFlag <- function(x,
+requireTableIntersectFlag <- function(cohort,
+                                      cohortId = NULL,
                                       tableName,
                                       indexDate = "cohort_start_date",
                                       targetStartDate = startDateColumn(tableName),
@@ -36,15 +39,17 @@ requireTableIntersectFlag <- function(x,
                                       censorDate = NULL,
                                       window = list(c(0, Inf)),
                                       negate = FALSE,
-                                      name = omopgenerics::tableName(x)){
+                                      name = omopgenerics::tableName(cohort)){
   # checks
   name <- validateName(name)
   assertLogical(negate, length = 1)
   assertCharacter(tableName)
-  validateCohortTable(x)
-  cdm <- omopgenerics::cdmReference(x)
+  validateCohortTable(cohort)
+  cdm <- omopgenerics::cdmReference(cohort)
   validateCDM(cdm)
-  validateCohortColumn(indexDate, x)
+  validateCohortColumn(indexDate, cohort, class = "Date")
+  ids <- omopgenerics::settings(cohort)$cohort_definition_id
+  cohortId <- validateCohortId(cohortId, ids)
 
   cols <- unique(c("cohort_definition_id", "subject_id",
                    "cohort_start_date", "cohort_end_date",
@@ -58,8 +63,6 @@ requireTableIntersectFlag <- function(x,
     window_end <- window[2]
   }
 
-  cdm <- omopgenerics::cdmReference(x)
-
   if (is.null(cdm[[tableName]])) {
     cli::cli_abort("{tableName} not found in cdm reference")
   }
@@ -68,7 +71,7 @@ requireTableIntersectFlag <- function(x,
     cli::cli_abort("Currently just one table supported.")
   }
 
-  subsetCohort <- x %>%
+  subsetCohort <- cohort %>%
     dplyr::select(dplyr::all_of(.env$cols)) %>%
     PatientProfiles::addTableIntersectFlag(
       tableName = tableName,
@@ -82,7 +85,10 @@ requireTableIntersectFlag <- function(x,
 
   if (isFALSE(negate)) {
     subsetCohort <- subsetCohort %>%
-      dplyr::filter(.data$intersect_table == 1) %>%
+      dplyr::filter(
+        .data$intersect_table == 1 |
+          (!.data$cohort_definition_id %in% .env$cohortId)
+      ) %>%
       dplyr::select(!"intersect_table")
     # attrition reason
     reason <- glue::glue("In table {tableName} between {window_start} & ",
@@ -90,23 +96,25 @@ requireTableIntersectFlag <- function(x,
   } else {
     # ie require absence instead of presence
     subsetCohort <- subsetCohort %>%
-      dplyr::filter(.data$intersect_table != 1) %>%
+      dplyr::filter(
+        .data$intersect_table != 1 |
+          (!.data$cohort_definition_id %in% .env$cohortId)
+      ) %>%
       dplyr::select(!"intersect_table")
     # attrition reason
     reason <- glue::glue("Not in table {tableName} between {window_start} & ",
                          "{window_end} days relative to {indexDate}")
   }
 
-
   if (!is.null(censorDate)) {
     reason <- glue::glue("{reason}, censoring at {censorDate}")
   }
 
-  x <- x %>%
+  x <- cohort %>%
     dplyr::inner_join(subsetCohort,
                       by = c(cols)) %>%
     dplyr::compute(name = name, temporary = FALSE) %>%
-    CDMConnector::recordCohortAttrition(reason = reason)
+    CDMConnector::recordCohortAttrition(reason = reason, cohortId = cohortId)
 
   return(x)
 }

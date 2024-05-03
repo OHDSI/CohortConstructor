@@ -8,7 +8,7 @@ test_that("requiring presence in another cohort", {
                                    cdm = cdm_local,
                                    schema = "main")
 
-  cdm$cohort3 <-  requireCohortIntersectFlag(x = cdm$cohort1,
+  cdm$cohort3 <-  requireCohortIntersectFlag(cohort = cdm$cohort1,
                                              targetCohortTable = "cohort2",
                                              targetCohortId = 1,
                                              window = c(-Inf, Inf),
@@ -30,7 +30,7 @@ test_that("requiring presence in another cohort", {
                       "Initial qualifying events",
                       "In cohort cohort_1 between -Inf & Inf days relative to cohort_start_date")))
 
-  cdm$cohort4 <-  requireCohortIntersectFlag(x = cdm$cohort1,
+  cdm$cohort4 <-  requireCohortIntersectFlag(cohort = cdm$cohort1,
                                              targetCohortTable = "cohort2",
                                              targetCohortId = 2,
                                              window = c(-Inf, Inf),
@@ -52,7 +52,7 @@ test_that("requiring presence in another cohort", {
                       "In cohort cohort_2 between -Inf & Inf days relative to cohort_start_date")))
 
   # name
-  cdm$cohort1 <-  requireCohortIntersectFlag(x = cdm$cohort1,
+  cdm$cohort1 <-  requireCohortIntersectFlag(cohort = cdm$cohort1,
                                              targetCohortTable = "cohort2",
                                              targetCohortId = 2,
                                              window = c(-Inf, Inf))
@@ -63,7 +63,7 @@ test_that("requiring presence in another cohort", {
                       "In cohort cohort_2 between -Inf & Inf days relative to cohort_start_date")))
 
   # censor date
-  cdm$cohort5 <- requireCohortIntersectFlag(x = cdm$cohort2,
+  cdm$cohort5 <- requireCohortIntersectFlag(cohort = cdm$cohort2,
                                             targetCohortTable = "cohort1",
                                             targetCohortId = 2,
                                             window = c(0, Inf),
@@ -78,18 +78,54 @@ test_that("requiring presence in another cohort", {
                       "Initial qualifying events",
                       "In cohort cohort_2 between 0 & Inf days relative to cohort_start_date, censoring at cohort_end_date")))
 
+  # cohort Id
+  cdm$cohort6 <- requireCohortIntersectFlag(cohort = cdm$cohort2,
+                                            cohortId = 2,
+                                            targetCohortTable = "cohort1",
+                                            targetCohortId = 1,
+                                            window = c(0, Inf),
+                                            censorDate = "cohort_end_date",
+                                            name = "cohort6")
+  expect_true(all(cdm$cohort6 |> dplyr::pull("cohort_start_date") |> sort() ==
+                    c("1993-01-06", "1999-06-23", "2000-03-06", "2003-07-21",
+                      "2015-02-23", "2015-04-14")))
+  expect_true(all(cdm$cohort6 |> dplyr::pull("subject_id") |> sort() == c("1", "2", "2", "3", "3", "4")))
+  expect_true(all(cdm$cohort6 |> dplyr::pull("cohort_definition_id") |> sort() == c(rep("1", 4), rep("2", 2))))
+  expect_true(all(omopgenerics::attrition(cdm$cohort6)$reason ==
+                    c("Initial qualifying events",
+                      "Initial qualifying events",
+                      "In cohort cohort_1 between 0 & Inf days relative to cohort_start_date, censoring at cohort_end_date")))
+
+  cdm$cohort7 <- requireCohortIntersectFlag(cohort = cdm$cohort2,
+                                            cohortId = 2,
+                                            targetCohortTable = "cohort1",
+                                            targetCohortId = 1,
+                                            window = c(0, Inf),
+                                            censorDate = "cohort_end_date",
+                                            name = "cohort7",
+                                            negate = TRUE)
+  expect_true(all(cdm$cohort7 |> dplyr::pull("cohort_start_date") |> sort() ==
+                    c("1999-06-23", "2000-03-06", "2003-07-21", "2015-02-02",
+                      "2015-02-08", "2015-04-14")))
+  expect_true(all(cdm$cohort7 |> dplyr::pull("subject_id") |> sort() == c("1", "2", "2", "3", "3", "3")))
+  expect_true(all(cdm$cohort7 |> dplyr::pull("cohort_definition_id") |> sort() == c(rep("1", 4), rep("2", 2))))
+  expect_true(all(omopgenerics::attrition(cdm$cohort7)$reason ==
+                    c("Initial qualifying events",
+                      "Initial qualifying events",
+                      "Not in cohort cohort_1 between 0 & Inf days relative to cohort_start_date, censoring at cohort_end_date")))
+
   # expected errors
   # only support one target id at the moment
-  expect_error(requireCohortIntersectFlag(x = cdm$cohort1,
+  expect_error(requireCohortIntersectFlag(cohort = cdm$cohort1,
                                           targetCohortTable = "cohort2",
                                           targetCohortId = c(1,2),
                                           window = c(-Inf, Inf)))
 
-  expect_error(requireCohortIntersectFlag(x = cdm$cohort1,
+  expect_error(requireCohortIntersectFlag(cohort = cdm$cohort1,
                                           targetCohortTable = "cohort22", # does not exist
                                           targetCohortId = 1,
                                           window = c(-Inf, Inf)))
-  expect_error(requireCohortIntersectFlag(x = cdm$cohort1,
+  expect_error(requireCohortIntersectFlag(cohort = cdm$cohort1,
                                           targetCohortTable = "cohort2",
                                           targetCohortId = 10, # does not exist
                                           window = c(-Inf, Inf)))
@@ -108,12 +144,12 @@ test_that("requiring absence in another cohort", {
                                    cdm = cdm_local,
                                    schema = "main")
 
-  cdm$cohort3_inclusion <-  requireCohortIntersectFlag(x = cdm$cohort1,
+  cdm$cohort3_inclusion <-  requireCohortIntersectFlag(cohort = cdm$cohort1,
                                                        targetCohortTable = "cohort2",
                                                        targetCohortId = 1,
                                                        window = c(-Inf, Inf),
                                                        name = "cohort3_inclusion")
-  cdm$cohort3_exclusion <-  requireCohortIntersectFlag(x = cdm$cohort1,
+  cdm$cohort3_exclusion <-  requireCohortIntersectFlag(cohort = cdm$cohort1,
                                                        targetCohortTable = "cohort2",
                                                        targetCohortId = 1,
                                                        window = c(-Inf, Inf),

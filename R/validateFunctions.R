@@ -40,11 +40,16 @@ validateCohortTable <- function(cohort, dropExtraColumns = FALSE) {
   return(invisible(cohort))
 }
 
-validateCohortColumn <- function(columns, cohort) {
+validateCohortColumn <- function(columns, cohort, class = NULL) {
   for (column in columns) {
     assertCharacter(column)
     if(!column %in% colnames(cohort)){
-      cli::cli_abort("{column} must be a date column in the cohort table.")
+      cli::cli_abort("{column} must be a column in the cohort table.")
+    }
+    if (!is.null(class)) {
+      if (cohort |> dplyr::pull(!!column) |> class() != class) {
+        cli::cli_abort("{column} must be a column of class {class} in the cohort table.")
+      }
     }
   }
   return(invisible(columns))

@@ -1,6 +1,8 @@
 #' Require cohort subjects to have events of a concept list
 #'
-#' @param x Cohort table.
+#' @param cohort A cohort table in a cdm reference.
+#' @param cohortId Vector of cohort definition ids to include. If NULL, all
+#' cohort definition ids will be used.
 #' @param conceptSet Concept set list.
 #' @param indexDate Variable in x that contains the date to compute the
 #' intersection.
@@ -36,11 +38,12 @@
 #'                                    "valid_end_date" = NA
 #'                                   ))
 #' cdm$cohort2 <-  requireConceptIntersectFlag(
-#'   x = cdm$cohort1,
+#'   cohort = cdm$cohort1,
 #'   conceptSet = list(a = 1),
 #'   window = c(-Inf, 0),
 #'   name = "cohort2")
-requireConceptIntersectFlag <- function(x,
+requireConceptIntersectFlag <- function(cohort,
+                                        cohortId = NULL,
                                         conceptSet,
                                         indexDate = "cohort_start_date",
                                         targetStartDate = "event_start_date",
@@ -48,15 +51,17 @@ requireConceptIntersectFlag <- function(x,
                                         censorDate = NULL,
                                         window = list(c(0, Inf)),
                                         negate = FALSE,
-                                        name = omopgenerics::tableName(x)){
+                                        name = omopgenerics::tableName(cohort)){
   # checks
   name <- validateName(name)
   assertLogical(negate, length = 1)
-  validateCohortTable(x)
-  cdm <- omopgenerics::cdmReference(x)
+  validateCohortTable(cohort)
+  cdm <- omopgenerics::cdmReference(cohort)
   validateCDM(cdm)
-  validateCohortColumn(indexDate, x)
+  validateCohortColumn(indexDate, cohort, class = "Date")
   assertList(conceptSet)
+  ids <- omopgenerics::settings(cohort)$cohort_definition_id
+  cohortId <- validateCohortId(cohortId, ids)
 
   cols <- unique(c("cohort_definition_id", "subject_id",
                    "cohort_start_date", "cohort_end_date",
@@ -74,11 +79,10 @@ requireConceptIntersectFlag <- function(x,
     cli::cli_abort("We currently suport 1 concept set.")
   }
 
-  cdm <- omopgenerics::cdmReference(x)
   if (length(conceptSet) == 0) {
     cli::cli_inform(c("i" = "Empty codelist provided, returning input cohort"))
   } else {
-    subsetCohort <- x %>%
+    subsetCohort <- cohort %>%
       dplyr::select(dplyr::all_of(.env$cols)) %>%
       PatientProfiles::addConceptIntersectFlag(
         conceptSet = conceptSet,
@@ -91,7 +95,10 @@ requireConceptIntersectFlag <- function(x,
       )
     if(isFALSE(negate)){
       subsetCohort <- subsetCohort %>%
-        dplyr::filter(.data$intersect_concept == 1) %>%
+        dplyr::filter(
+          .data$intersect_concept == 1  |
+            (!.data$cohort_definition_id %in% .env$cohortId)
+        ) %>%
         dplyr::select(!"intersect_concept")
       # attrition reason
       reason <- glue::glue("Concept {names(conceptSet)} between {window_start} & ",
@@ -99,7 +106,10 @@ requireConceptIntersectFlag <- function(x,
     } else {
       # ie require absence instead of presence
       subsetCohort <- subsetCohort %>%
-        dplyr::filter(.data$intersect_concept != 1) %>%
+        dplyr::filter(
+          .data$intersect_concept != 1 |
+            (!.data$cohort_definition_id %in% .env$cohortId)
+        ) %>%
         dplyr::select(!"intersect_concept")
       # attrition reason
       reason <- glue::glue("Not in concept {names(conceptSet)} between {window_start} & ",
@@ -108,12 +118,12 @@ requireConceptIntersectFlag <- function(x,
     if (!is.null(censorDate)) {
       reason <- glue::glue("{reason}, censoring at {censorDate}")
     }
-    x <- x %>%
+    cohort <- cohort %>%
       dplyr::inner_join(subsetCohort,
                         by = c(cols)) %>%
       dplyr::compute(name = name, temporary = FALSE) %>%
-      CDMConnector::recordCohortAttrition(reason = reason)
+      CDMConnector::recordCohortAttrition(reason = reason, cohortId = cohortId)
   }
 
-  return(x)
+  return(cohort)
 }

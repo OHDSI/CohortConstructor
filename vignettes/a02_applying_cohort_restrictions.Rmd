@@ -20,9 +20,9 @@ library(CDMConnector)
 library(dplyr, warn.conflicts = FALSE)
 
 if (Sys.getenv("EUNOMIA_DATA_FOLDER") == ""){
-Sys.setenv("EUNOMIA_DATA_FOLDER" = file.path(tempdir(), "eunomia"))}
+  Sys.setenv("EUNOMIA_DATA_FOLDER" = file.path(tempdir(), "eunomia"))}
 if (!dir.exists(Sys.getenv("EUNOMIA_DATA_FOLDER"))){ dir.create(Sys.getenv("EUNOMIA_DATA_FOLDER"))
-downloadEunomiaData()  
+  downloadEunomiaData()  
 }
 ```
 
@@ -49,8 +49,8 @@ cohortCount(cdm$medications)
 As well as our medication cohorts, let's also make another cohort containing individuals with a record of a GI bleed. For this cohort we can use `generateConceptCohortSet()` from the CDMConnector package. Later we'll use this cohort when specifying inclusion/ exclusion criteria.
 ```{r}
 cdm <- generateConceptCohortSet(cdm = cdm,  
-                                   name = "gi_bleed", 
-                                   conceptSet = list("gi_bleed" = 192671))
+                                name = "gi_bleed", 
+                                conceptSet = list("gi_bleed" = 192671))
 ```
 
 ## Keep only the first record per person

@@ -1,6 +1,8 @@
 #' Require cohort subjects' death at a certain time window
 #'
-#' @param x Cohort table.
+#' @param cohort A cohort table in a cdm reference.
+#' @param cohortId Vector of cohort definition ids to include. If NULL, all
+#' cohort definition ids will be used.
 #' @param indexDate Variable in x that contains the date to compute the
 #' intersection.
 #' @param censorDate Whether to censor overlap events at a specific date or a
@@ -29,19 +31,22 @@
 #' attrition(cdm$cohort1)
 
 
-requireDeathFlag <- function(x,
+requireDeathFlag <- function(cohort,
+                             cohortId = NULL,
                              indexDate = "cohort_start_date",
                              censorDate = NULL,
                              window = list(c(0, Inf)),
                              negate = FALSE,
-                             name = omopgenerics::tableName(x)) {
+                             name = omopgenerics::tableName(cohort)) {
   # checks
   name <- validateName(name)
   assertLogical(negate, length = 1)
-  validateCohortTable(x)
-  cdm <- omopgenerics::cdmReference(x)
+  validateCohortTable(cohort)
+  cdm <- omopgenerics::cdmReference(cohort)
   validateCDM(cdm)
-  validateCohortColumn(indexDate, x)
+  validateCohortColumn(indexDate, cohort, class = "Date")
+  ids <- omopgenerics::settings(cohort)$cohort_definition_id
+  cohortId <- validateCohortId(cohortId, ids)
 
   cols <- unique(c("cohort_definition_id", "subject_id",
                    "cohort_start_date", "cohort_end_date",
@@ -55,9 +60,7 @@ requireDeathFlag <- function(x,
     window_end <- window[2]
   }
 
-  cdm <- omopgenerics::cdmReference(x)
-
-  subsetCohort <- x %>%
+  subsetCohort <- cohort %>%
     dplyr::select(dplyr::all_of(.env$cols)) %>%
     PatientProfiles::addDeathFlag(
       indexDate = indexDate,
@@ -68,7 +71,10 @@ requireDeathFlag <- function(x,
 
   if(isFALSE(negate)){
     subsetCohort <- subsetCohort %>%
-      dplyr::filter(.data$death == 1) %>%
+      dplyr::filter(
+        .data$death == 1 |
+          (!.data$cohort_definition_id %in% cohortId)
+      ) %>%
       dplyr::select(!"death")
     # attrition reason
     reason <- glue::glue("Death between {window_start} & ",
@@ -76,7 +82,10 @@ requireDeathFlag <- function(x,
   } else {
     # ie require absence instead of presence
     subsetCohort <- subsetCohort %>%
-      dplyr::filter(.data$death != 1) %>%
+      dplyr::filter(
+        .data$death != 1 |
+          (!.data$cohort_definition_id %in% cohortId)
+      ) %>%
       dplyr::select(!"death")
     # attrition reason
     reason <- glue::glue("Alive between {window_start} & ",
@@ -87,11 +96,11 @@ requireDeathFlag <- function(x,
     reason <- glue::glue("{reason}, censoring at {censorDate}")
   }
 
-  x <- x %>%
+  x <- cohort %>%
     dplyr::inner_join(subsetCohort,
                       by = c(cols)) %>%
     dplyr::compute(name = name, temporary = FALSE) %>%
-    CDMConnector::recordCohortAttrition(reason = reason)
+    CDMConnector::recordCohortAttrition(reason = reason, cohortId = cohortId)
 
   return(x)
 }

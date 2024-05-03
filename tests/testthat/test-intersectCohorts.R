@@ -27,49 +27,44 @@ test_that("joinOverlap", {
   x <- dplyr::tbl(db, "x")
 
   # gap = 0
-  expect_warning(
-    res <- joinOverlap(
-      x, startDate = "start_date", endDate = "end_date", by = c("pid", "def_id")
-    ) |>
-      dplyr::collect() |>
-      dplyr::arrange(.data$pid, .data$def_id, .data$start_date)
-  )
+  res <- joinOverlap(
+    x, startDate = "start_date", endDate = "end_date", by = c("pid", "def_id")
+  ) |>
+    dplyr::collect() |>
+    dplyr::arrange(.data$pid, .data$def_id, .data$start_date)
   expect_true(nrow(res) == 6)
-  expect_identical(
-    res,
+  expect_equal(
+    res |> dplyr::arrange(.data$start_date, .data$end_date) |> dplyr::select("pid", "def_id", "start_date", "end_date"),
     dplyr::tibble(
-      pid = c(1, 1, 1, 2, 2, 2),
-      def_id = c(1, 2, 2, 1, 1, 2),
+      pid = c(1, 1, 2, 2, 1, 2),
+      def_id = c(1, 2, 1, 2, 2, 1),
       start_date = as.Date(c(
-        "2020-01-01", "2020-02-01", "2020-05-02", "2020-03-01", "2020-06-01",
-        "2020-04-01"
+        "2020-01-01", "2020-02-01", "2020-03-01", "2020-04-01", "2020-05-02", "2020-06-01"
       )),
       end_date = as.Date(c(
-        "2020-08-01", "2020-05-01", "2020-07-01", "2020-05-01", "2020-08-01",
-        "2020-07-01"
+        "2020-08-01", "2020-05-01", "2020-05-01", "2020-07-01", "2020-07-01", "2020-08-01"
       ))
     )
   )
 
   # gap = 1
-  expect_warning(
-    res <- joinOverlap(
-      x, start = "start_date", end = "end_date", by = c("pid", "def_id"), gap = 1
-    ) |>
-      dplyr::collect() |>
-      dplyr::arrange(.data$pid, .data$def_id, .data$start_date)
-  )
+  res <- joinOverlap(
+    x, start = "start_date", end = "end_date", by = c("pid", "def_id"), gap = 1
+  ) |>
+    dplyr::collect() |>
+    dplyr::arrange(.data$pid, .data$def_id, .data$start_date)
+
   expect_true(nrow(res) == 5)
-  expect_identical(
-    res,
+  expect_equal(
+    res |> dplyr::arrange(.data$start_date, .data$end_date) |> dplyr::select("pid", "def_id", "start_date", "end_date"),
     dplyr::tibble(
       pid = c(1, 1, 2, 2, 2),
-      def_id = c(1, 2, 1, 1, 2),
+      def_id = c(1, 2, 1, 2, 1),
       start_date = as.Date(c(
-        "2020-01-01", "2020-02-01", "2020-03-01", "2020-06-01", "2020-04-01"
+        "2020-01-01", "2020-02-01", "2020-03-01", "2020-04-01", "2020-06-01"
       )),
       end_date = as.Date(c(
-        "2020-08-01", "2020-07-01", "2020-05-01", "2020-08-01", "2020-07-01"
+        "2020-08-01", "2020-07-01", "2020-05-01", "2020-07-01", "2020-08-01"
       ))
     )
   )
@@ -206,10 +201,11 @@ test_that("intersectCohorts", {
   expect_true(all(omopgenerics::attrition(cdm$cohort3)$excluded_subjects ==  c(0, 0, 0)))
 
   # not enough cohorts provided
-  expect_warning(cdm$cohort4 <- intersectCohorts(
-    cohort = cdm$cohort1, name = "cohort4",
-    cohortId = 1
-  ), "At least 2 cohort id must be provided to do the intersection.")
+  expect_warning(
+    cdm$cohort4 <- intersectCohorts(
+      cohort = cdm$cohort1, name = "cohort4",
+      cohortId = 1
+    ), "At least 2 cohort id must be provided to do the intersection.")
   expect_equal(cdm$cohort1 %>%
                  omopgenerics::settings() %>%
                  dplyr::filter(cohort_definition_id == 1),
@@ -467,9 +463,11 @@ test_that("codelist", {
   expect_true(all(codes |> dplyr::pull("cohort_definition_id") |> sort() == c(1, 1, 1)))
 
   # union concept + non concept cohorts
-  # TODO when omopgenerics issue #260
-  cdm <- omopgenerics::bind(cdm$cohort, cdm$cohort1, name = "cohort3")
-  cdm$cohort4 <- intersectCohorts(cdm$cohort3, name = "cohort4")
-
-
+  cdm <- omopgenerics::bind(cdm$cohort, cdm$cohort1, name = "cohort5")
+  cdm$cohort6 <- intersectCohorts(cdm$cohort5, name = "cohort6")
+  codes <- attr(cdm$cohort6, "cohort_codelist")
+  expect_true(all(codes |> dplyr::pull("codelist_name") |> sort() == c(rep("c1", 8), rep("c2", 4))))
+  expect_true(all(codes |> dplyr::pull("concept_id") |> sort() == c(rep(1, 4), rep(2, 4), rep(3, 4))))
+  expect_true(all(codes |> dplyr::pull("type") |> sort() == rep("index event", 12)))
+  expect_true(all(codes |> dplyr::pull("cohort_definition_id") |> sort() == c(2, 2, 3, 3, 4, 5, 6, 6, 6, 7, 7, 7)))
 })

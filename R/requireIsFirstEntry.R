@@ -17,44 +17,32 @@
 #' }
 #'
 requireIsFirstEntry <- function(cohort,
-                                 cohortId = NULL,
-                                 indexDate = "cohort_start_date",
-                                 name = omopgenerics::tableName(cohort)){
+                                cohortId = NULL,
+                                indexDate = "cohort_start_date",
+                                name = omopgenerics::tableName(cohort)){
 
   # checks
   name <- validateName(name)
   validateCohortTable(cohort)
   cdm <- omopgenerics::cdmReference(cohort)
   validateCDM(cdm)
-  validateCohortColumn(indexDate, cohort)
+  validateCohortColumn(indexDate, cohort, class = "Date")
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
   cohortId <- validateCohortId(cohortId, ids)
 
   # restrict to first entry
   indexDateSym <- rlang::sym(indexDate)
 
-  if (all(ids %in% cohortId)) {
-    cohort <- cohort |>
-      dplyr::group_by(.data$subject_id,.data$cohort_definition_id) |>
-      dplyr::filter(!!indexDateSym == min(!!indexDateSym, na.rm = TRUE)) |>
-      dplyr::ungroup() |>
-      dplyr::compute(name = name, temporary = FALSE) |>
-      omopgenerics::newCohortTable() |>
-      CDMConnector::recordCohortAttrition("Restricted to first entry")
-  } else {
-    cohort <- cohort |>
-      dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>
-      dplyr::group_by(.data$subject_id,.data$cohort_definition_id) |>
-      dplyr::filter(!!indexDateSym == min(!!indexDateSym, na.rm = TRUE)) |>
-      dplyr::ungroup() |>
-      dplyr::union_all(
-        cohort |>
-          dplyr::filter(!.data$cohort_definition_id %in% .env$cohortId)
-      ) |>
-      dplyr::compute(name = name, temporary = FALSE) |>
-      omopgenerics::newCohortTable() |>
-      CDMConnector::recordCohortAttrition("Restricted to first entry", cohortId = cohortId)
-  }
+  cohort <- cohort |>
+    dplyr::group_by(.data$subject_id,.data$cohort_definition_id) |>
+    dplyr::filter(
+      !!indexDateSym == min(!!indexDateSym, na.rm = TRUE) |
+        (!.data$cohort_definition_id %in% .env$cohortId)
+    ) |>
+    dplyr::ungroup() |>
+    dplyr::compute(name = name, temporary = FALSE) |>
+    omopgenerics::newCohortTable() |>
+    CDMConnector::recordCohortAttrition("Restricted to first entry", cohortId = cohortId)
 
   return(cohort)
 }
@@ -78,44 +66,32 @@ requireIsFirstEntry <- function(cohort,
 #' }
 #'
 requireIsLastEntry <- function(cohort,
-                                cohortId = NULL,
-                                indexDate = "cohort_start_date",
-                                name = omopgenerics::tableName(cohort)){
+                               cohortId = NULL,
+                               indexDate = "cohort_start_date",
+                               name = omopgenerics::tableName(cohort)){
 
   # checks
   name <- validateName(name)
   validateCohortTable(cohort)
   cdm <- omopgenerics::cdmReference(cohort)
   validateCDM(cdm)
-  validateCohortColumn(indexDate, cohort)
+  validateCohortColumn(indexDate, cohort, class = "Date")
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
   cohortId <- validateCohortId(cohortId, ids)
 
   # restrict to first entry
   indexDateSym <- rlang::sym(indexDate)
 
-  if (all(ids %in% cohortId)) {
-    cohort <- cohort |>
-      dplyr::group_by(.data$subject_id,.data$cohort_definition_id) |>
-      dplyr::filter(!!indexDateSym == max(!!indexDateSym, na.rm = TRUE)) |>
-      dplyr::ungroup() |>
-      dplyr::compute(name = name, temporary = FALSE) |>
-      omopgenerics::newCohortTable() |>
-      CDMConnector::recordCohortAttrition("Restricted to last entry")
-  } else {
-    cohort <- cohort |>
-      dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>
-      dplyr::group_by(.data$subject_id,.data$cohort_definition_id) |>
-      dplyr::filter(!!indexDateSym == max(!!indexDateSym, na.rm = TRUE)) |>
-      dplyr::ungroup() |>
-      dplyr::union_all(
-        cohort |>
-          dplyr::filter(!.data$cohort_definition_id %in% .env$cohortId)
-      ) |>
-      dplyr::compute(name = name, temporary = FALSE) |>
-      omopgenerics::newCohortTable() |>
-      CDMConnector::recordCohortAttrition("Restricted to last entry", cohortId = cohortId)
-  }
+  cohort <- cohort |>
+    dplyr::group_by(.data$subject_id,.data$cohort_definition_id) |>
+    dplyr::filter(
+      !!indexDateSym == max(!!indexDateSym, na.rm = TRUE) |
+        (!.data$cohort_definition_id %in% .env$cohortId)
+    ) |>
+    dplyr::ungroup() |>
+    dplyr::compute(name = name, temporary = FALSE) |>
+    omopgenerics::newCohortTable() |>
+    CDMConnector::recordCohortAttrition("Restricted to last entry", cohortId = cohortId)
 
   return(cohort)
 }

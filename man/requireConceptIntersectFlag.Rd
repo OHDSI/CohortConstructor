@@ -5,7 +5,8 @@
 \title{Require cohort subjects to have events of a concept list}
 \usage{
 requireConceptIntersectFlag(
-  x,
+  cohort,
+  cohortId = NULL,
   conceptSet,
   indexDate = "cohort_start_date",
   targetStartDate = "event_start_date",
@@ -13,11 +14,14 @@ requireConceptIntersectFlag(
   censorDate = NULL,
   window = list(c(0, Inf)),
   negate = FALSE,
-  name = omopgenerics::tableName(x)
+  name = omopgenerics::tableName(cohort)
 )
 }
 \arguments{
-\item{x}{Cohort table.}
+\item{cohort}{A cohort table in a cdm reference.}
+
+\item{cohortId}{Vector of cohort definition ids to include. If NULL, all
+cohort definition ids will be used.}
 
 \item{conceptSet}{Concept set list.}
 
@@ -63,7 +67,7 @@ cdm <- CDMConnector::insertTable(cdm, name = "concept",
                                    "valid_end_date" = NA
                                   ))
 cdm$cohort2 <-  requireConceptIntersectFlag(
-  x = cdm$cohort1,
+  cohort = cdm$cohort1,
   conceptSet = list(a = 1),
   window = c(-Inf, 0),
   name = "cohort2")
