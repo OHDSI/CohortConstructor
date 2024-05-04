@@ -473,14 +473,20 @@ observationControl <- function(x) {
   x |>
     dplyr::select(-"cohort_start_date", -"cohort_end_date") |>
     dplyr::rename("cohort_start_date" = "index_date") |>
-    PatientProfiles::addFutureObservation(
-      futureObservationName = "cohort_end_date", futureObservationType = "date"
+    dplyr::inner_join(
+      cdm$observation_period |>
+        dplyr::select(
+          "subject_id" = "person_id",
+          "observation_period_start_date",
+          "cohort_end_date" = "observation_period_end_date"
+        ),
+      by = "subject_id"
     ) |>
-    dplyr::filter(!is.na(.data$cohort_end_date)) |>
-    dplyr::select(
-      "cohort_definition_id", "subject_id", "cohort_start_date",
-      "cohort_end_date", "cluster_id"
+    dplyr::filter(
+      .data$cohort_start_date <= .data$cohort_end_date &
+        .data$cohort_start_date >= .data$observation_period_start_date
     ) |>
+    dplyr::select(-"observation_period_start_date") |>
     dplyr::compute(name = tableName(x), temporary = FALSE) |>
     omopgenerics::recordCohortAttrition(
       reason = "Exclude individuals not in observation"
