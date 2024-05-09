@@ -5,7 +5,7 @@ articles:
   a01_building_concept_cohorts: a01_building_concept_cohorts.html
   a02_applying_cohort_restrictions: a02_applying_cohort_restrictions.html
   a03_age_sex_matching: a03_age_sex_matching.html
-last_built: 2024-05-09T19:19Z
+last_built: 2024-05-09T19:28Z
 urls:
   reference: https://ohdsi.github.io/CohortConstructor/reference
   article: https://ohdsi.github.io/CohortConstructor/articles

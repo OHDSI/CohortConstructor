@@ -61,8 +61,12 @@
   <main id="main" class="col-md-9"><div class="section level1">
 <div class="page-header"><h1 id="cohortconstructor">CohortConstructor<a class="anchor" aria-label="anchor" href="#cohortconstructor"></a>
 </h1></div>
+<blockquote>
+<p><strong>This package is currently experimental and not currently recommended for use.</strong></p>
+</blockquote>
 <!-- badges: start -->
 
+<!-- badges: end -->
 <p>The goal of CohortConstructor is to help on the creation and manipulation of cohorts in the OMOP Common Data Model. The package provides functions to support cohort building pipelines and additional functions to support cohort evaluation.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -70,7 +74,7 @@
 <p>You can install the development version of CohortConstructor from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"oxford-pharmacoepi/CohortConstructor"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"ohdsi/CohortConstructor"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="creating-and-manipulating-cohorts">Creating and manipulating cohorts<a class="anchor" aria-label="anchor" href="#creating-and-manipulating-cohorts"></a>
@@ -78,179 +82,164 @@
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://darwin-eu.github.io/CDMConnector/" class="external-link">CDMConnector</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://darwin-eu-dev.github.io/PatientProfiles/" class="external-link">PatientProfiles</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://darwin-eu-dev.github.io/DrugUtilisation/" class="external-link">DrugUtilisation</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: package 'DrugUtilisation' was built under R version 4.2.3</span></span>
+<span><span class="co">#&gt; Warning: package 'PatientProfiles' was built under R version 4.2.3</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: package 'dplyr' was built under R version 4.2.3</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'dplyr'</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     filter, lag</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ohdsi.github.io/CohortConstructor/">CohortConstructor</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">duckdb</span><span class="fu">::</span><span class="fu"><a href="https://r.duckdb.org/reference/duckdb.html" class="external-link">duckdb</a></span><span class="op">(</span><span class="op">)</span>, dbdir <span class="op">=</span> <span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/eunomiaDir.html" class="external-link">eunomia_dir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/cdm_from_con.html" class="external-link">cdm_from_con</a></span><span class="op">(</span><span class="va">con</span>, cdm_schema <span class="op">=</span> <span class="st">"main"</span>, </span>
-<span>                    write_schema <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>prefix <span class="op">=</span> <span class="st">"my_study_"</span>, schema <span class="op">=</span> <span class="st">"main"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>                    write_schema <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>prefix <span class="op">=</span> <span class="st">"my_study_"</span>, schema <span class="op">=</span> <span class="st">"main"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">)</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="generating-concept-based-cohorts">Generating concept based cohorts<a class="anchor" aria-label="anchor" href="#generating-concept-based-cohorts"></a>
 </h3>
-<p>We’ll start by generating a set of drug cohorts, using generateDrugUtilisationCohortSet from the DrugUtilisation R package. Here we make two cohorts, one for diclofenac and another for acetaminophen, combining records with a gap of 7 days or less.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu-dev.github.io/DrugUtilisation/reference/generateDrugUtilisationCohortSet.html" class="external-link">generateDrugUtilisationCohortSet</a></span><span class="op">(</span>cdm <span class="op">=</span> <span class="va">cdm</span>,  </span>
-<span>                            name <span class="op">=</span> <span class="st">"medications"</span>,</span>
-<span>                            conceptSet <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"diclofenac"</span> <span class="op">=</span> <span class="fl">1124300</span>,</span>
-<span>                                           <span class="st">"acetaminophen"</span> <span class="op">=</span> <span class="fl">1127433</span><span class="op">)</span>,</span>
-<span>                            gapEra <span class="op">=</span> <span class="fl">7</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span> <span class="op">&lt;-</span> <span class="va">cdm</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="reference/conceptCohort.html">conceptCohort</a></span><span class="op">(</span>conceptSet <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    <span class="st">"ankle_fracture"</span> <span class="op">=</span> <span class="fl">4059173</span>,</span>
+<span>    <span class="st">"forearm_fracture"</span> <span class="op">=</span> <span class="fl">4278672</span>,</span>
+<span>    <span class="st">"hip_fracture"</span> <span class="op">=</span> <span class="fl">4230399</span><span class="op">)</span>,</span>
+<span>  name <span class="op">=</span> <span class="st">"fractures"</span><span class="op">)</span></span></code></pre></div>
 <p>We can see that our starting cohorts, before we add any additional restrictions, have the following counts</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/cohortSet.html" class="external-link">cohort_set</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">medications</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Rows: 2</span></span>
-<span><span class="co">#&gt; Columns: 11</span></span>
-<span><span class="co">#&gt; $ cohort_definition_id    &lt;int&gt; 1, 2</span></span>
-<span><span class="co">#&gt; $ cohort_name             &lt;chr&gt; "diclofenac", "acetaminophen"</span></span>
-<span><span class="co">#&gt; $ duration_range_min      &lt;chr&gt; "1", "1"</span></span>
-<span><span class="co">#&gt; $ duration_range_max      &lt;chr&gt; "Inf", "Inf"</span></span>
-<span><span class="co">#&gt; $ impute_duration         &lt;chr&gt; "none", "none"</span></span>
-<span><span class="co">#&gt; $ gap_era                 &lt;chr&gt; "7", "7"</span></span>
-<span><span class="co">#&gt; $ prior_use_washout       &lt;chr&gt; "0", "0"</span></span>
-<span><span class="co">#&gt; $ prior_observation       &lt;chr&gt; "0", "0"</span></span>
-<span><span class="co">#&gt; $ cohort_date_range_start &lt;chr&gt; NA, NA</span></span>
-<span><span class="co">#&gt; $ cohort_date_range_end   &lt;chr&gt; NA, NA</span></span>
-<span><span class="co">#&gt; $ limit                   &lt;chr&gt; "all", "all"</span></span>
-<span><span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/cohort_count.html" class="external-link">cohort_count</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">medications</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Rows: 2</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://darwin-eu-dev.github.io/omopgenerics/reference/settings.html" class="external-link">settings</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Rows: 3</span></span>
+<span><span class="co">#&gt; Columns: 2</span></span>
+<span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 1, 2, 3</span></span>
+<span><span class="co">#&gt; $ cohort_name          &lt;chr&gt; "ankle_fracture", "forearm_fracture", "hip_fractu…</span></span>
+<span><span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/cohort_count.html" class="external-link">cohort_count</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Rows: 3</span></span>
 <span><span class="co">#&gt; Columns: 3</span></span>
-<span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 2, 1</span></span>
-<span><span class="co">#&gt; $ number_records       &lt;dbl&gt; 9363, 830</span></span>
-<span><span class="co">#&gt; $ number_subjects      &lt;dbl&gt; 2580, 830</span></span></code></pre></div>
+<span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 1, 2, 3</span></span>
+<span><span class="co">#&gt; $ number_records       &lt;int&gt; 464, 569, 138</span></span>
+<span><span class="co">#&gt; $ number_subjects      &lt;int&gt; 427, 510, 132</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="require-in-date-range">Require in date range<a class="anchor" aria-label="anchor" href="#require-in-date-range"></a>
 </h3>
 <p>We can require that individuals’ cohort start date fall within a certain date range.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">medications</span> <span class="op">&lt;-</span> <span class="va">cdm</span><span class="op">$</span><span class="va">medications</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span> <span class="op">&lt;-</span> <span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="reference/requireInDateRange.html">requireInDateRange</a></span><span class="op">(</span>indexDate <span class="op">=</span> <span class="st">"cohort_start_date"</span>,</span>
 <span>                     dateRange <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2000-01-01"</span>, <span class="st">"2020-01-01"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Now that we’ve applied these date restrictions, we can see how many people and records have been excluded</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/cohort_count.html" class="external-link">cohort_count</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">medications</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Rows: 2</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/cohort_count.html" class="external-link">cohort_count</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Rows: 3</span></span>
 <span><span class="co">#&gt; Columns: 3</span></span>
-<span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 2, 1</span></span>
-<span><span class="co">#&gt; $ number_records       &lt;dbl&gt; 2750, 397</span></span>
-<span><span class="co">#&gt; $ number_subjects      &lt;dbl&gt; 1737, 397</span></span>
-<span><span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/cohortAttrition.html" class="external-link">cohort_attrition</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">medications</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Rows: 16</span></span>
+<span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 1, 2, 3</span></span>
+<span><span class="co">#&gt; $ number_records       &lt;int&gt; 108, 152, 62</span></span>
+<span><span class="co">#&gt; $ number_subjects      &lt;int&gt; 104, 143, 60</span></span>
+<span><span class="fu"><a href="https://darwin-eu-dev.github.io/omopgenerics/reference/attrition.html" class="external-link">attrition</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Rows: 6</span></span>
 <span><span class="co">#&gt; Columns: 7</span></span>
-<span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 2, 1</span></span>
-<span><span class="co">#&gt; $ number_records       &lt;dbl&gt; 9365, 9365, 9363, 9363, 9363, 9363, 9363, 850, 85…</span></span>
-<span><span class="co">#&gt; $ number_subjects      &lt;dbl&gt; 2580, 2580, 2580, 2580, 2580, 2580, 2580, 850, 85…</span></span>
-<span><span class="co">#&gt; $ reason_id            &lt;dbl&gt; 1, 2, 3, 4, 5, 6, 7, 1, 2, 3, 4, 5, 6, 7, 8, 8</span></span>
-<span><span class="co">#&gt; $ reason               &lt;chr&gt; "Qualifying initial records", "Duration imputatio…</span></span>
-<span><span class="co">#&gt; $ excluded_records     &lt;dbl&gt; 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 6613, …</span></span>
-<span><span class="co">#&gt; $ excluded_subjects    &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 843, 4…</span></span>
-<span><span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/cohortAttrition.html" class="external-link">cohort_attrition</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">medications</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">reason</span> <span class="op">==</span> <span class="st">"cohort_start_date between 2000-01-01 and 2020-01-01"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 1, 1, 2, 2, 3, 3</span></span>
+<span><span class="co">#&gt; $ number_records       &lt;int&gt; 464, 108, 569, 152, 138, 62</span></span>
+<span><span class="co">#&gt; $ number_subjects      &lt;int&gt; 427, 104, 510, 143, 132, 60</span></span>
+<span><span class="co">#&gt; $ reason_id            &lt;int&gt; 1, 2, 1, 2, 1, 2</span></span>
+<span><span class="co">#&gt; $ reason               &lt;chr&gt; "Initial qualifying events", "cohort_start_date b…</span></span>
+<span><span class="co">#&gt; $ excluded_records     &lt;int&gt; 0, 356, 0, 417, 0, 76</span></span>
+<span><span class="co">#&gt; $ excluded_subjects    &lt;int&gt; 0, 323, 0, 367, 0, 72</span></span>
+<span><span class="fu"><a href="https://darwin-eu-dev.github.io/omopgenerics/reference/attrition.html" class="external-link">attrition</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">reason</span> <span class="op">==</span> <span class="st">"cohort_start_date between 2000-01-01 &amp; 2020-01-01"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Rows: 2</span></span>
+<span><span class="co">#&gt; Rows: 3</span></span>
 <span><span class="co">#&gt; Columns: 7</span></span>
-<span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 2, 1</span></span>
-<span><span class="co">#&gt; $ number_records       &lt;dbl&gt; 2750, 397</span></span>
-<span><span class="co">#&gt; $ number_subjects      &lt;dbl&gt; 1737, 397</span></span>
-<span><span class="co">#&gt; $ reason_id            &lt;dbl&gt; 8, 8</span></span>
-<span><span class="co">#&gt; $ reason               &lt;chr&gt; "cohort_start_date between 2000-01-01 and 2020-01…</span></span>
-<span><span class="co">#&gt; $ excluded_records     &lt;dbl&gt; 6613, 433</span></span>
-<span><span class="co">#&gt; $ excluded_subjects    &lt;dbl&gt; 843, 433</span></span></code></pre></div>
+<span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 1, 2, 3</span></span>
+<span><span class="co">#&gt; $ number_records       &lt;int&gt; 108, 152, 62</span></span>
+<span><span class="co">#&gt; $ number_subjects      &lt;int&gt; 104, 143, 60</span></span>
+<span><span class="co">#&gt; $ reason_id            &lt;int&gt; 2, 2, 2</span></span>
+<span><span class="co">#&gt; $ reason               &lt;chr&gt; "cohort_start_date between 2000-01-01 &amp; 2020-01-0…</span></span>
+<span><span class="co">#&gt; $ excluded_records     &lt;int&gt; 356, 417, 76</span></span>
+<span><span class="co">#&gt; $ excluded_subjects    &lt;int&gt; 323, 367, 72</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="applying-demographic-requirements">Applying demographic requirements<a class="anchor" aria-label="anchor" href="#applying-demographic-requirements"></a>
 </h3>
 <p>We can also add restrictions on age (on cohort start date) and sex.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">medications</span> <span class="op">&lt;-</span> <span class="va">cdm</span><span class="op">$</span><span class="va">medications</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span> <span class="op">&lt;-</span> <span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="reference/requireDemographics.html">requireDemographics</a></span><span class="op">(</span>indexDate <span class="op">=</span> <span class="st">"cohort_start_date"</span>,</span>
 <span>                      ageRange <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">40</span>, <span class="fl">65</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>                      sex <span class="op">=</span> <span class="st">"Female"</span><span class="op">)</span></span></code></pre></div>
 <p>Again we can see how many individuals we’ve lost after applying this criteria.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/cohortAttrition.html" class="external-link">cohort_attrition</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">medications</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">reason</span> <span class="op">==</span> <span class="st">"Demographic requirements"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://darwin-eu-dev.github.io/omopgenerics/reference/attrition.html" class="external-link">attrition</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">reason</span> <span class="op">==</span> <span class="st">"Age requirement: 40 to 65"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Rows: 2</span></span>
+<span><span class="co">#&gt; Rows: 3</span></span>
 <span><span class="co">#&gt; Columns: 7</span></span>
-<span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 2, 1</span></span>
-<span><span class="co">#&gt; $ number_records       &lt;dbl&gt; 787, 75</span></span>
-<span><span class="co">#&gt; $ number_subjects      &lt;dbl&gt; 551, 75</span></span>
-<span><span class="co">#&gt; $ reason_id            &lt;dbl&gt; 9, 9</span></span>
-<span><span class="co">#&gt; $ reason               &lt;chr&gt; "Demographic requirements", "Demographic requirem…</span></span>
-<span><span class="co">#&gt; $ excluded_records     &lt;dbl&gt; 1963, 322</span></span>
-<span><span class="co">#&gt; $ excluded_subjects    &lt;dbl&gt; 1186, 322</span></span></code></pre></div>
+<span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 1, 2, 3</span></span>
+<span><span class="co">#&gt; $ number_records       &lt;int&gt; 43, 64, 22</span></span>
+<span><span class="co">#&gt; $ number_subjects      &lt;int&gt; 43, 62, 22</span></span>
+<span><span class="co">#&gt; $ reason_id            &lt;int&gt; 3, 3, 3</span></span>
+<span><span class="co">#&gt; $ reason               &lt;chr&gt; "Age requirement: 40 to 65", "Age requirement: 40…</span></span>
+<span><span class="co">#&gt; $ excluded_records     &lt;int&gt; 65, 88, 40</span></span>
+<span><span class="co">#&gt; $ excluded_subjects    &lt;int&gt; 61, 81, 38</span></span>
+<span></span>
+<span><span class="fu"><a href="https://darwin-eu-dev.github.io/omopgenerics/reference/attrition.html" class="external-link">attrition</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">reason</span> <span class="op">==</span> <span class="st">"Sex requirement: Female"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Rows: 3</span></span>
+<span><span class="co">#&gt; Columns: 7</span></span>
+<span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 1, 2, 3</span></span>
+<span><span class="co">#&gt; $ number_records       &lt;int&gt; 19, 37, 12</span></span>
+<span><span class="co">#&gt; $ number_subjects      &lt;int&gt; 19, 36, 12</span></span>
+<span><span class="co">#&gt; $ reason_id            &lt;int&gt; 4, 4, 4</span></span>
+<span><span class="co">#&gt; $ reason               &lt;chr&gt; "Sex requirement: Female", "Sex requirement: Fema…</span></span>
+<span><span class="co">#&gt; $ excluded_records     &lt;int&gt; 24, 27, 10</span></span>
+<span><span class="co">#&gt; $ excluded_subjects    &lt;int&gt; 24, 26, 10</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="require-presence-in-another-cohort">Require presence in another cohort<a class="anchor" aria-label="anchor" href="#require-presence-in-another-cohort"></a>
 </h3>
 <p>We can also require that individuals are in another cohort over some window. Here for example we require that study participants are in a GI bleed cohort any time prior up to their entry in the medications cohort.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/generateConceptCohortSet.html" class="external-link">generate_concept_cohort_set</a></span><span class="op">(</span>cdm <span class="op">=</span> <span class="va">cdm</span>, </span>
-<span>                            name <span class="op">=</span> <span class="st">"gibleed"</span>,</span>
-<span>                            concept_set <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"gibleed"</span> <span class="op">=</span> <span class="fl">192671</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">gibleed</span> <span class="op">&lt;-</span> <span class="va">cdm</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="reference/conceptCohort.html">conceptCohort</a></span><span class="op">(</span>conceptSet <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"gibleed"</span> <span class="op">=</span> <span class="fl">192671</span><span class="op">)</span>,</span>
+<span>  name <span class="op">=</span> <span class="st">"gibleed"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">cdm</span><span class="op">$</span><span class="va">medications</span> <span class="op">&lt;-</span> <span class="va">cdm</span><span class="op">$</span><span class="va">medications</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span></span>
+<span><span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span> <span class="op">&lt;-</span> <span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="reference/requireCohortIntersectFlag.html">requireCohortIntersectFlag</a></span><span class="op">(</span>targetCohortTable <span class="op">=</span> <span class="st">"gibleed"</span>,</span>
 <span>                             window <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="cn">Inf</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/cohortAttrition.html" class="external-link">cohort_attrition</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">medications</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">reason</span> <span class="op">==</span> <span class="st">"In cohort gibleed between -Inf and 0 days relative to cohort_start_date"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://darwin-eu-dev.github.io/omopgenerics/reference/attrition.html" class="external-link">attrition</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">reason</span> <span class="op">==</span> <span class="st">"In cohort gibleed between -Inf &amp; 0 days relative to cohort_start_date"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Rows: 2</span></span>
+<span><span class="co">#&gt; Rows: 3</span></span>
 <span><span class="co">#&gt; Columns: 7</span></span>
-<span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 2, 1</span></span>
-<span><span class="co">#&gt; $ number_records       &lt;dbl&gt; 136, 0</span></span>
-<span><span class="co">#&gt; $ number_subjects      &lt;dbl&gt; 89, 0</span></span>
-<span><span class="co">#&gt; $ reason_id            &lt;dbl&gt; 10, 10</span></span>
-<span><span class="co">#&gt; $ reason               &lt;chr&gt; "In cohort gibleed between -Inf and 0 days relati…</span></span>
-<span><span class="co">#&gt; $ excluded_records     &lt;dbl&gt; 651, 75</span></span>
-<span><span class="co">#&gt; $ excluded_subjects    &lt;dbl&gt; 462, 75</span></span></code></pre></div>
+<span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 1, 2, 3</span></span>
+<span><span class="co">#&gt; $ number_records       &lt;int&gt; 5, 7, 2</span></span>
+<span><span class="co">#&gt; $ number_subjects      &lt;int&gt; 5, 6, 2</span></span>
+<span><span class="co">#&gt; $ reason_id            &lt;int&gt; 7, 7, 7</span></span>
+<span><span class="co">#&gt; $ reason               &lt;chr&gt; "In cohort gibleed between -Inf &amp; 0 days relative…</span></span>
+<span><span class="co">#&gt; $ excluded_records     &lt;int&gt; 14, 30, 10</span></span>
+<span><span class="co">#&gt; $ excluded_subjects    &lt;int&gt; 14, 30, 10</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="combining-cohorts">Combining cohorts<a class="anchor" aria-label="anchor" href="#combining-cohorts"></a>
 </h3>
-<p>Currently we have two separate cohorts. One of users of diclofenac, the other of users of acetaminophen.</p>
-<p>Let’s say we want to create a cohort of people taking <strong>either</strong> diclofenac or acetaminophen. We could create this cohort like so:</p>
-<p>Alternatively, we might want to create a cohort of people taking <strong>both</strong> diclofenac and acetaminophen. For this we can create this combination cohort like so:</p>
-<p>Both diclofenac and acetaminophen</p>
-<p>Generate a combination cohort.</p>
+<p>Currently we have separate fracture cohorts.</p>
+<p>Let’s say we want to create a cohort of people with any of the fractures. We could create this cohort like so:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu">generateIntersectCohortSet</span><span class="op">(</span>cdm <span class="op">=</span> <span class="va">cdm</span>, </span>
-<span>                                    name <span class="op">=</span> <span class="st">"combinations"</span>, </span>
-<span>                                    targetCohortName <span class="op">=</span> <span class="st">"medications"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span> <span class="op">&lt;-</span> <span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">CohortConstructor</span><span class="fu">::</span><span class="fu"><a href="reference/unionCohorts.html">unionCohorts</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/cohortSet.html" class="external-link">cohortSet</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">combinations</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 3 × 5</span></span>
-<span><span class="co">#&gt;   cohort_definition_id cohort_name   diclofenac acetaminophen mutually_exclusive</span></span>
-<span><span class="co">#&gt;                  &lt;int&gt; &lt;chr&gt;              &lt;dbl&gt;         &lt;dbl&gt; &lt;lgl&gt;             </span></span>
-<span><span class="co">#&gt; 1                    1 diclofenac             1            NA FALSE             </span></span>
-<span><span class="co">#&gt; 2                    2 acetaminophen         NA             1 FALSE             </span></span>
-<span><span class="co">#&gt; 3                    3 diclofenac+a…          1             1 FALSE</span></span>
-<span><span class="fu"><a href="https://darwin-eu-dev.github.io/omopgenerics/reference/cohortCount.html" class="external-link">cohortCount</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">combinations</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 3 × 3</span></span>
+<span><span class="fu"><a href="https://darwin-eu-dev.github.io/omopgenerics/reference/settings.html" class="external-link">settings</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 3</span></span>
+<span><span class="co">#&gt;   cohort_definition_id cohort_name                                    gap</span></span>
+<span><span class="co">#&gt;                  &lt;dbl&gt; &lt;chr&gt;                                        &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1                    1 ankle_fracture_forearm_fracture_hip_fracture     0</span></span>
+<span><span class="fu"><a href="https://darwin-eu-dev.github.io/omopgenerics/reference/cohortCount.html" class="external-link">cohortCount</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 3</span></span>
 <span><span class="co">#&gt;   cohort_definition_id number_records number_subjects</span></span>
-<span><span class="co">#&gt;                  &lt;int&gt;          &lt;dbl&gt;           &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1                    2            136              89</span></span>
-<span><span class="co">#&gt; 2                    1              0               0</span></span>
-<span><span class="co">#&gt; 3                    3              0               0</span></span></code></pre></div>
+<span><span class="co">#&gt;                  &lt;int&gt;          &lt;int&gt;           &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1                    1             14              13</span></span></code></pre></div>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/cdmDisconnect.html" class="external-link">cdmDisconnect</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">)</span></span></code></pre></div>
 </div>
-</div>
-<div class="section level2">
-<h2 id="evaluating-cohorts">Evaluating cohorts<a class="anchor" aria-label="anchor" href="#evaluating-cohorts"></a>
-</h2>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="license">
@@ -283,9 +272,8 @@
 <div class="dev-status">
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://github.com/OHDSI/CohortConstructor/actions" class="external-link"><img src="https://github.com/OHDSI/CohortConstructor/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://github.com/oxford-pharmacoepi/CohortConstructor/actions" class="external-link"><img src="https://github.com/oxford-pharmacoepi/CohortConstructor/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a></li>
 <li><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental" class="external-link"><img src="https://img.shields.io/badge/Lifecycle-Experimental-339999" alt="Lifecycle:Experimental"></a></li>
-<li><a href="https://app.codecov.io/gh/OHDSI/CohortConstructor?branch=main" class="external-link"><img src="https://codecov.io/gh/OHDSI/CohortConstructor/branch/main/graph/badge.svg" alt="Codecov test coverage"></a></li>
 </ul>
 </div>
 
