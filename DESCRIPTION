@@ -53,3 +53,4 @@ Remotes:
     darwin-eu-dev/omopgenerics
 Depends: 
     R (>= 4.1)
+URL: https://ohdsi.github.io/CohortConstructor/
