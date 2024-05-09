@@ -10,3 +10,4 @@
 ^Meta$
 ^data-raw$
 ^docs$
+^codecov\.yml$
