@@ -8,6 +8,13 @@
 \description{
 This package aims to provide functionalities to manipulate and evaluate cohorts in data mapped to the Observational Medical Outcomes Partnership Common Data Model.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://ohdsi.github.io/CohortConstructor/}
+}
+
+}
 \author{
 \strong{Maintainer}: Edward Burn \email{edward.burn@ndorms.ox.ac.uk} (\href{https://orcid.org/0000-0002-9286-1128}{ORCID})
 

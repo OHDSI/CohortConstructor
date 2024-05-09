@@ -15,9 +15,12 @@ knitr::opts_chunk$set(
 
 # CohortConstructor
 
+**This package is currently experimental and not currently recommended for use.**
+
 <!-- badges: start -->
-[![R-CMD-check](https://github.com/oxford-pharmacoepi/CohortConstructor/workflows/R-CMD-check/badge.svg)](https://github.com/oxford-pharmacoepi/CohortConstructor/actions)
+[![R-CMD-check](https://github.com/OHDSI/CohortConstructor/workflows/R-CMD-check/badge.svg)](https://github.com/OHDSI/CohortConstructor/actions)
 [![Lifecycle:Experimental](https://img.shields.io/badge/Lifecycle-Experimental-339999)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![Codecov test coverage](https://codecov.io/gh/OHDSI/CohortConstructor/branch/main/graph/badge.svg)](https://app.codecov.io/gh/OHDSI/CohortConstructor?branch=main)
 <!-- badges: end -->
 
 The goal of CohortConstructor is to help on the creation and manipulation of cohorts in the OMOP Common Data Model. The package provides functions to support cohort building pipelines and additional functions to support cohort evaluation.
@@ -26,14 +29,14 @@ The goal of CohortConstructor is to help on the creation and manipulation of coh
 
 You can install the development version of CohortConstructor from [GitHub](https://github.com/) with:
 
-``` {r, eval = FALSE}
+```{r, eval = FALSE}
 # install.packages("devtools")
 devtools::install_github("oxford-pharmacoepi/CohortConstructor")
 ```
 
 ## Creating and manipulating cohorts
 
-``` {r}
+```{r}
 library(CDMConnector)
 library(PatientProfiles)
 library(DrugUtilisation)
@@ -46,8 +49,10 @@ cdm <- cdm_from_con(con, cdm_schema = "main",
 ```
 
 ### Generating concept based cohorts
+
 We'll start by generating a set of drug cohorts, using generateDrugUtilisationCohortSet from the DrugUtilisation R package. Here we make two cohorts, one for diclofenac and another for acetaminophen, combining records with a gap of 7 days or less.
-``` {r}
+
+```{r}
 cdm <- generateDrugUtilisationCohortSet(cdm = cdm,  
                             name = "medications",
                             conceptSet = list("diclofenac" = 1124300,
@@ -56,21 +61,25 @@ cdm <- generateDrugUtilisationCohortSet(cdm = cdm,
 ```
 
 We can see that our starting cohorts, before we add any additional restrictions, have the following counts
-``` {r}
+
+```{r}
 cohort_set(cdm$medications) %>% glimpse()
 cohort_count(cdm$medications) %>% glimpse()
 ```
 
 ### Require in date range
+
 We can require that individuals' cohort start date fall within a certain date range.
-``` {r}
+
+```{r}
 cdm$medications <- cdm$medications %>% 
   requireInDateRange(indexDate = "cohort_start_date",
                      dateRange = as.Date(c("2000-01-01", "2020-01-01")))
 ```
 
 Now that we've applied these date restrictions, we can see how many people and records have been excluded
-``` {r}
+
+```{r}
 cohort_count(cdm$medications) %>% glimpse()
 cohort_attrition(cdm$medications) %>% glimpse()
 cohort_attrition(cdm$medications) %>% 
@@ -79,8 +88,10 @@ cohort_attrition(cdm$medications) %>%
 ```
 
 ### Applying demographic requirements
+
 We can also add restrictions on age (on cohort start date) and sex.
-``` {r}
+
+```{r}
 cdm$medications <- cdm$medications %>% 
   requireDemographics(indexDate = "cohort_start_date",
                       ageRange = list(c(40, 65)),
@@ -88,14 +99,17 @@ cdm$medications <- cdm$medications %>%
 ```
 
 Again we can see how many individuals we've lost after applying this criteria.
-``` {r}
+
+```{r}
 cohort_attrition(cdm$medications) %>% 
   filter(reason == "Demographic requirements") %>% 
   glimpse()
 ```
 
 ### Require presence in another cohort
+
 We can also require that individuals are in another cohort over some window. Here for example we require that study participants are in a GI bleed cohort any time prior up to their entry in the medications cohort.
+
 ```{r}
 cdm <- generate_concept_cohort_set(cdm = cdm, 
                             name = "gibleed",
@@ -106,7 +120,7 @@ cdm$medications <- cdm$medications %>%
                              window = c(-Inf, 0))
 ```
 
-``` {r}
+```{r}
 cohort_attrition(cdm$medications) %>% 
   filter(reason == "In cohort gibleed between -Inf and 0 days relative to cohort_start_date") %>% 
   glimpse()
@@ -114,9 +128,10 @@ cohort_attrition(cdm$medications) %>%
 
 ### Combining cohorts
 
-Currently we have two separate cohorts. One of users of diclofenac, the other of users of acetaminophen. 
+Currently we have two separate cohorts. One of users of diclofenac, the other of users of acetaminophen.
 
 Let's say we want to create a cohort of people taking **either** diclofenac or acetaminophen. We could create this cohort like so:
+
 ```{r}
 
 ```
@@ -139,6 +154,5 @@ cohortCount(cdm$combinations)
 ```{r}
 cdmDisconnect(cdm)
 ```
-
 
 ## Evaluating cohorts
