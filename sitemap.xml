@@ -1,78 +1,102 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/404.html</loc>
+    <loc>https://ohdsi.github.io/CohortConstructor/404.html</loc>
   </url>
   <url>
-    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/LICENSE.html</loc>
+    <loc>https://ohdsi.github.io/CohortConstructor/LICENSE.html</loc>
   </url>
   <url>
-    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/articles/a01_building_concept_cohorts.html</loc>
+    <loc>https://ohdsi.github.io/CohortConstructor/articles/a01_building_concept_cohorts.html</loc>
   </url>
   <url>
-    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/articles/a02_applying_cohort_restrictions.html</loc>
+    <loc>https://ohdsi.github.io/CohortConstructor/articles/a02_applying_cohort_restrictions.html</loc>
   </url>
   <url>
-    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/articles/a03_age_sex_matching.html</loc>
+    <loc>https://ohdsi.github.io/CohortConstructor/articles/a03_age_sex_matching.html</loc>
   </url>
   <url>
-    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/articles/a04_cohort_timing.html</loc>
+    <loc>https://ohdsi.github.io/CohortConstructor/articles/index.html</loc>
   </url>
   <url>
-    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/articles/index.html</loc>
+    <loc>https://ohdsi.github.io/CohortConstructor/authors.html</loc>
   </url>
   <url>
-    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/authors.html</loc>
+    <loc>https://ohdsi.github.io/CohortConstructor/index.html</loc>
   </url>
   <url>
-    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/index.html</loc>
+    <loc>https://ohdsi.github.io/CohortConstructor/reference/CohortConstructor-package.html</loc>
   </url>
   <url>
-    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/reference/CohortConstructor-package.html</loc>
+    <loc>https://ohdsi.github.io/CohortConstructor/reference/conceptCohort.html</loc>
   </url>
   <url>
-    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/reference/generateIntersectCohortSet.html</loc>
+    <loc>https://ohdsi.github.io/CohortConstructor/reference/demographicsCohort.html</loc>
   </url>
   <url>
-    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/reference/generateMatchedCohortSet.html</loc>
+    <loc>https://ohdsi.github.io/CohortConstructor/reference/erafy.html</loc>
   </url>
   <url>
-    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/reference/getIdentifier.html</loc>
+    <loc>https://ohdsi.github.io/CohortConstructor/reference/index.html</loc>
   </url>
   <url>
-    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/reference/index.html</loc>
+    <loc>https://ohdsi.github.io/CohortConstructor/reference/intersectCohorts.html</loc>
   </url>
   <url>
-    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/reference/joinOverlap.html</loc>
+    <loc>https://ohdsi.github.io/CohortConstructor/reference/matchCohorts.html</loc>
   </url>
   <url>
-    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/reference/requireAge.html</loc>
+    <loc>https://ohdsi.github.io/CohortConstructor/reference/reexports.html</loc>
   </url>
   <url>
-    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/reference/requireCohortIntersectFlag.html</loc>
+    <loc>https://ohdsi.github.io/CohortConstructor/reference/requireAge.html</loc>
   </url>
   <url>
-    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/reference/requireDemographics.html</loc>
+    <loc>https://ohdsi.github.io/CohortConstructor/reference/requireCohortIntersectFlag.html</loc>
   </url>
   <url>
-    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/reference/requireFutureObservation.html</loc>
+    <loc>https://ohdsi.github.io/CohortConstructor/reference/requireConceptIntersectFlag.html</loc>
   </url>
   <url>
-    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/reference/requireInDateRange.html</loc>
+    <loc>https://ohdsi.github.io/CohortConstructor/reference/requireDeathFlag.html</loc>
   </url>
   <url>
-    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/reference/requirePriorObservation.html</loc>
+    <loc>https://ohdsi.github.io/CohortConstructor/reference/requireDemographics.html</loc>
   </url>
   <url>
-    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/reference/requireSex.html</loc>
+    <loc>https://ohdsi.github.io/CohortConstructor/reference/requireFutureObservation.html</loc>
   </url>
   <url>
-    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/reference/restrictToFirstEntry.html</loc>
+    <loc>https://ohdsi.github.io/CohortConstructor/reference/requireInDateRange.html</loc>
   </url>
   <url>
-    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/reference/splitOverlap.html</loc>
+    <loc>https://ohdsi.github.io/CohortConstructor/reference/requireIsFirstEntry.html</loc>
   </url>
   <url>
-    <loc>https://darwin-eu-dev.github.io/DrugUtilisation/reference/trimToDateRange.html</loc>
+    <loc>https://ohdsi.github.io/CohortConstructor/reference/requireIsLastEntry.html</loc>
+  </url>
+  <url>
+    <loc>https://ohdsi.github.io/CohortConstructor/reference/requirePriorObservation.html</loc>
+  </url>
+  <url>
+    <loc>https://ohdsi.github.io/CohortConstructor/reference/requireSex.html</loc>
+  </url>
+  <url>
+    <loc>https://ohdsi.github.io/CohortConstructor/reference/requireTableIntersectFlag.html</loc>
+  </url>
+  <url>
+    <loc>https://ohdsi.github.io/CohortConstructor/reference/subsetCohorts.html</loc>
+  </url>
+  <url>
+    <loc>https://ohdsi.github.io/CohortConstructor/reference/trimDemographics.html</loc>
+  </url>
+  <url>
+    <loc>https://ohdsi.github.io/CohortConstructor/reference/trimToDateRange.html</loc>
+  </url>
+  <url>
+    <loc>https://ohdsi.github.io/CohortConstructor/reference/unionCohorts.html</loc>
+  </url>
+  <url>
+    <loc>https://ohdsi.github.io/CohortConstructor/reference/yearCohorts.html</loc>
   </url>
 </urlset>
