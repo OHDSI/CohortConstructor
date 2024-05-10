@@ -2,10 +2,11 @@ pandoc: 3.1.11
 pkgdown: 2.0.9
 pkgdown_sha: ~
 articles:
-  a01_building_concept_cohorts: a01_building_concept_cohorts.html
+  a01_building_base_cohorts: a01_building_base_cohorts.html
   a02_applying_cohort_restrictions: a02_applying_cohort_restrictions.html
   a03_age_sex_matching: a03_age_sex_matching.html
-last_built: 2024-05-10T21:01Z
+  a04_cohort_manipulations: a04_cohort_manipulations.html
+last_built: 2024-05-10T22:11Z
 urls:
   reference: https://ohdsi.github.io/CohortConstructor/reference
   article: https://ohdsi.github.io/CohortConstructor/articles

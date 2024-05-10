@@ -41,9 +41,10 @@
 <li class="active nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/a01_building_concept_cohorts.html">a01_building_concept_cohorts</a>
+    <a class="dropdown-item" href="../articles/a01_building_base_cohorts.html">Building base cohorts</a>
     <a class="dropdown-item" href="../articles/a02_applying_cohort_restrictions.html">Applying cohort restrictions</a>
     <a class="dropdown-item" href="../articles/a03_age_sex_matching.html">Generate a matched age and sex cohort</a>
+    <a class="dropdown-item" href="../articles/a04_cohort_manipulations.html">Cohort manipulations</a>
   </div>
 </li>
       </ul>
@@ -76,42 +77,30 @@
 CDMConnector package.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://darwin-eu.github.io/CDMConnector/" class="external-link">CDMConnector</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://darwin-eu-dev.github.io/DrugUtilisation/" class="external-link">DrugUtilisation</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ohdsi.github.io/CohortConstructor/">CohortConstructor</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'CohortConstructor'</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:CDMConnector':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     intersectCohorts, unionCohorts</span></span>
 <span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">duckdb</span><span class="fu">::</span><span class="fu"><a href="https://r.duckdb.org/reference/duckdb.html" class="external-link">duckdb</a></span><span class="op">(</span><span class="op">)</span>, dbdir <span class="op">=</span> <span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/eunomiaDir.html" class="external-link">eunomia_dir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Creating CDM database /tmp/RtmpxAXl1j/eunomia/GiBleed_5.3.zip</span></span>
 <span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/cdm_from_con.html" class="external-link">cdm_from_con</a></span><span class="op">(</span><span class="va">con</span>, cdm_schema <span class="op">=</span> <span class="st">"main"</span>, </span>
 <span>                    write_schema <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>prefix <span class="op">=</span> <span class="st">"my_study_"</span>, schema <span class="op">=</span> <span class="st">"main"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Let’s start by creating two drug cohorts, one for users of diclofenac
-and another for users of acetaminophen. We’ll use the
-<code><a href="https://darwin-eu-dev.github.io/DrugUtilisation/reference/generateDrugUtilisationCohortSet.html" class="external-link">generateDrugUtilisationCohortSet()</a></code> from the DrugUtilisation
-package so that we can specify a gap era when creating the cohort.</p>
+and another for users of acetaminophen.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu-dev.github.io/DrugUtilisation/reference/generateDrugUtilisationCohortSet.html" class="external-link">generateDrugUtilisationCohortSet</a></span><span class="op">(</span>cdm <span class="op">=</span> <span class="va">cdm</span>,  </span>
-<span>                                        name <span class="op">=</span> <span class="st">"medications"</span>,</span>
-<span>                                        conceptSet <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"diclofenac"</span> <span class="op">=</span> <span class="fl">1124300</span>,</span>
-<span>                                                          <span class="st">"acetaminophen"</span> <span class="op">=</span> <span class="fl">1127433</span><span class="op">)</span>,</span>
-<span>                                        gapEra <span class="op">=</span> <span class="fl">7</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">medications</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/conceptCohort.html">conceptCohort</a></span><span class="op">(</span>cdm <span class="op">=</span> <span class="va">cdm</span>, </span>
+<span>                                 conceptSet <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"diclofenac"</span> <span class="op">=</span> <span class="fl">1124300</span>,</span>
+<span>                                                   <span class="st">"acetaminophen"</span> <span class="op">=</span> <span class="fl">1127433</span><span class="op">)</span>, </span>
+<span>                                 name <span class="op">=</span> <span class="st">"medications"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://darwin-eu-dev.github.io/omopgenerics/reference/cohortCount.html" class="external-link">cohortCount</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">medications</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 3</span></span></span>
 <span><span class="co">#&gt;   cohort_definition_id number_records number_subjects</span></span>
 <span><span class="co">#&gt;                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1            830             830</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                    2           <span style="text-decoration: underline;">9</span>363            <span style="text-decoration: underline;">2</span>580</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                    2           <span style="text-decoration: underline;">9</span>308            <span style="text-decoration: underline;">2</span>575</span></span></code></pre></div>
 <p>As well as our medication cohorts, let’s also make another cohort
-containing individuals with a record of a GI bleed. For this cohort we
-can use <code><a href="https://darwin-eu.github.io/CDMConnector/reference/generateConceptCohortSet.html" class="external-link">generateConceptCohortSet()</a></code> from the CDMConnector
-package. Later we’ll use this cohort when specifying inclusion/
-exclusion criteria.</p>
+containing individuals with a record of a GI bleed. Later we’ll use this
+cohort when specifying inclusion/ exclusion criteria.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/generateConceptCohortSet.html" class="external-link">generateConceptCohortSet</a></span><span class="op">(</span>cdm <span class="op">=</span> <span class="va">cdm</span>,  </span>
-<span>                                name <span class="op">=</span> <span class="st">"gi_bleed"</span>, </span>
-<span>                                conceptSet <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"gi_bleed"</span> <span class="op">=</span> <span class="fl">192671</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">gi_bleed</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/conceptCohort.html">conceptCohort</a></span><span class="op">(</span>cdm <span class="op">=</span> <span class="va">cdm</span>,  </span>
+<span>                              conceptSet <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"gi_bleed"</span> <span class="op">=</span> <span class="fl">192671</span><span class="op">)</span>,</span>
+<span>                              name <span class="op">=</span> <span class="st">"gi_bleed"</span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="keep-only-the-first-record-per-person">Keep only the first record per person<a class="anchor" aria-label="anchor" href="#keep-only-the-first-record-per-person"></a>
 </h2>
@@ -128,7 +117,7 @@ see that after this we have one record per person for each cohort.</p>
 <span><span class="co">#&gt;   cohort_definition_id number_records number_subjects</span></span>
 <span><span class="co">#&gt;                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1            830             830</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                    2           <span style="text-decoration: underline;">2</span>580            <span style="text-decoration: underline;">2</span>580</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                    2           <span style="text-decoration: underline;">2</span>575            <span style="text-decoration: underline;">2</span>575</span></span></code></pre></div>
 <p>Note, applying this criteria later after applying other criteria
 would result in a different result. Here we’re requiring that
 individuals meet inclusion criteria at the time of their first use of
@@ -153,11 +142,6 @@ on these demographic requirements.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/cohortAttrition.html" class="external-link">cohort_attrition</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">medications</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">reason</span> <span class="op">==</span> <span class="st">"Demographic requirements"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: `cohort_attrition()` was deprecated in CDMConnector 1.3.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use `attrition()` instead.</span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span>
 <span><span class="co">#&gt; Rows: 0</span></span>
 <span><span class="co">#&gt; Columns: 7</span></span>
 <span><span class="co">#&gt; $ cohort_definition_id <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> </span></span>

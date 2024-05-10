@@ -7,13 +7,16 @@
     <loc>https://ohdsi.github.io/CohortConstructor/LICENSE.html</loc>
   </url>
   <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/articles/a01_building_concept_cohorts.html</loc>
+    <loc>https://ohdsi.github.io/CohortConstructor/articles/a01_building_base_cohorts.html</loc>
   </url>
   <url>
     <loc>https://ohdsi.github.io/CohortConstructor/articles/a02_applying_cohort_restrictions.html</loc>
   </url>
   <url>
     <loc>https://ohdsi.github.io/CohortConstructor/articles/a03_age_sex_matching.html</loc>
+  </url>
+  <url>
+    <loc>https://ohdsi.github.io/CohortConstructor/articles/a04_cohort_manipulations.html</loc>
   </url>
   <url>
     <loc>https://ohdsi.github.io/CohortConstructor/articles/index.html</loc>
