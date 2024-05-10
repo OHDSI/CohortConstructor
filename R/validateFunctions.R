@@ -62,8 +62,12 @@ validateCohortId <- function(cohortId, ids) {
   } else {
     indNot <- !cohortId %in% ids
     if (sum(indNot)>0) {
-      cli::cli_warn("{paste0(cohortId[indNot], collapse = ', ')} {?is/are} not in the cohort table and won't be used.")
-      cohortId <- cohortId[!indNot]
+      if (sum(indNot) == length(cohortId)) {
+        cli::cli_abort("No valid cohort ids supplied.")
+      } else {
+        cli::cli_warn("{paste0(cohortId[indNot], collapse = ', ')} {?is/are} not in the cohort table and won't be used.")
+        cohortId <- cohortId[!indNot]
+      }
     }
   }
   return(cohortId)
@@ -147,4 +151,34 @@ validateMinFutureObservation <- function(minFutureObservation) {
 
 validateGap <- function(gap) {
   assertNumeric(gap, integerish = TRUE, min = 0)
+}
+
+validateDemographicRequirements <- function(ageRange,
+                                            sex,
+                                            minPriorObservation,
+                                            minFutureObservation) {
+  # ageRange:
+  assertList(ageRange, class = "numeric")
+  for (i in seq_along(ageRange)) {
+    if (length(ageRange[[i]]) != 2) {
+      cli::cli_abort("Each numeric vector in `ageRange` list must be of length 2.")
+    }
+    if (ageRange[[i]][1] >= ageRange[[i]][2]) {
+      cli::cli_abort("Upper `ageRange` value must be equal or higher than lower `ageRange` value.")
+    }
+    if (ageRange[[i]][1] < 0 | ageRange[[i]][2] < 0) {
+      cli::cli_abort("Both `ageRange` components must be >= 0.")
+    }
+  }
+
+  # sex:
+  assertCharacter(sex)
+  if (!all(sex %in% c("Male", "Female", "Both"))) {
+    cli::cli_abort("`sex` must be from: 'Male', 'Female', and 'Both'.")
+  }
+
+  # minPriorObservation:
+  assertNumeric(minPriorObservation, integerish = TRUE, min = 0)
+  # minFutureObservation:
+  assertNumeric(minFutureObservation, integerish = TRUE, min = 0)
 }

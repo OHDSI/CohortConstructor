@@ -134,6 +134,7 @@ conceptCohort <- function(cdm,
     ) |>
     dplyr::select(-"observation_period_start_date", -"observation_period_end_date") |>
     joinOverlap(gap = 0) |>
+    dplyr::mutate(subject_id = as.integer(.data$subject_id)) |>
     dplyr::compute(name = name, temporary = FALSE)
 
   cli::cli_inform(c("i" = "Creating cohort attributes."))

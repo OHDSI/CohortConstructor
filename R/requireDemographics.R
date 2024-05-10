@@ -255,7 +255,6 @@ demographicsFilter <- function(cohort,
                                reqFutureObservation) {
   # checks
   name <- validateName(name)
-  assertChoice(sex, choices = c("Both", "Male", "Female"), length = 1)
   validateCohortTable(cohort)
   cdm <- omopgenerics::cdmReference(cohort)
   validateCDM(cdm)
@@ -417,7 +416,7 @@ demographicsFilter <- function(cohort,
   newSet <- newSet |>
     dplyr::select(dplyr::all_of(c("target_cohort_rand01", "cohort_definition_id", "cohort_name", reqCols))) |>
     dplyr::mutate(target_cohort_rand01 = dplyr::if_else(
-      .data$requirements, .data$cohort_definition_id, .data$target_cohort_rand01)
+      is.na(.data$target_cohort_rand01), .data$cohort_definition_id, .data$target_cohort_rand01)
     ) |>
     dplyr::left_join(
       settings(cohort) |>
@@ -436,7 +435,7 @@ demographicsFilter <- function(cohort,
           "cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date",
           "target_cohort_rand01", indexDate
         ))),
-      by = c("target_cohort_rand01", "subject_id", "cohort_start_date", "cohort_end_date")) |>
+      by = unique(c("target_cohort_rand01", "subject_id", "cohort_start_date", "cohort_end_date", indexDate))) |>
     dplyr::select(!"target_cohort_rand01") |>
     dplyr::compute(name = name, temporary = FALSE) |>
     omopgenerics::newCohortTable(
