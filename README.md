@@ -10,6 +10,8 @@
 
 [![R-CMD-check](https://github.com/oxford-pharmacoepi/CohortConstructor/workflows/R-CMD-check/badge.svg)](https://github.com/oxford-pharmacoepi/CohortConstructor/actions)
 [![Lifecycle:Experimental](https://img.shields.io/badge/Lifecycle-Experimental-339999)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![Codecov test
+coverage](https://codecov.io/gh/ohdsi/CohortConstructor/branch/main/graph/badge.svg)](https://app.codecov.io/gh/ohdsi/CohortConstructor?branch=main)
 
 <!-- badges: end -->
 
@@ -33,9 +35,7 @@ devtools::install_github("ohdsi/CohortConstructor")
 ``` r
 library(CDMConnector)
 library(PatientProfiles)
-#> Warning: package 'PatientProfiles' was built under R version 4.2.3
 library(dplyr)
-#> Warning: package 'dplyr' was built under R version 4.2.3
 library(CohortConstructor)
 
 con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomia_dir())

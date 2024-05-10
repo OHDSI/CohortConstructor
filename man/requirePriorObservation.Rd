@@ -25,9 +25,6 @@ demographics characteristics on which to restrict on.}
 the database.}
 
 \item{name}{Name of the new cohort with the prior observation restriction.}
-
-\item{keep}{If TRUE cohorts used to apply restrictions will be kept as they
-were, otherwise they will be dropped from the cohort table.}
 }
 \value{
 The cohort table with only records for individuals satisfying the

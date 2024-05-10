@@ -21,9 +21,6 @@ cohort definition ids will be used.}
 those with that sex will be included.}
 
 \item{name}{Name of the new cohort with the sex requirements.}
-
-\item{keep}{If TRUE cohorts used to apply restrictions will be kept as they
-were, otherwise they will be dropped from the cohort table.}
 }
 \value{
 The cohort table with only records for individuals satisfying the

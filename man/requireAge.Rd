@@ -24,9 +24,6 @@ cohort definition ids will be used.}
 demographics characteristics on which to restrict on.}
 
 \item{name}{Name of the new cohort with the age requirement.}
-
-\item{keep}{If TRUE cohorts used to apply restrictions will be kept as they
-were, otherwise they will be dropped from the cohort table.}
 }
 \value{
 The cohort table with only records for individuals satisfying the

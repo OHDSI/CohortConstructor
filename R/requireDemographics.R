@@ -63,8 +63,6 @@ requireDemographics <- function(cohort,
 #' @param indexDate Variable in cohort that contains the date to compute the
 #' demographics characteristics on which to restrict on.
 #' @param ageRange A list of minimum and maximum age.
-#' @param keep If TRUE cohorts used to apply restrictions will be kept as they
-#' were, otherwise they will be dropped from the cohort table.
 #' @param name Name of the new cohort with the age requirement.
 #'
 #' @return The cohort table with only records for individuals satisfying the
@@ -109,8 +107,6 @@ requireAge <- function(cohort,
 #' cohort definition ids will be used.
 #' @param sex Can be "Both", "Male" or "Female". If one of the latter, only
 #' those with that sex will be included.
-#' @param keep If TRUE cohorts used to apply restrictions will be kept as they
-#' were, otherwise they will be dropped from the cohort table.
 #' @param name Name of the new cohort with the sex requirements.
 #'
 #' @return The cohort table with only records for individuals satisfying the
@@ -155,8 +151,6 @@ requireSex <- function(cohort,
 #' demographics characteristics on which to restrict on.
 #' @param minPriorObservation A minimum number of prior observation days in
 #' the database.
-#' @param keep If TRUE cohorts used to apply restrictions will be kept as they
-#' were, otherwise they will be dropped from the cohort table.
 #' @param name Name of the new cohort with the prior observation restriction.
 #'
 #' @return The cohort table with only records for individuals satisfying the
@@ -202,8 +196,6 @@ requirePriorObservation <- function(cohort,
 #' demographics characteristics on which to restrict on.
 #' @param minFutureObservation A minimum number of future observation days in
 #' the database.
-#' @param keep If TRUE cohorts used to apply restrictions will be kept as they
-#' were, otherwise they will be dropped from the cohort table.
 #' @param name Name of the new cohort with the future observation restriction.
 #'
 #' @return The cohort table with only records for individuals satisfying the
@@ -310,7 +302,8 @@ demographicsFilter <- function(cohort,
           )
         ) |>
         dplyr::rename("sex_req" = "sex"),
-      by = "target_cohort_rand01"
+      by = "target_cohort_rand01",
+      relationship = "many-to-many"
     ) |>
     dplyr::compute(name = workingName, temporary = FALSE) |>
     omopgenerics::newCohortTable(
@@ -509,8 +502,8 @@ reqDemographicsCohortSet <- function(set,
 
   combinations <- combinations |>
     dplyr::mutate(
-      min_age = as.numeric(sub("_.*", "", age_range)),
-      max_age = as.numeric(sub(".*_", "", age_range))
+      min_age = as.numeric(sub("_.*", "", .data$age_range)),
+      max_age = as.numeric(sub(".*_", "", .data$age_range))
     ) |>
     dplyr::select(!c("group_id"))
 
@@ -524,7 +517,8 @@ newAttribute <- function(newSet, att, cohortId) {
     dplyr::inner_join(
       att |>
         dplyr::rename("target_cohort_rand01" = "cohort_definition_id"),
-      by = "target_cohort_rand01"
+      by = "target_cohort_rand01",
+      relationship = "many-to-many"
     ) |>
     dplyr::select(!"target_cohort_rand01") |>
     dplyr::union_all(
