@@ -3,10 +3,14 @@
 
 # CohortConstructor
 
+> **This package is currently experimental and not currently recommended
+> for use.**
+
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/oxford-pharmacoepi/CohortConstructor/workflows/R-CMD-check/badge.svg)](https://github.com/oxford-pharmacoepi/CohortConstructor/actions)
 [![Lifecycle:Experimental](https://img.shields.io/badge/Lifecycle-Experimental-339999)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+
 <!-- badges: end -->
 
 The goal of CohortConstructor is to help on the creation and
@@ -21,7 +25,7 @@ You can install the development version of CohortConstructor from
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("oxford-pharmacoepi/CohortConstructor")
+devtools::install_github("ohdsi/CohortConstructor")
 ```
 
 ## Creating and manipulating cohorts
@@ -29,64 +33,43 @@ devtools::install_github("oxford-pharmacoepi/CohortConstructor")
 ``` r
 library(CDMConnector)
 library(PatientProfiles)
-library(DrugUtilisation)
-#> Warning: package 'DrugUtilisation' was built under R version 4.2.3
+#> Warning: package 'PatientProfiles' was built under R version 4.2.3
 library(dplyr)
 #> Warning: package 'dplyr' was built under R version 4.2.3
-#> 
-#> Attaching package: 'dplyr'
-#> The following objects are masked from 'package:stats':
-#> 
-#>     filter, lag
-#> The following objects are masked from 'package:base':
-#> 
-#>     intersect, setdiff, setequal, union
 library(CohortConstructor)
 
 con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomia_dir())
 cdm <- cdm_from_con(con, cdm_schema = "main", 
                     write_schema = c(prefix = "my_study_", schema = "main"))
+print(cdm)
 ```
 
 ### Generating concept based cohorts
 
-We’ll start by generating a set of drug cohorts, using
-generateDrugUtilisationCohortSet from the DrugUtilisation R package.
-Here we make two cohorts, one for diclofenac and another for
-acetaminophen, combining records with a gap of 7 days or less.
-
 ``` r
-cdm <- generateDrugUtilisationCohortSet(cdm = cdm,  
-                            name = "medications",
-                            conceptSet = list("diclofenac" = 1124300,
-                                           "acetaminophen" = 1127433),
-                            gapEra = 7)
+cdm$fractures <- cdm |> 
+  conceptCohort(conceptSet = list(
+    "ankle_fracture" = 4059173,
+    "forearm_fracture" = 4278672,
+    "hip_fracture" = 4230399),
+  name = "fractures")
 ```
 
 We can see that our starting cohorts, before we add any additional
 restrictions, have the following counts
 
 ``` r
-cohort_set(cdm$medications) %>% glimpse()
-#> Rows: 2
-#> Columns: 11
-#> $ cohort_definition_id    <int> 1, 2
-#> $ cohort_name             <chr> "diclofenac", "acetaminophen"
-#> $ duration_range_min      <chr> "1", "1"
-#> $ duration_range_max      <chr> "Inf", "Inf"
-#> $ impute_duration         <chr> "none", "none"
-#> $ gap_era                 <chr> "7", "7"
-#> $ prior_use_washout       <chr> "0", "0"
-#> $ prior_observation       <chr> "0", "0"
-#> $ cohort_date_range_start <chr> NA, NA
-#> $ cohort_date_range_end   <chr> NA, NA
-#> $ limit                   <chr> "all", "all"
-cohort_count(cdm$medications) %>% glimpse()
-#> Rows: 2
+settings(cdm$fractures) %>% glimpse()
+#> Rows: 3
+#> Columns: 2
+#> $ cohort_definition_id <int> 1, 2, 3
+#> $ cohort_name          <chr> "ankle_fracture", "forearm_fracture", "hip_fractu…
+cohort_count(cdm$fractures) %>% glimpse()
+#> Rows: 3
 #> Columns: 3
-#> $ cohort_definition_id <int> 2, 1
-#> $ number_records       <dbl> 9363, 830
-#> $ number_subjects      <dbl> 2580, 830
+#> $ cohort_definition_id <int> 1, 2, 3
+#> $ number_records       <int> 464, 569, 138
+#> $ number_subjects      <int> 427, 510, 132
 ```
 
 ### Require in date range
@@ -95,7 +78,7 @@ We can require that individuals’ cohort start date fall within a certain
 date range.
 
 ``` r
-cdm$medications <- cdm$medications %>% 
+cdm$fractures <- cdm$fractures %>% 
   requireInDateRange(indexDate = "cohort_start_date",
                      dateRange = as.Date(c("2000-01-01", "2020-01-01")))
 ```
@@ -104,34 +87,34 @@ Now that we’ve applied these date restrictions, we can see how many
 people and records have been excluded
 
 ``` r
-cohort_count(cdm$medications) %>% glimpse()
-#> Rows: 2
+cohort_count(cdm$fractures) %>% glimpse()
+#> Rows: 3
 #> Columns: 3
-#> $ cohort_definition_id <int> 2, 1
-#> $ number_records       <dbl> 2750, 397
-#> $ number_subjects      <dbl> 1737, 397
-cohort_attrition(cdm$medications) %>% glimpse()
-#> Rows: 16
+#> $ cohort_definition_id <int> 1, 2, 3
+#> $ number_records       <int> 108, 152, 62
+#> $ number_subjects      <int> 104, 143, 60
+attrition(cdm$fractures) %>% glimpse()
+#> Rows: 6
 #> Columns: 7
-#> $ cohort_definition_id <int> 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 2, 1
-#> $ number_records       <dbl> 9365, 9365, 9363, 9363, 9363, 9363, 9363, 850, 85…
-#> $ number_subjects      <dbl> 2580, 2580, 2580, 2580, 2580, 2580, 2580, 850, 85…
-#> $ reason_id            <dbl> 1, 2, 3, 4, 5, 6, 7, 1, 2, 3, 4, 5, 6, 7, 8, 8
-#> $ reason               <chr> "Qualifying initial records", "Duration imputatio…
-#> $ excluded_records     <dbl> 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 6613, …
-#> $ excluded_subjects    <dbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 843, 4…
-cohort_attrition(cdm$medications) %>% 
-  filter(reason == "cohort_start_date between 2000-01-01 and 2020-01-01") %>% 
+#> $ cohort_definition_id <int> 1, 1, 2, 2, 3, 3
+#> $ number_records       <int> 464, 108, 569, 152, 138, 62
+#> $ number_subjects      <int> 427, 104, 510, 143, 132, 60
+#> $ reason_id            <int> 1, 2, 1, 2, 1, 2
+#> $ reason               <chr> "Initial qualifying events", "cohort_start_date b…
+#> $ excluded_records     <int> 0, 356, 0, 417, 0, 76
+#> $ excluded_subjects    <int> 0, 323, 0, 367, 0, 72
+attrition(cdm$fractures) %>% 
+  filter(reason == "cohort_start_date between 2000-01-01 & 2020-01-01") %>% 
   glimpse()
-#> Rows: 2
+#> Rows: 3
 #> Columns: 7
-#> $ cohort_definition_id <int> 2, 1
-#> $ number_records       <dbl> 2750, 397
-#> $ number_subjects      <dbl> 1737, 397
-#> $ reason_id            <dbl> 8, 8
-#> $ reason               <chr> "cohort_start_date between 2000-01-01 and 2020-01…
-#> $ excluded_records     <dbl> 6613, 433
-#> $ excluded_subjects    <dbl> 843, 433
+#> $ cohort_definition_id <int> 1, 2, 3
+#> $ number_records       <int> 108, 152, 62
+#> $ number_subjects      <int> 104, 143, 60
+#> $ reason_id            <int> 2, 2, 2
+#> $ reason               <chr> "cohort_start_date between 2000-01-01 & 2020-01-0…
+#> $ excluded_records     <int> 356, 417, 76
+#> $ excluded_subjects    <int> 323, 367, 72
 ```
 
 ### Applying demographic requirements
@@ -139,7 +122,7 @@ cohort_attrition(cdm$medications) %>%
 We can also add restrictions on age (on cohort start date) and sex.
 
 ``` r
-cdm$medications <- cdm$medications %>% 
+cdm$fractures <- cdm$fractures %>% 
   requireDemographics(indexDate = "cohort_start_date",
                       ageRange = list(c(40, 65)),
                       sex = "Female")
@@ -149,18 +132,31 @@ Again we can see how many individuals we’ve lost after applying this
 criteria.
 
 ``` r
-cohort_attrition(cdm$medications) %>% 
-  filter(reason == "Demographic requirements") %>% 
+attrition(cdm$fractures) %>% 
+  filter(reason == "Age requirement: 40 to 65") %>% 
   glimpse()
-#> Rows: 2
+#> Rows: 3
 #> Columns: 7
-#> $ cohort_definition_id <int> 2, 1
-#> $ number_records       <dbl> 787, 75
-#> $ number_subjects      <dbl> 551, 75
-#> $ reason_id            <dbl> 9, 9
-#> $ reason               <chr> "Demographic requirements", "Demographic requirem…
-#> $ excluded_records     <dbl> 1963, 322
-#> $ excluded_subjects    <dbl> 1186, 322
+#> $ cohort_definition_id <int> 1, 2, 3
+#> $ number_records       <int> 43, 64, 22
+#> $ number_subjects      <int> 43, 62, 22
+#> $ reason_id            <int> 3, 3, 3
+#> $ reason               <chr> "Age requirement: 40 to 65", "Age requirement: 40…
+#> $ excluded_records     <int> 65, 88, 40
+#> $ excluded_subjects    <int> 61, 81, 38
+
+attrition(cdm$fractures) %>% 
+  filter(reason == "Sex requirement: Female") %>% 
+  glimpse()
+#> Rows: 3
+#> Columns: 7
+#> $ cohort_definition_id <int> 1, 2, 3
+#> $ number_records       <int> 19, 37, 12
+#> $ number_subjects      <int> 19, 36, 12
+#> $ reason_id            <int> 4, 4, 4
+#> $ reason               <chr> "Sex requirement: Female", "Sex requirement: Fema…
+#> $ excluded_records     <int> 24, 27, 10
+#> $ excluded_subjects    <int> 24, 26, 10
 ```
 
 ### Require presence in another cohort
@@ -170,69 +166,54 @@ window. Here for example we require that study participants are in a GI
 bleed cohort any time prior up to their entry in the medications cohort.
 
 ``` r
-cdm <- generate_concept_cohort_set(cdm = cdm, 
-                            name = "gibleed",
-                            concept_set = list("gibleed" = 192671))
+cdm$gibleed <- cdm |> 
+  conceptCohort(conceptSet = list("gibleed" = 192671),
+  name = "gibleed")
 
-cdm$medications <- cdm$medications %>% 
+
+cdm$fractures <- cdm$fractures %>% 
   requireCohortIntersectFlag(targetCohortTable = "gibleed",
                              window = c(-Inf, 0))
 ```
 
 ``` r
-cohort_attrition(cdm$medications) %>% 
-  filter(reason == "In cohort gibleed between -Inf and 0 days relative to cohort_start_date") %>% 
+attrition(cdm$fractures) %>% 
+  filter(reason == "In cohort gibleed between -Inf & 0 days relative to cohort_start_date") %>% 
   glimpse()
-#> Rows: 2
+#> Rows: 3
 #> Columns: 7
-#> $ cohort_definition_id <int> 2, 1
-#> $ number_records       <dbl> 136, 0
-#> $ number_subjects      <dbl> 89, 0
-#> $ reason_id            <dbl> 10, 10
-#> $ reason               <chr> "In cohort gibleed between -Inf and 0 days relati…
-#> $ excluded_records     <dbl> 651, 75
-#> $ excluded_subjects    <dbl> 462, 75
+#> $ cohort_definition_id <int> 1, 2, 3
+#> $ number_records       <int> 5, 7, 2
+#> $ number_subjects      <int> 5, 6, 2
+#> $ reason_id            <int> 7, 7, 7
+#> $ reason               <chr> "In cohort gibleed between -Inf & 0 days relative…
+#> $ excluded_records     <int> 14, 30, 10
+#> $ excluded_subjects    <int> 14, 30, 10
 ```
 
 ### Combining cohorts
 
-Currently we have two separate cohorts. One of users of diclofenac, the
-other of users of acetaminophen.
+Currently we have separate fracture cohorts.
 
-Let’s say we want to create a cohort of people taking **either**
-diclofenac or acetaminophen. We could create this cohort like so:
-
-Alternatively, we might want to create a cohort of people taking
-**both** diclofenac and acetaminophen. For this we can create this
-combination cohort like so:
-
-Both diclofenac and acetaminophen
-
-Generate a combination cohort.
+Let’s say we want to create a cohort of people with any of the
+fractures. We could create this cohort like so:
 
 ``` r
-cdm <- generateIntersectCohortSet(cdm = cdm, 
-                                    name = "combinations", 
-                                    targetCohortName = "medications")
+cdm$fractures <- cdm$fractures |> 
+  CohortConstructor::unionCohorts()
 
-cohortSet(cdm$combinations)
-#> # A tibble: 3 × 5
-#>   cohort_definition_id cohort_name   diclofenac acetaminophen mutually_exclusive
-#>                  <int> <chr>              <dbl>         <dbl> <lgl>             
-#> 1                    1 diclofenac             1            NA FALSE             
-#> 2                    2 acetaminophen         NA             1 FALSE             
-#> 3                    3 diclofenac+a…          1             1 FALSE
-cohortCount(cdm$combinations)
-#> # A tibble: 3 × 3
+settings(cdm$fractures)
+#> # A tibble: 1 × 3
+#>   cohort_definition_id cohort_name                                    gap
+#>                  <dbl> <chr>                                        <dbl>
+#> 1                    1 ankle_fracture_forearm_fracture_hip_fracture     0
+cohortCount(cdm$fractures)
+#> # A tibble: 1 × 3
 #>   cohort_definition_id number_records number_subjects
-#>                  <int>          <dbl>           <dbl>
-#> 1                    2            136              89
-#> 2                    1              0               0
-#> 3                    3              0               0
+#>                  <int>          <int>           <int>
+#> 1                    1             14              13
 ```
 
 ``` r
 cdmDisconnect(cdm)
 ```
-
-## Evaluating cohorts
