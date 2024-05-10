@@ -36,6 +36,7 @@ Imports:
 Suggests: 
     DBI,
     DrugUtilisation,
+    CodelistGenerator,
     duckdb,
     knitr,
     rmarkdown,
