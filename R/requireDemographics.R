@@ -46,10 +46,10 @@ requireDemographics <- function(cohort,
     minPriorObservation = minPriorObservation,
     minFutureObservation = minFutureObservation,
     name = name,
-    attritionAge = TRUE,
-    attritionSex = TRUE,
-    attritionPriorObservation = TRUE,
-    attritionFutureObservation = TRUE
+    reqAge = TRUE,
+    reqSex = TRUE,
+    reqPriorObservation = TRUE,
+    reqFutureObservation = TRUE
   )
 
   return(cohort)
@@ -91,10 +91,10 @@ requireAge <- function(cohort,
     minPriorObservation = 0,
     minFutureObservation = 0,
     name = name,
-    attritionAge = TRUE,
-    attritionSex = FALSE,
-    attritionPriorObservation = FALSE,
-    attritionFutureObservation = FALSE
+    reqAge = TRUE,
+    reqSex = FALSE,
+    reqPriorObservation = FALSE,
+    reqFutureObservation = FALSE
   )
 
   return(cohort)
@@ -133,10 +133,10 @@ requireSex <- function(cohort,
     minPriorObservation = 0,
     minFutureObservation = 0,
     name = name,
-    attritionAge = FALSE,
-    attritionSex = TRUE,
-    attritionPriorObservation = FALSE,
-    attritionFutureObservation = FALSE
+    reqAge = FALSE,
+    reqSex = TRUE,
+    reqPriorObservation = FALSE,
+    reqFutureObservation = FALSE
   )
 
   return(cohort)
@@ -178,10 +178,10 @@ requirePriorObservation <- function(cohort,
     minPriorObservation = minPriorObservation,
     minFutureObservation = 0,
     name = name,
-    attritionAge = FALSE,
-    attritionSex = FALSE,
-    attritionPriorObservation = TRUE,
-    attritionFutureObservation = FALSE
+    reqAge = FALSE,
+    reqSex = FALSE,
+    reqPriorObservation = TRUE,
+    reqFutureObservation = FALSE
   )
 
   return(cohort)
@@ -224,10 +224,10 @@ requireFutureObservation <- function(cohort,
     minPriorObservation = 0,
     minFutureObservation = minFutureObservation,
     name = name,
-    attritionAge = FALSE,
-    attritionSex = FALSE,
-    attritionPriorObservation = FALSE,
-    attritionFutureObservation = TRUE
+    reqAge = FALSE,
+    reqSex = FALSE,
+    reqPriorObservation = FALSE,
+    reqFutureObservation = TRUE
   )
 
   return(cohort)
@@ -241,54 +241,37 @@ demographicsFilter <- function(cohort,
                                minPriorObservation,
                                minFutureObservation,
                                name,
-                               attritionAge,
-                               attritionSex,
-                               attritionPriorObservation,
-                               attritionFutureObservation
-                               ) {
+                               reqAge,
+                               reqSex,
+                               reqPriorObservation,
+                               reqFutureObservation) {
   # checks
   name <- validateName(name)
-  assertChoice(sex, choices = c("Both", "Male", "Female"), length = 1)
   validateCohortTable(cohort)
   cdm <- omopgenerics::cdmReference(cohort)
   validateCDM(cdm)
   validateCohortColumn(indexDate, cohort, class = "Date")
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
   cohortId <- validateCohortId(cohortId, ids)
-  # age range
-  if (!is.list(ageRange)) {
-    cli::cli_abort("ageRange must be a list")
-  }
-  if (length(ageRange[[1]]) != 2 ||
-      !is.numeric(ageRange[[1]]) ||
-      !ageRange[[1]][2] >= ageRange[[1]][1] ||
-      !ageRange[[1]][1] >= 0) {
-    cli::cli_abort("ageRange only contain a vector of length two, with the
-                   second number greater or equal to the first")
-  }
-  if (length(ageRange) != 1) {
-    cli::cli_abort("Only a single ageRange is currently supported")
-  }
-  # minPriorObservation
-  if (!is.numeric(minPriorObservation) ||
-    length(minPriorObservation) != 1 ||
-    !minPriorObservation >= 0) {
-    cli::cli_abort("minPriorObservation must be a positive number")
-  }
-  # minFutureObservation
-  if (!is.numeric(minFutureObservation) ||
-    length(minFutureObservation) != 1 ||
-    !minFutureObservation >= 0) {
-    cli::cli_abort("minFutureObservation must be a positive number")
-  }
+  validateDemographicRequirements(ageRange, sex, minPriorObservation,
+                                  minFutureObservation)
 
-  minAge <- ageRange[[1]][1]
-  maxAge <- ageRange[[1]][2]
-  if (sex == "Both") {
-    sex <- c("Male", "Female")
-  }
-  noRequirementsIds <- ids[!ids %in% cohortId]
+  # output cohort attributes ----
+  reqCols <- c("age_range", "sex", "min_prior_observation",
+               "min_future_observation")[c(
+                 reqAge, reqSex, reqPriorObservation, reqFutureObservation)]
 
+  newSet <- reqDemographicsCohortSet(
+    omopgenerics::settings(cohort), cohortId, ageRange, sex,
+    minPriorObservation, minFutureObservation
+  )
+
+  tempSetName <- omopgenerics::uniqueTableName()
+  cdm <- CDMConnector::insertTable(cdm, name = tempSetName, newSet)
+  newAtt <- newAttribute(newSet, omopgenerics::attrition(cohort), cohortId)
+  newCod <- newAttribute(cdm[[tempSetName]], attr(cohort, "cohort_codelist"), cohortId)
+
+  # cohort table ----
   # because the cohort table passed to the function might have extra columns
   # that would conflict with ones we'll add, we'll take the core table first
   # join later
@@ -299,79 +282,246 @@ demographicsFilter <- function(cohort,
       "cohort_start_date", "cohort_end_date",
       indexDate
     ))) %>%
-    PatientProfiles::addDemographics(indexDate = indexDate) |>
+    PatientProfiles::addDemographics(
+      indexDate = indexDate,
+      age  = reqAge,
+      sex = reqSex,
+      priorObservation = reqPriorObservation,
+      futureObservation = reqFutureObservation
+    ) |>
     dplyr::compute(name = workingName, temporary = FALSE)
 
-  # filter and attritions
-  if (attritionAge) {
-    workingTable <- workingTable |>
-      dplyr::filter(
-        (.data$age >= .env$minAge & .data$age <= .env$maxAge) |
-          .data$cohort_definition_id %in% noRequirementsIds
-      ) |>
-      dplyr::compute(name = workingName, temporary = FALSE) |>
-      CDMConnector::recordCohortAttrition(
-        reason = glue::glue("Age requirement: {minAge} to {maxAge}"),
-        cohortId = cohortId
-      )
-  }
-  if (attritionSex) {
-    if (all(c("Male", "Female") %in% sex)) {
-      sexAttr <- "Both"
-    } else {
-      sexAttr <- sex
-    }
-    workingTable <- workingTable |>
-      dplyr::filter(
-        .data$sex %in% .env$sex |
-          .data$cohort_definition_id %in% noRequirementsIds
-      ) |>
-      dplyr::compute(name = workingName, temporary = FALSE) |>
-      CDMConnector::recordCohortAttrition(
-        reason = glue::glue("Sex requirement: {sexAttr}"),
-        cohortId = cohortId
-      )
-  }
-  if (attritionPriorObservation) {
-    workingTable <- workingTable |>
-      dplyr::filter(
-        .data$prior_observation >= .env$minPriorObservation |
-          .data$cohort_definition_id %in% noRequirementsIds
-      ) |>
-      dplyr::compute(name = workingName, temporary = FALSE) |>
-      CDMConnector::recordCohortAttrition(
-        reason = glue::glue("Prior observation requirement: {minPriorObservation} days"),
-        cohortId = cohortId
-      )
-  }
-  if (attritionFutureObservation) {
-    workingTable <- workingTable |>
-      dplyr::filter(
-        .data$future_observation >= .env$minFutureObservation |
-          .data$cohort_definition_id %in% noRequirementsIds) |>
-      dplyr::compute(name = workingName, temporary = FALSE) |>
-      CDMConnector::recordCohortAttrition(
-        reason = glue::glue("Future observation requirement: {minFutureObservation} days"),
-        cohortId = cohortId)
-  }
-
-  # get original columns
-  cohort <- cohort |>
-    dplyr::inner_join(
-      workingTable |>
-        dplyr::select(
-          c("cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date")
-        ),
-      by = c("cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date")
+  # all output cohorts in one table to filter all at the same time:
+  workingTable <- workingTable |>
+    dplyr::rename("target_cohort_rand01" = "cohort_definition_id") |>
+    dplyr::left_join(
+      cdm[[tempSetName]] |>
+        dplyr::mutate(
+          target_cohort_rand01 = dplyr::if_else(
+            is.na(.data$target_cohort_rand01), .data$cohort_definition_id, .data$target_cohort_rand01
+          )
+        ) |>
+        dplyr::rename("sex_req" = "sex"),
+      by = "target_cohort_rand01",
+      relationship = "many-to-many"
     ) |>
-    dplyr::compute(name = name, temporary = FALSE) %>%
+    dplyr::compute(name = workingName, temporary = FALSE) |>
     omopgenerics::newCohortTable(
-      cohortSetRef = omopgenerics::settings(workingTable),
-      cohortAttritionRef = omopgenerics::attrition(workingTable)
+      cohortSetRef = newSet,
+      cohortAttritionRef = newAtt,
+      cohortCodelistRef = newCod,
+      .softValidation = TRUE
     )
 
-  # drop working table and its attributes
-  omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with(workingName))
+  # filter + record attrition ----
+  # age
+  if (reqAge) {
+    # filter
+    workingTable <- workingTable |>
+      dplyr::filter(.data$age >= .data$min_age & .data$age <= .data$max_age) |>
+      dplyr::compute(name = workingName, temporary = FALSE)
+    # attrition
+    uniqueRanges <- unique(newSet$age_range)
+    for (ii in seq_along(uniqueRanges)) {
+      ids <- newSet |>
+        dplyr::filter(.data$age_range == .env$uniqueRanges[ii]) |>
+        dplyr::filter(.data$requirements)
+      minAge <- unique(ids$min_age)
+      maxAge <- unique(ids$max_age)
+      ids <- ids$cohort_definition_id
+      if (length(ids) > 0) {
+        workingTable <- workingTable |>
+          omopgenerics::recordCohortAttrition(
+            reason = glue::glue("Age requirement: {minAge} to {maxAge}"),
+            cohortId = ids
+          )
+      }
+    }
+  }
+  # sex
+  if (reqSex) {
+    workingTable <- workingTable |>
+      dplyr::filter(.data$sex == .data$sex_req | .data$sex_req == "Both") |>
+      dplyr::compute(name = workingName, temporary = FALSE)
+    # attrition
+    uniqueSex <- unique(newSet$sex)
+    for (ii in seq_along(uniqueSex)) {
+      ids <- newSet |>
+        dplyr::filter(.data$sex == .env$uniqueSex[ii]) |>
+        dplyr::filter(.data$requirements)
+      sex <- unique(ids$sex)
+      ids <- ids$cohort_definition_id
+      if (length(ids) > 0) {
+        workingTable <- workingTable |>
+          omopgenerics::recordCohortAttrition(
+            reason = glue::glue("Sex requirement: {sex}"),
+            cohortId = ids
+          )
+      }
+    }
+  }
+  # prior observation
+  if (reqPriorObservation) {
+    workingTable <- workingTable |>
+      dplyr::filter(.data$prior_observation >= .data$min_prior_observation) |>
+      dplyr::compute(name = workingName, temporary = FALSE)
+    # attrition
+    uniquePrior <- unique(newSet$min_prior_observation)
+    for (ii in seq_along(uniquePrior)) {
+      ids <- newSet |>
+        dplyr::filter(.data$min_prior_observation == .env$uniquePrior[ii]) |>
+        dplyr::filter(.data$requirements)
+      minPriorObservation <- unique(ids$min_prior_observation)
+      ids <- ids$cohort_definition_id
+      if (length(ids) > 0) {
+        workingTable <- workingTable |>
+          omopgenerics::recordCohortAttrition(
+            reason = glue::glue("Prior observation requirement: {minPriorObservation} days"),
+            cohortId = ids
+          )
+      }
+    }
+  }
+  # future observation
+  if (reqFutureObservation) {
+    workingTable <- workingTable |>
+      dplyr::filter(.data$future_observation >= .data$min_future_observation) |>
+      dplyr::compute(name = workingName, temporary = FALSE)
+    # attrition
+    uniqueFuture <- unique(newSet$min_future_observation)
+    for (ii in seq_along(uniqueFuture)) {
+      ids <- newSet |>
+        dplyr::filter(.data$min_future_observation == .env$uniqueFuture[ii]) |>
+        dplyr::filter(.data$requirements)
+      minFutureObservation <- unique(ids$min_future_observation)
+      ids <- ids$cohort_definition_id
+      if (length(ids) > 0) {
+        workingTable <- workingTable |>
+          omopgenerics::recordCohortAttrition(
+            reason = glue::glue("Future observation requirement: {minFutureObservation} days"),
+            cohortId = ids
+          )
+      }
+    }
+  }
 
-  return(cohort)
+  # get original columns in settings
+  newSet <- newSet |>
+    dplyr::select(dplyr::all_of(c("target_cohort_rand01", "cohort_definition_id", "cohort_name", reqCols))) |>
+    dplyr::mutate(target_cohort_rand01 = dplyr::if_else(
+      is.na(.data$target_cohort_rand01), .data$cohort_definition_id, .data$target_cohort_rand01)
+    ) |>
+    dplyr::left_join(
+      settings(cohort) |>
+        dplyr::select(!dplyr::any_of(c(reqCols, "cohort_name"))) |>
+        dplyr::rename("target_cohort_rand01" = "cohort_definition_id"),
+      by = "target_cohort_rand01"
+    ) |>
+    dplyr::select(!"target_cohort_rand01")
+
+  # get original columns in cohort
+  newCohort <- cohort |>
+    dplyr::rename("target_cohort_rand01" = "cohort_definition_id") |>
+    dplyr::inner_join(
+      workingTable |>
+        dplyr::select(dplyr::all_of(c(
+          "cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date",
+          "target_cohort_rand01", indexDate
+        ))),
+      by = unique(c("target_cohort_rand01", "subject_id", "cohort_start_date", "cohort_end_date", indexDate))) |>
+    dplyr::select(!"target_cohort_rand01") |>
+    dplyr::compute(name = name, temporary = FALSE) |>
+    omopgenerics::newCohortTable(
+      cohortSetRef = newSet,
+      cohortAttritionRef = attrition(workingTable),
+      cohortCodelistRef = newCod
+    )
+
+  # drop working tables and their attributes
+  omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with(workingName))
+  omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with(tempSetName))
+
+  return(newCohort)
+}
+
+reqDemographicsCohortSet <- function(set,
+                                     targetIds,
+                                     ageRange,
+                                     sex,
+                                     minPriorObservation,
+                                     minFutureObservation) {
+
+  combinations <- tidyr::expand_grid(
+    requirements = TRUE,
+    target_cohort_rand01 = targetIds,
+    age_range = lapply(ageRange, function(x){paste0(x[1], "_", x[2])}) |> unlist(),
+    sex = sex,
+    min_prior_observation = minPriorObservation,
+    min_future_observation = minFutureObservation
+  ) |>
+    dplyr::mutate(cohort_definition_id = .data$target_cohort_rand01) |>
+    dplyr::arrange(.data$cohort_definition_id, .data$age_range, .data$sex, .data$min_prior_observation, .data$min_future_observation) |>
+    dplyr::group_by(.data$cohort_definition_id) |>
+    dplyr::mutate(group_id = dplyr::row_number()) |>
+    dplyr::ungroup() |>
+    dplyr::left_join(
+      set |> dplyr::select("cohort_definition_id", "cohort_name"),
+      by = "cohort_definition_id"
+    ) |>
+    dplyr::bind_rows(
+      set |>
+        dplyr::select("cohort_definition_id", "cohort_name") |>
+        dplyr::filter(!.data$cohort_definition_id %in% targetIds) |>
+        dplyr::mutate(
+          age_range = "0_150",
+          sex = "Both",
+          min_prior_observation  = 0,
+          min_future_observation = 0,
+          group_id = 1,
+          requirements = FALSE
+        )
+    ) |>
+    # correct ids
+    dplyr::arrange(.data$group_id, .data$cohort_definition_id) |>
+    dplyr::mutate(
+      cohort_definition_id = dplyr::if_else(
+        .data$group_id == 1,
+        .data$cohort_definition_id,
+        dplyr::row_number()
+      )
+    )
+  # correct names
+  if (length(ageRange) > 1 | length(sex) > 1 | length(minPriorObservation) > 1 |
+      length(minFutureObservation) > 1) {
+    combinations <- combinations |>
+      dplyr::mutate(cohort_name = dplyr::if_else(
+        .data$requirements, paste0(.data$cohort_name, "_", .data$group_id), .data$cohort_name
+      ))
+  }
+
+
+  combinations <- combinations |>
+    dplyr::mutate(
+      min_age = as.numeric(sub("_.*", "", .data$age_range)),
+      max_age = as.numeric(sub(".*_", "", .data$age_range))
+    ) |>
+    dplyr::select(!c("group_id"))
+
+  # new cohort set
+  return(combinations)
+}
+
+newAttribute <- function(newSet, att, cohortId) {
+  newSet |>
+    dplyr::select(c("cohort_definition_id", "target_cohort_rand01")) |>
+    dplyr::inner_join(
+      att |>
+        dplyr::rename("target_cohort_rand01" = "cohort_definition_id"),
+      by = "target_cohort_rand01",
+      relationship = "many-to-many"
+    ) |>
+    dplyr::select(!"target_cohort_rand01") |>
+    dplyr::union_all(
+      att |> dplyr::filter(!.data$cohort_definition_id %in% .env$cohortId)
+    )
 }

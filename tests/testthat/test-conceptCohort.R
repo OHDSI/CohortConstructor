@@ -46,7 +46,7 @@ test_that("expected errors and messages", {
     settings(x), dplyr::tibble("cohort_definition_id" = 1L, "cohort_name" = "a")
   )
   expect_true(nrow(attrition(x)) == 1)
-  # currently only standard concepts are includes in cohortCodelist see https://github.com/oxford-pharmacoepi/CohortConstructor/issues/74
+  # currently only standard concepts are includes in cohortCodelist see https://github.com/OHDSI/CohortConstructor/issues/74
   expect_warning(expect_equal(
     cohortCodelist(x, 1), omopgenerics::newCodelist(list())
   ))
