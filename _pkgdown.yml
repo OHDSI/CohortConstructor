@@ -3,20 +3,16 @@ template:
   bootstrap: 5
 
 reference:
-- subtitle: Create concept based cohorts
-  desc: Build base cohorts
+- subtitle: Build base cohorts
 - contents:
   - matches("conceptCohort|demographicsCohort|addPriorObservation")
 - subtitle: Impose requirements on existing cohorts
-  desc: Restricts cohorts to only those satisfying the specified inclusion criteria
 - contents:
   - matches("^require")
-- subtitle: Update cohort entry durations
-  desc: Updates inidividuals cohort start and end dates based on some critirea
+- subtitle: Update cohort start and end dates
 - contents:
   - matches("^trim")
-- subtitle: Alter cohorts
-  desc: Update cohort set
+- subtitle: Cohort manipulations
 - contents:
   - matches("erafy|intersectCohorts|matchCohorts|subsetCohorts|unionCohorts|yearCohorts")
 
