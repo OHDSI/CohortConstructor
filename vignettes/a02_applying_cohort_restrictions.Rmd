@@ -7,12 +7,11 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-
 ```{r, include = FALSE}
 
 knitr::opts_chunk$set(
   collapse = TRUE,
-  eval = TRUE,
+  eval = TRUE, message = FALSE, warning = FALSE,
   comment = "#>"
 )
 
@@ -29,28 +28,26 @@ if (!dir.exists(Sys.getenv("EUNOMIA_DATA_FOLDER"))){ dir.create(Sys.getenv("EUNO
 For this example we'll use the Eunomia synthetic data from the CDMConnector package.
 ```{r}
 library(CDMConnector)
-library(DrugUtilisation)
 library(CohortConstructor)
 con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomia_dir())
 cdm <- cdm_from_con(con, cdm_schema = "main", 
                     write_schema = c(prefix = "my_study_", schema = "main"))
 ```
 
-Let's start by creating two drug cohorts, one for users of diclofenac and another for users of acetaminophen. We'll use the `generateDrugUtilisationCohortSet()` from the DrugUtilisation package so that we can specify a gap era when creating the cohort.
+Let's start by creating two drug cohorts, one for users of diclofenac and another for users of acetaminophen. 
 ```{r}
-cdm <- generateDrugUtilisationCohortSet(cdm = cdm,  
-                                        name = "medications",
-                                        conceptSet = list("diclofenac" = 1124300,
-                                                          "acetaminophen" = 1127433),
-                                        gapEra = 7)
+cdm$medications <- conceptCohort(cdm = cdm, 
+                                 conceptSet = list("diclofenac" = 1124300,
+                                                   "acetaminophen" = 1127433), 
+                                 name = "medications")
 cohortCount(cdm$medications)
 ```
 
-As well as our medication cohorts, let's also make another cohort containing individuals with a record of a GI bleed. For this cohort we can use `generateConceptCohortSet()` from the CDMConnector package. Later we'll use this cohort when specifying inclusion/ exclusion criteria.
+As well as our medication cohorts, let's also make another cohort containing individuals with a record of a GI bleed. Later we'll use this cohort when specifying inclusion/ exclusion criteria.
 ```{r}
-cdm <- generateConceptCohortSet(cdm = cdm,  
-                                name = "gi_bleed", 
-                                conceptSet = list("gi_bleed" = 192671))
+cdm$gi_bleed <- conceptCohort(cdm = cdm,  
+                              conceptSet = list("gi_bleed" = 192671),
+                              name = "gi_bleed")
 ```
 
 ## Keep only the first record per person
