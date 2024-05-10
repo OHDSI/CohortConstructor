@@ -13,10 +13,8 @@
 
 <!-- badges: end -->
 
-The goal of CohortConstructor is to help on the creation and
-manipulation of cohorts in the OMOP Common Data Model. The package
-provides functions to support cohort building pipelines and additional
-functions to support cohort evaluation.
+The goal of CohortConstructor is to support the creation and
+manipulation of cohorts in the OMOP Common Data Model.
 
 ## Installation
 
@@ -30,10 +28,15 @@ devtools::install_github("ohdsi/CohortConstructor")
 
 ## Creating and manipulating cohorts
 
+To illustrate how the functionality let’s create a CDM reference for the
+Eunomia dataset Using the CDMConnector package.
+
 ``` r
 library(CDMConnector)
 library(PatientProfiles)
+#> Warning: package 'PatientProfiles' was built under R version 4.2.3
 library(dplyr)
+#> Warning: package 'dplyr' was built under R version 4.2.3
 library(CohortConstructor)
 
 con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomia_dir())
@@ -43,6 +46,11 @@ print(cdm)
 ```
 
 ### Generating concept based cohorts
+
+We start by making a concept based cohort. For this we only need to
+provide concept sets and we will get a cohort back, with cohort end date
+the event date associated with the records, overlapping records
+collapsed, and only records in observation kept.
 
 ``` r
 cdm$fractures <- cdm |> 
@@ -54,7 +62,8 @@ cdm$fractures <- cdm |>
 ```
 
 We can see that our starting cohorts, before we add any additional
-restrictions, have the following counts
+restrictions, have the following associated settings, counts, and
+attrition.
 
 ``` r
 settings(cdm$fractures) %>% glimpse()
@@ -68,21 +77,31 @@ cohort_count(cdm$fractures) %>% glimpse()
 #> $ cohort_definition_id <int> 1, 2, 3
 #> $ number_records       <int> 464, 569, 138
 #> $ number_subjects      <int> 427, 510, 132
+attrition(cdm$fractures) %>% glimpse()
+#> Rows: 3
+#> Columns: 7
+#> $ cohort_definition_id <int> 1, 2, 3
+#> $ number_records       <int> 464, 569, 138
+#> $ number_subjects      <int> 427, 510, 132
+#> $ reason_id            <int> 1, 1, 1
+#> $ reason               <chr> "Initial qualifying events", "Initial qualifying …
+#> $ excluded_records     <int> 0, 0, 0
+#> $ excluded_subjects    <int> 0, 0, 0
 ```
 
 ### Require in date range
 
-We can require that individuals’ cohort start date fall within a certain
-date range.
+Once we have created our base cohort, we can then start applying
+additional cohort requirements. For example, first we can require that
+individuals’ cohort start date fall within a certain date range.
 
 ``` r
 cdm$fractures <- cdm$fractures %>% 
-  requireInDateRange(indexDate = "cohort_start_date",
-                     dateRange = as.Date(c("2000-01-01", "2020-01-01")))
+  requireInDateRange(dateRange = as.Date(c("2000-01-01", "2020-01-01")))
 ```
 
-Now that we’ve applied these date restrictions, we can see how many
-people and records have been excluded
+Now that we’ve applied this date restriction, we can see that our cohort
+attributes have been updated
 
 ``` r
 cohort_count(cdm$fractures) %>% glimpse()
@@ -91,16 +110,6 @@ cohort_count(cdm$fractures) %>% glimpse()
 #> $ cohort_definition_id <int> 1, 2, 3
 #> $ number_records       <int> 108, 152, 62
 #> $ number_subjects      <int> 104, 143, 60
-attrition(cdm$fractures) %>% glimpse()
-#> Rows: 6
-#> Columns: 7
-#> $ cohort_definition_id <int> 1, 1, 2, 2, 3, 3
-#> $ number_records       <int> 464, 108, 569, 152, 138, 62
-#> $ number_subjects      <int> 427, 104, 510, 143, 132, 60
-#> $ reason_id            <int> 1, 2, 1, 2, 1, 2
-#> $ reason               <chr> "Initial qualifying events", "cohort_start_date b…
-#> $ excluded_records     <int> 0, 356, 0, 417, 0, 76
-#> $ excluded_subjects    <int> 0, 323, 0, 367, 0, 72
 attrition(cdm$fractures) %>% 
   filter(reason == "cohort_start_date between 2000-01-01 & 2020-01-01") %>% 
   glimpse()
@@ -117,16 +126,16 @@ attrition(cdm$fractures) %>%
 
 ### Applying demographic requirements
 
-We can also add restrictions on age (on cohort start date) and sex.
+We can also add restrictions on patient characteristics such as age (on
+cohort start date by default) and sex.
 
 ``` r
 cdm$fractures <- cdm$fractures %>% 
-  requireDemographics(indexDate = "cohort_start_date",
-                      ageRange = list(c(40, 65)),
+  requireDemographics(ageRange = list(c(40, 65)),
                       sex = "Female")
 ```
 
-Again we can see how many individuals we’ve lost after applying this
+Again we can see how many individuals we’ve lost after applying these
 criteria.
 
 ``` r
@@ -161,13 +170,12 @@ attrition(cdm$fractures) %>%
 
 We can also require that individuals are in another cohort over some
 window. Here for example we require that study participants are in a GI
-bleed cohort any time prior up to their entry in the medications cohort.
+bleed cohort any time prior up to their entry in the fractures cohort.
 
 ``` r
 cdm$gibleed <- cdm |> 
   conceptCohort(conceptSet = list("gibleed" = 192671),
   name = "gibleed")
-
 
 cdm$fractures <- cdm$fractures %>% 
   requireCohortIntersectFlag(targetCohortTable = "gibleed",
