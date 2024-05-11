@@ -6,16 +6,27 @@ reference:
 - subtitle: Build base cohorts
 - contents:
   - matches("conceptCohort|demographicsCohort|addPriorObservation")
-- subtitle: Impose requirements on existing cohorts
+- subtitle: Limit to an individualss first or last cohort entry
 - contents:
-  - matches("^require")
+  - matches("requireIsFirstEntry|requireIsLastEntry")
+- subtitle: Impose date requirements on existing cohorts
+- contents:
+  - matches("requireInDateRange")
+- subtitle: Impose singular demographic requirements on existing cohorts
+- contents:
+  - matches("requireAge|requireSex|requirePriorObservation|requireFutureObservation")
+- subtitle: Impose multiple demographic requirements on existing cohorts
+- contents:
+  - matches("requireDemographics")
+- subtitle: Impose requirements of presence or absence in other cohorts, concept sets, or table
+- contents:
+  - matches("requireCohortIntersectFlag|requireConceptIntersectFlag|requireTableIntersectFlag")
+- subtitle: Impose presence or absence of a death record within a time window
+- contents:
+  - matches("requireDeathFlag")
 - subtitle: Update cohort start and end dates
 - contents:
   - matches("^trim")
 - subtitle: Cohort manipulations
 - contents:
   - matches("erafy|intersectCohorts|matchCohorts|subsetCohorts|unionCohorts|yearCohorts")
-
-
-
-
