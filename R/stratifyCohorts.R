@@ -85,7 +85,10 @@ stratifyCohorts <- function(cohort,
       "number_records" = dplyr::n(),
       .groups = "drop"
     ) |>
-    dplyr::collect()
+    dplyr::collect() |>
+    dplyr::arrange(dplyr::across(dplyr::all_of(c(
+      "cohort_definition_id", strataCols
+    ))))
 
   newSettings <- getNewSettingsStrata(set, strata, counts)
 
@@ -136,11 +139,13 @@ stratifyCohorts <- function(cohort,
 
 getNewSettingsStrata <- function(set, strata, counts) {
   lapply(strata, function(x) {
+    values <- counts |>
+      dplyr::select(dplyr::all_of(x)) |>
+      as.list() |>
+      lapply(unique)
     set |>
       dplyr::cross_join(
-        counts |>
-          dplyr::select(dplyr::all_of(x)) |>
-          dplyr::distinct() |>
+        tidyr::expand_grid(!!!values) |>
           tidyr::unite(
             col = "cohort_name", dplyr::all_of(x), sep = "_", remove = FALSE
           ) |>
