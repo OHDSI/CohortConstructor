@@ -66,7 +66,44 @@
         <dd>Create the observation period cohort</dd>
       </dl></div><div class="section level2">
       
-      <h3 id="impose-requirements-on-existing-cohorts">Impose requirements on existing cohorts<a class="anchor" aria-label="anchor" href="#impose-requirements-on-existing-cohorts"></a></h3>
+      <h3 id="limit-to-an-individualss-first-or-last-cohort-entry">Limit to an individualss first or last cohort entry<a class="anchor" aria-label="anchor" href="#limit-to-an-individualss-first-or-last-cohort-entry"></a></h3>
+      
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="requireIsFirstEntry.html">requireIsFirstEntry()</a></code> 
+        </dt>
+        <dd>Restrict cohort to first entry by index date</dd>
+      </dl><dl><dt>
+          
+          <code><a href="requireIsLastEntry.html">requireIsLastEntry()</a></code> 
+        </dt>
+        <dd>Restrict cohort to last entry by index date</dd>
+      </dl></div><div class="section level2">
+      
+      <h3 id="impose-date-requirements-on-existing-cohorts">Impose date requirements on existing cohorts<a class="anchor" aria-label="anchor" href="#impose-date-requirements-on-existing-cohorts"></a></h3>
+      
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="requireInDateRange.html">requireInDateRange()</a></code> 
+        </dt>
+        <dd>Require that an index date is within a date range</dd>
+      </dl></div><div class="section level2">
+      
+      <h3 id="impose-singular-demographic-requirements-on-existing-cohorts">Impose singular demographic requirements on existing cohorts<a class="anchor" aria-label="anchor" href="#impose-singular-demographic-requirements-on-existing-cohorts"></a></h3>
       
 
       
@@ -82,44 +119,9 @@
         <dd>Restrict cohort on age</dd>
       </dl><dl><dt>
           
-          <code><a href="requireCohortIntersectFlag.html">requireCohortIntersectFlag()</a></code> 
-        </dt>
-        <dd>Require cohort subjects are present in another cohort</dd>
-      </dl><dl><dt>
-          
-          <code><a href="requireConceptIntersectFlag.html">requireConceptIntersectFlag()</a></code> 
-        </dt>
-        <dd>Require cohort subjects to have events of a concept list</dd>
-      </dl><dl><dt>
-          
-          <code><a href="requireDeathFlag.html">requireDeathFlag()</a></code> 
-        </dt>
-        <dd>Require cohort subjects' death at a certain time window</dd>
-      </dl><dl><dt>
-          
-          <code><a href="requireDemographics.html">requireDemographics()</a></code> 
-        </dt>
-        <dd>Restrict cohort on patient demographics</dd>
-      </dl><dl><dt>
-          
           <code><a href="requireFutureObservation.html">requireFutureObservation()</a></code> 
         </dt>
         <dd>Restrict cohort on future observation</dd>
-      </dl><dl><dt>
-          
-          <code><a href="requireInDateRange.html">requireInDateRange()</a></code> 
-        </dt>
-        <dd>Require that an index date is within a date range</dd>
-      </dl><dl><dt>
-          
-          <code><a href="requireIsFirstEntry.html">requireIsFirstEntry()</a></code> 
-        </dt>
-        <dd>Restrict cohort to first entry by index date</dd>
-      </dl><dl><dt>
-          
-          <code><a href="requireIsLastEntry.html">requireIsLastEntry()</a></code> 
-        </dt>
-        <dd>Restrict cohort to last entry by index date</dd>
       </dl><dl><dt>
           
           <code><a href="requirePriorObservation.html">requirePriorObservation()</a></code> 
@@ -130,11 +132,64 @@
           <code><a href="requireSex.html">requireSex()</a></code> 
         </dt>
         <dd>Restrict cohort on sex</dd>
+      </dl></div><div class="section level2">
+      
+      <h3 id="impose-multiple-demographic-requirements-on-existing-cohorts">Impose multiple demographic requirements on existing cohorts<a class="anchor" aria-label="anchor" href="#impose-multiple-demographic-requirements-on-existing-cohorts"></a></h3>
+      
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="requireDemographics.html">requireDemographics()</a></code> 
+        </dt>
+        <dd>Restrict cohort on patient demographics</dd>
+      </dl></div><div class="section level2">
+      
+      <h3 id="impose-requirements-of-presence-or-absence-in-other-cohorts-concept-sets-or-table">Impose requirements of presence or absence in other cohorts, concept sets, or table<a class="anchor" aria-label="anchor" href="#impose-requirements-of-presence-or-absence-in-other-cohorts-concept-sets-or-table"></a></h3>
+      
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="requireCohortIntersectFlag.html">requireCohortIntersectFlag()</a></code> 
+        </dt>
+        <dd>Require cohort subjects are present in another cohort</dd>
+      </dl><dl><dt>
+          
+          <code><a href="requireConceptIntersectFlag.html">requireConceptIntersectFlag()</a></code> 
+        </dt>
+        <dd>Require cohort subjects to have events of a concept list</dd>
       </dl><dl><dt>
           
           <code><a href="requireTableIntersectFlag.html">requireTableIntersectFlag()</a></code> 
         </dt>
         <dd>Require cohort subjects are present in another table</dd>
+      </dl></div><div class="section level2">
+      
+      <h3 id="impose-presence-or-absence-of-a-death-record-within-a-time-window">Impose presence or absence of a death record within a time window<a class="anchor" aria-label="anchor" href="#impose-presence-or-absence-of-a-death-record-within-a-time-window"></a></h3>
+      
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="requireDeathFlag.html">requireDeathFlag()</a></code> 
+        </dt>
+        <dd>Require cohort subjects' death at a certain time window</dd>
       </dl></div><div class="section level2">
       
       <h3 id="update-cohort-start-and-end-dates">Update cohort start and end dates<a class="anchor" aria-label="anchor" href="#update-cohort-start-and-end-dates"></a></h3>
