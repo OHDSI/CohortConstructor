@@ -2,21 +2,21 @@
 % Please edit documentation in R/conceptCohort.R
 \name{conceptCohort}
 \alias{conceptCohort}
-\title{Generate a cohort based on a concept set. The current supported domains are:}
+\title{Create cohorts based on a concept set}
 \usage{
 conceptCohort(cdm, conceptSet, name)
 }
 \arguments{
-\item{cdm}{A cdm_reference object.}
+\item{cdm}{A cdm reference.}
 
-\item{conceptSet}{A conceptSet, can either be a list of concepts, a codelist
-or a conceptSetExpression (TO DO).}
+\item{conceptSet}{A conceptSet, which can either be a codelist, a codelist
+or a conceptSetExpression.}
 
 \item{name}{Name of the cohort in the cdm object.}
 }
 \value{
-A cohort_table object.
+A cohort table
 }
 \description{
-Generate a cohort based on a concept set. The current supported domains are:
+Create cohorts based on a concept set
 }

@@ -2,12 +2,12 @@
 % Please edit documentation in R/yearCohorts.R
 \name{yearCohorts}
 \alias{yearCohorts}
-\title{Generate a new cohort_table object restrincting observation to certain years.}
+\title{Generate a new cohort table restricting cohort entries to certain years}
 \usage{
 yearCohorts(cohort, cohortId = NULL, years, name = tableName(cohort))
 }
 \arguments{
-\item{cohort}{A cohort_table in a cdm_reference.}
+\item{cohort}{A cohort table in a cdm reference.}
 
 \item{cohortId}{Cohort definition id to use. If NULL all the cohort
 definition ids in settings will be used.}
@@ -20,7 +20,7 @@ definition ids in settings will be used.}
 A cohort table.
 }
 \description{
-Generate a new cohort_table object restrincting observation to certain years.
+Generate a new cohort table restricting cohort entries to certain years
 }
 \examples{
 library(omock)

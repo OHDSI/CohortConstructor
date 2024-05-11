@@ -1,13 +1,13 @@
-#' Generate a cohort based on a concept set. The current supported domains are:
+#' Create cohorts based on a concept set
 #'
-#' @param cdm A cdm_reference object.
-#' @param conceptSet A conceptSet, can either be a list of concepts, a codelist
-#' or a conceptSetExpression (TO DO).
+#' @param cdm A cdm reference.
+#' @param conceptSet A conceptSet, which can either be a codelist, a codelist
+#' or a conceptSetExpression.
 #' @param name Name of the cohort in the cdm object.
 #'
 #' @export
 #'
-#' @return A cohort_table object.
+#' @return A cohort table
 #'
 conceptCohort <- function(cdm,
                           conceptSet,
