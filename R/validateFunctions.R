@@ -88,7 +88,7 @@ validateDateRange<-function(dateRange){
 
 validateName <- function(name) {
   em <- c(
-    "x" = "{name} it is not a valida value for name.",
+    "x" = "{name} it is not a valid value for name.",
     "i" = "It must be:",
     "*" = "lowercase character vector of length 1",
     "*" = "NA or NULL values are not allowed"
@@ -181,4 +181,17 @@ validateDemographicRequirements <- function(ageRange,
   assertNumeric(minPriorObservation, integerish = TRUE, min = 0)
   # minFutureObservation:
   assertNumeric(minFutureObservation, integerish = TRUE, min = 0)
+}
+
+validateStrata <- function(strata, cohort) {
+  assertList(strata, class = "character")
+  colsCohort <- colnames(cohort)
+  colsStrata <- unique(unlist(strata))
+  misisngCols <- colsStrata[!colsStrata %in%colsCohort]
+  if (length(misisngCols) > 0) {
+    cli::cli_abort(
+      "{misisngCols} column{?s} {?is/are} not present in cohort table"
+    )
+  }
+  return(strata)
 }

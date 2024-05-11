@@ -5,8 +5,8 @@ template:
 reference:
 - subtitle: Build base cohorts
 - contents:
-  - matches("conceptCohort|demographicsCohort|addPriorObservation")
-- subtitle: Limit to an individuals first or last cohort entry
+  - matches("conceptCohort|demographicsCohort")
+- subtitle: Limit to an individualss first or last cohort entry
 - contents:
   - matches("requireIsFirstEntry|requireIsLastEntry")
 - subtitle: Impose date requirements on existing cohorts
@@ -29,4 +29,4 @@ reference:
   - matches("^trim")
 - subtitle: Cohort manipulations
 - contents:
-  - matches("erafy|intersectCohorts|matchCohorts|subsetCohorts|unionCohorts|yearCohorts")
+  - matches("erafy|intersectCohorts|matchCohorts|subsetCohorts|unionCohorts|yearCohorts|stratifyCohorts")
