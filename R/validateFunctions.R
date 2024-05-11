@@ -88,7 +88,7 @@ validateDateRange<-function(dateRange){
 
 validateName <- function(name) {
   em <- c(
-    "x" = "{name} it is not a valida value for name.",
+    "x" = "{name} it is not a valid value for name.",
     "i" = "It must be:",
     "*" = "lowercase character vector of length 1",
     "*" = "NA or NULL values are not allowed"

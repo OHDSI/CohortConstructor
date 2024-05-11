@@ -34,23 +34,19 @@ Crate a new cohort table with the specified stratifications.
 library(CohortConstructor)
 library(PatientProfiles)
 
-# cdm <- mockCohortConstructor()
-#
-# cdm$my_cohort <- conceptCohort(
-#   cdm = cdm,
-#   conceptSet = list(x = c(1, 2), y = c(2, 7, 8)),
-#   name = "my_cohort"
-# ) |>
-#  addAge(ageGroups = list("child" = c(0, 17), "adult" = c(18, Inf))) |>
-#  addSex() |>
-#  stratifyCohorts(
-#    strata = list("sex, c("sex", "age_group")), name = "my_cohort"
-#  )
-#
-# cdm$mycohort
-#
-# settings(cdm$my_cohort)
-#
-# attrition(cdm$my_cohort)
+cdm <- mockPatientProfiles()
+
+cdm$my_cohort <- cdm$cohort1 |>
+  addAge(ageGroup = list("child" = c(0, 17), "adult" = c(18, Inf))) |>
+  addSex() |>
+  stratifyCohorts(
+    strata = list("sex", c("sex", "age_group")), name = "my_cohort"
+  )
+
+cdm$my_cohort
+
+settings(cdm$my_cohort)
+
+attrition(cdm$my_cohort)
 
 }
