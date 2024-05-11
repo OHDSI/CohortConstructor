@@ -18,7 +18,7 @@
 #' @param name Name of the new cohort with the future observation restriction.
 #'
 #' @return Cohort table with only those  with the events in the concept list
-#' kept (or those without the event if nagate = TRUE)
+#' kept (or those without the event if negate = TRUE)
 #'
 #' @export
 #'
