@@ -182,3 +182,16 @@ validateDemographicRequirements <- function(ageRange,
   # minFutureObservation:
   assertNumeric(minFutureObservation, integerish = TRUE, min = 0)
 }
+
+validateStrata <- function(strata, cohort) {
+  assertList(strata, class = "character")
+  colsCohort <- colnames(cohort)
+  colsStrata <- unique(unlist(strata))
+  misisngCols <- colsStrata[!colsStrata %in%colsCohort]
+  if (length(misisngCols) > 0) {
+    cli::cli_abort(
+      "{misisngCols} column{?s} {?is/are} not present in cohort table"
+    )
+  }
+  return(strata)
+}
