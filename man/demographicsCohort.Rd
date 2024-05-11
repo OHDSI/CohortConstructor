@@ -2,7 +2,7 @@
 % Please edit documentation in R/demographicsCohort.R
 \name{demographicsCohort}
 \alias{demographicsCohort}
-\title{Create the observation period cohort}
+\title{Create cohorts based on patient demographics}
 \usage{
 demographicsCohort(
   cdm,
@@ -14,14 +14,13 @@ demographicsCohort(
 )
 }
 \arguments{
-\item{cdm}{A cdm_reference.}
+\item{cdm}{A cdm reference.}
 
-\item{name}{Name of the new cohort_table object.}
+\item{name}{Name of the new cohort table}
 
-\item{ageRange}{A list of minimum and maximum age.}
+\item{ageRange}{A list of vectors specifying minimum and maximum age.}
 
-\item{sex}{Can be "Both", "Male" or "Female". If one of the latter, only
-those with that sex will be included.}
+\item{sex}{Can be "Both", "Male" or "Female".}
 
 \item{minPriorObservation}{A minimum number of prior observation days in
 the database.}
@@ -30,8 +29,8 @@ the database.}
 the database.}
 }
 \value{
-The cohort with the observation period
+A cohort table
 }
 \description{
-Create the observation period cohort
+Create cohorts based on patient demographics
 }

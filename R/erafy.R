@@ -1,14 +1,14 @@
-#' Collapse a cohort using a certain gap to join records.
+#' Collapse cohort entries using a certain gap to concatenate records.
 #'
-#' @param cohort A cohort_table object.
+#' @param cohort A cohort table
 #' @param cohortId The cohort definition ids to subset, if NULL all cohort
 #' definition ids are used.
-#' @param gap number of days to join consecutive records.
-#' @param name Name of the resultant cohort.
+#' @param gap Number of days to use when merging cohort entries.
+#' @param name Name of the cohort table.
 #'
 #' @export
 #'
-#' @return A cohort_table object.
+#' @return A cohort table
 #'
 erafy <- function(cohort,
                   cohortId = NULL,

@@ -1,16 +1,15 @@
-#' Create the observation period cohort
+#' Create cohorts based on patient demographics
 #'
-#' @param cdm A cdm_reference.
-#' @param name Name of the new cohort_table object.
-#' @param ageRange A list of minimum and maximum age.
-#' @param sex Can be "Both", "Male" or "Female". If one of the latter, only
-#' those with that sex will be included.
+#' @param cdm A cdm reference.
+#' @param name Name of the new cohort table
+#' @param ageRange A list of vectors specifying minimum and maximum age.
+#' @param sex Can be "Both", "Male" or "Female".
 #' @param minPriorObservation A minimum number of prior observation days in
 #' the database.
 #' @param minFutureObservation A minimum number of future observation days in
 #' the database.
 #'
-#' @return The cohort with the observation period
+#' @return A cohort table
 #'
 #' @export
 #'

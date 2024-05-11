@@ -1,6 +1,6 @@
-#' Generate a new cohort_table object restrincting observation to certain years.
+#' Generate a new cohort table restricting cohort entries to certain years
 #'
-#' @param cohort A cohort_table in a cdm_reference.
+#' @param cohort A cohort table in a cdm reference.
 #' @param cohortId Cohort definition id to use. If NULL all the cohort
 #' definition ids in settings will be used.
 #' @param years Numeric vector of years to use to restrict observation to.

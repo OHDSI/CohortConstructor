@@ -2,23 +2,23 @@
 % Please edit documentation in R/erafy.R
 \name{erafy}
 \alias{erafy}
-\title{Collapse a cohort using a certain gap to join records.}
+\title{Collapse cohort entries using a certain gap to concatenate records.}
 \usage{
 erafy(cohort, cohortId = NULL, gap = 0, name = tableName(cohort))
 }
 \arguments{
-\item{cohort}{A cohort_table object.}
+\item{cohort}{A cohort table}
 
 \item{cohortId}{The cohort definition ids to subset, if NULL all cohort
 definition ids are used.}
 
-\item{gap}{number of days to join consecutive records.}
+\item{gap}{Number of days to use when merging cohort entries.}
 
-\item{name}{Name of the resultant cohort.}
+\item{name}{Name of the cohort table.}
 }
 \value{
-A cohort_table object.
+A cohort table
 }
 \description{
-Collapse a cohort using a certain gap to join records.
+Collapse cohort entries using a certain gap to concatenate records.
 }
