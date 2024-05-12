@@ -6,7 +6,8 @@ test_that("matchCohorts runs without errors", {
     name = "cases",
     end  = "observation_period_end_date",
     requiredObservation = c(180, 180),
-    overwrite = TRUE)
+    overwrite = TRUE
+  )
 
   expect_no_error(a <- matchCohorts(cohort = cdm$cases,
                                     name = "new_cohort",
