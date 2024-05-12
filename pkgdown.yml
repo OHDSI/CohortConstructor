@@ -7,7 +7,7 @@ articles:
   a02_applying_cohort_restrictions: a02_applying_cohort_restrictions.html
   a03_age_sex_matching: a03_age_sex_matching.html
   a04_cohort_manipulations: a04_cohort_manipulations.html
-last_built: 2024-05-11T16:00Z
+last_built: 2024-05-12T17:56Z
 urls:
   reference: https://ohdsi.github.io/CohortConstructor/reference
   article: https://ohdsi.github.io/CohortConstructor/articles
