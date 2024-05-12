@@ -1,10 +1,10 @@
 #' Require that an index date is within a date range
 #'
 #' @param cohort A cohort table in a cdm reference.
-#' @param cohortId Vector of cohort definition ids to include. If NULL, all
-#' cohort definition ids will be used.
 #' @param dateRange A window of time during which the index date must have
 #' been observed.
+#' @param cohortId Vector of cohort definition ids to include. If NULL, all
+#' cohort definition ids will be used.
 #' @param indexDate Variable in cohort that contains the index date of interest
 #' @param name Name of the new cohort with the restriction.
 #'
@@ -20,8 +20,8 @@
 #'   requireInDateRange(indexDate = "cohort_start_date",
 #'                      dateRange = as.Date(c("2010-01-01", "2019-01-01")))
 requireInDateRange <- function(cohort,
-                               cohortId = NULL,
                                dateRange,
+                               cohortId = NULL,
                                indexDate = "cohort_start_date",
                                name = omopgenerics::tableName(cohort)) {
 
@@ -33,7 +33,7 @@ requireInDateRange <- function(cohort,
   validateCohortColumn(indexDate, cohort, class = "Date")
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
   cohortId <- validateCohortId(cohortId, ids)
-  validateDateRange(dateRange)
+  dateRange <- validateDateRange(dateRange, cdm)
 
   # requirement
   cohort <- cohort |>
@@ -53,10 +53,10 @@ requireInDateRange <- function(cohort,
 #' Trim cohort dates to be within a date range
 #'
 #' @param cohort A cohort table in a cdm reference.
-#' @param cohortId Vector of cohort definition ids to include. If NULL, all
-#' cohort definition ids will be used.
 #' @param dateRange A window of time during which the index date must have
 #' been observed.
+#' @param cohortId Vector of cohort definition ids to include. If NULL, all
+#' cohort definition ids will be used.
 #' @param startDate Variable with earliest date.
 #' @param endDate Variable with latest date.
 #' @param name Name of the new cohort with the restriction.
@@ -77,8 +77,8 @@ requireInDateRange <- function(cohort,
 #'                   dateRange = as.Date(c("2015-01-01",
 #'                                         "2015-12-31")))
 trimToDateRange <- function(cohort,
-                            cohortId = NULL,
                             dateRange,
+                            cohortId = NULL,
                             startDate = "cohort_start_date",
                             endDate = "cohort_end_date",
                             name = omopgenerics::tableName(cohort)) {
@@ -92,7 +92,7 @@ trimToDateRange <- function(cohort,
   validateCohortColumn(endDate, cohort, class = "Date")
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
   cohortId <- validateCohortId(cohortId, ids)
-  validateDateRange(dateRange)
+  dateRange <- validateDateRange(dateRange, cdm)
 
   # requirement
   cohort <- cohort %>%

@@ -73,12 +73,32 @@ validateCohortId <- function(cohortId, ids) {
   return(cohortId)
 }
 
-validateDateRange<-function(dateRange){
+validateDateRange <- function(dateRange, cdm){
   if(!"Date" %in% class(dateRange)){
     cli::cli_abort("dateRange is not a date")
   }
   if(length(dateRange) != 2){
     cli::cli_abort("dateRange must be length two")
+  }
+  emptyDate <- is.na(dateRange)
+  if (sum(emptyDate) == 1) {
+    if (is.na(dateRange[1])) {
+      minDate <- cdm$observation_period |>
+        dplyr::filter(.data$observation_period_start_date == min(.data$observation_period_start_date)) |>
+        dplyr::pull("observation_period_start_date") |>
+        unique()
+      dateRange[1] <- minDate
+    }
+    if (is.na(dateRange[2])) {
+      maxDate <- cdm$observation_period |>
+        dplyr::filter(.data$observation_period_end_date == min(.data$observation_period_end_date)) |>
+        dplyr::pull("observation_period_end_date") |>
+        unique()
+      dateRange[2] <- maxDate
+    }
+  } else if (sum(emptyDate) == 2) {
+    # TODO wait for discussion in issue #117
+    # cli::cli_abort("At least one date should be specified in `dateRange`")
   }
   if(dateRange[1]>dateRange[2]){
     cli::cli_abort("First date in dateRange cannot be after second")
@@ -163,7 +183,7 @@ validateDemographicRequirements <- function(ageRange,
     if (length(ageRange[[i]]) != 2) {
       cli::cli_abort("Each numeric vector in `ageRange` list must be of length 2.")
     }
-    if (ageRange[[i]][1] >= ageRange[[i]][2]) {
+    if (ageRange[[i]][1] > ageRange[[i]][2]) {
       cli::cli_abort("Upper `ageRange` value must be equal or higher than lower `ageRange` value.")
     }
     if (ageRange[[i]][1] < 0 | ageRange[[i]][2] < 0) {

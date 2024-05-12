@@ -53,6 +53,14 @@ test_that("requireDateRange", {
   expect_error(cdm$cohort1 %>%
     requireInDateRange(dateRange = as.Date(c("2010-01-01", "2010-01-01",
                                              "2009-01-01"))))
+  expect_no_error(
+    cdm$cohort1 %>%
+      requireInDateRange(dateRange = as.Date(c(NA, "2010-01-01")))
+  )
+  expect_no_error(
+    cdm$cohort1 %>%
+      requireInDateRange(dateRange = as.Date(c("2010-01-01", NA)))
+  )
   expect_error(cdm$cohort1 %>%
     requireInDateRange(dateRange = c("a", "b")))
   expect_error(

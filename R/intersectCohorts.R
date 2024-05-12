@@ -295,10 +295,10 @@ splitOverlap <- function(x,
 #' Join overlapping periods in single periods.
 #'
 #' @param x Table in the cdm.
+#' @param gap Distance between exposures to consider that they overlap.
 #' @param startDate Column that indicates the start of periods.
 #' @param endDate Column that indicates the end of periods.
 #' @param by Variables to group by.
-#' @param gap Distance between exposures to consider that they overlap.
 #'
 #' @noRd
 #'
@@ -306,10 +306,10 @@ splitOverlap <- function(x,
 #' going to overlap between each other.
 #'
 joinOverlap <- function(cohort,
+                        gap = 0,
                         startDate = "cohort_start_date",
                         endDate = "cohort_end_date",
-                        by = c("cohort_definition_id", "subject_id"),
-                        gap = 0) {
+                        by = c("cohort_definition_id", "subject_id")) {
   start <- cohort |>
     dplyr::rename("date" := !!startDate) |>
     dplyr::select(dplyr::all_of(c(by, "date"))) |>

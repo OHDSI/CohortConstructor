@@ -1,9 +1,9 @@
 #' Crate a new cohort table with the specified stratifications.
 #'
 #' @param cohort A cohort table in a cdm reference.
+#' @param strata A strata list that point to columns in cohort table.
 #' @param cohortId Vector of cohort definition ids to include. If NULL, all
 #' cohort definition ids will be used.
-#' @param strata A strata list that point to columns in cohort table.
 #' @param removeStrata Whether to remove strata columns from final cohort table.
 #' @param name Name of the new cohort.
 #'
@@ -31,8 +31,8 @@
 #' attrition(cdm$my_cohort)
 #'
 stratifyCohorts <- function(cohort,
+                            strata,
                             cohortId = NULL,
-                            strata = list(),
                             removeStrata = TRUE,
                             name = tableName(cohort)) {
   # initial checks

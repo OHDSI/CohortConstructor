@@ -6,8 +6,8 @@
 \usage{
 requireAge(
   cohort,
+  ageRange,
   cohortId = NULL,
-  ageRange = list(c(0, 150)),
   indexDate = "cohort_start_date",
   name = omopgenerics::tableName(cohort)
 )
@@ -15,10 +15,10 @@ requireAge(
 \arguments{
 \item{cohort}{A cohort table in a cdm reference.}
 
+\item{ageRange}{A list of minimum and maximum age.}
+
 \item{cohortId}{Vector of cohort definition ids to include. If NULL, all
 cohort definition ids will be used.}
-
-\item{ageRange}{A list of minimum and maximum age.}
 
 \item{indexDate}{Variable in cohort that contains the date to compute the
 demographics characteristics on which to restrict on.}

@@ -1,13 +1,13 @@
 #' Require cohort subjects' death at a certain time window
 #'
 #' @param cohort A cohort table in a cdm reference.
+#' @param window Window to consider events over.
 #' @param cohortId Vector of cohort definition ids to include. If NULL, all
 #' cohort definition ids will be used.
 #' @param indexDate Variable in x that contains the date to compute the
 #' intersection.
 #' @param censorDate Whether to censor overlap events at a specific date or a
 #' column date of x.
-#' @param window Window to consider events over.
 #' @param negate If set as TRUE, criteria will be applied as exclusion
 #' rather than inclusion (i.e. require absence in another cohort).
 #' @param name Name of the new cohort with the future observation restriction.
@@ -32,10 +32,10 @@
 
 
 requireDeathFlag <- function(cohort,
+                             window,
                              cohortId = NULL,
                              indexDate = "cohort_start_date",
                              censorDate = NULL,
-                             window = list(c(0, Inf)),
                              negate = FALSE,
                              name = omopgenerics::tableName(cohort)) {
   # checks

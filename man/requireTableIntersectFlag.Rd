@@ -6,13 +6,13 @@
 \usage{
 requireTableIntersectFlag(
   cohort,
-  cohortId = NULL,
   tableName,
+  window,
+  cohortId = NULL,
   indexDate = "cohort_start_date",
   targetStartDate = startDateColumn(tableName),
   targetEndDate = endDateColumn(tableName),
   censorDate = NULL,
-  window = list(c(0, Inf)),
   negate = FALSE,
   name = omopgenerics::tableName(cohort)
 )
@@ -20,10 +20,12 @@ requireTableIntersectFlag(
 \arguments{
 \item{cohort}{A cohort table in a cdm reference.}
 
+\item{tableName}{Name of the table to check for intersect.}
+
+\item{window}{Window to consider events over.}
+
 \item{cohortId}{Vector of cohort definition ids to include. If NULL, all
 cohort definition ids will be used.}
-
-\item{tableName}{Name of the table to check for intersect.}
 
 \item{indexDate}{Variable in x that contains the date to compute the
 intersection.}
@@ -36,8 +38,6 @@ intersection.}
 
 \item{censorDate}{Whether to censor overlap events at a specific date or a
 column date of x.}
-
-\item{window}{Window to consider events over.}
 
 \item{negate}{If set as TRUE, criteria will be applied as exclusion
 rather than inclusion (i.e. require absence in another cohort).}
