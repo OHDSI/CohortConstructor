@@ -87,6 +87,11 @@ validateDateRange <- function(dateRange, cdm){
         dplyr::filter(.data$observation_period_start_date == min(.data$observation_period_start_date)) |>
         dplyr::pull("observation_period_start_date") |>
         unique()
+      if(minDate>dateRange[2]){
+        cli::cli_abort("Minimum observation start date in the database is after the second element in `dateRange`")
+      } else {
+        dateRange[1] <- minDate
+      }
       dateRange[1] <- minDate
     }
     if (is.na(dateRange[2])) {
@@ -94,14 +99,18 @@ validateDateRange <- function(dateRange, cdm){
         dplyr::filter(.data$observation_period_end_date == min(.data$observation_period_end_date)) |>
         dplyr::pull("observation_period_end_date") |>
         unique()
-      dateRange[2] <- maxDate
+      if(dateRange[1]>maxDate){
+        cli::cli_abort("Maximum observation end date in the database is before the first element in `dateRange`")
+      } else {
+        dateRange[2] <- maxDate
+      }
     }
   } else if (sum(emptyDate) == 2) {
     # TODO wait for discussion in issue #117
     # cli::cli_abort("At least one date should be specified in `dateRange`")
   }
   if(dateRange[1]>dateRange[2]){
-    cli::cli_abort("First date in dateRange cannot be after second")
+    cli::cli_abort("First date in dateRange cannot be after the second")
   }
   return(invisible(dateRange))
 }
