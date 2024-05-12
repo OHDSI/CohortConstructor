@@ -104,8 +104,9 @@ matchCohorts <- function(cohort,
   cdm <- infiniteMatching(cdm, target, control)
 
   # Delete controls that are not in observation
-  cli::cli_inform(c("*" = "Removing pairs that were not in observation at index date"))
+  cli::cli_inform(c("*" = "Removing controls that were not in observation at index date"))
   cdm[[control]] <- observationControl(cdm[[control]])
+  cli::cli_inform(c("*" = "Excluding target records whose pair is not in observation"))
   cdm[[target]] <- observationTarget(cdm, target, control)
 
   # Check ratio
@@ -469,17 +470,24 @@ infiniteMatching <- function(cdm, target, control){
 }
 
 observationControl <- function(x) {
+  cdm <- omopgenerics::cdmReference(x)
   x |>
     dplyr::select(-"cohort_start_date", -"cohort_end_date") |>
-    PatientProfiles::addInObservation(indexDate = "index_date") |>
-    dplyr::filter(.data$in_observation == 1) |>
-    dplyr::select(
-      "cohort_definition_id", "subject_id", "cohort_start_date" = "index_date",
-      "cluster_id"
+    dplyr::rename("cohort_start_date" = "index_date") |>
+    dplyr::inner_join(
+      cdm$observation_period |>
+        dplyr::select(
+          "subject_id" = "person_id",
+          "observation_period_start_date",
+          "cohort_end_date" = "observation_period_end_date"
+        ),
+      by = "subject_id"
     ) |>
-    PatientProfiles::addFutureObservation(
-      futureObservationName = "cohort_end_date", futureObservationType = "date"
+    dplyr::filter(
+      .data$cohort_start_date <= .data$cohort_end_date &
+        .data$cohort_start_date >= .data$observation_period_start_date
     ) |>
+    dplyr::select(-"observation_period_start_date") |>
     dplyr::compute(name = tableName(x), temporary = FALSE) |>
     omopgenerics::recordCohortAttrition(
       reason = "Exclude individuals not in observation"
