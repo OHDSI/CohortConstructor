@@ -96,7 +96,7 @@ validateDateRange <- function(dateRange, cdm){
     }
     if (is.na(dateRange[2])) {
       maxDate <- cdm$observation_period |>
-        dplyr::filter(.data$observation_period_end_date == min(.data$observation_period_end_date)) |>
+        dplyr::filter(.data$observation_period_end_date == max(.data$observation_period_end_date)) |>
         dplyr::pull("observation_period_end_date") |>
         unique()
       if(dateRange[1]>maxDate){
