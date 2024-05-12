@@ -46,10 +46,7 @@ test_that("expected errors and messages", {
     settings(x), dplyr::tibble("cohort_definition_id" = 1L, "cohort_name" = "a")
   )
   expect_true(nrow(attrition(x)) == 1)
-  # currently only standard concepts are includes in cohortCodelist see https://github.com/OHDSI/CohortConstructor/issues/74
-  expect_warning(expect_equal(
-    cohortCodelist(x, 1), omopgenerics::newCodelist(list())
-  ))
+  expect_true(nrow(attr(x, "cohort_codelist")) == 1)
   expect_message(expect_message(
     x <- conceptCohort(cdm = cdm, conceptSet = list(a = 2), name = "cohort")
   ))
@@ -191,7 +188,7 @@ test_that("simple example duckdb", {
 })
 
 
-test_that("simple not used concepts ar ein codelist", {
+test_that("excluded concepts in codelist", {
   cdm <- omock::mockCdmReference() |>
     omock::mockCdmFromTable(cohortTable = list("cohort" = dplyr::tibble(
       "cohort_definition_id" = 1,
@@ -228,10 +225,10 @@ test_that("simple not used concepts ar ein codelist", {
 
   cdm <- CDMConnector::copyCdmTo(con = DBI::dbConnect(duckdb::duckdb()), cdm = cdm, schema = "main")
 
-  expect_no_error(cohort <- conceptCohort(cdm = cdm, conceptSet = list(a = 1:2), name = "cohort"))
+  expect_no_error(cohort <- conceptCohort(cdm = cdm, conceptSet = list(a = 1:2), name = "cohort1"))
   expect_true(all(attr(cohort, "cohort_codelist") |> dplyr::pull("concept_id") |> sort() == 1:2))
 
-  expect_no_error(cohort <- conceptCohort(cdm = cdm, conceptSet = list(a = 2:3), name = "cohort"))
+  expect_no_error(cohort <- conceptCohort(cdm = cdm, conceptSet = list(a = 2:3), name = "cohort2"))
   expect_true(all(attr(cohort, "cohort_codelist") |> dplyr::pull("concept_id") |> sort() == 2:3))
 
   CDMConnector::cdmDisconnect(cdm = cdm)

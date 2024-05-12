@@ -27,7 +27,7 @@
 #'                      person_id = 1,
 #'                      death_date = as.Date("2020-05-01"),
 #'                      death_type_concept_id = NA))
-#' cdm$cohort1 <- cdm$cohort1 %>% requireDeathFlag()
+#' cdm$cohort1 <- cdm$cohort1 %>% requireDeathFlag(window = list(c(0, Inf)))
 #' attrition(cdm$cohort1)
 
 

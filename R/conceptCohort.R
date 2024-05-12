@@ -99,7 +99,7 @@ conceptCohort <- function(cdm,
 
   if (length(cohorts) == 0) {
     cli::cli_inform(c("i" = "No table could be subsetted, returning empty cohort."))
-    cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name, over)
+    cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name)
     cdm[[name]] <- cdm[[name]] |>
       omopgenerics::newCohortTable(
         cohortSetRef = cohortSet,
