@@ -70,7 +70,7 @@ exitAtObservationEnd <- function(cohort,
 }
 
 
-#' Set cohort end date to end of observation
+#' Set cohort end date to death date
 #'
 #' @param cohort A cohort table in a cdm reference.
 #' @param cohortId Vector of cohort definition ids to include. If NULL, all
@@ -82,9 +82,9 @@ exitAtObservationEnd <- function(cohort,
 #' @return The cohort table.
 #'
 #' @description
-#' This functions changes cohort end date to the end date of the observation
-#' period corresponding to the cohort entry. In the case were this generates
-#' overlapping records in the cohort, overlapping entries will be merged.
+#' This functions changes cohort end date to subject's death date. In the case
+#' were this generates overlapping records in the cohort, those overlapping
+#' entries will be merged.
 #'
 #'
 #' @export
