@@ -54,8 +54,8 @@
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">stratifyCohorts</span><span class="op">(</span></span>
 <span>  <span class="va">cohort</span>,</span>
+<span>  <span class="va">strata</span>,</span>
 <span>  cohortId <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  strata <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  removeStrata <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  name <span class="op">=</span> <span class="fu"><a href="https://darwin-eu-dev.github.io/omopgenerics/reference/tableName.html" class="external-link">tableName</a></span><span class="op">(</span><span class="va">cohort</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -67,13 +67,13 @@
 <dd><p>A cohort table in a cdm reference.</p></dd>
 
 
+<dt>strata</dt>
+<dd><p>A strata list that point to columns in cohort table.</p></dd>
+
+
 <dt>cohortId</dt>
 <dd><p>Vector of cohort definition ids to include. If NULL, all
 cohort definition ids will be used.</p></dd>
-
-
-<dt>strata</dt>
-<dd><p>A strata list that point to columns in cohort table.</p></dd>
 
 
 <dt>removeStrata</dt>
