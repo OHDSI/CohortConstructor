@@ -58,11 +58,11 @@ requireDemographics <- function(cohort,
 #' Restrict cohort on age
 #'
 #' @param cohort A cohort table in a cdm reference.
+#' @param ageRange A list of minimum and maximum age.
 #' @param cohortId Vector of cohort definition ids to include. If NULL, all
 #' cohort definition ids will be used.
 #' @param indexDate Variable in cohort that contains the date to compute the
 #' demographics characteristics on which to restrict on.
-#' @param ageRange A list of minimum and maximum age.
 #' @param name Name of the new cohort with the age requirement.
 #'
 #' @return The cohort table with only records for individuals satisfying the
@@ -77,8 +77,8 @@ requireDemographics <- function(cohort,
 #'   requireAge(indexDate = "cohort_start_date",
 #'              ageRange = list(c(18, 65)))
 requireAge <- function(cohort,
+                       ageRange,
                        cohortId = NULL,
-                       ageRange = list(c(0, 150)),
                        indexDate = "cohort_start_date",
                        name = omopgenerics::tableName(cohort)) {
 
@@ -120,8 +120,8 @@ requireAge <- function(cohort,
 #' cdm$cohort1 %>%
 #'   requireSex(sex = "Female")
 requireSex <- function(cohort,
+                       sex,
                        cohortId = NULL,
-                       sex = c("Both"),
                        name = omopgenerics::tableName(cohort)) {
 
   cohort <- demographicsFilter(
@@ -145,12 +145,12 @@ requireSex <- function(cohort,
 #' Restrict cohort on prior observation
 #'
 #' @param cohort A cohort table in a cdm reference.
+#' @param minPriorObservation A minimum number of prior observation days in
+#' the database.
 #' @param cohortId Vector of cohort definition ids to include. If NULL, all
 #' cohort definition ids will be used.
 #' @param indexDate Variable in cohort that contains the date to compute the
 #' demographics characteristics on which to restrict on.
-#' @param minPriorObservation A minimum number of prior observation days in
-#' the database.
 #' @param name Name of the new cohort with the prior observation restriction.
 #'
 #' @return The cohort table with only records for individuals satisfying the
@@ -165,9 +165,9 @@ requireSex <- function(cohort,
 #'   requirePriorObservation(indexDate = "cohort_start_date",
 #'                           minPriorObservation = 365)
 requirePriorObservation <- function(cohort,
+                                    minPriorObservation,
                                     cohortId = NULL,
                                     indexDate = "cohort_start_date",
-                                    minPriorObservation = 0,
                                     name = omopgenerics::tableName(cohort)) {
   cohort <- demographicsFilter(
     cohort = cohort,
@@ -190,12 +190,12 @@ requirePriorObservation <- function(cohort,
 #' Restrict cohort on future observation
 #'
 #' @param cohort A cohort table in a cdm reference.
+#' @param minFutureObservation A minimum number of future observation days in
+#' the database.
 #' @param cohortId Vector of cohort definition ids to include. If NULL, all
 #' cohort definition ids will be used.
 #' @param indexDate Variable in cohort that contains the date to compute the
 #' demographics characteristics on which to restrict on.
-#' @param minFutureObservation A minimum number of future observation days in
-#' the database.
 #' @param name Name of the new cohort with the future observation restriction.
 #'
 #' @return The cohort table with only records for individuals satisfying the
@@ -211,9 +211,9 @@ requirePriorObservation <- function(cohort,
 #'   requireFutureObservation(indexDate = "cohort_start_date",
 #'                            minFutureObservation = 30)
 requireFutureObservation <- function(cohort,
+                                     minFutureObservation,
                                      cohortId = NULL,
                                      indexDate = "cohort_start_date",
-                                     minFutureObservation = 0,
                                      name = omopgenerics::tableName(cohort)) {
   cohort <- demographicsFilter(
     cohort = cohort,

@@ -6,8 +6,8 @@
 \usage{
 stratifyCohorts(
   cohort,
+  strata,
   cohortId = NULL,
-  strata = list(),
   removeStrata = TRUE,
   name = tableName(cohort)
 )
@@ -15,10 +15,10 @@ stratifyCohorts(
 \arguments{
 \item{cohort}{A cohort table in a cdm reference.}
 
+\item{strata}{A strata list that point to columns in cohort table.}
+
 \item{cohortId}{Vector of cohort definition ids to include. If NULL, all
 cohort definition ids will be used.}
-
-\item{strata}{A strata list that point to columns in cohort table.}
 
 \item{removeStrata}{Whether to remove strata columns from final cohort table.}
 

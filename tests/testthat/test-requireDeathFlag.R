@@ -65,7 +65,7 @@ test_that("requiring death", {
                       "Initial qualifying events")))
 
   # name
-  cdm$cohort1 <-  requireDeathFlag(cohort = cdm$cohort1)
+  cdm$cohort1 <-  requireDeathFlag(cohort = cdm$cohort1, window = list(c(0, Inf)))
   expect_true(all(omopgenerics::attrition(cdm$cohort1)$reason ==
                     c("Initial qualifying events",
                       "Death between 0 & Inf days relative to cohort_start_date",

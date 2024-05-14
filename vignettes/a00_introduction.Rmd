@@ -30,7 +30,7 @@ When making study cohorts we often have a concept sets to define a clinical even
 
 ![](images/combined_cohort.png)
 
-## Deriving study cohorts from base cohorts
+## Considerations when building cohort pipelines
 
 CohortConstructor provides a means of building cohorts via a pipeline, with cohorts created through the application of a sequence of functions. It is important to note that the order of the sequence will often have important implications. In the example below we have just one individual who has three recorded diagnoses of asthma. One diagnosis was in 2008 and two in 2009, with only the last coming after the individual´s 18th birthday. Below three cohort pipelines are shown with restrictions around calendar dates, age, and that the record was the first. Only in cohort pipeline A, however, would the individual be included in the final cohort, with their third diagnosis used for cohort start. In pipeline B and C the individual would have been excluded.  
 

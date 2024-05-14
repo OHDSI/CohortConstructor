@@ -1,9 +1,9 @@
 #' Generate a new cohort table restricting cohort entries to certain years
 #'
 #' @param cohort A cohort table in a cdm reference.
+#' @param years Numeric vector of years to use to restrict observation to.
 #' @param cohortId Cohort definition id to use. If NULL all the cohort
 #' definition ids in settings will be used.
-#' @param years Numeric vector of years to use to restrict observation to.
 #' @param name Name of the new cohort table.
 #'
 #' @return A cohort table.
@@ -24,8 +24,8 @@
 #' cdm$year_restricted |> attrition()
 #'
 yearCohorts <- function(cohort,
-                        cohortId = NULL,
                         years,
+                        cohortId = NULL,
                         name = tableName(cohort)) {
   # initial checks
   cohort <- validateCohortTable(cohort)

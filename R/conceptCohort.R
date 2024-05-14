@@ -43,6 +43,10 @@ conceptCohort <- function(cdm,
     ))
   }
 
+  cohortCodelistRef <- cohortCodelist |>
+    dplyr::select(-"domain_id") |>
+    dplyr::collect()
+
   cohortCodelist <- cohortCodelist |>
     dplyr::filter(.data$domain_id %in% !!domainsData$domain_id) |>
     dplyr::compute()
@@ -100,16 +104,16 @@ conceptCohort <- function(cdm,
       omopgenerics::newCohortTable(
         cohortSetRef = cohortSet,
         cohortAttritionRef = NULL,
-        cohortCodelistRef = NULL
+        cohortCodelistRef = cohortCodelistRef
       )
     return(cdm[[name]])
   }
 
   if (length(cohorts) == 1) {
-  cohort <- cohorts[[1]]
+    cohort <- cohorts[[1]]
   } else {
-  cli::cli_inform(c("i" = "Combining tables."))
-  cohort <- cohorts[[1]] |> dplyr::compute()
+    cli::cli_inform(c("i" = "Combining tables."))
+    cohort <- cohorts[[1]] |> dplyr::compute()
     for (k in 2:length(cohorts)) {
       cohort <- cohort |>
         dplyr::union_all(cohorts[[k]]) |>
@@ -143,9 +147,7 @@ conceptCohort <- function(cdm,
     omopgenerics::newCohortTable(
       cohortSetRef = cohortSet,
       cohortAttritionRef = NULL,
-      cohortCodelistRef = cohortCodelist |>
-        dplyr::select(-"domain_id") |>
-        dplyr::collect()
+      cohortCodelistRef = cohortCodelistRef
     )
 
   cli::cli_inform(c("v" = "Cohort {.strong {name}} created."))

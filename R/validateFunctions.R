@@ -73,17 +73,18 @@ validateCohortId <- function(cohortId, ids) {
   return(cohortId)
 }
 
-validateDateRange<-function(dateRange){
-  if(!"Date" %in% class(dateRange)){
+validateDateRange <- function(dateRange){
+  if(!"Date" %in% class(dateRange) & !all(is.na(dateRange))){
     cli::cli_abort("dateRange is not a date")
   }
   if(length(dateRange) != 2){
     cli::cli_abort("dateRange must be length two")
   }
-  if(dateRange[1]>dateRange[2]){
-    cli::cli_abort("First date in dateRange cannot be after second")
+  if (!any(is.na(dateRange))) {
+    if(dateRange[1]>dateRange[2]){
+      cli::cli_abort("First date in dateRange cannot be after the second")
+    }
   }
-  return(invisible(dateRange))
 }
 
 validateName <- function(name) {
@@ -163,7 +164,7 @@ validateDemographicRequirements <- function(ageRange,
     if (length(ageRange[[i]]) != 2) {
       cli::cli_abort("Each numeric vector in `ageRange` list must be of length 2.")
     }
-    if (ageRange[[i]][1] >= ageRange[[i]][2]) {
+    if (ageRange[[i]][1] > ageRange[[i]][2]) {
       cli::cli_abort("Upper `ageRange` value must be equal or higher than lower `ageRange` value.")
     }
     if (ageRange[[i]][1] < 0 | ageRange[[i]][2] < 0) {

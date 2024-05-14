@@ -4,15 +4,15 @@
 \alias{yearCohorts}
 \title{Generate a new cohort table restricting cohort entries to certain years}
 \usage{
-yearCohorts(cohort, cohortId = NULL, years, name = tableName(cohort))
+yearCohorts(cohort, years, cohortId = NULL, name = tableName(cohort))
 }
 \arguments{
 \item{cohort}{A cohort table in a cdm reference.}
 
+\item{years}{Numeric vector of years to use to restrict observation to.}
+
 \item{cohortId}{Cohort definition id to use. If NULL all the cohort
 definition ids in settings will be used.}
-
-\item{years}{Numeric vector of years to use to restrict observation to.}
 
 \item{name}{Name of the new cohort table.}
 }

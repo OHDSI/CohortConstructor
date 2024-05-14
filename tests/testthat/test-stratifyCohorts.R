@@ -40,9 +40,9 @@ test_that("simple stratification", {
   con <- duckdb::dbConnect(duckdb::duckdb(), ":memory:")
   cdm <- CDMConnector::copyCdmTo(con = con, cdm = cdm, schema = "main")
 
-  expect_error(cdm$new_cohort <- stratifyCohorts(cdm$cohort1))
+  expect_error(cdm$new_cohort <- stratifyCohorts(cdm$cohort1), strata = list())
   expect_no_error(
-    cdm$new_cohort <- stratifyCohorts(cdm$cohort1, name = "new_cohort")
+    cdm$new_cohort <- stratifyCohorts(cdm$cohort1, name = "new_cohort", strata = list())
   )
   expect_warning(
     expect_no_error(

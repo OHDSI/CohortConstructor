@@ -348,21 +348,21 @@ test_that("attrition and cohortId", {
   )
   expect_true(all(
     omopgenerics::attrition(cdm$cohort1)$reason ==
-      c("Initial qualifying events", "cohort_start_date between 1990-01-01 & 2025-01-01",
+      c("Initial qualifying events",  "cohort_start_date after 1990-01-01",  "cohort_start_date before 2025-01-01",
         "Sex requirement: Female", "Age requirement: 0 to 40", "Mutually exclusive cohorts",
-        "Initial qualifying events", "cohort_start_date between 1990-01-01 & 2025-01-01",
+        "Initial qualifying events",  "cohort_start_date after 1990-01-01",  "cohort_start_date before 2025-01-01",
         "Sex requirement: Female", "Age requirement: 0 to 40", "Mutually exclusive cohorts",
         "Initial qualifying events" )
   ))
-  expect_true(all(omopgenerics::attrition(cdm$cohort1)$reason_id ==  c(1:5, 1:5, 1)))
+  expect_true(all(omopgenerics::attrition(cdm$cohort1)$reason_id ==  c(1:6, 1:6, 1)))
   expect_true(all(omopgenerics::attrition(cdm$cohort1)$number_records ==
-                    c(4, 4, 1, 1, 1, 4, 4, 0, 0, 0, 0)))
+                    c(4, 4, 4, 1, 1, 1, 4, 4, 4, 0, 0, 0, 0)))
   expect_true(all(omopgenerics::attrition(cdm$cohort1)$number_subjects ==
-                    c(3, 3, 1, 1, 1, 2, 2, 0, 0, 0, 0)))
+                    c(3, 3, 3, 1, 1, 1, 2, 2, 2, 0, 0, 0, 0)))
   expect_true(all(omopgenerics::attrition(cdm$cohort1)$excluded_records ==
-                    c(0, 0, 3, 0, 0, 0, 0, 4, 0, 0, 0)))
+                    c(0, 0, 0, 3, 0, 0, 0, 0, 0, 4, 0, 0, 0)))
   expect_true(all(omopgenerics::attrition(cdm$cohort1)$excluded_subjects ==
-                    c(0, 0, 2, 0, 0, 0, 0, 2, 0, 0, 0)))
+                    c(0, 0, 0, 2, 0, 0, 0, 0, 0, 2, 0, 0, 0)))
   expect_true(all(omopgenerics::settings(cdm$cohort1)$cohort_name == c("cohort_1", "cohort_2", "cohort_1_cohort_2")))
 })
 
