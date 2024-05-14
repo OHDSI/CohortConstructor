@@ -1,18 +1,18 @@
 #' Require cohort subjects are present in another table
 #'
 #' @param cohort A cohort table in a cdm reference.
-#' @param cohortId Vector of cohort definition ids to include. If NULL, all
-#' cohort definition ids will be used.
 #' @param tableName Name of the table to check for intersect.
+#' @param window Window to consider events over.
 #' @param indexDate Variable in x that contains the date to compute the
 #' intersection.
+#' @param cohortId Vector of cohort definition ids to include. If NULL, all
+#' cohort definition ids will be used.
 #' @param targetStartDate Date of reference in cohort table, either for start
 #' (in overlap) or on its own (for incidence).
 #' @param targetEndDate Date of reference in cohort table, either for end
 #' (overlap) or NULL (if incidence).
 #' @param censorDate Whether to censor overlap events at a specific date or a
 #' column date of x.
-#' @param window Window to consider events over.
 #' @param negate If set as TRUE, criteria will be applied as exclusion
 #' rather than inclusion (i.e. require absence in another cohort).
 #' @param name Name of the new cohort with the future observation restriction.
@@ -31,13 +31,13 @@
 #'                             indexDate = "cohort_start_date",
 #'                             window = c(-Inf, 0))
 requireTableIntersectFlag <- function(cohort,
-                                      cohortId = NULL,
                                       tableName,
+                                      window,
+                                      cohortId = NULL,
                                       indexDate = "cohort_start_date",
                                       targetStartDate = startDateColumn(tableName),
                                       targetEndDate = endDateColumn(tableName),
                                       censorDate = NULL,
-                                      window = list(c(0, Inf)),
                                       negate = FALSE,
                                       name = omopgenerics::tableName(cohort)){
   # checks

@@ -6,19 +6,19 @@
 \usage{
 requireSex(
   cohort,
+  sex,
   cohortId = NULL,
-  sex = c("Both"),
   name = omopgenerics::tableName(cohort)
 )
 }
 \arguments{
 \item{cohort}{A cohort table in a cdm reference.}
 
-\item{cohortId}{Vector of cohort definition ids to include. If NULL, all
-cohort definition ids will be used.}
-
 \item{sex}{Can be "Both", "Male" or "Female". If one of the latter, only
 those with that sex will be included.}
+
+\item{cohortId}{Vector of cohort definition ids to include. If NULL, all
+cohort definition ids will be used.}
 
 \item{name}{Name of the new cohort with the sex requirements.}
 }
