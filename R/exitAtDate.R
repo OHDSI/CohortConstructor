@@ -20,7 +20,7 @@
 #' library(CohortConstructor)
 #' cdm <- mockPatientProfiles()
 #' cdm$cohort1 %>% exitAtObservationEnd()
-
+#'
 exitAtObservationEnd <- function(cohort,
                                  cohortId = NULL,
                                  name = omopgenerics::tableName(cohort)) {
@@ -94,7 +94,7 @@ exitAtObservationEnd <- function(cohort,
 #' library(CohortConstructor)
 #' cdm <- mockPatientProfiles()
 #' cdm$cohort1 %>% exitAtDeath()
-
+#'
 exitAtDeath <- function(cohort,
                         cohortId = NULL,
                         requireDeath = FALSE,
@@ -132,7 +132,11 @@ exitAtDeath <- function(cohort,
     } else . } |>
     # no overlapping periods
     joinOverlap() |>
-    omopgenerics::newCohortTable()
+    omopgenerics::newCohortTable() |>
+    omopgenerics::recordCohortAttrition(
+      reason = "Exit at death",
+      cohortId = cohortId
+    )
 
   return(newCohort)
 }

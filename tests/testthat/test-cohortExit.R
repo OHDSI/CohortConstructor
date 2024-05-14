@@ -51,7 +51,7 @@ test_that("exit at death date", {
                     c("2013-06-29", "2013-06-29")))
   expect_true(all(cdm$cohort1 |> dplyr::pull(subject_id) |> sort() ==  c(1, 1)))
   expect_true(all(attrition(cdm$cohort1)$reason ==
-                    c("Initial qualifying events", "No death recorded", "Initial qualifying events", "No death recorded")))
+                    c("Initial qualifying events", "No death recorded", "Exit at death", "Initial qualifying events", "No death recorded", "Exit at death")))
 
   # simple example - require death FALSE works
   cdm$cohort2 <- cdm$cohort |> exitAtDeath(requireDeath = FALSE, name = "cohort2")
@@ -61,7 +61,7 @@ test_that("exit at death date", {
                     c("1999-05-28", "2013-06-29", "2013-06-29", "2015-04-14", "2015-07-06")))
   expect_true(all(cdm$cohort2 |> dplyr::pull(subject_id) |> sort() ==  c(1, 1, 3, 3, 4)))
   expect_true(all(attrition(cdm$cohort2)$reason ==
-                    c("Initial qualifying events", "Initial qualifying events")))
+                    c("Initial qualifying events", "Exit at death", "Initial qualifying events", "Exit at death")))
 
   # cohort ID and name
   cdm$cohort <- cdm$cohort |> exitAtDeath(cohortId = 1, requireDeath = TRUE)
@@ -71,7 +71,7 @@ test_that("exit at death date", {
                     c("2001-07-15", "2001-12-03", "2006-09-27", "2013-06-29", "2015-07-06")))
   expect_true(all(cdm$cohort |> dplyr::pull(subject_id) |> sort() ==  c(1, 1, 1, 1, 3)))
   expect_true(all(attrition(cdm$cohort)$reason ==
-                    c("Initial qualifying events", "No death recorded", "Initial qualifying events")))
+                    c("Initial qualifying events", "No death recorded", "Exit at death", "Initial qualifying events")))
 
   # expected errors
   expect_error(cdm$cohort |> exitAtDeath(name = 1))
