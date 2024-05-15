@@ -71,7 +71,7 @@ conceptCohort <- function(cdm,
       cli::cli_inform(c(
         "i" = "Subsetting table {.strong {table}} using {n} concept{?s} with domain: {.strong {domain}}."
       ))
-      cohorts[[k]] <- cdm[[table]] |>
+      tempCohort <- cdm[[table]] |>
         dplyr::select(
           "subject_id" = "person_id",
           "concept_id" = dplyr::all_of(concept),
@@ -90,6 +90,9 @@ conceptCohort <- function(cdm,
           .data$cohort_start_date,
           .data$cohort_end_date
         ))
+      if (tempCohort |> dplyr::tally() |> dplyr::pull("n") > 0) {
+        cohorts[[k]] <- tempCohort
+      }
     } else {
       cli::cli_inform(c(
         "x" = "Domain {.strong {domain}} ({n} concept{?s}) excluded because table {table} is not present in the cdm."
