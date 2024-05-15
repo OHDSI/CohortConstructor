@@ -71,7 +71,7 @@ conceptCohort <- function(cdm,
       cli::cli_inform(c(
         "i" = "Subsetting table {.strong {table}} using {n} concept{?s} with domain: {.strong {domain}}."
       ))
-      cohorts[[k]] <- cdm[[table]] |>
+      tempCohort <- cdm[[table]] |>
         dplyr::select(
           "subject_id" = "person_id",
           "concept_id" = dplyr::all_of(concept),
@@ -90,6 +90,9 @@ conceptCohort <- function(cdm,
           .data$cohort_start_date,
           .data$cohort_end_date
         ))
+      if (tempCohort |> dplyr::tally() |> dplyr::pull("n") > 0) {
+        cohorts[[k]] <- tempCohort
+      }
     } else {
       cli::cli_inform(c(
         "x" = "Domain {.strong {domain}} ({n} concept{?s}) excluded because table {table} is not present in the cdm."
@@ -125,7 +128,7 @@ conceptCohort <- function(cdm,
 
   cli::cli_inform(c("i" = "Collapsing records."))
   # assign to cdm so we keep class, to be removed when https://github.com/darwin-eu-dev/omopgenerics/issues/256
-  cdm[[name]] <- cohort |>
+  cohort <- cohort |>
     dplyr::inner_join(cdm$observation_period |>
                         dplyr::select("subject_id" = "person_id",
                                       "observation_period_start_date",
@@ -138,12 +141,12 @@ conceptCohort <- function(cdm,
     ) |>
     dplyr::select(-"observation_period_start_date", -"observation_period_end_date") |>
     joinOverlap(gap = 0) |>
-    dplyr::mutate(subject_id = as.integer(.data$subject_id)) |>
+    dplyr::mutate(subject_id = .data$subject_id) |>
     dplyr::compute(name = name, temporary = FALSE)
 
   cli::cli_inform(c("i" = "Creating cohort attributes."))
 
-  cdm[[name]] <- cdm[[name]] |>
+  cohort <- cohort |>
     omopgenerics::newCohortTable(
       cohortSetRef = cohortSet,
       cohortAttritionRef = NULL,
@@ -152,7 +155,7 @@ conceptCohort <- function(cdm,
 
   cli::cli_inform(c("v" = "Cohort {.strong {name}} created."))
 
-  return(cdm[[name]])
+  return(cohort)
 }
 
 addDomains <- function(cohortCodelist, cdm) {
