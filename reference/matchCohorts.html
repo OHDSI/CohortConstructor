@@ -105,8 +105,7 @@ matched.</p></dd>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://darwin-eu-dev.github.io/PatientProfiles/" class="external-link">PatientProfiles</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ohdsi.github.io/CohortConstructor/">CohortConstructor</a></span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ohdsi.github.io/CohortConstructor/">CohortConstructor</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Attaching package: ‘dplyr’</span>
@@ -116,25 +115,8 @@ matched.</p></dd>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> The following objects are masked from ‘package:base’:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>     intersect, setdiff, setequal, union</span>
-<span class="r-in"><span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu-dev.github.io/PatientProfiles/reference/mockPatientProfiles.html" class="external-link">mockPatientProfiles</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  person <span class="op">=</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    person_id <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span>,</span></span>
-<span class="r-in"><span>    gender_concept_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">8532</span>, <span class="fl">8532</span>, <span class="fl">8507</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    year_of_birth <span class="op">=</span> <span class="fl">1992</span>,</span></span>
-<span class="r-in"><span>    month_of_birth <span class="op">=</span> <span class="fl">1</span>,</span></span>
-<span class="r-in"><span>    day_of_birth <span class="op">=</span> <span class="fl">1</span>,</span></span>
-<span class="r-in"><span>    race_concept_id <span class="op">=</span> <span class="fl">0</span>,</span></span>
-<span class="r-in"><span>    ethnicity_concept_id <span class="op">=</span> <span class="fl">0</span></span></span>
-<span class="r-in"><span>  <span class="op">)</span>,</span></span>
-<span class="r-in"><span>  observation_period <span class="op">=</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    observation_period_id <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span>,</span></span>
-<span class="r-in"><span>      person_id <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span>,</span></span>
-<span class="r-in"><span>      observation_period_start_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"1950-01-01"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>      observation_period_end_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2023-01-01"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>      period_type_concept_id <span class="op">=</span> <span class="fl">0</span></span></span>
-<span class="r-in"><span>  <span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">cdm</span><span class="op">$</span><span class="va">new_matched_cohort</span> <span class="op">&lt;-</span> <span class="va">cdm</span><span class="op">$</span><span class="va">cohort2</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="mockCohortConstructor.html">mockCohortConstructor</a></span><span class="op">(</span>nPerson <span class="op">=</span> <span class="fl">200</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">cdm</span><span class="op">$</span><span class="va">new_matched_cohort</span> <span class="op">&lt;-</span> <span class="va">cdm</span><span class="op">$</span><span class="va">cohort2</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu">matchCohorts</span><span class="op">(</span></span></span>
 <span class="r-in"><span>    name <span class="op">=</span> <span class="st">"new_matched_cohort"</span>,</span></span>
 <span class="r-in"><span>    cohortId <span class="op">=</span> <span class="fl">2</span>,</span></span>
@@ -153,12 +135,21 @@ matched.</p></dd>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Binding both cohorts</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Done</span>
 <span class="r-in"><span><span class="va">cdm</span><span class="op">$</span><span class="va">new_matched_cohort</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Source:   table&lt;main.new_matched_cohort&gt; [2 x 5]</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Source:   table&lt;main.new_matched_cohort&gt; [?? x 5]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: DuckDB v0.10.2 [unknown@Linux 6.5.0-1021-azure:R 4.4.0/:memory:]</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   cohort_definition_id subject_id cohort_start_date cohort_end_date cluster_id</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>                    1          1 2020-05-25        2020-05-25               1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>                    2          2 2020-05-25        2023-01-01               1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    cohort_definition_id subject_id cohort_start_date cohort_end_date cluster_id</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>                    1        118 1975-11-28        1981-05-30               6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>                    1         56 2007-09-28        2008-07-15              18</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>                    1         20 1985-08-15        1990-06-06              26</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>                    1         19 2003-06-22        2005-07-21              35</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>                    1         84 1999-04-06        2000-04-12              42</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>                    1        121 2007-10-25        2010-01-05              47</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>                    1         24 2016-12-17        2016-12-29              59</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>                    1        119 1978-01-10        1982-09-07              65</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>                    1        120 2008-12-12        2009-02-06              78</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>                    1         98 2010-02-24        2013-03-24              84</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ more rows</span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
