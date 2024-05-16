@@ -54,7 +54,7 @@ Require cohort subjects are present in another table
 \examples{
 library(CohortConstructor)
 cdm <- mockCohortConstructor(drugExposure = TRUE)
-cdm$cohort1 \%>\%
+cdm$cohort1 |>
   requireTableIntersectFlag(tableName = "drug_exposure",
                             indexDate = "cohort_start_date",
                             window = c(-Inf, 0))

@@ -59,7 +59,7 @@ Require cohort subjects are present in another cohort
 
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
-cdm$cohort1 \%>\%
+cdm$cohort1 |>
   requireCohortIntersectFlag(targetCohortTable = "cohort2",
                              targetCohortId = 1,
                              indexDate = "cohort_start_date",

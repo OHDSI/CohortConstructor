@@ -30,6 +30,6 @@ overlapping records in the cohort, overlapping entries will be merged.
 library(CohortConstructor)
 
 cdm <- mockCohortConstructor()
-cdm$cohort1 \%>\% exitAtObservationEnd()
+cdm$cohort1 |> exitAtObservationEnd()
 
 }

@@ -44,6 +44,6 @@ Require cohort subjects' death at a certain time window
 library(CDMConnector)
 library(CohortConstructor)
 cdm <- mockCohortConstructor(death = TRUE)
-cdm$cohort1 <- cdm$cohort1 \%>\% requireDeathFlag(window = list(c(0, Inf)))
+cdm$cohort1 <- cdm$cohort1 |> requireDeathFlag(window = list(c(0, Inf)))
 attrition(cdm$cohort1)
 }

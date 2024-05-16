@@ -19,7 +19,7 @@
 #' library(CohortConstructor)
 #'
 #' cdm <- mockCohortConstructor()
-#' cdm$cohort1 %>% exitAtObservationEnd()
+#' cdm$cohort1 |> exitAtObservationEnd()
 #'
 exitAtObservationEnd <- function(cohort,
                                  cohortId = NULL,

@@ -21,7 +21,7 @@
 #' @examples
 #' library(CohortConstructor)
 #' cdm <- mockCohortConstructor(nPerson = 100)
-#' cdm$cohort1 %>%
+#' cdm$cohort1 |>
 #'   requireDemographics(indexDate = "cohort_start_date",
 #'                       ageRange = list(c(18, 65)),
 #'                       sex = "Female",

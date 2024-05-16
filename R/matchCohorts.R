@@ -19,7 +19,7 @@
 #' library(CohortConstructor)
 #' library(dplyr)
 #' cdm <- mockCohortConstructor(nPerson = 200)
-#' cdm$new_matched_cohort <- cdm$cohort2 %>%
+#' cdm$new_matched_cohort <- cdm$cohort2 |>
 #'   matchCohorts(
 #'     name = "new_matched_cohort",
 #'     cohortId = 2,
