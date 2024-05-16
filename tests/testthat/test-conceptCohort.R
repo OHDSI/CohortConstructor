@@ -55,7 +55,7 @@ test_that("expected errors and messages", {
 
 test_that("simple example", {
   cdm <- omock::mockCdmReference() |>
-    omock::mockCdmFromTable(cohortTable = list("cohort" = dplyr::tibble(
+    omock::mockCdmFromTables(tables = list("cohort" = dplyr::tibble(
       "cohort_definition_id" = 1,
       "subject_id" = c(1, 2, 3),
       "cohort_start_date" = as.Date("2020-01-01"),
@@ -121,7 +121,7 @@ test_that("simple example", {
 
 test_that("simple example duckdb", {
   cdm <- omock::mockCdmReference() |>
-    omock::mockCdmFromTable(cohortTable = list("cohort" = dplyr::tibble(
+    omock::mockCdmFromTables(tables = list("cohort" = dplyr::tibble(
       "cohort_definition_id" = 1,
       "subject_id" = c(1, 2, 3),
       "cohort_start_date" = as.Date("2020-01-01"),
@@ -190,7 +190,7 @@ test_that("simple example duckdb", {
 
 test_that("excluded concepts in codelist", {
   cdm <- omock::mockCdmReference() |>
-    omock::mockCdmFromTable(cohortTable = list("cohort" = dplyr::tibble(
+    omock::mockCdmFromTables(tables = list("cohort" = dplyr::tibble(
       "cohort_definition_id" = 1,
       "subject_id" = c(1, 2, 3),
       "cohort_start_date" = as.Date("2020-01-01"),

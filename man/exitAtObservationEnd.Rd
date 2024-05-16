@@ -27,8 +27,9 @@ period corresponding to the cohort entry. In the case were this generates
 overlapping records in the cohort, overlapping entries will be merged.
 }
 \examples{
-library(PatientProfiles)
 library(CohortConstructor)
-cdm <- mockPatientProfiles()
-cdm$cohort1 \%>\% exitAtObservationEnd()
+
+cdm <- mockCohortConstructor()
+cdm$cohort1 |> exitAtObservationEnd()
+
 }

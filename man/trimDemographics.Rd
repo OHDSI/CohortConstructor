@@ -40,3 +40,10 @@ demographic requirements
 \description{
 Restrict cohort on patient demographics
 }
+\examples{
+library(CohortConstructor)
+
+cdm <- mockCohortConstructor(nPerson = 100)
+
+cdm$cohort1 |> trimDemographics(sex = "Male")
+}

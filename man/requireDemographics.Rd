@@ -45,10 +45,9 @@ demographic requirements
 Restrict cohort on patient demographics
 }
 \examples{
-library(DrugUtilisation)
 library(CohortConstructor)
-cdm <- mockDrugUtilisation(numberIndividuals = 100)
-cdm$cohort1 \%>\%
+cdm <- mockCohortConstructor(nPerson = 100)
+cdm$cohort1 |>
   requireDemographics(indexDate = "cohort_start_date",
                       ageRange = list(c(18, 65)),
                       sex = "Female",

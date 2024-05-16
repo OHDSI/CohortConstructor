@@ -56,10 +56,10 @@ are not in the cohort if negate = TRUE)
 Require cohort subjects are present in another cohort
 }
 \examples{
-library(DrugUtilisation)
+
 library(CohortConstructor)
-cdm <- mockDrugUtilisation(numberIndividuals = 100)
-cdm$cohort1 \%>\%
+cdm <- mockCohortConstructor()
+cdm$cohort1 |>
   requireCohortIntersectFlag(targetCohortTable = "cohort2",
                              targetCohortId = 1,
                              indexDate = "cohort_start_date",
