@@ -108,6 +108,18 @@ exitAtDeath <- function(cohort,
   cohortId <- validateCohortId(cohortId, ids)
   assertLogical(requireDeath, length = 1)
 
+  # warning
+  extraColumns <- colnames(cohort)
+  extraColumns <- extraColumns[!extraColumns %in% c(
+    "cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date"
+  )]
+  if (length(extraColumns) > 0) {
+    cli::cli_inform(c(
+      "!" = "Extra columns are not supported in this function, the following
+      columns will be dropped: {paste0(extraColumns, collapse = ', ')}"
+    ))
+  }
+
   # create new cohort
   newCohort <- cohort |>
     PatientProfiles::addDeathDate() |>

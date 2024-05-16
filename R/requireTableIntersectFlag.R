@@ -63,10 +63,6 @@ requireTableIntersectFlag <- function(cohort,
     window_end <- window[2]
   }
 
-  if (is.null(cdm[[tableName]])) {
-    cli::cli_abort("{tableName} not found in cdm reference")
-  }
-
   if (length(tableName) > 1) {
     cli::cli_abort("Currently just one table supported.")
   }

@@ -132,7 +132,9 @@ intersectCohorts <- function(cohort,
           dplyr::select("id_in" = "cohort_definition_id", "cohort_name"),
         by = "cohort_name")
   )
+
   if (!returnOnlyComb & !mutuallyExclusive & gap < 1) {
+    nameComputing <- omopgenerics::uniqueTableName()
     # if not mutually exclusive --> cohorts in = individual cohorts out:
     # cohort in cannot be recover after splitting (if joinOverlap with gap = 1 is
     # done we might be joining different input entries)
@@ -150,14 +152,16 @@ intersectCohorts <- function(cohort,
         cohort %>%
           dplyr::rename("id_in" = "cohort_definition_id") %>%
           dplyr::inner_join(
-            cdm[[tempName]] |>
+            cdm[[tempName]] %>%
               dplyr::filter(.data$cohort_definition_id %in% .env$individualId),
             by = "id_in") %>%
           dplyr::select(
             "cohort_definition_id", "subject_id", "cohort_start_date",
-            "cohort_end_date")
+            "cohort_end_date") |>
+          dplyr::compute(name = nameComputing, temporary = FALSE)
       ) %>%
       dplyr::compute(name = name, temporary = FALSE)
+    cdm <- omopgenerics::dropTable(cdm, name = nameComputing)
   } else {
     cohortOut <- cohortOut %>%
       dplyr::inner_join(cdm[[tempName]], by = cohortNames) %>%
@@ -310,6 +314,11 @@ joinOverlap <- function(cohort,
                         startDate = "cohort_start_date",
                         endDate = "cohort_end_date",
                         by = c("cohort_definition_id", "subject_id")) {
+
+  if (cohort |> dplyr::tally() |> dplyr::pull("n") == 0) {
+    return(cohort)
+  }
+
   start <- cohort |>
     dplyr::rename("date" := !!startDate) |>
     dplyr::select(dplyr::all_of(c(by, "date"))) |>

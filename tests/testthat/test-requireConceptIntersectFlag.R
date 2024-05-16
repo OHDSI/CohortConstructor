@@ -83,7 +83,7 @@ test_that("require flag in concept", {
   expect_message(
     cdm$cohort1 <-  requireConceptIntersectFlag(cohort = cdm$cohort1,
                                                 conceptSet = list(),
-                                                window = c(-Inf, Inf))
+                                                window = list(c(-Inf, Inf)))
   )
   expect_true(all(omopgenerics::attrition(cdm$cohort1)$reason ==
                     c("Initial qualifying events",

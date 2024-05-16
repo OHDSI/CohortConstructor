@@ -16,7 +16,7 @@ test_that("requiring presence in another table", {
                                             tableName = "table",
                                             targetStartDate = "date_start",
                                             targetEndDate = "date_end",
-                                            window = c(-Inf, Inf),
+                                            window = list(c(-Inf, Inf)),
                                             name = "cohort2")
 
   expect_equal(cdm$cohort2 |> dplyr::pull("subject_id") |> sort(),
@@ -85,6 +85,11 @@ test_that("requiring presence in another table", {
   expect_error(
     requireTableIntersectFlag(cohort = cdm$cohort1,
                               tableName = cdm$table,
+                              window = c(-Inf, Inf))
+  )
+  expect_error(
+    requireTableIntersectFlag(cohort = cdm$cohort1,
+                              tableName = "not_a_table",
                               window = c(-Inf, Inf))
   )
 

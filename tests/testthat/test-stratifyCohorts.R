@@ -5,6 +5,8 @@ test_that("simple stratification", {
         "person_id" = 1:4,
         "gender_concept_id" = 0,
         "year_of_birth" = 0L,
+        "month_of_birth" = 0L,
+        "day_of_birth" = 0L,
         "race_concept_id" = 0L,
         "ethnicity_concept_id" = 0L
       ),
@@ -40,7 +42,7 @@ test_that("simple stratification", {
   con <- duckdb::dbConnect(duckdb::duckdb(), ":memory:")
   cdm <- CDMConnector::copyCdmTo(con = con, cdm = cdm, schema = "main")
 
-  expect_error(cdm$new_cohort <- stratifyCohorts(cdm$cohort1), strata = list())
+  expect_error(cdm$new_cohort <- stratifyCohorts(cdm$cohort1, strata = list()))
   expect_no_error(
     cdm$new_cohort <- stratifyCohorts(cdm$cohort1, name = "new_cohort", strata = list())
   )
@@ -74,6 +76,17 @@ test_that("simple stratification", {
   expect_true(all(attritionCdi$number_subjects == c(2, 2, 1, 2, 1, 0, 1, 0, 0)))
   expect_true(all(attritionCdi$excluded_records == c(0, 1, 1, 0, 1, 1, 0, 1, 0)))
   expect_true(all(attritionCdi$excluded_subjects == c(0, 0, 1, 0, 1, 1, 0, 1, 0)))
+
+  # empty cohort
+  cdm <- omopgenerics::emptyCohortTable(cdm, "empty_cohort")
+  cdm$empty_cohort <- cdm$empty_cohort|> PatientProfiles::addSex() |> dplyr::compute(name = "empty_cohort", temporary = FALSE)
+  expect_no_error(cdm$empty_cohort <- stratifyCohorts(cdm$empty_cohort, strata = list("sex")))
+  expect_true(cdm$empty_cohort |> dplyr::tally() |>dplyr::pull("n") == 0)
+
+  # extra columns in settings and strata
+  attr(cdm$cohort1, "cohort_set") <- attr(cdm$cohort1, "cohort_set") |> dplyr::mutate(sex = NA)
+  expect_message(cdm$extracols <- stratifyCohorts(cdm$cohort1, strata = list("sex"), name = "extracols"))
+  expect_true(all(settings(cdm$extracols)$sex |> unique() == c("Female", "Male")))
 
   duckdb::dbDisconnect(conn = con, shutdown = TRUE)
 })

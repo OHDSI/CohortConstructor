@@ -48,7 +48,7 @@ test_that("simple example", {
         "number_records" = 7L,
         "number_subjects" = 2L,
         "reason_id" = 2L,
-        "reason" = "Collapse cohort with gap = 0 days.",
+        "reason" = "Collapse cohort with a gap of 0 days.",
         "excluded_records" = 0L,
         "excluded_subjects" = 0L
       ))
@@ -71,7 +71,7 @@ test_that("simple example", {
         "number_records" = 4L,
         "number_subjects" = 2L,
         "reason_id" = 2L,
-        "reason" = "Collapse cohort with gap = 1 days.",
+        "reason" = "Collapse cohort with a gap of 1 days.",
         "excluded_records" = 3L,
         "excluded_subjects" = 0L
       ))
@@ -81,6 +81,14 @@ test_that("simple example", {
     omopgenerics::tableSource(newCohort), omopgenerics::tableSource(cohort)
   )
 
+  # expected behaviour
+  cdm$cohort <- cdm$cohort |> dplyr::mutate(extra_column = 1)
+  expect_message(cdm$cohort |> erafy())
+  expect_error(cdm$cohort |> erafy(gap = Inf))
+  expect_error(cdm$cohort |> erafy(gap = NA))
+  expect_error(cdm$cohort |> erafy(gap = NULL))
+
+  CDMConnector::cdm_disconnect(cdm)
 })
 
 test_that("out of observation", {
@@ -133,7 +141,7 @@ test_that("out of observation", {
         "number_records" = 7L,
         "number_subjects" = 2L,
         "reason_id" = 2L,
-        "reason" = "Collapse cohort with gap = 0 days.",
+        "reason" = "Collapse cohort with a gap of 0 days.",
         "excluded_records" = 0L,
         "excluded_subjects" = 0L
       ))
@@ -156,7 +164,7 @@ test_that("out of observation", {
         "number_records" = 4L,
         "number_subjects" = 2L,
         "reason_id" = 2L,
-        "reason" = "Collapse cohort with gap = 1 days.",
+        "reason" = "Collapse cohort with a gap of 1 days.",
         "excluded_records" = 3L,
         "excluded_subjects" = 0L
       ))
@@ -166,4 +174,6 @@ test_that("out of observation", {
     omopgenerics::tableSource(newCohort), omopgenerics::tableSource(cohort)
   )
 
+  CDMConnector::cdm_disconnect(cdm)
 })
+

@@ -33,7 +33,7 @@ test_that("requiring presence in another cohort", {
   cdm$cohort4 <-  requireCohortIntersectFlag(cohort = cdm$cohort1,
                                              targetCohortTable = "cohort2",
                                              targetCohortId = 2,
-                                             window = c(-Inf, Inf),
+                                             window = list(c(-Inf, Inf)),
                                              name = "cohort4")
   expect_true(all(cdm$cohort4 %>%
                     dplyr::distinct(subject_id) %>%
@@ -120,7 +120,6 @@ test_that("requiring presence in another cohort", {
                                           targetCohortTable = "cohort2",
                                           targetCohortId = c(1,2),
                                           window = c(-Inf, Inf)))
-
   expect_error(requireCohortIntersectFlag(cohort = cdm$cohort1,
                                           targetCohortTable = "cohort22", # does not exist
                                           targetCohortId = 1,
@@ -129,7 +128,14 @@ test_that("requiring presence in another cohort", {
                                           targetCohortTable = "cohort2",
                                           targetCohortId = 10, # does not exist
                                           window = c(-Inf, Inf)))
-
+  expect_error(requireCohortIntersectFlag(cohort = cdm$cohort1,
+                                          targetCohortTable = "cohort2",
+                                          targetCohortId = NULL, # only one id supported
+                                          window = c(-Inf, Inf)))
+  expect_error(requireCohortIntersectFlag(cohort = cdm$cohort1,
+                                          targetCohortTable = c("not_a_cohort", "lala"),
+                                          targetCohortId = 1,
+                                          window = c(-Inf, Inf)))
   CDMConnector::cdm_disconnect(cdm)
 
 })
