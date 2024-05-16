@@ -30,6 +30,6 @@ reference:
 - subtitle: Cohort manipulations
 - contents:
   - matches("erafy|intersectCohorts|matchCohorts|subsetCohorts|unionCohorts|yearCohorts|stratifyCohorts")
-  - subtitle: Mock data
+- subtitle: Mock data
 - contents:
   - matches("mockCohortConstructor")
