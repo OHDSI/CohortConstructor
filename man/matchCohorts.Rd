@@ -39,27 +39,9 @@ new cohort will contain individuals not included in the target cohort with
 same year of birth (matchYearOfBirth = TRUE) and same sex (matchSex = TRUE).
 }
 \examples{
-library(PatientProfiles)
 library(CohortConstructor)
 library(dplyr)
-cdm <- mockPatientProfiles(
-  person = tibble(
-    person_id = 1:3,
-    gender_concept_id = c(8532, 8532, 8507),
-    year_of_birth = 1992,
-    month_of_birth = 1,
-    day_of_birth = 1,
-    race_concept_id = 0,
-    ethnicity_concept_id = 0
-  ),
-  observation_period = tibble(
-    observation_period_id = 1:3,
-      person_id = 1:3,
-      observation_period_start_date = as.Date("1950-01-01"),
-      observation_period_end_date = as.Date("2023-01-01"),
-      period_type_concept_id = 0
-  )
-)
+cdm <- mockCohortConstructor(nPerson = 200)
 cdm$new_matched_cohort <- cdm$cohort2 \%>\%
   matchCohorts(
     name = "new_matched_cohort",

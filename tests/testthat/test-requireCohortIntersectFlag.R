@@ -2,8 +2,8 @@ test_that("requiring presence in another cohort", {
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
-    omock::mockCohort(tableName = c("cohort1"), numberCohorts = 2) |>
-    omock::mockCohort(tableName = c("cohort2"), numberCohorts = 2, seed = 2)
+    omock::mockCohort(name = c("cohort1"), numberCohorts = 2) |>
+    omock::mockCohort(name = c("cohort2"), numberCohorts = 2, seed = 2)
   cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
                                    cdm = cdm_local,
                                    schema = "main")
@@ -138,8 +138,8 @@ test_that("requiring absence in another cohort", {
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
-    omock::mockCohort(tableName = c("cohort1"), numberCohorts = 2) |>
-    omock::mockCohort(tableName = c("cohort2"), numberCohorts = 2, seed = 2)
+    omock::mockCohort(name = c("cohort1"), numberCohorts = 2) |>
+    omock::mockCohort(name = c("cohort2"), numberCohorts = 2, seed = 2)
   cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
                                    cdm = cdm_local,
                                    schema = "main")

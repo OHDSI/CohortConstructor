@@ -23,9 +23,8 @@
 #' @export
 #'
 #' @examples
-#' library(PatientProfiles)
 #' library(CohortConstructor)
-#' cdm <- mockPatientProfiles()
+#' cdm <- mockCohortConstructor(drugExposure = TRUE)
 #' cdm$cohort1 %>%
 #'   requireTableIntersectFlag(tableName = "drug_exposure",
 #'                             indexDate = "cohort_start_date",

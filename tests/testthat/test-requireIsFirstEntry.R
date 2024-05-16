@@ -2,8 +2,8 @@ test_that("test restrict to first entry works", {
   cdm <- omock::mockCdmReference() |>
     omock::mockPerson(n = 3) |>
     omock::mockObservationPeriod() |>
-    omock::mockCohort(tableName = "cohort1", numberCohorts = 1, recordPerson = 2) |>
-    omock::mockCohort(tableName = "cohort2", numberCohorts = 2, recordPerson = 2)
+    omock::mockCohort(name = "cohort1", numberCohorts = 1, recordPerson = 2) |>
+    omock::mockCohort(name = "cohort2", numberCohorts = 2, recordPerson = 2)
 
   expect_true(all(cdm$cohort1 |> CohortConstructor::requireIsFirstEntry() |>
     dplyr::pull(cohort_start_date) == c("2001-05-29", "1999-07-30", "2015-01-23")))

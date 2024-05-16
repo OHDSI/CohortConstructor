@@ -11,8 +11,7 @@
 #' @examples
 #' \donttest{
 #' library(CohortConstructor)
-#' library(PatientProfiles)
-#' cdm <- mockPatientProfiles()
+#' cdm <- mockCohortConstructor()
 #' cdm$cohort1 <- requireIsFirstEntry(cdm$cohort1)
 #' }
 #'

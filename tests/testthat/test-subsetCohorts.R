@@ -2,7 +2,7 @@ test_that("subsetCohort works", {
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
-    omock::mockCohort(tableName = c("cohort1"), numberCohorts = 5, seed = 2)
+    omock::mockCohort(name = c("cohort1"), numberCohorts = 5, seed = 2)
   cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
                                    cdm = cdm_local,
                                    schema = "main")
@@ -96,7 +96,7 @@ test_that("Expected behaviour", {
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
-    omock::mockCohort(tableName = c("cohort1"), numberCohorts = 5, seed = 2)
+    omock::mockCohort(name = c("cohort1"), numberCohorts = 5, seed = 2)
   cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
                                    cdm = cdm_local,
                                    schema = "main")

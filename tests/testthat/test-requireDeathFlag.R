@@ -2,7 +2,7 @@ test_that("requiring death", {
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
-    omock::mockCohort(tableName = c("cohort1"), numberCohorts = 2)
+    omock::mockCohort(name = c("cohort1"), numberCohorts = 2)
   cdm_local$death <- dplyr::tibble(
     person_id = c(1,3),
     death_date = as.Date(c("2013-06-29", "2015-04-14")),
@@ -79,7 +79,7 @@ test_that("not death", {
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
-    omock::mockCohort(tableName = c("cohort1"), numberCohorts = 2, seed = 3)
+    omock::mockCohort(name = c("cohort1"), numberCohorts = 2, seed = 3)
   cdm_local$death <- dplyr::tibble(
     person_id = c(1,3),
     death_date = as.Date(c("2013-06-29", "2015-10-11")),

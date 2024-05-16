@@ -16,9 +16,9 @@
 #' @export
 #'
 #' @examples
-#' library(PatientProfiles)
 #' library(CohortConstructor)
-#' cdm <- mockPatientProfiles()
+#'
+#' cdm <- mockCohortConstructor()
 #' cdm$cohort1 %>% exitAtObservationEnd()
 #'
 exitAtObservationEnd <- function(cohort,

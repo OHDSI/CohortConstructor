@@ -13,9 +13,9 @@
 #' @export
 #'
 #' @examples
-#' library(DrugUtilisation)
 #' library(CohortConstructor)
-#' cdm <- mockDrugUtilisation(numberIndividuals = 100)
+#'
+#' cdm <- mockCohortConstructor(nPerson = 100)
 #' cdm$cohort1 %>%
 #'   requireInDateRange(indexDate = "cohort_start_date",
 #'                      dateRange = as.Date(c("2010-01-01", "2019-01-01")))

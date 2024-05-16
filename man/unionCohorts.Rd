@@ -34,11 +34,12 @@ Generate cohort from the union of different cohorts
 }
 \examples{
 \donttest{
-library(PatientProfiles)
+library(CohortConstructor)
 
-cdm <- mockPatientProfiles()
+cdm <- mockCohortConstructor(nPerson = 100)
+
 cdm$cohort2 <- cdm$cohort2 |> unionCohorts()
-CDMConnector::settings(cdm$cohort2)
+settings(cdm$cohort2)
 
 }
 }

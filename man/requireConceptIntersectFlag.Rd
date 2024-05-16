@@ -52,20 +52,9 @@ kept (or those without the event if negate = TRUE)
 Require cohort subjects to have events of a concept list
 }
 \examples{
-library(PatientProfiles)
+
 library(CohortConstructor)
-cdm <- mockPatientProfiles()
-cdm <- CDMConnector::insertTable(cdm, name = "concept",
-                                 table = dplyr::tibble(
-                                   "concept_id" = 1,
-                                   "concept_name" = "my concept",
-                                   "domain_id" = "Drug",
-                                   "vocabulary_id" = NA,
-                                   "concept_class_id" = NA,
-                                   "concept_code" = NA,
-                                   "valid_start_date" = NA,
-                                   "valid_end_date" = NA
-                                  ))
+cdm <- mockCohortConstructor(conditionOccurrence = TRUE)
 cdm$cohort2 <-  requireConceptIntersectFlag(
   cohort = cdm$cohort1,
   conceptSet = list(a = 1),

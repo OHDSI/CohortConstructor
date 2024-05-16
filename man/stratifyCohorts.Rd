@@ -34,7 +34,7 @@ Crate a new cohort table with the specified stratifications.
 library(CohortConstructor)
 library(PatientProfiles)
 
-cdm <- mockPatientProfiles()
+cdm <- mockCohortConstructor()
 
 cdm$my_cohort <- cdm$cohort1 |>
   addAge(ageGroup = list("child" = c(0, 17), "adult" = c(18, Inf))) |>

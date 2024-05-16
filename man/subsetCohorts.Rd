@@ -20,3 +20,10 @@ Cohort table with only cohorts in cohortId.
 \description{
 Generate a cohort table using a subset of cohorts from another table.
 }
+\examples{
+library(CohortConstructor)
+
+cdm <- mockCohortConstructor(nPerson = 100)
+
+cdm$cohort1 |> subsetCohorts(cohortId = 1)
+}
