@@ -11,23 +11,20 @@
 #' @export
 #'
 #' @examples
-#' library(omock)
+#' library(CohortConstructor)
 #'
-#' cdm <- mockCdmReference() |>
-#'   mockPerson() |>
-#'   mockObservationPeriod() |>
-#'   mockCohort()
-#' cdm$year_restricted <- cdm$cohort |>
-#'   yearCohorts(years = 2010:2019, name = "year_restricted")
-#' cdm$year_restricted
-#' cdm$year_restricted |> settings()
-#' cdm$year_restricted |> attrition()
+#' cdm <- mockCohortConstructor(nPerson = 100)
+#'
+#' cdm$cohort1 <- cdm$cohort1 |> yearCohorts(years = 2000:2002)
+#' settings(cdm$cohort1)
 #'
 yearCohorts <- function(cohort,
                         years,
                         cohortId = NULL,
                         name = tableName(cohort)) {
   # initial checks
+  cdm <- omopgenerics::cdmReference(cohort)
+  validateCDM(cdm)
   cohort <- validateCohortTable(cohort)
   ids <- settings(cohort)$cohort_definition_id
   cohortId <- validateCohortId(cohortId, ids)
