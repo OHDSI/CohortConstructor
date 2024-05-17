@@ -7,7 +7,7 @@
 exitAtObservationEnd(
   cohort,
   cohortId = NULL,
-  name = omopgenerics::tableName(cohort)
+  name = tableName(cohort)
 )
 }
 \arguments{

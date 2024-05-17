@@ -23,6 +23,10 @@ test_that("exit at observation end", {
   expect_true(all(cdm$cohort |> dplyr::pull(subject_id) |> sort() ==  c(1, 1, 1, 1, 3, 3, 4)))
   expect_true(all(attrition(cdm$cohort)$reason == c("Initial qualifying events", "Exit at observation period end date", "Initial qualifying events")))
 
+  # additional columns warning
+  expect_message(cdm$cohort <- cdm$cohort |> dplyr::mutate(extra_col = 1) |> exitAtObservationEnd())
+  expect_true(all(colnames(cdm$cohort) == c("cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date")))
+
   # expected errors
   expect_error(cdm$cohort |> exitAtObservationEnd(name = 1))
   expect_error(cdm$cohort |> exitAtObservationEnd(cohortId = "HI"))
@@ -72,6 +76,10 @@ test_that("exit at death date", {
   expect_true(all(cdm$cohort |> dplyr::pull(subject_id) |> sort() ==  c(1, 1, 1, 1, 3)))
   expect_true(all(attrition(cdm$cohort)$reason ==
                     c("Initial qualifying events", "No death recorded", "Exit at death", "Initial qualifying events")))
+
+  # additional columns warning
+  expect_message(cdm$cohort <- cdm$cohort |> dplyr::mutate(extra_col = 1) |> exitAtDeath())
+  expect_true(all(colnames(cdm$cohort) == c("cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date")))
 
   # expected errors
   expect_error(cdm$cohort |> exitAtDeath(name = 1))

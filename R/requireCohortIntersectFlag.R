@@ -43,7 +43,7 @@ requireCohortIntersectFlag <- function(cohort,
                                        targetEndDate = "cohort_end_date",
                                        censorDate = NULL,
                                        negate = FALSE,
-                                       name = omopgenerics::tableName(cohort)){
+                                       name = tableName(cohort)){
   # checks
   name <- validateName(name)
   assertLogical(negate, length = 1)
@@ -66,17 +66,17 @@ requireCohortIntersectFlag <- function(cohort,
     window_end <- window[2]
   }
 
-  if(is.null(cdm[[targetCohortTable]])){
-    cli::cli_abort("targetCohortTable not found in cdm reference")
+  if(length(targetCohortTable) > 1){
+    cli::cli_abort("Only one target cohort table is currently supported")
+  }
+
+  if(length(targetCohortId) > 1){
+    cli::cli_abort("Only one target cohort is currently supported")
   }
 
   if(is.null(targetCohortId)){
     targetCohortId <- CDMConnector::settings(cdm[[targetCohortTable]]) %>%
       dplyr::pull("cohort_definition_id")
-  }
-
-  if(length(targetCohortId) > 1){
-    cli::cli_abort("Only one target cohort is currently supported")
   }
 
   target_name <- cdm[[targetCohortTable]] %>%

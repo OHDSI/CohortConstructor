@@ -107,49 +107,6 @@ validateConceptSet <- function(conceptSet) {
   omopgenerics::newCodelist(conceptSet)
 }
 
-validateAgeRange <- function(ageRange) {
-  err <- "ageRange must be a list of pairs of age ranges, example: list(c(0, 9), c(10, 19))"
-  if (is.null(ageRange)) {
-    return(invisible(ageRange))
-  }
-  if (!is.list(ageRange)) {
-    ageRange <- list(ageRange)
-  }
-  assertList(ageRange, class = c("numeric", "integer"))
-  l <- lengths(ageRange)
-  if (!all(l == 2)) {
-    cli::cli_abort(err)
-  }
-  if (!all(unlist(ageRange) >= 0)) {
-    cli::cli_abort(err)
-  }
-  min <- lapply(ageRange, function(x) {x[1]}) |> unlist()
-  max <- lapply(ageRange, function(x) {x[2]}) |> unlist()
-  if (!all(min <= max)) {
-    cli::cli_abort(err)
-  }
-  return(invisible(ageRange))
-}
-
-validateSex <- function(sex) {
-  if (is.null(sex)) return(sex)
-  sex <- tolower(sex)
-  assertChoice(sex, c("both", "female", "male"))
-  return(invisible(sex))
-}
-
-validateMinPriorObservation <- function(minPriorObservation) {
-  assertNumeric(minPriorObservation, integerish = TRUE, min = 0, null = T)
-  minPriorObservation <- minPriorObservation |> sort()
-  return(invisible(minPriorObservation))
-}
-
-validateMinFutureObservation <- function(minFutureObservation) {
-  assertNumeric(minFutureObservation, integerish = TRUE, min = 0, null = T)
-  minFutureObservation <- minFutureObservation |> sort()
-  return(invisible(minFutureObservation))
-}
-
 validateGap <- function(gap) {
   assertNumeric(gap, integerish = TRUE, min = 0)
 }
@@ -157,31 +114,37 @@ validateGap <- function(gap) {
 validateDemographicRequirements <- function(ageRange,
                                             sex,
                                             minPriorObservation,
-                                            minFutureObservation) {
+                                            minFutureObservation,
+                                            null = FALSE) {
   # ageRange:
-  assertList(ageRange, class = "numeric")
-  for (i in seq_along(ageRange)) {
-    if (length(ageRange[[i]]) != 2) {
-      cli::cli_abort("Each numeric vector in `ageRange` list must be of length 2.")
-    }
-    if (ageRange[[i]][1] > ageRange[[i]][2]) {
-      cli::cli_abort("Upper `ageRange` value must be equal or higher than lower `ageRange` value.")
-    }
-    if (ageRange[[i]][1] < 0 | ageRange[[i]][2] < 0) {
-      cli::cli_abort("Both `ageRange` components must be >= 0.")
+  if (!is.list(ageRange) & !is.null(ageRange)) {ageRange <- list(ageRange)}
+  assertList(ageRange, class = "numeric", null = null)
+  if (!is.null(ageRange)) {
+    for (i in seq_along(ageRange)) {
+      if (length(ageRange[[i]]) != 2) {
+        cli::cli_abort("Each numeric vector in `ageRange` list must be of length 2.")
+      }
+      if (ageRange[[i]][1] > ageRange[[i]][2]) {
+        cli::cli_abort("Upper `ageRange` value must be equal or higher than lower `ageRange` value.")
+      }
+      if (ageRange[[i]][1] < 0 | ageRange[[i]][2] < 0) {
+        cli::cli_abort("Both `ageRange` components must be >= 0.")
+      }
     }
   }
 
   # sex:
-  assertCharacter(sex)
-  if (!all(sex %in% c("Male", "Female", "Both"))) {
+  assertCharacter(sex, null = null)
+  if (!all(sex %in% c("Male", "Female", "Both")) & !is.null(sex)) {
     cli::cli_abort("`sex` must be from: 'Male', 'Female', and 'Both'.")
   }
 
   # minPriorObservation:
-  assertNumeric(minPriorObservation, integerish = TRUE, min = 0)
+  assertNumeric(minPriorObservation, integerish = TRUE, min = 0, null = null)
   # minFutureObservation:
-  assertNumeric(minFutureObservation, integerish = TRUE, min = 0)
+  assertNumeric(minFutureObservation, integerish = TRUE, min = 0, null = null)
+
+  return(ageRange)
 }
 
 validateStrata <- function(strata, cohort) {

@@ -38,7 +38,7 @@ requireTableIntersectFlag <- function(cohort,
                                       targetEndDate = endDateColumn(tableName),
                                       censorDate = NULL,
                                       negate = FALSE,
-                                      name = omopgenerics::tableName(cohort)){
+                                      name = tableName(cohort)){
   # checks
   name <- validateName(name)
   assertLogical(negate, length = 1)
@@ -60,10 +60,6 @@ requireTableIntersectFlag <- function(cohort,
   } else {
     window_start <- window[1]
     window_end <- window[2]
-  }
-
-  if (is.null(cdm[[tableName]])) {
-    cli::cli_abort("{tableName} not found in cdm reference")
   }
 
   if (length(tableName) > 1) {

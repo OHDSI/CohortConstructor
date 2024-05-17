@@ -14,7 +14,7 @@ requireTableIntersectFlag(
   targetEndDate = endDateColumn(tableName),
   censorDate = NULL,
   negate = FALSE,
-  name = omopgenerics::tableName(cohort)
+  name = tableName(cohort)
 )
 }
 \arguments{

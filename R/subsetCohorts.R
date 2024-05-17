@@ -15,6 +15,7 @@
 #' cdm <- mockCohortConstructor(nPerson = 100)
 #'
 #' cdm$cohort1 |> subsetCohorts(cohortId = 1)
+#'
 subsetCohorts <- function(cohort,
                           cohortId,
                           name = tableName(cohort)) {
@@ -22,7 +23,6 @@ subsetCohorts <- function(cohort,
   cohort <- validateCohortTable(cohort, TRUE)
   cohortId <- validateCohortId(cohortId, settings(cohort)$cohort_definition_id)
   name <- validateName(name)
-
 
   cohort <- cohort |>
     dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>

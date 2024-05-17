@@ -11,7 +11,7 @@ requireDeathFlag(
   indexDate = "cohort_start_date",
   censorDate = NULL,
   negate = FALSE,
-  name = omopgenerics::tableName(cohort)
+  name = tableName(cohort)
 )
 }
 \arguments{
