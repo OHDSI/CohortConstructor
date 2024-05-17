@@ -34,10 +34,9 @@ future observation requirement
 Restrict cohort on future observation
 }
 \examples{
-library(DrugUtilisation)
 library(CohortConstructor)
-cdm <- mockDrugUtilisation(numberIndividuals = 100)
-cdm$cohort1 \%>\%
+cdm <- mockCohortConstructor()
+cdm$cohort1 |>
   requireFutureObservation(indexDate = "cohort_start_date",
                            minFutureObservation = 30)
 }

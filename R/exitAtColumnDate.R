@@ -4,13 +4,15 @@
 #' @param dateColumns Date columns in the cohort table to consider.
 #' @param cohortId Vector of cohort definition ids to include. If NULL, all
 #' cohort definition ids will be used.
-#' @param outOfObservation Strategy to handle end dates outside observation period:
-#' "asis" to keep the original cohort end date, "drop" to drop those entries,
-#' and "end" to set cohort end at observation end date.
-#' @param na.rm If TRUE empty dates will not be used to compute the
-#' end date, but if FALSE cohort end date will be NA when one of the
-#' dates is empty.
+#' @param returnReason If TRUE it will return a column stating which column in
+#' `dateColumns` is used as a new cohort end date.
 #' @param name Name of the new cohort with the restriction.
+#' @param .softValidation Whether to perform a soft validation of consistency.
+#' If set to FALSE four additional checks will be performed: 1) a check that
+#' cohort end date is not before cohort start date, 2) a check that there are no
+#' missing values in required columns, 3) a check that cohort duration is all
+#' within observation period, and 4) that there are no overlapping cohort
+#' entries
 #'
 #' @return The cohort table.
 #'
@@ -18,10 +20,18 @@
 #' @export
 #'
 #' @examples
-#' library(PatientProfiles)
 #' library(CohortConstructor)
-#' cdm <- mockPatientProfiles()
-#' cdm$cohort1 %>% exitAtFirstDate()
+#' cdm <- mockCohortConstructor(tables = list(
+#' "cohort" = dplyr::tibble(
+#'   cohort_definition_id = 1,
+#'   subject_id = c(1, 2, 3, 4),
+#'   cohort_start_date = as.Date(c("2000-06-03", "2000-01-01", "2015-01-15", "2000-12-09")),
+#'   cohort_end_date = as.Date(c("2001-09-01", "2001-01-12", "2015-02-15", "2002-12-09")),
+#'   date_1 = as.Date(c("2001-08-01", "2001-01-01", "2015-01-15", "2002-12-09")),
+#'   date_2 = as.Date(c("2001-08-01", NA, "2015-04-15", "2002-12-09"))
+#' )
+#' ))
+#' cdm$cohort |> exitAtFirstDate(dateColumns = c("date_1", "date_2"))
 
 exitAtFirstDate <- function(cohort,
                             dateColumns,
@@ -47,13 +57,15 @@ exitAtFirstDate <- function(cohort,
 #' @param dateColumns description
 #' @param cohortId Vector of cohort definition ids to include. If NULL, all
 #' cohort definition ids will be used.
-#' @param outOfObservation Strategy to handle end dates outside observation period:
-#' "asis" to keep the original cohort end date, "drop" to drop those entries,
-#' and "end" to set cohort end at observation end date.
-#' @param na.rm If TRUE empty dates will not be used to compute the
-#' end date, but if FALSE cohort end date will be NA when one of the
-#' dates is empty.
+#' @param returnReason If TRUE it will return a column stating which column in
+#' `dateColumns` is used as a new cohort end date. description
 #' @param name Name of the new cohort with the restriction.
+#' @param .softValidation Whether to perform a soft validation of consistency.
+#' If set to FALSE four additional checks will be performed: 1) a check that
+#' cohort end date is not before cohort start date, 2) a check that there are no
+#' missing values in required columns, 3) a check that cohort duration is all
+#' within observation period, and 4) that there are no overlapping cohort
+#' entries
 #'
 #' @return The cohort table.
 #'
@@ -61,10 +73,18 @@ exitAtFirstDate <- function(cohort,
 #' @export
 #'
 #' @examples
-#' library(PatientProfiles)
 #' library(CohortConstructor)
-#' cdm <- mockPatientProfiles()
-#' cdm$cohort1 %>% exitAtLastDate()
+#' cdm <- mockCohortConstructor(tables = list(
+#' "cohort" = dplyr::tibble(
+#'   cohort_definition_id = 1,
+#'   subject_id = c(1, 2, 3, 4),
+#'   cohort_start_date = as.Date(c("2000-06-03", "2000-01-01", "2015-01-15", "2000-12-09")),
+#'   cohort_end_date = as.Date(c("2001-09-01", "2001-01-12", "2015-02-15", "2002-12-09")),
+#'   date_1 = as.Date(c("2001-08-01", "2001-01-01", "2015-01-15", "2002-12-09")),
+#'   date_2 = as.Date(c("2001-08-01", NA, "2015-04-15", "2002-12-09"))
+#' )
+#' ))
+#' cdm$cohort |> exitAtLastDate(dateColumns = c("date_1", "date_2"))
 
 exitAtLastDate <- function(cohort,
                            dateColumns,
@@ -110,6 +130,15 @@ exitAtColumnDate <- function(cohort,
     atDateFunction <- rlang::expr(max(.data$new_end_date_0123456789, na.rm = TRUE)) # NA always removed in SQL
   }
 
+  # check NA
+  checkNA <- cohort |>
+    dplyr::filter(dplyr::if_all(.cols = dplyr::all_of(dateColumns), .fns = ~is.na(.x))) |>
+    dplyr::tally() |>
+    dplyr::pull("n")
+  if (checkNA > 0) {
+    cli::cli_abort("All cohort records must have at least one non-empty date in the `dateColumns`")
+  }
+
   tmpName <- omopgenerics::uniqueTableName()
 
   if (all(ids %in% cohortId)) {
@@ -137,7 +166,7 @@ exitAtColumnDate <- function(cohort,
     dplyr::ungroup() |>
     dplyr::group_by(dplyr::across(!"exit_reason")) |>
     dplyr::arrange(.data$exit_reason) |>
-    dplyr::summarise(exit_reason = str_flatten(exit_reason, collapse = '; '), .groups = "drop") |>
+    dplyr::summarise(exit_reason = stringr::str_flatten(.data$exit_reason, collapse = '; '), .groups = "drop") |>
     dplyr::mutate("cohort_end_date" = .data$new_end_date_0123456789) |>
     dplyr::select(!c("new_end_date_0123456789", "cohort_end_date_0123456789")) |>
     dplyr::distinct() |>
@@ -173,15 +202,6 @@ exitAtColumnDate <- function(cohort,
 }
 
 validateNewCohort <- function(newCohort, tmpName) {
-  ## NA
-  checkNA <- newCohort |>
-    dplyr::filter(is.na(.data$cohort_end_date)) |>
-    dplyr::tally() |>
-    dplyr::pull("n")
-  if (checkNA > 0) {
-    cdm <- omopgenerics::dropTable(cdm, name = dplyr::starts_with(tmpName))
-    cli::cli_abort("There should be at least one non-empty date in `dateColumns` options for all cohort records")
-  }
   ## start > end
   checkStart <- newCohort |>
     dplyr::filter(.data$cohort_start_date > .data$cohort_end_date) |>
@@ -190,7 +210,7 @@ validateNewCohort <- function(newCohort, tmpName) {
   if (checkStart > 0) {
     cdm <- omopgenerics::dropTable(cdm, name = dplyr::starts_with(tmpName))
     cli::cli_abort("There are new cohort end dates smaller than the start date.
-    Please provide dates valid date options")
+    Please provide valid dates in `dateColumns`")
   }
   ## Out of observation
   checkObservation <- newCohort |>
@@ -204,7 +224,7 @@ validateNewCohort <- function(newCohort, tmpName) {
   if (checkObservation > 0) {
     cdm <- omopgenerics::dropTable(cdm, name = dplyr::starts_with(tmpName))
     cli::cli_abort("There are new cohort end dates outside of the observation period.
-    Please provide dates within the subject's observation period")
+    Please provide dates in observation in `dateColumns`")
   }
   ## overlapping
   checkOverlap <- newCohort |>
