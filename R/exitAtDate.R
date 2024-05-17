@@ -26,23 +26,11 @@ exitAtObservationEnd <- function(cohort,
                                  name = omopgenerics::tableName(cohort)) {
   # checks
   name <- validateName(name)
-  validateCohortTable(cohort)
+  cohort <- validateCohortTable(cohort, dropExtraColumns = TRUE)
   cdm <- omopgenerics::cdmReference(cohort)
   validateCDM(cdm)
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
   cohortId <- validateCohortId(cohortId, ids)
-
-  # warning
-  extraColumns <- colnames(cohort)
-  extraColumns <- extraColumns[!extraColumns %in% c(
-    "cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date"
-  )]
-  if (length(extraColumns) > 0) {
-    cli::cli_inform(c(
-      "!" = "Extra columns are not supported in this function, the following
-      columns will be dropped: {paste0(extraColumns, collapse = ', ')}"
-    ))
-  }
 
   # create new cohort
   newCohort <- cohort |>
@@ -101,24 +89,12 @@ exitAtDeath <- function(cohort,
                         name = omopgenerics::tableName(cohort)) {
   # checks
   name <- validateName(name)
-  validateCohortTable(cohort)
+  cohort <- validateCohortTable(cohort, dropExtraColumns = TRUE)
   cdm <- omopgenerics::cdmReference(cohort)
   validateCDM(cdm)
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
   cohortId <- validateCohortId(cohortId, ids)
   assertLogical(requireDeath, length = 1)
-
-  # warning
-  extraColumns <- colnames(cohort)
-  extraColumns <- extraColumns[!extraColumns %in% c(
-    "cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date"
-  )]
-  if (length(extraColumns) > 0) {
-    cli::cli_inform(c(
-      "!" = "Extra columns are not supported in this function, the following
-      columns will be dropped: {paste0(extraColumns, collapse = ', ')}"
-    ))
-  }
 
   # create new cohort
   newCohort <- cohort |>

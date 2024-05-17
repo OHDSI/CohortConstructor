@@ -91,6 +91,10 @@ test_that("requireDateRange", {
     cdm$cohort1 %>%
       requireInDateRange(dateRange = as.Date(c("2010-01-01", "2010-01-01")), indexDate = "subject_id")
   )
+  expect_error(
+    cdm$cohort1 %>%
+      requireInDateRange(dateRange = as.Date(c("2011-01-01", "2010-01-01")))
+  )
 
   CDMConnector::cdm_disconnect(cdm)
 })

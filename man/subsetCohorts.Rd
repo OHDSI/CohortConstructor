@@ -26,4 +26,5 @@ library(CohortConstructor)
 cdm <- mockCohortConstructor(nPerson = 100)
 
 cdm$cohort1 |> subsetCohorts(cohortId = 1)
+
 }

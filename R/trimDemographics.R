@@ -33,10 +33,9 @@ trimDemographics <- function(cohort,
   # initial validation
   cohort <- validateCohortTable(cohort, TRUE)
   cohortId <- validateCohortId(cohortId, settings(cohort)$cohort_definition_id)
-  ageRange <- validateAgeRange(ageRange)
-  sex <- validateSex(sex)
-  minPriorObservation <- validateMinPriorObservation(minPriorObservation)
-  minFutureObservation <- validateMinFutureObservation(minFutureObservation)
+  ageRange <- validateDemographicRequirements(
+    ageRange, sex, minPriorObservation, minFutureObservation, null = TRUE
+  )
   name <- validateName(name)
 
   cdm <- omopgenerics::cdmReference(cohort)
@@ -118,8 +117,8 @@ trimDemographics <- function(cohort,
     cli::cli_inform(c("Trim sex"))
     cohort <- cohort |>
       dplyr::filter(
-        tolower(.data$sex) == .data$require_sex |
-          tolower(.data$require_sex) == "both"
+        .data$sex == .data$require_sex |
+          .data$require_sex == "Both"
       ) |>
       dplyr::select(-c("sex", "require_sex")) |>
       dplyr::compute(name = name, temporary = FALSE) |>

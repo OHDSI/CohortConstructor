@@ -47,11 +47,6 @@ intersectCohorts <- function(cohort,
   assertLogical(mutuallyExclusive, length = 1)
   assertLogical(returnOnlyComb, length = 1)
 
-  # check targetCohortId
-  if (is.null(cohortId)) {
-    cohortId <- CDMConnector::settings(cohort) %>%
-      dplyr::pull("cohort_definition_id")
-  }
   if (length(cohortId) < 2) {
     cli::cli_warn("At least 2 cohort id must be provided to do the intersection.")
     # update properly

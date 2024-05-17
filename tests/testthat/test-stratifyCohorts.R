@@ -88,5 +88,8 @@ test_that("simple stratification", {
   expect_message(cdm$extracols <- stratifyCohorts(cdm$cohort1, strata = list("sex"), name = "extracols"))
   expect_true(all(settings(cdm$extracols)$sex |> unique() == c("Female", "Male")))
 
+  # no column in the cohort
+  expect_error(cdm$new_cohort <- stratifyCohorts(cdm$cohort1, strata = list("not_a_column")))
+
   duckdb::dbDisconnect(conn = con, shutdown = TRUE)
 })
