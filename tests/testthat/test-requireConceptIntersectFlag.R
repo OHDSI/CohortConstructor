@@ -2,7 +2,7 @@ test_that("require flag in concept", {
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
-    omock::mockCohort(tableName = c("cohort1"), numberCohorts = 2)
+    omock::mockCohort(name = c("cohort1"), numberCohorts = 2)
   cdm_local$concept <- dplyr::tibble(
     "concept_id" = 1,
     "concept_name" = "my concept",
@@ -111,7 +111,7 @@ test_that("requiring absence in another cohort", {
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
-    omock::mockCohort(tableName = c("cohort1"), numberCohorts = 2)
+    omock::mockCohort(name = c("cohort1"), numberCohorts = 2)
   cdm_local$concept <- dplyr::tibble(
     "concept_id" = 1,
     "concept_name" = "my concept",

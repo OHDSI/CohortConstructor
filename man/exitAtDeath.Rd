@@ -35,4 +35,5 @@ library(PatientProfiles)
 library(CohortConstructor)
 cdm <- mockPatientProfiles()
 cdm$cohort1 \%>\% exitAtDeath()
+
 }

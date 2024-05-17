@@ -17,6 +17,12 @@
 #'
 #' @export
 #'
+#' @examples
+#' library(CohortConstructor)
+#'
+#' cdm <- mockCohortConstructor(nPerson = 100)
+#'
+#' cdm$cohort1 |> trimDemographics(sex = "Male")
 trimDemographics <- function(cohort,
                              cohortId = NULL,
                              ageRange = NULL,

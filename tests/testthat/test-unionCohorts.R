@@ -2,7 +2,7 @@ test_that("unionCohorts works", {
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
-    omock::mockCohort(tableName = c("cohort1"), numberCohorts = 4)
+    omock::mockCohort(name = c("cohort1"), numberCohorts = 4)
   cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
                                    cdm = cdm_local,
                                    schema = "main")
@@ -62,7 +62,7 @@ test_that("gap and name works", {
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
-    omock::mockCohort(tableName = c("cohort"), numberCohorts = 4, seed = 11, recordPerson = 2)
+    omock::mockCohort(name = c("cohort"), numberCohorts = 4, seed = 11, recordPerson = 2)
   cdm_local$cohort <- cdm_local$cohort |>
     dplyr::arrange(.data$subject_id, .data$cohort_start_date) |>
     dplyr::mutate(id = dplyr::row_number()) |>
@@ -137,7 +137,7 @@ test_that("Expected behaviour", {
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
-    omock::mockCohort(tableName = c("cohort"), numberCohorts = 4, seed = 8, recordPerson = 2)
+    omock::mockCohort(name = c("cohort"), numberCohorts = 4, seed = 8, recordPerson = 2)
   cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
                                    cdm = cdm_local,
                                    schema = "main")

@@ -17,18 +17,16 @@
 #'
 #' @examples
 #' \donttest{
-#' library(PatientProfiles)
+#' library(CohortConstructor)
 #'
-#' cdm <- mockPatientProfiles()
+#' cdm <- mockCohortConstructor(nPerson = 100)
 #'
 #' cdm$cohort3 <- intersectCohorts(
-#'   cohort = cdm$cohort1,
+#'   cohort = cdm$cohort2,
 #'   name = "cohort3",
 #' )
 #'
-#' cdm$cohort3
-#'
-#' CDMConnector::settings(cdm$cohort3)
+#' settings(cdm$cohort3)
 #'
 #' }
 intersectCohorts <- function(cohort,
