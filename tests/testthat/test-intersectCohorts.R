@@ -122,7 +122,7 @@ test_that("intersectCohorts", {
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
-    omock::mockCohort(tableName = c("cohort1"), numberCohorts = 2)
+    omock::mockCohort(name = c("cohort1"), numberCohorts = 2)
   cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
                                    cdm = cdm_local,
                                    schema = "main")
@@ -223,7 +223,7 @@ test_that("only return comb", {
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
-    omock::mockCohort(tableName = c("cohort1"), numberCohorts = 2, seed = 2)
+    omock::mockCohort(name = c("cohort1"), numberCohorts = 2, seed = 2)
   cdm_local$cohort1 <- cdm_local$cohort1 |>
     dplyr::filter(cohort_end_date != as.Date("2015-04-17"))
   cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
@@ -266,7 +266,7 @@ test_that("only return comb", {
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
-    omock::mockCohort(tableName = c("cohort1"), numberCohorts = 3)
+    omock::mockCohort(name = c("cohort1"), numberCohorts = 3)
   cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
                                    cdm = cdm_local,
                                    schema = "main")
@@ -334,7 +334,7 @@ test_that("attrition and cohortId", {
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
-    omock::mockCohort(tableName = c("cohort1"), numberCohorts = 4, seed = 2)
+    omock::mockCohort(name = c("cohort1"), numberCohorts = 4, seed = 2)
   cdm_local$person <- cdm_local$person |>
     dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
   cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),

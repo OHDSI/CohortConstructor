@@ -2,7 +2,7 @@ test_that("exit at observation end", {
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
-    omock::mockCohort(tableName = c("cohort"), numberCohorts = 2)
+    omock::mockCohort(name = c("cohort"), numberCohorts = 2)
   cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
                                    cdm = cdm_local,
                                    schema = "main")
@@ -37,7 +37,7 @@ test_that("exit at death date", {
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
-    omock::mockCohort(tableName = c("cohort"), numberCohorts = 2)
+    omock::mockCohort(name = c("cohort"), numberCohorts = 2)
   cdm_local$death <- dplyr::tibble(
     person_id = 1:2,
     death_date = as.Date(c("2013-06-29", "2003-06-15")),

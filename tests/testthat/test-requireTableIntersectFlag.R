@@ -2,7 +2,7 @@ test_that("requiring presence in another table", {
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
-    omock::mockCohort(tableName = c("cohort1"), numberCohorts = 2)
+    omock::mockCohort(name = c("cohort1"), numberCohorts = 2)
   cdm_local$table <- dplyr::tibble(
     person_id = c(1, 3, 4),
     date_start = as.Date(c("2002-01-01", "2015-10-01", "2000-01-01")),
@@ -100,7 +100,7 @@ test_that("requiring absence in another table", {
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
-    omock::mockCohort(tableName = c("cohort1"), numberCohorts = 2)
+    omock::mockCohort(name = c("cohort1"), numberCohorts = 2)
   cdm_local$table <- dplyr::tibble(
     person_id = c(1, 3, 4),
     date_start = as.Date(c("2002-01-01", "2015-10-01", "2000-01-01")),

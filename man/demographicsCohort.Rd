@@ -34,3 +34,12 @@ A cohort table
 \description{
 Create cohorts based on patient demographics
 }
+\examples{
+library(CohortConstructor)
+
+cdm <- mockCohortConstructor()
+
+cohort <-  cdm |> demographicsCohort(name = "cohort3", ageRange = c(18,40), sex = "Male")
+
+attrition(cohort)
+}

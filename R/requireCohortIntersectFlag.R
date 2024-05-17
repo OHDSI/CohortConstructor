@@ -25,10 +25,10 @@
 #' @export
 #'
 #' @examples
-#' library(DrugUtilisation)
+#'
 #' library(CohortConstructor)
-#' cdm <- mockDrugUtilisation(numberIndividuals = 100)
-#' cdm$cohort1 %>%
+#' cdm <- mockCohortConstructor()
+#' cdm$cohort1 |>
 #'   requireCohortIntersectFlag(targetCohortTable = "cohort2",
 #'                              targetCohortId = 1,
 #'                              indexDate = "cohort_start_date",
