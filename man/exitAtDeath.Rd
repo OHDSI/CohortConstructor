@@ -8,7 +8,7 @@ exitAtDeath(
   cohort,
   cohortId = NULL,
   requireDeath = FALSE,
-  name = omopgenerics::tableName(cohort)
+  name = tableName(cohort)
 )
 }
 \arguments{

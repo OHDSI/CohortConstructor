@@ -23,7 +23,7 @@
 #'
 exitAtObservationEnd <- function(cohort,
                                  cohortId = NULL,
-                                 name = omopgenerics::tableName(cohort)) {
+                                 name = tableName(cohort)) {
   # checks
   name <- validateName(name)
   cohort <- validateCohortTable(cohort, dropExtraColumns = TRUE)
@@ -86,7 +86,7 @@ exitAtObservationEnd <- function(cohort,
 exitAtDeath <- function(cohort,
                         cohortId = NULL,
                         requireDeath = FALSE,
-                        name = omopgenerics::tableName(cohort)) {
+                        name = tableName(cohort)) {
   # checks
   name <- validateName(name)
   cohort <- validateCohortTable(cohort, dropExtraColumns = TRUE)

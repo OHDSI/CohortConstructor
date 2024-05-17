@@ -38,7 +38,7 @@ requireTableIntersectFlag <- function(cohort,
                                       targetEndDate = endDateColumn(tableName),
                                       censorDate = NULL,
                                       negate = FALSE,
-                                      name = omopgenerics::tableName(cohort)){
+                                      name = tableName(cohort)){
   # checks
   name <- validateName(name)
   assertLogical(negate, length = 1)

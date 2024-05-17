@@ -34,7 +34,7 @@ intersectCohorts <- function(cohort,
                             gap = 0,
                             mutuallyExclusive = FALSE,
                             returnOnlyComb = FALSE,
-                            name = omopgenerics::tableName(cohort)) {
+                            name = tableName(cohort)) {
 
   # checks
   name <- validateName(name)

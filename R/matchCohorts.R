@@ -33,7 +33,7 @@ matchCohorts <- function(cohort,
                          matchSex = TRUE,
                          matchYearOfBirth = TRUE,
                          ratio = 1,
-                         name = omopgenerics::tableName(cohort)) {
+                         name = tableName(cohort)) {
   cli::cli_inform("Starting matching")
 
   # validate initial input
@@ -238,7 +238,7 @@ excludeIndividualsWithNoMatch <- function(cohort, groups, matchCols) {
       groups, by = c("cohort_definition_id", matchCols)
     ) %>%
     dplyr::select(!dplyr::all_of(matchCols)) |>
-    dplyr::compute(name = omopgenerics::tableName(cohort), temporary = FALSE) |>
+    dplyr::compute(name = tableName(cohort), temporary = FALSE) |>
     omopgenerics::recordCohortAttrition(
       "Exclude individuals that do not have any match"
     )
