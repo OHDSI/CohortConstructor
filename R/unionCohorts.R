@@ -27,7 +27,7 @@ unionCohorts <- function(cohort,
                         cohortId = NULL,
                         gap = 0,
                         cohortName = NULL,
-                        name = omopgenerics::tableName(cohort)) {
+                        name = tableName(cohort)) {
   # checks
   name <- validateName(name)
   validateCohortTable(cohort)

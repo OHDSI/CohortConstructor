@@ -23,7 +23,7 @@ requireInDateRange <- function(cohort,
                                dateRange,
                                cohortId = NULL,
                                indexDate = "cohort_start_date",
-                               name = omopgenerics::tableName(cohort)) {
+                               name = tableName(cohort)) {
 
   # checks
   name <- validateName(name)
@@ -100,7 +100,7 @@ trimToDateRange <- function(cohort,
                             cohortId = NULL,
                             startDate = "cohort_start_date",
                             endDate = "cohort_end_date",
-                            name = omopgenerics::tableName(cohort)) {
+                            name = tableName(cohort)) {
 
   # checks
   name <- validateName(name)

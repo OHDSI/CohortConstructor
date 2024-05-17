@@ -12,7 +12,7 @@ matchCohorts(
   matchSex = TRUE,
   matchYearOfBirth = TRUE,
   ratio = 1,
-  name = omopgenerics::tableName(cohort)
+  name = tableName(cohort)
 )
 }
 \arguments{

@@ -211,6 +211,10 @@ test_that("intersectCohorts", {
                  dplyr::filter(cohort_definition_id == 1),
                cdm$cohort4 %>%
                  omopgenerics::settings())
+
+  # all cohorts
+  expect_no_error(cohort <- cdm$cohort1 |> intersectCohorts())
+
   CDMConnector::cdmDisconnect(cdm)
 })
 

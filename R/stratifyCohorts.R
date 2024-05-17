@@ -159,14 +159,7 @@ getNewSettingsStrata <- function(set, strata, counts) {
       "cohort_definition_id" = dplyr::row_number()
     )
 }
-uniqueId <- function(cols = character(), n = 1) {
-  ids <- tidyr::expand_grid(x = letters, y = letters, z = letters) |>
-    dplyr::mutate("id" = paste0("id_", .data$x, .data$y, .data$z)) |>
-    dplyr::pull("id")
-  cols <- cols[nchar(cols) == 5]
-  ids <- ids[!ids %in% cols]
-  sample(x = ids, size = n)
-}
+
 getNewAttritionStrata <- function(originalAttrition, set, counts) {
   numCohorts <- nrow(set)
   newAttrition <- rep(list(originalAttrition), numCohorts)

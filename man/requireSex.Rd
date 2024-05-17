@@ -8,7 +8,7 @@ requireSex(
   cohort,
   sex,
   cohortId = NULL,
-  name = omopgenerics::tableName(cohort)
+  name = tableName(cohort)
 )
 }
 \arguments{

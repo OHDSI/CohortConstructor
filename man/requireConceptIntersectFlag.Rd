@@ -14,7 +14,7 @@ requireConceptIntersectFlag(
   targetEndDate = "event_end_date",
   censorDate = NULL,
   negate = FALSE,
-  name = omopgenerics::tableName(cohort)
+  name = tableName(cohort)
 )
 }
 \arguments{

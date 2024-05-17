@@ -48,7 +48,7 @@ test_that("simple duckdb checks", {
         ageRange = list(
           c(0, Inf), c(0, 19), c(20, 39), c(40, 59), c(60, 79), c(80, Inf)
         ),
-        sex = c("FEMale", "malE", "bOTh"),
+        sex = c("Female", "Male", "Both"),
         minPriorObservation = c(0, 365),
         minFutureObservation = c(0, 365),
         name = "cohort2"
@@ -59,7 +59,7 @@ test_that("simple duckdb checks", {
 
   id <- settings(cdm$cohort2) |>
     dplyr::filter(
-      require_sex == "both" & require_min_age == 40 & require_max_age == 59 &
+      require_sex == "Both" & require_min_age == 40 & require_max_age == 59 &
         require_min_prior_observation == 0 &
         require_min_future_observation == 0 &
         grepl("cohort_1", cohort_name)
@@ -80,7 +80,7 @@ test_that("simple duckdb checks", {
   )
   id <- settings(cdm$cohort2) |>
     dplyr::filter(
-      require_sex == "both" & require_min_age == 40 & require_max_age == 59 &
+      require_sex == "Both" & require_min_age == 40 & require_max_age == 59 &
         require_min_prior_observation == 0 &
         require_min_future_observation == 365 &
         grepl("cohort_1", cohort_name)
@@ -138,7 +138,7 @@ test_that("simple duckdb checks", {
         ageRange = list(
           c(0, Inf), c(0, 19), c(20, 39), c(40, 59), c(60, 79), c(80, Inf)
         ),
-        sex = c("FEMale", "malE", "bOTh"),
+        sex = c("Female", "Male", "Both"),
         minPriorObservation = c(0, 365),
         minFutureObservation = c(0, 365),
         name = "obs1"
@@ -148,7 +148,7 @@ test_that("simple duckdb checks", {
   # check few examples ----
   id <- settings(cdm$obs1) |>
     dplyr::filter(
-      require_sex == "both" & require_min_age == 0 & require_max_age == 19 &
+      require_sex == "Both" & require_min_age == 0 & require_max_age == 19 &
         require_min_prior_observation == 0 &
         require_min_future_observation == 0
     ) |>
@@ -164,7 +164,7 @@ test_that("simple duckdb checks", {
   )
   id <- settings(cdm$obs1) |>
     dplyr::filter(
-      require_sex == "both" & require_min_age == 0 & require_max_age == 19 &
+      require_sex == "Both" & require_min_age == 0 & require_max_age == 19 &
         require_min_prior_observation == 365 &
         require_min_future_observation == 0
     ) |>
@@ -184,12 +184,12 @@ test_that("simple duckdb checks", {
   expect_no_error(
     cdm$obs2 <- cdm$obs |>
       trimDemographics(
-        sex = c("FEMale", "malE", "bOTh"),
+        sex = c("Female", "Male", "Both"),
         name = "obs2"
       )
   )
   expect_true(settings(cdm$obs2) |> nrow() == 3)
-  values <- c("male", "female")
+  values <- c("Male", "Female")
   for (val in values) {
     id1 <- settings(cdm$obs1) |>
       dplyr::filter(
@@ -220,7 +220,7 @@ test_that("simple duckdb checks", {
   for (k in seq_along(valmin)) {
     id1 <- settings(cdm$obs1) |>
       dplyr::filter(
-        require_sex == "both" & require_min_age == valmin[k] &
+        require_sex == "Both" & require_min_age == valmin[k] &
           require_max_age == valmax[k] & require_min_prior_observation == 0 &
           require_min_future_observation == 0
       ) |>
@@ -246,7 +246,7 @@ test_that("simple duckdb checks", {
   for (val in values) {
     id1 <- settings(cdm$obs1) |>
       dplyr::filter(
-        require_sex == "both" & require_min_age == 0 &
+        require_sex == "Both" & require_min_age == 0 &
           require_max_age == Inf & require_min_prior_observation == val &
           require_min_future_observation == 0
       ) |>
@@ -270,7 +270,7 @@ test_that("simple duckdb checks", {
   for (val in values) {
     id1 <- settings(cdm$obs1) |>
       dplyr::filter(
-        require_sex == "both" & require_min_age == 0 &
+          require_sex == "Both" & require_min_age == 0 &
           require_max_age == Inf & require_min_prior_observation == 0 &
           require_min_future_observation == val
       ) |>

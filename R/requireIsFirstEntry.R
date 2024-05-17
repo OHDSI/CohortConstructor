@@ -18,7 +18,7 @@
 requireIsFirstEntry <- function(cohort,
                                 cohortId = NULL,
                                 indexDate = "cohort_start_date",
-                                name = omopgenerics::tableName(cohort)){
+                                name = tableName(cohort)){
 
   # checks
   name <- validateName(name)
@@ -67,7 +67,7 @@ requireIsFirstEntry <- function(cohort,
 requireIsLastEntry <- function(cohort,
                                cohortId = NULL,
                                indexDate = "cohort_start_date",
-                               name = omopgenerics::tableName(cohort)){
+                               name = tableName(cohort)){
 
   # checks
   name <- validateName(name)

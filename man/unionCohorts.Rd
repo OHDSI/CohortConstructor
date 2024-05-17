@@ -9,7 +9,7 @@ unionCohorts(
   cohortId = NULL,
   gap = 0,
   cohortName = NULL,
-  name = omopgenerics::tableName(cohort)
+  name = tableName(cohort)
 )
 }
 \arguments{

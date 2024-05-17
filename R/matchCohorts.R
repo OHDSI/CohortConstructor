@@ -33,17 +33,19 @@ matchCohorts <- function(cohort,
                          matchSex = TRUE,
                          matchYearOfBirth = TRUE,
                          ratio = 1,
-                         name = omopgenerics::tableName(cohort)) {
+                         name = tableName(cohort)) {
   cli::cli_inform("Starting matching")
 
   # validate initial input
+  name <- validateName(name)
+  validateCohortTable(cohort)
   cdm <- omopgenerics::cdmReference(cohort)
-  targetCohortName <- omopgenerics::tableName(cohort)
-  validateInput(
-    cdm = cdm, name = name, targetCohortName = targetCohortName,
-    cohortId = cohortId, matchSex = matchSex,
-    matchYearOfBirth = matchYearOfBirth, ratio = ratio
-  )
+  validateCDM(cdm)
+  ids <- omopgenerics::settings(cohort)$cohort_definition_id
+  cohortId <- validateCohortId(cohortId, ids)
+  assertNumeric(ratio, min = 0, length = 1)
+  assertLogical(matchSex, length = 1)
+  assertLogical(matchYearOfBirth, length = 1)
 
   # table prefix
   tablePrefix <- omopgenerics::tmpPrefix()
@@ -51,7 +53,7 @@ matchCohorts <- function(cohort,
   control <- omopgenerics::uniqueTableName(tablePrefix)
 
   if (cohort |> settings() |> nrow() == 0) {
-    cdm[[name]] <- cdm[[targetCohortName]] |>
+    cdm[[name]] <- cohort |>
       dplyr::compute(name = name, temporary = FALSE) |>
       omopgenerics::newCohortTable()
     return(cdm[[name]])
@@ -101,7 +103,7 @@ matchCohorts <- function(cohort,
       cohortSetRef = settings(cdm[[control]]) |>
         dplyr::select("cohort_definition_id", "cohort_name") |>
         dplyr::mutate(
-          "target_table_name" = .env$targetCohortName,
+          "target_table_name" = omopgenerics::tableName(cohort),
           "target_cohort_id" = .data$cohort_definition_id,
           "match_sex" = .env$matchSex,
           "match_year_of_birth" = .env$matchYearOfBirth,
@@ -127,7 +129,7 @@ matchCohorts <- function(cohort,
       cohortSetRef = settings(cdm[[target]]) |>
         dplyr::select("cohort_definition_id", "cohort_name") |>
         dplyr::mutate(
-          "target_table_name" = .env$targetCohortName,
+          "target_table_name" = omopgenerics::tableName(cohort),
           "target_cohort_id" = .data$cohort_definition_id,
           "target_cohort_name" = .data$cohort_name,
           "match_sex" = .env$matchSex,
@@ -148,123 +150,6 @@ matchCohorts <- function(cohort,
   # Return
   cli::cli_inform(c("v" = "Done"))
   return(cdm[[name]])
-}
-
-#' @noRd
-validateInput <- function(cdm,
-                          name,
-                          targetCohortName,
-                          cohortId,
-                          matchSex,
-                          matchYearOfBirth,
-                          ratio) {
-  errorMessage <- checkmate::makeAssertCollection()
-  # Check cdm class
-  data_check   <- any("cdm_reference" == class(cdm))
-  checkmate::assertTRUE(data_check, add = errorMessage)
-  if(!isTRUE(data_check)){
-    errorMessage$push(glue::glue("- cdm input must be a cdm object"))
-  }
-  # Check if targetCohortName is a character
-  targetCohortName_format_check <- any(class(targetCohortName) %in% c("character"))
-  checkmate::assertTRUE(targetCohortName_format_check, add = errorMessage)
-  if(!isTRUE(targetCohortName_format_check)){
-    errorMessage$push(glue::glue("- targetCohortName input must be a string"))
-  }
-  # Check if targetCohortName length
-  targetCohortName_length_check <- length(targetCohortName) == 1
-  checkmate::assertTRUE(  targetCohortName_length_check, add = errorMessage)
-  if(!isTRUE(  targetCohortName_length_check)){
-    errorMessage$push(glue::glue("- targetCohortName input must have length equal to 1"))
-  }
-  # Check if targetCohortName is within the cdm object
-  targetCohortName_check <- targetCohortName %in% names(cdm)
-  checkmate::assertTRUE(targetCohortName_check, add = errorMessage)
-  if(!isTRUE(targetCohortName_check)){
-    errorMessage$push(glue::glue("- cdm input has not table named {targetCohortName}"))
-  }
-  # Check if observation period is within the cdm object
-  observation_period_check <- "observation_period" %in% names(cdm)
-  checkmate::assertTRUE(observation_period_check , add = errorMessage)
-  if(!isTRUE(observation_period_check)){
-    errorMessage$push(glue::glue("- cdm input has not table named 'observation_period'"))
-  }
-  # Check if cohortId is a numeric value
-  if(!is.null(cohortId)){
-    cohortId_format_check <- any(class(cohortId) %in% c("numeric","double","integer"))
-    checkmate::assertTRUE(cohortId_format_check, add = errorMessage)
-    if(!isTRUE(cohortId_format_check)){
-      errorMessage$push(glue::glue("- cohortId input must be numeric"))
-    }
-  }
-  # Check if cohortId is in the cohort_definition_id
-  if(!is.null(cohortId)){
-    rows <- cdm[[targetCohortName]] %>% dplyr::filter(.data$cohort_definition_id %in% cohortId) %>% dplyr::tally() %>% dplyr::pull()
-    cohortId_check <- rows != 0
-    checkmate::assertTRUE(cohortId_check, add = errorMessage)
-    if(!isTRUE(cohortId_check)){
-      errorMessage$push(glue::glue("- {name} table does not containg '{cohortId}' as a cohort_definition_id"))
-    }
-  }
-  # Check if ratio is > 0
-  ratio_check <- ratio > 0
-  checkmate::assertTRUE(ratio_check, add = errorMessage)
-  if(!isTRUE(ratio_check)){
-    errorMessage$push(glue::glue("- ratio parameter must be > 0 "))
-  }
-
-  checkmate::reportAssertions(collection = errorMessage)
-  return(invisible(TRUE))
-}
-
-randomPrefix <- function(n = 5) {
-  paste0(
-    "temp_", paste0(sample(letters, 5, TRUE), collapse = ""), "_", collapse = ""
-  )
-}
-
-getNumberOfCohorts <- function(cdm, targetCohortName){
-  # Read number of cohorts
-  n <- settings(cdm[[targetCohortName]]) %>%
-    dplyr::summarise(v = max(.data$cohort_definition_id, na.rm = TRUE)) %>%
-    dplyr::pull("v")
-
-  if(is.na(n)){# Empty table, number of cohorts is 0
-    n <- 0
-  }
-  return(n)
-}
-
-getcohortId <- function(cdm, cohortId, targetCohortName){
-  if(is.null(cohortId)){
-    cohortId <-cdm[[targetCohortName]] %>%
-      omopgenerics::settings() %>%
-      dplyr::arrange(.data$cohort_definition_id) %>%
-      dplyr::pull("cohort_definition_id")
-  }
-
-  return(cohortId)
-}
-
-setInitialControlAttriton <- function(cdm, ids) {
-  num_records <- cdm[["person"]] %>%
-    dplyr::tally() %>%
-    dplyr::pull(.data$n)
-  num_subjects <- cdm[["person"]] %>%
-    dplyr::distinct(.data$person_id) %>%
-    dplyr::tally() %>%
-    dplyr::pull(.data$n)
-  return(
-    dplyr::tibble(
-      cohort_definition_id = ids,
-      number_records = num_records,
-      number_subjects = num_subjects,
-      reason_id = 1,
-      reason = "Subjects in the database",
-      excluded_records = 0,
-      excluded_subjects = 0
-    )
-  )
 }
 
 getNewCohort <- function(cohort, cohortId, control){
@@ -353,7 +238,7 @@ excludeIndividualsWithNoMatch <- function(cohort, groups, matchCols) {
       groups, by = c("cohort_definition_id", matchCols)
     ) %>%
     dplyr::select(!dplyr::all_of(matchCols)) |>
-    dplyr::compute(name = omopgenerics::tableName(cohort), temporary = FALSE) |>
+    dplyr::compute(name = tableName(cohort), temporary = FALSE) |>
     omopgenerics::recordCohortAttrition(
       "Exclude individuals that do not have any match"
     )

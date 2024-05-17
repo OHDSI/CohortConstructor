@@ -12,7 +12,7 @@ requireDemographics(
   sex = c("Both"),
   minPriorObservation = 0,
   minFutureObservation = 0,
-  name = omopgenerics::tableName(cohort)
+  name = tableName(cohort)
 )
 }
 \arguments{

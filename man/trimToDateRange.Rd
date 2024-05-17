@@ -10,7 +10,7 @@ trimToDateRange(
   cohortId = NULL,
   startDate = "cohort_start_date",
   endDate = "cohort_end_date",
-  name = omopgenerics::tableName(cohort)
+  name = tableName(cohort)
 )
 }
 \arguments{

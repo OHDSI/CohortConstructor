@@ -34,7 +34,7 @@ requireDemographics <- function(cohort,
                                 sex = c("Both"),
                                 minPriorObservation = 0,
                                 minFutureObservation = 0,
-                                name = omopgenerics::tableName(cohort)) {
+                                name = tableName(cohort)) {
 
   cohort <- demographicsFilter(
     cohort = cohort,
@@ -79,7 +79,7 @@ requireAge <- function(cohort,
                        ageRange,
                        cohortId = NULL,
                        indexDate = "cohort_start_date",
-                       name = omopgenerics::tableName(cohort)) {
+                       name = tableName(cohort)) {
 
   cohort <- demographicsFilter(
     cohort = cohort,
@@ -121,7 +121,7 @@ requireAge <- function(cohort,
 requireSex <- function(cohort,
                        sex,
                        cohortId = NULL,
-                       name = omopgenerics::tableName(cohort)) {
+                       name = tableName(cohort)) {
 
   cohort <- demographicsFilter(
     cohort = cohort,
@@ -167,7 +167,7 @@ requirePriorObservation <- function(cohort,
                                     minPriorObservation,
                                     cohortId = NULL,
                                     indexDate = "cohort_start_date",
-                                    name = omopgenerics::tableName(cohort)) {
+                                    name = tableName(cohort)) {
   cohort <- demographicsFilter(
     cohort = cohort,
     cohortId = cohortId,
@@ -213,7 +213,7 @@ requireFutureObservation <- function(cohort,
                                      minFutureObservation,
                                      cohortId = NULL,
                                      indexDate = "cohort_start_date",
-                                     name = omopgenerics::tableName(cohort)) {
+                                     name = tableName(cohort)) {
   cohort <- demographicsFilter(
     cohort = cohort,
     cohortId = cohortId,
@@ -252,8 +252,9 @@ demographicsFilter <- function(cohort,
   validateCohortColumn(indexDate, cohort, class = "Date")
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
   cohortId <- validateCohortId(cohortId, ids)
-  validateDemographicRequirements(ageRange, sex, minPriorObservation,
-                                  minFutureObservation)
+  ageRange <- validateDemographicRequirements(
+    ageRange, sex, minPriorObservation, minFutureObservation
+  )
 
   # output cohort attributes ----
   reqCols <- c("age_range", "sex", "min_prior_observation",

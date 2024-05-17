@@ -12,7 +12,7 @@ test_that("test it works and expected errors", {
 
   cdm$cohort1 <- cdm$cohort %>%
     requireDemographics(
-      ageRange = list(c(0, 35)),
+      ageRange = c(0, 35),
       indexDate = "cohort_start_date",
       sex = "Both",
       minPriorObservation = 10,
@@ -75,7 +75,7 @@ test_that("test it works and expected errors", {
   expect_error(requireDemographics(cohort = "cohort"))
   expect_error(requireDemographics(cohort = cdm$person))
   expect_error(requireDemographics(
-    cohort = cdm$cohort2,
+    cohort = cdm$cohort,
     indexDate = "aaa"
   ))
   expect_error(requireDemographics(
@@ -83,24 +83,32 @@ test_that("test it works and expected errors", {
     ageRange = c(0, 50)
   ))
   expect_error(requireDemographics(
-    cohort = cdm$cohort2,
-    ageRange = list(c(50, 40))
+    cohort = cdm$cohort,
+    ageRange = list(c(0, 50, 100))
   ))
   expect_error(requireDemographics(
-    cohort = cdm$cohort2,
+    cohort = cdm$cohort,
+    ageRange = list(c(50, 0))
+  ))
+  expect_error(requireDemographics(
+    cohort = cdm$cohort,
+    sex = "all"
+  ))
+  expect_error(requireDemographics(
+    cohort = cdm$cohort,
     ageRange = list(c(-10, 40))
   ))
   expect_error(requireDemographics(
-    cohort = cdm$cohort2,
+    cohort = cdm$cohort,
     ageRange = list(c(0, "a"))
   ))
   expect_error(requireDemographics(
-    cohort = cdm$cohort2,
+    cohort = cdm$cohort,
     sex = "a"
   ))
 
   expect_error(requireDemographics(
-    cohort = cdm$cohort2,
+    cohort = cdm$cohort,
     minPriorObservation = -10
   ))
   expect_error(requireDemographics(
@@ -108,33 +116,12 @@ test_that("test it works and expected errors", {
     minPriorObservation = "a"
   ))
   expect_error(requireDemographics(
-    cohort = cdm$cohort2,
+    cohort = cdm$cohort,
     minFutureObservation = -10
   ))
   expect_error(requireDemographics(
-    cohort = cdm$cohort2,
+    cohort = cdm$cohort,
     minFutureObservation = "a"
-  ))
-
-  # multiple options not currently supported
-  expect_error(requireDemographics(
-    cohort = cdm$cohort2,
-    ageRange = list(
-      c(0, 50),
-      c(51, 100)
-    )
-  ))
-  expect_error(requireDemographics(
-    cohort = cdm$cohort2,
-    sex = c("Both", "Male")
-  ))
-  expect_error(requireDemographics(
-    cohort = cdm$cohort2,
-    minPriorObservation = c(0, 10)
-  ))
-  expect_error(requireDemographics(
-    cohort = cdm$cohort2,
-    minFutureObservation = c(0, 10)
   ))
 
   CDMConnector::cdm_disconnect(cdm)

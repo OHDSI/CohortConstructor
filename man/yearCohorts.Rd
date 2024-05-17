@@ -23,16 +23,11 @@ A cohort table.
 Generate a new cohort table restricting cohort entries to certain years
 }
 \examples{
-library(omock)
+library(CohortConstructor)
 
-cdm <- mockCdmReference() |>
-  mockPerson() |>
-  mockObservationPeriod() |>
-  mockCohort()
-cdm$year_restricted <- cdm$cohort |>
-  yearCohorts(years = 2010:2019, name = "year_restricted")
-cdm$year_restricted
-cdm$year_restricted |> settings()
-cdm$year_restricted |> attrition()
+cdm <- mockCohortConstructor(nPerson = 100)
+
+cdm$cohort1 <- cdm$cohort1 |> yearCohorts(years = 2000:2002)
+settings(cdm$cohort1)
 
 }

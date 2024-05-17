@@ -11,35 +11,37 @@
 #' @export
 #'
 #' @examples
-#' library(omock)
+#' library(CohortConstructor)
 #'
-#' cdm <- mockCdmReference() |>
-#'   mockPerson() |>
-#'   mockObservationPeriod() |>
-#'   mockCohort()
-#' cdm$year_restricted <- cdm$cohort |>
-#'   yearCohorts(years = 2010:2019, name = "year_restricted")
-#' cdm$year_restricted
-#' cdm$year_restricted |> settings()
-#' cdm$year_restricted |> attrition()
+#' cdm <- mockCohortConstructor(nPerson = 100)
+#'
+#' cdm$cohort1 <- cdm$cohort1 |> yearCohorts(years = 2000:2002)
+#' settings(cdm$cohort1)
 #'
 yearCohorts <- function(cohort,
                         years,
                         cohortId = NULL,
                         name = tableName(cohort)) {
   # initial checks
+  cdm <- omopgenerics::cdmReference(cohort)
+  validateCDM(cdm)
   cohort <- validateCohortTable(cohort)
-  cohortId <- validateCohortId(cohortId, settings(cohort)$cohort_definition_id)
+  ids <- settings(cohort)$cohort_definition_id
+  cohortId <- validateCohortId(cohortId, ids)
   assertNumeric(years, integerish = T)
   name <- validateName(name)
-  originalName <- omopgenerics::tableName(cohort)
 
   if (length(years) == 0) {
-    return(subsetCohorts(cohort = cohort, cohortId = cohortId, name = name))
+    cohort <- cohort |>
+      dplyr::compute(name = name, temporary = FALSE) |>
+      omopgenerics::newCohortTable(.softValidation = TRUE)
+    return(cohort)
   }
 
+  # temp tables
   tablePrefix <- omopgenerics::tmpPrefix()
-  tmpCohort <- omopgenerics::uniqueTableName(tablePrefix)
+  tmpName <- omopgenerics::uniqueTableName(tablePrefix)
+  tmpNewCohort <- omopgenerics::uniqueTableName(tablePrefix)
 
   # start dates
   date <- glue::glue("as.Date('{years}-01-01')")
@@ -55,6 +57,7 @@ yearCohorts <- function(cohort,
     rlang::parse_exprs() |>
     rlang::set_names(glue::glue("cohort_end_date_{years}"))
 
+  # years set
   sets <- cohort |>
     settings() |>
     dplyr::filter(.data$cohort_definition_id %in% .env$cohortId)
@@ -62,12 +65,12 @@ yearCohorts <- function(cohort,
     sets |>
       dplyr::mutate(
         "year" = as.integer(.env$y),
+        "target_cohort_name" = .data$cohort_name,
         "cohort_name" = paste0(.data$cohort_name, "_", as.character(.env$y))
       )
   }) |>
     dplyr::bind_rows() |>
     dplyr::mutate("new_cohort_definition_id" = dplyr::row_number())
-  tmpName <- omopgenerics::uniqueTableName(tablePrefix)
   cdm <- omopgenerics::insertTable(
     cdm = cdm,
     name = tmpName,
@@ -76,8 +79,18 @@ yearCohorts <- function(cohort,
     temporary = TRUE
   )
 
-  cohort <- cohort |>
-    subsetCohorts(cohortId = cohortId, name = tmpCohort)
+  # years cohort
+  if (all(ids %in% cohortId)) {
+    cohort <- cohort |>
+      dplyr::compute(name = tmpNewCohort, temporary = FALSE) |>
+      omopgenerics::newCohortTable(.softValidation = TRUE)
+  } else {
+    tmpUnchanged <- omopgenerics::uniqueTableName(tablePrefix)
+    unchangedCohort <- cohort |>
+      subsetCohorts(cohortId = ids[!ids %in% cohortId], name = tmpUnchanged)
+    cohort <- cohort |>
+      subsetCohorts(cohortId = cohortId, name = tmpNewCohort)
+  }
 
   newCohort <- cohort |>
     dplyr::mutate(!!!startDates, !!!endDates) |>
@@ -92,13 +105,14 @@ yearCohorts <- function(cohort,
     dplyr::inner_join(cdm[[tmpName]], by = c("cohort_definition_id", "year")) |>
     dplyr::select(-"cohort_definition_id", - "year") |>
     dplyr::rename("cohort_definition_id" = "new_cohort_definition_id") |>
-    dplyr::compute(name = tmpCohort, temporary = FALSE)
+    dplyr::compute(name = tmpNewCohort, temporary = FALSE)
 
   # build new metadata
+  ## set
   newSet <- sets |>
-    dplyr::mutate("target_cohort" = originalName) |>
     dplyr::rename("target_cohort_definition_id" = "cohort_definition_id") |>
     dplyr::rename("cohort_definition_id" = "new_cohort_definition_id")
+  ## attrition
   counts <- newCohort |>
     dplyr::summarise(
       "number_records" = dplyr::n(),
@@ -141,17 +155,39 @@ yearCohorts <- function(cohort,
           )
       )
   }
+  ## codelist
+  codelist <- attr(cohort, "cohort_codelist")
+  newCodelist <- cdm[[tmpName]] |>
+    dplyr::rename("target_cohort_definition_id" = "cohort_definition_id") |>
+    dplyr::rename("cohort_definition_id" = "new_cohort_definition_id") |>
+    dplyr::select(c("cohort_definition_id", "target_cohort_definition_id")) |>
+    dplyr::inner_join(
+      codelist |>
+        dplyr::rename("target_cohort_definition_id" = "cohort_definition_id"),
+      by = "target_cohort_definition_id",
+      relationship = "many-to-many"
+    ) |>
+    dplyr::select(!"target_cohort_definition_id")
 
-  newCohort <- newCohort|>
+  # new cohort
+  newCohort <- newCohort |>
     omopgenerics::newCohortTable(
       cohortSetRef = newSet,
       cohortAttritionRef = newAttrition |> dplyr::bind_rows(),
+      cohortCodelistRef = newCodelist,
       .softValidation = TRUE
     )
 
-  cdm <- cohort |> omopgenerics::bind(newCohort, name = name)
+  if (!all(ids %in% cohortId)) {
+    cdm <- unchangedCohort |> omopgenerics::bind(newCohort, name = name)
+    newCohort <- cdm[[name]]
+  } else {
+    newCohort <- newCohort |>
+      dplyr::compute(name = name, temporary = FALSE) |>
+      omopgenerics::newCohortTable()
+  }
 
   omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with(tablePrefix))
 
-  return(cdm[[name]])
+  return(newCohort)
 }
