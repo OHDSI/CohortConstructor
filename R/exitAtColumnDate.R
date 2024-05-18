@@ -173,7 +173,7 @@ exitAtColumnDate <- function(cohort,
     dplyr::compute(name = tmpName, temporary = FALSE)
 
   # checks with informative errors
-  validateNewCohort(newCohort, tmpName)
+  validateNewCohort(newCohort, cdm, tmpName)
 
   if (any(!ids %in% cohortId)) {
     dateColumns <- dateColumns[dateColumns != "cohort_end_date"]
@@ -201,7 +201,7 @@ exitAtColumnDate <- function(cohort,
   return(newCohort)
 }
 
-validateNewCohort <- function(newCohort, tmpName) {
+validateNewCohort <- function(newCohort, cdm, tmpName) {
   ## start > end
   checkStart <- newCohort |>
     dplyr::filter(.data$cohort_start_date > .data$cohort_end_date) |>

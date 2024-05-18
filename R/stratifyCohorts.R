@@ -155,7 +155,7 @@ getNewSettingsStrata <- function(set, strata, counts) {
   }) |>
     dplyr::bind_rows() |>
     dplyr::mutate(
-      "cohort_name" = paste0(.data$target_cohort_name, "_", .data$cohort_name),
+      "cohort_name" = paste0(.data$target_cohort_name, "_", tolower(.data$cohort_name)),
       "cohort_definition_id" = dplyr::row_number()
     )
 }
