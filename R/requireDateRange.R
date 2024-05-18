@@ -89,7 +89,7 @@ requireInDateRange <- function(cohort,
 #' @examples
 #' library(CohortConstructor)
 #' cdm <- mockCohortConstructor()
-#' cdm$cohort1 %>%
+#' cdm$cohort1 |>
 #'   trimToDateRange(startDate = "cohort_start_date",
 #'                   endDate = "cohort_end_date",
 #'                   dateRange = as.Date(c("2015-01-01",
