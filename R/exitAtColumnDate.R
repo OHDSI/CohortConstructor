@@ -46,12 +46,13 @@ exitAtFirstDate <- function(cohort,
     returnReason = returnReason,
     name = name,
     order = "first",
+    exit = TRUE,
     .softValidation = .softValidation
   )
 }
 
 
-#' Set cohort end date to the first of a set of column dates
+#' Set cohort end date to the last of a set of column dates
 #'
 #' @param cohort A cohort table in a cdm reference.
 #' @param dateColumns description
@@ -99,6 +100,7 @@ exitAtLastDate <- function(cohort,
     returnReason = returnReason,
     name = name,
     order = "last",
+    exit = TRUE,
     .softValidation = .softValidation
   )
 }
@@ -109,6 +111,7 @@ exitAtColumnDate <- function(cohort,
                              returnReason,
                              order,
                              name,
+                             exit,
                              .softValidation) {
   # checks
   name <- validateName(name)
@@ -119,15 +122,22 @@ exitAtColumnDate <- function(cohort,
   cohortId <- validateCohortId(cohortId, ids)
   assertLogical(returnReason, length = 1)
   validateCohortColumn(dateColumns, cohort, "Date")
-  if ("cohort_start_date" %in% dateColumns) {
-    cli::cli_abort("`cohort_start_date` cannot be one of the dateColumns")
-  }
   assertLogical(.softValidation, length = 1)
 
   if (order == "first") {
-    atDateFunction <- rlang::expr(min(.data$new_end_date_0123456789, na.rm = TRUE)) # NA always removed in SQL
+    atDateFunction <- rlang::expr(min(.data$new_date_0123456789, na.rm = TRUE)) # NA always removed in SQL
   } else if (order == "last") {
-    atDateFunction <- rlang::expr(max(.data$new_end_date_0123456789, na.rm = TRUE)) # NA always removed in SQL
+    atDateFunction <- rlang::expr(max(.data$new_date_0123456789, na.rm = TRUE)) # NA always removed in SQL
+  }
+
+  if (exit) {
+    newDate <- "cohort_end_date"
+    keptDate <- "cohort_start_date"
+    reason <- "exit_reason"
+  } else {
+    newDate <- "cohort_start_date"
+    keptDate <- "cohort_end_date"
+    reason <- "entry_reason"
   }
 
   # check NA
@@ -143,32 +153,41 @@ exitAtColumnDate <- function(cohort,
 
   if (all(ids %in% cohortId)) {
     newCohort <- cohort |>
-      dplyr::mutate("cohort_end_date_0123456789" = .data$cohort_end_date) |>
+      dplyr::mutate(
+        "cohort_start_date_0123456789" = .data$cohort_start_date,
+        "cohort_end_date_0123456789" = .data$cohort_end_date
+      ) |>
       dplyr::compute(name = tmpName, temporary = FALSE)
   } else {
     newCohort <- cohort |>
       dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>
-      dplyr::mutate("cohort_end_date_0123456789" = .data$cohort_end_date) |>
+      dplyr::mutate(
+        "cohort_start_date_0123456789" = .data$cohort_start_date,
+        "cohort_end_date_0123456789" = .data$cohort_end_date
+      ) |>
       dplyr::compute(name = tmpName, temporary = FALSE)
   }
 
   newCohort <- newCohort |>
     tidyr::pivot_longer(
       cols = dplyr::all_of(dateColumns),
-      names_to = "exit_reason",
-      values_to = "new_end_date_0123456789"
+      names_to = reason,
+      values_to = "new_date_0123456789"
     ) |>
     dplyr::group_by(
       .data$cohort_definition_id, .data$subject_id,
-      .data$cohort_start_date, .data$cohort_end_date_0123456789
+      .data$cohort_start_date_0123456789, .data$cohort_end_date_0123456789
     ) |>
-    dplyr::filter(.data$new_end_date_0123456789 == !!atDateFunction) |>
+    dplyr::filter(.data$new_date_0123456789 == !!atDateFunction) |>
     dplyr::ungroup() |>
-    dplyr::group_by(dplyr::across(!"exit_reason")) |>
-    dplyr::arrange(.data$exit_reason) |>
-    dplyr::summarise(exit_reason = stringr::str_flatten(.data$exit_reason, collapse = '; '), .groups = "drop") |>
-    dplyr::mutate("cohort_end_date" = .data$new_end_date_0123456789) |>
-    dplyr::select(!c("new_end_date_0123456789", "cohort_end_date_0123456789")) |>
+    dplyr::group_by(dplyr::across(!dplyr::all_of(reason))) |>
+    dplyr::arrange(.data[[reason]]) |>
+    dplyr::summarise(!!reason := stringr::str_flatten(.data[[reason]], collapse = '; '), .groups = "drop") |>
+    dplyr::mutate(
+      !!newDate := .data$new_date_0123456789,
+      !!keptDate := .data[[paste0(keptDate, "_0123456789")]]
+    ) |>
+    dplyr::select(!c("new_date_0123456789", "cohort_end_date_0123456789", "cohort_start_date_0123456789")) |>
     dplyr::distinct() |>
     dplyr::compute(name = tmpName, temporary = FALSE)
 
@@ -176,20 +195,20 @@ exitAtColumnDate <- function(cohort,
   validateNewCohort(newCohort, cdm, tmpName)
 
   if (any(!ids %in% cohortId)) {
-    dateColumns <- dateColumns[dateColumns != "cohort_end_date"]
+    dateColumns <- dateColumns[dateColumns != c("cohort_end_date", "cohort_start_date")]
     newCohort <- newCohort |>
       # join non modified cohorts
       dplyr::union_all(
         cohort |>
           dplyr::filter(!.data$cohort_definition_id %in% .env$cohortId) |>
           dplyr::select(!dplyr::all_of(dateColumns)) |>
-          dplyr::mutate(exit_reason = "cohort_end_date")
+          dplyr::mutate(!!reason := !!newDate)
       ) |>
       dplyr::compute(name = tmpName, temporary = FALSE)
   }
 
   if (!returnReason) {
-    newCohort <- newCohort |> dplyr::select(!"exit_reason")
+    newCohort <- newCohort |> dplyr::select(!dplyr::all_of(reason))
   }
 
   newCohort <- newCohort |>
