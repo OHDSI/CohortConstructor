@@ -42,18 +42,16 @@ test_that("simple stratification", {
   con <- duckdb::dbConnect(duckdb::duckdb(), ":memory:")
   cdm <- CDMConnector::copyCdmTo(con = con, cdm = cdm, schema = "main")
 
-  expect_error(cdm$new_cohort <- stratifyCohorts(cdm$cohort1, strata = list()))
+  expect_no_error(cdm$cohort1 <- stratifyCohorts(cdm$cohort1, strata = list()))
   expect_no_error(
     cdm$new_cohort <- stratifyCohorts(cdm$cohort1, name = "new_cohort", strata = list())
   )
-  expect_warning(
-    expect_no_error(
-      cdm$new_cohort <- cdm$cohort1 |>
-        stratifyCohorts(
-          strata = list(c("blood_type", "age_group"), "sex"),
-          name = "new_cohort"
-        )
-    )
+  expect_no_error(
+    cdm$new_cohort <- cdm$cohort1 |>
+      stratifyCohorts(
+        strata = list(c("blood_type", "age_group"), "sex"),
+        name = "new_cohort"
+      )
   )
   # 3 cdi * 3 blood * 2 age + 3 cdi * 2 sex
   expect_true(cdm$new_cohort |> settings() |> nrow() == 24)
