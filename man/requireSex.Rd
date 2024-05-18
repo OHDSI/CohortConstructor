@@ -4,12 +4,7 @@
 \alias{requireSex}
 \title{Restrict cohort on sex}
 \usage{
-requireSex(
-  cohort,
-  sex,
-  cohortId = NULL,
-  name = tableName(cohort)
-)
+requireSex(cohort, sex, cohortId = NULL, name = tableName(cohort))
 }
 \arguments{
 \item{cohort}{A cohort table in a cdm reference.}
@@ -30,9 +25,8 @@ sex requirement
 Restrict cohort on sex
 }
 \examples{
-library(DrugUtilisation)
 library(CohortConstructor)
-cdm <- mockDrugUtilisation(numberIndividuals = 100)
-cdm$cohort1 \%>\%
+cdm <- mockCohortConstructor()
+cdm$cohort1 |>
   requireSex(sex = "Female")
 }

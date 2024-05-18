@@ -34,6 +34,6 @@ entries will be merged.
 library(PatientProfiles)
 library(CohortConstructor)
 cdm <- mockPatientProfiles()
-cdm$cohort1 \%>\% exitAtDeath()
+cdm$cohort1 |> exitAtDeath()
 
 }

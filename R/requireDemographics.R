@@ -69,10 +69,9 @@ requireDemographics <- function(cohort,
 #' @export
 #'
 #' @examples
-#' library(DrugUtilisation)
 #' library(CohortConstructor)
-#' cdm <- mockDrugUtilisation(numberIndividuals = 100)
-#' cdm$cohort1 %>%
+#' cdm <- mockCohortConstructor()
+#' cdm$cohort1 |>
 #'   requireAge(indexDate = "cohort_start_date",
 #'              ageRange = list(c(18, 65)))
 requireAge <- function(cohort,
@@ -113,10 +112,9 @@ requireAge <- function(cohort,
 #' @export
 #'
 #' @examples
-#' library(DrugUtilisation)
 #' library(CohortConstructor)
-#' cdm <- mockDrugUtilisation(numberIndividuals = 100)
-#' cdm$cohort1 %>%
+#' cdm <- mockCohortConstructor()
+#' cdm$cohort1 |>
 #'   requireSex(sex = "Female")
 requireSex <- function(cohort,
                        sex,
@@ -157,10 +155,9 @@ requireSex <- function(cohort,
 #' @export
 #'
 #' @examples
-#' library(DrugUtilisation)
 #' library(CohortConstructor)
-#' cdm <- mockDrugUtilisation(numberIndividuals = 100)
-#' cdm$cohort1 %>%
+#' cdm <- mockCohortConstructor()
+#' cdm$cohort1 |>
 #'   requirePriorObservation(indexDate = "cohort_start_date",
 #'                           minPriorObservation = 365)
 requirePriorObservation <- function(cohort,
@@ -203,10 +200,9 @@ requirePriorObservation <- function(cohort,
 #' @export
 #'
 #' @examples
-#' library(DrugUtilisation)
 #' library(CohortConstructor)
-#' cdm <- mockDrugUtilisation(numberIndividuals = 100)
-#' cdm$cohort1 %>%
+#' cdm <- mockCohortConstructor()
+#' cdm$cohort1 |>
 #'   requireFutureObservation(indexDate = "cohort_start_date",
 #'                            minFutureObservation = 30)
 requireFutureObservation <- function(cohort,

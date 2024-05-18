@@ -81,7 +81,7 @@ exitAtObservationEnd <- function(cohort,
 #' library(PatientProfiles)
 #' library(CohortConstructor)
 #' cdm <- mockPatientProfiles()
-#' cdm$cohort1 %>% exitAtDeath()
+#' cdm$cohort1 |> exitAtDeath()
 #'
 exitAtDeath <- function(cohort,
                         cohortId = NULL,

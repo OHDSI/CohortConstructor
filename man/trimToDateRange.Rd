@@ -37,10 +37,9 @@ been dropped.
 Trim cohort dates to be within a date range
 }
 \examples{
-library(DrugUtilisation)
 library(CohortConstructor)
-cdm <- mockDrugUtilisation(numberIndividuals = 100)
-cdm$cohort1 \%>\%
+cdm <- mockCohortConstructor()
+cdm$cohort1 |>
   trimToDateRange(startDate = "cohort_start_date",
                   endDate = "cohort_end_date",
                   dateRange = as.Date(c("2015-01-01",

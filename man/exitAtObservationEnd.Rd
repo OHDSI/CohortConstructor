@@ -4,11 +4,7 @@
 \alias{exitAtObservationEnd}
 \title{Set cohort end date to end of observation}
 \usage{
-exitAtObservationEnd(
-  cohort,
-  cohortId = NULL,
-  name = tableName(cohort)
-)
+exitAtObservationEnd(cohort, cohortId = NULL, name = tableName(cohort))
 }
 \arguments{
 \item{cohort}{A cohort table in a cdm reference.}
