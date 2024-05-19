@@ -176,7 +176,7 @@ exitAtColumnDate <- function(cohort,
   validateNewCohort(newCohort, cdm, tmpName)
 
   if (any(!ids %in% cohortId)) {
-    dateColumns <- dateColumns[dateColumns != "cohort_end_date"]
+    dateColumns <- dateColumns[!dateColumns %in% "cohort_end_date"]
     newCohort <- newCohort |>
       # join non modified cohorts
       dplyr::union_all(

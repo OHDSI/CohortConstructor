@@ -10,6 +10,12 @@
 #' exclusive or not.
 #' @param returnOnlyComb Whether to only get the combination cohort back
 #' @param name Name of the new cohort with the demographic requirements.
+#' @param .softValidation Whether to perform a soft validation of consistency.
+#' If set to FALSE four additional checks will be performed: 1) check that
+#' cohort end date is not before cohort start date, 2) check that there are no
+#' missing values in required columns, 3) check that cohort duration is all
+#' within observation period, and 4) check that there are no overlapping cohort
+#' entries.
 #'
 #' @export
 #'
@@ -30,11 +36,12 @@
 #'
 #' }
 intersectCohorts <- function(cohort,
-                            cohortId = NULL,
-                            gap = 0,
-                            mutuallyExclusive = FALSE,
-                            returnOnlyComb = FALSE,
-                            name = tableName(cohort)) {
+                             cohortId = NULL,
+                             gap = 0,
+                             mutuallyExclusive = FALSE,
+                             returnOnlyComb = FALSE,
+                             name = tableName(cohort),
+                             .softValidation = FALSE) {
 
   # checks
   name <- validateName(name)
@@ -46,6 +53,7 @@ intersectCohorts <- function(cohort,
   assertNumeric(gap, integerish = TRUE, min = 0, length = 1)
   assertLogical(mutuallyExclusive, length = 1)
   assertLogical(returnOnlyComb, length = 1)
+  assertLogical(.softValidation, length = 1)
 
   if (length(cohortId) < 2) {
     cli::cli_warn("At least 2 cohort id must be provided to do the intersection.")
@@ -61,7 +69,8 @@ intersectCohorts <- function(cohort,
         cohortAttritionRef = cohort %>%
           omopgenerics::attrition() %>%
           dplyr::filter(.data$cohort_definition_id == .env$cohortId) %>%
-          dplyr::compute(name = paste0(name, "_attrition"), temporary = FALSE)
+          dplyr::compute(name = paste0(name, "_attrition"), temporary = FALSE),
+        .softValidation = .softValidation
       )
     return(cohort)
   }
@@ -208,7 +217,7 @@ intersectCohorts <- function(cohort,
         dplyr::select(-"cohort_definition_id"),
       by = "cohort_name",
       relationship = "many-to-many"
-      ) |>
+    ) |>
     dplyr::select("cohort_definition_id", "codelist_name", "concept_id", "type")
 
   cohSet <- cohSet %>%
@@ -218,7 +227,8 @@ intersectCohorts <- function(cohort,
 
   cohortOut <- omopgenerics::newCohortTable(
     table = cohortOut, cohortSetRef = cohSet,
-    cohortAttritionRef = cohAtt, cohortCodelistRef = codelist
+    cohortAttritionRef = cohAtt, cohortCodelistRef = codelist,
+    .softValidation = .softValidation
   )
 
   return(cohortOut)

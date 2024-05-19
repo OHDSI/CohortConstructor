@@ -4,7 +4,13 @@
 \alias{erafy}
 \title{Collapse cohort entries using a certain gap to concatenate records.}
 \usage{
-erafy(cohort, cohortId = NULL, gap = 0, name = tableName(cohort))
+erafy(
+  cohort,
+  cohortId = NULL,
+  gap = 0,
+  name = tableName(cohort),
+  .softValidation = FALSE
+)
 }
 \arguments{
 \item{cohort}{A cohort table}
@@ -15,6 +21,13 @@ definition ids are used.}
 \item{gap}{Number of days to use when merging cohort entries.}
 
 \item{name}{Name of the cohort table.}
+
+\item{.softValidation}{Whether to perform a soft validation of consistency.
+If set to FALSE four additional checks will be performed: 1) check that
+cohort end date is not before cohort start date, 2) check that there are no
+missing values in required columns, 3) check that cohort duration is all
+within observation period, and 4) check that there are no overlapping cohort
+entries.}
 }
 \value{
 A cohort table

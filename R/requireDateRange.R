@@ -7,6 +7,12 @@
 #' cohort definition ids will be used.
 #' @param indexDate Variable in cohort that contains the index date of interest
 #' @param name Name of the new cohort with the restriction.
+#' @param .softValidation Whether to perform a soft validation of consistency.
+#' If set to FALSE four additional checks will be performed: 1) check that
+#' cohort end date is not before cohort start date, 2) check that there are no
+#' missing values in required columns, 3) check that cohort duration is all
+#' within observation period, and 4) check that there are no overlapping cohort
+#' entries.
 #'
 #' @return The cohort table with any cohort entries outside of the date range
 #' dropped
@@ -23,7 +29,8 @@ requireInDateRange <- function(cohort,
                                dateRange,
                                cohortId = NULL,
                                indexDate = "cohort_start_date",
-                               name = tableName(cohort)) {
+                               name = tableName(cohort),
+                               .softValidation = FALSE) {
 
   # checks
   name <- validateName(name)
@@ -34,7 +41,7 @@ requireInDateRange <- function(cohort,
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
   cohortId <- validateCohortId(cohortId, ids)
   validateDateRange(dateRange)
-
+  assertLogical(.softValidation, length = 1)
 
   # requirement
   if (!is.na(dateRange[1])) {
@@ -63,7 +70,7 @@ requireInDateRange <- function(cohort,
 
   cohort <- cohort |>
     dplyr::compute(name = name, temporary = FALSE) |>
-    omopgenerics::newCohortTable()
+    omopgenerics::newCohortTable(.softValidation = .softValidation)
 
   return(cohort)
 }
@@ -78,6 +85,12 @@ requireInDateRange <- function(cohort,
 #' @param startDate Variable with earliest date.
 #' @param endDate Variable with latest date.
 #' @param name Name of the new cohort with the restriction.
+#' @param .softValidation Whether to perform a soft validation of consistency.
+#' If set to FALSE four additional checks will be performed: 1) check that
+#' cohort end date is not before cohort start date, 2) check that there are no
+#' missing values in required columns, 3) check that cohort duration is all
+#' within observation period, and 4) check that there are no overlapping cohort
+#' entries.
 #'
 #'
 #' @return The cohort table with record timings updated to only be within the
@@ -99,7 +112,8 @@ trimToDateRange <- function(cohort,
                             cohortId = NULL,
                             startDate = "cohort_start_date",
                             endDate = "cohort_end_date",
-                            name = tableName(cohort)) {
+                            name = tableName(cohort),
+                            .softValidation = FALSE) {
 
   # checks
   name <- validateName(name)
@@ -146,7 +160,7 @@ trimToDateRange <- function(cohort,
 
   cohort <- cohort |>
     dplyr::compute(name = name, temporary = FALSE) |>
-    omopgenerics::newCohortTable()
+    omopgenerics::newCohortTable(.softValidation = .softValidation)
 
   return(cohort)
 }

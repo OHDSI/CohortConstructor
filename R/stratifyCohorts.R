@@ -6,6 +6,12 @@
 #' cohort definition ids will be used.
 #' @param removeStrata Whether to remove strata columns from final cohort table.
 #' @param name Name of the new cohort.
+#' @param .softValidation Whether to perform a soft validation of consistency.
+#' If set to FALSE four additional checks will be performed: 1) check that
+#' cohort end date is not before cohort start date, 2) check that there are no
+#' missing values in required columns, 3) check that cohort duration is all
+#' within observation period, and 4) check that there are no overlapping cohort
+#' entries.
 #'
 #' @return Cohort table stratified.
 #'
@@ -34,12 +40,14 @@ stratifyCohorts <- function(cohort,
                             strata,
                             cohortId = NULL,
                             removeStrata = TRUE,
-                            name = tableName(cohort)) {
+                            name = tableName(cohort),
+                            .softValidation = FALSE) {
   # initial checks
   cohort <- validateCohortTable(cohort = cohort)
   cohortId <- validateCohortId(cohortId, settings(cohort)$cohort_definition_id)
   strata <- validateStrata(strata, cohort)
   name <- validateName(name)
+  assertLogical(.softValidation, length = 1)
 
   cdm <- omopgenerics::cdmReference(cohort)
 
@@ -50,7 +58,7 @@ stratifyCohorts <- function(cohort,
       return(
         cohort |>
         dplyr::compute(name = name, temporary = FALSE) |>
-        omopgenerics::newCohortTable()
+        omopgenerics::newCohortTable(.softValidation = .softValidation)
       )
     }
   }
@@ -129,7 +137,8 @@ stratifyCohorts <- function(cohort,
     omopgenerics::newCohortTable(
       cohortSetRef = newSettings,
       cohortAttritionRef = newAttrition,
-      cohortCodelistRef = NULL
+      cohortCodelistRef = NULL,
+      .softValidation = .softValidation
     )
 
   omopgenerics::dropTable(cdm = cdm, name = nm)

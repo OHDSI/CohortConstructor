@@ -2,25 +2,25 @@
 title: "Building base cohorts"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{a01_building_concept_cohorts}
+%\VignetteIndexEntry{a01_building_concept_cohorts}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
----
-
-```{r, include = FALSE}
+  ---
+  
+  ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  eval = TRUE, 
-  warning = FALSE, 
-  message = FALSE,
-  comment = "#>"
+collapse = TRUE,
+eval = TRUE, 
+warning = FALSE, 
+message = FALSE,
+comment = "#>"
 )
 
 library(CDMConnector)
 if (Sys.getenv("EUNOMIA_DATA_FOLDER") == ""){
-  Sys.setenv("EUNOMIA_DATA_FOLDER" = file.path(tempdir(), "eunomia"))}
+Sys.setenv("EUNOMIA_DATA_FOLDER" = file.path(tempdir(), "eunomia"))}
 if (!dir.exists(Sys.getenv("EUNOMIA_DATA_FOLDER"))){ dir.create(Sys.getenv("EUNOMIA_DATA_FOLDER"))
-  downloadEunomiaData()  
+downloadEunomiaData()  
 }
 ```
 
@@ -42,8 +42,8 @@ drug_codes <- getDrugIngredientCodes(cdm,
                                      name = c("diclofenac", "acetaminophen"))
 
 cdm$medications <- conceptCohort(cdm = cdm, 
-                             conceptSet = drug_codes, 
-                             name = "medications")
+                                 conceptSet = drug_codes, 
+                                 name = "medications")
 
 settings(cdm$medications)
 cohortCount(cdm$medications)
@@ -56,8 +56,8 @@ TO DO
 ## Demographic based cohort creation
 ```{r}
 cdm$working_age_cohort <- demographicsCohort(cdm = cdm, 
-                                 ageRange = c(18, 65), 
-                                 name = "working_age_cohort")
+                                             ageRange = c(18, 65), 
+                                             name = "working_age_cohort")
 
 settings(cdm$working_age_cohort)
 cohortCount(cdm$working_age_cohort)

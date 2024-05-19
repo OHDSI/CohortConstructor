@@ -16,6 +16,12 @@
 #' @param negate If set as TRUE, criteria will be applied as exclusion
 #' rather than inclusion (i.e. require absence in another cohort).
 #' @param name Name of the new cohort with the future observation restriction.
+#' @param .softValidation Whether to perform a soft validation of consistency.
+#' If set to FALSE four additional checks will be performed: 1) check that
+#' cohort end date is not before cohort start date, 2) check that there are no
+#' missing values in required columns, 3) check that cohort duration is all
+#' within observation period, and 4) check that there are no overlapping cohort
+#' entries.
 #'
 #' @return Cohort table with only those  with the events in the concept list
 #' kept (or those without the event if negate = TRUE)
@@ -40,7 +46,8 @@ requireConceptIntersectFlag <- function(cohort,
                                         targetEndDate = "event_end_date",
                                         censorDate = NULL,
                                         negate = FALSE,
-                                        name = tableName(cohort)){
+                                        name = tableName(cohort),
+                                        .softValidation = FALSE){
   # checks
   name <- validateName(name)
   assertLogical(negate, length = 1)
@@ -51,6 +58,7 @@ requireConceptIntersectFlag <- function(cohort,
   assertList(conceptSet)
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
   cohortId <- validateCohortId(cohortId, ids)
+  assertLogical(.softValidation, length = 1)
 
   cols <- unique(c("cohort_definition_id", "subject_id",
                    "cohort_start_date", "cohort_end_date",
@@ -111,6 +119,7 @@ requireConceptIntersectFlag <- function(cohort,
       dplyr::inner_join(subsetCohort,
                         by = c(cols)) %>%
       dplyr::compute(name = name, temporary = FALSE) %>%
+      omopgenerics::newCohortTable(.softValidation = .softValidation) %>%
       CDMConnector::recordCohortAttrition(reason = reason, cohortId = cohortId)
   }
 

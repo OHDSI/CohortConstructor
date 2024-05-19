@@ -4,7 +4,12 @@
 \alias{subsetCohorts}
 \title{Generate a cohort table using a subset of cohorts from another table.}
 \usage{
-subsetCohorts(cohort, cohortId, name = tableName(cohort))
+subsetCohorts(
+  cohort,
+  cohortId,
+  name = tableName(cohort),
+  .softValidation = FALSE
+)
 }
 \arguments{
 \item{cohort}{A cohort table in a cdm reference.}
@@ -13,6 +18,13 @@ subsetCohorts(cohort, cohortId, name = tableName(cohort))
 cohort will be selected.}
 
 \item{name}{Name of the new cohort with the demographic requirements.}
+
+\item{.softValidation}{Whether to perform a soft validation of consistency.
+If set to FALSE four additional checks will be performed: 1) check that
+cohort end date is not before cohort start date, 2) check that there are no
+missing values in required columns, 3) check that cohort duration is all
+within observation period, and 4) check that there are no overlapping cohort
+entries.}
 }
 \value{
 Cohort table with only cohorts in cohortId.

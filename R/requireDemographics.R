@@ -13,6 +13,12 @@
 #' @param minFutureObservation A minimum number of future observation days in
 #' the database.
 #' @param name Name of the new cohort with the demographic requirements.
+#' @param .softValidation Whether to perform a soft validation of consistency.
+#' If set to FALSE four additional checks will be performed: 1) check that
+#' cohort end date is not before cohort start date, 2) check that there are no
+#' missing values in required columns, 3) check that cohort duration is all
+#' within observation period, and 4) check that there are no overlapping cohort
+#' entries.
 #'
 #' @return The cohort table with only records for individuals satisfying the
 #' demographic requirements
@@ -34,7 +40,8 @@ requireDemographics <- function(cohort,
                                 sex = c("Both"),
                                 minPriorObservation = 0,
                                 minFutureObservation = 0,
-                                name = tableName(cohort)) {
+                                name = tableName(cohort),
+                                .softValidation = FALSE) {
 
   cohort <- demographicsFilter(
     cohort = cohort,
@@ -48,7 +55,8 @@ requireDemographics <- function(cohort,
     reqAge = TRUE,
     reqSex = TRUE,
     reqPriorObservation = TRUE,
-    reqFutureObservation = TRUE
+    reqFutureObservation = TRUE,
+    .softValidation = .softValidation
   )
 
   return(cohort)
@@ -63,6 +71,12 @@ requireDemographics <- function(cohort,
 #' @param indexDate Variable in cohort that contains the date to compute the
 #' demographics characteristics on which to restrict on.
 #' @param name Name of the new cohort with the age requirement.
+#' @param .softValidation Whether to perform a soft validation of consistency.
+#' If set to FALSE four additional checks will be performed: 1) check that
+#' cohort end date is not before cohort start date, 2) check that there are no
+#' missing values in required columns, 3) check that cohort duration is all
+#' within observation period, and 4) check that there are no overlapping cohort
+#' entries.
 #'
 #' @return The cohort table with only records for individuals satisfying the
 #' age requirement
@@ -78,7 +92,8 @@ requireAge <- function(cohort,
                        ageRange,
                        cohortId = NULL,
                        indexDate = "cohort_start_date",
-                       name = tableName(cohort)) {
+                       name = tableName(cohort),
+                       .softValidation = FALSE) {
 
   cohort <- demographicsFilter(
     cohort = cohort,
@@ -92,7 +107,8 @@ requireAge <- function(cohort,
     reqAge = TRUE,
     reqSex = FALSE,
     reqPriorObservation = FALSE,
-    reqFutureObservation = FALSE
+    reqFutureObservation = FALSE,
+    .softValidation = .softValidation
   )
 
   return(cohort)
@@ -106,6 +122,12 @@ requireAge <- function(cohort,
 #' @param sex Can be "Both", "Male" or "Female". If one of the latter, only
 #' those with that sex will be included.
 #' @param name Name of the new cohort with the sex requirements.
+#' @param .softValidation Whether to perform a soft validation of consistency.
+#' If set to FALSE four additional checks will be performed: 1) check that
+#' cohort end date is not before cohort start date, 2) check that there are no
+#' missing values in required columns, 3) check that cohort duration is all
+#' within observation period, and 4) check that there are no overlapping cohort
+#' entries.
 #'
 #' @return The cohort table with only records for individuals satisfying the
 #' sex requirement
@@ -119,7 +141,8 @@ requireAge <- function(cohort,
 requireSex <- function(cohort,
                        sex,
                        cohortId = NULL,
-                       name = tableName(cohort)) {
+                       name = tableName(cohort),
+                       .softValidation = FALSE) {
 
   cohort <- demographicsFilter(
     cohort = cohort,
@@ -133,7 +156,8 @@ requireSex <- function(cohort,
     reqAge = FALSE,
     reqSex = TRUE,
     reqPriorObservation = FALSE,
-    reqFutureObservation = FALSE
+    reqFutureObservation = FALSE,
+    .softValidation = .softValidation
   )
 
   return(cohort)
@@ -149,6 +173,12 @@ requireSex <- function(cohort,
 #' @param indexDate Variable in cohort that contains the date to compute the
 #' demographics characteristics on which to restrict on.
 #' @param name Name of the new cohort with the prior observation restriction.
+#' @param .softValidation Whether to perform a soft validation of consistency.
+#' If set to FALSE four additional checks will be performed: 1) check that
+#' cohort end date is not before cohort start date, 2) check that there are no
+#' missing values in required columns, 3) check that cohort duration is all
+#' within observation period, and 4) check that there are no overlapping cohort
+#' entries.
 #'
 #' @return The cohort table with only records for individuals satisfying the
 #' prior observation requirement
@@ -164,7 +194,8 @@ requirePriorObservation <- function(cohort,
                                     minPriorObservation,
                                     cohortId = NULL,
                                     indexDate = "cohort_start_date",
-                                    name = tableName(cohort)) {
+                                    name = tableName(cohort),
+                                    .softValidation = FALSE) {
   cohort <- demographicsFilter(
     cohort = cohort,
     cohortId = cohortId,
@@ -177,7 +208,8 @@ requirePriorObservation <- function(cohort,
     reqAge = FALSE,
     reqSex = FALSE,
     reqPriorObservation = TRUE,
-    reqFutureObservation = FALSE
+    reqFutureObservation = FALSE,
+    .softValidation = .softValidation
   )
 
   return(cohort)
@@ -193,6 +225,12 @@ requirePriorObservation <- function(cohort,
 #' @param indexDate Variable in cohort that contains the date to compute the
 #' demographics characteristics on which to restrict on.
 #' @param name Name of the new cohort with the future observation restriction.
+#' @param .softValidation Whether to perform a soft validation of consistency.
+#' If set to FALSE four additional checks will be performed: 1) check that
+#' cohort end date is not before cohort start date, 2) check that there are no
+#' missing values in required columns, 3) check that cohort duration is all
+#' within observation period, and 4) check that there are no overlapping cohort
+#' entries.
 #'
 #' @return The cohort table with only records for individuals satisfying the
 #' future observation requirement
@@ -209,7 +247,8 @@ requireFutureObservation <- function(cohort,
                                      minFutureObservation,
                                      cohortId = NULL,
                                      indexDate = "cohort_start_date",
-                                     name = tableName(cohort)) {
+                                     name = tableName(cohort),
+                                     .softValidation = FALSE) {
   cohort <- demographicsFilter(
     cohort = cohort,
     cohortId = cohortId,
@@ -222,7 +261,8 @@ requireFutureObservation <- function(cohort,
     reqAge = FALSE,
     reqSex = FALSE,
     reqPriorObservation = FALSE,
-    reqFutureObservation = TRUE
+    reqFutureObservation = TRUE,
+    .softValidation = .softValidation
   )
 
   return(cohort)
@@ -239,7 +279,8 @@ demographicsFilter <- function(cohort,
                                reqAge,
                                reqSex,
                                reqPriorObservation,
-                               reqFutureObservation) {
+                               reqFutureObservation,
+                               .softValidation) {
   # checks
   name <- validateName(name)
   validateCohortTable(cohort)
@@ -251,6 +292,7 @@ demographicsFilter <- function(cohort,
   ageRange <- validateDemographicRequirements(
     ageRange, sex, minPriorObservation, minFutureObservation
   )
+  assertLogical(.softValidation, length = 1)
 
   # output cohort attributes ----
   reqCols <- c("age_range", "sex", "min_prior_observation",
@@ -430,7 +472,8 @@ demographicsFilter <- function(cohort,
     omopgenerics::newCohortTable(
       cohortSetRef = newSet,
       cohortAttritionRef = attrition(workingTable),
-      cohortCodelistRef = newCod
+      cohortCodelistRef = newCod,
+      .softValidation = .softValidation
     )
 
   # drop working tables and their attributes

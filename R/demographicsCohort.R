@@ -8,6 +8,12 @@
 #' the database.
 #' @param minFutureObservation A minimum number of future observation days in
 #' the database.
+#' @param .softValidation Whether to perform a soft validation of consistency.
+#' If set to FALSE four additional checks will be performed: 1) check that
+#' cohort end date is not before cohort start date, 2) check that there are no
+#' missing values in required columns, 3) check that cohort duration is all
+#' within observation period, and 4) check that there are no overlapping cohort
+#' entries.
 #'
 #' @return A cohort table
 #'
@@ -26,10 +32,12 @@ demographicsCohort <- function(cdm,
                                ageRange = NULL,
                                sex = NULL,
                                minPriorObservation = NULL,
-                               minFutureObservation = NULL) {
+                               minFutureObservation = NULL,
+                               .softValidation = FALSE) {
   # initial checks
   cdm <- validateCdm(cdm)
   name <- validateName(name)
+  assertLogical(.softValidation, length = 1)
 
   cdm[[name]] <- cdm$observation_period |>
     dplyr::inner_join(
@@ -48,7 +56,8 @@ demographicsCohort <- function(cdm,
         "cohort_definition_id" = 1, "cohort_name" = "demographics"
       ),
       cohortAttritionRef = NULL,
-      cohortCodelistRef = NULL
+      cohortCodelistRef = NULL,
+      .softValidation = TRUE
     )
 
   cdm[[name]] <- trimDemographics(
@@ -58,7 +67,8 @@ demographicsCohort <- function(cdm,
     sex = sex,
     minPriorObservation = minPriorObservation,
     minFutureObservation = minFutureObservation,
-    name = name
+    name = name,
+    .softValidation = .softValidation
   )
 
   return(cdm[[name]])

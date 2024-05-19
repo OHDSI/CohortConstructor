@@ -8,6 +8,12 @@
 #' @param cohortName Name of the returned cohort. If NULL, the cohort name will
 #' be created by collapsing the individual cohort names, separated by "_".
 #' @param name Name of the new cohort table.
+#' @param .softValidation Whether to perform a soft validation of consistency.
+#' If set to FALSE four additional checks will be performed: 1) check that
+#' cohort end date is not before cohort start date, 2) check that there are no
+#' missing values in required columns, 3) check that cohort duration is all
+#' within observation period, and 4) check that there are no overlapping cohort
+#' entries.
 #'
 #' @export
 #'
@@ -27,7 +33,8 @@ unionCohorts <- function(cohort,
                         cohortId = NULL,
                         gap = 0,
                         cohortName = NULL,
-                        name = tableName(cohort)) {
+                        name = tableName(cohort),
+                        .softValidation = FALSE) {
   # checks
   name <- validateName(name)
   validateCohortTable(cohort)
@@ -37,6 +44,7 @@ unionCohorts <- function(cohort,
   cohortId <- validateCohortId(cohortId, ids)
   assertNumeric(gap, integerish = TRUE, min = 0, length = 1)
   assertCharacter(cohortName, length = 1, null = TRUE)
+  assertLogical(.softValidation, length = 1)
 
   if (length(cohortId) < 2) {
     cli::cli_warn("At least 2 cohort id must be provided to do the union.")
@@ -50,7 +58,8 @@ unionCohorts <- function(cohort,
           dplyr::filter(.data$cohort_definition_id == .env$cohortId),
         cohortAttritionRef = cohort %>%
           omopgenerics::attrition() %>%
-          dplyr::filter(.data$cohort_definition_id == .env$cohortId)
+          dplyr::filter(.data$cohort_definition_id == .env$cohortId),
+        .softValidation = .softValidation
       )
     return(cohort)
   }
@@ -96,7 +105,8 @@ unionCohorts <- function(cohort,
     omopgenerics::newCohortTable(
       cohortSetRef = cohSet,
       cohortAttritionRef = cohAtt,
-      cohortCodelistRef = cohCodelist
+      cohortCodelistRef = cohCodelist,
+      .softValidation = .softValidation
     )
   return(newCohort)
 }

@@ -10,7 +10,8 @@ demographicsCohort(
   ageRange = NULL,
   sex = NULL,
   minPriorObservation = NULL,
-  minFutureObservation = NULL
+  minFutureObservation = NULL,
+  .softValidation = FALSE
 )
 }
 \arguments{
@@ -27,6 +28,13 @@ the database.}
 
 \item{minFutureObservation}{A minimum number of future observation days in
 the database.}
+
+\item{.softValidation}{Whether to perform a soft validation of consistency.
+If set to FALSE four additional checks will be performed: 1) check that
+cohort end date is not before cohort start date, 2) check that there are no
+missing values in required columns, 3) check that cohort duration is all
+within observation period, and 4) check that there are no overlapping cohort
+entries.}
 }
 \value{
 A cohort table
