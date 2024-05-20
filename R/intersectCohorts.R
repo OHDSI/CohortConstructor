@@ -30,11 +30,11 @@
 #'
 #' }
 intersectCohorts <- function(cohort,
-                            cohortId = NULL,
-                            gap = 0,
-                            mutuallyExclusive = FALSE,
-                            returnOnlyComb = FALSE,
-                            name = tableName(cohort)) {
+                             cohortId = NULL,
+                             gap = 0,
+                             mutuallyExclusive = FALSE,
+                             returnOnlyComb = FALSE,
+                             name = tableName(cohort)) {
 
   # checks
   name <- validateName(name)
@@ -61,7 +61,8 @@ intersectCohorts <- function(cohort,
         cohortAttritionRef = cohort %>%
           omopgenerics::attrition() %>%
           dplyr::filter(.data$cohort_definition_id == .env$cohortId) %>%
-          dplyr::compute(name = paste0(name, "_attrition"), temporary = FALSE)
+          dplyr::compute(name = paste0(name, "_attrition"), temporary = FALSE),
+        .softValidation = TRUE
       )
     return(cohort)
   }
@@ -208,7 +209,7 @@ intersectCohorts <- function(cohort,
         dplyr::select(-"cohort_definition_id"),
       by = "cohort_name",
       relationship = "many-to-many"
-      ) |>
+    ) |>
     dplyr::select("cohort_definition_id", "codelist_name", "concept_id", "type")
 
   cohSet <- cohSet %>%
@@ -218,7 +219,8 @@ intersectCohorts <- function(cohort,
 
   cohortOut <- omopgenerics::newCohortTable(
     table = cohortOut, cohortSetRef = cohSet,
-    cohortAttritionRef = cohAtt, cohortCodelistRef = codelist
+    cohortAttritionRef = cohAtt, cohortCodelistRef = codelist,
+    .softValidation = TRUE
   )
 
   return(cohortOut)

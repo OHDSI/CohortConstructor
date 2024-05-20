@@ -116,7 +116,8 @@ conceptCohort <- function(cdm,
       omopgenerics::newCohortTable(
         cohortSetRef = cohortSet,
         cohortAttritionRef = NULL,
-        cohortCodelistRef = cohortCodelistRef
+        cohortCodelistRef = cohortCodelistRef,
+        .softValidation = TRUE
       )
     return(cdm[[name]])
   }
@@ -159,7 +160,8 @@ conceptCohort <- function(cdm,
     omopgenerics::newCohortTable(
       cohortSetRef = cohortSet,
       cohortAttritionRef = NULL,
-      cohortCodelistRef = cohortCodelistRef
+      cohortCodelistRef = cohortCodelistRef,
+      .softValidation = TRUE
     )
 
   cli::cli_inform(c("v" = "Cohort {.strong {name}} created."))

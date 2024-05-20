@@ -5,8 +5,9 @@
 #' @param window Window to consider events over.
 #' @param indexDate Variable in x that contains the date to compute the
 #' intersection.
-#' @param cohortId Vector of cohort definition ids to include. If NULL, all
-#' cohort definition ids will be used.
+#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
+#' used; otherwise, only the specified cohorts will be modified, and the
+#' rest will remain unchanged.
 #' @param targetStartDate Date of reference in cohort table, either for start
 #' (in overlap) or on its own (for incidence).
 #' @param targetEndDate Date of reference in cohort table, either for end
@@ -38,7 +39,7 @@ requireTableIntersectFlag <- function(cohort,
                                       targetEndDate = endDateColumn(tableName),
                                       censorDate = NULL,
                                       negate = FALSE,
-                                      name = tableName(cohort)){
+                                      name = tableName(cohort)) {
   # checks
   name <- validateName(name)
   assertLogical(negate, length = 1)
@@ -109,6 +110,7 @@ requireTableIntersectFlag <- function(cohort,
     dplyr::inner_join(subsetCohort,
                       by = c(cols)) %>%
     dplyr::compute(name = name, temporary = FALSE) %>%
+    omopgenerics::newCohortTable(.softValidation = TRUE) %>%
     CDMConnector::recordCohortAttrition(reason = reason, cohortId = cohortId)
 
   return(x)

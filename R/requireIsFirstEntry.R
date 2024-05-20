@@ -1,10 +1,12 @@
 #' Restrict cohort to first entry by index date
 #'
 #' @param cohort A cohort table in a cdm reference.
-#' @param cohortId Vector of cohort definition ids to include. If NULL, all
-#' cohort definition ids will be used.
+#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
+#' used; otherwise, only the specified cohorts will be modified, and the
+#' rest will remain unchanged.
 #' @param indexDate Column name in cohort that contains the date to restrict on.
 #' @param name Name of the new cohort with the restriction.
+#'
 #' @return A cohort table in a cdm reference.
 #' @export
 #'
@@ -18,7 +20,7 @@
 requireIsFirstEntry <- function(cohort,
                                 cohortId = NULL,
                                 indexDate = "cohort_start_date",
-                                name = tableName(cohort)){
+                                name = tableName(cohort)) {
 
   # checks
   name <- validateName(name)
@@ -40,7 +42,7 @@ requireIsFirstEntry <- function(cohort,
     ) |>
     dplyr::ungroup() |>
     dplyr::compute(name = name, temporary = FALSE) |>
-    omopgenerics::newCohortTable() |>
+    omopgenerics::newCohortTable(.softValidation = TRUE) |>
     CDMConnector::recordCohortAttrition("Restricted to first entry", cohortId = cohortId)
 
   return(cohort)
@@ -49,18 +51,19 @@ requireIsFirstEntry <- function(cohort,
 #' Restrict cohort to last entry by index date
 #'
 #' @param cohort A cohort table in a cdm reference.
-#' @param cohortId Vector of cohort definition ids to include. If NULL, all
-#' cohort definition ids will be used.
+#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
+#' used; otherwise, only the specified cohorts will be modified, and the
+#' rest will remain unchanged.
 #' @param indexDate Column name in cohort that contains the date to restrict on.
 #' @param name Name of the new cohort with the restriction.
+#'
 #' @return A cohort table in a cdm reference.
 #' @export
 #'
 #' @examples
 #' \donttest{
 #' library(CohortConstructor)
-#' library(PatientProfiles)
-#' cdm <- mockPatientProfiles()
+#' cdm <- mockCohortConstructor()
 #' cdm$cohort1 <- requireIsLastEntry(cdm$cohort1)
 #' }
 #'
@@ -89,7 +92,7 @@ requireIsLastEntry <- function(cohort,
     ) |>
     dplyr::ungroup() |>
     dplyr::compute(name = name, temporary = FALSE) |>
-    omopgenerics::newCohortTable() |>
+    omopgenerics::newCohortTable(.softValidation = TRUE) |>
     CDMConnector::recordCohortAttrition("Restricted to last entry", cohortId = cohortId)
 
   return(cohort)

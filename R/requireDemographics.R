@@ -1,8 +1,9 @@
 #' Restrict cohort on patient demographics
 #'
 #' @param cohort A cohort table in a cdm reference.
-#' @param cohortId Vector of cohort definition ids to include. If NULL, all
-#' cohort definition ids will be used.
+#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
+#' used; otherwise, only the specified cohorts will be modified, and the
+#' rest will remain unchanged.
 #' @param indexDate Variable in cohort that contains the date to compute the
 #' demographics characteristics on which to restrict on.
 #' @param ageRange A list of minimum and maximum age.
@@ -64,8 +65,9 @@ requireDemographics <- function(cohort,
 #'
 #' @param cohort A cohort table in a cdm reference.
 #' @param ageRange A list of minimum and maximum age.
-#' @param cohortId Vector of cohort definition ids to include. If NULL, all
-#' cohort definition ids will be used.
+#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
+#' used; otherwise, only the specified cohorts will be modified, and the
+#' rest will remain unchanged.
 #' @param indexDate Variable in cohort that contains the date to compute the
 #' demographics characteristics on which to restrict on.
 #' @param name Name of the new cohort with the age requirement.
@@ -108,8 +110,9 @@ requireAge <- function(cohort,
 #' Restrict cohort on sex
 #'
 #' @param cohort A cohort table in a cdm reference.
-#' @param cohortId Vector of cohort definition ids to include. If NULL, all
-#' cohort definition ids will be used.
+#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
+#' used; otherwise, only the specified cohorts will be modified, and the
+#' rest will remain unchanged.
 #' @param sex Can be "Both", "Male" or "Female". If one of the latter, only
 #' those with that sex will be included.
 #' @param name Name of the new cohort with the sex requirements.
@@ -152,8 +155,9 @@ requireSex <- function(cohort,
 #' @param cohort A cohort table in a cdm reference.
 #' @param minPriorObservation A minimum number of prior observation days in
 #' the database.
-#' @param cohortId Vector of cohort definition ids to include. If NULL, all
-#' cohort definition ids will be used.
+#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
+#' used; otherwise, only the specified cohorts will be modified, and the
+#' rest will remain unchanged.
 #' @param indexDate Variable in cohort that contains the date to compute the
 #' demographics characteristics on which to restrict on.
 #' @param name Name of the new cohort with the prior observation restriction.
@@ -197,8 +201,9 @@ requirePriorObservation <- function(cohort,
 #' @param cohort A cohort table in a cdm reference.
 #' @param minFutureObservation A minimum number of future observation days in
 #' the database.
-#' @param cohortId Vector of cohort definition ids to include. If NULL, all
-#' cohort definition ids will be used.
+#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
+#' used; otherwise, only the specified cohorts will be modified, and the
+#' rest will remain unchanged.
 #' @param indexDate Variable in cohort that contains the date to compute the
 #' demographics characteristics on which to restrict on.
 #' @param name Name of the new cohort with the future observation restriction.
@@ -441,7 +446,8 @@ demographicsFilter <- function(cohort,
     omopgenerics::newCohortTable(
       cohortSetRef = newSet,
       cohortAttritionRef = attrition(workingTable),
-      cohortCodelistRef = newCod
+      cohortCodelistRef = newCod,
+      .softValidation = TRUE
     )
 
   # drop working tables and their attributes

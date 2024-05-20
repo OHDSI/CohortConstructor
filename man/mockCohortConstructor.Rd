@@ -12,6 +12,7 @@ mockCohortConstructor(
   conceptIdClass = NULL,
   drugExposure = F,
   conditionOccurrence = F,
+  measurement = F,
   death = F,
   con = DBI::dbConnect(duckdb::duckdb())
 )
@@ -30,6 +31,8 @@ mockCohortConstructor(
 \item{drugExposure}{T/F include drug exposure table in the cdm}
 
 \item{conditionOccurrence}{T/F include condition occurrence in the cdm}
+
+\item{measurement}{T/F include measurement in the cdm}
 
 \item{death}{T/F include death table in the cdm}
 

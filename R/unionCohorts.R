@@ -50,7 +50,8 @@ unionCohorts <- function(cohort,
           dplyr::filter(.data$cohort_definition_id == .env$cohortId),
         cohortAttritionRef = cohort %>%
           omopgenerics::attrition() %>%
-          dplyr::filter(.data$cohort_definition_id == .env$cohortId)
+          dplyr::filter(.data$cohort_definition_id == .env$cohortId),
+        .softValidation = TRUE
       )
     return(cohort)
   }
@@ -96,7 +97,8 @@ unionCohorts <- function(cohort,
     omopgenerics::newCohortTable(
       cohortSetRef = cohSet,
       cohortAttritionRef = cohAtt,
-      cohortCodelistRef = cohCodelist
+      cohortCodelistRef = cohCodelist,
+      .softValidation = TRUE
     )
   return(newCohort)
 }

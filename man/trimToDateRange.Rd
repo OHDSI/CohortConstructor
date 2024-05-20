@@ -19,8 +19,9 @@ trimToDateRange(
 \item{dateRange}{A window of time during which the index date must have
 been observed.}
 
-\item{cohortId}{Vector of cohort definition ids to include. If NULL, all
-cohort definition ids will be used.}
+\item{cohortId}{IDs of the cohorts to modify. If NULL, all cohorts will be
+used; otherwise, only the specified cohorts will be modified, and the
+rest will remain unchanged.}
 
 \item{startDate}{Variable with earliest date.}
 
