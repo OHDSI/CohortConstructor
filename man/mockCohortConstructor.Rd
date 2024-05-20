@@ -10,10 +10,10 @@ mockCohortConstructor(
   tables = NULL,
   conceptId = NULL,
   conceptIdClass = NULL,
-  drugExposure = F,
-  conditionOccurrence = F,
-  measurement = F,
-  death = F,
+  drugExposure = FALSE,
+  conditionOccurrence = FALSE,
+  measurement = FALSE,
+  death = FALSE,
   con = DBI::dbConnect(duckdb::duckdb())
 )
 }

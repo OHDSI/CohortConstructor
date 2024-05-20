@@ -28,21 +28,22 @@ mockCohortConstructor <- function(nPerson = 10,
                                   tables = NULL,
                                   conceptId = NULL,
                                   conceptIdClass = NULL,
-                                  drugExposure = F,
-                                  conditionOccurrence = F,
-                                  measurement = F,
-                                  death = F,
+                                  drugExposure = FALSE,
+                                  conditionOccurrence = FALSE,
+                                  measurement = FALSE,
+                                  death = FALSE,
                                   con = DBI::dbConnect(duckdb::duckdb())) {
 
 
   if (is.null(tables)) {
-    cdm <-
-      omock::mockCdmReference() |> omock::mockVocabularyTables(concept = conceptTable) |>
-      omock::mockPerson(nPerson = nPerson) |> omock::mockObservationPeriod() |> omock::mockCohort(name = "cohort1") |>
+    cdm <- omock::mockCdmReference() |>
+      omock::mockVocabularyTables(concept = conceptTable) |>
+      omock::mockPerson(nPerson = nPerson) |>
+      omock::mockObservationPeriod() |>
+      omock::mockCohort(name = "cohort1") |>
       omock::mockCohort(name = "cohort2", numberCohorts = 2)
   } else {
-    cdm <-
-      omock::mockCdmFromTables(tables = tables, seed = 1) |>
+    cdm <- omock::mockCdmFromTables(tables = tables, seed = 1) |>
       omock::mockVocabularyTables(concept = conceptTable)
   }
 
@@ -67,8 +68,8 @@ mockCohortConstructor <- function(nPerson = 10,
   }
 
   if (!is.null(con)){
-  cdm <- CDMConnector::copyCdmTo(con = con, cdm = cdm, schema = "main")
-}
+    cdm <- CDMConnector::copyCdmTo(con = con, cdm = cdm, schema = "main")
+  }
 
   return(cdm)
 

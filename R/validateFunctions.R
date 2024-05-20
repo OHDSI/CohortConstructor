@@ -161,9 +161,8 @@ validateStrata <- function(strata, cohort) {
 }
 
 validateValueAsNumber <- function(valueAsNumber) {
-
   assertList(valueAsNumber, named = TRUE, class = "numeric", null = TRUE)
-  for (k in seq_along(valueAsNumber)) {
+  for (i in seq_along(valueAsNumber)) {
     if (length(valueAsNumber[[i]]) != 2) {
       cli::cli_abort("Each numeric vector in `valueAsNumber` list must be of length 2.")
     }

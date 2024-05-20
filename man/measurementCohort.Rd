@@ -2,7 +2,8 @@
 % Please edit documentation in R/measurementCohort.R
 \name{measurementCohort}
 \alias{measurementCohort}
-\title{Create cohorts based on a concept set from the measurement table}
+\title{Create cohorts from the measurement table based on a concept set and
+required measurement values}
 \usage{
 measurementCohort(
   cdm,
@@ -43,11 +44,47 @@ fulfilling one OR the other will be included.
 }
 \examples{
 library(CohortConstructor)
+cdm <- mockCohortConstructor(con = NULL)
+cdm$concept <- cdm$concept |>
+  dplyr::union_all(
+    dplyr::tibble(
+      concept_id = c(4326744, 4298393, 45770407, 8876, 4124457),
+      concept_name = c("Blood pressure", "Systemic blood pressure",
+                       "Baseline blood pressure", "millimeter mercury column",
+                       "Normal range"),
+      domain_id = "Measurement",
+      vocabulary_id = c("SNOMED", "SNOMED", "SNOMED", "UCUM", "SNOMED"),
+      standard_concept = "S",
+      concept_class_id = c("Observable Entity", "Observable Entity",
+                           "Observable Entity", "Unit", "Qualifier Value"),
+      concept_code = NA,
+      valid_start_date = NA,
+      valid_end_date = NA,
+      invalid_reason = NA
+    )
+  )
+cdm$measurement <- dplyr::tibble(
+  measurement_id = 1:4,
+  person_id = c(1, 1, 2, 3),
+  measurement_concept_id = c(4326744, 4298393, 4298393, 45770407),
+  measurement_date = as.Date(c("2000-07-01", "2000-12-11", "2002-09-08",
+                                "2015-02-19")),
+  measurement_type_concept_id = NA,
+  value_as_number = c(100, 125, NA, NA),
+  value_as_concept_id = c(0, 0, 0, 4124457),
+  unit_concept_id = c(8876, 8876, 0, 0)
+)
+cdm <- CDMConnector::copyCdmTo(
+  con = DBI::dbConnect(duckdb::duckdb()),
+  cdm = cdm, schema = "main")
 
-cdm <- mockCohortConstructor(conditionOccurrence = TRUE)
+cdm$cohort <- measurementCohort(
+  cdm = cdm,
+  name = "cohort",
+  conceptSet = list("normal_blood_pressure" = c(4326744, 4298393, 45770407)),
+  valueAsConcept = c(4124457),
+  valueAsNumber = list("8876" = c(70, 120))
+)
 
-cohort <- conceptCohort(cdm = cdm, conceptSet = list(a = 1), name = "cohort")
-
-cohort |> attrition()
-
+cdm$cohort
 }

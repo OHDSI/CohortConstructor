@@ -28,13 +28,49 @@
 #'
 #' @examples
 #' library(CohortConstructor)
+#' cdm <- mockCohortConstructor(con = NULL)
+#' cdm$concept <- cdm$concept |>
+#'   dplyr::union_all(
+#'     dplyr::tibble(
+#'       concept_id = c(4326744, 4298393, 45770407, 8876, 4124457),
+#'       concept_name = c("Blood pressure", "Systemic blood pressure",
+#'                        "Baseline blood pressure", "millimeter mercury column",
+#'                        "Normal range"),
+#'       domain_id = "Measurement",
+#'       vocabulary_id = c("SNOMED", "SNOMED", "SNOMED", "UCUM", "SNOMED"),
+#'       standard_concept = "S",
+#'       concept_class_id = c("Observable Entity", "Observable Entity",
+#'                            "Observable Entity", "Unit", "Qualifier Value"),
+#'       concept_code = NA,
+#'       valid_start_date = NA,
+#'       valid_end_date = NA,
+#'       invalid_reason = NA
+#'     )
+#'   )
+#' cdm$measurement <- dplyr::tibble(
+#'   measurement_id = 1:4,
+#'   person_id = c(1, 1, 2, 3),
+#'   measurement_concept_id = c(4326744, 4298393, 4298393, 45770407),
+#'   measurement_date = as.Date(c("2000-07-01", "2000-12-11", "2002-09-08",
+#'                                 "2015-02-19")),
+#'   measurement_type_concept_id = NA,
+#'   value_as_number = c(100, 125, NA, NA),
+#'   value_as_concept_id = c(0, 0, 0, 4124457),
+#'   unit_concept_id = c(8876, 8876, 0, 0)
+#' )
+#' cdm <- CDMConnector::copyCdmTo(
+#'   con = DBI::dbConnect(duckdb::duckdb()),
+#'   cdm = cdm, schema = "main")
 #'
-#' cdm <- mockCohortConstructor(conditionOccurrence = TRUE)
+#' cdm$cohort <- measurementCohort(
+#'   cdm = cdm,
+#'   name = "cohort",
+#'   conceptSet = list("normal_blood_pressure" = c(4326744, 4298393, 45770407)),
+#'   valueAsConcept = c(4124457),
+#'   valueAsNumber = list("8876" = c(70, 120))
+#' )
 #'
-#' cohort <- conceptCohort(cdm = cdm, conceptSet = list(a = 1), name = "cohort")
-#'
-#' cohort |> attrition()
-#'
+#' cdm$cohort
 measurementCohort <- function(cdm,
                               conceptSet,
                               name,
@@ -63,13 +99,15 @@ measurementCohort <- function(cdm,
     addDomains(cdm)
 
   ud <- cohortCodelist |>
-    dplyr::filter(!tolower(.data$domain_id) %in% "measurement") |>
+    dplyr::filter(!tolower(.data$domain_id) %in% "measurement" | is.na(.data$domain_id)) |>
     dplyr::tally() |>
     dplyr::pull("n")
 
-  cli::cli_inform(c(
-    "x" = "{.strong {ud}} concept{?s} excluded because they don't correspond to the `Measurement` domain."
-  ))
+  if (ud > 0) {
+    cli::cli_inform(c(
+      "x" = "{.strong {ud}} concept{?s} excluded because don't correspond to the `Measurement` domain."
+    ))
+  }
 
   cohortCodelist <- cohortCodelist |>
     dplyr::filter(tolower(.data$domain_id) %in% "measurement") |>
@@ -92,7 +130,7 @@ measurementCohort <- function(cdm,
     ) |>
     dplyr::filter(!is.na(.data$cohort_start_date))
 
-  if (tempCohort |> dplyr::tally() |> dplyr::pull("n") > 0) {
+  if (cohort |> dplyr::tally() |> dplyr::pull("n") == 0) {
     cli::cli_inform(c("i" = "No table could be subsetted, returning empty cohort."))
     cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name) # TODO: overwritte to TRUE when omopgenerics in CRAN
     cdm[[name]] <- cdm[[name]] |>
@@ -125,15 +163,17 @@ measurementCohort <- function(cdm,
 
   if (!is.null(valueAsConcept) | !is.null(valueAsNumber)) {
     cli::cli_inform(c("i" = "Applying measurement requirements."))
-    filterExpr <- getFilterExpression(valuesAsConcept, valueAsNumber)
+    filterExpr <- getFilterExpression(valueAsConcept, valueAsNumber)
     cohort <- cohort |>
       dplyr::filter(!!!filterExpr) |>
       dplyr::compute(name = name, temporary = FALSE)
   }
 
-  cli::cli_inform(c("i" = "Collapsing records."))
   cohort <- cohort |>
-    joinOverlap(gap = 0) |>
+    dplyr::select(
+      "cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date"
+    ) |>
+    dplyr::distinct() |>
     dplyr::compute(name = name, temporary = FALSE)
 
   cli::cli_inform(c("i" = "Creating cohort attributes."))
@@ -151,14 +191,18 @@ measurementCohort <- function(cdm,
   return(cohort)
 }
 
-getFilterExpression <- function(valuesAsConcept, valueAsNumber) {
+getFilterExpression <- function(valueAsConcept, valueAsNumber) {
   expFilter <- character()
-  for (ii in seq_along(valueAsNumber)) {
-    expFilter[ii] <- glue::glue(
-      "(.data$unit_concept_id %in% {names(valueAsNumber)[ii]} &
+  if (!is.null(valueAsNumber)) {
+    for (ii in seq_along(valueAsNumber)) {
+      expFilter[ii] <- glue::glue(
+        "(.data$unit_concept_id %in% {names(valueAsNumber)[ii]} &
       .data$value_as_number >= {valueAsNumber[[ii]][1]} &
       .data$value_as_number <= {valueAsNumber[[ii]][2]})"
-    )
+      )
+    }
+  } else {
+    ii <- 0
   }
 
   if (!is.null(valueAsConcept)) {
