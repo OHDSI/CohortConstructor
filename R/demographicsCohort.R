@@ -48,7 +48,8 @@ demographicsCohort <- function(cdm,
         "cohort_definition_id" = 1, "cohort_name" = "demographics"
       ),
       cohortAttritionRef = NULL,
-      cohortCodelistRef = NULL
+      cohortCodelistRef = NULL,
+      .softValidation = TRUE
     )
 
   cdm[[name]] <- trimDemographics(

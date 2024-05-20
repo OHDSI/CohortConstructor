@@ -2,8 +2,9 @@
 #'
 #' @param cohort A cohort table in a cdm reference.
 #' @param window Window to consider events over.
-#' @param cohortId Vector of cohort definition ids to include. If NULL, all
-#' cohort definition ids will be used.
+#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
+#' used; otherwise, only the specified cohorts will be modified, and the
+#' rest will remain unchanged.
 #' @param indexDate Variable in x that contains the date to compute the
 #' intersection.
 #' @param censorDate Whether to censor overlap events at a specific date or a
@@ -94,6 +95,7 @@ requireDeathFlag <- function(cohort,
     dplyr::inner_join(subsetCohort,
                       by = c(cols)) %>%
     dplyr::compute(name = name, temporary = FALSE) %>%
+    omopgenerics::newCohortTable(.softValidation = TRUE) %>%
     CDMConnector::recordCohortAttrition(reason = reason, cohortId = cohortId)
 
   return(x)

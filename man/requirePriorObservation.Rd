@@ -18,8 +18,9 @@ requirePriorObservation(
 \item{minPriorObservation}{A minimum number of prior observation days in
 the database.}
 
-\item{cohortId}{Vector of cohort definition ids to include. If NULL, all
-cohort definition ids will be used.}
+\item{cohortId}{IDs of the cohorts to modify. If NULL, all cohorts will be
+used; otherwise, only the specified cohorts will be modified, and the
+rest will remain unchanged.}
 
 \item{indexDate}{Variable in cohort that contains the date to compute the
 demographics characteristics on which to restrict on.}

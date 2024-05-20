@@ -502,3 +502,34 @@ test_that("settings with extra columns", {
   expect_true(all(colnames(attrition(cdm$cohort)) ==
                     c("cohort_definition_id", "number_records", "number_subjects", "reason_id", "reason", "excluded_records", "excluded_subjects" )))
 })
+
+test_that("requireInteractions", {
+  cdm_local <- omock::mockCdmReference() |>
+    omock::mockPerson(n = 3) |>
+    omock::mockObservationPeriod() |>
+    omock::mockCohort(numberCohorts = 3, seed = 4)
+  # to remove in new omock
+  cdm_local$person <- cdm_local$person |>
+    dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
+  cdm <- CDMConnector::copy_cdm_to(
+    con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
+    cdm = cdm_local,
+    schema = "main")
+
+  cdm$cohort1 <- cdm$cohort |>
+    requireDemographics(sex = c("Both", "Female"),
+                        minPriorObservation = c(0, 1),
+                        requirementInteractions = FALSE,
+                        name = "cohort1")
+  expect_equal(
+    cdm$cohort1 |> settings() |> dplyr::arrange(.data$cohort_definition_id),
+    dplyr::tibble(
+      cohort_definition_id = 1:9,
+      cohort_name = c("cohort_1_1", "cohort_2_1", "cohort_3_1", "cohort_1_2", "cohort_2_2", "cohort_3_2", "cohort_1_3", "cohort_2_3", "cohort_3_3"),
+      age_range = "0_150",
+      sex = c(rep("Both", 6), rep("Female", 3)),
+      min_prior_observation = c(rep(0, 3), rep(1, 3), rep(0, 3)),
+      min_future_observation = rep(0, 9)
+    )
+  )
+})

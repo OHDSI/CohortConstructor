@@ -2,8 +2,9 @@
 #'
 #' @param cohort A cohort table in a cdm reference.
 #' @param years Numeric vector of years to use to restrict observation to.
-#' @param cohortId Cohort definition id to use. If NULL all the cohort
-#' definition ids in settings will be used.
+#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
+#' used; otherwise, only the specified cohorts will be modified, and the
+#' rest will remain unchanged.
 #' @param name Name of the new cohort table.
 #'
 #' @return A cohort table.
@@ -184,7 +185,7 @@ yearCohorts <- function(cohort,
   } else {
     newCohort <- newCohort |>
       dplyr::compute(name = name, temporary = FALSE) |>
-      omopgenerics::newCohortTable()
+      omopgenerics::newCohortTable(.softValidation = TRUE)
   }
 
   omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with(tablePrefix))

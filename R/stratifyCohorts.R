@@ -50,7 +50,7 @@ stratifyCohorts <- function(cohort,
       return(
         cohort |>
         dplyr::compute(name = name, temporary = FALSE) |>
-        omopgenerics::newCohortTable()
+        omopgenerics::newCohortTable(.softValidation = TRUE)
       )
     }
   }
@@ -129,7 +129,8 @@ stratifyCohorts <- function(cohort,
     omopgenerics::newCohortTable(
       cohortSetRef = newSettings,
       cohortAttritionRef = newAttrition,
-      cohortCodelistRef = NULL
+      cohortCodelistRef = NULL,
+      .softValidation = TRUE
     )
 
   omopgenerics::dropTable(cdm = cdm, name = nm)
