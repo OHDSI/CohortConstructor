@@ -12,6 +12,10 @@
 #' the database.
 #' @param minFutureObservation A minimum number of future observation days in
 #' the database.
+#' @param requirementInteractions If TRUE, cohorts will be created for
+#' all combinations of ageGroup, sex, and daysPriorObservation. If FALSE, only the
+#' first value specified for the other factors will be used. Consequently,
+#' order of values matters when requirementInteractions is FALSE.
 #' @param name Name of the new cohort with the demographic requirements.
 #'
 #' @return The cohort table with only records for individuals satisfying the
@@ -34,6 +38,7 @@ requireDemographics <- function(cohort,
                                 sex = c("Both"),
                                 minPriorObservation = 0,
                                 minFutureObservation = 0,
+                                requirementInteractions = TRUE,
                                 name = tableName(cohort)) {
 
   cohort <- demographicsFilter(
@@ -48,7 +53,8 @@ requireDemographics <- function(cohort,
     reqAge = TRUE,
     reqSex = TRUE,
     reqPriorObservation = TRUE,
-    reqFutureObservation = TRUE
+    reqFutureObservation = TRUE,
+    requirementInteractions = requirementInteractions,
   )
 
   return(cohort)
@@ -92,7 +98,8 @@ requireAge <- function(cohort,
     reqAge = TRUE,
     reqSex = FALSE,
     reqPriorObservation = FALSE,
-    reqFutureObservation = FALSE
+    reqFutureObservation = FALSE,
+    requirementInteractions = TRUE
   )
 
   return(cohort)
@@ -133,7 +140,8 @@ requireSex <- function(cohort,
     reqAge = FALSE,
     reqSex = TRUE,
     reqPriorObservation = FALSE,
-    reqFutureObservation = FALSE
+    reqFutureObservation = FALSE,
+    requirementInteractions = TRUE
   )
 
   return(cohort)
@@ -177,7 +185,8 @@ requirePriorObservation <- function(cohort,
     reqAge = FALSE,
     reqSex = FALSE,
     reqPriorObservation = TRUE,
-    reqFutureObservation = FALSE
+    reqFutureObservation = FALSE,
+    requirementInteractions = TRUE
   )
 
   return(cohort)
@@ -222,7 +231,8 @@ requireFutureObservation <- function(cohort,
     reqAge = FALSE,
     reqSex = FALSE,
     reqPriorObservation = FALSE,
-    reqFutureObservation = TRUE
+    reqFutureObservation = TRUE,
+    requirementInteractions = TRUE
   )
 
   return(cohort)
@@ -239,7 +249,8 @@ demographicsFilter <- function(cohort,
                                reqAge,
                                reqSex,
                                reqPriorObservation,
-                               reqFutureObservation) {
+                               reqFutureObservation,
+                               requirementInteractions) {
   # checks
   name <- validateName(name)
   validateCohortTable(cohort)
@@ -259,7 +270,7 @@ demographicsFilter <- function(cohort,
 
   newSet <- reqDemographicsCohortSet(
     omopgenerics::settings(cohort), cohortId, ageRange, sex,
-    minPriorObservation, minFutureObservation
+    minPriorObservation, minFutureObservation, requirementInteractions
   )
 
   tempSetName <- omopgenerics::uniqueTableName()
@@ -447,14 +458,48 @@ reqDemographicsCohortSet <- function(set,
                                      minPriorObservation,
                                      minFutureObservation) {
 
-  combinations <- tidyr::expand_grid(
-    requirements = TRUE,
-    target_cohort_rand01 = targetIds,
-    age_range = lapply(ageRange, function(x){paste0(x[1], "_", x[2])}) |> unlist(),
-    sex = sex,
-    min_prior_observation = minPriorObservation,
-    min_future_observation = minFutureObservation
-  ) |>
+  if (isTRUE(requirementInteractions)) {
+    combinations <- tidyr::expand_grid(
+      requirements = TRUE,
+      target_cohort_rand01 = targetIds,
+      age_range = lapply(ageRange, function(x){paste0(x[1], "_", x[2])}) |> unlist(),
+      sex = sex,
+      min_prior_observation = minPriorObservation,
+      min_future_observation = minFutureObservation
+    )
+  } else {
+    ageRangeFormatted <- unlist(lapply(ageRange, function(x){paste0(x[1], "_", x[2])}))
+    combinations <- dplyr::bind_rows(
+      dplyr::tibble(
+        age_group = .env$ageRangeFormatted,
+        sex = .env$sex[1],
+        min_prior_observation = .env$min_prior_observation[1],
+        min_future_observation = .env$min_future_observation[1]
+      ),
+      dplyr::tibble(
+        age_group = ageRangeFormatted[1],
+        sex = .env$sex,
+        days_prior_observation = .env$daysPriorObservation[1],
+        min_future_observation = .env$min_future_observation[1]
+      ),
+      dplyr::tibble(
+        age_group = ageRangeFormatted[1],
+        sex = .env$sex[1],
+        days_prior_observation = .env$daysPriorObservation,
+        min_future_observation = .env$min_future_observation[1]
+      ),
+      dplyr::tibble(
+        age_group = ageRangeFormatted[1],
+        sex = .env$sex[1],
+        days_prior_observation = .env$daysPriorObservation[1],
+        min_future_observation = .env$min_future_observation
+      )
+    ) |>
+      dplyr::mutate(requirements = TRUE) |>
+      dplyr::distinct()
+  }
+
+  combinations <- combinations |>
     dplyr::mutate(cohort_definition_id = .data$target_cohort_rand01) |>
     dplyr::arrange(.data$cohort_definition_id, .data$age_range, .data$sex, .data$min_prior_observation, .data$min_future_observation) |>
     dplyr::group_by(.data$cohort_definition_id) |>
