@@ -2,17 +2,12 @@
 #'
 #' @param cohort A cohort table in a cdm reference.
 #' @param dateColumns Date columns in the cohort table to consider.
-#' @param cohortId Vector of cohort definition ids to include. If NULL, all
-#' cohort definition ids will be used.
+#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
+#' used; otherwise, only the specified cohorts will be modified, and the
+#' rest will remain unchanged.
 #' @param returnReason If TRUE it will return a column stating which column in
 #' `dateColumns` is used as a new cohort end date.
 #' @param name Name of the new cohort with the restriction.
-#' @param .softValidation Whether to perform a soft validation of consistency.
-#' If set to FALSE four additional checks will be performed: 1) a check that
-#' cohort end date is not before cohort start date, 2) a check that there are no
-#' missing values in required columns, 3) a check that cohort duration is all
-#' within observation period, and 4) that there are no overlapping cohort
-#' entries
 #'
 #' @return The cohort table.
 #'
@@ -37,8 +32,7 @@ exitAtFirstDate <- function(cohort,
                             dateColumns,
                             cohortId = NULL,
                             returnReason = TRUE,
-                            name = tableName(cohort),
-                            .softValidation = FALSE) {
+                            name = tableName(cohort)) {
   exitAtColumnDate(
     cohort = cohort,
     dateColumns = dateColumns,
@@ -46,8 +40,7 @@ exitAtFirstDate <- function(cohort,
     returnReason = returnReason,
     name = name,
     order = "first",
-    exit = TRUE,
-    .softValidation = .softValidation
+    exit = TRUE
   )
 }
 
@@ -56,17 +49,12 @@ exitAtFirstDate <- function(cohort,
 #'
 #' @param cohort A cohort table in a cdm reference.
 #' @param dateColumns description
-#' @param cohortId Vector of cohort definition ids to include. If NULL, all
-#' cohort definition ids will be used.
+#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
+#' used; otherwise, only the specified cohorts will be modified, and the
+#' rest will remain unchanged.
 #' @param returnReason If TRUE it will return a column stating which column in
 #' `dateColumns` is used as a new cohort end date. description
 #' @param name Name of the new cohort with the restriction.
-#' @param .softValidation Whether to perform a soft validation of consistency.
-#' If set to FALSE four additional checks will be performed: 1) a check that
-#' cohort end date is not before cohort start date, 2) a check that there are no
-#' missing values in required columns, 3) a check that cohort duration is all
-#' within observation period, and 4) that there are no overlapping cohort
-#' entries
 #'
 #' @return The cohort table.
 #'
@@ -91,8 +79,7 @@ exitAtLastDate <- function(cohort,
                            dateColumns,
                            cohortId = NULL,
                            returnReason = TRUE,
-                           name = tableName(cohort),
-                           .softValidation = FALSE) {
+                           name = tableName(cohort)) {
   exitAtColumnDate(
     cohort = cohort,
     dateColumns = dateColumns,
@@ -100,8 +87,7 @@ exitAtLastDate <- function(cohort,
     returnReason = returnReason,
     name = name,
     order = "last",
-    exit = TRUE,
-    .softValidation = .softValidation
+    exit = TRUE
   )
 }
 
@@ -111,8 +97,7 @@ exitAtColumnDate <- function(cohort,
                              returnReason,
                              order,
                              name,
-                             exit,
-                             .softValidation) {
+                             exit) {
   # checks
   name <- validateName(name)
   validateCohortTable(cohort)
@@ -122,7 +107,6 @@ exitAtColumnDate <- function(cohort,
   cohortId <- validateCohortId(cohortId, ids)
   assertLogical(returnReason, length = 1)
   validateCohortColumn(dateColumns, cohort, "Date")
-  assertLogical(.softValidation, length = 1)
 
   if (order == "first") {
     atDateFunction <- rlang::expr(min(.data$new_date_0123456789, na.rm = TRUE)) # NA always removed in SQL
@@ -195,7 +179,7 @@ exitAtColumnDate <- function(cohort,
   validateNewCohort(newCohort, cdm, tmpName)
 
   if (any(!ids %in% cohortId)) {
-    dateColumns <- dateColumns[dateColumns != c("cohort_end_date", "cohort_start_date")]
+    dateColumns <- dateColumns[!dateColumns %in% c("cohort_end_date", "cohort_start_date")]
     newCohort <- newCohort |>
       # join non modified cohorts
       dplyr::union_all(
@@ -213,7 +197,7 @@ exitAtColumnDate <- function(cohort,
 
   newCohort <- newCohort |>
     dplyr::compute(name = name, temporary = FALSE) |>
-    omopgenerics::newCohortTable(.softValidation = .softValidation)
+    omopgenerics::newCohortTable(.softValidation = TRUE)
 
   cdm <- omopgenerics::dropTable(cdm, name = dplyr::starts_with(tmpName))
 

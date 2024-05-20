@@ -55,7 +55,7 @@ matchCohorts <- function(cohort,
   if (cohort |> settings() |> nrow() == 0) {
     cdm[[name]] <- cohort |>
       dplyr::compute(name = name, temporary = FALSE) |>
-      omopgenerics::newCohortTable()
+      omopgenerics::newCohortTable(.softValidation = TRUE)
     return(cdm[[name]])
   }
 
@@ -196,7 +196,8 @@ getNewCohort <- function(cohort, cohortId, control){
         "excluded_records" = 0L,
         "excluded_subjects" = 0L
       ),
-      cohortCodelistRef = NULL
+      cohortCodelistRef = NULL,
+      .softValidation = TRUE
     )
 
   return(controls)

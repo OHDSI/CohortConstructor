@@ -42,20 +42,15 @@ mockCohortConstructor <- function(nPerson = 10,
       omock::mockCohort(name = "cohort2", numberCohorts = 2)
   } else {
     cdm <-
-      omock::mockCdmFromTables(tables = tables) |>
+      omock::mockCdmFromTables(tables = tables, seed = 1) |>
       omock::mockVocabularyTables(concept = conceptTable)
-
   }
 
-
   if(!is.null(conceptIdClass) & !is.null(conceptId)){
-
     cdm <- cdm |> omock::mockConcepts(conceptSet = conceptId, domain = conceptIdClass)
-
   }
 
   if(drugExposure == T){
-
     cdm <- cdm |> omock::mockDrugExposure()
   }
 
@@ -71,32 +66,10 @@ mockCohortConstructor <- function(nPerson = 10,
     cdm <- cdm |> omock::mockMeasurement()
   }
 
-
   if (!is.null(con)){
   cdm <- CDMConnector::copyCdmTo(con = con, cdm = cdm, schema = "main")
 }
 
   return(cdm)
 
-
-
 }
-
-
-#
-# library(omock)
-#
-#
-# cdm <- mockCohortConstructor(nPerson = 100)
-#
-#
-# cdm$cohort3 <- intersectCohorts(
-# cohort = cdm$cohort2,
-# name = "cohort3",
-# )
-#
-# cdm$year_restricted <- cdm$cohort |>
-# yearCohorts(years = 2010:2019, name = "year_restricted")
-# cdm$year_restricted
-# cdm$year_restricted |> settings()
-# cdm$year_restricted |> attrition()

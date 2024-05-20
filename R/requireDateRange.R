@@ -3,8 +3,9 @@
 #' @param cohort A cohort table in a cdm reference.
 #' @param dateRange A window of time during which the index date must have
 #' been observed.
-#' @param cohortId Vector of cohort definition ids to include. If NULL, all
-#' cohort definition ids will be used.
+#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
+#' used; otherwise, only the specified cohorts will be modified, and the
+#' rest will remain unchanged.
 #' @param indexDate Variable in cohort that contains the index date of interest
 #' @param name Name of the new cohort with the restriction.
 #'
@@ -35,7 +36,6 @@ requireInDateRange <- function(cohort,
   cohortId <- validateCohortId(cohortId, ids)
   validateDateRange(dateRange)
 
-
   # requirement
   if (!is.na(dateRange[1])) {
     cohort <- cohort |>
@@ -63,7 +63,7 @@ requireInDateRange <- function(cohort,
 
   cohort <- cohort |>
     dplyr::compute(name = name, temporary = FALSE) |>
-    omopgenerics::newCohortTable()
+    omopgenerics::newCohortTable(.softValidation = TRUE)
 
   return(cohort)
 }
@@ -73,12 +73,12 @@ requireInDateRange <- function(cohort,
 #' @param cohort A cohort table in a cdm reference.
 #' @param dateRange A window of time during which the index date must have
 #' been observed.
-#' @param cohortId Vector of cohort definition ids to include. If NULL, all
-#' cohort definition ids will be used.
+#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
+#' used; otherwise, only the specified cohorts will be modified, and the
+#' rest will remain unchanged.
 #' @param startDate Variable with earliest date.
 #' @param endDate Variable with latest date.
 #' @param name Name of the new cohort with the restriction.
-#'
 #'
 #' @return The cohort table with record timings updated to only be within the
 #' date range. Any records with all time outside of the range will have
@@ -146,7 +146,7 @@ trimToDateRange <- function(cohort,
 
   cohort <- cohort |>
     dplyr::compute(name = name, temporary = FALSE) |>
-    omopgenerics::newCohortTable()
+    omopgenerics::newCohortTable(.softValidation = TRUE)
 
   return(cohort)
 }

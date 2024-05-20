@@ -11,8 +11,9 @@ yearCohorts(cohort, years, cohortId = NULL, name = tableName(cohort))
 
 \item{years}{Numeric vector of years to use to restrict observation to.}
 
-\item{cohortId}{Cohort definition id to use. If NULL all the cohort
-definition ids in settings will be used.}
+\item{cohortId}{IDs of the cohorts to modify. If NULL, all cohorts will be
+used; otherwise, only the specified cohorts will be modified, and the
+rest will remain unchanged.}
 
 \item{name}{Name of the new cohort table.}
 }

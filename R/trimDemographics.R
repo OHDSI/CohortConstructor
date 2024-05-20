@@ -110,7 +110,8 @@ trimDemographics <- function(cohort,
           by = "cohort_definition_id"
         ) |>
         dplyr::select(-"cohort_definition_id") |>
-        dplyr::rename("cohort_definition_id" = "new_cohort_definition_id")
+        dplyr::rename("cohort_definition_id" = "new_cohort_definition_id"),
+      .softValidation = TRUE
     )
 
   if (!is.null(sex)) {
@@ -185,6 +186,8 @@ trimDemographics <- function(cohort,
   }
 
   # TODO update attrition names to be more coherent with the age groups, sex and so
+  cohort <- cohort |>
+    omopgenerics::newCohortTable(.softValidation = TRUE)
 
   cli::cli_inform(c("v" = "Cohort trimmed"))
   return(cohort)

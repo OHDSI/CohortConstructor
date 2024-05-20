@@ -14,8 +14,9 @@ exitAtDeath(
 \arguments{
 \item{cohort}{A cohort table in a cdm reference.}
 
-\item{cohortId}{Vector of cohort definition ids to include. If NULL, all
-cohort definition ids will be used.}
+\item{cohortId}{IDs of the cohorts to modify. If NULL, all cohorts will be
+used; otherwise, only the specified cohorts will be modified, and the
+rest will remain unchanged.}
 
 \item{requireDeath}{If TRUE, subjects without a death record will be dropped,
 while if FALSE their end date will be left as is.}
