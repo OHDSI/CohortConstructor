@@ -80,9 +80,9 @@ test_that("mearurementCohorts works", {
   expect_equal(
     collectCohort(cdm$cohort4, 1),
     dplyr::tibble(
-      subject_id = c(1, 1, 2, 3),
-      cohort_start_date = as.Date(c("2000-07-01", "2000-12-11", "2002-09-08", "2015-02-19")),
-      cohort_end_date = as.Date(c("2000-07-01", "2000-12-11", "2002-09-08", "2015-02-19"))
+      subject_id = c(1, 1, 2, 3, 3),
+      cohort_start_date = as.Date(c("2000-07-01", "2000-12-11", "2002-09-08", "2015-02-19", "2015-02-20")),
+      cohort_end_date = as.Date(c("2000-07-01", "2000-12-11", "2002-09-08", "2015-02-19", "2015-02-20"))
     ))
   expect_true(cdm$cohort4 |> attrition() |> dplyr::pull("reason") == "Initial qualifying events")
   expect_true(settings(cdm$cohort4)$cohort_name == "normal_blood_pressure")
