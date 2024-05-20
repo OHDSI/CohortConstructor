@@ -2,8 +2,9 @@
 #'
 #' @param cohort A cohort table in a cdm reference.
 #' @param dateColumns Date columns in the cohort table to consider.
-#' @param cohortId Vector of cohort definition ids to include. If NULL, all
-#' cohort definition ids will be used.
+#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
+#' used; otherwise, only the specified cohorts will be modified, and the
+#' rest will remain unchanged.
 #' @param returnReason If TRUE it will return a column stating which column in
 #' `dateColumns` is used as a new cohort end date.
 #' @param name Name of the new cohort with the restriction.
@@ -48,8 +49,9 @@ exitAtFirstDate <- function(cohort,
 #'
 #' @param cohort A cohort table in a cdm reference.
 #' @param dateColumns description
-#' @param cohortId Vector of cohort definition ids to include. If NULL, all
-#' cohort definition ids will be used.
+#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
+#' used; otherwise, only the specified cohorts will be modified, and the
+#' rest will remain unchanged.
 #' @param returnReason If TRUE it will return a column stating which column in
 #' `dateColumns` is used as a new cohort end date. description
 #' @param name Name of the new cohort with the restriction.

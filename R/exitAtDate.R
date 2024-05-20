@@ -1,15 +1,10 @@
 #' Set cohort end date to end of observation
 #'
 #' @param cohort A cohort table in a cdm reference.
-#' @param cohortId Vector of cohort definition ids to include. If NULL, all
-#' cohort definition ids will be used.
+#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
+#' used; otherwise, only the specified cohorts will be modified, and the
+#' rest will remain unchanged.
 #' @param name Name of the new cohort with the restriction.
-#' @param .softValidation Whether to perform a soft validation of consistency.
-#' If set to FALSE four additional checks will be performed: 1) check that
-#' cohort end date is not before cohort start date, 2) check that there are no
-#' missing values in required columns, 3) check that cohort duration is all
-#' within observation period, and 4) check that there are no overlapping cohort
-#' entries.
 #'
 #' @return The cohort table.
 #'
@@ -29,8 +24,7 @@
 #'
 exitAtObservationEnd <- function(cohort,
                                  cohortId = NULL,
-                                 name = tableName(cohort),
-                                 .softValidation = FALSE) {
+                                 name = tableName(cohort)) {
   # checks
   name <- validateName(name)
   cohort <- validateCohortTable(cohort, dropExtraColumns = TRUE)
@@ -38,7 +32,6 @@ exitAtObservationEnd <- function(cohort,
   validateCDM(cdm)
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
   cohortId <- validateCohortId(cohortId, ids)
-  assertLogical(.softValidation, length = 1)
 
   # create new cohort
   newCohort <- cohort |>
@@ -56,7 +49,7 @@ exitAtObservationEnd <- function(cohort,
     # no overlapping periods
     joinOverlap() |>
     dplyr::compute(name = name, temporary = FALSE) |>
-    omopgenerics::newCohortTable(.softValidation = .softValidation) |>
+    omopgenerics::newCohortTable(.softValidation = TRUE) |>
     omopgenerics::recordCohortAttrition(
       reason = "Exit at observation period end date",
       cohortId = cohortId
@@ -69,17 +62,12 @@ exitAtObservationEnd <- function(cohort,
 #' Set cohort end date to death date
 #'
 #' @param cohort A cohort table in a cdm reference.
-#' @param cohortId Vector of cohort definition ids to include. If NULL, all
-#' cohort definition ids will be used.
+#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
+#' used; otherwise, only the specified cohorts will be modified, and the
+#' rest will remain unchanged.
 #' @param requireDeath If TRUE, subjects without a death record will be dropped,
 #' while if FALSE their end date will be left as is.
 #' @param name Name of the new cohort with the restriction.
-#' @param .softValidation Whether to perform a soft validation of consistency.
-#' If set to FALSE four additional checks will be performed: 1) check that
-#' cohort end date is not before cohort start date, 2) check that there are no
-#' missing values in required columns, 3) check that cohort duration is all
-#' within observation period, and 4) check that there are no overlapping cohort
-#' entries.
 #'
 #' @return The cohort table.
 #'
@@ -100,8 +88,7 @@ exitAtObservationEnd <- function(cohort,
 exitAtDeath <- function(cohort,
                         cohortId = NULL,
                         requireDeath = FALSE,
-                        name = tableName(cohort),
-                        .softValidation = FALSE) {
+                        name = tableName(cohort)) {
   # checks
   name <- validateName(name)
   cohort <- validateCohortTable(cohort, dropExtraColumns = TRUE)
@@ -110,7 +97,7 @@ exitAtDeath <- function(cohort,
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
   cohortId <- validateCohortId(cohortId, ids)
   assertLogical(requireDeath, length = 1)
-  assertLogical(.softValidation, length = 1)
+
 
   # create new cohort
   newCohort <- cohort |>
@@ -128,6 +115,7 @@ exitAtDeath <- function(cohort,
         .,
         !is.na(.data$date_of_death) | !.data$cohort_definition_id %in% .env$cohortId
       ) |>
+        dplyr::compute(name = name, temporary = FALSE) |>
         omopgenerics::recordCohortAttrition(
           reason = "No death recorded",
           cohortId = cohortId
@@ -136,7 +124,7 @@ exitAtDeath <- function(cohort,
     # no overlapping periods
     joinOverlap() |>
     dplyr::compute(name = name, temporary = FALSE) |>
-    omopgenerics::newCohortTable(.softValidation = .softValidation) |>
+    omopgenerics::newCohortTable(.softValidation = TRUE) |>
     omopgenerics::recordCohortAttrition(
       reason = "Exit at death",
       cohortId = cohortId

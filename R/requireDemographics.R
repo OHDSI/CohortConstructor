@@ -1,8 +1,9 @@
 #' Restrict cohort on patient demographics
 #'
 #' @param cohort A cohort table in a cdm reference.
-#' @param cohortId Vector of cohort definition ids to include. If NULL, all
-#' cohort definition ids will be used.
+#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
+#' used; otherwise, only the specified cohorts will be modified, and the
+#' rest will remain unchanged.
 #' @param indexDate Variable in cohort that contains the date to compute the
 #' demographics characteristics on which to restrict on.
 #' @param ageRange A list of minimum and maximum age.
@@ -13,12 +14,6 @@
 #' @param minFutureObservation A minimum number of future observation days in
 #' the database.
 #' @param name Name of the new cohort with the demographic requirements.
-#' @param .softValidation Whether to perform a soft validation of consistency.
-#' If set to FALSE four additional checks will be performed: 1) check that
-#' cohort end date is not before cohort start date, 2) check that there are no
-#' missing values in required columns, 3) check that cohort duration is all
-#' within observation period, and 4) check that there are no overlapping cohort
-#' entries.
 #'
 #' @return The cohort table with only records for individuals satisfying the
 #' demographic requirements
@@ -40,8 +35,7 @@ requireDemographics <- function(cohort,
                                 sex = c("Both"),
                                 minPriorObservation = 0,
                                 minFutureObservation = 0,
-                                name = tableName(cohort),
-                                .softValidation = FALSE) {
+                                name = tableName(cohort)) {
 
   cohort <- demographicsFilter(
     cohort = cohort,
@@ -55,8 +49,7 @@ requireDemographics <- function(cohort,
     reqAge = TRUE,
     reqSex = TRUE,
     reqPriorObservation = TRUE,
-    reqFutureObservation = TRUE,
-    .softValidation = .softValidation
+    reqFutureObservation = TRUE
   )
 
   return(cohort)
@@ -66,17 +59,12 @@ requireDemographics <- function(cohort,
 #'
 #' @param cohort A cohort table in a cdm reference.
 #' @param ageRange A list of minimum and maximum age.
-#' @param cohortId Vector of cohort definition ids to include. If NULL, all
-#' cohort definition ids will be used.
+#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
+#' used; otherwise, only the specified cohorts will be modified, and the
+#' rest will remain unchanged.
 #' @param indexDate Variable in cohort that contains the date to compute the
 #' demographics characteristics on which to restrict on.
 #' @param name Name of the new cohort with the age requirement.
-#' @param .softValidation Whether to perform a soft validation of consistency.
-#' If set to FALSE four additional checks will be performed: 1) check that
-#' cohort end date is not before cohort start date, 2) check that there are no
-#' missing values in required columns, 3) check that cohort duration is all
-#' within observation period, and 4) check that there are no overlapping cohort
-#' entries.
 #'
 #' @return The cohort table with only records for individuals satisfying the
 #' age requirement
@@ -92,8 +80,7 @@ requireAge <- function(cohort,
                        ageRange,
                        cohortId = NULL,
                        indexDate = "cohort_start_date",
-                       name = tableName(cohort),
-                       .softValidation = FALSE) {
+                       name = tableName(cohort)) {
 
   cohort <- demographicsFilter(
     cohort = cohort,
@@ -107,8 +94,7 @@ requireAge <- function(cohort,
     reqAge = TRUE,
     reqSex = FALSE,
     reqPriorObservation = FALSE,
-    reqFutureObservation = FALSE,
-    .softValidation = .softValidation
+    reqFutureObservation = FALSE
   )
 
   return(cohort)
@@ -117,17 +103,12 @@ requireAge <- function(cohort,
 #' Restrict cohort on sex
 #'
 #' @param cohort A cohort table in a cdm reference.
-#' @param cohortId Vector of cohort definition ids to include. If NULL, all
-#' cohort definition ids will be used.
+#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
+#' used; otherwise, only the specified cohorts will be modified, and the
+#' rest will remain unchanged.
 #' @param sex Can be "Both", "Male" or "Female". If one of the latter, only
 #' those with that sex will be included.
 #' @param name Name of the new cohort with the sex requirements.
-#' @param .softValidation Whether to perform a soft validation of consistency.
-#' If set to FALSE four additional checks will be performed: 1) check that
-#' cohort end date is not before cohort start date, 2) check that there are no
-#' missing values in required columns, 3) check that cohort duration is all
-#' within observation period, and 4) check that there are no overlapping cohort
-#' entries.
 #'
 #' @return The cohort table with only records for individuals satisfying the
 #' sex requirement
@@ -141,8 +122,7 @@ requireAge <- function(cohort,
 requireSex <- function(cohort,
                        sex,
                        cohortId = NULL,
-                       name = tableName(cohort),
-                       .softValidation = FALSE) {
+                       name = tableName(cohort)) {
 
   cohort <- demographicsFilter(
     cohort = cohort,
@@ -156,8 +136,7 @@ requireSex <- function(cohort,
     reqAge = FALSE,
     reqSex = TRUE,
     reqPriorObservation = FALSE,
-    reqFutureObservation = FALSE,
-    .softValidation = .softValidation
+    reqFutureObservation = FALSE
   )
 
   return(cohort)
@@ -168,17 +147,12 @@ requireSex <- function(cohort,
 #' @param cohort A cohort table in a cdm reference.
 #' @param minPriorObservation A minimum number of prior observation days in
 #' the database.
-#' @param cohortId Vector of cohort definition ids to include. If NULL, all
-#' cohort definition ids will be used.
+#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
+#' used; otherwise, only the specified cohorts will be modified, and the
+#' rest will remain unchanged.
 #' @param indexDate Variable in cohort that contains the date to compute the
 #' demographics characteristics on which to restrict on.
 #' @param name Name of the new cohort with the prior observation restriction.
-#' @param .softValidation Whether to perform a soft validation of consistency.
-#' If set to FALSE four additional checks will be performed: 1) check that
-#' cohort end date is not before cohort start date, 2) check that there are no
-#' missing values in required columns, 3) check that cohort duration is all
-#' within observation period, and 4) check that there are no overlapping cohort
-#' entries.
 #'
 #' @return The cohort table with only records for individuals satisfying the
 #' prior observation requirement
@@ -194,8 +168,7 @@ requirePriorObservation <- function(cohort,
                                     minPriorObservation,
                                     cohortId = NULL,
                                     indexDate = "cohort_start_date",
-                                    name = tableName(cohort),
-                                    .softValidation = FALSE) {
+                                    name = tableName(cohort)) {
   cohort <- demographicsFilter(
     cohort = cohort,
     cohortId = cohortId,
@@ -208,8 +181,7 @@ requirePriorObservation <- function(cohort,
     reqAge = FALSE,
     reqSex = FALSE,
     reqPriorObservation = TRUE,
-    reqFutureObservation = FALSE,
-    .softValidation = .softValidation
+    reqFutureObservation = FALSE
   )
 
   return(cohort)
@@ -220,17 +192,12 @@ requirePriorObservation <- function(cohort,
 #' @param cohort A cohort table in a cdm reference.
 #' @param minFutureObservation A minimum number of future observation days in
 #' the database.
-#' @param cohortId Vector of cohort definition ids to include. If NULL, all
-#' cohort definition ids will be used.
+#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
+#' used; otherwise, only the specified cohorts will be modified, and the
+#' rest will remain unchanged.
 #' @param indexDate Variable in cohort that contains the date to compute the
 #' demographics characteristics on which to restrict on.
 #' @param name Name of the new cohort with the future observation restriction.
-#' @param .softValidation Whether to perform a soft validation of consistency.
-#' If set to FALSE four additional checks will be performed: 1) check that
-#' cohort end date is not before cohort start date, 2) check that there are no
-#' missing values in required columns, 3) check that cohort duration is all
-#' within observation period, and 4) check that there are no overlapping cohort
-#' entries.
 #'
 #' @return The cohort table with only records for individuals satisfying the
 #' future observation requirement
@@ -247,8 +214,7 @@ requireFutureObservation <- function(cohort,
                                      minFutureObservation,
                                      cohortId = NULL,
                                      indexDate = "cohort_start_date",
-                                     name = tableName(cohort),
-                                     .softValidation = FALSE) {
+                                     name = tableName(cohort)) {
   cohort <- demographicsFilter(
     cohort = cohort,
     cohortId = cohortId,
@@ -261,8 +227,7 @@ requireFutureObservation <- function(cohort,
     reqAge = FALSE,
     reqSex = FALSE,
     reqPriorObservation = FALSE,
-    reqFutureObservation = TRUE,
-    .softValidation = .softValidation
+    reqFutureObservation = TRUE
   )
 
   return(cohort)
@@ -279,8 +244,7 @@ demographicsFilter <- function(cohort,
                                reqAge,
                                reqSex,
                                reqPriorObservation,
-                               reqFutureObservation,
-                               .softValidation) {
+                               reqFutureObservation) {
   # checks
   name <- validateName(name)
   validateCohortTable(cohort)
@@ -292,7 +256,6 @@ demographicsFilter <- function(cohort,
   ageRange <- validateDemographicRequirements(
     ageRange, sex, minPriorObservation, minFutureObservation
   )
-  assertLogical(.softValidation, length = 1)
 
   # output cohort attributes ----
   reqCols <- c("age_range", "sex", "min_prior_observation",
@@ -473,7 +436,7 @@ demographicsFilter <- function(cohort,
       cohortSetRef = newSet,
       cohortAttritionRef = attrition(workingTable),
       cohortCodelistRef = newCod,
-      .softValidation = .softValidation
+      .softValidation = TRUE
     )
 
   # drop working tables and their attributes

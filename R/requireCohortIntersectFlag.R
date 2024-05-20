@@ -4,8 +4,9 @@
 #' @param targetCohortTable Name of the cohort that we want to check for
 #' intersect.
 #' @param window Window to consider events over.
-#' @param cohortId Vector of cohort definition ids to include. If NULL, all
-#' cohort definition ids will be used.
+#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
+#' used; otherwise, only the specified cohorts will be modified, and the
+#' rest will remain unchanged.
 #' @param targetCohortId Vector of cohort definition ids to include.
 #' @param indexDate Variable in x that contains the date to compute the
 #' intersection.
@@ -18,12 +19,6 @@
 #' @param negate If set as TRUE, criteria will be applied as exclusion
 #' rather than inclusion (i.e. require absence in another cohort).
 #' @param name Name of the new cohort with the future observation restriction.
-#' @param .softValidation Whether to perform a soft validation of consistency.
-#' If set to FALSE four additional checks will be performed: 1) check that
-#' cohort end date is not before cohort start date, 2) check that there are no
-#' missing values in required columns, 3) check that cohort duration is all
-#' within observation period, and 4) check that there are no overlapping cohort
-#' entries.
 #'
 #' @return Cohort table with only those in the other cohort kept (or those that
 #' are not in the cohort if negate = TRUE)
@@ -49,8 +44,7 @@ requireCohortIntersectFlag <- function(cohort,
                                        targetEndDate = "cohort_end_date",
                                        censorDate = NULL,
                                        negate = FALSE,
-                                       name = tableName(cohort),
-                                       .softValidation = FALSE){
+                                       name = tableName(cohort)) {
   # checks
   name <- validateName(name)
   assertLogical(negate, length = 1)
@@ -60,7 +54,6 @@ requireCohortIntersectFlag <- function(cohort,
   validateCohortColumn(indexDate, cohort, class = "Date")
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
   cohortId <- validateCohortId(cohortId, ids)
-  assertLogical(.softValidation, length = 1)
 
   cols <- unique(c("cohort_definition_id", "subject_id",
                    "cohort_start_date", "cohort_end_date",
@@ -137,7 +130,7 @@ requireCohortIntersectFlag <- function(cohort,
     dplyr::inner_join(subsetCohort,
                       by = c(cols)) %>%
     dplyr::compute(name = name, temporary = FALSE) %>%
-    omopgenerics::newCohortTable(.softValidation = .softValidation) %>%
+    omopgenerics::newCohortTable(.softValidation = TRUE) %>%
     CDMConnector::recordCohortAttrition(reason = reason, cohortId = cohortId)
 
   return(x)

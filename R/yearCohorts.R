@@ -2,15 +2,10 @@
 #'
 #' @param cohort A cohort table in a cdm reference.
 #' @param years Numeric vector of years to use to restrict observation to.
-#' @param cohortId Cohort definition id to use. If NULL all the cohort
-#' definition ids in settings will be used.
+#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
+#' used; otherwise, only the specified cohorts will be modified, and the
+#' rest will remain unchanged.
 #' @param name Name of the new cohort table.
-#' @param .softValidation Whether to perform a soft validation of consistency.
-#' If set to FALSE four additional checks will be performed: 1) check that
-#' cohort end date is not before cohort start date, 2) check that there are no
-#' missing values in required columns, 3) check that cohort duration is all
-#' within observation period, and 4) check that there are no overlapping cohort
-#' entries.
 #'
 #' @return A cohort table.
 #'
@@ -27,8 +22,7 @@
 yearCohorts <- function(cohort,
                         years,
                         cohortId = NULL,
-                        name = tableName(cohort),
-                        .softValidation = FALSE) {
+                        name = tableName(cohort)) {
   # initial checks
   cdm <- omopgenerics::cdmReference(cohort)
   validateCDM(cdm)
@@ -37,12 +31,11 @@ yearCohorts <- function(cohort,
   cohortId <- validateCohortId(cohortId, ids)
   assertNumeric(years, integerish = T)
   name <- validateName(name)
-  assertLogical(.softValidation, length = 1)
 
   if (length(years) == 0) {
     cohort <- cohort |>
       dplyr::compute(name = name, temporary = FALSE) |>
-      omopgenerics::newCohortTable(.softValidation = .softValidation)
+      omopgenerics::newCohortTable(.softValidation = TRUE)
     return(cohort)
   }
 
@@ -192,7 +185,7 @@ yearCohorts <- function(cohort,
   } else {
     newCohort <- newCohort |>
       dplyr::compute(name = name, temporary = FALSE) |>
-      omopgenerics::newCohortTable(.softValidation = .softValidation)
+      omopgenerics::newCohortTable(.softValidation = TRUE)
   }
 
   omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with(tablePrefix))

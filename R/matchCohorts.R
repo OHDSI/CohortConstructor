@@ -10,12 +10,6 @@
 #' @param matchYearOfBirth Whether to match in year of birth.
 #' @param ratio Number of allowed matches per individual in the target cohort.
 #' @param name Name of the new generated cohort set.
-#' @param .softValidation Whether to perform a soft validation of consistency.
-#' If set to FALSE four additional checks will be performed: 1) check that
-#' cohort end date is not before cohort start date, 2) check that there are no
-#' missing values in required columns, 3) check that cohort duration is all
-#' within observation period, and 4) check that there are no overlapping cohort
-#' entries.
 #'
 #' @return A cohort table.
 #'
@@ -39,8 +33,7 @@ matchCohorts <- function(cohort,
                          matchSex = TRUE,
                          matchYearOfBirth = TRUE,
                          ratio = 1,
-                         name = tableName(cohort),
-                         .softValidation = FALSE) {
+                         name = tableName(cohort)) {
   cli::cli_inform("Starting matching")
 
   # validate initial input
@@ -53,7 +46,6 @@ matchCohorts <- function(cohort,
   assertNumeric(ratio, min = 0, length = 1)
   assertLogical(matchSex, length = 1)
   assertLogical(matchYearOfBirth, length = 1)
-  assertLogical(.softValidation, length = 1)
 
   # table prefix
   tablePrefix <- omopgenerics::tmpPrefix()
@@ -63,7 +55,7 @@ matchCohorts <- function(cohort,
   if (cohort |> settings() |> nrow() == 0) {
     cdm[[name]] <- cohort |>
       dplyr::compute(name = name, temporary = FALSE) |>
-      omopgenerics::newCohortTable(.softValidation = .softValidation)
+      omopgenerics::newCohortTable(.softValidation = TRUE)
     return(cdm[[name]])
   }
 
@@ -130,7 +122,7 @@ matchCohorts <- function(cohort,
           "match_year_of_birth", "match_status"
         )
       ,
-      .softValidation = .softValidation
+      .softValidation = TRUE
     )
   cdm[[target]] <- cdm[[target]] |>
     omopgenerics::newCohortTable(
@@ -204,7 +196,8 @@ getNewCohort <- function(cohort, cohortId, control){
         "excluded_records" = 0L,
         "excluded_subjects" = 0L
       ),
-      cohortCodelistRef = NULL
+      cohortCodelistRef = NULL,
+      .softValidation = TRUE
     )
 
   return(controls)

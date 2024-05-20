@@ -4,12 +4,6 @@
 #' @param conceptSet A conceptSet, which can either be a codelist, a codelist
 #' or a conceptSetExpression.
 #' @param name Name of the cohort in the cdm object.
-#' @param .softValidation Whether to perform a soft validation of consistency.
-#' If set to FALSE four additional checks will be performed: 1) check that
-#' cohort end date is not before cohort start date, 2) check that there are no
-#' missing values in required columns, 3) check that cohort duration is all
-#' within observation period, and 4) check that there are no overlapping cohort
-#' entries.
 #'
 #' @export
 #'
@@ -26,8 +20,7 @@
 #'
 conceptCohort <- function(cdm,
                           conceptSet,
-                          name,
-                          .softValidation = FALSE) {
+                          name) {
   # initial input validation
   cdm <- validateCdm(cdm)
   name <- validateName(name)
@@ -37,7 +30,6 @@ conceptCohort <- function(cdm,
     return(cdm[[name]])
   }
   conceptSet <- validateConceptSet(conceptSet)
-  assertLogical(.softValidation, length = 1)
 
   # create concept set tibble
   cohortSet <- dplyr::tibble("cohort_name" = names(conceptSet)) |>
@@ -125,7 +117,7 @@ conceptCohort <- function(cdm,
         cohortSetRef = cohortSet,
         cohortAttritionRef = NULL,
         cohortCodelistRef = cohortCodelistRef,
-        .softValidation = .softValidation
+        .softValidation = TRUE
       )
     return(cdm[[name]])
   }
@@ -169,7 +161,7 @@ conceptCohort <- function(cdm,
       cohortSetRef = cohortSet,
       cohortAttritionRef = NULL,
       cohortCodelistRef = cohortCodelistRef,
-      .softValidation = .softValidation
+      .softValidation = TRUE
     )
 
   cli::cli_inform(c("v" = "Cohort {.strong {name}} created."))

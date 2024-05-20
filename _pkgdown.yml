@@ -29,7 +29,7 @@ reference:
   - matches("^trim|exit|entry")
 - subtitle: Cohort manipulations
 - contents:
-  - matches("erafy|intersectCohorts|matchCohorts|subsetCohorts|unionCohorts|yearCohorts|stratifyCohorts")
+  - matches("collapseCohorts|intersectCohorts|matchCohorts|subsetCohorts|unionCohorts|yearCohorts|stratifyCohorts")
 - subtitle: Mock data
 - contents:
   - matches("mockCohortConstructor")

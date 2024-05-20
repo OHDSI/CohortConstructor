@@ -11,12 +11,6 @@
 #' @param minFutureObservation A minimum number of future observation days in
 #' the database.
 #' @param name Name of the new cohort with the demographic requirements.
-#' @param .softValidation Whether to perform a soft validation of consistency.
-#' If set to FALSE four additional checks will be performed: 1) check that
-#' cohort end date is not before cohort start date, 2) check that there are no
-#' missing values in required columns, 3) check that cohort duration is all
-#' within observation period, and 4) check that there are no overlapping cohort
-#' entries.
 #'
 #' @return The cohort table with only records for individuals satisfying the
 #' demographic requirements
@@ -35,8 +29,7 @@ trimDemographics <- function(cohort,
                              sex = NULL,
                              minPriorObservation = NULL,
                              minFutureObservation = NULL,
-                             name = tableName(cohort),
-                             .softValidation = FALSE) {
+                             name = tableName(cohort)) {
   # initial validation
   cohort <- validateCohortTable(cohort, TRUE)
   cohortId <- validateCohortId(cohortId, settings(cohort)$cohort_definition_id)
@@ -44,7 +37,6 @@ trimDemographics <- function(cohort,
     ageRange, sex, minPriorObservation, minFutureObservation, null = TRUE
   )
   name <- validateName(name)
-  assertLogical(.softValidation, length = 1)
 
   cdm <- omopgenerics::cdmReference(cohort)
   tablePrefix <- omopgenerics::tmpPrefix()
@@ -195,7 +187,7 @@ trimDemographics <- function(cohort,
 
   # TODO update attrition names to be more coherent with the age groups, sex and so
   cohort <- cohort |>
-    omopgenerics::newCohortTable(.softValidation = .softValidation)
+    omopgenerics::newCohortTable(.softValidation = TRUE)
 
   cli::cli_inform(c("v" = "Cohort trimmed"))
   return(cohort)

@@ -4,12 +4,6 @@
 #' @param cohortId Vector of cohort definition ids to include. If NULL all
 #' cohort will be selected.
 #' @param name Name of the new cohort with the demographic requirements.
-#' @param .softValidation Whether to perform a soft validation of consistency.
-#' If set to FALSE four additional checks will be performed: 1) check that
-#' cohort end date is not before cohort start date, 2) check that there are no
-#' missing values in required columns, 3) check that cohort duration is all
-#' within observation period, and 4) check that there are no overlapping cohort
-#' entries.
 #'
 #' @return Cohort table with only cohorts in cohortId.
 #'
@@ -24,13 +18,11 @@
 #'
 subsetCohorts <- function(cohort,
                           cohortId,
-                          name = tableName(cohort),
-                          .softValidation = FALSE) {
+                          name = tableName(cohort)) {
   # checks
   cohort <- validateCohortTable(cohort, TRUE)
   cohortId <- validateCohortId(cohortId, settings(cohort)$cohort_definition_id)
   name <- validateName(name)
-  assertLogical(.softValidation, length = 1)
 
   cohort <- cohort |>
     dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>
@@ -39,7 +31,7 @@ subsetCohorts <- function(cohort,
       cohortSetRef = settings(cohort) |> dplyr::filter(.data$cohort_definition_id %in% .env$cohortId),
       cohortAttritionRef = attrition(cohort) |> dplyr::filter(.data$cohort_definition_id %in% .env$cohortId),
       cohortCodelistRef = attr(cohort, "cohort_codelist") |> dplyr::filter(.data$cohort_definition_id %in% .env$cohortId),
-      .softValidation = .softValidation
+      .softValidation = TRUE
     )
 
   return(cohort)

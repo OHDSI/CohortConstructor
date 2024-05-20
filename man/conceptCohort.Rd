@@ -4,7 +4,7 @@
 \alias{conceptCohort}
 \title{Create cohorts based on a concept set}
 \usage{
-conceptCohort(cdm, conceptSet, name, .softValidation = FALSE)
+conceptCohort(cdm, conceptSet, name)
 }
 \arguments{
 \item{cdm}{A cdm reference.}
@@ -13,13 +13,6 @@ conceptCohort(cdm, conceptSet, name, .softValidation = FALSE)
 or a conceptSetExpression.}
 
 \item{name}{Name of the cohort in the cdm object.}
-
-\item{.softValidation}{Whether to perform a soft validation of consistency.
-If set to FALSE four additional checks will be performed: 1) check that
-cohort end date is not before cohort start date, 2) check that there are no
-missing values in required columns, 3) check that cohort duration is all
-within observation period, and 4) check that there are no overlapping cohort
-entries.}
 }
 \value{
 A cohort table

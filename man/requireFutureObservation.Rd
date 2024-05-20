@@ -9,8 +9,7 @@ requireFutureObservation(
   minFutureObservation,
   cohortId = NULL,
   indexDate = "cohort_start_date",
-  name = tableName(cohort),
-  .softValidation = FALSE
+  name = tableName(cohort)
 )
 }
 \arguments{
@@ -19,20 +18,14 @@ requireFutureObservation(
 \item{minFutureObservation}{A minimum number of future observation days in
 the database.}
 
-\item{cohortId}{Vector of cohort definition ids to include. If NULL, all
-cohort definition ids will be used.}
+\item{cohortId}{IDs of the cohorts to modify. If NULL, all cohorts will be
+used; otherwise, only the specified cohorts will be modified, and the
+rest will remain unchanged.}
 
 \item{indexDate}{Variable in cohort that contains the date to compute the
 demographics characteristics on which to restrict on.}
 
 \item{name}{Name of the new cohort with the future observation restriction.}
-
-\item{.softValidation}{Whether to perform a soft validation of consistency.
-If set to FALSE four additional checks will be performed: 1) check that
-cohort end date is not before cohort start date, 2) check that there are no
-missing values in required columns, 3) check that cohort duration is all
-within observation period, and 4) check that there are no overlapping cohort
-entries.}
 }
 \value{
 The cohort table with only records for individuals satisfying the
