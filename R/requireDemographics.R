@@ -54,7 +54,7 @@ requireDemographics <- function(cohort,
     reqSex = TRUE,
     reqPriorObservation = TRUE,
     reqFutureObservation = TRUE,
-    requirementInteractions = requirementInteractions,
+    requirementInteractions = requirementInteractions
   )
 
   return(cohort)
@@ -456,7 +456,8 @@ reqDemographicsCohortSet <- function(set,
                                      ageRange,
                                      sex,
                                      minPriorObservation,
-                                     minFutureObservation) {
+                                     minFutureObservation,
+                                     requirementInteractions) {
 
   if (isTRUE(requirementInteractions)) {
     combinations <- tidyr::expand_grid(
@@ -471,30 +472,31 @@ reqDemographicsCohortSet <- function(set,
     ageRangeFormatted <- unlist(lapply(ageRange, function(x){paste0(x[1], "_", x[2])}))
     combinations <- dplyr::bind_rows(
       dplyr::tibble(
-        age_group = .env$ageRangeFormatted,
+        age_range = .env$ageRangeFormatted,
         sex = .env$sex[1],
-        min_prior_observation = .env$min_prior_observation[1],
-        min_future_observation = .env$min_future_observation[1]
+        min_prior_observation = .env$minPriorObservation[1],
+        min_future_observation = .env$minFutureObservation[1]
       ),
       dplyr::tibble(
-        age_group = ageRangeFormatted[1],
+        age_range = ageRangeFormatted[1],
         sex = .env$sex,
-        days_prior_observation = .env$daysPriorObservation[1],
-        min_future_observation = .env$min_future_observation[1]
+        min_prior_observation = .env$minPriorObservation[1],
+        min_future_observation = .env$minFutureObservation[1]
       ),
       dplyr::tibble(
-        age_group = ageRangeFormatted[1],
+        age_range = ageRangeFormatted[1],
         sex = .env$sex[1],
-        days_prior_observation = .env$daysPriorObservation,
-        min_future_observation = .env$min_future_observation[1]
+        min_prior_observation = .env$minPriorObservation,
+        min_future_observation = .env$minFutureObservation[1]
       ),
       dplyr::tibble(
-        age_group = ageRangeFormatted[1],
+        age_range = ageRangeFormatted[1],
         sex = .env$sex[1],
-        days_prior_observation = .env$daysPriorObservation[1],
-        min_future_observation = .env$min_future_observation
+        min_prior_observation = .env$minPriorObservation[1],
+        min_future_observation = .env$minFutureObservation
       )
     ) |>
+      dplyr::cross_join(dplyr::tibble(target_cohort_rand01 = targetIds)) |>
       dplyr::mutate(requirements = TRUE) |>
       dplyr::distinct()
   }
