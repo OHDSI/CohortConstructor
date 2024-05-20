@@ -9,6 +9,7 @@
 #' @param conceptIdClass the domain class of the conceptId
 #' @param drugExposure T/F include drug exposure table in the cdm
 #' @param conditionOccurrence T/F include condition occurrence in the cdm
+#' @param measurement T/F include measurement in the cdm
 #' @param death T/F include death table in the cdm
 #' @param con db connection detail for copy to databases
 #'
@@ -29,6 +30,7 @@ mockCohortConstructor <- function(nPerson = 10,
                                   conceptIdClass = NULL,
                                   drugExposure = F,
                                   conditionOccurrence = F,
+                                  measurement = F,
                                   death = F,
                                   con = DBI::dbConnect(duckdb::duckdb())) {
 
@@ -48,7 +50,7 @@ mockCohortConstructor <- function(nPerson = 10,
 
   if(!is.null(conceptIdClass) & !is.null(conceptId)){
 
-    cdm <- cdm |> omock::addConcept(conceptSet = conceptId, domain = conceptIdClass)
+    cdm <- cdm |> omock::mockConcepts(conceptSet = conceptId, domain = conceptIdClass)
 
   }
 
@@ -63,6 +65,10 @@ mockCohortConstructor <- function(nPerson = 10,
 
   if(death == T){
     cdm <- cdm |> omock::mockDeath()
+  }
+
+  if(measurement == T){
+    cdm <- cdm |> omock::mockMeasurement()
   }
 
 
