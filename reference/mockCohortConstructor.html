@@ -60,6 +60,7 @@
 <span>  conceptIdClass <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  drugExposure <span class="op">=</span> <span class="cn">F</span>,</span>
 <span>  conditionOccurrence <span class="op">=</span> <span class="cn">F</span>,</span>
+<span>  measurement <span class="op">=</span> <span class="cn">F</span>,</span>
 <span>  death <span class="op">=</span> <span class="cn">F</span>,</span>
 <span>  con <span class="op">=</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">duckdb</span><span class="fu">::</span><span class="fu"><a href="https://r.duckdb.org/reference/duckdb.html" class="external-link">duckdb</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -93,6 +94,10 @@
 
 <dt>conditionOccurrence</dt>
 <dd><p>T/F include condition occurrence in the cdm</p></dd>
+
+
+<dt>measurement</dt>
+<dd><p>T/F include measurement in the cdm</p></dd>
 
 
 <dt>death</dt>
