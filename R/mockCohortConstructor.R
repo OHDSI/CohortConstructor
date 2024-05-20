@@ -48,7 +48,7 @@ mockCohortConstructor <- function(nPerson = 10,
 
   if(!is.null(conceptIdClass) & !is.null(conceptId)){
 
-    cdm <- cdm |> omock::addConcept(conceptSet = conceptId, domain = conceptIdClass)
+    cdm <- cdm |> omock::mockConcepts(conceptSet = conceptId, domain = conceptIdClass)
 
   }
 
