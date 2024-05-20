@@ -26,7 +26,7 @@ reference:
   - matches("requireDeathFlag")
 - subtitle: Update cohort start and end dates
 - contents:
-  - matches("^trim|exit")
+  - matches("^trim|exit|entry")
 - subtitle: Cohort manipulations
 - contents:
   - matches("erafy|intersectCohorts|matchCohorts|subsetCohorts|unionCohorts|yearCohorts|stratifyCohorts")
