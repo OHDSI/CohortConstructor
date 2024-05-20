@@ -25,7 +25,7 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/a00_introduction.html">Introduction</a>
-    <a class="dropdown-item" href="../articles/a01_building_base_cohorts.html">Building base cohorts</a>
+    <a class="dropdown-item" href="../articles/a01_building_base_cohorts.html">UNKNOWN TITLE</a>
     <a class="dropdown-item" href="../articles/a02_applying_cohort_restrictions.html">Applying cohort restrictions</a>
     <a class="dropdown-item" href="../articles/a03_age_sex_matching.html">Generate a matched age and sex cohort</a>
     <a class="dropdown-item" href="../articles/a04_cohort_manipulations.html">Cohort manipulations</a>
@@ -57,8 +57,7 @@
 <span>  <span class="va">dateColumns</span>,</span>
 <span>  cohortId <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  returnReason <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  name <span class="op">=</span> <span class="fu"><a href="https://darwin-eu-dev.github.io/omopgenerics/reference/tableName.html" class="external-link">tableName</a></span><span class="op">(</span><span class="va">cohort</span><span class="op">)</span>,</span>
-<span>  .softValidation <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  name <span class="op">=</span> <span class="fu"><a href="https://darwin-eu-dev.github.io/omopgenerics/reference/tableName.html" class="external-link">tableName</a></span><span class="op">(</span><span class="va">cohort</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -73,8 +72,9 @@
 
 
 <dt>cohortId</dt>
-<dd><p>Vector of cohort definition ids to include. If NULL, all
-cohort definition ids will be used.</p></dd>
+<dd><p>IDs of the cohorts to modify. If NULL, all cohorts will be
+used; otherwise, only the specified cohorts will be modified, and the
+rest will remain unchanged.</p></dd>
 
 
 <dt>returnReason</dt>
@@ -84,15 +84,6 @@ cohort definition ids will be used.</p></dd>
 
 <dt>name</dt>
 <dd><p>Name of the new cohort with the restriction.</p></dd>
-
-
-<dt>.softValidation</dt>
-<dd><p>Whether to perform a soft validation of consistency.
-If set to FALSE four additional checks will be performed: 1) a check that
-cohort end date is not before cohort start date, 2) a check that there are no
-missing values in required columns, 3) a check that cohort duration is all
-within observation period, and 4) that there are no overlapping cohort
-entries</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -120,10 +111,10 @@ entries</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: DuckDB v0.10.2 [unknown@Linux 6.5.0-1021-azure:R 4.4.0/:memory:]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   cohort_definition_id subject_id cohort_start_date cohort_end_date exit_reason </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>                    1          4 2000-12-09        2002-12-09      date_1; dat…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>                    1          3 2015-01-15        2015-01-15      date_1      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>                    1          2 2000-01-01        2001-01-01      date_1      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>                    1          1 2000-06-03        2001-08-01      date_1; dat…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span>                    1          3 2015-01-15        2015-01-15      date_1      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span>                    1          4 2000-12-09        2002-12-09      date_1; dat…</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

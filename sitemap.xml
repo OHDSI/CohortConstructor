@@ -34,6 +34,9 @@
     <loc>https://ohdsi.github.io/CohortConstructor/reference/CohortConstructor-package.html</loc>
   </url>
   <url>
+    <loc>https://ohdsi.github.io/CohortConstructor/reference/collapseCohorts.html</loc>
+  </url>
+  <url>
     <loc>https://ohdsi.github.io/CohortConstructor/reference/conceptCohort.html</loc>
   </url>
   <url>
@@ -44,9 +47,6 @@
   </url>
   <url>
     <loc>https://ohdsi.github.io/CohortConstructor/reference/entryAtLastDate.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/reference/erafy.html</loc>
   </url>
   <url>
     <loc>https://ohdsi.github.io/CohortConstructor/reference/exitAtDeath.html</loc>
