@@ -40,7 +40,7 @@ mockCohortConstructor <- function(nPerson = 10,
       omock::mockCohort(name = "cohort2", numberCohorts = 2)
   } else {
     cdm <-
-      omock::mockCdmFromTables(tables = tables) |>
+      omock::mockCdmFromTables(tables = tables, seed = 1) |>
       omock::mockVocabularyTables(concept = conceptTable)
 
   }
