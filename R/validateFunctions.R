@@ -159,3 +159,16 @@ validateStrata <- function(strata, cohort) {
   }
   return(strata)
 }
+
+validateValueAsNumber <- function(valueAsNumber) {
+
+  assertList(valueAsNumber, named = TRUE, class = "numeric", null = TRUE)
+  for (k in seq_along(valueAsNumber)) {
+    if (length(valueAsNumber[[i]]) != 2) {
+      cli::cli_abort("Each numeric vector in `valueAsNumber` list must be of length 2.")
+    }
+    if (valueAsNumber[[i]][1] > valueAsNumber[[i]][2]) {
+      cli::cli_abort("Upper `valueAsNumber` value must be equal or higher than lower `valueAsNumber` value.")
+    }
+  }
+}
