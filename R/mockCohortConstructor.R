@@ -11,6 +11,7 @@
 #' @param conditionOccurrence T/F include condition occurrence in the cdm
 #' @param measurement T/F include measurement in the cdm
 #' @param death T/F include death table in the cdm
+#' @param otherTables it takes a list of single tibble with names to include other tables in the cdm
 #' @param con db connection detail for copy to databases
 #'
 #' @return cdm object
