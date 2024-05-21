@@ -8,6 +8,7 @@
 \alias{attrition}
 \alias{cohortCodelist}
 \alias{tableName}
+\alias{bind}
 \alias{startDateColumn}
 \alias{endDateColumn}
 \title{Objects exported from other packages}
@@ -17,7 +18,7 @@ These objects are imported from other packages. Follow the links
 below to see their documentation.
 
 \describe{
-  \item{omopgenerics}{\code{\link[omopgenerics]{attrition}}, \code{\link[omopgenerics]{cohortCodelist}}, \code{\link[omopgenerics]{cohortCount}}, \code{\link[omopgenerics]{settings}}, \code{\link[omopgenerics]{tableName}}}
+  \item{omopgenerics}{\code{\link[omopgenerics]{attrition}}, \code{\link[omopgenerics]{bind}}, \code{\link[omopgenerics]{cohortCodelist}}, \code{\link[omopgenerics]{cohortCount}}, \code{\link[omopgenerics]{settings}}, \code{\link[omopgenerics]{tableName}}}
 
   \item{PatientProfiles}{\code{\link[PatientProfiles]{endDateColumn}}, \code{\link[PatientProfiles]{startDateColumn}}}
 }}

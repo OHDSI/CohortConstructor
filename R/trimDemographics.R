@@ -281,8 +281,8 @@ getNewSettings <- function(set, cohortId, age, sex, prior, future) {
       ))
   }
   sets <- sets |>
-    # we will need a new release of omopgenerics so we can change ::: -> ::
-    dplyr::mutate("cohort_name" = omopgenerics:::toSnakeCase(.data$cohort_name))
+    # TODO: change to omopgenerics when new release
+    dplyr::mutate("cohort_name" = gsub(" ", "_", tolower(.data$cohort_name)))
   return(sets)
 }
 caseAge <- function(age) {
