@@ -14,6 +14,7 @@ mockCohortConstructor(
   conditionOccurrence = F,
   measurement = F,
   death = F,
+  otherTables = NULL,
   con = DBI::dbConnect(duckdb::duckdb())
 )
 }
