@@ -69,7 +69,6 @@ test_that("joinOverlap", {
     )
   )
 
-  DBI::dbDisconnect(db, shutdown = TRUE)
 })
 
 test_that("splitOverlap", {
