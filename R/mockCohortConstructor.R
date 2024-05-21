@@ -32,6 +32,7 @@ mockCohortConstructor <- function(nPerson = 10,
                                   conditionOccurrence = F,
                                   measurement = F,
                                   death = F,
+                                  otherTables = NULL,
                                   con = DBI::dbConnect(duckdb::duckdb())) {
 
 
@@ -64,6 +65,11 @@ mockCohortConstructor <- function(nPerson = 10,
 
   if(measurement == T){
     cdm <- cdm |> omock::mockMeasurement()
+  }
+
+  if(!is.null(otherTables)){
+
+    cdm <- cdm |> omopgenerics::insertTable(name = names(otherTables), table = otherTables[[1]])
   }
 
   if (!is.null(con)){
