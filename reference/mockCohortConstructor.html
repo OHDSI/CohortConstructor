@@ -62,6 +62,7 @@
 <span>  conditionOccurrence <span class="op">=</span> <span class="cn">F</span>,</span>
 <span>  measurement <span class="op">=</span> <span class="cn">F</span>,</span>
 <span>  death <span class="op">=</span> <span class="cn">F</span>,</span>
+<span>  otherTables <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  con <span class="op">=</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">duckdb</span><span class="fu">::</span><span class="fu"><a href="https://r.duckdb.org/reference/duckdb.html" class="external-link">duckdb</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -102,6 +103,10 @@
 
 <dt>death</dt>
 <dd><p>T/F include death table in the cdm</p></dd>
+
+
+<dt>otherTables</dt>
+<dd><p>it takes a list of single tibble with names to include other tables in the cdm</p></dd>
 
 
 <dt>con</dt>
