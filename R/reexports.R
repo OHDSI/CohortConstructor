@@ -18,6 +18,10 @@ omopgenerics::cohortCodelist
 #' @export
 omopgenerics::tableName
 
+#' @importFrom omopgenerics bind
+#' @export
+omopgenerics::bind
+
 #' @importFrom PatientProfiles startDateColumn
 #' @export
 PatientProfiles::startDateColumn
