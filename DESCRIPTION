@@ -29,7 +29,7 @@ Imports:
     dplyr,
     glue,
     magrittr,
-    omopgenerics (>= 0.1.2),
+    omopgenerics (>= 0.2.1),
     PatientProfiles (>= 0.8.0),
     purrr,
     rlang,
