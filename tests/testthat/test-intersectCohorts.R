@@ -10,6 +10,7 @@ test_that("getIdentifier", {
 })
 
 test_that("joinOverlap", {
+
   x <- dplyr::tibble(
     start_date = as.Date(c(
       "2020-01-01", "2020-03-01", "2020-06-01", "2020-02-01", "2020-05-02",
@@ -22,13 +23,11 @@ test_that("joinOverlap", {
     pid = c(1, 1, 1, 1, 1, 2, 2, 2),
     def_id = c(1, 1, 1, 2, 2, 1, 1, 2)
   )
-  db <- DBI::dbConnect(duckdb::duckdb(), ":memory:")
-  DBI::dbWriteTable(db, "x", x)
-  x <- dplyr::tbl(db, "x")
 
+  cdm <- mockCohortConstructor(otherTables = list(x = x))
   # gap = 0
   res <- joinOverlap(
-    x, startDate = "start_date", endDate = "end_date", by = c("pid", "def_id")
+    cdm$x, startDate = "start_date", endDate = "end_date", by = c("pid", "def_id")
   ) |>
     dplyr::collect() |>
     dplyr::arrange(.data$pid, .data$def_id, .data$start_date)
@@ -49,7 +48,7 @@ test_that("joinOverlap", {
 
   # gap = 1
   res <- joinOverlap(
-    x, start = "start_date", end = "end_date", by = c("pid", "def_id"), gap = 1
+    cdm$x, start = "start_date", end = "end_date", by = c("pid", "def_id"), gap = 1
   ) |>
     dplyr::collect() |>
     dplyr::arrange(.data$pid, .data$def_id, .data$start_date)
@@ -68,8 +67,6 @@ test_that("joinOverlap", {
       ))
     )
   )
-
-  DBI::dbDisconnect(db, shutdown = TRUE)
 })
 
 test_that("splitOverlap", {

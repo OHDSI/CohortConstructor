@@ -6,13 +6,14 @@ Authors@R: c(
     role = c("aut", "cre"), comment = c(ORCID = "0000-0002-9286-1128")),
     person("Marti", "Catala", , "marti.catalasabate@ndorms.ox.ac.uk", 
     role = c("aut"), comment = c(ORCID = "0000-0003-3308-9905")),
+    person("Nuria", "Mercade-Besora", , "nuria.mercadebesora@ndorms.ox.ac.uk", 
+    role = c("aut"), comment = c(ORCID = "0009-0006-7948-3747")),
     person("Marta", "Alcalde-Herraiz", , "marta.alcaldeherraiz@ndorms.ox.ac.uk", 
     role = c("aut"), comment = c(ORCID = "0009-0002-4405-1814")),
+    person("Mike", "Du", , "mike.du@ndorms.ox.ac.uk", 
+    role = c("aut"), comment = c(ORCID = "0000-0002-9517-8834")),
     person("Yuchen", "Guo", email = "yuchen.guo@ndorms.ox.ac.uk", 
-    role = c("aut"), comment = c(ORCID = "0000-0002-0847-4855")),
-    person("Nuria", "Mercade-Besora", , "nuria.mercadebesora@ndorms.ox.ac.uk", 
-    role = c("aut"), comment = c(ORCID = "0009-0006-7948-3747"))
-    )
+    role = c("aut"), comment = c(ORCID = "0000-0002-0847-4855")))
 Description: This package aims to provide functionalities to manipulate
     and evaluate cohorts in data mapped to the Observational Medical 
     Outcomes Partnership Common Data Model.
@@ -28,7 +29,7 @@ Imports:
     dplyr,
     glue,
     magrittr,
-    omopgenerics (>= 0.1.2),
+    omopgenerics (>= 0.2.1),
     PatientProfiles (>= 0.8.0),
     purrr,
     rlang,
@@ -54,5 +55,3 @@ VignetteBuilder: knitr
 Depends: 
     R (>= 4.1)
 URL: https://ohdsi.github.io/CohortConstructor/
-
-

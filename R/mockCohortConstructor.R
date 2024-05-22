@@ -11,6 +11,7 @@
 #' @param conditionOccurrence T/F include condition occurrence in the cdm
 #' @param measurement T/F include measurement in the cdm
 #' @param death T/F include death table in the cdm
+#' @param otherTables it takes a list of single tibble with names to include other tables in the cdm
 #' @param con db connection detail for copy to databases
 #'
 #' @return cdm object
@@ -32,6 +33,7 @@ mockCohortConstructor <- function(nPerson = 10,
                                   conditionOccurrence = FALSE,
                                   measurement = FALSE,
                                   death = FALSE,
+                                  otherTables = NULL,
                                   con = DBI::dbConnect(duckdb::duckdb())) {
 
 
@@ -65,6 +67,11 @@ mockCohortConstructor <- function(nPerson = 10,
 
   if(measurement == T){
     cdm <- cdm |> omock::mockMeasurement()
+  }
+
+  if(!is.null(otherTables)){
+
+    cdm <- cdm |> omopgenerics::insertTable(name = names(otherTables), table = otherTables[[1]])
   }
 
   if (!is.null(con)){

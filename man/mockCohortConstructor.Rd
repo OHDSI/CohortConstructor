@@ -14,6 +14,7 @@ mockCohortConstructor(
   conditionOccurrence = FALSE,
   measurement = FALSE,
   death = FALSE,
+  otherTables = NULL,
   con = DBI::dbConnect(duckdb::duckdb())
 )
 }
@@ -35,6 +36,8 @@ mockCohortConstructor(
 \item{measurement}{T/F include measurement in the cdm}
 
 \item{death}{T/F include death table in the cdm}
+
+\item{otherTables}{it takes a list of single tibble with names to include other tables in the cdm}
 
 \item{con}{db connection detail for copy to databases}
 }
