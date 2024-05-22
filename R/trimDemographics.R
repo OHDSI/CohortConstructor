@@ -61,7 +61,12 @@ trimDemographics <- function(cohort,
     cli::cli_inform(c("Adding birth date"))
     newCohort <- newCohort |>
       PatientProfiles::addDateOfBirth(name = "date_0") %>%
-      dplyr::mutate(!!!datesAgeRange(ageRange))
+      dplyr::mutate(
+        !!!datesAgeRange(ageRange)
+      ) %>%
+      # correct dates for those born on the 29th february
+      correctAgeDates() |>
+      dplyr::compute(name = tmpNewCohort, temporary = FALSE)
   }
   if (!is.null(minPriorObservation) |
       !is.null(minFutureObservation) |
@@ -327,4 +332,18 @@ caseAge <- function(age) {
   ageMax <- lapply(age, function(x){x[2]}) |>
     prepareColEnd("max_age")
   c(ageMin, ageMax)
+}
+
+correctAgeDates <- function(x) {
+  dateCols <- colnames(x)
+  dateCols <- dateCols[grepl("date_", dateCols) & dateCols != "date_0"]
+  fixDates <- lapply(dateCols, function(x) {
+    glue::glue("dplyr::if_else(month(.data$date_0) == 2 & day(.data$date_0) == 29 & day(.data${x}) == 28,
+           as.Date(local(CDMConnector::dateadd(date = '{x}', number = 1))),
+           .data${x})") |>
+      rlang::parse_expr()
+  })
+  names(fixDates) <- dateCols
+  x <- x %>% dplyr::mutate(!!!fixDates)
+  return(x)
 }
