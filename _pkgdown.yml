@@ -5,7 +5,7 @@ template:
 reference:
 - subtitle: Build base cohorts
 - contents:
-  - matches("conceptCohort|demographicsCohort")
+  - matches("conceptCohort|demographicsCohort|measurementCohort")
 - subtitle: Limit to an individualss first or last cohort entry
 - contents:
   - matches("requireIsFirstEntry|requireIsLastEntry")

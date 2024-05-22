@@ -9,7 +9,7 @@ conceptCohort(cdm, conceptSet, name)
 \arguments{
 \item{cdm}{A cdm reference.}
 
-\item{conceptSet}{A conceptSet, which can either be a codelist, a codelist
+\item{conceptSet}{A conceptSet, which can either be a codelist
 or a conceptSetExpression.}
 
 \item{name}{Name of the cohort in the cdm object.}
