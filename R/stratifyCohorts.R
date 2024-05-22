@@ -121,6 +121,18 @@ stratifyCohorts <- function(cohort,
   }
   newAttrition <- getNewAttritionStrata(attrition(cohort), newSettings, counts)
   newSettings <- newSettings |> dplyr::bind_rows()
+  ## codelist
+  codelist <- attr(cohort, "cohort_codelist")
+  newCodelist <- cdm[[nm]] |>
+    dplyr::select(c("cohort_definition_id", "target_cohort_id")) |>
+    dplyr::inner_join(
+      codelist |>
+        dplyr::rename("target_cohort_id" = "cohort_definition_id"),
+      by = "target_cohort_id",
+      relationship = "many-to-many"
+    ) |>
+    dplyr::select(!"target_cohort_id")
+
   newCohort <- purrr::reduce(newCohort, dplyr::union_all) |>
     dplyr::select(!dplyr::all_of(c(
       "target_cohort_id", strataCols[removeStrata]
@@ -129,7 +141,7 @@ stratifyCohorts <- function(cohort,
     omopgenerics::newCohortTable(
       cohortSetRef = newSettings,
       cohortAttritionRef = newAttrition,
-      cohortCodelistRef = NULL,
+      cohortCodelistRef = newCodelist,
       .softValidation = TRUE
     )
 

@@ -187,7 +187,7 @@ test_that("yearCohorts - keep name", {
   expect_true(all(cdm$cohort |> dplyr::pull("subject_id") |> sort() == c(1)))
   expect_true(all(cdm$cohort |> dplyr::pull("cohort_definition_id") |> sort() == c(1)))
   expect_true(all(attrition(cdm$cohort)$reason == c(
-    'nitial qualifying events', 'Restrict to observations between: 2005-01-01 and 2005-12-31',
+    'Initial qualifying events', 'Restrict to observations between: 2005-01-01 and 2005-12-31',
     'Initial qualifying events', 'Restrict to observations between: 2006-01-01 and 2006-12-31',
     'Initial qualifying events', 'Restrict to observations between: 2007-01-01 and 2007-12-31',
     'Initial qualifying events', 'Restrict to observations between: 2008-01-01 and 2008-12-31'
