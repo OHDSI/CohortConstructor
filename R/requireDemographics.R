@@ -465,6 +465,13 @@ reqDemographicsCohortSet <- function(set,
                                      minFutureObservation,
                                      requirementInteractions) {
 
+  if (is.null(ageRange)) {ageRange <- list(c(0, 150))}
+  if (is.null(sex)) {sex <- "Both"}
+  if (is.null(minPriorObservation)) {minPriorObservation <- 0}
+  if (is.null(minFutureObservation)) {minFutureObservation <- 0}
+
+  minPriorObservation <- as.integer(minPriorObservation)
+  minFutureObservation <- as.integer(minFutureObservation)
   if (isTRUE(requirementInteractions)) {
     combinations <- tidyr::expand_grid(
       requirements = TRUE,
@@ -547,7 +554,6 @@ reqDemographicsCohortSet <- function(set,
         .data$requirements, paste0(.data$cohort_name, "_", .data$group_id), .data$cohort_name
       ))
   }
-
 
   combinations <- combinations |>
     dplyr::mutate(

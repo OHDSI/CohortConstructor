@@ -89,30 +89,27 @@ test_that("yearCohorts - change name", {
                              name = "cohort1")
   expect_equal(settings(cdm$cohort1) |> dplyr::arrange(.data$cohort_definition_id),
                dplyr::tibble(
-                 cohort_definition_id = 1:6,
+                 cohort_definition_id = 1:4,
                  cohort_name = c(
-                   "cohort_2", "cohort_3", paste0("cohort_1_", 2005:2008)
+                   paste0("cohort_1_", 2005:2008)
                  ),
-                 target_cohort_definition_id = c(NA, NA, 1, 1, 1, 1),
-                 year = c(NA, NA, 2005:2008),
-                 target_cohort_name = c(NA, NA, rep("cohort_1", 4))
+                 target_cohort_definition_id = c(1, 1, 1, 1),
+                 year = c(2005:2008),
+                 target_cohort_name = c(rep("cohort_1", 4))
                ))
   expect_true(all(cdm$cohort1 |> dplyr::pull("cohort_start_date") |> sort() ==
-                    c("1994-06-17", "1999-12-19", "2000-05-15", "2000-06-23", "2001-07-16",
-                      "2001-12-04", "2005-01-01", "2015-01-19", "2015-03-05")))
+                    c("2005-01-01")))
   expect_true(all(cdm$cohort1 |> dplyr::pull("cohort_end_date") |> sort() ==
-                    c("2000-05-14", "2001-07-15", "2001-08-26", "2001-12-03", "2005-11-23",
-                      "2006-09-27", "2007-08-06", "2015-07-06", "2015-09-14")))
-  expect_true(all(cdm$cohort1 |> dplyr::pull("subject_id") |> sort() == c(1, 1, 1, 1, 2, 2, 3, 3, 4)))
-  expect_true(all(cdm$cohort1 |> dplyr::pull("cohort_definition_id") |> sort() == c(1, 1, 1, 1, 2, 2, 2, 2, 3)))
+                    c("2005-11-23")))
+  expect_true(all(cdm$cohort1 |> dplyr::pull("subject_id") |> sort() == 1))
+  expect_true(all(cdm$cohort1 |> dplyr::pull("cohort_definition_id") |> sort() == 1))
   expect_true(all(attrition(cdm$cohort1)$reason == c(
-    'Initial qualifying events', 'Initial qualifying events', 'Initial qualifying events',
-    'Restrict to observations between: 2005-01-01 and 2005-12-31', 'Initial qualifying events',
-    'Restrict to observations between: 2006-01-01 and 2006-12-31', 'Initial qualifying events',
-    'Restrict to observations between: 2007-01-01 and 2007-12-31', 'Initial qualifying events',
-    'Restrict to observations between: 2008-01-01 and 2008-12-31'
+    'Initial qualifying events', 'Restrict to observations between: 2005-01-01 and 2005-12-31',
+    'Initial qualifying events', 'Restrict to observations between: 2006-01-01 and 2006-12-31',
+    'Initial qualifying events', 'Restrict to observations between: 2007-01-01 and 2007-12-31',
+    'Initial qualifying events', 'Restrict to observations between: 2008-01-01 and 2008-12-31'
   )))
-  expect_true(all(cohortCount(cdm$cohort1)$number_records == c(4, 4, 1, 0, 0, 0)))
+  expect_true(all(cohortCount(cdm$cohort1)$number_records == c(1, 0, 0, 0)))
 
   # no years in:
   cdm$cohort1 <- yearCohorts(cohort = cdm$cohort,
@@ -175,30 +172,27 @@ test_that("yearCohorts - keep name", {
                              cohortId = 1)
   expect_equal(settings(cdm$cohort) |> dplyr::arrange(.data$cohort_definition_id),
                dplyr::tibble(
-                 cohort_definition_id = 1:6,
+                 cohort_definition_id = 1:4,
                  cohort_name = c(
-                   "cohort_2", "cohort_3", paste0("cohort_1_", 2005:2008)
+                   paste0("cohort_1_", 2005:2008)
                  ),
-                 target_cohort_definition_id = c(NA, NA, 1, 1, 1, 1),
-                 year = c(NA, NA, 2005:2008),
-                 target_cohort_name = c(NA, NA, rep("cohort_1", 4))
+                 target_cohort_definition_id = c(1, 1, 1, 1),
+                 year = c(2005:2008),
+                 target_cohort_name = c(rep("cohort_1", 4))
                ))
   expect_true(all(cdm$cohort |> dplyr::pull("cohort_start_date") |> sort() ==
-                    c("1994-06-17", "1999-12-19", "2000-05-15", "2000-06-23", "2001-07-16",
-                      "2001-12-04", "2005-01-01", "2015-01-19", "2015-03-05")))
+                    c("2005-01-01")))
   expect_true(all(cdm$cohort |> dplyr::pull("cohort_end_date") |> sort() ==
-                    c("2000-05-14", "2001-07-15", "2001-08-26", "2001-12-03", "2005-11-23",
-                      "2006-09-27", "2007-08-06", "2015-07-06", "2015-09-14")))
-  expect_true(all(cdm$cohort |> dplyr::pull("subject_id") |> sort() == c(1, 1, 1, 1, 2, 2, 3, 3, 4)))
-  expect_true(all(cdm$cohort |> dplyr::pull("cohort_definition_id") |> sort() == c(1, 1, 1, 1, 2, 2, 2, 2, 3)))
+                    c("2005-11-23")))
+  expect_true(all(cdm$cohort |> dplyr::pull("subject_id") |> sort() == c(1)))
+  expect_true(all(cdm$cohort |> dplyr::pull("cohort_definition_id") |> sort() == c(1)))
   expect_true(all(attrition(cdm$cohort)$reason == c(
-    'Initial qualifying events', 'Initial qualifying events', 'Initial qualifying events',
-    'Restrict to observations between: 2005-01-01 and 2005-12-31', 'Initial qualifying events',
-    'Restrict to observations between: 2006-01-01 and 2006-12-31', 'Initial qualifying events',
-    'Restrict to observations between: 2007-01-01 and 2007-12-31', 'Initial qualifying events',
-    'Restrict to observations between: 2008-01-01 and 2008-12-31'
+    'nitial qualifying events', 'Restrict to observations between: 2005-01-01 and 2005-12-31',
+    'Initial qualifying events', 'Restrict to observations between: 2006-01-01 and 2006-12-31',
+    'Initial qualifying events', 'Restrict to observations between: 2007-01-01 and 2007-12-31',
+    'Initial qualifying events', 'Restrict to observations between: 2008-01-01 and 2008-12-31'
   )))
-  expect_true(all(cohortCount(cdm$cohort)$number_records == c(4, 4, 1, 0, 0, 0)))
+  expect_true(all(cohortCount(cdm$cohort)$number_records == c(1, 0, 0, 0)))
 
   CDMConnector::cdm_disconnect(cdm)
 })

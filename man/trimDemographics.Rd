@@ -45,5 +45,5 @@ library(CohortConstructor)
 
 cdm <- mockCohortConstructor(nPerson = 100)
 
-cdm$cohort1 |> trimDemographics(sex = "Male")
+cdm$cohort1 |> trimDemographics(ageRange = list(c(10, 30)))
 }
