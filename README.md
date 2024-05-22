@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# CohortConstructor
+# CohortConstructor <img src="man/figures/logo.png" align="right" height="180"/>
 
 > **This package is currently experimental and not currently recommended
 > for use.**
@@ -34,7 +34,6 @@ Eunomia dataset Using the CDMConnector package.
 ``` r
 library(CDMConnector)
 library(PatientProfiles)
-#> Warning: package 'PatientProfiles' was built under R version 4.2.3
 library(dplyr)
 #> Warning: package 'dplyr' was built under R version 4.2.3
 library(CohortConstructor)
@@ -113,15 +112,15 @@ cohort_count(cdm$fractures) %>% glimpse()
 attrition(cdm$fractures) %>% 
   filter(reason == "cohort_start_date between 2000-01-01 & 2020-01-01") %>% 
   glimpse()
-#> Rows: 3
+#> Rows: 0
 #> Columns: 7
-#> $ cohort_definition_id <int> 1, 2, 3
-#> $ number_records       <int> 108, 152, 62
-#> $ number_subjects      <int> 104, 143, 60
-#> $ reason_id            <int> 2, 2, 2
-#> $ reason               <chr> "cohort_start_date between 2000-01-01 & 2020-01-0…
-#> $ excluded_records     <int> 356, 417, 76
-#> $ excluded_subjects    <int> 323, 367, 72
+#> $ cohort_definition_id <int> 
+#> $ number_records       <int> 
+#> $ number_subjects      <int> 
+#> $ reason_id            <int> 
+#> $ reason               <chr> 
+#> $ excluded_records     <int> 
+#> $ excluded_subjects    <int>
 ```
 
 ### Applying demographic requirements
@@ -147,7 +146,7 @@ attrition(cdm$fractures) %>%
 #> $ cohort_definition_id <int> 1, 2, 3
 #> $ number_records       <int> 43, 64, 22
 #> $ number_subjects      <int> 43, 62, 22
-#> $ reason_id            <int> 3, 3, 3
+#> $ reason_id            <int> 4, 4, 4
 #> $ reason               <chr> "Age requirement: 40 to 65", "Age requirement: 40…
 #> $ excluded_records     <int> 65, 88, 40
 #> $ excluded_subjects    <int> 61, 81, 38
@@ -160,7 +159,7 @@ attrition(cdm$fractures) %>%
 #> $ cohort_definition_id <int> 1, 2, 3
 #> $ number_records       <int> 19, 37, 12
 #> $ number_subjects      <int> 19, 36, 12
-#> $ reason_id            <int> 4, 4, 4
+#> $ reason_id            <int> 5, 5, 5
 #> $ reason               <chr> "Sex requirement: Female", "Sex requirement: Fema…
 #> $ excluded_records     <int> 24, 27, 10
 #> $ excluded_subjects    <int> 24, 26, 10
@@ -191,7 +190,7 @@ attrition(cdm$fractures) %>%
 #> $ cohort_definition_id <int> 1, 2, 3
 #> $ number_records       <int> 5, 7, 2
 #> $ number_subjects      <int> 5, 6, 2
-#> $ reason_id            <int> 7, 7, 7
+#> $ reason_id            <int> 8, 8, 8
 #> $ reason               <chr> "In cohort gibleed between -Inf & 0 days relative…
 #> $ excluded_records     <int> 14, 30, 10
 #> $ excluded_subjects    <int> 14, 30, 10
