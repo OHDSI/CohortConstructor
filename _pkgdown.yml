@@ -6,7 +6,7 @@ reference:
 - subtitle: Build base cohorts
 - contents:
   - matches("conceptCohort|demographicsCohort|measurementCohort")
-- subtitle: Limit to an individualss first or last cohort entry
+- subtitle: Limit to an individuals first or last cohort entry
 - contents:
   - matches("requireIsFirstEntry|requireIsLastEntry")
 - subtitle: Impose date requirements on existing cohorts
