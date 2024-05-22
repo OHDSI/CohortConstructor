@@ -15,8 +15,9 @@ trimDemographics(
 )
 }
 \arguments{
-\item{cohort}{A cohort table in a cdm reference.
-@param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
+\item{cohort}{A cohort table in a cdm reference.}
+
+\item{cohortId}{IDs of the cohorts to modify. If NULL, all cohorts will be
 used; otherwise, only the specified cohorts will be modified, and the
 rest will remain unchanged.}
 
