@@ -2,9 +2,8 @@
 #'
 #' @param cohort A cohort table in a cdm reference.
 #' @param years Numeric vector of years to use to restrict observation to.
-#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
-#' used; otherwise, only the specified cohorts will be modified, and the
-#' rest will remain unchanged.
+#' @param cohortId IDs of the cohorts to include. If NULL all cohorts will be
+#' considered. Cohorts not included will be removed from the cohort set.
 #' @param name Name of the new cohort table.
 #'
 #' @return A cohort table.

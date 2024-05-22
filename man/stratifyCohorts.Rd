@@ -17,8 +17,8 @@ stratifyCohorts(
 
 \item{strata}{A strata list that point to columns in cohort table.}
 
-\item{cohortId}{Vector of cohort definition ids to include. If NULL, all
-cohort definition ids will be used.}
+\item{cohortId}{IDs of the cohorts to include. If NULL all cohorts will be
+considered. Cohorts not included will be removed from the cohort set.}
 
 \item{removeStrata}{Whether to remove strata columns from final cohort table.}
 
