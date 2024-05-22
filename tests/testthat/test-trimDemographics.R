@@ -386,4 +386,35 @@ test_that("cohort Id, name, additional columns", {
                                minPriorObservation = c(0, 400),
                                minFutureObservation = NULL)
   )
+
+  # test 29th frebruary
+  cdm <- mockCohortConstructor(
+    tables = list(
+      "cohort" = dplyr::tibble(
+        cohort_definition_id = 1,
+        subject_id = 1,
+        cohort_start_date = as.Date("1972-02-29"),
+        cohort_end_date = as.Date("2018-03-20")
+      )
+    )
+  )
+  cdm <- omopgenerics::insertTable(
+    cdm, "observation_period",
+    dplyr::tibble(
+      person_id = 1,
+      observation_period_start_date = as.Date("2000-01-01"),
+      observation_period_end_date = as.Date("2050-01-01"),
+      observation_period_id = 1,
+      period_type_concept_id = 0
+    )
+  )
+  cdm$person <- cdm$person |> dplyr::mutate(
+    birth_datetime = as.Date("1972-02-29"),
+    year_of_birth = 1972,
+    month_of_birth = 2,
+    day_of_birth = 29
+  )
+  cohort <- trimDemographics(cdm$cohort, ageRange = c(18, 65))
+  expect_true(cohort |> dplyr::pull(cohort_start_date) == "1990-03-01")
+  CDMConnector::cdm_disconnect(cdm)
 })
