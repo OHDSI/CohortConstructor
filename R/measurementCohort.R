@@ -167,6 +167,11 @@ measurementCohort <- function(cdm,
     cohort <- cohort |>
       dplyr::filter(!!!filterExpr) |>
       dplyr::compute(name = name, temporary = FALSE)
+
+  if (cohort |> dplyr::tally() |> dplyr::pull(n) == 0){
+    cli::cli_warn("There are no subjects with the specified value_as_concept_id or value_as_number.")
+  }
+
   }
 
   cohort <- cohort |>
