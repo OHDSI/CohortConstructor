@@ -1,7 +1,7 @@
 #' Create cohorts based on a concept set
 #'
 #' @param cdm A cdm reference.
-#' @param conceptSet A conceptSet, which can either be a codelist, a codelist
+#' @param conceptSet A conceptSet, which can either be a codelist
 #' or a conceptSetExpression.
 #' @param name Name of the cohort in the cdm object.
 #'
@@ -137,21 +137,20 @@ conceptCohort <- function(cdm,
     dplyr::compute(name = name, temporary = FALSE)
 
   cli::cli_inform(c("i" = "Collapsing records."))
-  # assign to cdm so we keep class, to be removed when https://github.com/darwin-eu-dev/omopgenerics/issues/256
   cohort <- cohort |>
-    dplyr::inner_join(cdm$observation_period |>
-                        dplyr::select("subject_id" = "person_id",
-                                      "observation_period_start_date",
-                                      "observation_period_end_date"),
-                      by = "subject_id") |>
+    PatientProfiles::addDemographics(
+      age = FALSE,
+      sex = FALSE,
+      priorObservationType = "date",
+      futureObservationType = "date"
+    ) |>
     dplyr::filter(
-      .data$observation_period_start_date <= .data$cohort_start_date,
-      .data$observation_period_end_date >= .data$cohort_end_date,
+      .data$prior_observation <= .data$cohort_start_date,
+      .data$future_observation >= .data$cohort_end_date,
       .data$cohort_start_date <= .data$cohort_end_date
     ) |>
-    dplyr::select(-"observation_period_start_date", -"observation_period_end_date") |>
+    dplyr::select(-"prior_observation", -"future_observation") |>
     joinOverlap(gap = 0) |>
-    dplyr::mutate(subject_id = .data$subject_id) |>
     dplyr::compute(name = name, temporary = FALSE)
 
   cli::cli_inform(c("i" = "Creating cohort attributes."))
