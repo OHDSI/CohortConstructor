@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">CohortConstructor</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,7 +42,7 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/a00_introduction.html">Introduction</a>
-    <a class="dropdown-item" href="../articles/a01_building_base_cohorts.html">UNKNOWN TITLE</a>
+    <a class="dropdown-item" href="../articles/a01_building_base_cohorts.html">Building base cohorts</a>
     <a class="dropdown-item" href="../articles/a02_applying_cohort_restrictions.html">Applying cohort restrictions</a>
     <a class="dropdown-item" href="../articles/a03_age_sex_matching.html">Generate a matched age and sex cohort</a>
     <a class="dropdown-item" href="../articles/a04_cohort_manipulations.html">Cohort manipulations</a>
@@ -92,11 +92,12 @@ diabetes) defined based on concepts seen in the condition occurrence
 table while the other 2 (acetaminophen and warfarin) are based on
 concepts recorded in the drug exposure table. We can build these cohorts
 independently, one after the other. However, this approach will mean
-repeated 3 joins to the condition occurrence tables and 2 joins to the
-drug exposure table. To make this less computationally expensive, we
-could instead create the cohorts by domain. In this case we will instead
-make one join with the condition occurrence table and one to the drug
-exposure.</p>
+repeating 3 joins to the condition occurrence tables and 2 joins to the
+drug exposure table (with the concepts in the concept sets). To make
+this less computationally expensive, we could instead create the cohorts
+by domain. In this case we will instead make one join with the condition
+occurrence table and one to the drug exposure (using all the concept
+sets together).</p>
 <p><img src="images/cohort_by_domain.png"></p>
 </div>
 <div class="section level2">
@@ -115,7 +116,7 @@ different inclusion criteria are each applied.</p>
 <p><img src="images/combined_cohort.png"></p>
 </div>
 <div class="section level2">
-<h2 id="considerations-when-building-cohort-pipelines">Considerations when building cohort pipelines<a class="anchor" aria-label="anchor" href="#considerations-when-building-cohort-pipelines"></a>
+<h2 id="considerations-when-building-cohorts">Considerations when building cohorts<a class="anchor" aria-label="anchor" href="#considerations-when-building-cohorts"></a>
 </h2>
 <p>CohortConstructor provides a means of building cohorts via a
 pipeline, with cohorts created through the application of a sequence of
