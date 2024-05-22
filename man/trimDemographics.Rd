@@ -17,8 +17,9 @@ trimDemographics(
 \arguments{
 \item{cohort}{A cohort table in a cdm reference.}
 
-\item{cohortId}{Vector of cohort definition ids to include. If NULL, all
-cohort definition ids will be used.}
+\item{cohortId}{IDs of the cohorts to modify. If NULL, all cohorts will be
+used; otherwise, only the specified cohorts will be modified, and the
+rest will remain unchanged.}
 
 \item{ageRange}{A list of minimum and maximum age.}
 
@@ -45,5 +46,5 @@ library(CohortConstructor)
 
 cdm <- mockCohortConstructor(nPerson = 100)
 
-cdm$cohort1 |> trimDemographics(sex = "Male")
+cdm$cohort1 |> trimDemographics(ageRange = list(c(10, 30)))
 }

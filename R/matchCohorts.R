@@ -3,9 +3,8 @@
 #' same year of birth (matchYearOfBirth = TRUE) and same sex (matchSex = TRUE).
 #'
 #' @param cohort A cohort table in a cdm reference.
-#' @param cohortId Cohort definition id to match from the target cohort.
-#' If NULL all the cohort definition id present in the target cohort will be
-#' matched.
+#' @param cohortId IDs of the cohorts to include. If NULL all cohorts will be
+#' considered. Cohorts not included will be removed from the cohort set.
 #' @param matchSex Whether to match in sex.
 #' @param matchYearOfBirth Whether to match in year of birth.
 #' @param ratio Number of allowed matches per individual in the target cohort.

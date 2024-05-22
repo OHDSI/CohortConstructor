@@ -2,8 +2,8 @@
 #'
 #' @param cohort A cohort table in a cdm reference.
 #' @param strata A strata list that point to columns in cohort table.
-#' @param cohortId Vector of cohort definition ids to include. If NULL, all
-#' cohort definition ids will be used.
+#' @param cohortId IDs of the cohorts to include. If NULL all cohorts will be
+#' considered. Cohorts not included will be removed from the cohort set.
 #' @param removeStrata Whether to remove strata columns from final cohort table.
 #' @param name Name of the new cohort.
 #'
@@ -121,6 +121,18 @@ stratifyCohorts <- function(cohort,
   }
   newAttrition <- getNewAttritionStrata(attrition(cohort), newSettings, counts)
   newSettings <- newSettings |> dplyr::bind_rows()
+  ## codelist
+  codelist <- attr(cohort, "cohort_codelist")
+  newCodelist <- cdm[[nm]] |>
+    dplyr::select(c("cohort_definition_id", "target_cohort_id")) |>
+    dplyr::inner_join(
+      codelist |>
+        dplyr::rename("target_cohort_id" = "cohort_definition_id"),
+      by = "target_cohort_id",
+      relationship = "many-to-many"
+    ) |>
+    dplyr::select(!"target_cohort_id")
+
   newCohort <- purrr::reduce(newCohort, dplyr::union_all) |>
     dplyr::select(!dplyr::all_of(c(
       "target_cohort_id", strataCols[removeStrata]
@@ -129,7 +141,7 @@ stratifyCohorts <- function(cohort,
     omopgenerics::newCohortTable(
       cohortSetRef = newSettings,
       cohortAttritionRef = newAttrition,
-      cohortCodelistRef = NULL,
+      cohortCodelistRef = newCodelist,
       .softValidation = TRUE
     )
 

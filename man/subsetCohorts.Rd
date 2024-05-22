@@ -9,8 +9,8 @@ subsetCohorts(cohort, cohortId, name = tableName(cohort))
 \arguments{
 \item{cohort}{A cohort table in a cdm reference.}
 
-\item{cohortId}{Vector of cohort definition ids to include. If NULL all
-cohort will be selected.}
+\item{cohortId}{IDs of the cohorts to include. If NULL all cohorts will be
+considered. Cohorts not included will be removed from the cohort set.}
 
 \item{name}{Name of the new cohort with the demographic requirements.}
 }

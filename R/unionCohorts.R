@@ -1,8 +1,8 @@
 #' Generate cohort from the union of different cohorts
 #'
 #' @param cohort A cohort table in a cdm reference.
-#' @param cohortId Vector of cohort definition ids to include. If NULL, all
-#' cohort definition ids will be used.
+#' @param cohortId IDs of the cohorts to include. If NULL all cohorts will be
+#' considered. Cohorts not included will be removed from the cohort set.
 #' @param gap Number of days between two subsequent cohort entries of a subject
 #' that will be merged in a single cohort entry
 #' @param cohortName Name of the returned cohort. If NULL, the cohort name will

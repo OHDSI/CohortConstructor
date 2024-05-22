@@ -59,9 +59,9 @@ test_that("simple duckdb checks", {
 
   id <- settings(cdm$cohort2) |>
     dplyr::filter(
-      require_sex == "Both" & require_min_age == 40 & require_max_age == 59 &
-        require_min_prior_observation == 0 &
-        require_min_future_observation == 0 &
+      sex == "Both" & age_range == "40_59" &
+        min_prior_observation == 0 &
+        min_future_observation == 0 &
         grepl("cohort_1", cohort_name)
     ) |>
     dplyr::pull("cohort_definition_id")
@@ -80,9 +80,9 @@ test_that("simple duckdb checks", {
   )
   id <- settings(cdm$cohort2) |>
     dplyr::filter(
-      require_sex == "Both" & require_min_age == 40 & require_max_age == 59 &
-        require_min_prior_observation == 0 &
-        require_min_future_observation == 365 &
+      sex == "Both" & age_range == "40_59" &
+        min_prior_observation == 0 &
+        min_future_observation == 365 &
         grepl("cohort_1", cohort_name)
     ) |>
     dplyr::pull("cohort_definition_id")
@@ -148,9 +148,9 @@ test_that("simple duckdb checks", {
   # check few examples ----
   id <- settings(cdm$obs1) |>
     dplyr::filter(
-      require_sex == "Both" & require_min_age == 0 & require_max_age == 19 &
-        require_min_prior_observation == 0 &
-        require_min_future_observation == 0
+      sex == "Both" & age_range == "0_19" &
+        min_prior_observation == 0 &
+        min_future_observation == 0
     ) |>
     dplyr::pull("cohort_definition_id")
   x <- collectCohort(cdm$obs1, id)
@@ -164,9 +164,9 @@ test_that("simple duckdb checks", {
   )
   id <- settings(cdm$obs1) |>
     dplyr::filter(
-      require_sex == "Both" & require_min_age == 0 & require_max_age == 19 &
-        require_min_prior_observation == 365 &
-        require_min_future_observation == 0
+      sex == "Both" & age_range == "0_19" &
+        min_prior_observation == 365 &
+        min_future_observation == 0
     ) |>
     dplyr::pull("cohort_definition_id")
   x <- collectCohort(cdm$obs1, id)
@@ -193,13 +193,12 @@ test_that("simple duckdb checks", {
   for (val in values) {
     id1 <- settings(cdm$obs1) |>
       dplyr::filter(
-        require_sex == val & require_min_age == 0 &
-          is.infinite(require_max_age) & require_min_prior_observation == 0 &
-          require_min_future_observation == 0
+        sex == val & age_range == "0_Inf" & min_prior_observation == 0 &
+          min_future_observation == 0
       ) |>
       dplyr::pull(cohort_definition_id)
     id2 <- settings(cdm$obs2) |>
-      dplyr::filter(require_sex == val) |>
+      dplyr::filter(sex == val) |>
       dplyr::pull(cohort_definition_id)
     expect_true(compareCohort(cdm$obs1, id1, cdm$obs2, id2))
   }
@@ -215,19 +214,17 @@ test_that("simple duckdb checks", {
       )
   )
   expect_true(cdm$obs3 |> settings() |> nrow() == 6)
-  valmin <- c(0, 0, 20, 40, 60, 80)
-  valmax <- c(Inf, 19, 39, 59, 79, Inf)
-  for (k in seq_along(valmin)) {
+  val = c("0_Inf", "0_19", "20_39", "40_59", "60_79", "80_Inf")
+  for (k in seq_along(val)) {
     id1 <- settings(cdm$obs1) |>
       dplyr::filter(
-        require_sex == "Both" & require_min_age == valmin[k] &
-          require_max_age == valmax[k] & require_min_prior_observation == 0 &
-          require_min_future_observation == 0
+        sex == "Both" & age_range == val[k] & min_prior_observation == 0 &
+          min_future_observation == 0
       ) |>
       dplyr::pull(cohort_definition_id)
     id2 <- settings(cdm$obs3) |>
       dplyr::filter(
-        require_min_age == valmin[k] & require_max_age == valmax[k]
+        age_range == val[k]
       ) |>
       dplyr::pull(cohort_definition_id)
     expect_true(compareCohort(cdm$obs1, id1, cdm$obs3, id2))
@@ -246,13 +243,12 @@ test_that("simple duckdb checks", {
   for (val in values) {
     id1 <- settings(cdm$obs1) |>
       dplyr::filter(
-        require_sex == "Both" & require_min_age == 0 &
-          require_max_age == Inf & require_min_prior_observation == val &
-          require_min_future_observation == 0
+        sex == "Both" & age_range == "0_Inf" & min_prior_observation == val &
+          min_future_observation == 0
       ) |>
       dplyr::pull(cohort_definition_id)
     id2 <- settings(cdm$obs4) |>
-      dplyr::filter(require_min_prior_observation == val) |>
+      dplyr::filter(min_prior_observation == val) |>
       dplyr::pull(cohort_definition_id)
     expect_true(compareCohort(cdm$obs1, id1, cdm$obs4, id2))
   }
@@ -270,13 +266,12 @@ test_that("simple duckdb checks", {
   for (val in values) {
     id1 <- settings(cdm$obs1) |>
       dplyr::filter(
-          require_sex == "Both" & require_min_age == 0 &
-          require_max_age == Inf & require_min_prior_observation == 0 &
-          require_min_future_observation == val
+        sex == "Both" & age_range == "0_Inf" & min_prior_observation == 0 &
+          min_future_observation == val
       ) |>
       dplyr::pull(cohort_definition_id)
     id2 <- settings(cdm$obs5) |>
-      dplyr::filter(require_min_future_observation == val) |>
+      dplyr::filter(min_future_observation == val) |>
       dplyr::pull(cohort_definition_id)
     expect_true(compareCohort(cdm$obs1, id1, cdm$obs5, id2))
   }
@@ -291,7 +286,7 @@ test_that("simple duckdb checks", {
       )
   )
   id <- settings(cdm$obs_new) |>
-    dplyr::filter(require_min_prior_observation == 0) |>
+    dplyr::filter(min_prior_observation == 0) |>
     dplyr::pull("cohort_definition_id")
   x <- collectCohort(cdm$obs_new, id)
   expect_identical(
@@ -303,7 +298,7 @@ test_that("simple duckdb checks", {
     )
   )
   id <- settings(cdm$obs_new) |>
-    dplyr::filter(require_min_prior_observation == 1825) |>
+    dplyr::filter(min_prior_observation == 1825) |>
     dplyr::pull("cohort_definition_id")
   x <- collectCohort(cdm$obs_new, id)
   expect_identical(
@@ -315,7 +310,7 @@ test_that("simple duckdb checks", {
     )
   )
   id <- settings(cdm$obs_new) |>
-    dplyr::filter(require_min_prior_observation == 3000) |>
+    dplyr::filter(min_prior_observation == 3000) |>
     dplyr::pull("cohort_definition_id")
   x <- collectCohort(cdm$obs_new, id)
   expect_identical(
@@ -325,5 +320,70 @@ test_that("simple duckdb checks", {
       "cohort_start_date" = as.Date(c("2001-07-06")),
       "cohort_end_date" = as.Date(c("2013-04-18"))
     )
+  )
+})
+
+test_that("cohort Id, name, additional columns", {
+  cdm <- mockCohortConstructor(nPerson = 5)
+  cdm$cohort2 <- cdm$cohort2 |>
+    dplyr::mutate(
+      col_extra1 = as.numeric(subject_id) + 1,
+      col_extra2 = as.numeric(subject_id) + 2
+    ) |>
+    dplyr::compute(name = "cohort2", temporary = FALSE)
+
+  cdm$cohort3 <- trimDemographics(cohort = cdm$cohort2,
+                                  cohortId = 1,
+                                  ageRange = NULL,
+                                  sex = "Male",
+                                  minPriorObservation = c(0, 400),
+                                  minFutureObservation = NULL,
+                                  name = "cohort3")
+  expect_true(all(colnames(cdm$cohort3) == c(
+    "cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date", "col_extra1", "col_extra2"
+  )))
+  expect_true(compareCohort(cdm$cohort2, 2, cdm$cohort3, 2))
+  x1 <- collectCohort(cdm$cohort3, 1)
+  x3 <- collectCohort(cdm$cohort3, 3)
+  expect_equal(
+    x1,
+    dplyr::tibble(
+      subject_id = c(1, 1, 2, 3, 5),
+      cohort_start_date = as.Date(c("2001-04-03", "2002-05-07", "1999-07-26", "2015-02-19", "2012-06-12")),
+      cohort_end_date = as.Date(c("2002-05-06", "2005-11-07", "2002-09-17", "2015-06-27", "2012-09-09"))
+    )
+  )
+  expect_equal(
+    x3,
+    dplyr::tibble(
+      subject_id = c(1, 1, 2),
+      cohort_start_date = as.Date(c("2001-07-08", "2002-05-07", "2000-05-09")),
+      cohort_end_date = as.Date(c("2002-05-06", "2005-11-07", "2002-09-17"))
+    )
+  )
+  expect_true(all(
+    attrition(cdm$cohort3)$reason ==
+      c('Initial qualifying events', 'Sex requirement: Male',
+        'Prior observation requirement: 0 days', 'Initial qualifying events',
+        'Initial qualifying events', 'Sex requirement: Male',
+        'Prior observation requirement: 400 days')
+  ))
+  expect_equal(
+    settings(cdm$cohort3),
+    dplyr::tibble(
+      cohort_definition_id = 1:3,
+      cohort_name = c("cohort_1_1", "cohort_2", "cohort_1_2"),
+      sex = c("Male", "Both", "Male"),
+      min_prior_observation = c(0, 0, 400)
+    )
+  )
+
+  expect_no_error(
+    cohort <- trimDemographics(cohort = cdm$cohort2,
+                               cohortId = 1,
+                               ageRange = NULL,
+                               sex = "Male",
+                               minPriorObservation = c(0, 400),
+                               minFutureObservation = NULL)
   )
 })
