@@ -1,6 +1,6 @@
 Package: CohortConstructor
 Title: Work With Cohorts Using a Common Data Model
-Version: 0.0.1
+Version: 0.1.0
 Authors@R: c(
     person("Edward", "Burn", , "edward.burn@ndorms.ox.ac.uk", 
     role = c("aut", "cre"), comment = c(ORCID = "0000-0002-9286-1128")),
@@ -14,8 +14,8 @@ Authors@R: c(
     role = c("aut"), comment = c(ORCID = "0000-0002-9517-8834")),
     person("Yuchen", "Guo", email = "yuchen.guo@ndorms.ox.ac.uk", 
     role = c("aut"), comment = c(ORCID = "0000-0002-0847-4855")))
-Description: This package aims to provide functionalities to manipulate
-    and evaluate cohorts in data mapped to the Observational Medical 
+Description: This package aims to provide functionalities to create
+    and manipulate cohorts in data mapped to the Observational Medical 
     Outcomes Partnership Common Data Model.
 License: Apache License (>= 2)
 Encoding: UTF-8
