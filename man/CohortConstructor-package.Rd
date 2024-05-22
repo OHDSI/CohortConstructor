@@ -6,7 +6,7 @@
 \alias{CohortConstructor-package}
 \title{CohortConstructor: Work With Cohorts Using a Common Data Model}
 \description{
-This package aims to provide functionalities to manipulate and evaluate cohorts in data mapped to the Observational Medical Outcomes Partnership Common Data Model.
+This package aims to provide functionalities to create and manipulate cohorts in data mapped to the Observational Medical Outcomes Partnership Common Data Model.
 }
 \seealso{
 Useful links:

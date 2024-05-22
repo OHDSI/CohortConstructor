@@ -2,10 +2,10 @@
 title: "Building base cohorts"
 output: rmarkdown::html_vignette
 vignette: >
-%\VignetteIndexEntry{a01_building_concept_cohorts}
+  %\VignetteIndexEntry{a01_building_concept_cohorts}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-  ---
+---
   
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
@@ -24,23 +24,63 @@ downloadEunomiaData()
 }
 ```
 
+## Introduction 
+
+Let's first create a cdm reference to the Eunomia synthetic data.
+
 ```{r}
 library(CDMConnector)
 library(CodelistGenerator)
+library(PatientProfiles)
 library(CohortConstructor)
+library(dplyr)
 
-con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomia_dir())
+con <- DBI::dbConnect(duckdb::duckdb(), 
+                      dbdir = eunomia_dir())
 cdm <- cdm_from_con(con, cdm_schema = "main", 
                     write_schema = c(prefix = "my_study_", schema = "main"))
+```
 
+## Demographic based cohort creation
+
+One base cohort we can create is based around patient demographics. Here for example we create a cohort where people enter on their 18th birthday and leave at age 65 or  
+
+```{r}
+cdm$working_age_cohort <- demographicsCohort(cdm = cdm, 
+                                             ageRange = c(18, 65), 
+                                             name = "working_age_cohort")
+
+settings(cdm$working_age_cohort)
+cohortCount(cdm$working_age_cohort)
+attrition(cdm$working_age_cohort)
+```
+
+
+```{r}
+cdm$working_age_cohort |> 
+  addAge(indexDate = "cohort_start_date") |> 
+  summarise(min_start_age = min(age), 
+            median_start_age = median(age), 
+            max_start_age = max(age))
+
+cdm$working_age_cohort |> 
+  addAge(indexDate = "cohort_end_date") |> 
+  summarise(min_start_age = min(age), 
+            median_start_age = median(age), 
+            max_start_age = max(age))
 ```
 
 ## Concept based cohort creation
 
 ```{r}
 drug_codes <- getDrugIngredientCodes(cdm, 
-                                     name = c("diclofenac", "acetaminophen"))
+                                     name = c("diclofenac", 
+                                              "acetaminophen"))
 
+drug_codes
+```
+
+```{r}
 cdm$medications <- conceptCohort(cdm = cdm, 
                                  conceptSet = drug_codes, 
                                  name = "medications")
@@ -53,13 +93,4 @@ cohortCount(cdm$medications)
 
 TO DO
 
-## Demographic based cohort creation
-```{r}
-cdm$working_age_cohort <- demographicsCohort(cdm = cdm, 
-                                             ageRange = c(18, 65), 
-                                             name = "working_age_cohort")
 
-settings(cdm$working_age_cohort)
-cohortCount(cdm$working_age_cohort)
-attrition(cdm$working_age_cohort)
-```
