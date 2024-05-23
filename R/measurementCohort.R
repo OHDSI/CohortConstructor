@@ -137,7 +137,7 @@ measurementCohort <- function(cdm,
 
     if (length(matching_ids) > 0) {
       cli::cli_inform(c(
-        "These value_as_concept_id don't exist in the cohort defined:",
+        "i" = "These valueAsConcept don't exist for the input measurement concepts:",
         paste(matching_ids, collapse = ", ")
       ))
     }
@@ -151,7 +151,7 @@ measurementCohort <- function(cdm,
 
     if (length(matching_ids) > 0) {
       cli::cli_inform(c(
-        "These unit_concept_id don't exist in the cohort defined:",
+        "i" = "These unit concepts don't exist for the input measurement concepts:",
         paste(matching_ids, collapse = ", ")
       ))
     }
