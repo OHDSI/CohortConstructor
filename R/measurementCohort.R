@@ -131,7 +131,7 @@ measurementCohort <- function(cdm,
     dplyr::filter(!is.na(.data$cohort_start_date))
 
   if (!is.null(valueAsConcept)) {
-    value <- cohort |> dplyr::pull(value_as_concept_id) |> unique()
+    value <- cohort |> dplyr::pull("value_as_concept_id") |> unique()
     matches <- valueAsConcept %in% value
     matching_ids <- valueAsConcept[!matches]
 
@@ -144,7 +144,7 @@ measurementCohort <- function(cdm,
   }
 
   if (!is.null(valueAsNumber)) {
-    unit <- cohort |> dplyr::pull(unit_concept_id) |> unique()
+    unit <- cohort |> dplyr::pull("unit_concept_id") |> unique()
     matches <-
       as.numeric(names(valueAsNumber)) %in% as.numeric(unit)
     matching_ids <- valueAsNumber[!matches]
