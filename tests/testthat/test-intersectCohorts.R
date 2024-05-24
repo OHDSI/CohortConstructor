@@ -84,13 +84,11 @@ test_that("splitOverlap", {
     pid = c(1, 1, 1, 1, 1, 2, 2, 2),
     def_id = c(1, 1, 1, 2, 2, 1, 2, 1)
   )
-  cdm <- mockCohortConstructor(otherTables = list(x = x), con = connection(), schema = writeSchema())
-  DBI::dbWriteTable(db, "x", x)
-  x <- dplyr::tbl(db, "x")
+  cdm <- mockCohortConstructor(otherTables = list(x = x), con = connection(), writeSchema = writeSchema())
 
   expect_no_error(
     res <- splitOverlap(
-      x, start = "start_date", end = "end_date", by = c("pid", "def_id")
+      cdm$x, start = "start_date", end = "end_date", by = c("pid", "def_id")
     ) |>
       dplyr::collect() |>
       dplyr::arrange(.data$pid, .data$def_id, .data$start_date)
@@ -114,7 +112,7 @@ test_that("splitOverlap", {
     )
   )
 
-  DBI::dbDisconnect(db, shutdown = TRUE)
+  CDMConnector::cdm_disconnect(cdm)
 })
 
 test_that("intersectCohorts", {
