@@ -88,7 +88,7 @@ test_that("simple example", {
   expect_error(cdm$cohort |> collapseCohorts(gap = NA))
   expect_error(cdm$cohort |> collapseCohorts(gap = NULL))
 
-  CDMConnector::cdm_disconnect(cdm)
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("out of observation", {
@@ -174,6 +174,6 @@ test_that("out of observation", {
     omopgenerics::tableSource(newCohort), omopgenerics::tableSource(cohort)
   )
 
-  CDMConnector::cdm_disconnect(cdm)
+  PatientProfiles::mockDisconnect(cdm)
 })
 

@@ -91,7 +91,7 @@ test_that("requiring presence in another table", {
                               window = c(-Inf, Inf))
   )
 
-  CDMConnector::cdm_disconnect(cdm)
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("requiring absence in another table", {
@@ -171,5 +171,5 @@ test_that("requiring absence in another table", {
                  "Not in table table between 0 & Inf days relative to cohort_start_date",
                  "Initial qualifying events"))
 
-  CDMConnector::cdm_disconnect(cdm)
+  PatientProfiles::mockDisconnect(cdm)
 })

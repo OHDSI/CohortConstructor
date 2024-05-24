@@ -102,7 +102,7 @@ test_that("require flag in concept", {
                                window = c(-Inf, Inf))
  )
 
-  CDMConnector::cdm_disconnect(cdm)
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("requiring absence in another cohort", {
@@ -182,5 +182,5 @@ test_that("requiring absence in another cohort", {
                       "Initial qualifying events"
                     )))
 
-  CDMConnector::cdm_disconnect(cdm)
+  PatientProfiles::mockDisconnect(cdm)
 })

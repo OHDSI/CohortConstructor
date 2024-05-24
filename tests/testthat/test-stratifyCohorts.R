@@ -88,5 +88,5 @@ test_that("simple stratification", {
   # no column in the cohort
   expect_error(cdm$new_cohort <- stratifyCohorts(cdm$cohort1, strata = list("not_a_column")))
 
-  CDMConnector::cdm_disconnect(cdm)
+  PatientProfiles::mockDisconnect(cdm)
 })

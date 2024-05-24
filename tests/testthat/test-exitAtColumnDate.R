@@ -52,7 +52,7 @@ test_that("exit at first date", {
   expect_true(all(colnames(cdm$cohort) ==
                     c("cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date")))
 
-  CDMConnector::cdm_disconnect(cdm)
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("exit at last date", {
@@ -106,7 +106,7 @@ test_that("exit at last date", {
                     c("cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date", "exit_reason")))
   expect_true(all(cdm$cohort %>% dplyr::pull("exit_reason") %in% c("other_date_1", "other_date_2")))
 
-  CDMConnector::cdm_disconnect(cdm)
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("expected errors", {
@@ -135,6 +135,9 @@ test_that("expected errors", {
                    dateColumns = c("other_date_1", "other_date_2"),
                    returnReason = TRUE
                  ))
+
+  PatientProfiles::mockDisconnect(cdm)
+
   # outside observation
   cdm <- mockCohortConstructor(tables = list(
     "cohort" = dplyr::tibble(
@@ -153,6 +156,7 @@ test_that("expected errors", {
                    dateColumns = c("other_date_1", "other_date_2"),
                    returnReason = TRUE
                  ))
+  PatientProfiles::mockDisconnect(cdm)
   # start > end
   cdm <- mockCohortConstructor(tables = list(
     "cohort" = dplyr::tibble(
@@ -171,4 +175,5 @@ test_that("expected errors", {
                    dateColumns = c("other_date_1", "other_date_2"),
                    returnReason = TRUE
                  ))
+  PatientProfiles::mockDisconnect(cdm)
 })

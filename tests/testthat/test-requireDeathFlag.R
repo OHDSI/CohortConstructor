@@ -70,7 +70,7 @@ test_that("requiring death", {
                       "Initial qualifying events",
                       "Death between 0 & Inf days relative to cohort_start_date")))
 
-  CDMConnector::cdm_disconnect(cdm)
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("not death", {
@@ -114,5 +114,5 @@ test_that("not death", {
                     c("Initial qualifying events", "Alive between 0 & Inf days relative to cohort_start_date",
                       "Initial qualifying events")))
 
-  CDMConnector::cdm_disconnect(cdm)
+  PatientProfiles::mockDisconnect(cdm)
 })

@@ -41,6 +41,8 @@ test_that("subsetCohort works", {
   ))
   expect_equal(attrition(cohort) |> dplyr::filter(.data$cohort_definition_id %in% 3:5),
                attrition(cdm$cohort1))
+
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("codelist works", {
@@ -87,6 +89,8 @@ test_that("codelist works", {
   cdm$cohort1 <- subsetCohorts(cdm$cohort1, 2)
   expect_equal(attr(cdm$cohort1, "cohort_codelist") |> dplyr::collect(),
                attr(cohort, "cohort_codelist") |> dplyr::filter(cohort_definition_id == 2) |> dplyr::collect())
+
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("Expected behaviour", {
@@ -103,4 +107,6 @@ test_that("Expected behaviour", {
   expect_error(cdm$cohort2 <- subsetCohorts(cdm$cohort1, 10, "cohort2"))
   expect_no_error(cohort <- subsetCohorts(cdm$cohort1, NULL))
   expect_identical(cohort, cdm$cohort1)
+
+  PatientProfiles::mockDisconnect(cdm)
 })

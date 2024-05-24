@@ -10,7 +10,6 @@ test_that("getIdentifier", {
 })
 
 test_that("joinOverlap", {
-
   x <- dplyr::tibble(
     start_date = as.Date(c(
       "2020-01-01", "2020-03-01", "2020-06-01", "2020-02-01", "2020-05-02",
@@ -69,6 +68,8 @@ test_that("joinOverlap", {
       ))
     )
   )
+
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("splitOverlap", {
@@ -112,7 +113,7 @@ test_that("splitOverlap", {
     )
   )
 
-  CDMConnector::cdm_disconnect(cdm)
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("intersectCohorts", {
@@ -210,7 +211,7 @@ test_that("intersectCohorts", {
   # all cohorts
   expect_no_error(cohort <- cdm$cohort1 |> intersectCohorts())
 
-  CDMConnector::cdmDisconnect(cdm)
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("only return comb", {
@@ -319,6 +320,8 @@ test_that("only return comb", {
   expect_true(all(omopgenerics::settings(cdm$cohort4)$cohort_2 == c(1, 1, 0, 1)))
   expect_true(all(omopgenerics::settings(cdm$cohort4)$cohort_3 == c(0, 1, 1, 1)))
   expect_true(all(omopgenerics::settings(cdm$cohort4)$mutually_exclusive))
+
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("attrition and cohortId", {
@@ -357,6 +360,8 @@ test_that("attrition and cohortId", {
   expect_true(all(omopgenerics::attrition(cdm$cohort1)$excluded_subjects ==
                     c(0, 0, 0, 2, 0, 0, 0, 0, 0, 2, 0, 0, 0)))
   expect_true(all(omopgenerics::settings(cdm$cohort1)$cohort_name == c("cohort_1", "cohort_2", "cohort_1_cohort_2")))
+
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("codelist", {
@@ -462,4 +467,6 @@ test_that("codelist", {
   expect_true(all(codes |> dplyr::pull("concept_id") |> sort() == c(rep(1, 4), rep(2, 4), rep(3, 4))))
   expect_true(all(codes |> dplyr::pull("type") |> sort() == rep("index event", 12)))
   expect_true(all(codes |> dplyr::pull("cohort_definition_id") |> sort() == c(2, 2, 3, 3, 4, 5, 6, 6, 6, 7, 7, 7)))
+
+  PatientProfiles::mockDisconnect(cdm)
 })

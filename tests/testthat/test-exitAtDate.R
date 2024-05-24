@@ -29,6 +29,7 @@ test_that("exit at observation end", {
   expect_error(cdm$cohort |> exitAtObservationEnd(name = 1))
   expect_error(cdm$cohort |> exitAtObservationEnd(cohortId = "HI"))
   expect_error(cdm$person |> exitAtObservationEnd())
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("exit at death date", {
@@ -82,4 +83,6 @@ test_that("exit at death date", {
   expect_error(cdm$cohort |> exitAtDeath(cohortId = "HI"))
   expect_error(cdm$person |> exitAtDeath())
   expect_error(cdm$person |> exitAtDeath(requireDeath = 1))
+
+  PatientProfiles::mockDisconnect(cdm)
 })

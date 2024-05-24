@@ -134,7 +134,7 @@ test_that("requiring presence in another cohort", {
                                           targetCohortTable = c("not_a_cohort", "lala"),
                                           targetCohortId = 1,
                                           window = c(-Inf, Inf)))
-  CDMConnector::cdm_disconnect(cdm)
+  PatientProfiles::mockDisconnect(cdm)
 
 })
 
@@ -170,5 +170,5 @@ test_that("requiring absence in another cohort", {
                       "Initial qualifying events",
                       "Not in cohort cohort_1 between -Inf & Inf days relative to cohort_start_date")))
 
-  CDMConnector::cdm_disconnect(cdm)
+  PatientProfiles::mockDisconnect(cdm)
 })

@@ -48,7 +48,7 @@ test_that("entry at first date", {
   expect_true(all(colnames(cdm$cohort) ==
                     c("cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date")))
 
-  CDMConnector::cdm_disconnect(cdm)
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("entry at last date", {
@@ -105,5 +105,5 @@ test_that("entry at last date", {
   expect_true(all(colnames(cdm$cohort) ==
                     c("cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date")))
 
-  CDMConnector::cdm_disconnect(cdm)
+  PatientProfiles::mockDisconnect(cdm)
 })

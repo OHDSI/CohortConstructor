@@ -114,7 +114,7 @@ test_that("yearCohorts - change name", {
                              name = "cohort1")
   expect_equal(cdm$cohort1 |> dplyr::collect(), cdm$cohort |> dplyr::collect())
 
-  CDMConnector::cdm_disconnect(cdm)
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 
@@ -187,5 +187,5 @@ test_that("yearCohorts - keep name", {
   )))
   expect_true(all(cohortCount(cdm$cohort)$number_records == c(1, 0, 0, 0)))
 
-  CDMConnector::cdm_disconnect(cdm)
+  PatientProfiles::mockDisconnect(cdm)
 })

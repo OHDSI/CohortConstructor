@@ -94,7 +94,7 @@ test_that("requireDateRange", {
       requireInDateRange(dateRange = as.Date(c("2011-01-01", "2010-01-01")))
   )
 
-  CDMConnector::cdm_disconnect(cdm)
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("trim cohort dates", {
@@ -161,5 +161,5 @@ test_that("trim cohort dates", {
                     name = "cohort6")
   expect_equal(cdm$cohort6 |> dplyr::collect(), cdm$cohort2 |> dplyr::collect())
 
-  CDMConnector::cdm_disconnect(cdm)
+  PatientProfiles::mockDisconnect(cdm)
 })

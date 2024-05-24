@@ -17,14 +17,14 @@ compareCohort <- function(cohort1, id1, cohort2, id2) {
   return(invisible(TRUE))
 }
 
-writeSchema <- function(dbToTest = Sys.getenv("DB_TO_TEST", "duckdb")) {
+writeSchema <- function(dbToTest = Sys.getenv("DB_TO_TEST", "sql server")) {
   switch(dbToTest,
          "duckdb" = c(schema = "main", prefix = "test_"),
-         "sql server" = Sys.getenv("CDM5_SQL_SERVER_OHDSI_SCHEMA"),
+         "sql server" = c(catalog = "ohdsi", schema = "dbo", prefix = "coco_"),
          "redshift" = Sys.getenv("CDM5_REDSHIFT_SCRATCH_SCHEMA")
   )
 }
-connection <- function(dbToTest = Sys.getenv("DB_TO_TEST", "duckdb")) {
+connection <- function(dbToTest = Sys.getenv("DB_TO_TEST", "sql server")) {
   switch(dbToTest,
          "duckdb" = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
          "sql server" = DBI::dbConnect(

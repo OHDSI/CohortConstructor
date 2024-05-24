@@ -178,7 +178,7 @@ test_that("mearurementCohorts works", {
   codes <- attr(cdm$cohort9, "cohort_codelist") |> dplyr::collect()
   expect_true(nrow(codes) == 0)
 
-  CDMConnector::cdm_disconnect(cdm)
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("expected errors", {

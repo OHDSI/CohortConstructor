@@ -117,6 +117,7 @@ test_that("simple example", {
     )
   )
 
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("simple example duckdb", {
@@ -184,7 +185,7 @@ test_that("simple example duckdb", {
     )
   )
 
-  CDMConnector::cdmDisconnect(cdm = cdm)
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 
@@ -231,7 +232,7 @@ test_that("excluded concepts in codelist", {
   expect_no_error(cohort <- conceptCohort(cdm = cdm, conceptSet = list(a = 2:3), name = "cohort2"))
   expect_true(all(attr(cohort, "cohort_codelist") |> dplyr::pull("concept_id") |> sort() == 2:3))
 
-  CDMConnector::cdmDisconnect(cdm = cdm)
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("out of observation", {
@@ -311,6 +312,8 @@ test_that("out of observation", {
   expect_true(cohortCodelist(cdm$cohort2, 1)$a == 1)
   expect_true(cohortCodelist(cdm$cohort2, 2)$b == 2)
 
+  PatientProfiles::mockDisconnect(cdm)
+
   # start date > end date (subject 1)
   # overlapping and out of observation (subject 2)
   # out of observation (subject 3)
@@ -353,7 +356,7 @@ test_that("out of observation", {
   expect_true(cdm$cohort4 |> dplyr::pull("subject_id") |> sort() == 4)
   expect_true(cdm$cohort4 |> dplyr::pull("cohort_start_date") == "1999-01-01")
 
-  CDMConnector::cdmDisconnect(cdm = cdm)
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("table not present in the cdm", {
@@ -400,5 +403,5 @@ test_that("table not present in the cdm", {
                       "2020-01-11", "2024-02-09", "2024-02-09", "2024-02-09", "2024-12-05",
                       "2024-12-05", "2024-12-05", "2024-12-08", "2024-12-08", "2024-12-08")))
 
-  CDMConnector::cdm_disconnect(cdm)
+  PatientProfiles::mockDisconnect(cdm)
 })
