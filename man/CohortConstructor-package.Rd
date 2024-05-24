@@ -6,6 +6,8 @@
 \alias{CohortConstructor-package}
 \title{CohortConstructor: Work With Cohorts Using a Common Data Model}
 \description{
+\if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
+
 This package aims to provide functionalities to create and manipulate cohorts in data mapped to the Observational Medical Outcomes Partnership Common Data Model.
 }
 \seealso{
