@@ -1,5 +1,3 @@
-
-
 #' Function to create a mock cdm reference for CohortConstructor
 #'
 #' @param nPerson number of person in the cdm
@@ -12,7 +10,9 @@
 #' @param measurement T/F include measurement in the cdm
 #' @param death T/F include death table in the cdm
 #' @param otherTables it takes a list of single tibble with names to include other tables in the cdm
-#' @param con db connection detail for copy to databases
+#' @param con A DBI connection to create the cdm mock object.
+#' @param writeSchema Name of an schema on the same connection with writing
+#' permisions.
 #'
 #' @return cdm object
 #' @export
@@ -34,7 +34,8 @@ mockCohortConstructor <- function(nPerson = 10,
                                   measurement = FALSE,
                                   death = FALSE,
                                   otherTables = NULL,
-                                  con = DBI::dbConnect(duckdb::duckdb())) {
+                                  con = DBI::dbConnect(duckdb::duckdb()),
+                                  writeSchema = "main") {
 
 
   if (is.null(tables)) {
@@ -49,35 +50,33 @@ mockCohortConstructor <- function(nPerson = 10,
       omock::mockVocabularyTables(concept = conceptTable)
   }
 
-  if(!is.null(conceptIdClass) & !is.null(conceptId)){
+  if (!is.null(conceptIdClass) & !is.null(conceptId)) {
     cdm <- cdm |> omock::mockConcepts(conceptSet = conceptId, domain = conceptIdClass)
   }
 
-  if(drugExposure == T){
+  if (drugExposure) {
     cdm <- cdm |> omock::mockDrugExposure()
   }
 
-  if(conditionOccurrence == T){
+  if (conditionOccurrence) {
     cdm <- cdm |> omock::mockConditionOccurrence()
   }
 
-  if(death == T){
+  if (death) {
     cdm <- cdm |> omock::mockDeath()
   }
 
-  if(measurement == T){
+  if (measurement) {
     cdm <- cdm |> omock::mockMeasurement()
   }
 
-  if(!is.null(otherTables)){
-
+  if (!is.null(otherTables)) {
     cdm <- cdm |> omopgenerics::insertTable(name = names(otherTables), table = otherTables[[1]])
   }
 
-  if (!is.null(con)){
-    cdm <- CDMConnector::copyCdmTo(con = con, cdm = cdm, schema = "main")
+  if (!is.null(con)) {
+    cdm <- CDMConnector::copyCdmTo(con = con, cdm = cdm, schema = writeSchema)
   }
 
   return(cdm)
-
 }

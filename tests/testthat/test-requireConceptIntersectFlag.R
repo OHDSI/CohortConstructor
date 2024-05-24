@@ -25,9 +25,7 @@ test_that("require flag in concept", {
       "drug_exposure_start_date" = as.Date(.data$drug_exposure_start_date, origin = "2010-01-01"),
       "drug_exposure_end_date" = as.Date(.data$drug_exposure_end_date, origin = "2010-01-01")
     )
-  cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
-                                   cdm = cdm_local,
-                                   schema = "main")
+  cdm <- CDMConnector::copyCdmTo(con = connection(), cdm = cdm_local, schema = writeSchema())
   cdm$cohort3 <-  requireConceptIntersectFlag(cohort = cdm$cohort1,
                                               conceptSet = list(a = 1),
                                               window = c(-Inf, Inf),
@@ -134,9 +132,7 @@ test_that("requiring absence in another cohort", {
       "drug_exposure_start_date" = as.Date(.data$drug_exposure_start_date, origin = "2010-01-01"),
       "drug_exposure_end_date" = as.Date(.data$drug_exposure_end_date, origin = "2010-01-01")
     )
-  cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
-                                   cdm = cdm_local,
-                                   schema = "main")
+  cdm <- CDMConnector::copyCdmTo(con = connection(), cdm = cdm_local, schema = writeSchema())
 
   cdm$cohort3_inclusion <-  requireConceptIntersectFlag(cohort = cdm$cohort1,
                                                        conceptSet = list(a = 1),

@@ -8,7 +8,9 @@ test_that("entry at first date", {
       other_date_1 = as.Date(c("2001-08-01", "2001-01-01", "2015-01-15", NA, "2002-12-09")),
       other_date_2 = as.Date(c("2001-08-01", NA, "2015-04-15", "1990-11-09", "2002-12-09"))
     )
-  ))
+  ),
+  con = connection(),
+  writeSchema = writeSchema())
   # works
   cdm$cohort1 <- cdm$cohort |>
     entryAtFirstDate(
@@ -59,7 +61,9 @@ test_that("entry at last date", {
       other_date_1 = as.Date(c("2001-09-02", "2001-01-01", "2015-01-15", "1989-11-09", "2002-12-09")),
       other_date_2 = as.Date(c("2001-08-01", NA, "2015-02-15", "1990-11-09", "2002-12-09"))
     )
-  ))
+  ),
+  con = connection(),
+  writeSchema = writeSchema())
 
   # test cohort id working
   cdm$cohort1 <- cdm$cohort |>

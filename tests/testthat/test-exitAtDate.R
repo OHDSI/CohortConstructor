@@ -3,9 +3,7 @@ test_that("exit at observation end", {
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
     omock::mockCohort(name = c("cohort"), numberCohorts = 2)
-  cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
-                                   cdm = cdm_local,
-                                   schema = "main")
+  cdm <- CDMConnector::copyCdmTo(con = connection(), cdm = cdm_local, schema = writeSchema())
   # simple example - test it works
   cdm$cohort1 <- cdm$cohort |> exitAtObservationEnd(name = "cohort1")
   expect_true(all(cdm$cohort1 |> dplyr::pull(cohort_start_date) |> sort() ==
@@ -43,9 +41,7 @@ test_that("exit at death date", {
     death_date = as.Date(c("2013-06-29", "2003-06-15")),
     death_type_concept_id = NA
   )
-  cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
-                                   cdm = cdm_local,
-                                   schema = "main")
+  cdm <- CDMConnector::copyCdmTo(con = connection(), cdm = cdm_local, schema = writeSchema())
 
   # simple example - require death TRUE works
   cdm$cohort1 <- cdm$cohort |> exitAtDeath(requireDeath = TRUE, name = "cohort1")

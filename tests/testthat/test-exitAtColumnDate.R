@@ -8,7 +8,9 @@ test_that("exit at first date", {
       other_date_1 = as.Date(c("2001-08-01", "2001-01-01", "2015-01-15", NA, "2002-12-09")),
       other_date_2 = as.Date(c("2001-08-01", NA, "2015-04-15", "1990-13-09", "2002-12-09"))
     )
-  ))
+  ),
+  con = connection(),
+  writeSchema = writeSchema())
   # works
   cdm$cohort1 <- cdm$cohort |>
     exitAtFirstDate(
@@ -63,7 +65,9 @@ test_that("exit at last date", {
       other_date_1 = as.Date(c("2001-09-02", "2001-01-01", "2015-01-15", "2000-11-09", "2002-12-09")),
       other_date_2 = as.Date(c("2001-08-01", NA, "2015-04-15", "1990-13-09", "2002-12-10"))
     )
-  ))
+  ),
+  con = connection(),
+  writeSchema = writeSchema())
 
   # test cohort id working
   cdm$cohort1 <- cdm$cohort |>
@@ -116,7 +120,9 @@ test_that("expected errors", {
       other_date_1 = as.Date(c("2001-09-02", NA, "2015-01-15", "2000-11-09", "2002-12-09")),
       other_date_2 = as.Date(c("2001-08-01", NA, "2015-04-15", "2002-12-10", "2002-12-10"))
     )
-  ))
+  ),
+  con = connection(),
+  writeSchema = writeSchema())
   expect_error(cdm$cohort <- cdm$cohort |>
                  exitAtLastDate(
                    dateColumns = c("other_date_1", "other_date_2"),
@@ -139,7 +145,9 @@ test_that("expected errors", {
       other_date_1 = as.Date(c("2001-09-02", "2015-01-15", "2000-11-09", "2002-12-09")),
       other_date_2 = as.Date(c("2001-08-01", "2016-04-15", "2002-12-10", "2002-12-10"))
     )
-  ))
+  ),
+  con = connection(),
+  writeSchema = writeSchema())
   expect_error(cdm$cohort <- cdm$cohort |>
                  exitAtLastDate(
                    dateColumns = c("other_date_1", "other_date_2"),
@@ -155,7 +163,9 @@ test_that("expected errors", {
       other_date_1 = as.Date(c("2000-06-02", "2015-01-15", "2000-11-09")),
       other_date_2 = as.Date(c("2001-08-01", "2016-04-15", "2002-12-10"))
     )
-  ))
+  ),
+  con = connection(),
+  writeSchema = writeSchema())
   expect_error(cdm$cohort <- cdm$cohort |>
                  exitAtFirstDate(
                    dateColumns = c("other_date_1", "other_date_2"),

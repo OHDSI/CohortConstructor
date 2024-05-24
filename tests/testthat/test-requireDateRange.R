@@ -4,9 +4,7 @@ test_that("requireDateRange", {
     omock::mockObservationPeriod() |>
     omock::mockCohort(name = c("cohort1"), numberCohorts = 2) |>
     omock::mockCohort(name = c("cohort2"), numberCohorts = 2, seed = 2)
-  cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
-                                   cdm = cdm_local,
-                                   schema = "main")
+  cdm <- CDMConnector::copyCdmTo(con = connection(), cdm = cdm_local, schema = writeSchema())
 
   # empty result
   cdm$cohort1 <- cdm$cohort1 %>%
@@ -105,9 +103,7 @@ test_that("trim cohort dates", {
     omock::mockObservationPeriod() |>
     omock::mockCohort(name = c("cohort1"), numberCohorts = 2) |>
     omock::mockCohort(name = c("cohort2"), numberCohorts = 2, seed = 2)
-  cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
-                                   cdm = cdm_local,
-                                   schema = "main")
+  cdm <- CDMConnector::copyCdmTo(con = connection(), cdm = cdm_local, schema = writeSchema())
 
   cdm$cohort1 <- cdm$cohort1 %>%
     trimToDateRange(dateRange = as.Date(c("2001-01-01", "2005-01-01")))

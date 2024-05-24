@@ -4,9 +4,7 @@ test_that("requiring presence in another cohort", {
     omock::mockObservationPeriod() |>
     omock::mockCohort(name = c("cohort1"), numberCohorts = 2) |>
     omock::mockCohort(name = c("cohort2"), numberCohorts = 2, seed = 2)
-  cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
-                                   cdm = cdm_local,
-                                   schema = "main")
+  cdm <- CDMConnector::copyCdmTo(con = connection(), cdm = cdm_local, schema = writeSchema())
 
   cdm$cohort3 <-  requireCohortIntersectFlag(cohort = cdm$cohort1,
                                              targetCohortTable = "cohort2",
@@ -146,9 +144,7 @@ test_that("requiring absence in another cohort", {
     omock::mockObservationPeriod() |>
     omock::mockCohort(name = c("cohort1"), numberCohorts = 2) |>
     omock::mockCohort(name = c("cohort2"), numberCohorts = 2, seed = 2)
-  cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
-                                   cdm = cdm_local,
-                                   schema = "main")
+  cdm <- CDMConnector::copyCdmTo(con = connection(), cdm = cdm_local, schema = writeSchema())
 
   cdm$cohort3_inclusion <-  requireCohortIntersectFlag(cohort = cdm$cohort1,
                                                        targetCohortTable = "cohort2",

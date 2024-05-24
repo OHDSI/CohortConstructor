@@ -3,9 +3,7 @@ test_that("yearCohorts - change name", {
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
     omock::mockCohort(name = c("cohort"))
-  cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
-                                   cdm = cdm_local,
-                                   schema = "main")
+  cdm <- CDMConnector::copyCdmTo(con = connection(), cdm = cdm_local, schema = writeSchema())
 
   # simple example
   cdm$cohort1 <- yearCohorts(cohort = cdm$cohort,
@@ -40,9 +38,7 @@ test_that("yearCohorts - change name", {
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
     omock::mockCohort(name = c("cohort"), numberCohorts = 3)
-  cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
-                                   cdm = cdm_local,
-                                   schema = "main")
+  cdm <- CDMConnector::copyCdmTo(con = connection(), cdm = cdm_local, schema = writeSchema())
   # all cohorts
   cdm$cohort1 <- yearCohorts(cohort = cdm$cohort,
                             years = 2005:2008,
@@ -127,9 +123,7 @@ test_that("yearCohorts - keep name", {
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
     omock::mockCohort(name = c("cohort"))
-  cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
-                                   cdm = cdm_local,
-                                   schema = "main")
+  cdm <- CDMConnector::copyCdmTo(con = connection(), cdm = cdm_local, schema = writeSchema())
 
   # simple example
   cdm$cohort <- yearCohorts(cohort = cdm$cohort,
@@ -163,9 +157,8 @@ test_that("yearCohorts - keep name", {
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
     omock::mockCohort(name = c("cohort"), numberCohorts = 3)
-  cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
-                                   cdm = cdm_local,
-                                   schema = "main")
+  cdm <- CDMConnector::copyCdmTo(con = connection(), cdm = cdm_local, schema = writeSchema())
+
   # just 1 cohort
   cdm$cohort <- yearCohorts(cohort = cdm$cohort,
                              years = 2005:2008,

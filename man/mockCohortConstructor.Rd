@@ -15,7 +15,8 @@ mockCohortConstructor(
   measurement = FALSE,
   death = FALSE,
   otherTables = NULL,
-  con = DBI::dbConnect(duckdb::duckdb())
+  con = DBI::dbConnect(duckdb::duckdb()),
+  writeSchema = "main"
 )
 }
 \arguments{
@@ -39,7 +40,10 @@ mockCohortConstructor(
 
 \item{otherTables}{it takes a list of single tibble with names to include other tables in the cdm}
 
-\item{con}{db connection detail for copy to databases}
+\item{con}{A DBI connection to create the cdm mock object.}
+
+\item{writeSchema}{Name of an schema on the same connection with writing
+permisions.}
 }
 \value{
 cdm object

@@ -87,7 +87,7 @@ test_that("simple example", {
         "drug_exposure_end_date" = as.Date(.data$drug_exposure_end_date, origin = "2020-01-01")
       )
   )
-  cdm <- CDMConnector::copyCdmTo(con = DBI::dbConnect(duckdb::duckdb()), cdm = cdm, schema = "main")
+  cdm <- CDMConnector::copyCdmTo(con = connection(), cdm = cdm, schema = writeSchema())
 
   expect_no_error(cohort <- conceptCohort(cdm = cdm, conceptSet = list(a = 1), name = "cohort"))
 
@@ -154,7 +154,7 @@ test_that("simple example duckdb", {
       )
   )
 
-  cdm <- CDMConnector::copyCdmTo(con = DBI::dbConnect(duckdb::duckdb()), cdm = cdm, schema = "main")
+  cdm <- CDMConnector::copyCdmTo(con = connection(), cdm = cdm, schema = writeSchema())
 
   expect_no_error(cohort <- conceptCohort(cdm = cdm, conceptSet = list(a = 1), name = "cohort"))
 
@@ -223,7 +223,7 @@ test_that("excluded concepts in codelist", {
       )
   )
 
-  cdm <- CDMConnector::copyCdmTo(con = DBI::dbConnect(duckdb::duckdb()), cdm = cdm, schema = "main")
+  cdm <- CDMConnector::copyCdmTo(con = connection(), cdm = cdm, schema = writeSchema())
 
   expect_no_error(cohort <- conceptCohort(cdm = cdm, conceptSet = list(a = 1:2), name = "cohort1"))
   expect_true(all(attr(cohort, "cohort_codelist") |> dplyr::pull("concept_id") |> sort() == 1:2))
@@ -261,8 +261,7 @@ test_that("out of observation", {
       "drug_exposure_end_date" = as.Date(.data$drug_exposure_end_date, origin = "2010-01-01")
     )
 
-  cdm <- CDMConnector::copyCdmTo(con = DBI::dbConnect(duckdb::duckdb()),
-                                 cdm = cdm_local, schema = "main")
+  cdm <- CDMConnector::copyCdmTo(con = connection(), cdm = cdm_local, schema = writeSchema())
 
   # start end after (subject 2, and some of 1)
   # start end before (subject 3)
@@ -301,8 +300,7 @@ test_that("out of observation", {
     "drug_exposure_end_date" = as.Date(c("2015-01-01", "2015-05-01", "2002-01-01", "2000-02-02")),
     "drug_type_concept_id" = 1
   )
-  cdm <- CDMConnector::copyCdmTo(con = DBI::dbConnect(duckdb::duckdb()),
-                                 cdm = cdm_local, schema = "main")
+  cdm <- CDMConnector::copyCdmTo(con = connection(), cdm = cdm_local, schema = writeSchema())
 
   cdm$cohort2 <- conceptCohort(cdm = cdm, conceptSet = list(a = 1, b = 2), name = "cohort2")
   expect_true(all(c("cohort_table", "cdm_table") %in% class(cdm$cohort2)))
@@ -338,8 +336,7 @@ test_that("out of observation", {
     "drug_exposure_end_date" = as.Date(c("2003-01-01", "2015-05-01", "2015-07-01", "2000-02-02", "2000-01-01", "2001-01-01")),
     "drug_type_concept_id" = 1
   )
-  cdm <- CDMConnector::copyCdmTo(con = DBI::dbConnect(duckdb::duckdb()),
-                                 cdm = cdm_local, schema = "main")
+  cdm <- CDMConnector::copyCdmTo(con = connection(), cdm = cdm_local, schema = writeSchema())
 
   # empty cohort
   cdm$cohort3 <- conceptCohort(cdm = cdm, conceptSet = list(a = 1), name = "cohort3")
@@ -394,7 +391,7 @@ test_that("table not present in the cdm", {
       )
   )
 
-  cdm <- CDMConnector::copyCdmTo(con = DBI::dbConnect(duckdb::duckdb()), cdm = cdm, schema = "main")
+  cdm <- CDMConnector::copyCdmTo(con = connection(), cdm = cdm, schema = writeSchema())
 
   cdm$conceptcohort <- conceptCohort(cdm, list(a = 1, b = 1, c = 1:2, d = 2), name = "conceptcohort")
   expect_true(all(cdm$conceptcohort |> dplyr::pull(cohort_definition_id) |> unique() |> sort() == 1:3))

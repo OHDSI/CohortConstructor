@@ -33,7 +33,7 @@ test_that("simple example", {
       )
   )
 
-  cdm <- CDMConnector::copyCdmTo(con = DBI::dbConnect(duckdb::duckdb()), cdm = cdm, schema = "main")
+  cdm <- CDMConnector::copyCdmTo(con = connection(), cdm = cdm, schema = writeSchema())
 
   expect_no_error(cohort <- conceptCohort(cdm = cdm, conceptSet = list(a = 1), name = "cohort"))
 
@@ -126,7 +126,7 @@ test_that("out of observation", {
       )
   )
 
-  cdm <- CDMConnector::copyCdmTo(con = DBI::dbConnect(duckdb::duckdb()), cdm = cdm, schema = "main")
+  cdm <- CDMConnector::copyCdmTo(con = connection(), cdm = cdm, schema = writeSchema())
 
   expect_no_error(cohort <- conceptCohort(cdm = cdm, conceptSet = list(a = 1), name = "cohort"))
 

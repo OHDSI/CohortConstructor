@@ -39,8 +39,7 @@ test_that("simple stratification", {
     )
   )
 
-  con <- duckdb::dbConnect(duckdb::duckdb(), ":memory:")
-  cdm <- CDMConnector::copyCdmTo(con = con, cdm = cdm, schema = "main")
+  cdm <- CDMConnector::copyCdmTo(con = connection(), cdm = cdm, schema = writeSchema())
 
   expect_no_error(cdm$cohort1 <- stratifyCohorts(cdm$cohort1, strata = list()))
   expect_no_error(
@@ -89,5 +88,5 @@ test_that("simple stratification", {
   # no column in the cohort
   expect_error(cdm$new_cohort <- stratifyCohorts(cdm$cohort1, strata = list("not_a_column")))
 
-  duckdb::dbDisconnect(conn = con, shutdown = TRUE)
+  CDMConnector::cdm_disconnect(cdm)
 })

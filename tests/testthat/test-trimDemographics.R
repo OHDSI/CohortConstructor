@@ -324,7 +324,9 @@ test_that("simple duckdb checks", {
 })
 
 test_that("cohort Id, name, additional columns", {
-  cdm <- mockCohortConstructor(nPerson = 5)
+  cdm <- mockCohortConstructor(nPerson = 5,
+                               con = connection(),
+                               writeSchema = writeSchema())
   cdm$cohort2 <- cdm$cohort2 |>
     dplyr::mutate(
       col_extra1 = as.numeric(subject_id) + 1,

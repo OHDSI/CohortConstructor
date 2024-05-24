@@ -24,7 +24,9 @@ test_that("joinOverlap", {
     def_id = c(1, 1, 1, 2, 2, 1, 1, 2)
   )
 
-  cdm <- mockCohortConstructor(otherTables = list(x = x))
+  cdm <- mockCohortConstructor(otherTables = list(x = x),
+                               con = connection(),
+                               writeSchema = writeSchema())
   # gap = 0
   res <- joinOverlap(
     cdm$x, startDate = "start_date", endDate = "end_date", by = c("pid", "def_id")
@@ -82,7 +84,7 @@ test_that("splitOverlap", {
     pid = c(1, 1, 1, 1, 1, 2, 2, 2),
     def_id = c(1, 1, 1, 2, 2, 1, 2, 1)
   )
-  db <- DBI::dbConnect(duckdb::duckdb(), ":memory:")
+  cdm <- mockCohortConstructor(otherTables = list(x = x), con = connection(), schema = writeSchema())
   DBI::dbWriteTable(db, "x", x)
   x <- dplyr::tbl(db, "x")
 
@@ -120,9 +122,7 @@ test_that("intersectCohorts", {
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
     omock::mockCohort(name = c("cohort1"), numberCohorts = 2)
-  cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
-                                   cdm = cdm_local,
-                                   schema = "main")
+  cdm <- CDMConnector::copyCdmTo(con = connection(), cdm = cdm_local, schema = writeSchema())
 
   # mutually exclusive
   expect_no_error(cdm$cohort2 <- intersectCohorts(
@@ -223,9 +223,7 @@ test_that("only return comb", {
     omock::mockCohort(name = c("cohort1"), numberCohorts = 2, seed = 2)
   cdm_local$cohort1 <- cdm_local$cohort1 |>
     dplyr::filter(cohort_end_date != as.Date("2015-04-17"))
-  cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
-                                   cdm = cdm_local,
-                                   schema = "main")
+  cdm <- CDMConnector::copyCdmTo(con = connection(), cdm = cdm_local, schema = writeSchema())
 
   cdm$cohort2 <- intersectCohorts(
     cohort = cdm$cohort1, name = "cohort2",
@@ -264,9 +262,7 @@ test_that("only return comb", {
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
     omock::mockCohort(name = c("cohort1"), numberCohorts = 3)
-  cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
-                                   cdm = cdm_local,
-                                   schema = "main")
+  cdm <- CDMConnector::copyCdmTo(con = connection(), cdm = cdm_local, schema = writeSchema())
   cdm$cohort3 <- intersectCohorts(
     cohort = cdm$cohort1, name = "cohort3",
     mutuallyExclusive = FALSE, returnOnlyComb = TRUE, gap = 1
@@ -334,9 +330,7 @@ test_that("attrition and cohortId", {
     omock::mockCohort(name = c("cohort1"), numberCohorts = 4, seed = 2)
   cdm_local$person <- cdm_local$person |>
     dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
-  cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
-                                   cdm = cdm_local,
-                                   schema = "main")
+  cdm <- CDMConnector::copyCdmTo(con = connection(), cdm = cdm_local, schema = writeSchema())
 
   cdm$cohort1 <- cdm$cohort1 |>
     requireInDateRange(dateRange = as.Date(c("1990-01-01", "2025-01-01"))) |>
@@ -397,8 +391,7 @@ test_that("codelist", {
   cdm_local$observation_period <- cdm_local$observation_period|>
     dplyr::mutate(observation_period_start_date = as.Date("1990-01-01"), observation_period_end_date = as.Date("2020-01-01"))
 
-  cdm <- CDMConnector::copyCdmTo(con = DBI::dbConnect(duckdb::duckdb()),
-                                 cdm = cdm_local, schema = "main")
+  cdm <- CDMConnector::copyCdmTo(con = connection(), cdm = cdm_local, schema = writeSchema())
 
   cdm$cohort1 <- conceptCohort(cdm, conceptSet = list(c1 = c(1,3), c2 = c(2)), name = "cohort1")
 
