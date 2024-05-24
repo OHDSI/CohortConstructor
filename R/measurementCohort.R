@@ -130,6 +130,34 @@ measurementCohort <- function(cdm,
     ) |>
     dplyr::filter(!is.na(.data$cohort_start_date))
 
+  if (!is.null(valueAsConcept)) {
+    value <- cohort |> dplyr::pull("value_as_concept_id") |> unique()
+    matches <- valueAsConcept %in% value
+    matching_ids <- valueAsConcept[!matches]
+
+    if (length(matching_ids) > 0) {
+      cli::cli_inform(c(
+        "i" = "These valueAsConcept don't exist for the input measurement concepts:",
+        paste(matching_ids, collapse = ", ")
+      ))
+    }
+  }
+
+  if (!is.null(valueAsNumber)) {
+    unit <- cohort |> dplyr::pull("unit_concept_id") |> unique()
+    matches <-
+      as.numeric(names(valueAsNumber)) %in% as.numeric(unit)
+    matching_ids <- valueAsNumber[!matches]
+
+    if (length(matching_ids) > 0) {
+      cli::cli_inform(c(
+        "i" = "These unit concepts don't exist for the input measurement concepts:",
+        paste(matching_ids, collapse = ", ")
+      ))
+    }
+  }
+
+
   if (cohort |> dplyr::tally() |> dplyr::pull("n") == 0) {
     cli::cli_inform(c("i" = "No table could be subsetted, returning empty cohort."))
     cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name) # TODO: overwritte to TRUE when omopgenerics in CRAN
