@@ -89,49 +89,57 @@ measurementCohort <- function(cdm,
   validateValueAsNumber(valueAsNumber)
 
   # create concept set tibble
-  cohortSet <- dplyr::tibble("cohort_name" = names(conceptSet)) |>
-    dplyr::mutate("cohort_definition_id" = dplyr::row_number())
-  cohortCodelist <- lapply(conceptSet, dplyr::as_tibble) |>
-    dplyr::bind_rows(.id = "cohort_name") |>
-    dplyr::inner_join(cohortSet, by = "cohort_name") |>
-    dplyr::select("cohort_definition_id", "concept_id"  = "value", "codelist_name" = "cohort_name") |>
-    dplyr::mutate("type" = "index event") |>
-    addDomains(cdm)
+  cohortSet <- conceptSetToCohortSet(conceptSet)
+  cohortCodelist <- conceptSetToCohortCodelist(conceptSet)
 
-  ud <- cohortCodelist |>
-    dplyr::filter(!tolower(.data$domain_id) %in% "measurement" | is.na(.data$domain_id)) |>
-    dplyr::tally() |>
-    dplyr::pull("n")
+  tableCohortCodelist <- omopgenerics::uniqueTableName()
+  cdm <- uploadCohortCodelistToCdm(cdm = cdm,
+                                   cohortCodelist = cohortCodelist,
+                                   tableCohortCodelist = tableCohortCodelist
+  )
 
-  if (ud > 0) {
-    cli::cli_inform(c(
-      "x" = "{.strong {ud}} concept{?s} excluded because don't correspond to the `Measurement` domain."
-    ))
+  # report codes from unsupported domains
+  reportConceptsFromUnsopportedDomains(cdm = cdm,
+                                       tableCohortCodelist = tableCohortCodelist,
+                                       supportedDomains = "measurement")
+
+  cdm[[tableCohortCodelist]] <- cdm[[tableCohortCodelist]] |>
+    dplyr::filter(tolower(.data$domain_id) %in% "measurement")
+
+  cdm[[name]] <- unerafiedConceptCohort(cdm = cdm,
+                                   conceptSet = conceptSet,
+                                   cohortSet = cohortSet,
+                                   cohortCodelist = cohortCodelist,
+                                   tableCohortCodelist = tableCohortCodelist,
+                                   name = name,
+                                   extraCols = c("value_as_number",
+                                                 "value_as_concept_id",
+                                                 "unit_concept_id"))
+
+  omopgenerics::dropTable(cdm = cdm,
+                          name = tableCohortCodelist)
+  cdm[[tableCohortCodelist]] <- NULL
+
+  if(cdm[[name]] |>
+     utils::head(1) |>
+     dplyr::tally() |>
+     dplyr::pull("n") == 0){
+    cli::cli_inform(c("i" = "No cohort entries found, returning empty cohort table."))
+    cdm[[name]] <- cdm[[name]] |>
+      omopgenerics::newCohortTable(
+        cohortSetRef = cohortSet,
+        cohortAttritionRef = NULL,
+        cohortCodelistRef = cohortCodelist,
+        .softValidation = TRUE
+      )
+
+    return(cdm[[name]])
   }
 
-  cohortCodelist <- cohortCodelist |>
-    dplyr::filter(tolower(.data$domain_id) %in% "measurement") |>
-    dplyr::compute()
-
-  cohort <- cdm$measurement |>
-    dplyr::select(
-      "subject_id" = "person_id",
-      "concept_id" = "measurement_concept_id",
-      "cohort_start_date" = "measurement_date",
-      "cohort_end_date" = "measurement_date",
-      "value_as_number",
-      "value_as_concept_id",
-      "unit_concept_id"
-    ) |>
-    dplyr::inner_join(
-      cohortCodelist |>
-        dplyr::select("concept_id", "cohort_definition_id"),
-      by = "concept_id"
-    ) |>
-    dplyr::filter(!is.na(.data$cohort_start_date))
-
   if (!is.null(valueAsConcept)) {
-    value <- cohort |> dplyr::pull("value_as_concept_id") |> unique()
+    value <- cdm[[name]] |>
+      dplyr::pull("value_as_concept_id") |>
+      unique()
     matches <- valueAsConcept %in% value
     matching_ids <- valueAsConcept[!matches]
 
@@ -144,9 +152,10 @@ measurementCohort <- function(cdm,
   }
 
   if (!is.null(valueAsNumber)) {
-    unit <- cohort |> dplyr::pull("unit_concept_id") |> unique()
-    matches <-
-      as.numeric(names(valueAsNumber)) %in% as.numeric(unit)
+    unit <- cdm[[name]] |>
+      dplyr::pull("unit_concept_id") |>
+      unique()
+    matches <- as.numeric(names(valueAsNumber)) %in% as.numeric(unit)
     matching_ids <- valueAsNumber[!matches]
 
     if (length(matching_ids) > 0) {
@@ -158,51 +167,43 @@ measurementCohort <- function(cdm,
   }
 
 
-  if (cohort |> dplyr::tally() |> dplyr::pull("n") == 0) {
-    cli::cli_inform(c("i" = "No table could be subsetted, returning empty cohort."))
-    cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name) # TODO: overwritte to TRUE when omopgenerics in CRAN
+  if(cdm[[name]] |>
+     utils::head(1) |>
+     dplyr::tally() |>
+     dplyr::pull("n") == 0){
+    cli::cli_inform(c("i" = "No cohort entries found, returning empty cohort table."))
     cdm[[name]] <- cdm[[name]] |>
       omopgenerics::newCohortTable(
         cohortSetRef = cohortSet,
         cohortAttritionRef = NULL,
-        cohortCodelistRef = cohortCodelist |> dplyr::collect()
+        cohortCodelistRef = cohortCodelist,
+        .softValidation = TRUE
       )
+
     return(cdm[[name]])
   }
-
-  cohort <- cohort |>
-    dplyr::compute(name = name, temporary = FALSE) # To move after line 90 when omopgenerics in CRAN
-
-  cli::cli_inform(c("i" = "Getting records in observation."))
-  cohort <- cohort |>
-    PatientProfiles::addDemographics(
-      age = FALSE,
-      sex = FALSE,
-      priorObservationType = "date",
-      futureObservationType = "date"
-    ) |>
-    dplyr::filter(
-      .data$prior_observation <= .data$cohort_start_date,
-      .data$future_observation >= .data$cohort_end_date
-    ) |>
-    dplyr::select(-"prior_observation", -"future_observation") |>
-    dplyr::compute(name = name, temporary = FALSE)
 
 
   if (!is.null(valueAsConcept) | !is.null(valueAsNumber)) {
     cli::cli_inform(c("i" = "Applying measurement requirements."))
     filterExpr <- getFilterExpression(valueAsConcept, valueAsNumber)
-    cohort <- cohort |>
+    cdm[[name]] <- cdm[[name]] |>
       dplyr::filter(!!!filterExpr) |>
       dplyr::compute(name = name, temporary = FALSE)
 
-  if (cohort |> dplyr::tally() |> dplyr::pull("n") == 0){
+  if (cdm[[name]] |> dplyr::tally() |> dplyr::pull("n") == 0){
     cli::cli_warn("There are no subjects with the specified value_as_concept_id or value_as_number.")
   }
 
   }
 
-  cohort <- cohort |>
+  cli::cli_inform(c("i" = "Collapsing records."))
+  cdm[[name]] <- fulfillCohortReqs(cdm = cdm, name = name) |>
+    dplyr::compute(name = name,
+                   temporary = FALSE,
+                   overwrite = TRUE)
+
+  cdm[[name]] <- cdm[[name]] |>
     dplyr::select(
       "cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date"
     ) |>
@@ -211,7 +212,7 @@ measurementCohort <- function(cdm,
 
   cli::cli_inform(c("i" = "Creating cohort attributes."))
 
-  cohort <- cohort |>
+  cdm[[name]] <- cdm[[name]] |>
     omopgenerics::newCohortTable(
       cohortSetRef = cohortSet,
       cohortAttritionRef = NULL,
@@ -221,7 +222,7 @@ measurementCohort <- function(cdm,
 
   cli::cli_inform(c("v" = "Cohort {.strong {name}} created."))
 
-  return(cohort)
+  return(cdm[[name]])
 }
 
 getFilterExpression <- function(valueAsConcept, valueAsNumber) {
@@ -243,23 +244,4 @@ getFilterExpression <- function(valueAsConcept, valueAsNumber) {
   }
 
   return(paste0(expFilter, collapse = " | ") |>  rlang::parse_exprs())
-}
-
-addDomains <- function(cohortCodelist, cdm) {
-  # insert table as temporary
-  tmpName <- omopgenerics::uniqueTableName()
-  cdm <- omopgenerics::insertTable(
-    cdm = cdm, name = tmpName, table = cohortCodelist
-  )
-  cdm[[tmpName]] <- cdm[[tmpName]] |> dplyr::compute()
-
-  cohortCodelist <- cdm[["concept"]] |>
-    dplyr::select("concept_id", "domain_id") |>
-    dplyr::right_join(cdm[[tmpName]], by = "concept_id") |>
-    dplyr::mutate("domain_id" = tolower(.data$domain_id)) |>
-    dplyr::compute()
-
-  omopgenerics::dropTable(cdm = cdm, name = tmpName)
-
-  return(cohortCodelist)
 }
