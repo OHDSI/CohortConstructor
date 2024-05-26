@@ -244,3 +244,22 @@ getFilterExpression <- function(valueAsConcept, valueAsNumber) {
 
   return(paste0(expFilter, collapse = " | ") |>  rlang::parse_exprs())
 }
+
+addDomains <- function(cohortCodelist, cdm) {
+  # insert table as temporary
+  tmpName <- omopgenerics::uniqueTableName()
+  cdm <- omopgenerics::insertTable(
+    cdm = cdm, name = tmpName, table = cohortCodelist
+  )
+  cdm[[tmpName]] <- cdm[[tmpName]] |> dplyr::compute()
+
+  cohortCodelist <- cdm[["concept"]] |>
+    dplyr::select("concept_id", "domain_id") |>
+    dplyr::right_join(cdm[[tmpName]], by = "concept_id") |>
+    dplyr::mutate("domain_id" = tolower(.data$domain_id)) |>
+    dplyr::compute()
+
+  omopgenerics::dropTable(cdm = cdm, name = tmpName)
+
+  return(cohortCodelist)
+}

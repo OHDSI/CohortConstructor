@@ -40,7 +40,8 @@ test_that("expected errors and messages", {
   expect_true(inherits(x, "cohort_table"))
   expect_true(x |> dplyr::collect() |> nrow() == 0)
   expect_true(omopgenerics::tableName(x) == "cohort")
-  expect_true(setdiff(names(omopgenerics::cdmReference(x)), names(cdm)) == "cohort")
+  expect_true(setdiff(names(omopgenerics::cdmReference(x)),
+                      names(cdm)) == "cohort")
   expect_identical(setdiff(names(cdm), names(omopgenerics::cdmReference(x))), character())
   expect_equal(
     settings(x), dplyr::tibble("cohort_definition_id" = 1L, "cohort_name" = "a")
@@ -187,6 +188,33 @@ test_that("simple example duckdb", {
   CDMConnector::cdmDisconnect(cdm = cdm)
 })
 
+test_that("concepts from multiple cdm tables duckdb", {
+  cdm <- omock::mockCdmReference() |>
+    omock::mockCdmFromTables(tables = list("cohort" = dplyr::tibble(
+      "cohort_definition_id" = 1,
+      "subject_id" = c(1, 2, 3),
+      "cohort_start_date" = as.Date("2020-01-01"),
+      "cohort_end_date" = as.Date("2029-12-31")
+    ))) |>
+    omock::mockConditionOccurrence() |>
+    omock::mockDrugExposure()
+  cdm <- CDMConnector::copyCdmTo(con = DBI::dbConnect(duckdb::duckdb()),
+                                 cdm = cdm, schema = "main")
+
+  cs <- list("a" = cdm$condition_occurrence |>
+    dplyr::select("condition_concept_id") |>
+    head(1)|>
+    dplyr::pull(),
+    "b" = cdm$drug_exposure |>
+    dplyr::select("drug_concept_id") |>
+    head(1) |>
+    dplyr::pull())
+
+  expect_no_error(cohort <- conceptCohort(cdm = cdm,
+                                          conceptSet = cs,
+                                          name = "my_new_cohort"))
+
+})
 
 test_that("excluded concepts in codelist", {
   cdm <- omock::mockCdmReference() |>
@@ -267,11 +295,27 @@ test_that("out of observation", {
   # start end after (subject 2, and some of 1)
   # start end before (subject 3)
   # end event < start event (subject 4)
-  cdm$cohort1 <- conceptCohort(cdm = cdm, conceptSet = list(a = 1, b = 2), name = "cohort1")
+  cdm$cohort1 <- conceptCohort(cdm = cdm,
+                               conceptSet = list(a = 1, b = 2), name = "cohort1")
   expect_true(all(c("cohort_table", "cdm_table") %in% class(cdm$cohort1)))
-  expect_true(cdm$cohort1 |> dplyr::pull("subject_id") == 1)
-  expect_true(cdm$cohort1 |> dplyr::pull("cohort_start_date") == "2010-01-01")
-  expect_true(cdm$cohort1 |> dplyr::pull("cohort_end_date") == "2012-03-11")
+  # person 1 has two cohort entries
+  # the first - same dates as drug exposure
+  # the second - limit cohort end based on observation period end date
+  expect_true(all(cdm$cohort1 |>
+                dplyr::pull("subject_id") == 1))
+  expect_true(cdm$cohort1 |>
+                dplyr::filter(cohort_definition_id == 1) |>
+                dplyr::pull("cohort_start_date") == "2010-01-01")
+  expect_true(cdm$cohort1 |>
+                dplyr::filter(cohort_definition_id == 1) |>
+                dplyr::pull("cohort_end_date") == "2012-03-11")
+  expect_true(cdm$cohort1 |>
+                dplyr::filter(cohort_definition_id == 2) |>
+                dplyr::pull("cohort_start_date") == "2012-01-21")
+  expect_true(cdm$cohort1 |>
+                dplyr::filter(cohort_definition_id == 2) |>
+                dplyr::pull("cohort_end_date") == "2013-06-29")
+
   expect_true(all(omopgenerics::settings(cdm$cohort1)$cohort_name == c("a", "b")))
   expect_true(cohortCodelist(cdm$cohort1, 1)$a == 1)
   expect_true(cohortCodelist(cdm$cohort1, 2)$b == 2)
@@ -306,10 +350,13 @@ test_that("out of observation", {
 
   cdm$cohort2 <- conceptCohort(cdm = cdm, conceptSet = list(a = 1, b = 2), name = "cohort2")
   expect_true(all(c("cohort_table", "cdm_table") %in% class(cdm$cohort2)))
-  expect_true(all(cdm$cohort2 |> dplyr::pull("subject_id") |> sort() == c(2, 4)))
-  expect_true(all(cdm$cohort2 |> dplyr::pull("cohort_start_date") |> sort() == c("2000-01-01", "2001-01-01")))
-  expect_true(all(cdm$cohort2 |> dplyr::pull("cohort_end_date") |> sort() == c("2000-02-02", "2002-01-01")))
-  expect_true(all(omopgenerics::settings(cdm$cohort2)$cohort_name |> sort() == c("a", "b")))
+  expect_true(all(cdm$cohort2 |> dplyr::pull("subject_id") |> sort() == c(1, 2, 4)))
+  expect_true(all(cdm$cohort2 |> dplyr::pull("cohort_start_date") |> sort() ==
+                    c("2000-01-01", "2001-01-01","2004-01-01")))
+  expect_true(all(cdm$cohort2 |> dplyr::pull("cohort_end_date") |> sort() ==
+                    c("2000-02-02", "2002-01-01","2013-06-29")))
+  expect_true(all(omopgenerics::settings(cdm$cohort2)$cohort_name |> sort() ==
+                    c("a", "b")))
   expect_true(cohortCodelist(cdm$cohort2, 1)$a == 1)
   expect_true(cohortCodelist(cdm$cohort2, 2)$b == 2)
 
@@ -396,7 +443,7 @@ test_that("table not present in the cdm", {
 
   cdm <- CDMConnector::copyCdmTo(con = DBI::dbConnect(duckdb::duckdb()), cdm = cdm, schema = "main")
 
-  cdm$conceptcohort <- conceptCohort(cdm, list(a = 1, b = 1, c = 1:2, d = 2), name = "conceptcohort")
+  expect_warning(cdm$conceptcohort <- conceptCohort(cdm, list(a = 1, b = 1, c = 1:2, d = 2), name = "conceptcohort"))
   expect_true(all(cdm$conceptcohort |> dplyr::pull(cohort_definition_id) |> unique() |> sort() == 1:3))
   expect_true(all(cdm$conceptcohort |> dplyr::pull(cohort_start_date) |> sort() ==
                     c("2020-01-01", "2020-01-01", "2020-01-01", "2020-01-11", "2020-01-11",
