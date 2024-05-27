@@ -34,10 +34,12 @@ dropped
 Require that an index date is within a date range
 }
 \examples{
+\donttest{
 library(CohortConstructor)
 
 cdm <- mockCohortConstructor(nPerson = 100)
 cdm$cohort1 |>
   requireInDateRange(indexDate = "cohort_start_date",
                      dateRange = as.Date(c("2010-01-01", "2019-01-01")))
+}
 }

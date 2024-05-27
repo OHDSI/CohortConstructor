@@ -34,9 +34,11 @@ age requirement
 Restrict cohort on age
 }
 \examples{
+\donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
 cdm$cohort1 |>
   requireAge(indexDate = "cohort_start_date",
              ageRange = list(c(18, 65)))
+}
 }

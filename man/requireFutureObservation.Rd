@@ -35,9 +35,11 @@ future observation requirement
 Restrict cohort on future observation
 }
 \examples{
+\donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
 cdm$cohort1 |>
   requireFutureObservation(indexDate = "cohort_start_date",
                            minFutureObservation = 30)
+}
 }

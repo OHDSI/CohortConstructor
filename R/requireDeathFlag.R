@@ -19,13 +19,13 @@
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' library(CDMConnector)
 #' library(CohortConstructor)
 #' cdm <- mockCohortConstructor(death = TRUE)
 #' cdm$cohort1 <- cdm$cohort1 |> requireDeathFlag(window = list(c(0, Inf)))
 #' attrition(cdm$cohort1)
-
-
+#' }
 requireDeathFlag <- function(cohort,
                              window,
                              cohortId = NULL,

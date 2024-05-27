@@ -24,6 +24,7 @@
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' library(CohortConstructor)
 #' cdm <- mockCohortConstructor(nPerson = 100)
 #' cdm$cohort1 |>
@@ -31,7 +32,7 @@
 #'                       ageRange = list(c(18, 65)),
 #'                       sex = "Female",
 #'                       minPriorObservation = 365)
-#'
+#' }
 requireDemographics <- function(cohort,
                                 cohortId = NULL,
                                 indexDate = "cohort_start_date",
@@ -77,11 +78,13 @@ requireDemographics <- function(cohort,
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' library(CohortConstructor)
 #' cdm <- mockCohortConstructor()
 #' cdm$cohort1 |>
 #'   requireAge(indexDate = "cohort_start_date",
 #'              ageRange = list(c(18, 65)))
+#' }
 requireAge <- function(cohort,
                        ageRange,
                        cohortId = NULL,
@@ -122,10 +125,12 @@ requireAge <- function(cohort,
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' library(CohortConstructor)
 #' cdm <- mockCohortConstructor()
 #' cdm$cohort1 |>
 #'   requireSex(sex = "Female")
+#' }
 requireSex <- function(cohort,
                        sex,
                        cohortId = NULL,
@@ -167,11 +172,13 @@ requireSex <- function(cohort,
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' library(CohortConstructor)
 #' cdm <- mockCohortConstructor()
 #' cdm$cohort1 |>
 #'   requirePriorObservation(indexDate = "cohort_start_date",
 #'                           minPriorObservation = 365)
+#' }
 requirePriorObservation <- function(cohort,
                                     minPriorObservation,
                                     cohortId = NULL,
@@ -214,11 +221,13 @@ requirePriorObservation <- function(cohort,
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' library(CohortConstructor)
 #' cdm <- mockCohortConstructor()
 #' cdm$cohort1 |>
 #'   requireFutureObservation(indexDate = "cohort_start_date",
 #'                            minFutureObservation = 30)
+#' }
 requireFutureObservation <- function(cohort,
                                      minFutureObservation,
                                      cohortId = NULL,

@@ -14,12 +14,14 @@
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' library(CohortConstructor)
 #'
 #' cdm <- mockCohortConstructor(nPerson = 100)
 #' cdm$cohort1 |>
 #'   requireInDateRange(indexDate = "cohort_start_date",
 #'                      dateRange = as.Date(c("2010-01-01", "2019-01-01")))
+#' }
 requireInDateRange <- function(cohort,
                                dateRange,
                                cohortId = NULL,
@@ -87,6 +89,7 @@ requireInDateRange <- function(cohort,
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' library(CohortConstructor)
 #' cdm <- mockCohortConstructor()
 #' cdm$cohort1 |>
@@ -94,6 +97,7 @@ requireInDateRange <- function(cohort,
 #'                   endDate = "cohort_end_date",
 #'                   dateRange = as.Date(c("2015-01-01",
 #'                                         "2015-12-31")))
+#' }
 trimToDateRange <- function(cohort,
                             dateRange,
                             cohortId = NULL,

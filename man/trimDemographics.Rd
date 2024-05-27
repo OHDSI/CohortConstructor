@@ -42,9 +42,11 @@ demographic requirements
 Restrict cohort on patient demographics
 }
 \examples{
+\donttest{
 library(CohortConstructor)
 
 cdm <- mockCohortConstructor(nPerson = 100)
 
 cdm$cohort1 |> trimDemographics(ageRange = list(c(10, 30)))
+}
 }

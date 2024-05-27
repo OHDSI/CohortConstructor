@@ -57,7 +57,7 @@ are not in the cohort if negate = TRUE)
 Require cohort subjects are present in another cohort
 }
 \examples{
-
+\donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
 cdm$cohort1 |>
@@ -65,4 +65,5 @@ cdm$cohort1 |>
                              targetCohortId = 1,
                              indexDate = "cohort_start_date",
                              window = c(-Inf, 0))
+}
 }

@@ -35,6 +35,7 @@ A cohort table
 Create cohorts based on patient demographics
 }
 \examples{
+\donttest{
 library(CohortConstructor)
 
 cdm <- mockCohortConstructor()
@@ -42,4 +43,5 @@ cdm <- mockCohortConstructor()
 cohort <-  cdm |> demographicsCohort(name = "cohort3", ageRange = c(18,40), sex = "Male")
 
 attrition(cohort)
+}
 }

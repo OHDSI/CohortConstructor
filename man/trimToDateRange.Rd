@@ -38,6 +38,7 @@ been dropped.
 Trim cohort dates to be within a date range
 }
 \examples{
+\donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
 cdm$cohort1 |>
@@ -45,4 +46,5 @@ cdm$cohort1 |>
                   endDate = "cohort_end_date",
                   dateRange = as.Date(c("2015-01-01",
                                         "2015-12-31")))
+}
 }

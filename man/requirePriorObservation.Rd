@@ -35,9 +35,11 @@ prior observation requirement
 Restrict cohort on prior observation
 }
 \examples{
+\donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
 cdm$cohort1 |>
   requirePriorObservation(indexDate = "cohort_start_date",
                           minPriorObservation = 365)
+}
 }

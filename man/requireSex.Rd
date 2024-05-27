@@ -26,8 +26,10 @@ sex requirement
 Restrict cohort on sex
 }
 \examples{
+\donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
 cdm$cohort1 |>
   requireSex(sex = "Female")
+}
 }

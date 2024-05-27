@@ -23,11 +23,12 @@ A cohort table.
 Generate a new cohort table restricting cohort entries to certain years
 }
 \examples{
+\donttest{
 library(CohortConstructor)
 
 cdm <- mockCohortConstructor(nPerson = 100)
 
 cdm$cohort1 <- cdm$cohort1 |> yearCohorts(years = 2000:2002)
 settings(cdm$cohort1)
-
+}
 }

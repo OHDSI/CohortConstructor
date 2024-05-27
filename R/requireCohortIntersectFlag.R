@@ -26,7 +26,7 @@
 #' @export
 #'
 #' @examples
-#'
+#' \donttest{
 #' library(CohortConstructor)
 #' cdm <- mockCohortConstructor()
 #' cdm$cohort1 |>
@@ -34,6 +34,7 @@
 #'                              targetCohortId = 1,
 #'                              indexDate = "cohort_start_date",
 #'                              window = c(-Inf, 0))
+#' }
 requireCohortIntersectFlag <- function(cohort,
                                        targetCohortTable,
                                        window,

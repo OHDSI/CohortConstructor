@@ -10,6 +10,7 @@
 #' @return A cohort table
 #'
 #' @examples
+#' \donttest{
 #' library(CohortConstructor)
 #'
 #' cdm <- mockCohortConstructor(conditionOccurrence = TRUE)
@@ -17,7 +18,7 @@
 #' cohort <- conceptCohort(cdm = cdm, conceptSet = list(a = 1), name = "cohort")
 #'
 #' cohort |> attrition()
-#'
+#' }
 conceptCohort <- function(cdm,
                           conceptSet,
                           name) {
