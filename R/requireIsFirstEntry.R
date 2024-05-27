@@ -43,7 +43,7 @@ requireIsFirstEntry <- function(cohort,
     dplyr::ungroup() |>
     dplyr::compute(name = name, temporary = FALSE) |>
     omopgenerics::newCohortTable(.softValidation = TRUE) |>
-    CDMConnector::recordCohortAttrition("Restricted to first entry", cohortId = cohortId)
+    omopgenerics::recordCohortAttrition("Restricted to first entry", cohortId = cohortId)
 
   return(cohort)
 }
@@ -93,7 +93,7 @@ requireIsLastEntry <- function(cohort,
     dplyr::ungroup() |>
     dplyr::compute(name = name, temporary = FALSE) |>
     omopgenerics::newCohortTable(.softValidation = TRUE) |>
-    CDMConnector::recordCohortAttrition("Restricted to last entry", cohortId = cohortId)
+    omopgenerics::recordCohortAttrition("Restricted to last entry", cohortId = cohortId)
 
   return(cohort)
 }

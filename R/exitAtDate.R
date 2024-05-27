@@ -17,11 +17,12 @@
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' library(CohortConstructor)
 #'
 #' cdm <- mockCohortConstructor()
 #' cdm$cohort1 |> exitAtObservationEnd()
-#'
+#'}
 exitAtObservationEnd <- function(cohort,
                                  cohortId = NULL,
                                  name = tableName(cohort)) {
@@ -80,11 +81,12 @@ exitAtObservationEnd <- function(cohort,
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' library(PatientProfiles)
 #' library(CohortConstructor)
 #' cdm <- mockPatientProfiles()
 #' cdm$cohort1 |> exitAtDeath()
-#'
+#' }
 exitAtDeath <- function(cohort,
                         cohortId = NULL,
                         requireDeath = FALSE,

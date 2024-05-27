@@ -24,7 +24,7 @@
 #' @export
 #'
 #' @examples
-#'
+#' \donttest{
 #' library(CohortConstructor)
 #' cdm <- mockCohortConstructor(conditionOccurrence = TRUE)
 #' cdm$cohort2 <-  requireConceptIntersectFlag(
@@ -32,6 +32,7 @@
 #'   conceptSet = list(a = 1),
 #'   window = c(-Inf, 0),
 #'   name = "cohort2")
+#'   }
 requireConceptIntersectFlag <- function(cohort,
                                         conceptSet,
                                         window,
@@ -113,7 +114,7 @@ requireConceptIntersectFlag <- function(cohort,
                         by = c(cols)) %>%
       dplyr::compute(name = name, temporary = FALSE) %>%
       omopgenerics::newCohortTable(.softValidation = TRUE) %>%
-      CDMConnector::recordCohortAttrition(reason = reason, cohortId = cohortId)
+      omopgenerics::recordCohortAttrition(reason = reason, cohortId = cohortId)
   }
 
   return(cohort)

@@ -31,6 +31,7 @@ Cohort table stratified.
 Crate a new cohort table with the specified stratifications.
 }
 \examples{
+\donttest{
 library(CohortConstructor)
 library(PatientProfiles)
 
@@ -48,5 +49,5 @@ cdm$my_cohort
 settings(cdm$my_cohort)
 
 attrition(cdm$my_cohort)
-
+}
 }

@@ -48,10 +48,11 @@ cdm object
 Function to create a mock cdm reference for CohortConstructor
 }
 \examples{
+\donttest{
 library(CohortConstructor)
 
 cdm <- mockCohortConstructor()
 
 cdm
-
+}
 }

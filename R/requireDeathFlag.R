@@ -19,13 +19,13 @@
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' library(CDMConnector)
 #' library(CohortConstructor)
 #' cdm <- mockCohortConstructor(death = TRUE)
 #' cdm$cohort1 <- cdm$cohort1 |> requireDeathFlag(window = list(c(0, Inf)))
 #' attrition(cdm$cohort1)
-
-
+#' }
 requireDeathFlag <- function(cohort,
                              window,
                              cohortId = NULL,
@@ -96,7 +96,7 @@ requireDeathFlag <- function(cohort,
                       by = c(cols)) %>%
     dplyr::compute(name = name, temporary = FALSE) %>%
     omopgenerics::newCohortTable(.softValidation = TRUE) %>%
-    CDMConnector::recordCohortAttrition(reason = reason, cohortId = cohortId)
+    omopgenerics::recordCohortAttrition(reason = reason, cohortId = cohortId)
 
   return(x)
 }

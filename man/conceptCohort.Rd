@@ -21,6 +21,7 @@ A cohort table
 Create cohorts based on a concept set
 }
 \examples{
+\donttest{
 library(CohortConstructor)
 
 cdm <- mockCohortConstructor(conditionOccurrence = TRUE)
@@ -28,5 +29,5 @@ cdm <- mockCohortConstructor(conditionOccurrence = TRUE)
 cohort <- conceptCohort(cdm = cdm, conceptSet = list(a = 1), name = "cohort")
 
 cohort |> attrition()
-
+}
 }

@@ -14,12 +14,14 @@
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' library(CohortConstructor)
 #'
 #' cdm <- mockCohortConstructor(nPerson = 100)
 #' cdm$cohort1 |>
 #'   requireInDateRange(indexDate = "cohort_start_date",
 #'                      dateRange = as.Date(c("2010-01-01", "2019-01-01")))
+#' }
 requireInDateRange <- function(cohort,
                                dateRange,
                                cohortId = NULL,
@@ -43,7 +45,7 @@ requireInDateRange <- function(cohort,
         .data[[indexDate]] >= !!dateRange[1] | (!.data$cohort_definition_id %in% cohortId)
       ) |>
       dplyr::compute(name = name, temporary = FALSE) |>
-      CDMConnector::recordCohortAttrition(
+      omopgenerics::recordCohortAttrition(
         reason = paste0(indexDate, " after ", dateRange[1]),
         cohortId = cohortId
       )
@@ -55,7 +57,7 @@ requireInDateRange <- function(cohort,
         .data[[indexDate]] <= !!dateRange[2] | (!.data$cohort_definition_id %in% cohortId)
       ) |>
       dplyr::compute(name = name, temporary = FALSE) |>
-      CDMConnector::recordCohortAttrition(
+      omopgenerics::recordCohortAttrition(
         reason = paste0(indexDate, " before ", dateRange[2]),
         cohortId = cohortId
       )
@@ -87,6 +89,7 @@ requireInDateRange <- function(cohort,
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' library(CohortConstructor)
 #' cdm <- mockCohortConstructor()
 #' cdm$cohort1 |>
@@ -94,6 +97,7 @@ requireInDateRange <- function(cohort,
 #'                   endDate = "cohort_end_date",
 #'                   dateRange = as.Date(c("2015-01-01",
 #'                                         "2015-12-31")))
+#' }
 trimToDateRange <- function(cohort,
                             dateRange,
                             cohortId = NULL,
@@ -122,7 +126,7 @@ trimToDateRange <- function(cohort,
         minDate = dateRange[1]
       ) %>%
       dplyr::compute(name = name, temporary = FALSE) %>%
-      CDMConnector::recordCohortAttrition(
+      omopgenerics::recordCohortAttrition(
         reason = paste0(startDate, " >= ", dateRange[1]),
         cohortId = cohortId
       )
@@ -138,7 +142,7 @@ trimToDateRange <- function(cohort,
         maxDate = dateRange[2]
       ) %>%
       dplyr::compute(name = name, temporary = FALSE) %>%
-      CDMConnector::recordCohortAttrition(
+      omopgenerics::recordCohortAttrition(
         reason = paste0(endDate, " <= ", dateRange[2]),
         cohortId = cohortId
       )

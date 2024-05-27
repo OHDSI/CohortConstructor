@@ -15,6 +15,7 @@
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' library(CohortConstructor)
 #' cdm <- mockCohortConstructor(tables = list(
 #' "cohort" = dplyr::tibble(
@@ -27,7 +28,7 @@
 #' )
 #' ))
 #' cdm$cohort |> entryAtLastDate(dateColumns = c("date_1", "date_2"))
-
+#' }
 entryAtFirstDate <- function(cohort,
                              dateColumns,
                              cohortId = NULL,
@@ -62,6 +63,7 @@ entryAtFirstDate <- function(cohort,
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' library(CohortConstructor)
 #' cdm <- mockCohortConstructor(tables = list(
 #' "cohort" = dplyr::tibble(
@@ -74,7 +76,7 @@ entryAtFirstDate <- function(cohort,
 #' )
 #' ))
 #' cdm$cohort |> entryAtLastDate(dateColumns = c("date_1", "date_2"))
-
+#' }
 entryAtLastDate <- function(cohort,
                             dateColumns,
                             cohortId = NULL,
