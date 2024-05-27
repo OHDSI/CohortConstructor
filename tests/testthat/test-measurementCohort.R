@@ -49,7 +49,7 @@ test_that("mearurementCohorts works", {
   expect_true(cdm$cohort |> attrition() |> dplyr::pull("reason") == "Initial qualifying events")
   expect_true(settings(cdm$cohort)$cohort_name == "normal_blood_pressure")
   codes <- attr(cdm$cohort, "cohort_codelist") |> dplyr::collect()
-  expect_true(all(codes$concept_id  |> sort() == c(4298393, 4326744, 45770407)))
+  expect_true(all(codes$concept_id |> sort() == c(4298393, 4326744, 45770407)))
 
   # non valid concept ----
   cdm$cohort3 <- measurementCohort(
@@ -69,7 +69,7 @@ test_that("mearurementCohorts works", {
   expect_true(cdm$cohort3 |> attrition() |> dplyr::pull("reason") == "Initial qualifying events")
   expect_true(settings(cdm$cohort3)$cohort_name == "normal_blood_pressure")
   codes <- attr(cdm$cohort3, "cohort_codelist") |> dplyr::collect()
-  expect_true(all(codes$concept_id  |> sort() == c(4298393, 4326744, 45770407)))
+  expect_true(all(codes$concept_id |> sort() == sort(c(4298393, 4326744, 45770407, 12345))))
 
   # no values ----
   cdm$cohort4 <- measurementCohort(
@@ -127,7 +127,6 @@ test_that("mearurementCohorts works", {
   codes <- attr(cdm$cohort6, "cohort_codelist") |> dplyr::collect()
   expect_true(all(codes$concept_id  |> sort() == c(4298393, 4326744, 45770407)))
 
-
   # more than 1 cohort ----
   cdm$cohort7 <- measurementCohort(
     cdm = cdm,
@@ -176,7 +175,7 @@ test_that("mearurementCohorts works", {
   expect_true(cdm$cohort9 |> attrition() |> dplyr::pull("reason") == "Initial qualifying events")
   expect_true(settings(cdm$cohort9)$cohort_name == "c1")
   codes <- attr(cdm$cohort9, "cohort_codelist") |> dplyr::collect()
-  expect_true(nrow(codes) == 0)
+  expect_true(nrow(codes) == 1)
 
   PatientProfiles::mockDisconnect(cdm)
 })

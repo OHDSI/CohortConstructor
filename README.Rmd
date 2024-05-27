@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# CohortConstructor
+# CohortConstructor <img src="man/figures/logo.png" align="right" height="180"/>
 
 > **This package is currently experimental and not currently recommended for use.**
 
