@@ -173,6 +173,7 @@ unerafiedConceptCohort <- function(cdm,
   if (length(cohorts) == 0) {
     cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name)
     return(cdm[[name]])
+  }
 
   cli::cli_inform(c("i" = "Combining tables."))
   cohort <- Reduce(dplyr::union_all, cohorts) |>
@@ -182,7 +183,7 @@ unerafiedConceptCohort <- function(cdm,
     dplyr::compute(name = name,
                    temporary = FALSE)
 
-  cohort
+  return(cohort)
 }
 
 fulfillCohortReqs <- function(cdm, name){
