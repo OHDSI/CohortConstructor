@@ -33,6 +33,7 @@ The cohort table.
 Set cohort start date to the last of a set of column dates
 }
 \examples{
+\donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor(tables = list(
 "cohort" = dplyr::tibble(
@@ -45,4 +46,5 @@ cdm <- mockCohortConstructor(tables = list(
 )
 ))
 cdm$cohort |> entryAtLastDate(dateColumns = c("date_1", "date_2"))
+}
 }

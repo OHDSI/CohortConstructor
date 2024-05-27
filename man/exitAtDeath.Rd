@@ -32,9 +32,10 @@ were this generates overlapping records in the cohort, those overlapping
 entries will be merged.
 }
 \examples{
+\donttest{
 library(PatientProfiles)
 library(CohortConstructor)
 cdm <- mockPatientProfiles()
 cdm$cohort1 |> exitAtDeath()
-
+}
 }

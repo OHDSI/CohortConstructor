@@ -42,9 +42,11 @@ if negate = TRUE)
 Require cohort subjects' death at a certain time window
 }
 \examples{
+\donttest{
 library(CDMConnector)
 library(CohortConstructor)
 cdm <- mockCohortConstructor(death = TRUE)
 cdm$cohort1 <- cdm$cohort1 |> requireDeathFlag(window = list(c(0, Inf)))
 attrition(cdm$cohort1)
+}
 }

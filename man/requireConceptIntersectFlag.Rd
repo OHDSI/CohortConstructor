@@ -53,7 +53,7 @@ kept (or those without the event if negate = TRUE)
 Require cohort subjects to have events of a concept list
 }
 \examples{
-
+\donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor(conditionOccurrence = TRUE)
 cdm$cohort2 <-  requireConceptIntersectFlag(
@@ -61,4 +61,5 @@ cdm$cohort2 <-  requireConceptIntersectFlag(
   conceptSet = list(a = 1),
   window = c(-Inf, 0),
   name = "cohort2")
+  }
 }

@@ -12,6 +12,7 @@
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' library(CohortConstructor)
 #' library(PatientProfiles)
 #'
@@ -29,7 +30,7 @@
 #' settings(cdm$my_cohort)
 #'
 #' attrition(cdm$my_cohort)
-#'
+#' }
 stratifyCohorts <- function(cohort,
                             strata,
                             cohortId = NULL,

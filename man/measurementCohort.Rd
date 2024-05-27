@@ -43,6 +43,7 @@ be based on the non NULL entry, and if both are specified, concepts
 fulfilling one OR the other will be included.
 }
 \examples{
+\donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor(con = NULL)
 cdm$concept <- cdm$concept |>
@@ -88,4 +89,5 @@ cdm$cohort <- measurementCohort(
 
 cdm$cohort
 
+}
 }

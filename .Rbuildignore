@@ -11,3 +11,4 @@
 ^data-raw$
 ^docs$
 ^codecov\.yml$
+^cran-comments\.md$

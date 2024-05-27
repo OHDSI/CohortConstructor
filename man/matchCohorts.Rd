@@ -38,6 +38,7 @@ new cohort will contain individuals not included in the target cohort with
 same year of birth (matchYearOfBirth = TRUE) and same sex (matchSex = TRUE).
 }
 \examples{
+\donttest{
 library(CohortConstructor)
 library(dplyr)
 cdm <- mockCohortConstructor(nPerson = 200)
@@ -49,5 +50,5 @@ cdm$new_matched_cohort <- cdm$cohort2 |>
     matchYearOfBirth = TRUE,
     ratio = 1)
 cdm$new_matched_cohort
-
+}
 }

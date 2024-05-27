@@ -4,7 +4,7 @@
 \name{CohortConstructor-package}
 \alias{CohortConstructor}
 \alias{CohortConstructor-package}
-\title{CohortConstructor: Work With Cohorts Using a Common Data Model}
+\title{CohortConstructor: Build and Manipulate Study Cohorts Using a Common Data Model}
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 

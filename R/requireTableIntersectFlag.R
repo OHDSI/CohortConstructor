@@ -24,12 +24,14 @@
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' library(CohortConstructor)
 #' cdm <- mockCohortConstructor(drugExposure = TRUE)
 #' cdm$cohort1 |>
 #'   requireTableIntersectFlag(tableName = "drug_exposure",
 #'                             indexDate = "cohort_start_date",
 #'                             window = c(-Inf, 0))
+#' }
 requireTableIntersectFlag <- function(cohort,
                                       tableName,
                                       window,
@@ -111,7 +113,7 @@ requireTableIntersectFlag <- function(cohort,
                       by = c(cols)) %>%
     dplyr::compute(name = name, temporary = FALSE) %>%
     omopgenerics::newCohortTable(.softValidation = TRUE) %>%
-    CDMConnector::recordCohortAttrition(reason = reason, cohortId = cohortId)
+    omopgenerics::recordCohortAttrition(reason = reason, cohortId = cohortId)
 
   return(x)
 }

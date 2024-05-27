@@ -18,12 +18,13 @@
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' library(CohortConstructor)
 #'
 #' cdm <- mockCohortConstructor()
 #'
 #' cdm
-#'
+#' }
 mockCohortConstructor <- function(nPerson = 10,
                                   conceptTable = NULL,
                                   tables = NULL,

@@ -161,7 +161,7 @@ test_that("intersectCohorts", {
     cohort = cdm$cohort1, name = "cohort3",
     mutuallyExclusive = FALSE, gap = 1
   ))
-  expect_true(all(CDMConnector::settings(cdm$cohort3)$mutually_exclusive == FALSE))
+  expect_true(all(omopgenerics::settings(cdm$cohort3)$mutually_exclusive == FALSE))
   expect_true(cdm$cohort3 %>% dplyr::tally() %>% dplyr::pull() == 7)
   expect_true(all(
     omopgenerics::cohortCount(cdm$cohort3) %>%

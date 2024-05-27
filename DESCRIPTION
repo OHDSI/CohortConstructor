@@ -1,5 +1,5 @@
 Package: CohortConstructor
-Title: Work With Cohorts Using a Common Data Model
+Title: Build and Manipulate Study Cohorts Using a Common Data Model
 Version: 0.1.0
 Authors@R: c(
     person("Edward", "Burn", , "edward.burn@ndorms.ox.ac.uk", 
@@ -30,7 +30,7 @@ Imports:
     glue,
     magrittr,
     omopgenerics (>= 0.2.1),
-    PatientProfiles (>= 0.8.0),
+    PatientProfiles (>= 1.0.0),
     purrr,
     rlang,
     tidyr,
@@ -50,7 +50,6 @@ Suggests:
     covr,
     RPostgres,
     odbc
-Remotes: oxford-pharmacoepi/omock   
 Config/testthat/edition: 3
 Config/testthat/parallel: true
 VignetteBuilder: knitr

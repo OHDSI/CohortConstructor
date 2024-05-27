@@ -15,6 +15,7 @@
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' library(CohortConstructor)
 #' library(dplyr)
 #' cdm <- mockCohortConstructor(nPerson = 200)
@@ -26,7 +27,7 @@
 #'     matchYearOfBirth = TRUE,
 #'     ratio = 1)
 #' cdm$new_matched_cohort
-#'
+#' }
 matchCohorts <- function(cohort,
                          cohortId = NULL,
                          matchSex = TRUE,
