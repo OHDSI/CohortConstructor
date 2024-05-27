@@ -39,7 +39,7 @@ test_that("simple stratification", {
     )
   )
 
-  cdm <- CDMConnector::copyCdmTo(con = connection(), cdm = cdm, schema = writeSchema())
+  cdm <- cdm |> copyCdm()
 
   expect_no_error(cdm$cohort1 <- stratifyCohorts(cdm$cohort1, strata = list()))
   expect_no_error(

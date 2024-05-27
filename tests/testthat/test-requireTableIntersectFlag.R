@@ -8,7 +8,7 @@ test_that("requiring presence in another table", {
     date_start = as.Date(c("2002-01-01", "2015-10-01", "2000-01-01")),
     date_end = as.Date(c("2002-01-01", "2015-10-01", "2000-01-01"))
   )
-  cdm <- CDMConnector::copyCdmTo(con = connection(), cdm = cdm_local, schema = writeSchema())
+  cdm <- cdm_local |> copyCdm()
 
   cdm$cohort2 <-  requireTableIntersectFlag(cohort = cdm$cohort1,
                                             tableName = "table",
@@ -104,7 +104,7 @@ test_that("requiring absence in another table", {
     date_start = as.Date(c("2002-01-01", "2015-10-01", "2000-01-01")),
     date_end = as.Date(c("2002-01-01", "2015-10-01", "2000-01-01"))
   )
-  cdm <- CDMConnector::copyCdmTo(con = connection(), cdm = cdm_local, schema = writeSchema())
+  cdm <- cdm_local |> copyCdm()
 
   cdm$cohort2 <-  requireTableIntersectFlag(cohort = cdm$cohort1,
                                             tableName = "table",

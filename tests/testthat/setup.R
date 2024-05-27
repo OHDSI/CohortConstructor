@@ -16,15 +16,14 @@ compareCohort <- function(cohort1, id1, cohort2, id2) {
   }
   return(invisible(TRUE))
 }
-
-writeSchema <- function(dbToTest = Sys.getenv("DB_TO_TEST", "sql server")) {
+writeSchema <- function(dbToTest = Sys.getenv("DB_TO_TEST", "duckdb")) {
+  prefix <- paste0("coco_", sample(letters, 4) |> paste0(collapse = ""), "_")
   switch(dbToTest,
-         "duckdb" = c(schema = "main", prefix = "test_"),
-         "sql server" = c(catalog = "ohdsi", schema = "dbo", prefix = "coco_"),
-         "redshift" = Sys.getenv("CDM5_REDSHIFT_SCRATCH_SCHEMA")
-  )
+         "duckdb" = c(schema = "main", prefix = prefix),
+         "sql server" = c(catalog = "ohdsi", schema = "dbo", prefix = prefix),
+         "redshift" = c(schema = "resultsv281", prefix = prefix))
 }
-connection <- function(dbToTest = Sys.getenv("DB_TO_TEST", "sql server")) {
+connection <- function(dbToTest = Sys.getenv("DB_TO_TEST", "duckdb")) {
   switch(dbToTest,
          "duckdb" = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
          "sql server" = DBI::dbConnect(
@@ -44,6 +43,10 @@ connection <- function(dbToTest = Sys.getenv("DB_TO_TEST", "sql server")) {
            host = Sys.getenv("CDM5_REDSHIFT_HOST"),
            user = Sys.getenv("CDM5_REDSHIFT_USER"),
            password = Sys.getenv("CDM5_REDSHIFT_PASSWORD")
-         )
+         ))
+}
+copyCdm <- function(cdm) {
+  CDMConnector::copyCdmTo(
+    con = connection(), cdm = cdm, schema = writeSchema(), overwrite = TRUE
   )
 }

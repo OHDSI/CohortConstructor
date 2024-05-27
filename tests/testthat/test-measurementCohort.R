@@ -29,7 +29,7 @@ test_that("mearurementCohorts works", {
     value_as_concept_id = c(0, 0, 0, 4124457, 999999, 0, 0),
     unit_concept_id = c(8876, 8876, 0, 0, 0, 0, 0)
   )
-  cdm <- CDMConnector::copyCdmTo(con = connection(), cdm = cdm, schema = writeSchema())
+  cdm <- cdm |> copyCdm()
 
   # simple example ----
   cdm$cohort <- measurementCohort(
@@ -211,7 +211,7 @@ test_that("expected errors", {
     value_as_concept_id = c(0, 0, 0, 4124457),
     unit_concept_id = c(8876, 8876, 0, 0)
   )
-  cdm <- CDMConnector::copyCdmTo(con = connection(), cdm = cdm, schema = writeSchema())
+  cdm <- cdm |> copyCdm()
 
   # simple example
   expect_error(
@@ -232,4 +232,6 @@ test_that("expected errors", {
       valueAsNumber = list("8876" = c(700, 120))
     )
   )
+
+  PatientProfiles::mockDisconnect(cdm)
 })

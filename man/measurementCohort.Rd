@@ -87,4 +87,5 @@ cdm$cohort <- measurementCohort(
 )
 
 cdm$cohort
+
 }

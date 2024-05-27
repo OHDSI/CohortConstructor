@@ -75,7 +75,7 @@ mockCohortConstructor <- function(nPerson = 10,
   }
 
   if (!is.null(con)) {
-    cdm <- CDMConnector::copyCdmTo(con = con, cdm = cdm, schema = writeSchema)
+    cdm <- CDMConnector::copyCdmTo(con = con, cdm = cdm, schema = writeSchema, overwrite = TRUE)
   }
 
   return(cdm)

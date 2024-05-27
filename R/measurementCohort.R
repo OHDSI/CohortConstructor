@@ -71,6 +71,7 @@
 #' )
 #'
 #' cdm$cohort
+#'
 measurementCohort <- function(cdm,
                               conceptSet,
                               name,

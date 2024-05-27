@@ -8,7 +8,7 @@ test_that("requiring death", {
     death_date = as.Date(c("2013-06-29", "2015-04-14")),
     death_type_concept_id = NA
   )
-  cdm <- CDMConnector::copyCdmTo(con = connection(), cdm = cdm_local, schema = writeSchema())
+  cdm <- cdm_local |> copyCdm()
 
   cdm$cohort3 <-  requireDeathFlag(cohort = cdm$cohort1,
                                    window = c(0, Inf),
@@ -83,7 +83,7 @@ test_that("not death", {
     death_date = as.Date(c("2013-06-29", "2015-10-11")),
     death_type_concept_id = NA
   )
-  cdm <- CDMConnector::copyCdmTo(con = connection(), cdm = cdm_local, schema = writeSchema())
+  cdm <- cdm_local |> copyCdm()
 
   cdm$cohort3 <-  requireDeathFlag(cohort = cdm$cohort1,
                                    window = c(0, Inf),
