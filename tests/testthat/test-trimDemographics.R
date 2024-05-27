@@ -388,4 +388,6 @@ test_that("cohort Id, name, additional columns", {
                                minPriorObservation = c(0, 400),
                                minFutureObservation = NULL)
   )
+
+  PatientProfiles::mockDisconnect(cdm)
 })

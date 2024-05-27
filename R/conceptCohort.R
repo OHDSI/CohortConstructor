@@ -99,9 +99,7 @@ conceptCohort <- function(cdm,
           .data$cohort_start_date,
           .data$cohort_end_date
         ))
-      if (tempCohort |> dplyr::tally() |> dplyr::pull("n") > 0) {
-        cohorts[[k]] <- tempCohort
-      }
+      cohorts[[domain]] <- tempCohort
     } else {
       cli::cli_inform(c(
         "x" = "Domain {.strong {domain}} ({n} concept{?s}) excluded because table {table} is not present in the cdm."
@@ -122,18 +120,8 @@ conceptCohort <- function(cdm,
     return(cdm[[name]])
   }
 
-  if (length(cohorts) == 1) {
-    cohort <- cohorts[[1]]
-  } else {
-    cli::cli_inform(c("i" = "Combining tables."))
-    cohort <- cohorts[[1]] |> dplyr::compute()
-    for (k in 2:length(cohorts)) {
-      cohort <- cohort |>
-        dplyr::union_all(cohorts[[k]]) |>
-        dplyr::compute()
-    }
-  }
-  cohort <- cohort |>
+  cli::cli_inform(c("i" = "Combining tables."))
+  cohort <- Reduce(dplyr::union_all, cohorts) |>
     dplyr::compute(name = name, temporary = FALSE)
 
   cli::cli_inform(c("i" = "Collapsing records."))
