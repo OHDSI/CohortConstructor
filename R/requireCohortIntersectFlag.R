@@ -77,7 +77,7 @@ requireCohortIntersectFlag <- function(cohort,
   }
 
   if(is.null(targetCohortId)){
-    targetCohortId <- CDMConnector::settings(cdm[[targetCohortTable]]) %>%
+    targetCohortId <- omopgenerics::settings(cdm[[targetCohortTable]]) %>%
       dplyr::pull("cohort_definition_id")
   }
 
@@ -132,7 +132,7 @@ requireCohortIntersectFlag <- function(cohort,
                       by = c(cols)) %>%
     dplyr::compute(name = name, temporary = FALSE) %>%
     omopgenerics::newCohortTable(.softValidation = TRUE) %>%
-    CDMConnector::recordCohortAttrition(reason = reason, cohortId = cohortId)
+    omopgenerics::recordCohortAttrition(reason = reason, cohortId = cohortId)
 
   return(x)
 }

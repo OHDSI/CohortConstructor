@@ -113,7 +113,7 @@ requireTableIntersectFlag <- function(cohort,
                       by = c(cols)) %>%
     dplyr::compute(name = name, temporary = FALSE) %>%
     omopgenerics::newCohortTable(.softValidation = TRUE) %>%
-    CDMConnector::recordCohortAttrition(reason = reason, cohortId = cohortId)
+    omopgenerics::recordCohortAttrition(reason = reason, cohortId = cohortId)
 
   return(x)
 }

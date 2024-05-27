@@ -45,7 +45,7 @@ requireInDateRange <- function(cohort,
         .data[[indexDate]] >= !!dateRange[1] | (!.data$cohort_definition_id %in% cohortId)
       ) |>
       dplyr::compute(name = name, temporary = FALSE) |>
-      CDMConnector::recordCohortAttrition(
+      omopgenerics::recordCohortAttrition(
         reason = paste0(indexDate, " after ", dateRange[1]),
         cohortId = cohortId
       )
@@ -57,7 +57,7 @@ requireInDateRange <- function(cohort,
         .data[[indexDate]] <= !!dateRange[2] | (!.data$cohort_definition_id %in% cohortId)
       ) |>
       dplyr::compute(name = name, temporary = FALSE) |>
-      CDMConnector::recordCohortAttrition(
+      omopgenerics::recordCohortAttrition(
         reason = paste0(indexDate, " before ", dateRange[2]),
         cohortId = cohortId
       )
@@ -126,7 +126,7 @@ trimToDateRange <- function(cohort,
         minDate = dateRange[1]
       ) %>%
       dplyr::compute(name = name, temporary = FALSE) %>%
-      CDMConnector::recordCohortAttrition(
+      omopgenerics::recordCohortAttrition(
         reason = paste0(startDate, " >= ", dateRange[1]),
         cohortId = cohortId
       )
@@ -142,7 +142,7 @@ trimToDateRange <- function(cohort,
         maxDate = dateRange[2]
       ) %>%
       dplyr::compute(name = name, temporary = FALSE) %>%
-      CDMConnector::recordCohortAttrition(
+      omopgenerics::recordCohortAttrition(
         reason = paste0(endDate, " <= ", dateRange[2]),
         cohortId = cohortId
       )
