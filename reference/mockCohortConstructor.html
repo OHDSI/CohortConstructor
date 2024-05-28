@@ -63,7 +63,8 @@
 <span>  measurement <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  death <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  otherTables <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  con <span class="op">=</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">duckdb</span><span class="fu">::</span><span class="fu"><a href="https://r.duckdb.org/reference/duckdb.html" class="external-link">duckdb</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span>  con <span class="op">=</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">duckdb</span><span class="fu">::</span><span class="fu"><a href="https://r.duckdb.org/reference/duckdb.html" class="external-link">duckdb</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  writeSchema <span class="op">=</span> <span class="st">"main"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -110,7 +111,12 @@
 
 
 <dt>con</dt>
-<dd><p>db connection detail for copy to databases</p></dd>
+<dd><p>A DBI connection to create the cdm mock object.</p></dd>
+
+
+<dt>writeSchema</dt>
+<dd><p>Name of an schema on the same connection with writing
+permisions.</p></dd>
 
 </dl></div>
     <div class="section level2">
