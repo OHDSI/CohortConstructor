@@ -8,9 +8,7 @@ test_that("requiring death", {
     death_date = as.Date(c("2013-06-29", "2015-04-14")),
     death_type_concept_id = NA
   )
-  cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
-                                   cdm = cdm_local,
-                                   schema = "main")
+  cdm <- cdm_local |> copyCdm()
 
   cdm$cohort3 <-  requireDeathFlag(cohort = cdm$cohort1,
                                    window = c(0, Inf),
@@ -72,7 +70,7 @@ test_that("requiring death", {
                       "Initial qualifying events",
                       "Death between 0 & Inf days relative to cohort_start_date")))
 
-  CDMConnector::cdm_disconnect(cdm)
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("not death", {
@@ -85,9 +83,7 @@ test_that("not death", {
     death_date = as.Date(c("2013-06-29", "2015-10-11")),
     death_type_concept_id = NA
   )
-  cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
-                                   cdm = cdm_local,
-                                   schema = "main")
+  cdm <- cdm_local |> copyCdm()
 
   cdm$cohort3 <-  requireDeathFlag(cohort = cdm$cohort1,
                                    window = c(0, Inf),
@@ -118,5 +114,5 @@ test_that("not death", {
                     c("Initial qualifying events", "Alive between 0 & Inf days relative to cohort_start_date",
                       "Initial qualifying events")))
 
-  CDMConnector::cdm_disconnect(cdm)
+  PatientProfiles::mockDisconnect(cdm)
 })

@@ -10,7 +10,6 @@ test_that("getIdentifier", {
 })
 
 test_that("joinOverlap", {
-
   x <- dplyr::tibble(
     start_date = as.Date(c(
       "2020-01-01", "2020-03-01", "2020-06-01", "2020-02-01", "2020-05-02",
@@ -24,7 +23,9 @@ test_that("joinOverlap", {
     def_id = c(1, 1, 1, 2, 2, 1, 1, 2)
   )
 
-  cdm <- mockCohortConstructor(otherTables = list(x = x))
+  cdm <- mockCohortConstructor(otherTables = list(x = x),
+                               con = connection(),
+                               writeSchema = writeSchema())
   # gap = 0
   res <- joinOverlap(
     cdm$x, startDate = "start_date", endDate = "end_date", by = c("pid", "def_id")
@@ -67,6 +68,8 @@ test_that("joinOverlap", {
       ))
     )
   )
+
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("splitOverlap", {
@@ -82,13 +85,11 @@ test_that("splitOverlap", {
     pid = c(1, 1, 1, 1, 1, 2, 2, 2),
     def_id = c(1, 1, 1, 2, 2, 1, 2, 1)
   )
-  db <- DBI::dbConnect(duckdb::duckdb(), ":memory:")
-  DBI::dbWriteTable(db, "x", x)
-  x <- dplyr::tbl(db, "x")
+  cdm <- mockCohortConstructor(otherTables = list(x = x), con = connection(), writeSchema = writeSchema())
 
   expect_no_error(
     res <- splitOverlap(
-      x, start = "start_date", end = "end_date", by = c("pid", "def_id")
+      cdm$x, start = "start_date", end = "end_date", by = c("pid", "def_id")
     ) |>
       dplyr::collect() |>
       dplyr::arrange(.data$pid, .data$def_id, .data$start_date)
@@ -112,7 +113,7 @@ test_that("splitOverlap", {
     )
   )
 
-  DBI::dbDisconnect(db, shutdown = TRUE)
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("intersectCohorts", {
@@ -120,9 +121,7 @@ test_that("intersectCohorts", {
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
     omock::mockCohort(name = c("cohort1"), numberCohorts = 2)
-  cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
-                                   cdm = cdm_local,
-                                   schema = "main")
+  cdm <- cdm_local |> copyCdm()
 
   # mutually exclusive
   expect_no_error(cdm$cohort2 <- intersectCohorts(
@@ -212,7 +211,7 @@ test_that("intersectCohorts", {
   # all cohorts
   expect_no_error(cohort <- cdm$cohort1 |> intersectCohorts())
 
-  CDMConnector::cdmDisconnect(cdm)
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("only return comb", {
@@ -223,9 +222,7 @@ test_that("only return comb", {
     omock::mockCohort(name = c("cohort1"), numberCohorts = 2, seed = 2)
   cdm_local$cohort1 <- cdm_local$cohort1 |>
     dplyr::filter(cohort_end_date != as.Date("2015-04-17"))
-  cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
-                                   cdm = cdm_local,
-                                   schema = "main")
+  cdm <- cdm_local |> copyCdm()
 
   cdm$cohort2 <- intersectCohorts(
     cohort = cdm$cohort1, name = "cohort2",
@@ -264,9 +261,7 @@ test_that("only return comb", {
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
     omock::mockCohort(name = c("cohort1"), numberCohorts = 3)
-  cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
-                                   cdm = cdm_local,
-                                   schema = "main")
+  cdm <- cdm_local |> copyCdm()
   cdm$cohort3 <- intersectCohorts(
     cohort = cdm$cohort1, name = "cohort3",
     mutuallyExclusive = FALSE, returnOnlyComb = TRUE, gap = 1
@@ -325,6 +320,8 @@ test_that("only return comb", {
   expect_true(all(omopgenerics::settings(cdm$cohort4)$cohort_2 == c(1, 1, 0, 1)))
   expect_true(all(omopgenerics::settings(cdm$cohort4)$cohort_3 == c(0, 1, 1, 1)))
   expect_true(all(omopgenerics::settings(cdm$cohort4)$mutually_exclusive))
+
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("attrition and cohortId", {
@@ -334,9 +331,7 @@ test_that("attrition and cohortId", {
     omock::mockCohort(name = c("cohort1"), numberCohorts = 4, seed = 2)
   cdm_local$person <- cdm_local$person |>
     dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
-  cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
-                                   cdm = cdm_local,
-                                   schema = "main")
+  cdm <- cdm_local |> copyCdm()
 
   cdm$cohort1 <- cdm$cohort1 |>
     requireInDateRange(dateRange = as.Date(c("1990-01-01", "2025-01-01"))) |>
@@ -365,6 +360,8 @@ test_that("attrition and cohortId", {
   expect_true(all(omopgenerics::attrition(cdm$cohort1)$excluded_subjects ==
                     c(0, 0, 0, 2, 0, 0, 0, 0, 0, 2, 0, 0, 0)))
   expect_true(all(omopgenerics::settings(cdm$cohort1)$cohort_name == c("cohort_1", "cohort_2", "cohort_1_cohort_2")))
+
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("codelist", {
@@ -397,8 +394,7 @@ test_that("codelist", {
   cdm_local$observation_period <- cdm_local$observation_period|>
     dplyr::mutate(observation_period_start_date = as.Date("1990-01-01"), observation_period_end_date = as.Date("2020-01-01"))
 
-  cdm <- CDMConnector::copyCdmTo(con = DBI::dbConnect(duckdb::duckdb()),
-                                 cdm = cdm_local, schema = "main")
+  cdm <- cdm_local |> copyCdm()
 
   cdm$cohort1 <- conceptCohort(cdm, conceptSet = list(c1 = c(1,3), c2 = c(2)), name = "cohort1")
 
@@ -471,4 +467,6 @@ test_that("codelist", {
   expect_true(all(codes |> dplyr::pull("concept_id") |> sort() == c(rep(1, 4), rep(2, 4), rep(3, 4))))
   expect_true(all(codes |> dplyr::pull("type") |> sort() == rep("index event", 12)))
   expect_true(all(codes |> dplyr::pull("cohort_definition_id") |> sort() == c(2, 2, 3, 3, 4, 5, 6, 6, 6, 7, 7, 7)))
+
+  PatientProfiles::mockDisconnect(cdm)
 })

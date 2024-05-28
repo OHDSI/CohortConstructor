@@ -37,9 +37,7 @@ test_that("simple duckdb checks", {
       )
     )
   )
-  cdm <- CDMConnector::copyCdmTo(
-    con = duckdb::dbConnect(duckdb::duckdb()), cdm = cdm, schema = "main"
-  )
+  cdm <- cdm |> copyCdm()
 
   # test with cohort1 ----
   expect_no_error(
@@ -321,10 +319,14 @@ test_that("simple duckdb checks", {
       "cohort_end_date" = as.Date(c("2013-04-18"))
     )
   )
+
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("cohort Id, name, additional columns", {
-  cdm <- mockCohortConstructor(nPerson = 5)
+  cdm <- mockCohortConstructor(nPerson = 5,
+                               con = connection(),
+                               writeSchema = writeSchema())
   cdm$cohort2 <- cdm$cohort2 |>
     dplyr::mutate(
       col_extra1 = as.numeric(subject_id) + 1,
@@ -386,4 +388,6 @@ test_that("cohort Id, name, additional columns", {
                                minPriorObservation = c(0, 400),
                                minFutureObservation = NULL)
   )
+
+  PatientProfiles::mockDisconnect(cdm)
 })

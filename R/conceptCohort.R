@@ -153,6 +153,7 @@ unerafiedConceptCohort <- function(cdm,
           .data$cohort_end_date
         )) |>
         dplyr::filter(.data$cohort_start_date <= .data$cohort_end_date)
+      cohorts[[domain]] <- tempCohort
       if (tempCohort |>
           utils::head(1) |>
           dplyr::tally() |>
@@ -172,32 +173,17 @@ unerafiedConceptCohort <- function(cdm,
   if (length(cohorts) == 0) {
     cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name)
     return(cdm[[name]])
-
-  } else if (length(cohorts) == 1) {
-    cohort <- cohorts[[1]]
-  } else { # more than one cohort, so will put together
-    cli::cli_inform(c("i" = "Combining tables."))
-    cohort <- cohorts[[1]] |>
-      dplyr::compute(name = paste0(name, "_1"),
-                     temporary = FALSE,
-                     overwrite = TRUE)
-    for (k in 2:length(cohorts)) {
-      cohort <- cohort |>
-        dplyr::union_all(cohorts[[k]])  |>
-        dplyr::compute(name = paste0(name, "_k_", k),
-                       temporary = FALSE,
-                       overwrite = TRUE)
-    }
   }
+
+  cli::cli_inform(c("i" = "Combining tables."))
+  cohort <- Reduce(dplyr::union_all, cohorts) |>
+    dplyr::compute(name = name, temporary = FALSE)
 
   cohort <- cohort |>
     dplyr::compute(name = name,
                    temporary = FALSE)
 
-  omopgenerics::dropTable(cdm = cdm,
-                          name = dplyr::contains(paste0(name, "_k_")))
-
-  cohort
+  return(cohort)
 }
 
 fulfillCohortReqs <- function(cdm, name){

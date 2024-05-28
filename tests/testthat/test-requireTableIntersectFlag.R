@@ -8,9 +8,7 @@ test_that("requiring presence in another table", {
     date_start = as.Date(c("2002-01-01", "2015-10-01", "2000-01-01")),
     date_end = as.Date(c("2002-01-01", "2015-10-01", "2000-01-01"))
   )
-  cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
-                                   cdm = cdm_local,
-                                   schema = "main")
+  cdm <- cdm_local |> copyCdm()
 
   cdm$cohort2 <-  requireTableIntersectFlag(cohort = cdm$cohort1,
                                             tableName = "table",
@@ -93,7 +91,7 @@ test_that("requiring presence in another table", {
                               window = c(-Inf, Inf))
   )
 
-  CDMConnector::cdm_disconnect(cdm)
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("requiring absence in another table", {
@@ -106,9 +104,7 @@ test_that("requiring absence in another table", {
     date_start = as.Date(c("2002-01-01", "2015-10-01", "2000-01-01")),
     date_end = as.Date(c("2002-01-01", "2015-10-01", "2000-01-01"))
   )
-  cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
-                                   cdm = cdm_local,
-                                   schema = "main")
+  cdm <- cdm_local |> copyCdm()
 
   cdm$cohort2 <-  requireTableIntersectFlag(cohort = cdm$cohort1,
                                             tableName = "table",
@@ -175,5 +171,5 @@ test_that("requiring absence in another table", {
                  "Not in table table between 0 & Inf days relative to cohort_start_date",
                  "Initial qualifying events"))
 
-  CDMConnector::cdm_disconnect(cdm)
+  PatientProfiles::mockDisconnect(cdm)
 })

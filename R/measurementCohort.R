@@ -27,7 +27,6 @@
 #' @return A cohort table
 #'
 #' @examples
-#' \donttest{
 #' library(CohortConstructor)
 #' cdm <- mockCohortConstructor(con = NULL)
 #' cdm$concept <- cdm$concept |>
@@ -72,7 +71,7 @@
 #' )
 #'
 #' cdm$cohort
-#' }
+#'
 measurementCohort <- function(cdm,
                               conceptSet,
                               name,

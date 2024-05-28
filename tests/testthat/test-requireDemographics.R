@@ -6,9 +6,7 @@ test_that("test it works and expected errors", {
   # to remove in new omock
   cdm_local$person <- cdm_local$person |>
     dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
-  cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
-                                   cdm = cdm_local,
-                                   schema = "main")
+  cdm <- cdm_local |> copyCdm()
 
   cdm$cohort1 <- cdm$cohort %>%
     requireDemographics(
@@ -124,7 +122,7 @@ test_that("test it works and expected errors", {
     minFutureObservation = "a"
   ))
 
-  CDMConnector::cdm_disconnect(cdm)
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("restrictions applied to single cohort", {
@@ -135,9 +133,7 @@ test_that("restrictions applied to single cohort", {
   # to remove in new omock
   cdm_local$person <- cdm_local$person |>
     dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
-  cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
-                                   cdm = cdm_local,
-                                   schema = "main")
+  cdm <- cdm_local |> copyCdm()
 
   cdm$cohort1 <- cdm$cohort %>%
     requireDemographics(ageRange = list(c(0, 5)), name = "cohort1")
@@ -172,7 +168,7 @@ test_that("restrictions applied to single cohort", {
   expect_true(settings(cdm$cohort2)$min_prior_observation == 0)
   expect_true(settings(cdm$cohort2)$min_future_observation == 0)
 
-  CDMConnector::cdm_disconnect(cdm)
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("ignore existing cohort extra variables", {
@@ -183,9 +179,8 @@ test_that("ignore existing cohort extra variables", {
   # to remove in new omock
   cdm_local$person <- cdm_local$person |>
     dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
-  cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
-                                   cdm = cdm_local,
-                                   schema = "main")
+  cdm <- cdm_local |> copyCdm()
+
   cdm$cohort <- cdm$cohort |>
     PatientProfiles::addDemographics() |>
     dplyr::compute(name = "cohort", temporary = FALSE)
@@ -211,7 +206,7 @@ test_that("ignore existing cohort extra variables", {
                     omopgenerics::attrition(cdm$new_cohort)$reason))
   expect_true(all(colnames(settings(cdm$cohort)) == c("cohort_definition_id", "cohort_name", "min_prior_observation")))
 
-  CDMConnector::cdm_disconnect(cdm)
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("external columns kept after requireDemographics", {
@@ -228,17 +223,14 @@ test_that("external columns kept after requireDemographics", {
   # to remove in new omock
   cdm_local$person <- cdm_local$person |>
     dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
-  cdm <- CDMConnector::copy_cdm_to(
-    con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
-    cdm = cdm_local,
-    schema = "main")
+  cdm <- cdm_local |> copyCdm()
 
   cdm$cohort <- cdm$cohort %>%
     requireDemographics(indexDate = "new_index_date", ageRange = list(c(0,5)))
 
   expect_true(all(c("col_extra1", "col_extra2", "new_index_date") %in% colnames(cdm$cohort)))
 
-  CDMConnector::cdm_disconnect(cdm)
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("cohortIds", {
@@ -249,10 +241,7 @@ test_that("cohortIds", {
   # to remove in new omock
   cdm_local$person <- cdm_local$person |>
     dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
-  cdm <- CDMConnector::copy_cdm_to(
-    con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
-    cdm = cdm_local,
-    schema = "main")
+  cdm <- cdm_local |> copyCdm()
 
   cdm$new_cohort <- requireSex(cohort = cdm$cohort, cohortId = 1, sex = "Male") |>
     requirePriorObservation(cohortId = 3, minPriorObservation = 1000, name = "new_cohort")
@@ -264,7 +253,7 @@ test_that("cohortIds", {
   expect_true(all(cdm$new_cohort |> dplyr::pull("cohort_definition_id") == c(2,2,2,3)))
   expect_true(all(cdm$new_cohort |> dplyr::pull("subject_id") == c(2,2,2,1)))
 
-  CDMConnector::cdm_disconnect(cdm)
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("test more than one restriction", {
@@ -275,10 +264,7 @@ test_that("test more than one restriction", {
   # to remove in new omock
   cdm_local$person <- cdm_local$person |>
     dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
-  cdm <- CDMConnector::copy_cdm_to(
-    con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
-    cdm = cdm_local,
-    schema = "main")
+  cdm <- cdm_local |> copyCdm()
 
   # keep = false
   cdm$cohort1 <- cdm$cohort |>
@@ -351,7 +337,7 @@ test_that("test more than one restriction", {
         'cohort_3_3', 'cohort_3_4')
   ))
 
-  CDMConnector::cdm_disconnect(cdm)
+  PatientProfiles::mockDisconnect(cdm)
 
   # one empty output cohort
   cdm_local <- omock::mockCdmReference() |>
@@ -361,10 +347,7 @@ test_that("test more than one restriction", {
   # to remove in new omock
   cdm_local$person <- cdm_local$person |>
     dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
-  cdm <- CDMConnector::copy_cdm_to(
-    con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
-    cdm = cdm_local,
-    schema = "main")
+  cdm <- cdm_local |> copyCdm()
 
   # empty cohort return (no males in the cohort)
   cdm$cohort1 <- cdm$cohort |>
@@ -418,7 +401,7 @@ test_that("test more than one restriction", {
         'Sex requirement: Male', 'Sex requirement: Male')
   ))
 
-  CDMConnector::cdm_disconnect(cdm)
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("codelist kept with >1 requirement", {
@@ -451,8 +434,7 @@ test_that("codelist kept with >1 requirement", {
       "drug_exposure_end_date" = as.Date(.data$drug_exposure_end_date, origin = "2010-01-01")
     )
 
-  cdm <- CDMConnector::copyCdmTo(con = DBI::dbConnect(duckdb::duckdb()),
-                                 cdm = cdm_local, schema = "main")
+  cdm <- cdm_local |> copyCdm()
 
   cdm$cohort1 <- conceptCohort(cdm = cdm, conceptSet = list(a = 1, b = 2), name = "cohort1")
 
@@ -467,7 +449,7 @@ test_that("codelist kept with >1 requirement", {
     )
   )
 
-  CDMConnector::cdm_disconnect(cdm)
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("settings with extra columns", {
@@ -478,10 +460,7 @@ test_that("settings with extra columns", {
   # to remove in new omock
   cdm_local$person <- cdm_local$person |>
     dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
-  cdm <- CDMConnector::copy_cdm_to(
-    con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
-    cdm = cdm_local,
-    schema = "main")
+  cdm <- cdm_local |> copyCdm()
 
   cdm$cohort <- cdm$cohort |>
     omopgenerics::newCohortTable(
@@ -501,6 +480,7 @@ test_that("settings with extra columns", {
   )
   expect_true(all(colnames(attrition(cdm$cohort)) ==
                     c("cohort_definition_id", "number_records", "number_subjects", "reason_id", "reason", "excluded_records", "excluded_subjects" )))
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("requireInteractions", {
@@ -511,10 +491,7 @@ test_that("requireInteractions", {
   # to remove in new omock
   cdm_local$person <- cdm_local$person |>
     dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
-  cdm <- CDMConnector::copy_cdm_to(
-    con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
-    cdm = cdm_local,
-    schema = "main")
+  cdm <- cdm_local |> copyCdm()
 
   cdm$cohort1 <- cdm$cohort |>
     requireDemographics(sex = c("Both", "Female"),
@@ -532,4 +509,5 @@ test_that("requireInteractions", {
       min_future_observation = rep(0, 9)
     )
   )
+  PatientProfiles::mockDisconnect(cdm)
 })

@@ -3,9 +3,7 @@ test_that("subsetCohort works", {
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
     omock::mockCohort(name = c("cohort1"), numberCohorts = 5, seed = 2)
-  cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
-                                   cdm = cdm_local,
-                                   schema = "main")
+  cdm <- cdm_local |> copyCdm()
 
   # Subset 1 cohort
   cdm$cohort2 <- subsetCohorts(cdm$cohort1, 1, "cohort2")
@@ -43,6 +41,8 @@ test_that("subsetCohort works", {
   ))
   expect_equal(attrition(cohort) |> dplyr::filter(.data$cohort_definition_id %in% 3:5),
                attrition(cdm$cohort1))
+
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("codelist works", {
@@ -75,8 +75,7 @@ test_that("codelist works", {
   cdm_local$observation_period <- cdm_local$observation_period|>
     dplyr::mutate(observation_period_start_date = as.Date("1990-01-01"), observation_period_end_date = as.Date("2020-01-01"))
 
-  cdm <- CDMConnector::copyCdmTo(con = DBI::dbConnect(duckdb::duckdb()),
-                                 cdm = cdm_local, schema = "main")
+  cdm <- cdm_local |> copyCdm()
 
   cdm$cohort1 <- conceptCohort(cdm, conceptSet = list(c1 = c(1,3), c2 = c(2)), name = "cohort1")
 
@@ -90,6 +89,8 @@ test_that("codelist works", {
   cdm$cohort1 <- subsetCohorts(cdm$cohort1, 2)
   expect_equal(attr(cdm$cohort1, "cohort_codelist") |> dplyr::collect(),
                attr(cohort, "cohort_codelist") |> dplyr::filter(cohort_definition_id == 2) |> dplyr::collect())
+
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("Expected behaviour", {
@@ -97,9 +98,7 @@ test_that("Expected behaviour", {
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
     omock::mockCohort(name = c("cohort1"), numberCohorts = 5, seed = 2)
-  cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
-                                   cdm = cdm_local,
-                                   schema = "main")
+  cdm <- cdm_local |> copyCdm()
 
   # Subset 1 cohort
   expect_error(cdm$cohort2 <- subsetCohorts("cohort1", 1, "cohort2"))
@@ -108,4 +107,6 @@ test_that("Expected behaviour", {
   expect_error(cdm$cohort2 <- subsetCohorts(cdm$cohort1, 10, "cohort2"))
   expect_no_error(cohort <- subsetCohorts(cdm$cohort1, NULL))
   expect_identical(cohort, cdm$cohort1)
+
+  PatientProfiles::mockDisconnect(cdm)
 })

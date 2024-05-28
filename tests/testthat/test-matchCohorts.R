@@ -64,7 +64,7 @@ test_that("matchCohorts runs without errors", {
   expect_error(matchCohorts(cohort = dplyr::tibble()))
   expect_error(matchCohorts(cohort = cdm$cases, ratio = -0.5))
 
-  CDMConnector::cdm_disconnect(cdm)
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("matchCohorts, no duplicated people within a cohort", {

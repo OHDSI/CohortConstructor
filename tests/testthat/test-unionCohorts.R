@@ -3,9 +3,7 @@ test_that("unionCohorts works", {
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
     omock::mockCohort(name = c("cohort1"), numberCohorts = 4)
-  cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
-                                   cdm = cdm_local,
-                                   schema = "main")
+  cdm <- cdm_local |> copyCdm()
   # simple example
   cdm$cohort2 <- unionCohorts(cdm$cohort1, name = "cohort2")
   expect_true(all(
@@ -56,6 +54,7 @@ test_that("unionCohorts works", {
                     )))
   expect_true(settings(cdm$cohort3)$cohort_name == "cohort_1_cohort_2")
 
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("gap and name works", {
@@ -74,9 +73,7 @@ test_that("gap and name works", {
     cohort_start_date = as.Date(c("2000-07-01", "2000-07-10", "2000-07-22")),
     cohort_end_date = as.Date(c("2000-07-02", "2000-07-20", "2000-08-22"))
   )
-  cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
-                                   cdm = cdm_local,
-                                   schema = "main")
+  cdm <- cdm_local |> copyCdm()
   cdm$cohort1 <- cdm$cohort1 |> omopgenerics::newCohortTable()
 
   # gap
@@ -131,6 +128,8 @@ test_that("gap and name works", {
                       excluded_subjects = 0
                     )))
   expect_true(settings(cdm$cohort)$cohort_name == "test")
+
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("Expected behaviour", {
@@ -138,9 +137,7 @@ test_that("Expected behaviour", {
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
     omock::mockCohort(name = c("cohort"), numberCohorts = 4, seed = 8, recordPerson = 2)
-  cdm <- CDMConnector::copy_cdm_to(con = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
-                                   cdm = cdm_local,
-                                   schema = "main")
+  cdm <- cdm_local |> copyCdm()
   expect_warning(
     cohort <- unionCohorts(cdm$cohort,
                           cohortId = 1,
@@ -185,6 +182,8 @@ test_that("Expected behaviour", {
                           cohortName = "hOLA",
                           name = "cohort1")
   )
+
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("test codelist", {
@@ -217,8 +216,7 @@ test_that("test codelist", {
   cdm_local$observation_period <- cdm_local$observation_period|>
     dplyr::mutate(observation_period_start_date = as.Date("1990-01-01"), observation_period_end_date = as.Date("2020-01-01"))
 
-  cdm <- CDMConnector::copyCdmTo(con = DBI::dbConnect(duckdb::duckdb()),
-                                 cdm = cdm_local, schema = "main")
+  cdm <- cdm_local |> copyCdm()
 
   cdm$cohort1 <- conceptCohort(cdm, conceptSet = list(c1 = c(1,3), c2 = c(2)), name = "cohort1")
 
@@ -260,6 +258,6 @@ test_that("test codelist", {
   expect_true(all(codes |> dplyr::pull("concept_id") |> sort() == c(1, 2, 3)))
   expect_true(all(codes |> dplyr::pull("type") |> sort() == rep("index event", 3)))
   expect_true(all(codes |> dplyr::pull("cohort_definition_id") |> sort() == c(1, 1, 1)))
+
+  PatientProfiles::mockDisconnect(cdm)
 })
-
-
