@@ -139,6 +139,7 @@ test_that("requiring presence in another cohort", {
 })
 
 test_that("requiring absence in another cohort", {
+  testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>

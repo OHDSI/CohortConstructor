@@ -1,5 +1,6 @@
 test_that("unionCohorts works", {
-  cdm_local <- omock::mockCdmReference() |>
+
+    cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
     omock::mockCohort(name = c("cohort1"), numberCohorts = 4)
@@ -133,7 +134,8 @@ test_that("gap and name works", {
 })
 
 test_that("Expected behaviour", {
-  cdm_local <- omock::mockCdmReference() |>
+  testthat::skip_on_cran()
+   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
     omock::mockCohort(name = c("cohort"), numberCohorts = 4, seed = 8, recordPerson = 2)
@@ -187,6 +189,7 @@ test_that("Expected behaviour", {
 })
 
 test_that("test codelist", {
+  testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>

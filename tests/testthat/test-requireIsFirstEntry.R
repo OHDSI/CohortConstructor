@@ -21,6 +21,7 @@ test_that("test restrict to first entry works", {
 })
 
 test_that("requireIsFirstEntry, cohortIds & name arguments", {
+  testthat::skip_on_cran()
   cdm <- omock::mockCdmReference() |>
     omock::mockPerson(n = 3) |>
     omock::mockObservationPeriod() |>
@@ -59,8 +60,8 @@ test_that("requireIsFirstEntry, cohortIds & name arguments", {
 
 })
 
-
 test_that("requireIsFirstEntry, index date + errors", {
+  testthat::skip_on_cran()
   cdm <- omock::mockCdmReference() |>
     omock::mockPerson(n = 3) |>
     omock::mockObservationPeriod() |>
@@ -83,8 +84,8 @@ test_that("requireIsFirstEntry, index date + errors", {
   expect_warning(cdm$cohort |> requireIsFirstEntry(cohortId = c(1, 5)))
 })
 
-
 test_that("requireIsLastEntry", {
+  testthat::skip_on_cran()
   cdm <- omock::mockCdmReference() |>
     omock::mockPerson(n = 3) |>
     omock::mockObservationPeriod() |>

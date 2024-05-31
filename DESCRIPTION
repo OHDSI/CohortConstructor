@@ -14,9 +14,8 @@ Authors@R: c(
     role = c("aut"), comment = c(ORCID = "0000-0002-9517-8834")),
     person("Yuchen", "Guo", email = "yuchen.guo@ndorms.ox.ac.uk", 
     role = c("aut"), comment = c(ORCID = "0000-0002-0847-4855")))
-Description: This package aims to provide functionalities to create
-    and manipulate cohorts in data mapped to the Observational Medical 
-    Outcomes Partnership Common Data Model.
+Description: Create and manipulate study cohorts in data mapped to the 
+    Observational Medical Outcomes Partnership Common Data Model.
 License: Apache License (>= 2)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

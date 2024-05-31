@@ -123,7 +123,8 @@ test_that("simple example", {
 })
 
 test_that("simple example duckdb", {
-  cdm <- omock::mockCdmReference() |>
+  testthat::skip_on_cran()
+   cdm <- omock::mockCdmReference() |>
     omock::mockCdmFromTables(tables = list("cohort" = dplyr::tibble(
       "cohort_definition_id" = 1,
       "subject_id" = c(1, 2, 3),
@@ -191,6 +192,7 @@ test_that("simple example duckdb", {
 })
 
 test_that("concepts from multiple cdm tables duckdb", {
+  testthat::skip_on_cran()
   cdm <- omock::mockCdmReference() |>
     omock::mockCdmFromTables(tables = list("cohort" = dplyr::tibble(
       "cohort_definition_id" = 1,
@@ -219,6 +221,7 @@ test_that("concepts from multiple cdm tables duckdb", {
 })
 
 test_that("excluded concepts in codelist", {
+  testthat::skip_on_cran()
   cdm <- omock::mockCdmReference() |>
     omock::mockCdmFromTables(tables = list("cohort" = dplyr::tibble(
       "cohort_definition_id" = 1,
@@ -265,6 +268,7 @@ test_that("excluded concepts in codelist", {
 })
 
 test_that("out of observation", {
+  testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod()
@@ -408,6 +412,7 @@ test_that("out of observation", {
 })
 
 test_that("table not present in the cdm", {
+  testthat::skip_on_cran()
   cdm <- omock::mockCdmReference() |>
     omock::mockCdmFromTables(tables = list("cohort" = dplyr::tibble(
       "cohort_definition_id" = 1,

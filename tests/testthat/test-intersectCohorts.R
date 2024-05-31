@@ -10,6 +10,7 @@ test_that("getIdentifier", {
 })
 
 test_that("joinOverlap", {
+  testthat::skip_on_cran()
   x <- dplyr::tibble(
     start_date = as.Date(c(
       "2020-01-01", "2020-03-01", "2020-06-01", "2020-02-01", "2020-05-02",
@@ -73,6 +74,7 @@ test_that("joinOverlap", {
 })
 
 test_that("splitOverlap", {
+  testthat::skip_on_cran()
   x <- dplyr::tibble(
     start_date = as.Date(c(
       "2020-01-01", "2020-03-01", "2020-06-01", "2020-02-01", "2020-05-02",
@@ -117,6 +119,7 @@ test_that("splitOverlap", {
 })
 
 test_that("intersectCohorts", {
+  testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
@@ -215,6 +218,7 @@ test_that("intersectCohorts", {
 })
 
 test_that("only return comb", {
+  testthat::skip_on_cran()
   # combination = null
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
@@ -325,6 +329,7 @@ test_that("only return comb", {
 })
 
 test_that("attrition and cohortId", {
+  testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
@@ -365,6 +370,7 @@ test_that("attrition and cohortId", {
 })
 
 test_that("codelist", {
+  testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 3) |>
     omock::mockObservationPeriod() |>

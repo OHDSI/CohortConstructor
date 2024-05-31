@@ -1,4 +1,5 @@
 test_that("requiring presence in another table", {
+  testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
@@ -95,6 +96,7 @@ test_that("requiring presence in another table", {
 })
 
 test_that("requiring absence in another table", {
+  testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>

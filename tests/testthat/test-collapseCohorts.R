@@ -92,6 +92,7 @@ test_that("simple example", {
 })
 
 test_that("out of observation", {
+  testthat::skip_on_cran()
   cdm <- omock::mockCdmReference() |>
     omock::mockCdmFromTables(tables = list("cohort" = dplyr::tibble(
       "cohort_definition_id" = 1,
