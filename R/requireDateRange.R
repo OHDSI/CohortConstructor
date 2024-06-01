@@ -1,5 +1,9 @@
 #' Require that an index date is within a date range
 #'
+#' @description
+#' `requireInDateRange()` filters cohort records, keeping only those for
+#' which the index date is within the specified date range.
+#'
 #' @param cohort A cohort table in a cdm reference.
 #' @param dateRange A window of time during which the index date must have
 #' been observed.

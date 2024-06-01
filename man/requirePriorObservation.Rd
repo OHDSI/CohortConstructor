@@ -32,7 +32,8 @@ The cohort table with only records for individuals satisfying the
 prior observation requirement
 }
 \description{
-Restrict cohort on prior observation
+\code{requirePriorObservation()} filters cohort records, keeping only records
+where individuals satisfy the specified prior observation criteria.
 }
 \examples{
 \donttest{

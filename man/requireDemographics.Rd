@@ -49,7 +49,8 @@ The cohort table with only records for individuals satisfying the
 demographic requirements
 }
 \description{
-Restrict cohort on patient demographics
+\code{requireDemographics()} filters cohort records, keeping only records where
+individuals satisfy the specified demographic criteria.
 }
 \examples{
 \donttest{

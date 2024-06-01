@@ -1,5 +1,11 @@
 #' Create cohorts based on patient demographics
 #'
+#' @description
+#' `demographicsCohort()` creates a cohort table based on patient
+#' characteristics. If and when an individual satisfies all the criteria they
+#' enter the cohort. When they stop satisfying any of the criteria their
+#' cohort entry ends.
+#'
 #' @param cdm A cdm reference.
 #' @param name Name of the new cohort table
 #' @param ageRange A list of vectors specifying minimum and maximum age.
