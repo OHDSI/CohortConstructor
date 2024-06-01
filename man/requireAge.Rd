@@ -31,7 +31,8 @@ The cohort table with only records for individuals satisfying the
 age requirement
 }
 \description{
-Restrict cohort on age
+\code{requireAge()} filters cohort records, keeping only records where individuals
+satisfy the specified age criteria.
 }
 \examples{
 \donttest{

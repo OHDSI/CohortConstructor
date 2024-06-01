@@ -2,7 +2,7 @@
 % Please edit documentation in R/requireIsFirstEntry.R
 \name{requireIsFirstEntry}
 \alias{requireIsFirstEntry}
-\title{Restrict cohort to first entry by index date}
+\title{Restrict cohort to first entry}
 \usage{
 requireIsFirstEntry(
   cohort,
@@ -26,7 +26,8 @@ rest will remain unchanged.}
 A cohort table in a cdm reference.
 }
 \description{
-Restrict cohort to first entry by index date
+\code{requireIsFirstEntry()} filters cohort records, keeping only the first
+cohort entry per person.
 }
 \examples{
 \donttest{

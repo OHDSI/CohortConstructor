@@ -32,7 +32,10 @@ the database.}
 A cohort table
 }
 \description{
-Create cohorts based on patient demographics
+\code{demographicsCohort()} creates a cohort table based on patient
+characteristics. If and when an individual satisfies all the criteria they
+enter the cohort. When they stop satisfying any of the criteria their
+cohort entry ends.
 }
 \examples{
 \donttest{

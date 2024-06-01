@@ -23,7 +23,8 @@ The cohort table with only records for individuals satisfying the
 sex requirement
 }
 \description{
-Restrict cohort on sex
+\code{requireSex()} filters cohort records, keeping only records where individuals
+satisfy the specified sex criteria.
 }
 \examples{
 \donttest{

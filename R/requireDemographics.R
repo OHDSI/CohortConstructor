@@ -1,5 +1,9 @@
 #' Restrict cohort on patient demographics
 #'
+#' @description
+#' `requireDemographics()` filters cohort records, keeping only records where
+#' individuals satisfy the specified demographic criteria.
+#'
 #' @param cohort A cohort table in a cdm reference.
 #' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
 #' used; otherwise, only the specified cohorts will be modified, and the
@@ -64,6 +68,10 @@ requireDemographics <- function(cohort,
 
 #' Restrict cohort on age
 #'
+#' @description
+#' `requireAge()` filters cohort records, keeping only records where individuals
+#' satisfy the specified age criteria.
+#'
 #' @param cohort A cohort table in a cdm reference.
 #' @param ageRange A list of minimum and maximum age.
 #' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
@@ -112,6 +120,10 @@ requireAge <- function(cohort,
 
 #' Restrict cohort on sex
 #'
+#' @description
+#' `requireSex()` filters cohort records, keeping only records where individuals
+#' satisfy the specified sex criteria.
+#'
 #' @param cohort A cohort table in a cdm reference.
 #' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
 #' used; otherwise, only the specified cohorts will be modified, and the
@@ -156,6 +168,10 @@ requireSex <- function(cohort,
 }
 
 #' Restrict cohort on prior observation
+#'
+#' @description
+#' `requirePriorObservation()` filters cohort records, keeping only records
+#' where individuals satisfy the specified prior observation criteria.
 #'
 #' @param cohort A cohort table in a cdm reference.
 #' @param minPriorObservation A minimum number of prior observation days in
@@ -204,6 +220,10 @@ requirePriorObservation <- function(cohort,
 }
 
 #' Restrict cohort on future observation
+#'
+#' @description
+#' `requireFutureObservation()` filters cohort records, keeping only records
+#' where individuals satisfy the specified future observation criteria.
 #'
 #' @param cohort A cohort table in a cdm reference.
 #' @param minFutureObservation A minimum number of future observation days in

@@ -32,7 +32,8 @@ The cohort table with only records for individuals satisfying the
 future observation requirement
 }
 \description{
-Restrict cohort on future observation
+\code{requireFutureObservation()} filters cohort records, keeping only records
+where individuals satisfy the specified future observation criteria.
 }
 \examples{
 \donttest{

@@ -2,8 +2,7 @@
 % Please edit documentation in R/measurementCohort.R
 \name{measurementCohort}
 \alias{measurementCohort}
-\title{Create cohorts from the measurement table based on a concept set and
-required measurement values}
+\title{Create cohorts measurement based cohorts}
 \usage{
 measurementCohort(
   cdm,
@@ -35,12 +34,19 @@ independently of their value as number will be included.}
 A cohort table
 }
 \description{
-This function creates cohorts from concepts in the measurement table. Value
-of the target measurements in \code{conceptSet} can be specified through
-\code{valueAsConcept} and \code{valueAsNumber}. If both NULL, conceptSets will not be
-restricted to any value, if one of them is not NULL, value restrictions will
-be based on the non NULL entry, and if both are specified, concepts
-fulfilling one OR the other will be included.
+\code{measurementCohort()} creates cohorts based on patient records contained
+in the measurement table. This function extends the \code{conceptCohort()} as it
+allows for measurement values associated with the records to be specified.
+\itemize{
+\item If \code{valueAsConcept} and \code{valueAsNumber} are NULL then no requirements on
+of the values associated with measurement records and using
+\code{measurementCohort()} will lead to the same result as using \code{conceptCohort()}
+(so long as all concepts are from the measurement domain).
+\item If one of \code{valueAsConcept} and \code{valueAsNumber} is not NULL then records
+will be required to have values that satisfy the requirement specified.
+\item If both \code{valueAsConcept} and \code{valueAsNumber} are not NULL, records will
+be required to have values that fulfill \emph{either} of the requirements
+}
 }
 \examples{
 \donttest{

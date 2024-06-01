@@ -1,4 +1,8 @@
-#' Restrict cohort to first entry by index date
+#' Restrict cohort to first entry
+#'
+#' @description
+#' `requireIsFirstEntry()` filters cohort records, keeping only the first
+#' cohort entry per person.
 #'
 #' @param cohort A cohort table in a cdm reference.
 #' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
@@ -48,7 +52,11 @@ requireIsFirstEntry <- function(cohort,
   return(cohort)
 }
 
-#' Restrict cohort to last entry by index date
+#' Restrict cohort to last entry per person
+#'
+#' @description
+#' `requireIsLastEntry()` filters cohort records, keeping only the last
+#' cohort entry per person.
 #'
 #' @param cohort A cohort table in a cdm reference.
 #' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be

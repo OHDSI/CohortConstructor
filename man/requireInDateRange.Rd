@@ -31,7 +31,8 @@ The cohort table with any cohort entries outside of the date range
 dropped
 }
 \description{
-Require that an index date is within a date range
+\code{requireInDateRange()} filters cohort records, keeping only those for
+which the index date is within the specified date range.
 }
 \examples{
 \donttest{

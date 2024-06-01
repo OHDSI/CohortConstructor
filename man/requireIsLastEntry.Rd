@@ -2,7 +2,7 @@
 % Please edit documentation in R/requireIsFirstEntry.R
 \name{requireIsLastEntry}
 \alias{requireIsLastEntry}
-\title{Restrict cohort to last entry by index date}
+\title{Restrict cohort to last entry per person}
 \usage{
 requireIsLastEntry(
   cohort,
@@ -26,7 +26,8 @@ rest will remain unchanged.}
 A cohort table in a cdm reference.
 }
 \description{
-Restrict cohort to last entry by index date
+\code{requireIsLastEntry()} filters cohort records, keeping only the last
+cohort entry per person.
 }
 \examples{
 \donttest{
