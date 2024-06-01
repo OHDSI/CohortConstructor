@@ -3,11 +3,13 @@
 
 # CohortConstructor <img src="man/figures/logo.png" align="right" height="180"/>
 
-> **This package is currently experimental and not currently recommended
-> for use.**
+> **This package is currently experimental. Please use with care and
+> report any issues you might come across.**
 
 <!-- badges: start -->
 
+[![CRAN
+status](https://www.r-pkg.org/badges/version/CohortConstructor)](https://CRAN.R-project.org/package=CohortConstructor)
 [![R-CMD-check](https://github.com/OHDSI/CohortConstructor/workflows/R-CMD-check/badge.svg)](https://github.com/OHDSI/CohortConstructor/actions)
 [![Lifecycle:Experimental](https://img.shields.io/badge/Lifecycle-Experimental-339999)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 
@@ -69,18 +71,12 @@ settings(cdm$fractures) %>% glimpse()
 #> Columns: 2
 #> $ cohort_definition_id <int> 1, 2, 3
 #> $ cohort_name          <chr> "ankle_fracture", "forearm_fracture", "hip_fractu…
-```
-
-``` r
 cohort_count(cdm$fractures) %>% glimpse()
 #> Rows: 3
 #> Columns: 3
 #> $ cohort_definition_id <int> 1, 2, 3
 #> $ number_records       <int> 464, 569, 138
 #> $ number_subjects      <int> 427, 510, 132
-```
-
-``` r
 attrition(cdm$fractures) %>% glimpse()
 #> Rows: 3
 #> Columns: 7
@@ -114,9 +110,6 @@ cohort_count(cdm$fractures) %>% glimpse()
 #> $ cohort_definition_id <int> 1, 2, 3
 #> $ number_records       <int> 108, 152, 62
 #> $ number_subjects      <int> 104, 143, 60
-```
-
-``` r
 attrition(cdm$fractures) %>% 
   filter(reason == "cohort_start_date between 2000-01-01 & 2020-01-01") %>% 
   glimpse()
@@ -158,9 +151,6 @@ attrition(cdm$fractures) %>%
 #> $ reason               <chr> "Age requirement: 40 to 65", "Age requirement: 40…
 #> $ excluded_records     <int> 65, 88, 40
 #> $ excluded_subjects    <int> 61, 81, 38
-```
-
-``` r
 
 attrition(cdm$fractures) %>% 
   filter(reason == "Sex requirement: Female") %>% 
@@ -223,9 +213,6 @@ settings(cdm$fractures)
 #>   cohort_definition_id cohort_name                                    gap
 #>                  <dbl> <chr>                                        <dbl>
 #> 1                    1 ankle_fracture_forearm_fracture_hip_fracture     0
-```
-
-``` r
 cohortCount(cdm$fractures)
 #> # A tibble: 1 × 3
 #>   cohort_definition_id number_records number_subjects

@@ -15,10 +15,10 @@ knitr::opts_chunk$set(
 
 # CohortConstructor <img src="man/figures/logo.png" align="right" height="180"/>
 
-> **This package is currently experimental and not currently recommended for use.**
+> **This package is currently experimental. Please use with care and report any issues you might come across.**
 
 <!-- badges: start -->
-
+[![CRAN status](https://www.r-pkg.org/badges/version/CohortConstructor)](https://CRAN.R-project.org/package=CohortConstructor)
 [![R-CMD-check](https://github.com/OHDSI/CohortConstructor/workflows/R-CMD-check/badge.svg)](https://github.com/OHDSI/CohortConstructor/actions)
 [![Lifecycle:Experimental](https://img.shields.io/badge/Lifecycle-Experimental-339999)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 
