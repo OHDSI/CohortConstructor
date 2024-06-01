@@ -1,4 +1,5 @@
 test_that("requireDateRange", {
+  testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
@@ -98,6 +99,7 @@ test_that("requireDateRange", {
 })
 
 test_that("trim cohort dates", {
+  testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>

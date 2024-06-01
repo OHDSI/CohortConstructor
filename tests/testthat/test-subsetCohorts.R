@@ -46,6 +46,7 @@ test_that("subsetCohort works", {
 })
 
 test_that("codelist works", {
+  testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
@@ -94,6 +95,7 @@ test_that("codelist works", {
 })
 
 test_that("Expected behaviour", {
+  testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>

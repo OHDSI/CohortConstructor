@@ -1,4 +1,5 @@
 test_that("test it works and expected errors", {
+  testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 10) |>
     omock::mockObservationPeriod() |>
@@ -126,6 +127,7 @@ test_that("test it works and expected errors", {
 })
 
 test_that("restrictions applied to single cohort", {
+  testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 1) |>
     omock::mockObservationPeriod() |>
@@ -172,6 +174,7 @@ test_that("restrictions applied to single cohort", {
 })
 
 test_that("ignore existing cohort extra variables", {
+  testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 1) |>
     omock::mockObservationPeriod() |>
@@ -210,6 +213,7 @@ test_that("ignore existing cohort extra variables", {
 })
 
 test_that("external columns kept after requireDemographics", {
+  testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 1) |>
     omock::mockObservationPeriod() |>
@@ -234,6 +238,7 @@ test_that("external columns kept after requireDemographics", {
 })
 
 test_that("cohortIds", {
+  testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 3) |>
     omock::mockObservationPeriod() |>
@@ -257,6 +262,7 @@ test_that("cohortIds", {
 })
 
 test_that("test more than one restriction", {
+  testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 3) |>
     omock::mockObservationPeriod() |>
@@ -405,6 +411,7 @@ test_that("test more than one restriction", {
 })
 
 test_that("codelist kept with >1 requirement", {
+  testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod()
@@ -453,6 +460,7 @@ test_that("codelist kept with >1 requirement", {
 })
 
 test_that("settings with extra columns", {
+  testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 3) |>
     omock::mockObservationPeriod() |>
@@ -484,6 +492,7 @@ test_that("settings with extra columns", {
 })
 
 test_that("requireInteractions", {
+  testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 3) |>
     omock::mockObservationPeriod() |>

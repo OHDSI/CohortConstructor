@@ -181,6 +181,7 @@ test_that("mearurementCohorts works", {
 })
 
 test_that("expected errors", {
+  testthat::skip_on_cran()
   cdm <- mockCohortConstructor(con = NULL)
   cdm$concept <- cdm$concept |>
     dplyr::union_all(

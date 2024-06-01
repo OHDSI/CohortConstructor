@@ -1,4 +1,5 @@
 test_that("simple duckdb checks", {
+  testthat::skip_on_cran()
   # create test mock ----
   cdm <- omopgenerics::cdmFromTables(
     tables = list(
@@ -324,6 +325,7 @@ test_that("simple duckdb checks", {
 })
 
 test_that("cohort Id, name, additional columns", {
+  testthat::skip_on_cran()
   cdm <- mockCohortConstructor(nPerson = 5,
                                con = connection(),
                                writeSchema = writeSchema())

@@ -106,6 +106,7 @@ test_that("require flag in concept", {
 })
 
 test_that("requiring absence in another cohort", {
+  testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>

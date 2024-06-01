@@ -13,6 +13,7 @@
 #' @param con A DBI connection to create the cdm mock object.
 #' @param writeSchema Name of an schema on the same connection with writing
 #' permisions.
+#' @param seed Seed passed to omock::mockCdmFromTable
 #'
 #' @return cdm object
 #' @export
@@ -36,7 +37,8 @@ mockCohortConstructor <- function(nPerson = 10,
                                   death = FALSE,
                                   otherTables = NULL,
                                   con = DBI::dbConnect(duckdb::duckdb()),
-                                  writeSchema = "main") {
+                                  writeSchema = "main",
+                                  seed = 123) {
 
 
   if (is.null(tables)) {
@@ -47,7 +49,8 @@ mockCohortConstructor <- function(nPerson = 10,
       omock::mockCohort(name = "cohort1") |>
       omock::mockCohort(name = "cohort2", numberCohorts = 2)
   } else {
-    cdm <- omock::mockCdmFromTables(tables = tables, seed = 1) |>
+    cdm <- omock::mockCdmFromTables(tables = tables,
+                                    seed = seed) |>
       omock::mockVocabularyTables(concept = conceptTable)
   }
 

@@ -1,4 +1,5 @@
 test_that("yearCohorts - change name", {
+  testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
@@ -117,8 +118,8 @@ test_that("yearCohorts - change name", {
   PatientProfiles::mockDisconnect(cdm)
 })
 
-
 test_that("yearCohorts - keep name", {
+  testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>

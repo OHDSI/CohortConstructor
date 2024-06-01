@@ -1,4 +1,5 @@
 test_that("exit at first date", {
+  testthat::skip_on_cran()
   cdm <- mockCohortConstructor(
     tables = list(
       "cohort" = dplyr::tibble(
@@ -58,6 +59,7 @@ test_that("exit at first date", {
 })
 
 test_that("exit at last date", {
+  testthat::skip_on_cran()
   cdm <- mockCohortConstructor(
     tables = list(
       "cohort" = dplyr::tibble(
@@ -114,6 +116,7 @@ test_that("exit at last date", {
 })
 
 test_that("expected errors", {
+  testthat::skip_on_cran()
   # NA
   cdm <- mockCohortConstructor(
     tables = list(

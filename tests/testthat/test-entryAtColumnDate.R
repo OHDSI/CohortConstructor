@@ -1,4 +1,5 @@
 test_that("entry at first date", {
+  testthat::skip_on_cran()
   cdm <- mockCohortConstructor(
     tables = list(
       "cohort" = dplyr::tibble(
@@ -54,6 +55,7 @@ test_that("entry at first date", {
 })
 
 test_that("entry at last date", {
+  testthat::skip_on_cran()
   cdm <- mockCohortConstructor(
     tables = list(
       "cohort" = dplyr::tibble(

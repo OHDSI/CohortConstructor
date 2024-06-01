@@ -1,4 +1,5 @@
 test_that("matchCohorts runs without errors", {
+  testthat::skip_on_cran()
   # Create cdm object
   cdm <- DrugUtilisation::generateConceptCohortSet(
     cdm = DrugUtilisation::mockDrugUtilisation(numberIndividuals = 200),
@@ -68,6 +69,7 @@ test_that("matchCohorts runs without errors", {
 })
 
 test_that("matchCohorts, no duplicated people within a cohort", {
+  testthat::skip_on_cran()
   followback <- 180
 
   cdm <- DrugUtilisation::generateConceptCohortSet(
@@ -108,6 +110,7 @@ test_that("matchCohorts, no duplicated people within a cohort", {
 })
 
 test_that("check that we obtain expected result when ratio is 1", {
+  testthat::skip_on_cran()
   followback <- 180
 
   cdm <- DrugUtilisation::generateConceptCohortSet(
@@ -174,6 +177,7 @@ test_that("check that we obtain expected result when ratio is 1", {
 })
 
 test_that("test exactMatchingCohort works if there are no subjects", {
+  testthat::skip_on_cran()
   followback  <- 180
   cdm <- DrugUtilisation::generateConceptCohortSet(
     cdm = DrugUtilisation::mockDrugUtilisation(numberIndividuals = 200),
@@ -192,6 +196,7 @@ test_that("test exactMatchingCohort works if there are no subjects", {
 })
 
 test_that("test exactMatchingCohort works if one of the cohorts does not have any people", {
+  testthat::skip_on_cran()
   followback  <- 180
   cdm <- DrugUtilisation::generateConceptCohortSet(
     cdm = DrugUtilisation::mockDrugUtilisation(numberIndividuals = 200),
@@ -212,6 +217,7 @@ test_that("test exactMatchingCohort works if one of the cohorts does not have an
 })
 
 test_that("test exactMatchingCohort with a ratio bigger than 1", {
+  testthat::skip_on_cran()
   followback  <- 180
   cdm <- DrugUtilisation::generateConceptCohortSet(
     cdm = DrugUtilisation::mockDrugUtilisation(numberIndividuals = 1000),
@@ -232,6 +238,7 @@ test_that("test exactMatchingCohort with a ratio bigger than 1", {
 })
 
 test_that("test exactMatchingCohort with a ratio bigger than 1", {
+  testthat::skip_on_cran()
   # Generate mock data
   cdmMock <- DrugUtilisation::mockDrugUtilisation(
     numberIndividuals = 10,

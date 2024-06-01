@@ -16,7 +16,8 @@ mockCohortConstructor(
   death = FALSE,
   otherTables = NULL,
   con = DBI::dbConnect(duckdb::duckdb()),
-  writeSchema = "main"
+  writeSchema = "main",
+  seed = 123
 )
 }
 \arguments{
@@ -44,6 +45,8 @@ mockCohortConstructor(
 
 \item{writeSchema}{Name of an schema on the same connection with writing
 permisions.}
+
+\item{seed}{Seed passed to omock::mockCdmFromTable}
 }
 \value{
 cdm object

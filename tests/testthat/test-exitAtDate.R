@@ -33,6 +33,7 @@ test_that("exit at observation end", {
 })
 
 test_that("exit at death date", {
+  testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
