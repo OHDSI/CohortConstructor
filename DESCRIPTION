@@ -1,6 +1,6 @@
 Package: CohortConstructor
 Title: Build and Manipulate Study Cohorts Using a Common Data Model
-Version: 0.1.0.900
+Version: 0.1.1
 Authors@R: c(
     person("Edward", "Burn", , "edward.burn@ndorms.ox.ac.uk", 
     role = c("aut", "cre"), comment = c(ORCID = "0000-0002-9286-1128")),
@@ -36,7 +36,6 @@ Imports:
     utils
 Suggests: 
     DBI,
-    DrugUtilisation,
     CodelistGenerator,
     duckdb,
     knitr,
