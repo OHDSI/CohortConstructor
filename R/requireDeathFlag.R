@@ -1,4 +1,9 @@
-#' Require cohort subjects' death at a certain time window
+#' Require cohort subjects have (or do not have) a death record
+#'
+#' @description
+#' `requireDeathFlag()` filters a cohort table based on a requirement
+#' that an individual is seen (or not seen) to have a death in some time
+#' window around an index date.
 #'
 #' @param cohort A cohort table in a cdm reference.
 #' @param window Window to consider events over.

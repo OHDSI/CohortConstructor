@@ -1,5 +1,9 @@
 #' Set cohort end date to end of observation
 #'
+#' @description
+#' `exitAtObservationEnd()` resets cohort end date based on a set of specified
+#' column dates. The last date that occurs is chosen.
+#'
 #' @param cohort A cohort table in a cdm reference.
 #' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
 #' used; otherwise, only the specified cohorts will be modified, and the

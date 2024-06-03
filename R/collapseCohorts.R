@@ -1,5 +1,9 @@
 #' Collapse cohort entries using a certain gap to concatenate records.
 #'
+#' @description
+#' `collapseCohorts()` concatenates cohort records, allowing for some number
+#' of days between one finishing and the next starting.
+#'
 #' @param cohort A cohort table
 #' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
 #' used; otherwise, only the specified cohorts will be modified, and the

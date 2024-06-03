@@ -2,7 +2,7 @@
 % Please edit documentation in R/stratifyCohorts.R
 \name{stratifyCohorts}
 \alias{stratifyCohorts}
-\title{Crate a new cohort table with the specified stratifications.}
+\title{Create a new cohort table from stratifying an existing one}
 \usage{
 stratifyCohorts(
   cohort,
@@ -28,7 +28,8 @@ considered. Cohorts not included will be removed from the cohort set.}
 Cohort table stratified.
 }
 \description{
-Crate a new cohort table with the specified stratifications.
+\code{stratifyCohorts()} creates new cohorts, splitting an existing cohort based
+on specified columns on which to stratify on.
 }
 \examples{
 \donttest{

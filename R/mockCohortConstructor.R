@@ -1,5 +1,9 @@
 #' Function to create a mock cdm reference for CohortConstructor
 #'
+#' @description
+#' `mockCohortConstructor()` creates an example dataset that can be used for
+#' demonstrating and testing the package
+#'
 #' @param nPerson number of person in the cdm
 #' @param conceptTable user defined concept table
 #' @param tables list of tables to include in the cdm
@@ -12,7 +16,7 @@
 #' @param otherTables it takes a list of single tibble with names to include other tables in the cdm
 #' @param con A DBI connection to create the cdm mock object.
 #' @param writeSchema Name of an schema on the same connection with writing
-#' permisions.
+#' permissions.
 #' @param seed Seed passed to omock::mockCdmFromTable
 #'
 #' @return cdm object

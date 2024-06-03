@@ -18,7 +18,8 @@ considered. Cohorts not included will be removed from the cohort set.}
 Cohort table with only cohorts in cohortId.
 }
 \description{
-Generate a cohort table using a subset of cohorts from another table.
+\code{subsetCohorts()} filters an existing cohort table, keeping only the records
+from cohorts that are specified.
 }
 \examples{
 \donttest{

@@ -20,7 +20,7 @@ considered. Cohorts not included will be removed from the cohort set.}
 A cohort table.
 }
 \description{
-Generate a new cohort table restricting cohort entries to certain years
+\code{yearCohorts()} splits a cohort into multiple cohorts, one for each year.
 }
 \examples{
 \donttest{

@@ -1,5 +1,10 @@
 #' Generate cohort from the union of different cohorts
 #'
+#' @description
+#' `unionCohorts()` combines different cohort entries, with those records
+#' that overlap combined and kept. Cohort entries are when an individual was in
+#' _either_ of the cohorts.
+#'
 #' @param cohort A cohort table in a cdm reference.
 #' @param cohortId IDs of the cohorts to include. If NULL all cohorts will be
 #' considered. Cohorts not included will be removed from the cohort set.

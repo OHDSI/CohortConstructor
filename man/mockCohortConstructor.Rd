@@ -44,7 +44,7 @@ mockCohortConstructor(
 \item{con}{A DBI connection to create the cdm mock object.}
 
 \item{writeSchema}{Name of an schema on the same connection with writing
-permisions.}
+permissions.}
 
 \item{seed}{Seed passed to omock::mockCdmFromTable}
 }
@@ -52,7 +52,8 @@ permisions.}
 cdm object
 }
 \description{
-Function to create a mock cdm reference for CohortConstructor
+\code{mockCohortConstructor()} creates an example dataset that can be used for
+demonstrating and testing the package
 }
 \examples{
 \donttest{

@@ -19,6 +19,9 @@ rest will remain unchanged.}
 The cohort table.
 }
 \description{
+\code{exitAtObservationEnd()} resets cohort end date based on a set of specified
+column dates. The last date that occurs is chosen.
+
 This functions changes cohort end date to the end date of the observation
 period corresponding to the cohort entry. In the case were this generates
 overlapping records in the cohort, overlapping entries will be merged.

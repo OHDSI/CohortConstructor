@@ -1,4 +1,8 @@
-#' Set cohort start date to the first of a set of column dates
+#' Update cohort start date to be the first date from of a set of column dates
+#'
+#' @description
+#' `entryAtFirstDate()` resets cohort start date based on a set of specified
+#' column dates. The first date that occurs is chosen.
 #'
 #' @param cohort A cohort table in a cdm reference.
 #' @param dateColumns Date columns in the cohort table to consider.
