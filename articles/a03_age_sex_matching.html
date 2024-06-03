@@ -91,14 +91,13 @@ function.</p>
 <div class="section level3">
 <h3 id="create-mock-data">Create mock data<a class="anchor" aria-label="anchor" href="#create-mock-data"></a>
 </h3>
-<p>We will first use <code><a href="https://darwin-eu-dev.github.io/DrugUtilisation/reference/mockDrugUtilisation.html" class="external-link">mockDrugUtilisation()</a></code> function from
+<p>We will first use <code>mockDrugUtilisation()</code> function from
 DrugUtilisation package to create mock data.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ohdsi.github.io/CohortConstructor/">CohortConstructor</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://darwin-eu-dev.github.io/DrugUtilisation/" class="external-link">DrugUtilisation</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu-dev.github.io/DrugUtilisation/reference/mockDrugUtilisation.html" class="external-link">mockDrugUtilisation</a></span><span class="op">(</span>numberIndividual <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mockCohortConstructor.html">mockCohortConstructor</a></span><span class="op">(</span>nPerson <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span></code></pre></div>
 <p>As we will use <code>cohort1</code> to explore
 <code>generateMatchedCohortSet()</code>, let us first use
 <code><a href="https://darwin-eu.github.io/CDMConnector/reference/cohortAttrition.html" class="external-link">cohort_attrition()</a></code> from CDMConnector package to explore

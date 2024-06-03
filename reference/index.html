@@ -169,17 +169,17 @@
           
           <code><a href="requireCohortIntersectFlag.html">requireCohortIntersectFlag()</a></code> 
         </dt>
-        <dd>Require cohort subjects are present in another cohort</dd>
+        <dd>Require cohort subjects are present (or absence) in another cohort</dd>
       </dl><dl><dt>
           
           <code><a href="requireConceptIntersectFlag.html">requireConceptIntersectFlag()</a></code> 
         </dt>
-        <dd>Require cohort subjects to have events of a concept list</dd>
+        <dd>Require cohort subjects to have (or not have) events of a concept list</dd>
       </dl><dl><dt>
           
           <code><a href="requireTableIntersectFlag.html">requireTableIntersectFlag()</a></code> 
         </dt>
-        <dd>Require cohort subjects are present in another table</dd>
+        <dd>Require cohort subjects are present in another clinical table</dd>
       </dl></div><div class="section level2">
       
       <h3 id="impose-presence-or-absence-of-a-death-record-within-a-time-window">Impose presence or absence of a death record within a time window<a class="anchor" aria-label="anchor" href="#impose-presence-or-absence-of-a-death-record-within-a-time-window"></a></h3>
@@ -195,7 +195,7 @@
           
           <code><a href="requireDeathFlag.html">requireDeathFlag()</a></code> 
         </dt>
-        <dd>Require cohort subjects' death at a certain time window</dd>
+        <dd>Require cohort subjects have (or do not have) a death record</dd>
       </dl></div><div class="section level2">
       
       <h3 id="update-cohort-start-and-end-dates">Update cohort start and end dates<a class="anchor" aria-label="anchor" href="#update-cohort-start-and-end-dates"></a></h3>
@@ -211,7 +211,7 @@
           
           <code><a href="entryAtFirstDate.html">entryAtFirstDate()</a></code> 
         </dt>
-        <dd>Set cohort start date to the first of a set of column dates</dd>
+        <dd>Update cohort start date to be the first date from of a set of column dates</dd>
       </dl><dl><dt>
           
           <code><a href="entryAtLastDate.html">entryAtLastDate()</a></code> 
@@ -272,12 +272,12 @@
           
           <code><a href="matchCohorts.html">matchCohorts()</a></code> 
         </dt>
-        <dd>Generate a new cohort matched cohort from a preexisting target cohort. The new cohort will contain individuals not included in the target cohort with same year of birth (matchYearOfBirth = TRUE) and same sex (matchSex = TRUE).</dd>
+        <dd>Generate a new cohort matched cohort</dd>
       </dl><dl><dt>
           
           <code><a href="stratifyCohorts.html">stratifyCohorts()</a></code> 
         </dt>
-        <dd>Crate a new cohort table with the specified stratifications.</dd>
+        <dd>Create a new cohort table from stratifying an existing one</dd>
       </dl><dl><dt>
           
           <code><a href="subsetCohorts.html">subsetCohorts()</a></code> 
