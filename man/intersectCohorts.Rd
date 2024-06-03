@@ -34,8 +34,9 @@ exclusive or not.}
 A cohort table.
 }
 \description{
-Generate a combination cohort set between the intersection of different
-cohorts.
+\code{intersectCohorts()} combines different cohort entries, with those records
+that overlap combined and kept. Cohort entries are when an individual was in
+\emph{both} of the cohorts.
 }
 \examples{
 \donttest{

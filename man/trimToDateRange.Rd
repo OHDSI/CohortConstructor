@@ -35,7 +35,8 @@ date range. Any records with all time outside of the range will have
 been dropped.
 }
 \description{
-Trim cohort dates to be within a date range
+\code{trimToDateRange()} resets the cohort start and end date based on the
+specified date range.
 }
 \examples{
 \donttest{

@@ -2,7 +2,7 @@
 % Please edit documentation in R/entryAtColumnDate.R
 \name{entryAtFirstDate}
 \alias{entryAtFirstDate}
-\title{Set cohort start date to the first of a set of column dates}
+\title{Update cohort start date to be the first date from of a set of column dates}
 \usage{
 entryAtFirstDate(
   cohort,
@@ -30,7 +30,8 @@ rest will remain unchanged.}
 The cohort table.
 }
 \description{
-Set cohort start date to the first of a set of column dates
+\code{entryAtFirstDate()} resets cohort start date based on a set of specified
+column dates. The first date that occurs is chosen.
 }
 \examples{
 \donttest{

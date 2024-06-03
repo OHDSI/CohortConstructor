@@ -30,7 +30,8 @@ rest will remain unchanged.}
 The cohort table.
 }
 \description{
-Set cohort end date to the first of a set of column dates
+\code{exitAtFirstDate()} resets cohort end date based on a set of specified
+column dates. The first date that occurs is chosen.
 }
 \examples{
 \donttest{

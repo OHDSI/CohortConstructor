@@ -1,6 +1,8 @@
-#' Generate a new cohort matched cohort from a preexisting target cohort. The
-#' new cohort will contain individuals not included in the target cohort with
-#' same year of birth (matchYearOfBirth = TRUE) and same sex (matchSex = TRUE).
+#' Generate a new cohort matched cohort
+#'
+#' @description
+#' `matchCohorts()` generate a new cohort matched to individuals in an
+#' existing cohort. Individuals can be matched based on year of birth and sex.
 #'
 #' @param cohort A cohort table in a cdm reference.
 #' @param cohortId IDs of the cohorts to include. If NULL all cohorts will be

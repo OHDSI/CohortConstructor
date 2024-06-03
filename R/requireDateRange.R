@@ -76,6 +76,10 @@ requireInDateRange <- function(cohort,
 
 #' Trim cohort dates to be within a date range
 #'
+#' @description
+#' `trimToDateRange()` resets the cohort start and end date based on the
+#' specified date range.
+#'
 #' @param cohort A cohort table in a cdm reference.
 #' @param dateRange A window of time during which the index date must have
 #' been observed.

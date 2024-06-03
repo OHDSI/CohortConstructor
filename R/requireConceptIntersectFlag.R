@@ -1,4 +1,9 @@
-#' Require cohort subjects to have events of a concept list
+#' Require cohort subjects to have (or not have) events of a concept list
+#'
+#' @description
+#' `requireConceptIntersectFlag()` filters a cohort table based on a requirement
+#' that an individual is seen (or not seen) to have events related to a concept
+#' list in some time window around an index date.
 #'
 #' @param cohort A cohort table in a cdm reference.
 #' @param conceptSet Concept set list.

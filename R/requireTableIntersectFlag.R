@@ -1,4 +1,9 @@
-#' Require cohort subjects are present in another table
+#' Require cohort subjects are present in another clinical table
+#'
+#' @description
+#' `requireTableIntersectFlag()` filters a cohort table based on a requirement
+#' that an individual is seen (or not seen) to have a record (or no records) in
+#' a clinical table in some time window around an index date.
 #'
 #' @param cohort A cohort table in a cdm reference.
 #' @param tableName Name of the table to check for intersect.

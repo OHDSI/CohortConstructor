@@ -1,5 +1,9 @@
 #' Generate a cohort table using a subset of cohorts from another table.
 #'
+#' @description
+#' `subsetCohorts()` filters an existing cohort table, keeping only the records
+#' from cohorts that are specified.
+#'
 #' @param cohort A cohort table in a cdm reference.
 #' @param cohortId IDs of the cohorts to include. If NULL all cohorts will be
 #' considered. Cohorts not included will be removed from the cohort set.

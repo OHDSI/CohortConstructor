@@ -2,9 +2,7 @@
 % Please edit documentation in R/matchCohorts.R
 \name{matchCohorts}
 \alias{matchCohorts}
-\title{Generate a new cohort matched cohort from a preexisting target cohort. The
-new cohort will contain individuals not included in the target cohort with
-same year of birth (matchYearOfBirth = TRUE) and same sex (matchSex = TRUE).}
+\title{Generate a new cohort matched cohort}
 \usage{
 matchCohorts(
   cohort,
@@ -33,9 +31,8 @@ considered. Cohorts not included will be removed from the cohort set.}
 A cohort table.
 }
 \description{
-Generate a new cohort matched cohort from a preexisting target cohort. The
-new cohort will contain individuals not included in the target cohort with
-same year of birth (matchYearOfBirth = TRUE) and same sex (matchSex = TRUE).
+\code{matchCohorts()} generate a new cohort matched to individuals in an
+existing cohort. Individuals can be matched based on year of birth and sex.
 }
 \examples{
 \donttest{

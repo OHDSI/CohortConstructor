@@ -1,5 +1,8 @@
 #' Generate a new cohort table restricting cohort entries to certain years
 #'
+#' @description
+#' `yearCohorts()` splits a cohort into multiple cohorts, one for each year.
+#'
 #' @param cohort A cohort table in a cdm reference.
 #' @param years Numeric vector of years to use to restrict observation to.
 #' @param cohortId IDs of the cohorts to include. If NULL all cohorts will be

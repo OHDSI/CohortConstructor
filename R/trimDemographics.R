@@ -1,5 +1,9 @@
 #' Restrict cohort on patient demographics
 #'
+#' @description
+#' `trimDemographics()` resets the cohort start and end date based on the
+#' specified demographic criteria is satisfied.
+#'
 #' @param cohort A cohort table in a cdm reference.
 #' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
 #' used; otherwise, only the specified cohorts will be modified, and the

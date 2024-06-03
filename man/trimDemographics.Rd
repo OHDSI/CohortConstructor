@@ -39,7 +39,8 @@ The cohort table with only records for individuals satisfying the
 demographic requirements
 }
 \description{
-Restrict cohort on patient demographics
+\code{trimDemographics()} resets the cohort start and end date based on the
+specified demographic criteria is satisfied.
 }
 \examples{
 \donttest{

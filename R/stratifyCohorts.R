@@ -1,4 +1,8 @@
-#' Crate a new cohort table with the specified stratifications.
+#' Create a new cohort table from stratifying an existing one
+#'
+#' @description
+#' `stratifyCohorts()` creates new cohorts, splitting an existing cohort based
+#' on specified columns on which to stratify on.
 #'
 #' @param cohort A cohort table in a cdm reference.
 #' @param strata A strata list that point to columns in cohort table.

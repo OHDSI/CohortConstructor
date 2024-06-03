@@ -2,7 +2,7 @@
 % Please edit documentation in R/requireDeathFlag.R
 \name{requireDeathFlag}
 \alias{requireDeathFlag}
-\title{Require cohort subjects' death at a certain time window}
+\title{Require cohort subjects have (or do not have) a death record}
 \usage{
 requireDeathFlag(
   cohort,
@@ -39,7 +39,9 @@ Cohort table with only those with a death event kept (or without
 if negate = TRUE)
 }
 \description{
-Require cohort subjects' death at a certain time window
+\code{requireDeathFlag()} filters a cohort table based on a requirement
+that an individual is seen (or not seen) to have a death in some time
+window around an index date.
 }
 \examples{
 \donttest{

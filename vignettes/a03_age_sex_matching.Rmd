@@ -23,9 +23,8 @@ We will first use `mockDrugUtilisation()` function from DrugUtilisation package 
 ```{r setup, message = FALSE, warning = FALSE, eval = FALSE}
 library(CohortConstructor)
 library(dplyr)
-library(DrugUtilisation)
 
-cdm <- mockDrugUtilisation(numberIndividual = 1000)
+cdm <- mockCohortConstructor(nPerson = 1000)
 ```
 
 As we will use `cohort1` to explore `generateMatchedCohortSet()`, let us first use `cohort_attrition()` from CDMConnector package to explore this cohort:

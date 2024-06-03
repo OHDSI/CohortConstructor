@@ -2,7 +2,7 @@
 % Please edit documentation in R/requireCohortIntersectFlag.R
 \name{requireCohortIntersectFlag}
 \alias{requireCohortIntersectFlag}
-\title{Require cohort subjects are present in another cohort}
+\title{Require cohort subjects are present (or absence) in another cohort}
 \usage{
 requireCohortIntersectFlag(
   cohort,
@@ -54,7 +54,9 @@ Cohort table with only those in the other cohort kept (or those that
 are not in the cohort if negate = TRUE)
 }
 \description{
-Require cohort subjects are present in another cohort
+\code{requireCohortIntersectFlag()} filters a cohort table based on a requirement
+that an individual is seen (or not seen) in another cohort in some time
+window around an index date.
 }
 \examples{
 \donttest{

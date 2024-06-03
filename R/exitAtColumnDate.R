@@ -1,5 +1,9 @@
 #' Set cohort end date to the first of a set of column dates
 #'
+#' @description
+#' `exitAtFirstDate()` resets cohort end date based on a set of specified
+#' column dates. The first date that occurs is chosen.
+#'
 #' @param cohort A cohort table in a cdm reference.
 #' @param dateColumns Date columns in the cohort table to consider.
 #' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
@@ -47,6 +51,10 @@ exitAtFirstDate <- function(cohort,
 
 
 #' Set cohort end date to the last of a set of column dates
+#'
+#' @description
+#' `exitAtLastDate()` resets cohort end date based on a set of specified
+#' column dates. The last date that occurs is chosen.
 #'
 #' @param cohort A cohort table in a cdm reference.
 #' @param dateColumns description

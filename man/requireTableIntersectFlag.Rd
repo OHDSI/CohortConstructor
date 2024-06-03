@@ -2,7 +2,7 @@
 % Please edit documentation in R/requireTableIntersectFlag.R
 \name{requireTableIntersectFlag}
 \alias{requireTableIntersectFlag}
-\title{Require cohort subjects are present in another table}
+\title{Require cohort subjects are present in another clinical table}
 \usage{
 requireTableIntersectFlag(
   cohort,
@@ -50,7 +50,9 @@ Cohort table with only those in the other table kept (or those that
 are not in the table if negate = TRUE)
 }
 \description{
-Require cohort subjects are present in another table
+\code{requireTableIntersectFlag()} filters a cohort table based on a requirement
+that an individual is seen (or not seen) to have a record (or no records) in
+a clinical table in some time window around an index date.
 }
 \examples{
 \donttest{

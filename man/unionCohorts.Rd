@@ -30,7 +30,9 @@ be created by collapsing the individual cohort names, separated by "_".}
 A cohort table.
 }
 \description{
-Generate cohort from the union of different cohorts
+\code{unionCohorts()} combines different cohort entries, with those records
+that overlap combined and kept. Cohort entries are when an individual was in
+\emph{either} of the cohorts.
 }
 \examples{
 \donttest{

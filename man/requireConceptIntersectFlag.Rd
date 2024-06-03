@@ -2,7 +2,7 @@
 % Please edit documentation in R/requireConceptIntersectFlag.R
 \name{requireConceptIntersectFlag}
 \alias{requireConceptIntersectFlag}
-\title{Require cohort subjects to have events of a concept list}
+\title{Require cohort subjects to have (or not have) events of a concept list}
 \usage{
 requireConceptIntersectFlag(
   cohort,
@@ -50,7 +50,9 @@ Cohort table with only those  with the events in the concept list
 kept (or those without the event if negate = TRUE)
 }
 \description{
-Require cohort subjects to have events of a concept list
+\code{requireConceptIntersectFlag()} filters a cohort table based on a requirement
+that an individual is seen (or not seen) to have events related to a concept
+list in some time window around an index date.
 }
 \examples{
 \donttest{

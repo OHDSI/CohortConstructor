@@ -21,5 +21,6 @@ rest will remain unchanged.}
 A cohort table
 }
 \description{
-Collapse cohort entries using a certain gap to concatenate records.
+\code{collapseCohorts()} concatenates cohort records, allowing for some number
+of days between one finishing and the next starting.
 }
