@@ -171,3 +171,7 @@ validateValueAsNumber <- function(valueAsNumber) {
     }
   }
 }
+
+validateN <- function(n) {
+  assertNumeric(n, integerish = TRUE, min = 0, length = 1)
+}
