@@ -44,11 +44,13 @@ test_that("sampleCohort subsetting multiple cohorts", {
                 dplyr::pull("number_subjects") == c(5,5,4)))
 
   # Subset it again but only cohorts 1 and 3
-  test_cohort1 <- sampleCohorts(cdm$cohort1, c(1,3), 4)
-  expect_true(all.equal(test_cohort1 |> dplyr::filter(cohort_definition_id == 3),
-                        cdm$cohort1 |> dplyr::filter(cohort_definition_id == 3)))
+  cdm$cohort2 <- sampleCohorts(cdm$cohort1, c(1,3), 4, name = "cohort2")
+  expect_true(all.equal(cdm$cohort2 |> dplyr::filter(cohort_definition_id == 3) |>
+                          dplyr::collect() |> dplyr::arrange(subject_id, cohort_start_date),
+                        cdm$cohort1 |> dplyr::filter(cohort_definition_id == 3) |>
+                          dplyr::collect() |> dplyr::arrange(subject_id, cohort_start_date)))
 
-  expect_true(all(attrition(test_cohort1) |>
+  expect_true(all(attrition(cdm$cohort2) |>
                 dplyr::filter(reason == "Sample 4 individuals") |>
                 dplyr::arrange(cohort_definition_id) |>
                 dplyr::pull("excluded_subjects") == c(1,0)))
@@ -67,8 +69,8 @@ test_that("sampleCohort subsetting all cohorts", {
                                  overwrite = TRUE)
 
   test1 <- sampleCohorts(cdm$cohort1, n = 2)
-  cdm$cohort2 <- sampleCohorts(cdm$cohort1, cohortId = c(1,2,3), n = 2, name = "cohort2")
-  expect_true(all.equal(test1, cdm$cohort2))
+  test2 <- sampleCohorts(cdm$cohort1, cohortId = c(1,2,3), n = 2)
+  expect_true(all.equal(test1, test2))
 
   PatientProfiles::mockDisconnect(cdm)
 })
