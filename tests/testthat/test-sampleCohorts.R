@@ -67,8 +67,8 @@ test_that("sampleCohort subsetting all cohorts", {
                                  overwrite = TRUE)
 
   test1 <- sampleCohorts(cdm$cohort1, n = 2)
-  test2 <- sampleCohorts(cdm$cohort1, cohortId = c(1,2,3), n = 2)
-  expect_true(all.equal(test1, test2))
+  cdm$cohort2 <- sampleCohorts(cdm$cohort1, cohortId = c(1,2,3), n = 2, name = "cohort2")
+  expect_true(all.equal(test1, cdm$cohort2))
 
   PatientProfiles::mockDisconnect(cdm)
 })
@@ -90,6 +90,7 @@ test_that("expected errors", {
   expect_error(sampleCohorts(cdm$cohort1, n = -1))
   expect_error(sampleCohorts(cdm$cohort1))
   expect_error(sampleCohorts(cdm$cohort1, n = c(1,2)))
+  expect_error(cdm$cohort2 <- sampleCohorts(cdm$cohort1, n = 10))
 
   PatientProfiles::mockDisconnect(cdm)
 })

@@ -4,7 +4,7 @@
 \alias{sampleCohorts}
 \title{Sample a cohort table for a given number of individuals.}
 \usage{
-sampleCohorts(cohort, cohortId = NULL, n)
+sampleCohorts(cohort, cohortId = NULL, n, name = tableName(cohort))
 }
 \arguments{
 \item{cohort}{A cohort table in a cdm reference.}
@@ -13,6 +13,8 @@ sampleCohorts(cohort, cohortId = NULL, n)
 considered. Cohorts not included will not be sampled.}
 
 \item{n}{Number of people to be sampled for each included cohort.}
+
+\item{name}{Name of the new sampled cohort.}
 }
 \value{
 Cohort table with the specified cohorts sampled.

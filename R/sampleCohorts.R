@@ -8,6 +8,7 @@
 #' @param cohortId IDs of the cohorts to include. If NULL all cohorts will be
 #' considered. Cohorts not included will not be sampled.
 #' @param n Number of people to be sampled for each included cohort.
+#' @param name Name of the new sampled cohort.
 #'
 #' @return Cohort table with the specified cohorts sampled.
 #'
@@ -23,11 +24,13 @@
 #' }
 sampleCohorts <- function(cohort,
                           cohortId = NULL,
-                          n) {
+                          n,
+                          name = tableName(cohort)) {
   # checks
   cohort <- validateCohortTable(cohort, TRUE)
   cohortId <- validateCohortId(cohortId, settings(cohort)$cohort_definition_id)
   n <- validateN(n)
+  name <- validateName(name)
 
   cohort <- cohort |>
     dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>
@@ -44,7 +47,7 @@ sampleCohorts <- function(cohort,
       reason = paste0("Sample ",n," individuals"),
       cohortId = cohortId
       ) |>
-    dplyr::compute(name = tableName(cohort), temporary = FALSE)
+    dplyr::compute(name = name, temporary = FALSE)
 
   return(cohort)
 }
