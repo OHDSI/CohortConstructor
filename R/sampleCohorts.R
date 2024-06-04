@@ -1,7 +1,7 @@
 #' Sample a cohort table for a given number of individuals.
 #'
 #' @description
-#' `sampleCohort()` samples an existing cohort table for a given number of
+#' `sampleCohorts()` samples an existing cohort table for a given number of
 #' people. All records of these individuals are preserved.
 #'
 #' @param cohort A cohort table in a cdm reference.
@@ -19,9 +19,9 @@
 #'
 #' cdm <- mockCohortConstructor(nPerson = 100)
 #'
-#' cdm$cohort2 |> sampleCohort(cohortId = 1, n = 10)
+#' cdm$cohort2 |> sampleCohorts(cohortId = 1, n = 10)
 #' }
-sampleCohort <- function(cohort,
+sampleCohorts <- function(cohort,
                           cohortId = NULL,
                           n) {
   # checks

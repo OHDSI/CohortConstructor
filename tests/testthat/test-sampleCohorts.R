@@ -8,7 +8,7 @@ test_that("sampleCohort subsetting one cohort", {
                                  schema = "main",
                                  overwrite = TRUE)
 
-  cdm$cohort1 <- sampleCohort(cdm$cohort1, 1, 2)
+  cdm$cohort1 <- sampleCohorts(cdm$cohort1, 1, 2)
   expect_true(cdm$cohort1 |>
                 dplyr::filter(cohort_definition_id == 1) |>
                 dplyr::pull("subject_id") |>
@@ -18,7 +18,7 @@ test_that("sampleCohort subsetting one cohort", {
                 dplyr::pull("cohort_definition_id") == 1)
 
   # Subset it again should yield the same cohort
-  test_cohort1 <- sampleCohort(cdm$cohort1, 1, 2)
+  test_cohort1 <- sampleCohorts(cdm$cohort1, 1, 2)
   expect_true(all.equal(test_cohort1, cdm$cohort1))
   expect_true(attrition(test_cohort1) |>
                 dplyr::filter(reason == "Sample 2 individuals" & reason_id == 3) |>
@@ -37,14 +37,14 @@ test_that("sampleCohort subsetting multiple cohorts", {
                                  schema = "main",
                                  overwrite = TRUE)
 
-  cdm$cohort1 <- sampleCohort(cdm$cohort1, n = 5)
+  cdm$cohort1 <- sampleCohorts(cdm$cohort1, n = 5)
   expect_true(all(attrition(cdm$cohort1) |>
                 dplyr::filter(reason == "Sample 5 individuals") |>
                 dplyr::arrange(cohort_definition_id) |>
                 dplyr::pull("number_subjects") == c(5,5,4)))
 
   # Subset it again but only cohorts 1 and 3
-  test_cohort1 <- sampleCohort(cdm$cohort1, c(1,3), 4)
+  test_cohort1 <- sampleCohorts(cdm$cohort1, c(1,3), 4)
   expect_true(all.equal(test_cohort1 |> dplyr::filter(cohort_definition_id == 3),
                         cdm$cohort1 |> dplyr::filter(cohort_definition_id == 3)))
 
@@ -66,8 +66,8 @@ test_that("sampleCohort subsetting all cohorts", {
                                  schema = "main",
                                  overwrite = TRUE)
 
-  test1 <- sampleCohort(cdm$cohort1, n = 2)
-  test2 <- sampleCohort(cdm$cohort1, cohortId = c(1,2,3), n = 2)
+  test1 <- sampleCohorts(cdm$cohort1, n = 2)
+  test2 <- sampleCohorts(cdm$cohort1, cohortId = c(1,2,3), n = 2)
   expect_true(all.equal(test1, test2))
 
   PatientProfiles::mockDisconnect(cdm)
@@ -83,13 +83,13 @@ test_that("expected errors", {
                                  schema = "main",
                                  overwrite = TRUE)
 
-  expect_error(sampleCohort(cdm$cohort2, n = 10))
-  expect_error(sampleCohort(cdm_local$cohort1, n = 10))
-  expect_error(sampleCohort(cdm$cohort1, cohortId = 4, n = 10))
-  expect_error(sampleCohort(cdm$cohort1, cohortId = "1", n = 10))
-  expect_error(sampleCohort(cdm$cohort1, n = -1))
-  expect_error(sampleCohort(cdm$cohort1))
-  expect_error(sampleCohort(cdm$cohort1, n = c(1,2)))
+  expect_error(sampleCohorts(cdm$cohort2, n = 10))
+  expect_error(sampleCohorts(cdm_local$cohort1, n = 10))
+  expect_error(sampleCohorts(cdm$cohort1, cohortId = 4, n = 10))
+  expect_error(sampleCohorts(cdm$cohort1, cohortId = "1", n = 10))
+  expect_error(sampleCohorts(cdm$cohort1, n = -1))
+  expect_error(sampleCohorts(cdm$cohort1))
+  expect_error(sampleCohorts(cdm$cohort1, n = c(1,2)))
 
   PatientProfiles::mockDisconnect(cdm)
 })
