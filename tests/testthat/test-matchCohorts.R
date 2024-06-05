@@ -1,6 +1,6 @@
 test_that("matchCohorts runs without errors", {
 
-  cdm <- mockCohortConstructor()
+  cdm <- mockCohortConstructor(nPerson = 1000)
 
   expect_no_error(a <- matchCohorts(cohort = cdm$cohort1,
                                     name = "new_cohort",
@@ -52,7 +52,7 @@ test_that("matchCohorts runs without errors", {
 })
 
 test_that("matchCohorts, no duplicated people within a cohort", {
-  cdm <- mockCohortConstructor()
+  cdm <- mockCohortConstructor(nPerson = 1000)
 
   cdm$new_cohort <- matchCohorts(cohort = cdm$cohort1,
                                  name = "new_cohort",
@@ -80,25 +80,15 @@ test_that("matchCohorts, no duplicated people within a cohort", {
     length()
   expect_true(length(p1) == length(unique(p1)))
 
-  PatientProfiles::mockDisconnect()
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("check that we obtain expected result when ratio is 1", {
-  testthat::skip_on_cran()
-  skip_if_not_installed("DrugUtilisation")
-  followback <- 180
 
-  cdm <- DrugUtilisation::generateConceptCohortSet(
-    cdm = DrugUtilisation::mockDrugUtilisation(numberIndividuals = 200),
-    conceptSet = list(c_1 = 317009, c_2 = 432526, c_3 = 4141052),
-    name = "cohort",
-    end  = "observation_period_end_date",
-    requiredObservation = c(followback,followback),
-    overwrite = TRUE
-  )
+  cdm <- mockCohortConstructor()
 
   # Number of counts for the initial cohorts are the same as in the matched cohorts
-  matched_cohorts <- matchCohorts(cohort = cdm$cohort,
+  matched_cohorts <- matchCohorts(cohort = cdm$cohort2,
                                   name = "new_cohort",
                                   matchSex = TRUE,
                                   matchYearOfBirth = TRUE,
