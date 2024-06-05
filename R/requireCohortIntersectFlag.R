@@ -133,8 +133,7 @@ requireCohortIntersectFlag <- function(cohort,
   }
 
   x <- cohort %>%
-    dplyr::inner_join(subsetCohort,
-                      by = c(cols)) %>%
+    dplyr::inner_join(subsetCohort, by = c(cols)) %>%
     dplyr::compute(name = name, temporary = FALSE) %>%
     omopgenerics::newCohortTable(.softValidation = TRUE) %>%
     omopgenerics::recordCohortAttrition(reason = reason, cohortId = cohortId)
@@ -267,8 +266,7 @@ requireCohortIntersectCount <- function(cohort,
 
   # new cohort
   x <- cohort %>%
-    dplyr::inner_join(subsetCohort,
-                      by = c(cols)) %>%
+    dplyr::inner_join(subsetCohort, by = c(cols)) %>%
     dplyr::compute(name = name, temporary = FALSE) %>%
     omopgenerics::newCohortTable(.softValidation = TRUE) %>%
     omopgenerics::recordCohortAttrition(reason = reason, cohortId = cohortId)

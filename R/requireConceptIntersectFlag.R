@@ -165,6 +165,7 @@ requireConceptIntersectFlag <- function(cohort,
 #'   cohort = cdm$cohort1,
 #'   conceptSet = list(a = 1),
 #'   window = c(-Inf, 0),
+#'   counts = 2,
 #'   name = "cohort2")
 #'   }
 requireConceptIntersectCount <- function(cohort,

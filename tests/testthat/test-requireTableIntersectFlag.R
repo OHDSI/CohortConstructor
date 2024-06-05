@@ -149,7 +149,7 @@ test_that("requiring absence in another table", {
                                             negate = TRUE)
   expect_true(all(cdm$cohort4 |> dplyr::pull("subject_id") == c(1, 3, 4, 1, 1, 1, 3)))
   expect_true(all((cdm$cohort4 |> dplyr::pull("cohort_start_date") ==
-                 c("2001-03-30", "2015-03-25", "1997-10-22", "2000-06-23", "2001-07-16", "2001-12-04", "2015-03-05"))))
+                     c("2001-03-30", "2015-03-25", "1997-10-22", "2000-06-23", "2001-07-16", "2001-12-04", "2015-03-05"))))
   expect_equal(omopgenerics::attrition(cdm$cohort4)$reason,
                c("Initial qualifying events",
                  "Not in table table between -Inf & 0 days relative to cohort_start_date, censoring at cohort_end_date",
@@ -173,5 +173,134 @@ test_that("requiring absence in another table", {
                  "Not in table table between 0 & Inf days relative to cohort_start_date",
                  "Initial qualifying events"))
 
+  PatientProfiles::mockDisconnect(cdm)
+})
+
+test_that("requiring presence in another table", {
+  testthat::skip_on_cran()
+  cdm_local <- omock::mockCdmReference() |>
+    omock::mockPerson(n = 4) |>
+    omock::mockObservationPeriod() |>
+    omock::mockCohort(name = c("cohort1"), numberCohorts = 2)
+  cdm_local$table <- dplyr::tibble(
+    person_id = c(1, 3, 4, 1),
+    date_start = as.Date(c("2002-01-01", "2015-10-01", "2000-01-01", "2004-01-01")),
+    date_end = as.Date(c("2002-01-01", "2015-10-01", "2000-01-01", "2004-04-01"))
+  )
+  cdm <- cdm_local |> copyCdm()
+
+  cdm$cohort2 <-  requireTableIntersectCount(cohort = cdm$cohort1,
+                                             tableName = "table",
+                                             targetStartDate = "date_start",
+                                             targetEndDate = "date_end",
+                                             window = list(c(-Inf, Inf)),
+                                             counts = 2,
+                                             name = "cohort2")
+
+  expect_true(all(cdm$cohort2 |> dplyr::pull("subject_id") %in% 1))
+  expect_equal(omopgenerics::attrition(cdm$cohort2)$reason,
+               c("Initial qualifying events",
+                 "Exactly 2 times in table table between -Inf & Inf days relative to cohort_start_date",
+                 "Initial qualifying events",
+                 "Exactly 2 times in table table between -Inf & Inf days relative to cohort_start_date"))
+
+  cdm$cohort3 <-  requireTableIntersectCount(cohort = cdm$cohort1,
+                                             tableName = "table",
+                                             targetStartDate = "date_start",
+                                             targetEndDate = "date_end",
+                                             counts = 1,
+                                             requirementType = "at_most",
+                                             window = c(0, Inf),
+                                             name = "cohort3")
+  expect_true(all(cdm$cohort3 |> dplyr::pull("subject_id") |> sort() == c(1, 3, 3, 4)))
+  expect_true(all(cdm$cohort3 |> dplyr::pull("cohort_start_date") ==
+                    c("2003-06-15", "2015-03-25", "1997-10-22", "2015-03-05")))
+  expect_equal(omopgenerics::attrition(cdm$cohort3)$reason,
+               c("Initial qualifying events",
+                 "At most 1 time in table table between 0 & Inf days relative to cohort_start_date",
+                 "Initial qualifying events",
+                 "At most 1 time in table table between 0 & Inf days relative to cohort_start_date"))
+
+  # censor date
+  cdm$cohort4 <-  requireTableIntersectCount(cohort = cdm$cohort1,
+                                             tableName = "table",
+                                             targetStartDate = "date_start",
+                                             targetEndDate = "date_end",
+                                             window = c(0, Inf),
+                                             counts = 0,
+                                             censorDate = "cohort_end_date",
+                                             name = "cohort4")
+  expect_true(all(cdm$cohort4 |> dplyr::pull("subject_id") |> sort() == c(1, 1, 3, 3, 4)))
+  expect_true(all(cdm$cohort4 |> dplyr::pull("cohort_start_date") |> sort() ==
+                    c("1997-10-22", "2000-06-23", "2001-07-16", "2015-03-05", "2015-03-25")))
+  expect_equal(omopgenerics::attrition(cdm$cohort4)$reason,
+               c("Initial qualifying events",
+                 "Exactly 0 times in table table between 0 & Inf days relative to cohort_start_date, censoring at cohort_end_date",
+                 "Initial qualifying events",
+                 "Exactly 0 times in table table between 0 & Inf days relative to cohort_start_date, censoring at cohort_end_date"))
+
+  # cohrot Id
+  cdm$cohort5 <-  requireTableIntersectCount(cohort = cdm$cohort1,
+                                             cohortId = 1,
+                                             tableName = "table",
+                                             targetStartDate = "date_start",
+                                             targetEndDate = "date_end",
+                                             window = c(-Inf, 0),
+                                             counts = 3,
+                                             requirementType = "at_least",
+                                             name = "cohort5")
+  expect_true(all(cdm$cohort5 |> dplyr::pull("cohort_definition_id") %in% 2))
+  expect_equal(collectCohort(cdm$cohort5, 2), collectCohort(cdm$cohort1, 2))
+  expect_equal(omopgenerics::attrition(cdm$cohort5)$reason,
+               c("Initial qualifying events",
+                 "At least 3 times in table table between -Inf & 0 days relative to cohort_start_date",
+                 "Initial qualifying events"))
+
+  # expected errors
+  # currently just 1 table suported´
+  expect_error(
+    requireTableIntersectCount(cohort = cdm$cohort1,
+                               tableName = c("table", "observation_period"),
+                               window = c(-Inf, Inf),
+                               counts = 1)
+  )
+  expect_error(
+    requireTableIntersectCount(cohort = cdm$cohort1,
+                               tableName = cdm$table,
+                               window = c(-Inf, Inf),
+                               counts = 1)
+  )
+  expect_error(
+    requireTableIntersectCount(cohort = cdm$cohort1,
+                               tableName = "not_a_table",
+                               window = c(-Inf, Inf),
+                               counts = 1)
+  )
+  expect_error(requireTableIntersectCount(cohort = cdm$cohort1,
+                                          cohortId = 1,
+                                          tableName = "table",
+                                          targetStartDate = "date_start",
+                                          targetEndDate = "date_end",
+                                          window = c(-Inf, 0),
+                                          counts = 1.5))
+  expect_error(requireTableIntersectCount(cohort = cdm$cohort1,
+                                          targetCohortTable = "cohort2",
+                                          targetCohortId = c(1,2),
+                                          counts = NA))
+  expect_error(requireTableIntersectCount(cohort = cdm$cohort1,
+                                          cohortId = 1,
+                                          tableName = "table",
+                                          targetStartDate = "date_start",
+                                          targetEndDate = "date_end",
+                                          window = c(-Inf, 0),
+                                          counts = NULL))
+  expect_error(requireTableIntersectCount(cohort = cdm$cohort1,
+                                          cohortId = 1,
+                                          tableName = "table",
+                                          targetStartDate = "date_start",
+                                          targetEndDate = "date_end",
+                                          window = c(-Inf, 0),
+                                          counts = 1,
+                                          requirementType = "rand"))
   PatientProfiles::mockDisconnect(cdm)
 })
