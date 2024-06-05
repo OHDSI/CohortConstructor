@@ -152,20 +152,13 @@ test_that("test exactMatchingCohort works if there are no subjects", {
 })
 
 test_that("test exactMatchingCohort works if one of the cohorts does not have any people", {
-  testthat::skip_on_cran()
-  skip_if_not_installed("DrugUtilisation")
-  followback  <- 180
-  cdm <- DrugUtilisation::generateConceptCohortSet(
-    cdm = DrugUtilisation::mockDrugUtilisation(numberIndividuals = 200),
-    conceptSet = list(c_1 = 317009, c_2 = 8505),
-    name = "cases",
-    end  = "observation_period_end_date",
-    requiredObservation = c(followback,followback),
-    overwrite = TRUE
-  )
+
+  cdm <- mockCohortConstructor()
+
+  cdm$cohort2 <- cdm$cohort2 |> filter(cohort_definition_id == 2)
 
   expect_no_error(
-    cdm$new_cohort <- matchCohorts(cohort = cdm$cases,
+    cdm$new_cohort <- matchCohorts(cohort = cdm$cohort2,
                                    name = "new_cohort",
                                    matchSex = TRUE,
                                    matchYearOfBirth = TRUE,
