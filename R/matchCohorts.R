@@ -38,15 +38,6 @@ matchCohorts <- function(cohort,
                          name = tableName(cohort)) {
   cli::cli_inform("Starting matching")
 
-  # Check if there are repeated people within the cohort
-  x <- cdm$cohort1 |>
-    dplyr::filter(cohort_definition_id %in% cohortId) |>
-    dplyr::group_by(cohort_definition_id, subject_id) |>
-    dplyr::filter(n() >= 2) |> ungroup() |> tally() |> pull()
-  if(x != 0){
-    warning("Multiple records per person detected. The matchCohorts() function is designed to operate under the assumption that there is only one record per person within each cohort. If this assumption is not met, each record will be treated independently. As a result, the same individual may be matched multiple times, leading to inconsistent and potentially misleading results.")
-  }
-
   # validate initial input
   name <- validateName(name)
   validateCohortTable(cohort)
@@ -57,6 +48,15 @@ matchCohorts <- function(cohort,
   assertNumeric(ratio, min = 0, length = 1)
   assertLogical(matchSex, length = 1)
   assertLogical(matchYearOfBirth, length = 1)
+
+  # Check if there are repeated people within the cohort
+  y <- cohort |>
+    dplyr::filter(cohort_definition_id %in% cohortId) |>
+    dplyr::group_by(cohort_definition_id, subject_id) |>
+    dplyr::filter(dplyr::n() >= 2) |> dplyr::ungroup() |> dplyr::tally() |> dplyr::pull()
+  if(y != 0){
+    warning("Multiple records per person detected. The matchCohorts() function is designed to operate under the assumption that there is only one record per person within each cohort. If this assumption is not met, each record will be treated independently. As a result, the same individual may be matched multiple times, leading to inconsistent and potentially misleading results.")
+  }
 
   # table prefix
   tablePrefix <- omopgenerics::tmpPrefix()
