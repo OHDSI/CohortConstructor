@@ -101,17 +101,17 @@ requireCohortIntersectFlag <- function(cohort,
       targetEndDate = targetEndDate,
       window = window,
       censorDate = censorDate,
-      nameStyle = "intersect_cohort"
+      nameStyle = "intersect"
     )
 
   # apply requirement
   if(isFALSE(negate)){
     subsetCohort <- subsetCohort %>%
       dplyr::filter(
-        .data$intersect_cohort == 1 |
+        .data$intersect == 1 |
           (!.data$cohort_definition_id %in% .env$cohortId)
       ) %>%
-      dplyr::select(!"intersect_cohort")
+      dplyr::select(!"intersect")
     # attrition reason
     reason <- glue::glue("In cohort {target_name} between {window_start} & ",
                          "{window_end} days relative to {indexDate}")
@@ -119,10 +119,10 @@ requireCohortIntersectFlag <- function(cohort,
     # ie require absence instead of presence
     subsetCohort <- subsetCohort %>%
       dplyr::filter(
-        .data$intersect_cohort != 1 |
+        .data$intersect != 1 |
           (!.data$cohort_definition_id %in% .env$cohortId)
         ) %>%
-      dplyr::select(!"intersect_cohort")
+      dplyr::select(!"intersect")
     # attrition reason
     reason <- glue::glue("Not in cohort {target_name} between {window_start} & ",
                          "{window_end} days relative to {indexDate}")
@@ -250,14 +250,14 @@ requireCohortIntersectCount <- function(cohort,
       targetEndDate = targetEndDate,
       window = window,
       censorDate = censorDate,
-      nameStyle = "intersect_cohort"
+      nameStyle = "intersect"
     )
 
   # filter
   filterExp <- getIntersectCountFilter(counts, requirementType)
   subsetCohort <- subsetCohort %>%
-    dplyr::filter(!!!filterExp) %>%
-    dplyr::select(!"intersect_cohort")
+    dplyr::filter(!!filterExp) %>%
+    dplyr::select(!"intersect")
 
   # attrition reason
   reason <- "{stringr::str_to_sentence(gsub('_', ' ', requirementType))} {counts} time{?s} in cohort {target_name} between {window_start} & {window_end} days relative to {indexDate}"
@@ -285,7 +285,7 @@ getIntersectCountFilter <- function(counts, requirementType) {
     comp <- "<="
   }
 
-  filterExp <- glue::glue(".data$intersect_cohort {comp} {counts} |
+  filterExp <- glue::glue(".data$intersect {comp} {counts} |
              (!.data$cohort_definition_id %in% .env$cohortId)") |>
     rlang::parse_expr()
 
