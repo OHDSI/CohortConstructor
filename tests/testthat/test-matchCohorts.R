@@ -141,20 +141,11 @@ test_that("check that we obtain expected result when ratio is 1", {
 })
 
 test_that("test exactMatchingCohort works if there are no subjects", {
-  testthat::skip_on_cran()
-  skip_if_not_installed("DrugUtilisation")
-  followback  <- 180
-  cdm <- DrugUtilisation::generateConceptCohortSet(
-    cdm = DrugUtilisation::mockDrugUtilisation(numberIndividuals = 200),
-    conceptSet = list(asthma = 317009),
-    name = "cases",
-    end  = "observation_period_end_date",
-    requiredObservation = c(followback,followback),
-    overwrite = TRUE
-  )
-  cdm$cases <- cdm$cases %>% dplyr::filter(subject_id == 0)
+  cdm <- mockCohortConstructor(nPerson = 1000)
+
+  cdm$cohort1 <- cdm$cohort1 %>% dplyr::filter(subject_id == 0)
   cdm$new_cohort <- matchCohorts(
-    cohort = cdm$cases,
+    cohort = cdm$cohort1,
     name = "new_cohort"
   )
   expect_true(cdm$new_cohort %>% dplyr::tally() %>% dplyr::pull(n) == 0)
