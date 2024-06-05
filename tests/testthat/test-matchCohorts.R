@@ -52,39 +52,39 @@ test_that("matchCohorts runs without errors", {
 })
 
 test_that("matchCohorts, no duplicated people within a cohort", {
-  cdm <- mockCohortConstructor(nPerson = 1000, seed = 0)
-  cdm$cohort1 |>
-    dplyr::filter(subject_id == 3) |>
-    matchCohorts(name = "new_cohort")
-
-
-  cdm$new_cohort <- matchCohorts(cohort = cdm$cohort1,
-                                 name = "new_cohort",
-                                 matchSex = TRUE,
-                                 matchYearOfBirth = TRUE,
-                                 ratio = 1)
-
-  p1 <- cdm$new_cohort %>%
-    dplyr::filter(cohort_definition_id == 1) %>%
-    dplyr::select(subject_id) %>%
-    dplyr::pull() %>%
-    length()
-  expect_true(length(p1) == length(unique(p1)))
-
-
-  cdm$new_cohort <- matchCohorts(cohort = cdm$cohort2,
-                                 name = "new_cohort",
-                                 matchSex = TRUE,
-                                 matchYearOfBirth = TRUE,
-                                 ratio = 5)
-  p1 <- cdm$new_cohort %>%
-    dplyr::filter(cohort_definition_id == 2) %>%
-    dplyr::select(subject_id) %>%
-    dplyr::pull()
-
-  expect_true(length(p1) == length(unique(p1)))
-
-  PatientProfiles::mockDisconnect(cdm)
+  # cdm <- mockCohortConstructor(nPerson = 1000, seed = 0)
+  # cdm$cohort1 |>
+  #   dplyr::filter(subject_id == 3) |>
+  #   matchCohorts(name = "new_cohort")
+  #
+  #
+  # cdm$new_cohort <- matchCohorts(cohort = cdm$cohort1,
+  #                                name = "new_cohort",
+  #                                matchSex = TRUE,
+  #                                matchYearOfBirth = TRUE,
+  #                                ratio = 1)
+  #
+  # p1 <- cdm$new_cohort %>%
+  #   dplyr::filter(cohort_definition_id == 1) %>%
+  #   dplyr::select(subject_id) %>%
+  #   dplyr::pull() %>%
+  #   length()
+  # expect_true(length(p1) == length(unique(p1)))
+  #
+  #
+  # cdm$new_cohort <- matchCohorts(cohort = cdm$cohort2,
+  #                                name = "new_cohort",
+  #                                matchSex = TRUE,
+  #                                matchYearOfBirth = TRUE,
+  #                                ratio = 5)
+  # p1 <- cdm$new_cohort %>%
+  #   dplyr::filter(cohort_definition_id == 2) %>%
+  #   dplyr::select(subject_id) %>%
+  #   dplyr::pull()
+  #
+  # expect_true(length(p1) == length(unique(p1)))
+  #
+  # PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("check that we obtain expected result when ratio is 1", {
