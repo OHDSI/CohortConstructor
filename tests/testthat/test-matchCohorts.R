@@ -52,7 +52,11 @@ test_that("matchCohorts runs without errors", {
 })
 
 test_that("matchCohorts, no duplicated people within a cohort", {
-  cdm <- mockCohortConstructor(nPerson = 1000)
+  cdm <- mockCohortConstructor(nPerson = 1000, seed = 0)
+  cdm$cohort1 |>
+    dplyr::filter(subject_id == 3) |>
+    matchCohorts(name = "new_cohort")
+
 
   cdm$new_cohort <- matchCohorts(cohort = cdm$cohort1,
                                  name = "new_cohort",
@@ -68,7 +72,7 @@ test_that("matchCohorts, no duplicated people within a cohort", {
   expect_true(length(p1) == length(unique(p1)))
 
 
-  cdm$new_cohort <- matchCohorts(cohort = cdm$cohort1,
+  cdm$new_cohort <- matchCohorts(cohort = cdm$cohort2,
                                  name = "new_cohort",
                                  matchSex = TRUE,
                                  matchYearOfBirth = TRUE,
@@ -76,8 +80,8 @@ test_that("matchCohorts, no duplicated people within a cohort", {
   p1 <- cdm$new_cohort %>%
     dplyr::filter(cohort_definition_id == 2) %>%
     dplyr::select(subject_id) %>%
-    dplyr::pull() %>%
-    length()
+    dplyr::pull()
+
   expect_true(length(p1) == length(unique(p1)))
 
   PatientProfiles::mockDisconnect(cdm)
@@ -85,7 +89,7 @@ test_that("matchCohorts, no duplicated people within a cohort", {
 
 test_that("check that we obtain expected result when ratio is 1", {
 
-  cdm <- mockCohortConstructor()
+  cdm <- mockCohortConstructor(nPerson = 1000)
 
   # Number of counts for the initial cohorts are the same as in the matched cohorts
   matched_cohorts <- matchCohorts(cohort = cdm$cohort2,
@@ -97,23 +101,16 @@ test_that("check that we obtain expected result when ratio is 1", {
   expect_true(nrow(omopgenerics::cohortCount(matched_cohorts) %>%
                      dplyr::left_join(omopgenerics::settings(matched_cohorts),
                                       by = "cohort_definition_id") %>%
-                     dplyr::filter(stringr::str_detect(cohort_name, "c_1"))  %>%
-                     dplyr::select("number_records") %>%
-                     dplyr::distinct()) == 1)
-  expect_true(nrow(omopgenerics::cohortCount(matched_cohorts) %>%
-                     dplyr::left_join(omopgenerics::settings(matched_cohorts),
-                                      by = "cohort_definition_id") %>%
-                     dplyr::filter(stringr::str_detect(cohort_name, "c_2"))  %>%
-                     dplyr::select("number_records") %>%
-                     dplyr::distinct()) == 1)
-  expect_true(nrow(omopgenerics::cohortCount(matched_cohorts) %>%
-                     dplyr::left_join(omopgenerics::settings(matched_cohorts),
-                                      by = "cohort_definition_id") %>%
-                     dplyr::filter(stringr::str_detect(cohort_name, "c_3"))  %>%
+                     dplyr::filter(stringr::str_detect(cohort_name, "cohort_1"))  %>%
                      dplyr::select("number_records") %>%
                      dplyr::distinct()) == 1)
 
-
+  expect_true(nrow(omopgenerics::cohortCount(matched_cohorts) %>%
+                     dplyr::left_join(omopgenerics::settings(matched_cohorts),
+                                      by = "cohort_definition_id") %>%
+                     dplyr::filter(stringr::str_detect(cohort_name, "cohort_2"))  %>%
+                     dplyr::select("number_records") %>%
+                     dplyr::distinct()) == 1)
 
   # Everybody has a match
   n <- matched_cohorts %>%
@@ -139,6 +136,8 @@ test_that("check that we obtain expected result when ratio is 1", {
                            dplyr::filter(
                              is.na(person_id.y)
                            ))))
+
+  PatientProfiles::mockPatientProfiles(cdm)
 })
 
 test_that("test exactMatchingCohort works if there are no subjects", {
