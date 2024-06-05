@@ -26,6 +26,13 @@ requireTableIntersectCount(
 
 \item{window}{Window to consider events over.}
 
+\item{counts}{Number of intersections to require.}
+
+\item{requirementType}{Can take the values: "exactly", "at_least" or
+"at_most". It indicates whether the number of intersections required should
+match the counts ("excatly"), or if the counts refer to the minimum
+("at_least") or maximum ("at_most") number of intersections required.}
+
 \item{cohortId}{IDs of the cohorts to modify. If NULL, all cohorts will be
 used; otherwise, only the specified cohorts will be modified, and the
 rest will remain unchanged.}
@@ -43,9 +50,6 @@ intersection.}
 column date of x.}
 
 \item{name}{Name of the new cohort with the future observation restriction.}
-
-\item{negate}{If set as TRUE, criteria will be applied as exclusion
-rather than inclusion (i.e. require absence in another cohort).}
 }
 \value{
 Cohort table.
