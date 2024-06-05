@@ -173,3 +173,121 @@ test_that("requiring absence in another cohort", {
 
   PatientProfiles::mockDisconnect(cdm)
 })
+
+test_that("requiring counts in another cohort", {
+  cdm_local <- omock::mockCdmReference() |>
+    omock::mockPerson(n = 4) |>
+    omock::mockObservationPeriod() |>
+    omock::mockCohort(name = c("cohort1"), numberCohorts = 2) |>
+    omock::mockCohort(name = c("cohort2"), numberCohorts = 2, seed = 2)
+  cdm <- cdm_local |> copyCdm()
+
+  cdm$cohort3 <-  requireCohortIntersectCount(cohort = cdm$cohort1,
+                                              targetCohortTable = "cohort2",
+                                              targetCohortId = 1,
+                                              window = c(-Inf, Inf),
+                                              counts = 1,
+                                              cohortId = 2,
+                                              requirementType = "exactly",
+                                              name = "cohort3")
+
+  expect_equal(collectCohort(cdm$cohort1, 1), collectCohort(cdm$cohort3, 1))
+  expect_equal(collectCohort(cdm$cohort1, 2), collectCohort(cdm$cohort3, 2))
+  expect_true(all(omopgenerics::attrition(cdm$cohort3)$reason ==
+                    c("Initial qualifying events",
+                      "Initial qualifying events",
+                      "Exactly 1 time in cohort cohort_1 between -Inf & Inf days relative to cohort_start_date")))
+
+  cdm$cohort4 <-  requireCohortIntersectCount(cohort = cdm$cohort1,
+                                              targetCohortTable = "cohort2",
+                                              targetCohortId = 2,
+                                              window = list(c(-Inf, Inf)),
+                                              counts = 2,
+                                              requirementType = "at_most",
+                                              name = "cohort4")
+  expect_false(any(cdm$cohort4 |> dplyr::pull("subject_id") %in% 3))
+  expect_true(all(omopgenerics::attrition(cdm$cohort4)$reason ==
+                    c("Initial qualifying events",
+                      "At most 2 times in cohort cohort_2 between -Inf & Inf days relative to cohort_start_date",
+                      "Initial qualifying events",
+                      "At most 2 times in cohort cohort_2 between -Inf & Inf days relative to cohort_start_date")))
+
+  # name
+  cdm$cohort1 <-  requireCohortIntersectCount(cohort = cdm$cohort1,
+                                              targetCohortTable = "cohort2",
+                                              targetCohortId = 2,
+                                              counts = 3,
+                                              requirementType = "at_least",
+                                              window = c(-Inf, Inf))
+  expect_true(all(cdm$cohort1 |> dplyr::pull("subject_id") %in% 3))
+  expect_true(all(omopgenerics::attrition(cdm$cohort1)$reason ==
+                    c("Initial qualifying events",
+                      "At least 3 times in cohort cohort_2 between -Inf & Inf days relative to cohort_start_date",
+                      "Initial qualifying events",
+                      "At least 3 times in cohort cohort_2 between -Inf & Inf days relative to cohort_start_date")))
+
+  # censor date
+  cdm$cohort5 <- requireCohortIntersectCount(cohort = cdm$cohort2,
+                                            targetCohortTable = "cohort1",
+                                            targetCohortId = 2,
+                                            window = c(0, Inf),
+                                            counts = 1,
+                                            requirementType = "at_least",
+                                            censorDate = "cohort_end_date",
+                                            name = "cohort5")
+  expect_true(all(cdm$cohort5 |> dplyr::pull("cohort_start_date") == c("2015-04-14", "2015-02-23")))
+  expect_true(all(cdm$cohort5 |> dplyr::pull("subject_id") == c("3", "3")))
+  expect_true(all(cdm$cohort5 |> dplyr::pull("cohort_definition_id") == c("1", "2")))
+  expect_true(all(omopgenerics::attrition(cdm$cohort5)$reason ==
+                    c("Initial qualifying events",
+                      "At least 1 time in cohort cohort_2 between 0 & Inf days relative to cohort_start_date, censoring at cohort_end_date",
+                      "Initial qualifying events",
+                      "At least 1 time in cohort cohort_2 between 0 & Inf days relative to cohort_start_date, censoring at cohort_end_date")))
+
+
+  # expected errors
+  # only support one target id at the moment
+  expect_error(requireCohortIntersectCount(cohort = cdm$cohort1,
+                                          targetCohortTable = "cohort2",
+                                          targetCohortId = c(1,2),
+                                          counts = 1,
+                                          window = c(-Inf, Inf)))
+  expect_error(requireCohortIntersectCount(cohort = cdm$cohort1,
+                                          targetCohortTable = "cohort22", # does not exist
+                                          targetCohortId = 1,
+                                          counts = 1,
+                                          window = c(-Inf, Inf)))
+  expect_error(requireCohortIntersectCount(cohort = cdm$cohort1,
+                                          targetCohortTable = "cohort2",
+                                          targetCohortId = 10, # does not exist
+                                          counts = 1,
+                                          window = c(-Inf, Inf)))
+  expect_error(requireCohortIntersectCount(cohort = cdm$cohort1,
+                                          targetCohortTable = "cohort2",
+                                          targetCohortId = NULL, # only one id supported
+                                          counts = 1,
+                                          window = c(-Inf, Inf)))
+  expect_error(requireCohortIntersectCount(cohort = cdm$cohort1,
+                                          targetCohortTable = c("not_a_cohort", "lala"),
+                                          counts = 1,
+                                          targetCohortId = 1,
+                                          window = c(-Inf, Inf)))
+  expect_error(requireCohortIntersectCount(cohort = cdm$cohort1,
+                                           targetCohortTable = "cohort2",
+                                           targetCohortId = c(1,2),
+                                           counts = 1.5))
+  expect_error(requireCohortIntersectCount(cohort = cdm$cohort1,
+                                           targetCohortTable = "cohort2",
+                                           targetCohortId = c(1,2),
+                                           counts = NA))
+  expect_error(requireCohortIntersectCount(cohort = cdm$cohort1,
+                                           targetCohortTable = "cohort2",
+                                           targetCohortId = c(1,2),
+                                           counts = NULL))
+  expect_error(requireCohortIntersectCount(cohort = cdm$cohort1,
+                                           targetCohortTable = "cohort2",
+                                           targetCohortId = c(1,2),
+                                           counts = 1,
+                                           requirementType = "rand"))
+  PatientProfiles::mockDisconnect(cdm)
+})

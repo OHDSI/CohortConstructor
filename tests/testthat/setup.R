@@ -1,4 +1,3 @@
-
 collectCohort <- function(cohort, id) {
   x <- cohort |>
     dplyr::filter(.data$cohort_definition_id == .env$id) |>
