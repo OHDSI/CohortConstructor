@@ -1,55 +1,38 @@
 test_that("matchCohorts runs without errors", {
-  testthat::skip_on_cran()
-  skip_if_not_installed("DrugUtilisation")
   # Create cdm object
-  cdm <- DrugUtilisation::generateConceptCohortSet(
-    cdm = DrugUtilisation::mockDrugUtilisation(numberIndividuals = 200),
-    conceptSet = list(asthma = 317009),
-    name = "cases",
-    end  = "observation_period_end_date",
-    requiredObservation = c(180, 180),
-    overwrite = TRUE
-  )
+  cdm <- mockCohortConstructor()
 
-  expect_no_error(a <- matchCohorts(cohort = cdm$cases,
+  expect_no_error(a <- matchCohorts(cohort = cdm$cohort1,
                                     name = "new_cohort",
                                     ratio = 2))
 
-  cdm <- DrugUtilisation::generateConceptCohortSet(
-    cdm = DrugUtilisation::mockDrugUtilisation(numberIndividuals = 200),
-    conceptSet = list(asthma = 317009, other = 4141052, other1 = 432526),
-    name = "cases",
-    end  = "observation_period_end_date",
-    requiredObservation = c(10,10),
-    overwrite = TRUE)
+  expect_no_error(a <- matchCohorts(cohort = cdm$cohort2,
+                                    name = "new_cohort"))
 
-  expect_no_error(matchCohorts(cohort = cdm$cases,
-                               name = "new_cohort"))
-
-  expect_no_error(matchCohorts(cohort = cdm$cases,
+  expect_no_error(matchCohorts(cohort = cdm$cohort2,
                                name = "new_cohort",
                                ratio = 3))
 
-  expect_no_error(matchCohorts(cohort = cdm$cases,
+  expect_no_error(matchCohorts(cohort = cdm$cohort2,
                                name = "new_cohort",
                                ratio = Inf))
 
-  expect_no_error(matchCohorts(cohort = cdm$cases,
+  expect_no_error(matchCohorts(cohort = cdm$cohort2,
                                name = "new_cohort",
                                matchSex = FALSE,
                                matchYearOfBirth = TRUE))
 
-  expect_no_error(matchCohorts(cohort = cdm$cases,
+  expect_no_error(matchCohorts(cohort = cdm$cohort2,
                                name = "new_cohort",
                                matchSex = TRUE,
                                matchYearOfBirth = FALSE))
 
-  expect_no_error(b <- matchCohorts(cohort = cdm$cases,
+  expect_no_error(b <- matchCohorts(cohort = cdm$cohort2,
                                     name = "new_cohort",
                                     matchSex = FALSE,
                                     matchYearOfBirth = FALSE))
 
-  expect_no_error(a <- matchCohorts(cohort = cdm$cases,
+  expect_no_error(a <- matchCohorts(cohort = cdm$cohort2,
                                     name = "new_cohort",
                                     cohortId = c(1,2),
                                     matchSex = TRUE,
@@ -60,7 +43,6 @@ test_that("matchCohorts runs without errors", {
   cdm <- omopgenerics::emptyCohortTable(cdm, name = "cohort")
   expect_no_error(empty_cohort <- matchCohorts(cohort = cdm$cohort, name = "empty_cohort"))
   expect_equal(cdm$cohort |> dplyr::collect(), empty_cohort |> dplyr::collect())
-
 
   # expect errors
   expect_error(matchCohorts(cohort = dplyr::tibble()))

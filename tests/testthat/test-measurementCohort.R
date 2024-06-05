@@ -1,5 +1,6 @@
 test_that("mearurementCohorts works", {
   cdm <- mockCohortConstructor(con = NULL)
+
   cdm$concept <- cdm$concept |>
     dplyr::union_all(
       dplyr::tibble(
