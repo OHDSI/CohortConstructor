@@ -18,9 +18,12 @@ reference:
 - subtitle: Impose multiple demographic requirements on existing cohorts
 - contents:
   - matches("requireDemographics")
-- subtitle: Impose requirements of presence or absence in other cohorts, concept sets, or table
+- subtitle: Impose requirements of presence or absence in other cohorts, concept sets, or tables
 - contents:
   - matches("requireCohortIntersectFlag|requireConceptIntersectFlag|requireTableIntersectFlag")
+- subtitle: Impose requirements of number of events in other cohorts, concept sets, or tables
+- contents:
+  - matches("requireCohortIntersectCount|requireConceptIntersectCount|requireTableIntersectCount")
 - subtitle: Impose presence or absence of a death record within a time window
 - contents:
   - matches("requireDeathFlag")
