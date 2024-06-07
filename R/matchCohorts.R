@@ -49,6 +49,15 @@ matchCohorts <- function(cohort,
   assertLogical(matchSex, length = 1)
   assertLogical(matchYearOfBirth, length = 1)
 
+  # Check if there are repeated people within the cohort
+  y <- cohort |>
+    dplyr::filter(cohort_definition_id %in% cohortId) |>
+    dplyr::group_by(cohort_definition_id, subject_id) |>
+    dplyr::filter(dplyr::n() >= 2) |> dplyr::ungroup() |> dplyr::tally() |> dplyr::pull()
+  if(y != 0){
+    cli::cli_warn("Multiple records per person detected. The matchCohorts() function is designed to operate under the assumption that there is only one record per person within each cohort. If this assumption is not met, each record will be treated independently. As a result, the same individual may be matched multiple times, leading to inconsistent and potentially misleading results.")
+  }
+
   # table prefix
   tablePrefix <- omopgenerics::tmpPrefix()
   target <- omopgenerics::uniqueTableName(tablePrefix)
