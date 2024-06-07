@@ -1,10 +1,10 @@
 test_that("matchCohorts runs without errors", {
-#
-#   cdm <- mockCohortConstructor(nPerson = 1000)
-#
-#   expect_no_error(a <- matchCohorts(cohort = cdm$cohort1,
-#                                     name = "new_cohort",
-#                                     ratio = 1))
+
+  cdm <- mockCohortConstructor(nPerson = 1000)
+
+  expect_no_error(a <- matchCohorts(cohort = cdm$cohort1,
+                                    name = "new_cohort",
+                                    ratio = 1))
 #
 #   expect_no_error(a <- matchCohorts(cohort = cdm$cohort2,
 #                                     name = "new_cohort"))
@@ -48,7 +48,7 @@ test_that("matchCohorts runs without errors", {
 #   expect_error(matchCohorts(cohort = dplyr::tibble()))
 #   expect_error(matchCohorts(cohort = cdm$cases, ratio = -0.5))
 #
-#   PatientProfiles::mockDisconnect(cdm)
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("matchCohorts, no duplicated people within a cohort", {
