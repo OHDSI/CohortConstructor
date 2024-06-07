@@ -51,7 +51,6 @@ trimDemographics <- function(cohort,
   cdm <- omopgenerics::cdmReference(cohort)
 
   # replace age Inf to avoid potential sql issues
-  # will create new variable, so we can still report Inf in the settings
   for(j in seq_along(ageRange)){
     ageRange[[j]][is.infinite(ageRange[[j]])] <- as.integer(999)
   }
