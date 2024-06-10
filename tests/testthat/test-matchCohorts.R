@@ -71,7 +71,7 @@ test_that("matchCohorts runs without errors", {
 test_that("matchCohorts, no duplicated people within a cohort", {
   cdm <- mockCohortConstructor(nPerson = 1000)
   cdm$cohort1 <- cdm$cohort1 |>
-    dplyr::group_by("subject_id") |>
+    dplyr::group_by(subject_id) |>
     dplyr::filter(dplyr::n() == 1) |>
     dplyr::ungroup() |>
     dplyr::filter(subject_id == 3) |>
@@ -91,7 +91,7 @@ test_that("matchCohorts, no duplicated people within a cohort", {
 
 
   cdm$cohort2 <- cdm$cohort2 |>
-    dplyr::group_by("subject_id") |>
+    dplyr::group_by(subject_id) |>
     dplyr::filter(dplyr::n() == 1) |>
     dplyr::ungroup() |>
     dplyr::compute(temporary = FALSE, name = "cohort2")
@@ -116,7 +116,7 @@ test_that("check that we obtain expected result when ratio is 1", {
   cdm <- mockCohortConstructor(nPerson = 1000)
 
   cdm$cohort2 <- cdm$cohort2 |>
-    dplyr::group_by("subject_id") |>
+    dplyr::group_by(subject_id) |>
     dplyr::filter(dplyr::n() == 1) |>
     dplyr::ungroup() |>
     dplyr::compute(temporary = FALSE, name = "cohort2")
