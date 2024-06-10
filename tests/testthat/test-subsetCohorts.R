@@ -113,7 +113,7 @@ test_that("Expected behaviour", {
   PatientProfiles::mockDisconnect(cdm)
 })
 
-test_that("Testing minCohortCount", {
+test_that("Testing minCohortCount argument", {
   testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 1) |>
