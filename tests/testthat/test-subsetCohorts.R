@@ -6,7 +6,7 @@ test_that("subsetCohort works", {
   cdm <- cdm_local |> copyCdm()
 
   # Subset 1 cohort
-  cdm$cohort2 <- subsetCohorts(cdm$cohort1, 1, "cohort2")
+  cdm$cohort2 <- subsetCohorts(cdm$cohort1, cohortId = 1, name = "cohort2")
   expect_true(unique(cdm$cohort2 |> dplyr::pull("cohort_definition_id")) == 1)
   expect_true(settings(cdm$cohort2) |> dplyr::pull("cohort_definition_id") == 1)
   expect_true(unique(attrition(cdm$cohort2) |> dplyr::pull("cohort_definition_id")) == 1)
@@ -18,7 +18,7 @@ test_that("subsetCohort works", {
                attrition(cdm$cohort2))
 
   # subset more than 1 cohort
-  cdm$cohort3 <- subsetCohorts(cdm$cohort1, c(3,4,5), "cohort3")
+  cdm$cohort3 <- subsetCohorts(cdm$cohort1, c(3,4,5), name = "cohort3")
   expect_true(all(unique(cdm$cohort3|> dplyr::pull("cohort_definition_id")) == 3:5))
   expect_true(all(settings(cdm$cohort3) |> dplyr::pull("cohort_definition_id") == 3:5))
   expect_true(all(unique(attrition(cdm$cohort3) |> dplyr::pull("cohort_definition_id")) == 3:5))
@@ -81,7 +81,7 @@ test_that("codelist works", {
   cdm$cohort1 <- conceptCohort(cdm, conceptSet = list(c1 = c(1,3), c2 = c(2)), name = "cohort1")
 
   # Subset 1 cohort
-  cdm$cohort2 <- subsetCohorts(cdm$cohort1, 1, "cohort2")
+  cdm$cohort2 <- subsetCohorts(cdm$cohort1, 1, name = "cohort2")
   expect_equal(attr(cdm$cohort2, "cohort_codelist") |> dplyr::collect(),
                attr(cdm$cohort1, "cohort_codelist") |> dplyr::filter(cohort_definition_id == 1) |> dplyr::collect())
 
@@ -103,12 +103,69 @@ test_that("Expected behaviour", {
   cdm <- cdm_local |> copyCdm()
 
   # Subset 1 cohort
-  expect_error(cdm$cohort2 <- subsetCohorts("cohort1", 1, "cohort2"))
-  expect_error(cdm$cohort2 <- subsetCohorts(cdm$cohort1, "1", "cohort2"))
-  expect_error(cdm$cohort2 <- subsetCohorts(cdm$cohort1, 2, "cohort3"))
-  expect_error(cdm$cohort2 <- subsetCohorts(cdm$cohort1, 10, "cohort2"))
+  expect_error(cdm$cohort2 <- subsetCohorts("cohort1", 1, name = "cohort2"))
+  expect_error(cdm$cohort2 <- subsetCohorts(cdm$cohort1, "1", name = "cohort2"))
+  expect_error(cdm$cohort2 <- subsetCohorts(cdm$cohort1, 2, name = "cohort3"))
+  expect_error(cdm$cohort2 <- subsetCohorts(cdm$cohort1, 10, name = "cohort2"))
   expect_no_error(cohort <- subsetCohorts(cdm$cohort1, NULL))
   expect_identical(cohort, cdm$cohort1)
+
+  PatientProfiles::mockDisconnect(cdm)
+})
+
+test_that("Testing minCohortCount argument", {
+  testthat::skip_on_cran()
+  cdm_local <- omock::mockCdmReference() |>
+    omock::mockPerson(n = 1) |>
+    omock::mockObservationPeriod() |>
+    omock::mockCohort(name = c("cohort1"), numberCohorts = 5, seed = 2)
+  cdm <- cdm_local |> copyCdm()
+
+  # Subset 1 cohort - minCohortCount default
+  cdm$subset_cohort1 <- subsetCohorts(cdm$cohort1, cohortId = 1, name = "subset_cohort1")
+  expect_equal(cdm$subset_cohort1 %>%
+                 dplyr::tally() %>%
+                 dplyr::pull("n") %>%
+                 as.numeric(), 1)
+
+  cdm$subset_cohort1 <- subsetCohorts(cdm$cohort1, cohortId = 1, minCohortCount = 2, name = "subset_cohort1")
+
+  expect_equal(cdm$subset_cohort1 %>%
+                 dplyr::tally() %>%
+                 dplyr::pull("n") %>%
+                 as.numeric(), 0)
+
+  cdm_local <- omock::mockCdmReference() |>
+    omock::mockPerson(n = 2) |>
+    omock::mockObservationPeriod() |>
+    omock::mockCohort(name = c("cohort1"), numberCohorts = 3, seed = 2,recordPerson = c(1,2,3))
+
+  cdm <- cdm_local |> copyCdm()
+
+  cdm$subset_cohort1 <- subsetCohorts(cdm$cohort1, cohortId = 1, minCohortCount = 2, name = "subset_cohort1")
+
+  expect_equal(cdm$subset_cohort1 %>%
+                 dplyr::tally() %>%
+                 dplyr::pull("n") %>%
+                 as.numeric(), 2)
+
+  cdm$subset_cohort1 <- subsetCohorts(cdm$cohort1, cohortId = NULL, minCohortCount = 2, name = "subset_cohort1")
+
+  expect_equal(cdm$subset_cohort1 %>%
+                 dplyr::tally() %>%
+                 dplyr::pull("n") %>%
+                 as.numeric(), 12)
+
+  cdm$subset_cohort1 <- subsetCohorts(cdm$cohort1, cohortId = c(1,2), minCohortCount = 4, name = "subset_cohort1")
+
+  expect_equal(cdm$subset_cohort1 %>%
+                 dplyr::tally() %>%
+                 dplyr::pull("n") %>%
+                 as.numeric(), 4)
+
+  expect_error(cdm$subset_cohort1 <- subsetCohorts(cdm$cohort1, cohortId = NULL, minCohortCount = -1, name = "cohort2"))
+  expect_error(cdm$subset_cohort1 <- subsetCohorts(cdm$cohort1, cohortId = NULL, minCohortCount = Inf, name = "cohort2"))
+  expect_error(cdm$subset_cohort1 <- subsetCohorts(cdm$cohort1, cohortId = NULL, minCohortCount = "one", name = "cohort2"))
 
   PatientProfiles::mockDisconnect(cdm)
 })

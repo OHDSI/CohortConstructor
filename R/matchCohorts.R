@@ -73,7 +73,7 @@ matchCohorts <- function(cohort,
   # create target cohort
   cli::cli_inform(c("i" = "Creating copy of target cohort."))
   cdm[[target]] <- subsetCohorts(
-    cohort = cohort, cohortId = cohortId, name = target
+    cohort = cohort, cohortId = cohortId, minCohortCount = 0, name = target
   )
 
   # get target cohort id
