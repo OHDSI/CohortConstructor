@@ -295,5 +295,6 @@ test_that("different intersection count requirements", {
                                       conceptSet = list("a" = 1),
                                       window = c(-Inf, Inf)))
 
+  PatientProfiles::mockDisconnect(cdm)
 
 })

@@ -290,5 +290,6 @@ test_that("different intersection count requirements", {
                                       window = c(-Inf, Inf),
                                       targetCohortTable = "cohort2"))
 
+  PatientProfiles::mockDisconnect(cdm)
 
 })

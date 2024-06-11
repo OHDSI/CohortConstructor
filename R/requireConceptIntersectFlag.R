@@ -107,8 +107,6 @@ requireConceptIntersect <- function(cohort,
                     !"lower_limit",
                     !"upper_limit")
 
-
-
     # attrition reason
     if(all(intersections == 0)){
       reason <- glue::glue("Not in concept {names(conceptSet)} between {window_start} & ",
