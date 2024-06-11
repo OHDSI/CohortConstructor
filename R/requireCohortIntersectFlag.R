@@ -1,7 +1,7 @@
 #' Require cohort subjects are present (or absence) in another cohort
 #'
 #' @description
-#' `requireCohortIntersectFlag()` filters a cohort table based on a requirement
+#' `requireCohortIntersect()` filters a cohort table based on a requirement
 #' that an individual is seen (or not seen) in another cohort in some time
 #' window around an index date.
 #'
@@ -9,6 +9,9 @@
 #' @param targetCohortTable Name of the cohort that we want to check for
 #' intersect.
 #' @param window Window to consider events over.
+#' @param intersections A range indicating number of intersections for
+#' criteria to be fulfilled. If a single number is passed, the number of
+#' intersections must match this.
 #' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
 #' used; otherwise, only the specified cohorts will be modified, and the
 #' rest will remain unchanged.
@@ -21,12 +24,9 @@
 #' (overlap) or NULL (if incidence).
 #' @param censorDate Whether to censor overlap events at a specific date or a
 #' column date of x.
-#' @param negate If set as TRUE, criteria will be applied as exclusion
-#' rather than inclusion (i.e. require absence in another cohort).
 #' @param name Name of the new cohort with the future observation restriction.
 #'
-#' @return Cohort table with only those in the other cohort kept (or those that
-#' are not in the cohort if negate = TRUE)
+#' @return Cohort table with only those isatisfying the criteria kept
 #'
 #' @export
 #'
@@ -35,31 +35,37 @@
 #' library(CohortConstructor)
 #' cdm <- mockCohortConstructor()
 #' cdm$cohort1 |>
-#'   requireCohortIntersectFlag(targetCohortTable = "cohort2",
+#'   requireCohortIntersect(targetCohortTable = "cohort2",
 #'                              targetCohortId = 1,
 #'                              indexDate = "cohort_start_date",
 #'                              window = c(-Inf, 0))
 #' }
-requireCohortIntersectFlag <- function(cohort,
-                                       targetCohortTable,
-                                       window,
-                                       cohortId = NULL,
-                                       targetCohortId = NULL,
-                                       indexDate = "cohort_start_date",
-                                       targetStartDate = "cohort_start_date",
-                                       targetEndDate = "cohort_end_date",
-                                       censorDate = NULL,
-                                       negate = FALSE,
-                                       name = tableName(cohort)) {
+requireCohortIntersect <- function(cohort,
+                                   targetCohortTable,
+                                   window,
+                                   intersections = c(1, Inf),
+                                   cohortId = NULL,
+                                   targetCohortId = NULL,
+                                   indexDate = "cohort_start_date",
+                                   targetStartDate = "cohort_start_date",
+                                   targetEndDate = "cohort_end_date",
+                                   censorDate = NULL,
+                                   name = tableName(cohort)) {
   # checks
   name <- validateName(name)
-  assertLogical(negate, length = 1)
   validateCohortTable(cohort)
   cdm <- omopgenerics::cdmReference(cohort)
   validateCDM(cdm)
   validateCohortColumn(indexDate, cohort, class = "Date")
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
   cohortId <- validateCohortId(cohortId, ids)
+  intersections <- validateIntersections(intersections)
+
+  lower_limit <- as.integer(intersections[[1]])
+  upper_limit <- intersections[[2]]
+  upper_limit[is.infinite(upper_limit)] <- as.integer(999999)
+  upper_limit <- as.integer(upper_limit)
+
 
   cols <- unique(c("cohort_definition_id", "subject_id",
                    "cohort_start_date", "cohort_end_date",
@@ -93,7 +99,7 @@ requireCohortIntersectFlag <- function(cohort,
 
   subsetCohort <- cohort %>%
     dplyr::select(dplyr::all_of(.env$cols)) %>%
-    PatientProfiles::addCohortIntersectFlag(
+    PatientProfiles::addCohortIntersectCount(
       targetCohortTable = targetCohortTable,
       targetCohortId = targetCohortId,
       indexDate = indexDate,
@@ -104,30 +110,29 @@ requireCohortIntersectFlag <- function(cohort,
       nameStyle = "intersect_cohort"
     )
 
-  # apply requirement
-  if(isFALSE(negate)){
-    subsetCohort <- subsetCohort %>%
-      dplyr::filter(
-        .data$intersect_cohort == 1 |
-          (!.data$cohort_definition_id %in% .env$cohortId)
-      ) %>%
-      dplyr::select(!"intersect_cohort")
-    # attrition reason
-    reason <- glue::glue("In cohort {target_name} between {window_start} & ",
-                         "{window_end} days relative to {indexDate}")
-  } else {
-    # ie require absence instead of presence
-    subsetCohort <- subsetCohort %>%
-      dplyr::filter(
-        .data$intersect_cohort != 1 |
-          (!.data$cohort_definition_id %in% .env$cohortId)
-        ) %>%
-      dplyr::select(!"intersect_cohort")
-    # attrition reason
+  subsetCohort <- subsetCohort %>%
+      dplyr::mutate(lower_limit = .env$lower_limit,
+                    upper_limit = .env$upper_limit) |>
+      dplyr::filter((.data$intersect_cohort >= .data$lower_limit &
+                    .data$intersect_cohort <= .data$upper_limit) |
+                    (!.data$cohort_definition_id %in% .env$cohortId)) %>%
+      dplyr::select(!"intersect_cohort",
+                    !"lower_limit",
+                    !"upper_limit")
+
+  # attrition reason
+  if(all(intersections == 0)){
     reason <- glue::glue("Not in cohort {target_name} between {window_start} & ",
                          "{window_end} days relative to {indexDate}")
+  } else if (intersections[[1]] != intersections[[2]]){
+    reason <- glue::glue("In cohort {target_name} between {window_start} & ",
+                         "{window_end} days relative to {indexDate} between ",
+                         "{intersections[[1]]} and {intersections[[2]]} times")
+  } else {
+    reason <- glue::glue("In cohort {target_name} between {window_start} & ",
+                         "{window_end} days relative to {indexDate} ",
+                         "{intersections[[1]]} times")
   }
-
   if (!is.null(censorDate)) {
     reason <- glue::glue("{reason}, censoring at {censorDate}")
   }

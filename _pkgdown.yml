@@ -20,7 +20,7 @@ reference:
   - matches("requireDemographics")
 - subtitle: Impose requirements of presence or absence in other cohorts, concept sets, or table
 - contents:
-  - matches("requireCohortIntersectFlag|requireConceptIntersectFlag|requireTableIntersectFlag")
+  - matches("requireCohortIntersect|requireConceptIntersect|requireTableIntersect")
 - subtitle: Impose presence or absence of a death record within a time window
 - contents:
   - matches("requireDeathFlag")

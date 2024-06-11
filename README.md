@@ -178,7 +178,7 @@ cdm$gibleed <- cdm |>
   name = "gibleed")
 
 cdm$fractures <- cdm$fractures %>% 
-  requireCohortIntersectFlag(targetCohortTable = "gibleed",
+  requireCohortIntersect(targetCohortTable = "gibleed",
                              window = c(-Inf, 0))
 ```
 
