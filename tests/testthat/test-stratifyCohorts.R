@@ -76,7 +76,7 @@ test_that("simple stratification", {
 
   # empty cohort
   cdm <- omopgenerics::emptyCohortTable(cdm, "empty_cohort")
-  cdm$empty_cohort <- cdm$empty_cohort|> PatientProfiles::addSex() |> dplyr::compute(name = "empty_cohort", temporary = FALSE)
+  cdm$empty_cohort <- cdm$empty_cohort|> PatientProfiles::addSex(name = "empty_cohort")
   expect_no_error(cdm$empty_cohort <- stratifyCohorts(cdm$empty_cohort, strata = list("sex")))
   expect_true(cdm$empty_cohort |> dplyr::tally() |>dplyr::pull("n") == 0)
 
