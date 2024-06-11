@@ -69,14 +69,8 @@ trimDemographics <- function(cohort,
     dplyr::compute(name = tmpNewCohort, temporary = FALSE) |>
     omopgenerics::newCohortTable(.softValidation = TRUE)
 
-
-  if (!is.null(ageRange)) {
-    cli::cli_inform(c("Adding birth date"))
-    newCohort <- newCohort |>
-      PatientProfiles::addDateOfBirth(name = "date_0") %>%
-      dplyr::mutate(!!!datesAgeRange(ageRange))
-  }
-  if (!is.null(minPriorObservation) |
+  if (!is.null(ageRange) |
+      !is.null(minPriorObservation) |
       !is.null(minFutureObservation) |
       !is.null(sex)) {
     cli::cli_inform(c("Adding demographics information"))
@@ -87,9 +81,11 @@ trimDemographics <- function(cohort,
         priorObservation = !is.null(minPriorObservation),
         priorObservationType = "date",
         futureObservation = !is.null(minFutureObservation),
-        futureObservationType = "date"
-      ) |>
-      dplyr::compute(name = tmpNewCohort, temporary = FALSE)
+        futureObservationType = "date",
+        dateOfBirth = TRUE,
+        dateOfBirthName = "date_0",
+        name = tmpNewCohort
+      )
   }
 
   newSet <- reqDemographicsCohortSet(set = settings(cohort),
@@ -154,6 +150,7 @@ trimDemographics <- function(cohort,
   if (!is.null(ageRange)) {
     cli::cli_inform(c("Trim age"))
     newCohort <- newCohort %>%
+      dplyr::mutate(!!!datesAgeRange(ageRange)) %>%
       dplyr::mutate(
         !!!caseAge(ageRange),
         "cohort_start_date" = dplyr::if_else(
