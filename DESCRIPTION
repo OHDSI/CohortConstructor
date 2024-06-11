@@ -13,7 +13,11 @@ Authors@R: c(
     person("Mike", "Du", , "mike.du@ndorms.ox.ac.uk", 
     role = c("aut"), comment = c(ORCID = "0000-0002-9517-8834")),
     person("Yuchen", "Guo", email = "yuchen.guo@ndorms.ox.ac.uk", 
-    role = c("aut"), comment = c(ORCID = "0000-0002-0847-4855")))
+    role = c("aut"), comment = c(ORCID = "0000-0002-0847-4855")),
+    person("Xihang", "Chen", , "xihang.chen@ndorms.ox.ac.uk", 
+    role = c("aut"), comment = c(ORCID = "0009-0001-8112-8959")),
+    person("Kim", "Lopez", , "kim.lopez@spc.ox.ac.uk", 
+    role = "aut", comment = c(ORCID = "0000-0002-8462-8668")))
 Description: Create and manipulate study cohorts in data mapped to the 
     Observational Medical Outcomes Partnership Common Data Model.
 License: Apache License (>= 2)
