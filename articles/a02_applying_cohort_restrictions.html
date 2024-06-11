@@ -189,13 +189,16 @@ records where cohort entry was between a particular date range.</p>
 </h2>
 <p>We could require that individuals in our medication cohorts have a
 history of GI bleed. To do this we can use the
-<code><a href="../reference/requireCohortIntersectFlag.html">requireCohortIntersectFlag()</a></code> function.</p>
+<code><a href="../reference/requireCohortIntersect.html">requireCohortIntersect()</a></code> function, requiring that
+individuals have one or more intersections with the GI bleed cohort.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">medications_gi_bleed</span> <span class="op">&lt;-</span> <span class="va">cdm</span><span class="op">$</span><span class="va">medications</span>  <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/requireCohortIntersectFlag.html">requireCohortIntersectFlag</a></span><span class="op">(</span>targetCohortTable <span class="op">=</span> <span class="st">"gi_bleed"</span>, </span>
-<span>                             targetCohortId <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>                             indexDate <span class="op">=</span> <span class="st">"cohort_start_date"</span>, </span>
-<span>                             window <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="cn">Inf</span>, <span class="fl">0</span><span class="op">)</span>, name <span class="op">=</span> <span class="st">"medications_gi_bleed"</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="../reference/requireCohortIntersect.html">requireCohortIntersect</a></span><span class="op">(</span>intersections <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="cn">Inf</span><span class="op">)</span>,</span>
+<span>                         targetCohortTable <span class="op">=</span> <span class="st">"gi_bleed"</span>, </span>
+<span>                         targetCohortId <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>                         indexDate <span class="op">=</span> <span class="st">"cohort_start_date"</span>, </span>
+<span>                         window <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="cn">Inf</span>, <span class="fl">0</span><span class="op">)</span>, </span>
+<span>                         name <span class="op">=</span> <span class="st">"medications_gi_bleed"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/cohort_count.html" class="external-link">cohort_count</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">medications_gi_bleed</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 3</span></span></span>
 <span><span class="co">#&gt;   cohort_definition_id number_records number_subjects</span></span>
@@ -204,18 +207,18 @@ history of GI bleed. To do this we can use the
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                    2              7               7</span></span></code></pre></div>
 <p>Instead of requiring that individuals have history of GI bleed, we
 could instead require that they are don’t have any history of it. In
-this case we can again use the <code><a href="../reference/requireCohortIntersectFlag.html">requireCohortIntersectFlag()</a></code>
-function, but this time set the negate argument to FALSE to require
+this case we can again use the <code><a href="../reference/requireCohortIntersect.html">requireCohortIntersect()</a></code>
+function, but this time set the intersections argument to 0 to require
 individuals’ absence in this other cohort rather than their presence in
 it.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">medications_no_gi_bleed</span> <span class="op">&lt;-</span> <span class="va">cdm</span><span class="op">$</span><span class="va">medications</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/requireCohortIntersectFlag.html">requireCohortIntersectFlag</a></span><span class="op">(</span>targetCohortTable <span class="op">=</span> <span class="st">"gi_bleed"</span>, </span>
-<span>                             targetCohortId <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>                             indexDate <span class="op">=</span> <span class="st">"cohort_start_date"</span>, </span>
-<span>                             window <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="cn">Inf</span>, <span class="fl">0</span><span class="op">)</span>, </span>
-<span>                             negate <span class="op">=</span> <span class="cn">TRUE</span>, </span>
-<span>                             name <span class="op">=</span> <span class="st">"medications_no_gi_bleed"</span><span class="op">)</span> </span>
+<span>  <span class="fu"><a href="../reference/requireCohortIntersect.html">requireCohortIntersect</a></span><span class="op">(</span>intersections <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>                         targetCohortTable <span class="op">=</span> <span class="st">"gi_bleed"</span>, </span>
+<span>                         targetCohortId <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>                         indexDate <span class="op">=</span> <span class="st">"cohort_start_date"</span>, </span>
+<span>                         window <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="cn">Inf</span>, <span class="fl">0</span><span class="op">)</span>, </span>
+<span>                         name <span class="op">=</span> <span class="st">"medications_no_gi_bleed"</span><span class="op">)</span> </span>
 <span><span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/cohort_count.html" class="external-link">cohort_count</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">medications_no_gi_bleed</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 3</span></span></span>
 <span><span class="co">#&gt;   cohort_definition_id number_records number_subjects</span></span>

@@ -82,10 +82,10 @@
     <loc>https://ohdsi.github.io/CohortConstructor/reference/requireAge.html</loc>
   </url>
   <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/reference/requireCohortIntersectFlag.html</loc>
+    <loc>https://ohdsi.github.io/CohortConstructor/reference/requireCohortIntersect.html</loc>
   </url>
   <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/reference/requireConceptIntersectFlag.html</loc>
+    <loc>https://ohdsi.github.io/CohortConstructor/reference/requireConceptIntersect.html</loc>
   </url>
   <url>
     <loc>https://ohdsi.github.io/CohortConstructor/reference/requireDeathFlag.html</loc>
@@ -112,7 +112,7 @@
     <loc>https://ohdsi.github.io/CohortConstructor/reference/requireSex.html</loc>
   </url>
   <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/reference/requireTableIntersectFlag.html</loc>
+    <loc>https://ohdsi.github.io/CohortConstructor/reference/requireTableIntersect.html</loc>
   </url>
   <url>
     <loc>https://ohdsi.github.io/CohortConstructor/reference/sampleCohorts.html</loc>
