@@ -6,7 +6,7 @@ test_that("requiring presence in another cohort", {
     omock::mockCohort(name = c("cohort2"), numberCohorts = 2, seed = 2)
   cdm <- cdm_local |> copyCdm()
 
-  cdm$cohort3 <-  requireCohortIntersectFlag(cohort = cdm$cohort1,
+  cdm$cohort3 <-  requireCohortIntersect(cohort = cdm$cohort1,
                                              targetCohortTable = "cohort2",
                                              targetCohortId = 1,
                                              window = c(-Inf, Inf),
@@ -28,7 +28,7 @@ test_that("requiring presence in another cohort", {
                       "Initial qualifying events",
                       "In cohort cohort_1 between -Inf & Inf days relative to cohort_start_date")))
 
-  cdm$cohort4 <-  requireCohortIntersectFlag(cohort = cdm$cohort1,
+  cdm$cohort4 <-  requireCohortIntersect(cohort = cdm$cohort1,
                                              targetCohortTable = "cohort2",
                                              targetCohortId = 2,
                                              window = list(c(-Inf, Inf)),
@@ -50,7 +50,7 @@ test_that("requiring presence in another cohort", {
                       "In cohort cohort_2 between -Inf & Inf days relative to cohort_start_date")))
 
   # name
-  cdm$cohort1 <-  requireCohortIntersectFlag(cohort = cdm$cohort1,
+  cdm$cohort1 <-  requireCohortIntersect(cohort = cdm$cohort1,
                                              targetCohortTable = "cohort2",
                                              targetCohortId = 2,
                                              window = c(-Inf, Inf))
@@ -61,7 +61,7 @@ test_that("requiring presence in another cohort", {
                       "In cohort cohort_2 between -Inf & Inf days relative to cohort_start_date")))
 
   # censor date
-  cdm$cohort5 <- requireCohortIntersectFlag(cohort = cdm$cohort2,
+  cdm$cohort5 <- requireCohortIntersect(cohort = cdm$cohort2,
                                             targetCohortTable = "cohort1",
                                             targetCohortId = 2,
                                             window = c(0, Inf),
@@ -77,7 +77,7 @@ test_that("requiring presence in another cohort", {
                       "In cohort cohort_2 between 0 & Inf days relative to cohort_start_date, censoring at cohort_end_date")))
 
   # cohort Id
-  cdm$cohort6 <- requireCohortIntersectFlag(cohort = cdm$cohort2,
+  cdm$cohort6 <- requireCohortIntersect(cohort = cdm$cohort2,
                                             cohortId = 2,
                                             targetCohortTable = "cohort1",
                                             targetCohortId = 1,
@@ -94,7 +94,7 @@ test_that("requiring presence in another cohort", {
                       "Initial qualifying events",
                       "In cohort cohort_1 between 0 & Inf days relative to cohort_start_date, censoring at cohort_end_date")))
 
-  cdm$cohort7 <- requireCohortIntersectFlag(cohort = cdm$cohort2,
+  cdm$cohort7 <- requireCohortIntersect(cohort = cdm$cohort2,
                                             cohortId = 2,
                                             targetCohortTable = "cohort1",
                                             targetCohortId = 1,
@@ -114,23 +114,23 @@ test_that("requiring presence in another cohort", {
 
   # expected errors
   # only support one target id at the moment
-  expect_error(requireCohortIntersectFlag(cohort = cdm$cohort1,
+  expect_error(requireCohortIntersect(cohort = cdm$cohort1,
                                           targetCohortTable = "cohort2",
                                           targetCohortId = c(1,2),
                                           window = c(-Inf, Inf)))
-  expect_error(requireCohortIntersectFlag(cohort = cdm$cohort1,
+  expect_error(requireCohortIntersect(cohort = cdm$cohort1,
                                           targetCohortTable = "cohort22", # does not exist
                                           targetCohortId = 1,
                                           window = c(-Inf, Inf)))
-  expect_error(requireCohortIntersectFlag(cohort = cdm$cohort1,
+  expect_error(requireCohortIntersect(cohort = cdm$cohort1,
                                           targetCohortTable = "cohort2",
                                           targetCohortId = 10, # does not exist
                                           window = c(-Inf, Inf)))
-  expect_error(requireCohortIntersectFlag(cohort = cdm$cohort1,
+  expect_error(requireCohortIntersect(cohort = cdm$cohort1,
                                           targetCohortTable = "cohort2",
                                           targetCohortId = NULL, # only one id supported
                                           window = c(-Inf, Inf)))
-  expect_error(requireCohortIntersectFlag(cohort = cdm$cohort1,
+  expect_error(requireCohortIntersect(cohort = cdm$cohort1,
                                           targetCohortTable = c("not_a_cohort", "lala"),
                                           targetCohortId = 1,
                                           window = c(-Inf, Inf)))
@@ -147,12 +147,12 @@ test_that("requiring absence in another cohort", {
     omock::mockCohort(name = c("cohort2"), numberCohorts = 2, seed = 2)
   cdm <- cdm_local |> copyCdm()
 
-  cdm$cohort3_inclusion <-  requireCohortIntersectFlag(cohort = cdm$cohort1,
+  cdm$cohort3_inclusion <-  requireCohortIntersect(cohort = cdm$cohort1,
                                                        targetCohortTable = "cohort2",
                                                        targetCohortId = 1,
                                                        window = c(-Inf, Inf),
                                                        name = "cohort3_inclusion")
-  cdm$cohort3_exclusion <-  requireCohortIntersectFlag(cohort = cdm$cohort1,
+  cdm$cohort3_exclusion <-  requireCohortIntersect(cohort = cdm$cohort1,
                                                        targetCohortTable = "cohort2",
                                                        targetCohortId = 1,
                                                        window = c(-Inf, Inf),

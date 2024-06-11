@@ -1,7 +1,7 @@
 #' Require cohort subjects are present in another clinical table
 #'
 #' @description
-#' `requireTableIntersectFlag()` filters a cohort table based on a requirement
+#' `requireTableIntersect()` filters a cohort table based on a requirement
 #' that an individual is seen (or not seen) to have a record (or no records) in
 #' a clinical table in some time window around an index date.
 #'
@@ -33,11 +33,11 @@
 #' library(CohortConstructor)
 #' cdm <- mockCohortConstructor(drugExposure = TRUE)
 #' cdm$cohort1 |>
-#'   requireTableIntersectFlag(tableName = "drug_exposure",
+#'   requireTableIntersect(tableName = "drug_exposure",
 #'                             indexDate = "cohort_start_date",
 #'                             window = c(-Inf, 0))
 #' }
-requireTableIntersectFlag <- function(cohort,
+requireTableIntersect <- function(cohort,
                                       tableName,
                                       window,
                                       cohortId = NULL,

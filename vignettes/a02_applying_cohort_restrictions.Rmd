@@ -96,22 +96,22 @@ cohort_attrition(cdm$medications) %>%
 
 
 ## Restrictions on cohort presence
-We could require that individuals in our medication cohorts have a history of GI bleed. To do this we can use the `requireCohortIntersectFlag()` function.
+We could require that individuals in our medication cohorts have a history of GI bleed. To do this we can use the `requireCohortIntersect()` function.
 
 ```{r}
 cdm$medications_gi_bleed <- cdm$medications  %>%
-  requireCohortIntersectFlag(targetCohortTable = "gi_bleed", 
+  requireCohortIntersect(targetCohortTable = "gi_bleed", 
                              targetCohortId = 1,
                              indexDate = "cohort_start_date", 
                              window = c(-Inf, 0), name = "medications_gi_bleed")
 cohort_count(cdm$medications_gi_bleed)
 ```
 
-Instead of requiring that individuals have history of GI bleed, we could instead require that they are don't have any history of it. In this case we can again use the `requireCohortIntersectFlag()` function, but this time set the negate argument to FALSE to require individuals' absence in this other cohort rather than their presence in it.
+Instead of requiring that individuals have history of GI bleed, we could instead require that they are don't have any history of it. In this case we can again use the `requireCohortIntersect()` function, but this time set the negate argument to FALSE to require individuals' absence in this other cohort rather than their presence in it.
 
 ```{r}
 cdm$medications_no_gi_bleed <- cdm$medications %>%
-  requireCohortIntersectFlag(targetCohortTable = "gi_bleed", 
+  requireCohortIntersect(targetCohortTable = "gi_bleed", 
                              targetCohortId = 1,
                              indexDate = "cohort_start_date", 
                              window = c(-Inf, 0), 

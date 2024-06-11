@@ -26,7 +26,7 @@ test_that("require flag in concept", {
       "drug_exposure_end_date" = as.Date(.data$drug_exposure_end_date, origin = "2010-01-01")
     )
   cdm <- cdm_local |> copyCdm()
-  cdm$cohort3 <-  requireConceptIntersectFlag(cohort = cdm$cohort1,
+  cdm$cohort3 <-  requireConceptIntersect(cohort = cdm$cohort1,
                                               conceptSet = list(a = 1),
                                               window = c(-Inf, Inf),
                                               name = "cohort3")
@@ -41,7 +41,7 @@ test_that("require flag in concept", {
                       "Initial qualifying events",
                       "Concept a between -Inf & Inf days relative to cohort_start_date")))
   # cohort Id
-  cdm$cohort4 <-  requireConceptIntersectFlag(cohort = cdm$cohort1,
+  cdm$cohort4 <-  requireConceptIntersect(cohort = cdm$cohort1,
                                               cohortId = 1,
                                               conceptSet = list(a = 1),
                                               window = c(-Inf, Inf),
@@ -55,7 +55,7 @@ test_that("require flag in concept", {
                       "Concept a between -Inf & Inf days relative to cohort_start_date",
                       "Initial qualifying events")))
   # censor date
-  cdm$cohort5 <- requireConceptIntersectFlag(cohort = cdm$cohort1,
+  cdm$cohort5 <- requireConceptIntersect(cohort = cdm$cohort1,
                                              conceptSet = list(a = 1),
                                              window = c(-Inf, Inf),
                                              censorDate = "cohort_end_date",
@@ -68,7 +68,7 @@ test_that("require flag in concept", {
                       "Concept a between -Inf & Inf days relative to cohort_start_date, censoring at cohort_end_date")))
 
   # name
-  cdm$cohort1 <-  requireConceptIntersectFlag(cohort = cdm$cohort1,
+  cdm$cohort1 <-  requireConceptIntersect(cohort = cdm$cohort1,
                                               conceptSet = list(a = 1),
                                               window = c(-Inf, Inf))
   expect_true(all(omopgenerics::attrition(cdm$cohort1)$reason ==
@@ -79,7 +79,7 @@ test_that("require flag in concept", {
 
   # empty concept
   expect_message(
-    cdm$cohort1 <-  requireConceptIntersectFlag(cohort = cdm$cohort1,
+    cdm$cohort1 <-  requireConceptIntersect(cohort = cdm$cohort1,
                                                 conceptSet = list(),
                                                 window = list(c(-Inf, Inf)))
   )
@@ -92,12 +92,12 @@ test_that("require flag in concept", {
   # expected errors
   # only support one concept at the moment
  expect_error(
-   requireConceptIntersectFlag(cohort = cdm$cohort1,
+   requireConceptIntersect(cohort = cdm$cohort1,
                                conceptSet = list(a = 1, b = 2),
                                window = c(-Inf, Inf))
  )
  expect_error(
-   requireConceptIntersectFlag(cohort = cdm$cohort1,
+   requireConceptIntersect(cohort = cdm$cohort1,
                                conceptSet = NULL,
                                window = c(-Inf, Inf))
  )
@@ -135,11 +135,11 @@ test_that("requiring absence in another cohort", {
     )
   cdm <- cdm_local |> copyCdm()
 
-  cdm$cohort3_inclusion <-  requireConceptIntersectFlag(cohort = cdm$cohort1,
+  cdm$cohort3_inclusion <-  requireConceptIntersect(cohort = cdm$cohort1,
                                                        conceptSet = list(a = 1),
                                                        window = c(-Inf, Inf),
                                                        name = "cohort3_inclusion")
-  cdm$cohort3_exclusion <-  requireConceptIntersectFlag(cohort = cdm$cohort1,
+  cdm$cohort3_exclusion <-  requireConceptIntersect(cohort = cdm$cohort1,
                                                        conceptSet = list(a = 1),
                                                        window = c(-Inf, Inf),
                                                        negate = TRUE,
@@ -165,7 +165,7 @@ test_that("requiring absence in another cohort", {
                       "Not in concept a between -Inf & Inf days relative to cohort_start_date")))
 
   # cohort Id
-  cdm$cohort3_exclusion_partial <-  requireConceptIntersectFlag(
+  cdm$cohort3_exclusion_partial <-  requireConceptIntersect(
     cohort = cdm$cohort1,
     cohortId = 1,
     conceptSet = list(a = 1),

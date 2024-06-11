@@ -11,7 +11,7 @@ test_that("requiring presence in another table", {
   )
   cdm <- cdm_local |> copyCdm()
 
-  cdm$cohort2 <-  requireTableIntersectFlag(cohort = cdm$cohort1,
+  cdm$cohort2 <-  requireTableIntersect(cohort = cdm$cohort1,
                                             tableName = "table",
                                             targetStartDate = "date_start",
                                             targetEndDate = "date_end",
@@ -26,7 +26,7 @@ test_that("requiring presence in another table", {
                  "Initial qualifying events",
                  "In table table between -Inf & Inf days relative to cohort_start_date"))
 
-  cdm$cohort3 <-  requireTableIntersectFlag(cohort = cdm$cohort1,
+  cdm$cohort3 <-  requireTableIntersect(cohort = cdm$cohort1,
                                             tableName = "table",
                                             targetStartDate = "date_start",
                                             targetEndDate = "date_end",
@@ -42,7 +42,7 @@ test_that("requiring presence in another table", {
                  "In table table between 0 & Inf days relative to cohort_start_date"))
 
   # censor date
-  cdm$cohort4 <-  requireTableIntersectFlag(cohort = cdm$cohort1,
+  cdm$cohort4 <-  requireTableIntersect(cohort = cdm$cohort1,
                                             tableName = "table",
                                             targetStartDate = "date_start",
                                             targetEndDate = "date_end",
@@ -58,7 +58,7 @@ test_that("requiring presence in another table", {
                  "In table table between -Inf & 0 days relative to cohort_start_date, censoring at cohort_end_date"))
 
   # cohrot Id
-  cdm$cohort5 <-  requireTableIntersectFlag(cohort = cdm$cohort1,
+  cdm$cohort5 <-  requireTableIntersect(cohort = cdm$cohort1,
                                             cohortId = 1,
                                             tableName = "table",
                                             targetStartDate = "date_start",
@@ -77,17 +77,17 @@ test_that("requiring presence in another table", {
   # expected errors
   # currently just 1 table suported´
   expect_error(
-    requireTableIntersectFlag(cohort = cdm$cohort1,
+    requireTableIntersect(cohort = cdm$cohort1,
                               tableName = c("table", "observation_period"),
                               window = c(-Inf, Inf))
   )
   expect_error(
-    requireTableIntersectFlag(cohort = cdm$cohort1,
+    requireTableIntersect(cohort = cdm$cohort1,
                               tableName = cdm$table,
                               window = c(-Inf, Inf))
   )
   expect_error(
-    requireTableIntersectFlag(cohort = cdm$cohort1,
+    requireTableIntersect(cohort = cdm$cohort1,
                               tableName = "not_a_table",
                               window = c(-Inf, Inf))
   )
@@ -108,7 +108,7 @@ test_that("requiring absence in another table", {
   )
   cdm <- cdm_local |> copyCdm()
 
-  cdm$cohort2 <-  requireTableIntersectFlag(cohort = cdm$cohort1,
+  cdm$cohort2 <-  requireTableIntersect(cohort = cdm$cohort1,
                                             tableName = "table",
                                             targetStartDate = "date_start",
                                             targetEndDate = "date_end",
@@ -123,7 +123,7 @@ test_that("requiring absence in another table", {
                  "Initial qualifying events",
                  "Not in table table between -Inf & Inf days relative to cohort_start_date"))
 
-  cdm$cohort3 <-  requireTableIntersectFlag(cohort = cdm$cohort1,
+  cdm$cohort3 <-  requireTableIntersect(cohort = cdm$cohort1,
                                             tableName = "table",
                                             targetStartDate = "date_start",
                                             targetEndDate = "date_end",
@@ -139,7 +139,7 @@ test_that("requiring absence in another table", {
                  "Not in table table between 0 & Inf days relative to cohort_start_date"))
 
   # censor date
-  cdm$cohort4 <-  requireTableIntersectFlag(cohort = cdm$cohort1,
+  cdm$cohort4 <-  requireTableIntersect(cohort = cdm$cohort1,
                                             tableName = "table",
                                             targetStartDate = "date_start",
                                             targetEndDate = "date_end",
@@ -157,7 +157,7 @@ test_that("requiring absence in another table", {
                  "Not in table table between -Inf & 0 days relative to cohort_start_date, censoring at cohort_end_date"))
 
   # cohort Id and name
-  cdm$cohort1 <-  requireTableIntersectFlag(cohort = cdm$cohort1,
+  cdm$cohort1 <-  requireTableIntersect(cohort = cdm$cohort1,
                                             cohortId = 1,
                                             tableName = "table",
                                             targetStartDate = "date_start",

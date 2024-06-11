@@ -1,7 +1,7 @@
 #' Require cohort subjects are present (or absence) in another cohort
 #'
 #' @description
-#' `requireCohortIntersectFlag()` filters a cohort table based on a requirement
+#' `requireCohortIntersect()` filters a cohort table based on a requirement
 #' that an individual is seen (or not seen) in another cohort in some time
 #' window around an index date.
 #'
@@ -35,12 +35,12 @@
 #' library(CohortConstructor)
 #' cdm <- mockCohortConstructor()
 #' cdm$cohort1 |>
-#'   requireCohortIntersectFlag(targetCohortTable = "cohort2",
+#'   requireCohortIntersect(targetCohortTable = "cohort2",
 #'                              targetCohortId = 1,
 #'                              indexDate = "cohort_start_date",
 #'                              window = c(-Inf, 0))
 #' }
-requireCohortIntersectFlag <- function(cohort,
+requireCohortIntersect <- function(cohort,
                                        targetCohortTable,
                                        window,
                                        cohortId = NULL,

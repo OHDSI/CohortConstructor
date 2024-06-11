@@ -1,7 +1,7 @@
 #' Require cohort subjects to have (or not have) events of a concept list
 #'
 #' @description
-#' `requireConceptIntersectFlag()` filters a cohort table based on a requirement
+#' `requireConceptIntersect()` filters a cohort table based on a requirement
 #' that an individual is seen (or not seen) to have events related to a concept
 #' list in some time window around an index date.
 #'
@@ -32,13 +32,13 @@
 #' \donttest{
 #' library(CohortConstructor)
 #' cdm <- mockCohortConstructor(conditionOccurrence = TRUE)
-#' cdm$cohort2 <-  requireConceptIntersectFlag(
+#' cdm$cohort2 <-  requireConceptIntersect(
 #'   cohort = cdm$cohort1,
 #'   conceptSet = list(a = 1),
 #'   window = c(-Inf, 0),
 #'   name = "cohort2")
 #'   }
-requireConceptIntersectFlag <- function(cohort,
+requireConceptIntersect <- function(cohort,
                                         conceptSet,
                                         window,
                                         cohortId = NULL,
