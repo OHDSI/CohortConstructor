@@ -135,7 +135,8 @@ measurementCohort <- function(cdm,
         dplyr::select("concept_id", "cohort_definition_id"),
       by = "concept_id"
     ) |>
-    dplyr::filter(!is.na(.data$cohort_start_date))
+    dplyr::filter(!is.na(.data$cohort_start_date)) |>
+    dplyr::compute(name = name, temporary = FALSE)
 
   if (!is.null(valueAsConcept)) {
     value <- cohort |> dplyr::pull("value_as_concept_id") |> unique()
@@ -167,7 +168,7 @@ measurementCohort <- function(cdm,
 
   if (cohort |> dplyr::tally() |> dplyr::pull("n") == 0) {
     cli::cli_inform(c("i" = "No table could be subsetted, returning empty cohort."))
-    cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name) # TODO: overwritte to TRUE when omopgenerics in CRAN
+    cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name)
     cdm[[name]] <- cdm[[name]] |>
       omopgenerics::newCohortTable(
         cohortSetRef = cohortSet,
@@ -176,9 +177,6 @@ measurementCohort <- function(cdm,
       )
     return(cdm[[name]])
   }
-
-  cohort <- cohort |>
-    dplyr::compute(name = name, temporary = FALSE) # To move after line 90 when omopgenerics in CRAN
 
   cli::cli_inform(c("i" = "Getting records in observation."))
   cohort <- cohort |>
