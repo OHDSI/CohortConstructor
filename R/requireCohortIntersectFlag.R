@@ -59,22 +59,8 @@ requireCohortIntersect <- function(cohort,
   validateCohortColumn(indexDate, cohort, class = "Date")
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
   cohortId <- validateCohortId(cohortId, ids)
+  intersections <- validateIntersections(intersections)
 
-  if(length(intersections) == 1){
-    intersections <- c(intersections, intersections)
-  }
-  if(length(intersections) != 2){
-    cli::cli_abort("intersections must be of length 1 or 2, but is length {length(intersections)}")
-  }
-  if(intersections[1] < 0){
-    cli::cli_abort("intersections lower limit must be equal or greater than zero but is {intersections[[1]]}")
-  }
-  if(intersections[1] > intersections[2]){
-    cli::cli_abort("Second value for intersections must be equal or greater than the first")
-  }
-  if(intersections[1] == Inf){
-    cli::cli_abort("First value for intersections cannot be Inf")
-  }
   lower_limit <- as.integer(intersections[[1]])
   upper_limit <- intersections[[2]]
   upper_limit[is.infinite(upper_limit)] <- as.integer(999999)

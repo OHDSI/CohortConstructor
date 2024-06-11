@@ -8,12 +8,12 @@ requireConceptIntersect(
   cohort,
   conceptSet,
   window,
+  intersections = c(1, Inf),
   cohortId = NULL,
   indexDate = "cohort_start_date",
   targetStartDate = "event_start_date",
   targetEndDate = "event_end_date",
   censorDate = NULL,
-  negate = FALSE,
   name = tableName(cohort)
 )
 }
@@ -23,6 +23,10 @@ requireConceptIntersect(
 \item{conceptSet}{Concept set list.}
 
 \item{window}{Window to consider events over.}
+
+\item{intersections}{A range indicating number of intersections for
+criteria to be fulfilled. If a single number is passed, the number of
+intersections must match this.}
 
 \item{cohortId}{IDs of the cohorts to modify. If NULL, all cohorts will be
 used; otherwise, only the specified cohorts will be modified, and the
@@ -39,9 +43,6 @@ intersection.}
 
 \item{censorDate}{Whether to censor overlap events at a specific date or a
 column date of x.}
-
-\item{negate}{If set as TRUE, criteria will be applied as exclusion
-rather than inclusion (i.e. require absence in another cohort).}
 
 \item{name}{Name of the new cohort with the future observation restriction.}
 }

@@ -175,3 +175,25 @@ validateValueAsNumber <- function(valueAsNumber) {
 validateN <- function(n) {
   assertNumeric(n, integerish = TRUE, min = 0, length = 1)
 }
+
+
+validateIntersections <- function(intersections){
+
+  if(length(intersections) == 1){
+    intersections <- c(intersections, intersections)
+  }
+  if(length(intersections) != 2){
+    cli::cli_abort("intersections must be of length 1 or 2, but is length {length(intersections)}")
+  }
+  if(intersections[1] < 0){
+    cli::cli_abort("intersections lower limit must be equal or greater than zero but is {intersections[[1]]}")
+  }
+  if(intersections[1] > intersections[2]){
+    cli::cli_abort("Second value for intersections must be equal or greater than the first")
+  }
+  if(intersections[1] == Inf){
+    cli::cli_abort("First value for intersections cannot be Inf")
+  }
+
+  intersections
+}
