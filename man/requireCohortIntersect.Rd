@@ -8,13 +8,13 @@ requireCohortIntersect(
   cohort,
   targetCohortTable,
   window,
+  intersections = c(1, Inf),
   cohortId = NULL,
   targetCohortId = NULL,
   indexDate = "cohort_start_date",
   targetStartDate = "cohort_start_date",
   targetEndDate = "cohort_end_date",
   censorDate = NULL,
-  negate = FALSE,
   name = tableName(cohort)
 )
 }
@@ -25,6 +25,10 @@ requireCohortIntersect(
 intersect.}
 
 \item{window}{Window to consider events over.}
+
+\item{intersections}{A range indicating number of intersections for
+criteria to be fulfilled. If a single number is passed, the number of
+intersections must match this.}
 
 \item{cohortId}{IDs of the cohorts to modify. If NULL, all cohorts will be
 used; otherwise, only the specified cohorts will be modified, and the
@@ -44,14 +48,10 @@ intersection.}
 \item{censorDate}{Whether to censor overlap events at a specific date or a
 column date of x.}
 
-\item{negate}{If set as TRUE, criteria will be applied as exclusion
-rather than inclusion (i.e. require absence in another cohort).}
-
 \item{name}{Name of the new cohort with the future observation restriction.}
 }
 \value{
-Cohort table with only those in the other cohort kept (or those that
-are not in the cohort if negate = TRUE)
+Cohort table with only those isatisfying the criteria kept
 }
 \description{
 \code{requireCohortIntersect()} filters a cohort table based on a requirement
