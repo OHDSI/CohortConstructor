@@ -11,12 +11,15 @@ test_that("requiring presence in another table", {
   )
   cdm <- cdm_local |> copyCdm()
 
+  start_cols <- colnames(cdm$cohort1)
   cdm$cohort2 <-  requireTableIntersect(cohort = cdm$cohort1,
                                             tableName = "table",
                                             targetStartDate = "date_start",
                                             targetEndDate = "date_end",
                                             window = list(c(-Inf, Inf)),
                                             name = "cohort2")
+  expect_equal(colnames(cdm$cohort2), colnames(cdm$cohort1))
+
 
   expect_equal(cdm$cohort2 |> dplyr::pull("subject_id") |> sort(),
                cdm$cohort1 |> dplyr::pull("subject_id") |> sort())

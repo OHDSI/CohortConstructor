@@ -50,3 +50,4 @@ copyCdm <- function(cdm) {
     con = connection(), cdm = cdm, schema = writeSchema(), overwrite = TRUE
   )
 }
+
