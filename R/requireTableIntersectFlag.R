@@ -98,9 +98,7 @@ requireTableIntersect <- function(cohort,
     dplyr::filter((.data$intersect_table >= .data$lower_limit &
                      .data$intersect_table <= .data$upper_limit) |
                     (!.data$cohort_definition_id %in% .env$cohortId)) %>%
-    dplyr::select(!"intersect_table",
-                  !"lower_limit",
-                  !"upper_limit")
+    dplyr::select(cols)
 
   # attrition reason
   if(all(intersections == 0)){

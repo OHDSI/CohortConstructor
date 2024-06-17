@@ -116,9 +116,7 @@ requireCohortIntersect <- function(cohort,
       dplyr::filter((.data$intersect_cohort >= .data$lower_limit &
                     .data$intersect_cohort <= .data$upper_limit) |
                     (!.data$cohort_definition_id %in% .env$cohortId)) %>%
-      dplyr::select(!"intersect_cohort",
-                    !"lower_limit",
-                    !"upper_limit")
+      dplyr::select(cols)
 
   # attrition reason
   if(all(intersections == 0)){

@@ -103,9 +103,7 @@ requireConceptIntersect <- function(cohort,
       dplyr::filter((.data$intersect_concept >= .data$lower_limit &
                        .data$intersect_concept <= .data$upper_limit) |
                       (!.data$cohort_definition_id %in% .env$cohortId)) %>%
-      dplyr::select(!"intersect_concept",
-                    !"lower_limit",
-                    !"upper_limit")
+      dplyr::select(cols)
 
     # attrition reason
     if(all(intersections == 0)){

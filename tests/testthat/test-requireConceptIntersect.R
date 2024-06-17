@@ -26,10 +26,15 @@ test_that("require flag in concept", {
       "drug_exposure_end_date" = as.Date(.data$drug_exposure_end_date, origin = "2010-01-01")
     )
   cdm <- cdm_local |> copyCdm()
+
+  start_cols <- colnames(cdm$cohort1)
   cdm$cohort3 <-  requireConceptIntersect(cohort = cdm$cohort1,
                                               conceptSet = list(a = 1),
                                               window = c(-Inf, Inf),
                                               name = "cohort3")
+  expect_equal(colnames(cdm$cohort3), colnames(cdm$cohort1))
+
+
   expect_true(all(cdm$cohort3 |> dplyr::pull("subject_id") ==
                     rep(1, 5)))
   expect_true(all(cdm$cohort3 |> dplyr::pull("cohort_start_date") |> sort() ==

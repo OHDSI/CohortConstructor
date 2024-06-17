@@ -6,11 +6,13 @@ test_that("requiring presence in another cohort", {
     omock::mockCohort(name = c("cohort2"), numberCohorts = 2, seed = 2)
   cdm <- cdm_local |> copyCdm()
 
+  start_cols <- colnames(cdm$cohort1)
   cdm$cohort3 <-  requireCohortIntersect(cohort = cdm$cohort1,
                                              targetCohortTable = "cohort2",
                                              targetCohortId = 1,
                                              window = c(-Inf, Inf),
                                              name = "cohort3")
+  expect_equal(colnames(cdm$cohort3), colnames(cdm$cohort1))
 
   expect_true(all(cdm$cohort3  %>%
                     dplyr::distinct(subject_id) %>%
