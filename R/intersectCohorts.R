@@ -194,8 +194,13 @@ intersectCohorts <- function(cohort,
     dplyr::summarise(number_records = dplyr::n(),
                      number_subjects = dplyr::n_distinct(.data$subject_id)) |>
     dplyr::collect() |>
-    dplyr::right_join(cohSet |> dplyr::select("cohort_definition_id"), by = "cohort_definition_id") |>
-    dplyr::mutate(dplyr::across(dplyr::starts_with("number"), ~dplyr::if_else(is.na(.x), 0, .x)))
+    dplyr::right_join(cohSet |>
+                      dplyr::select("cohort_definition_id"),
+                      by = "cohort_definition_id") |>
+    dplyr::mutate(dplyr::across(dplyr::starts_with("number"),
+                                ~dplyr::if_else(is.na(.x),
+                                                0L,
+                                                as.integer(NA))))
   cohAtt <- intersectCohortAttrition(cohort, cohSet, counts, returnOnlyComb, mutuallyExclusive)
 
   # concept codelists
