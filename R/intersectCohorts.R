@@ -200,7 +200,7 @@ intersectCohorts <- function(cohort,
     dplyr::mutate(dplyr::across(dplyr::starts_with("number"),
                                 ~dplyr::if_else(is.na(.x),
                                                 0L,
-                                                as.integer(NA))))
+                                                as.integer(.x))))
   cohAtt <- intersectCohortAttrition(cohort, cohSet, counts, returnOnlyComb, mutuallyExclusive)
 
   # concept codelists
