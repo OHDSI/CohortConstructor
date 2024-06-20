@@ -104,8 +104,11 @@ validateName <- function(name) {
 }
 
 validateConceptSet <- function(conceptSet) {
-  assertList(conceptSet, named = TRUE, null = TRUE)
-  omopgenerics::newCodelist(conceptSet)
+  # while is.list does not work for tibbles:
+  if (!"list" %in% class(conceptSet)) {
+    cli::cli_abort("{substitute(conceptSet)} must be a list; it can not contain NA; it has to be named; elements must have class: numeric.")
+  }
+  assertList(conceptSet, named = TRUE, null = TRUE, class = "numeric")
 }
 
 validateGap <- function(gap) {
