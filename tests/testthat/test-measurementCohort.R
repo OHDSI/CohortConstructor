@@ -160,6 +160,8 @@ test_that("mearurementCohorts works", {
     name = "cohort8",
     conceptSet = list("c1" = c(123456))
   )
+  expect_true(all(colnames(cdm$cohort8) ==
+                    c("cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date")))
   expect_true(cdm$cohort8 |> dplyr::tally() |> dplyr::pull("n") == 0)
   expect_true(cdm$cohort8 |> attrition() |> dplyr::pull("reason") == "Initial qualifying events")
   expect_true(settings(cdm$cohort8)$cohort_name == "c1")

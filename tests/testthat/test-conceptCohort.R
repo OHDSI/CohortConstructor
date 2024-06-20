@@ -395,6 +395,8 @@ test_that("out of observation", {
 
   # empty cohort
   cdm$cohort3 <- conceptCohort(cdm = cdm, conceptSet = list(a = 1), name = "cohort3")
+  expect_true(all(colnames(cdm$cohort3) ==
+                    c("cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date")))
   expect_true(all(c("cohort_table", "cdm_table") %in% class(cdm$cohort3)))
   expect_true(cdm$cohort3 |> dplyr::tally() |> dplyr::pull("n") == 0)
   expect_true(cohortCodelist(cdm$cohort3, 1)$a == 1)

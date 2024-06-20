@@ -104,6 +104,7 @@ validateName <- function(name) {
 }
 
 validateConceptSet <- function(conceptSet) {
+  assertList(conceptSet, named = TRUE, null = TRUE)
   omopgenerics::newCodelist(conceptSet)
 }
 
@@ -140,8 +141,14 @@ validateDemographicRequirements <- function(ageRange,
   }
 
   # minPriorObservation:
+  if (is.infinite(minPriorObservation)) {
+    cli::cli_abort("`minPriorObservation` cannot be infinite.")
+  }
   assertNumeric(minPriorObservation, integerish = TRUE, min = 0, null = null)
   # minFutureObservation:
+  if (is.infinite(minFutureObservation)) {
+    cli::cli_abort("`minFutureObservation` cannot be infinite.")
+  }
   assertNumeric(minFutureObservation, integerish = TRUE, min = 0, null = null)
 
   return(ageRange)
@@ -197,3 +204,4 @@ validateIntersections <- function(intersections){
 
   intersections
 }
+

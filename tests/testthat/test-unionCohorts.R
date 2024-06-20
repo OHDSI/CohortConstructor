@@ -1,6 +1,5 @@
 test_that("unionCohorts works", {
-
-    cdm_local <- omock::mockCdmReference() |>
+  cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
     omock::mockCohort(name = c("cohort1"), numberCohorts = 4)
@@ -43,17 +42,24 @@ test_that("unionCohorts works", {
   expect_true(all(
     cdm$cohort3 %>% dplyr::pull("subject_id") %>% sort() == c(1, 3, 4)
   ))
-  expect_true(all(attrition(cdm$cohort3) ==
-                    dplyr::tibble(
-                      cohort_definition_id = 1,
-                      number_records = 3,
-                      number_subjects = 3,
-                      reason_id = 1,
-                      reason = "Initial qualifying events",
-                      excluded_records = 0,
-                      excluded_subjects = 0
-                    )))
+  expect_true(all(
+    attrition(cdm$cohort3) ==
+      dplyr::tibble(
+        cohort_definition_id = 1,
+        number_records = 3,
+        number_subjects = 3,
+        reason_id = 1,
+        reason = "Initial qualifying events",
+        excluded_records = 0,
+        excluded_subjects = 0
+      )))
   expect_true(settings(cdm$cohort3)$cohort_name == "cohort_1_cohort_2")
+
+  # 1 cohort
+  cdm$cohort4 <- unionCohorts(cdm$cohort1, cohortId = 2, cohortName = "newname", name = "cohort4")
+  expect_equal(settings(cdm$cohort4), dplyr::tibble(cohort_definition_id = 1, cohort_name = "newname"))
+  expect_true(attrition(cdm$cohort4)$cohort_definition_id == 1)
+  expect_true(cohortCount(cdm$cohort4)$cohort_definition_id == 1)
 
   PatientProfiles::mockDisconnect(cdm)
 })
@@ -103,7 +109,7 @@ test_that("gap and name works", {
   expect_true(settings(cdm$cohort2)$cohort_name == "cohort_1_cohort_2")
 
 
-   # names
+  # names
   cdm$cohort <- unionCohorts(cdm$cohort, gap = 2,  cohortName = "test")
   expect_true(all(
     cdm$cohort %>% dplyr::pull("cohort_start_date") %>% sort() ==
@@ -135,54 +141,54 @@ test_that("gap and name works", {
 
 test_that("Expected behaviour", {
   testthat::skip_on_cran()
-   cdm_local <- omock::mockCdmReference() |>
+  cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
     omock::mockCohort(name = c("cohort"), numberCohorts = 4, seed = 8, recordPerson = 2)
   cdm <- cdm_local |> copyCdm()
   expect_warning(
     cohort <- unionCohorts(cdm$cohort,
-                          cohortId = 1,
-                          gap = 0,
-                          cohortName = NULL,
-                          name = "cohort1")
+                           cohortId = 1,
+                           gap = 0,
+                           cohortName = NULL,
+                           name = "cohort1")
   )
   expect_true(cohort |> dplyr::anti_join(cdm$cohort, by = colnames(cohort)) |>
                 dplyr::tally() |> dplyr::pull("n") == 0)
   expect_error(
     cohort <- unionCohorts(cdm$cohort,
-                          cohortId = NULL,
-                          gap = -1,
-                          cohortName = NULL,
-                          name = "cohort1")
+                           cohortId = NULL,
+                           gap = -1,
+                           cohortName = NULL,
+                           name = "cohort1")
   )
   expect_error(
     cohort <- unionCohorts(cdm$cohort,
-                          cohortId = NULL,
-                          gap = NA,
-                          cohortName = NULL,
-                          name = "cohort1")
+                           cohortId = NULL,
+                           gap = NA,
+                           cohortName = NULL,
+                           name = "cohort1")
   )
   expect_error(
     cohort <- unionCohorts(cdm$cohort,
-                          cohortId = NULL,
-                          gap = Inf,
-                          cohortName = NULL,
-                          name = "cohort1")
+                           cohortId = NULL,
+                           gap = Inf,
+                           cohortName = NULL,
+                           name = "cohort1")
   )
   expect_error(
     cohort <- unionCohorts(cdm$cohort,
-                          cohortId = "1",
-                          gap = 1,
-                          cohortName = NULL,
-                          name = "cohort1")
+                           cohortId = "1",
+                           gap = 1,
+                           cohortName = NULL,
+                           name = "cohort1")
   )
   expect_warning(
     cohort <- unionCohorts(cdm$cohort,
-                          cohortId = NULL,
-                          gap = 1,
-                          cohortName = "hOLA",
-                          name = "cohort1")
+                           cohortId = NULL,
+                           gap = 1,
+                           cohortName = "hOLA",
+                           name = "cohort1")
   )
 
   PatientProfiles::mockDisconnect(cdm)
