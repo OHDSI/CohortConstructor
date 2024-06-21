@@ -104,6 +104,10 @@ validateName <- function(name) {
 }
 
 validateConceptSet <- function(conceptSet) {
+  # while is.list does not work for tibbles:
+  if (!"list" %in% class(conceptSet)) {
+    cli::cli_abort("{substitute(conceptSet)} must be a list; it can not contain NA; it has to be named; elements must have class: numeric.")
+  }
   omopgenerics::newCodelist(conceptSet)
 }
 
@@ -140,9 +144,19 @@ validateDemographicRequirements <- function(ageRange,
   }
 
   # minPriorObservation:
-  assertNumeric(minPriorObservation, integerish = TRUE, min = 0, null = null)
+  if (!is.null(minPriorObservation)) {
+    if (all(is.infinite(minPriorObservation))) {
+      cli::cli_abort("`minPriorObservation` cannot be infinite.")
+    }
+  }
+  assertNumeric(minPriorObservation, integerish = TRUE, min = 0, null = TRUE)
   # minFutureObservation:
-  assertNumeric(minFutureObservation, integerish = TRUE, min = 0, null = null)
+  if (!is.null(minFutureObservation)) {
+    if (all(is.infinite(minFutureObservation))) {
+      cli::cli_abort("`minFutureObservation` cannot be infinite.")
+    }
+  }
+  assertNumeric(minFutureObservation, integerish = TRUE, min = 0, null = TRUE)
 
   return(ageRange)
 }
@@ -197,3 +211,4 @@ validateIntersections <- function(intersections){
 
   intersections
 }
+

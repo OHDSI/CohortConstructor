@@ -153,9 +153,8 @@ measurementCohort <- function(cdm,
 
   if (!is.null(valueAsNumber)) {
     unit <- cohort |> dplyr::pull("unit_concept_id") |> unique()
-    matches <-
-      as.numeric(names(valueAsNumber)) %in% as.numeric(unit)
-    matching_ids <- valueAsNumber[!matches]
+    matches <- as.numeric(names(valueAsNumber)) %in% as.numeric(unit)
+    matching_ids <- names(valueAsNumber)[!matches]
 
     if (length(matching_ids) > 0) {
       cli::cli_inform(c(
@@ -170,6 +169,10 @@ measurementCohort <- function(cdm,
     cli::cli_inform(c("i" = "No table could be subsetted, returning empty cohort."))
     cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name)
     cdm[[name]] <- cdm[[name]] |>
+      dplyr::select(
+        "cohort_definition_id", "subject_id", "cohort_start_date",
+        "cohort_end_date"
+      ) |>
       omopgenerics::newCohortTable(
         cohortSetRef = cohortSet,
         cohortAttritionRef = NULL,
@@ -201,9 +204,9 @@ measurementCohort <- function(cdm,
       dplyr::filter(!!!filterExpr) |>
       dplyr::compute(name = name, temporary = FALSE)
 
-  if (cohort |> dplyr::tally() |> dplyr::pull("n") == 0){
-    cli::cli_warn("There are no subjects with the specified value_as_concept_id or value_as_number.")
-  }
+    if (cohort |> dplyr::tally() |> dplyr::pull("n") == 0){
+      cli::cli_warn("There are no subjects with the specified value_as_concept_id or value_as_number.")
+    }
 
   }
 

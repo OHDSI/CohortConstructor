@@ -45,17 +45,31 @@ unionCohorts <- function(cohort,
 
   if (length(cohortId) < 2) {
     cli::cli_warn("At least 2 cohort id must be provided to do the union.")
+    # set
+    set <- cohort |>
+      omopgenerics::settings() |>
+      dplyr::filter(.data$cohort_definition_id == .env$cohortId)
+    if (is.null(cohortName)) {cohortName <- set$cohort_name}
+    # codelist
+    cohCodelist <- attr(cohort, "cohort_codelist")
+    if(!is.null(cohCodelist)) {
+      cohCodelist <- cohCodelist |>
+        dplyr::filter(.data$cohort_definition_id == .env$cohortId) |>
+        dplyr::mutate("cohort_definition_id" = 1)
+    }
     # update properly
-    cohort <- cohort %>%
-      dplyr::filter(.data$cohort_definition_id == .env$cohortId) %>%
-      dplyr::compute(name = name, temporary = FALSE) %>%
+    cohort <- cohort |>
+      dplyr::filter(.data$cohort_definition_id == .env$cohortId) |>
+      dplyr::mutate(cohort_definition_id = 1) |>
+      dplyr::compute(name = name, temporary = FALSE) |>
       omopgenerics::newCohortTable(
-        cohortSetRef = cohort %>%
-          omopgenerics::settings() %>%
-          dplyr::filter(.data$cohort_definition_id == .env$cohortId),
-        cohortAttritionRef = cohort %>%
-          omopgenerics::attrition() %>%
-          dplyr::filter(.data$cohort_definition_id == .env$cohortId),
+        cohortSetRef = set |>
+          dplyr::mutate(cohort_definition_id = 1, cohort_name = cohortName),
+        cohortAttritionRef = cohort |>
+          omopgenerics::attrition() |>
+          dplyr::filter(.data$cohort_definition_id == .env$cohortId) |>
+          dplyr::mutate(cohort_definition_id = 1),
+        cohortCodelistRef = cohCodelist,
         .softValidation = TRUE
       )
     return(cohort)
