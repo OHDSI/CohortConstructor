@@ -202,8 +202,7 @@ test_that("concepts from multiple cdm tables duckdb", {
     ))) |>
     omock::mockConditionOccurrence() |>
     omock::mockDrugExposure()
-  cdm <- CDMConnector::copyCdmTo(con = DBI::dbConnect(duckdb::duckdb()),
-                                 cdm = cdm, schema = "main")
+  cdm <- copyCdm(cdm)
 
   cs <- list("a" = cdm$condition_occurrence |>
     dplyr::select("condition_concept_id") |>
@@ -217,7 +216,7 @@ test_that("concepts from multiple cdm tables duckdb", {
   expect_no_error(cohort <- conceptCohort(cdm = cdm,
                                           conceptSet = cs,
                                           name = "my_new_cohort"))
-
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("excluded concepts in codelist", {

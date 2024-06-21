@@ -108,7 +108,7 @@ validateConceptSet <- function(conceptSet) {
   if (!"list" %in% class(conceptSet)) {
     cli::cli_abort("{substitute(conceptSet)} must be a list; it can not contain NA; it has to be named; elements must have class: numeric.")
   }
-  assertList(conceptSet, named = TRUE, null = TRUE, class = "numeric")
+  omopgenerics::newCodelist(conceptSet)
 }
 
 validateGap <- function(gap) {
@@ -144,15 +144,19 @@ validateDemographicRequirements <- function(ageRange,
   }
 
   # minPriorObservation:
-  if (is.infinite(minPriorObservation)) {
-    cli::cli_abort("`minPriorObservation` cannot be infinite.")
+  if (!is.null(minPriorObservation)) {
+    if (all(is.infinite(minPriorObservation))) {
+      cli::cli_abort("`minPriorObservation` cannot be infinite.")
+    }
   }
-  assertNumeric(minPriorObservation, integerish = TRUE, min = 0, null = null)
+  assertNumeric(minPriorObservation, integerish = TRUE, min = 0, null = TRUE)
   # minFutureObservation:
-  if (is.infinite(minFutureObservation)) {
-    cli::cli_abort("`minFutureObservation` cannot be infinite.")
+  if (!is.null(minFutureObservation)) {
+    if (all(is.infinite(minFutureObservation))) {
+      cli::cli_abort("`minFutureObservation` cannot be infinite.")
+    }
   }
-  assertNumeric(minFutureObservation, integerish = TRUE, min = 0, null = null)
+  assertNumeric(minFutureObservation, integerish = TRUE, min = 0, null = TRUE)
 
   return(ageRange)
 }
