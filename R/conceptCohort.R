@@ -57,7 +57,7 @@ conceptCohort <- function(cdm,
   }
   conceptSet <- validateConceptSet(conceptSet)
 
-  cohortSet <- conceptSetToCohortSet(conceptSet)
+  cohortSet <- conceptSetToCohortSet(conceptSet, cdm)
   cohortCodelist <- conceptSetToCohortCodelist(conceptSet)
 
   tableCohortCodelist <- omopgenerics::uniqueTableName()
@@ -238,9 +238,12 @@ fulfillCohortReqs <- function(cdm, name){
 }
 
 
-conceptSetToCohortSet <- function(conceptSet){
+conceptSetToCohortSet <- function(conceptSet, cdm){
   dplyr::tibble("cohort_name" = names(conceptSet)) |>
-    dplyr::mutate("cohort_definition_id" = dplyr::row_number())
+    dplyr::mutate(
+      "cohort_definition_id" = dplyr::row_number(),
+      "cdm_version" = attr(cdm, "cdm_version")
+      )
 }
 
 conceptSetToCohortCodelist <- function(conceptSet){

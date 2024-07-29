@@ -44,7 +44,7 @@ test_that("expected errors and messages", {
                       names(cdm)) == "cohort")
   expect_identical(setdiff(names(cdm), names(omopgenerics::cdmReference(x))), character())
   expect_equal(
-    settings(x), dplyr::tibble("cohort_definition_id" = 1L, "cohort_name" = "a")
+    settings(x), dplyr::tibble("cohort_definition_id" = 1L, "cohort_name" = "a", "cdm_version" = attr(cdm, "cdm_version"))
   )
   expect_true(nrow(attrition(x)) == 1)
   expect_true(nrow(attr(x, "cohort_codelist")) == 1)
@@ -99,7 +99,7 @@ test_that("simple example", {
   expect_true(attrition(cohort) |> nrow() == 1)
   expect_identical(
     settings(cohort),
-    dplyr::tibble("cohort_definition_id" = 1L, "cohort_name" = "a")
+    dplyr::tibble("cohort_definition_id" = 1L, "cohort_name" = "a", "cdm_version" = attr(cdm, "cdm_version"))
   )
   expect_identical(cohortCodelist(cohort, 1), omopgenerics::newCodelist(list(a = 1)))
   cohort <- cohort |>
@@ -168,7 +168,7 @@ test_that("simple example duckdb", {
   expect_true(attrition(cohort) |> nrow() == 1)
   expect_identical(
     settings(cohort),
-    dplyr::tibble("cohort_definition_id" = 1L, "cohort_name" = "a")
+    dplyr::tibble("cohort_definition_id" = 1L, "cohort_name" = "a", "cdm_version" = attr(cdm, "cdm_version"))
   )
   expect_identical(cohortCodelist(cohort, 1), omopgenerics::newCodelist(list(a = 1)))
   cohort <- cohort |>

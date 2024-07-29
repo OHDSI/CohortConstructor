@@ -96,8 +96,7 @@ measurementCohort <- function(cdm,
   validateValueAsNumber(valueAsNumber)
 
   # create concept set tibble
-  cohortSet <- dplyr::tibble("cohort_name" = names(conceptSet)) |>
-    dplyr::mutate("cohort_definition_id" = dplyr::row_number())
+  cohortSet <- conceptSetToCohortSet(conceptSet, cdm)
   cohortCodelist <- lapply(conceptSet, dplyr::as_tibble) |>
     dplyr::bind_rows(.id = "cohort_name") |>
     dplyr::inner_join(cohortSet, by = "cohort_name") |>
