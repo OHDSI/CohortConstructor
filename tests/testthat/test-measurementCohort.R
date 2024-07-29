@@ -1,6 +1,5 @@
 test_that("mearurementCohorts works", {
   cdm <- mockCohortConstructor(con = NULL)
-
   cdm$concept <- cdm$concept |>
     dplyr::union_all(
       dplyr::tibble(
@@ -51,6 +50,13 @@ test_that("mearurementCohorts works", {
   expect_true(settings(cdm$cohort)$cohort_name == "normal_blood_pressure")
   codes <- attr(cdm$cohort, "cohort_codelist") |> dplyr::collect()
   expect_true(all(codes$concept_id |> sort() == c(4298393, 4326744, 45770407)))
+  expect_equal(
+    settings(cdm$cohort),
+    dplyr::tibble(
+      "cohort_definition_id" = 1L, "cohort_name" = "normal_blood_pressure",
+      "cdm_version" = attr(cdm, "cdm_version"), "vocabulary_version" = "mock"
+    )
+  )
 
   # non valid concept ----
   cdm$cohort3 <- measurementCohort(
@@ -168,7 +174,7 @@ test_that("mearurementCohorts works", {
   codes <- attr(cdm$cohort8, "cohort_codelist") |> dplyr::collect()
   expect_true(all(codes$concept_id  |> sort() == c(123456)))
 
-  # empty cohort ----
+  # empty cohort but non empty codelist ----
   cdm$cohort9 <- measurementCohort(
     cdm = cdm,
     name = "cohort9",
@@ -177,8 +183,24 @@ test_that("mearurementCohorts works", {
   expect_true(cdm$cohort9 |> dplyr::tally() |> dplyr::pull("n") == 0)
   expect_true(cdm$cohort9 |> attrition() |> dplyr::pull("reason") == "Initial qualifying events")
   expect_true(settings(cdm$cohort9)$cohort_name == "c1")
-  # codes <- attr(cdm$cohort9, "cohort_codelist") |> dplyr::collect()
-  # expect_true(nrow(codes) == 1)
+  expect_equal(
+    colnames(settings(cdm$cohort9)) |> sort(),
+    c("cdm_version", "cohort_definition_id", "cohort_name", "vocabulary_version")
+  )
+
+  # empty cohort and empty codelist ----
+  cdm$cohort10 <- measurementCohort(
+    cdm = cdm,
+    name = "cohort10",
+    conceptSet = list()
+  )
+  expect_true(cdm$cohort10 |> dplyr::tally() |> dplyr::pull("n") == 0)
+  expect_true(cdm$cohort10 |> attrition() |> nrow() == 0)
+  expect_true(cdm$cohort10 |> settings() |> nrow() == 0)
+  expect_equal(
+    colnames(settings(cdm$cohort10)) |> sort(),
+    c("cdm_version", "cohort_definition_id", "cohort_name", "vocabulary_version")
+  )
 
   PatientProfiles::mockDisconnect(cdm)
 })

@@ -86,17 +86,21 @@ measurementCohort <- function(cdm,
   # initial input validation
   cdm <- validateCdm(cdm)
   name <- validateName(name)
-  if (length(conceptSet) == 0) {
-    cli::cli_inform(c("i" = "Empty codelist provided, returning empty cohort"))
-    cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name)
-    return(cdm[[name]])
-  }
   conceptSet <- validateConceptSet(conceptSet)
   assertNumeric(valueAsConcept, integerish = TRUE, null = TRUE)
   validateValueAsNumber(valueAsNumber)
 
-  # create concept set tibble
+  # empty concept set
   cohortSet <- conceptSetToCohortSet(conceptSet, cdm)
+  if (length(conceptSet) == 0) {
+    cli::cli_inform(c("i" = "Empty codelist provided, returning empty cohort"))
+    cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name)
+    cdm[[name]] <- cdm[[name]] |>
+      omopgenerics::newCohortTable(cohortSetRef = cohortSet)
+    return(cdm[[name]])
+  }
+
+  # create concept set tibble
   cohortCodelist <- lapply(conceptSet, dplyr::as_tibble) |>
     dplyr::bind_rows(.id = "cohort_name") |>
     dplyr::inner_join(cohortSet, by = "cohort_name") |>
