@@ -1,138 +1,48 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/404.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/LICENSE.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/articles/a00_introduction.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/articles/a01_building_base_cohorts.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/articles/a02_applying_cohort_restrictions.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/articles/a03_age_sex_matching.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/articles/a04_cohort_manipulations.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/index.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/reference/CohortConstructor-package.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/reference/collapseCohorts.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/reference/conceptCohort.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/reference/demographicsCohort.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/reference/entryAtFirstDate.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/reference/entryAtLastDate.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/reference/exitAtDeath.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/reference/exitAtFirstDate.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/reference/exitAtLastDate.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/reference/exitAtObservationEnd.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/reference/intersectCohorts.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/reference/matchCohorts.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/reference/measurementCohort.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/reference/mockCohortConstructor.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/reference/reexports.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/reference/requireAge.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/reference/requireCohortIntersect.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/reference/requireConceptIntersect.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/reference/requireDeathFlag.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/reference/requireDemographics.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/reference/requireFutureObservation.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/reference/requireInDateRange.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/reference/requireIsFirstEntry.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/reference/requireIsLastEntry.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/reference/requirePriorObservation.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/reference/requireSex.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/reference/requireTableIntersect.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/reference/sampleCohorts.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/reference/stratifyCohorts.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/reference/subsetCohorts.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/reference/trimDemographics.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/reference/trimToDateRange.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/reference/unionCohorts.html</loc>
-  </url>
-  <url>
-    <loc>https://ohdsi.github.io/CohortConstructor/reference/yearCohorts.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://ohdsi.github.io/CohortConstructor/404.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/LICENSE.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/articles/a00_introduction.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/articles/a01_building_base_cohorts.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/articles/a02_applying_cohort_restrictions.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/articles/a03_age_sex_matching.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/articles/a04_cohort_manipulations.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/articles/index.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/authors.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/index.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/reference/CohortConstructor-package.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/reference/collapseCohorts.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/reference/conceptCohort.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/reference/demographicsCohort.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/reference/entryAtFirstDate.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/reference/entryAtLastDate.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/reference/exitAtDeath.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/reference/exitAtFirstDate.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/reference/exitAtLastDate.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/reference/exitAtObservationEnd.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/reference/index.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/reference/intersectCohorts.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/reference/matchCohorts.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/reference/measurementCohort.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/reference/mockCohortConstructor.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/reference/reexports.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/reference/requireAge.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/reference/requireCohortIntersect.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/reference/requireConceptIntersect.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/reference/requireDeathFlag.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/reference/requireDemographics.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/reference/requireFutureObservation.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/reference/requireInDateRange.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/reference/requireIsFirstEntry.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/reference/requireIsLastEntry.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/reference/requirePriorObservation.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/reference/requireSex.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/reference/requireTableIntersect.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/reference/sampleCohorts.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/reference/stratifyCohorts.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/reference/subsetCohorts.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/reference/trimDemographics.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/reference/trimToDateRange.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/reference/unionCohorts.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/reference/yearCohorts.html</loc></url>
 </urlset>
+
