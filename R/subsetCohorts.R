@@ -34,13 +34,15 @@ subsetCohorts <- function(cohort,
   name <- validateName(name)
   minCohortCount <- validateN(minCohortCount)
 
-  minId <- cohort %>%
-    dplyr::group_by(.data$cohort_definition_id) %>%
-    dplyr::tally() %>%
-    dplyr::filter(.data$n >= .env$minCohortCount) %>%
-    dplyr::pull("cohort_definition_id")
+  if (minCohortCount > 0) {
+    minId <- cohort %>%
+      dplyr::group_by(.data$cohort_definition_id) %>%
+      dplyr::tally() %>%
+      dplyr::filter(.data$n >= .env$minCohortCount) %>%
+      dplyr::pull("cohort_definition_id")
 
-  cohortId <- intersect(cohortId, minId)
+    cohortId <- intersect(cohortId, minId)
+  }
 
   cohort <- cohort |>
     dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>
