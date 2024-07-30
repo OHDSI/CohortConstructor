@@ -23,13 +23,18 @@ test_that("expected errors and messages", {
   expect_error(conceptCohort(cdm = cdm, name = 1, conceptSet = NULL))
   expect_error(conceptCohort(cdm = cdm, name = c("ass", "asdf"), conceptSet = NULL))
   expect_error(conceptCohort(cdm = cdm, name = "AAAA", conceptSet = NULL))
-  expect_no_error(x <- conceptCohort(cdm = cdm, name = "my_cohort", conceptSet = NULL))
-  expect_true("my_cohort" == omopgenerics::tableName(x))
+  expect_error(conceptCohort(cdm = cdm, conceptSet = NULL, name = "cohort"))
 
-  # empty cohort
-  expect_no_error(x <- conceptCohort(cdm = cdm, conceptSet = NULL, name = "cohort"))
+  # empty cohort from empty concept
+  expect_no_error(x <- conceptCohort(cdm = cdm, conceptSet = list(), name = "cohort"))
   expect_true(inherits(x, "cohort_table"))
   expect_true(x |> dplyr::collect() |> nrow() == 0)
+  expect_equal(
+    colnames(settings(x)) |> sort(),
+    c("cdm_version", "cohort_definition_id", "cohort_name", "vocabulary_version")
+  )
+  expect_true(settings(x) |> nrow() == 0)
+  expect_true(attrition(x) |> nrow() == 0)
 
   # not codelist
   expect_error(x <- conceptCohort(cdm = cdm, conceptSet = 1, name = "cohort"))
@@ -44,7 +49,10 @@ test_that("expected errors and messages", {
                       names(cdm)) == "cohort")
   expect_identical(setdiff(names(cdm), names(omopgenerics::cdmReference(x))), character())
   expect_equal(
-    settings(x), dplyr::tibble("cohort_definition_id" = 1L, "cohort_name" = "a")
+    settings(x),
+    dplyr::tibble(
+      "cohort_definition_id" = 1L, "cohort_name" = "a",
+      "cdm_version" = attr(cdm, "cdm_version"), "vocabulary_version" = "mock")
   )
   expect_true(nrow(attrition(x)) == 1)
   expect_true(nrow(attr(x, "cohort_codelist")) == 1)
@@ -99,7 +107,10 @@ test_that("simple example", {
   expect_true(attrition(cohort) |> nrow() == 1)
   expect_identical(
     settings(cohort),
-    dplyr::tibble("cohort_definition_id" = 1L, "cohort_name" = "a")
+    dplyr::tibble(
+      "cohort_definition_id" = 1L, "cohort_name" = "a",
+      "cdm_version" = attr(cdm, "cdm_version"), "vocabulary_version" = "mock"
+      )
   )
   expect_identical(cohortCodelist(cohort, 1), omopgenerics::newCodelist(list(a = 1)))
   cohort <- cohort |>
@@ -124,7 +135,7 @@ test_that("simple example", {
 
 test_that("simple example duckdb", {
   testthat::skip_on_cran()
-   cdm <- omock::mockCdmReference() |>
+  cdm <- omock::mockCdmReference() |>
     omock::mockCdmFromTables(tables = list("cohort" = dplyr::tibble(
       "cohort_definition_id" = 1,
       "subject_id" = c(1, 2, 3),
@@ -168,7 +179,10 @@ test_that("simple example duckdb", {
   expect_true(attrition(cohort) |> nrow() == 1)
   expect_identical(
     settings(cohort),
-    dplyr::tibble("cohort_definition_id" = 1L, "cohort_name" = "a")
+    dplyr::tibble(
+      "cohort_definition_id" = 1L, "cohort_name" = "a",
+      "cdm_version" = attr(cdm, "cdm_version"), "vocabulary_version" = "mock"
+      )
   )
   expect_identical(cohortCodelist(cohort, 1), omopgenerics::newCodelist(list(a = 1)))
   cohort <- cohort |>
@@ -205,13 +219,13 @@ test_that("concepts from multiple cdm tables duckdb", {
   cdm <- copyCdm(cdm)
 
   cs <- list("a" = cdm$condition_occurrence |>
-    dplyr::select("condition_concept_id") |>
-    head(1)|>
-    dplyr::pull(),
-    "b" = cdm$drug_exposure |>
-    dplyr::select("drug_concept_id") |>
-    head(1) |>
-    dplyr::pull())
+               dplyr::select("condition_concept_id") |>
+               head(1)|>
+               dplyr::pull(),
+             "b" = cdm$drug_exposure |>
+               dplyr::select("drug_concept_id") |>
+               head(1) |>
+               dplyr::pull())
 
   expect_no_error(cohort <- conceptCohort(cdm = cdm,
                                           conceptSet = cs,
@@ -306,7 +320,7 @@ test_that("out of observation", {
   # the first - same dates as drug exposure
   # the second - limit cohort end based on observation period end date
   expect_true(all(cdm$cohort1 |>
-                dplyr::pull("subject_id") == 1))
+                    dplyr::pull("subject_id") == 1))
   expect_true(cdm$cohort1 |>
                 dplyr::filter(cohort_definition_id == 1) |>
                 dplyr::pull("cohort_start_date") == "2010-01-01")

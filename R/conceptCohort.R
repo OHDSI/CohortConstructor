@@ -50,21 +50,24 @@ conceptCohort <- function(cdm,
   # initial input validation
   cdm <- validateCdm(cdm)
   name <- validateName(name)
+  conceptSet <- validateConceptSet(conceptSet)
+
+  # empty concept set
+  cohortSet <- conceptSetToCohortSet(conceptSet, cdm)
   if (length(conceptSet) == 0) {
     cli::cli_inform(c("i" = "Empty codelist provided, returning empty cohort"))
     cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name)
+    cdm[[name]] <- cdm[[name]] |>
+      omopgenerics::newCohortTable(cohortSetRef = cohortSet)
     return(cdm[[name]])
   }
-  conceptSet <- validateConceptSet(conceptSet)
 
-  cohortSet <- conceptSetToCohortSet(conceptSet)
+  # codelist attribute
   cohortCodelist <- conceptSetToCohortCodelist(conceptSet)
-
   tableCohortCodelist <- omopgenerics::uniqueTableName()
   cdm <- uploadCohortCodelistToCdm(cdm = cdm,
                                    cohortCodelist = cohortCodelist,
-                                   tableCohortCodelist = tableCohortCodelist
-  )
+                                   tableCohortCodelist = tableCohortCodelist)
 
   # report codes from unsupported domains
   reportConceptsFromUnsopportedDomains(cdm = cdm,
@@ -238,9 +241,18 @@ fulfillCohortReqs <- function(cdm, name){
 }
 
 
-conceptSetToCohortSet <- function(conceptSet){
-  dplyr::tibble("cohort_name" = names(conceptSet)) |>
-    dplyr::mutate("cohort_definition_id" = dplyr::row_number())
+conceptSetToCohortSet <- function(conceptSet, cdm){
+  cohSet <- dplyr::tibble("cohort_name" = names(conceptSet)) |>
+    dplyr::mutate(
+      "cohort_definition_id" = dplyr::row_number(),
+      "cdm_version" = attr(cdm, "cdm_version"),
+      "vocabulary_version" = CodelistGenerator::getVocabVersion(cdm)
+      )
+  if (length(conceptSet) == 0) {
+    cohSet <- cohSet |>
+      dplyr::mutate("cohort_name" = character())
+  }
+  return(cohSet)
 }
 
 conceptSetToCohortCodelist <- function(conceptSet){
