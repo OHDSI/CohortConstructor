@@ -27,8 +27,8 @@ test_that("simple duckdb checks", {
     cdmName = "test cohortconstructor",
     cohortTables = list(
       "cohort1" = dplyr::tibble(
-        "cohort_definition_id" = c(1, 1, 1, 2),
-        "subject_id" = c(1, 2, 3, 1),
+        "cohort_definition_id" = c(1L, 1L, 1L, 2L),
+        "subject_id" = c(1L, 2L, 3L, 1L),
         "cohort_start_date" = as.Date(c(
           "2032-01-19", "2039-11-12", "2036-03-16", "2003-12-15"
         )),
@@ -68,7 +68,7 @@ test_that("simple duckdb checks", {
   expect_identical(
     x,
     dplyr::tibble(
-      "subject_id" = c(1, 2, 3),
+      "subject_id" = c(1L, 2L, 3L),
       "cohort_start_date" = as.Date(c(
         "2033-04-19", "2040-01-15", "2045-08-20"
       )),
@@ -89,7 +89,7 @@ test_that("simple duckdb checks", {
   expect_identical(
     x,
     dplyr::tibble(
-      "subject_id" = c(2, 3),
+      "subject_id" = c(2L, 3L),
       "cohort_start_date" = as.Date(c("2040-01-15", "2045-08-20")),
       "cohort_end_date" = as.Date(c("2045-01-12", "2065-08-19"))
     )
@@ -156,7 +156,7 @@ test_that("simple duckdb checks", {
   expect_identical(
     x,
     dplyr::tibble(
-      "subject_id" = c(1, 2, 3),
+      "subject_id" = c(1L, 2L, 3L),
       "cohort_start_date" = as.Date(c("1993-04-19", "2010-03-12", "2020-10-06")),
       "cohort_end_date" = as.Date(c("2013-04-18", "2017-01-01", "2025-08-19"))
     )
@@ -172,7 +172,7 @@ test_that("simple duckdb checks", {
   expect_identical(
     x,
     dplyr::tibble(
-      "subject_id" = c(1, 2, 3),
+      "subject_id" = c(1L, 2L, 3L),
       "cohort_start_date" = as.Date(c("1994-04-19", "2011-03-12", "2021-10-06")),
       "cohort_end_date" = as.Date(c("2013-04-18", "2017-01-01", "2025-08-19"))
     )
@@ -291,7 +291,7 @@ test_that("simple duckdb checks", {
   expect_identical(
     x,
     dplyr::tibble(
-      "subject_id" = c(1, 2, 3),
+      "subject_id" = c(1L, 2L, 3L),
       "cohort_start_date" = as.Date(c("1993-04-19", "2010-03-12", "2020-10-06")),
       "cohort_end_date" = as.Date(c("2013-04-18", "2017-01-01", "2025-08-19"))
     )
@@ -303,7 +303,7 @@ test_that("simple duckdb checks", {
   expect_identical(
     x,
     dplyr::tibble(
-      "subject_id" = c(1, 2),
+      "subject_id" = c(1L, 2L),
       "cohort_start_date" = as.Date(c("1998-04-18", "2015-03-11")),
       "cohort_end_date" = as.Date(c("2013-04-18", "2017-01-01"))
     )
@@ -315,7 +315,7 @@ test_that("simple duckdb checks", {
   expect_identical(
     x,
     dplyr::tibble(
-      "subject_id" = 1,
+      "subject_id" = 1L,
       "cohort_start_date" = as.Date(c("2001-07-06")),
       "cohort_end_date" = as.Date(c("2013-04-18"))
     )
@@ -352,7 +352,7 @@ test_that("cohort Id, name, additional columns", {
   expect_equal(
     x1,
     dplyr::tibble(
-      subject_id = c(1, 1, 2, 3, 5),
+      subject_id = c(1L, 1L, 2L, 3L, 5L),
       cohort_start_date = as.Date(c("2001-04-03", "2002-05-07", "1999-07-26", "2015-02-19", "2012-06-12")),
       cohort_end_date = as.Date(c("2002-05-06", "2005-11-07", "2002-09-17", "2015-06-27", "2012-09-09"))
     )
@@ -360,7 +360,7 @@ test_that("cohort Id, name, additional columns", {
   expect_equal(
     x3,
     dplyr::tibble(
-      subject_id = c(1, 1, 2),
+      subject_id = c(1L, 1L, 2L),
       cohort_start_date = as.Date(c("2001-07-08", "2002-05-07", "2000-05-09")),
       cohort_end_date = as.Date(c("2002-05-06", "2005-11-07", "2002-09-17"))
     )
