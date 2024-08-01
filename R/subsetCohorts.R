@@ -29,7 +29,7 @@ subsetCohorts <- function(cohort,
                           minCohortCount = 0,
                           name = tableName(cohort)) {
   # checks
-  cohort <- validateCohortTable(cohort, TRUE)
+  cohort <- validateCohortTable(cohort)
   cohortId <- validateCohortId(cohortId, settings(cohort)$cohort_definition_id)
   name <- validateName(name)
   minCohortCount <- validateN(minCohortCount)
