@@ -48,20 +48,15 @@ stratifyCohorts <- function(cohort,
 
   cdm <- omopgenerics::cdmReference(cohort)
 
-  if (length(strata) == 0 | sum(cohortCount(cohort)$number_records) == 0) {
-    if (identical(name, tableName(cohort))) {
-      return(cohort)
-    } else {
-      return(
-        cohort |>
-        dplyr::compute(name = name, temporary = FALSE) |>
-        omopgenerics::newCohortTable(.softValidation = TRUE)
-      )
-    }
+  # no strata
+  if (length(strata) == 0) {
+    cohort <- subsetCohorts(cohort = cohort, cohortId = cohortId, name = name)
+    return(cohort)
   }
 
-  strataCols <- unique(unlist(strata))
 
+  # create new attributes
+  strataCols <- unique(unlist(strata))
   set <- settings(cohort) |>
     dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>
     dplyr::mutate("target_cohort_table_name" = tableName(cohort)) |>
@@ -69,7 +64,6 @@ stratifyCohorts <- function(cohort,
       "target_cohort_id" = "cohort_definition_id",
       "target_cohort_name" = "cohort_name"
     )
-
   # drop columns from set
   dropCols <- colnames(set)[colnames(set) %in% strataCols]
   if (length(dropCols) > 0) {
@@ -80,7 +74,6 @@ stratifyCohorts <- function(cohort,
     set <- set |> dplyr::select(!dplyr::all_of(dropCols))
   }
 
-  # get counts for attrition
   counts <- cohort |>
     dplyr::group_by(dplyr::across(dplyr::all_of(c(
       "cohort_definition_id", strataCols
@@ -94,9 +87,8 @@ stratifyCohorts <- function(cohort,
     dplyr::arrange(dplyr::across(dplyr::all_of(c(
       "cohort_definition_id", strataCols
     ))))
-
   newSettings <- getNewSettingsStrata(set, strata, counts)
-
+  newAttrition <- getNewAttritionStrata(attrition(cohort), newSettings, counts)
   nm <- omopgenerics::uniqueTableName()
   cdm <- omopgenerics::insertTable(
     cdm = cdm,
@@ -106,7 +98,23 @@ stratifyCohorts <- function(cohort,
         "cohort_definition_id", "target_cohort_id", "strata_columns", strataCols
       )))
   )
+  newCodelist <- getNewCodelistStrata(attr(cohort, "cohort_codelist"), cdm[[nm]], strataCols)
 
+  if (cohort |> dplyr::tally() |> dplyr::pull("n") == 0) {
+    return(
+      cohort |>
+        dplyr::select(!dplyr::all_of(c(strataCols[removeStrata]))) |>
+        dplyr::compute(name = name, temporary = FALSE) |>
+        omopgenerics::newCohortTable(
+          cohortSetRef = newSettings,
+          cohortAttritionRef = newAttrition,
+          cohortCodelistRef = newCodelist,
+          .softValidation = FALSE
+        )
+    )
+  }
+
+  # stratify cohort
   newCohort <- list()
   for (k in seq_along(strata)) {
     newCohort[[k]] <- cohort |>
@@ -124,24 +132,13 @@ stratifyCohorts <- function(cohort,
         by = c("target_cohort_id", strata[[k]])
       )
   }
-  newAttrition <- getNewAttritionStrata(attrition(cohort), newSettings, counts)
-  newSettings <- newSettings |> dplyr::bind_rows()
-  ## codelist
-  codelist <- attr(cohort, "cohort_codelist")
-  newCodelist <- cdm[[nm]] |>
-    dplyr::select(c("cohort_definition_id", "target_cohort_id")) |>
-    dplyr::inner_join(
-      codelist |>
-        dplyr::rename("target_cohort_id" = "cohort_definition_id"),
-      by = "target_cohort_id",
-      relationship = "many-to-many"
-    ) |>
-    dplyr::select(!"target_cohort_id")
-
   newCohort <- purrr::reduce(newCohort, dplyr::union_all) |>
     dplyr::select(!dplyr::all_of(c(
       "target_cohort_id", strataCols[removeStrata]
     ))) |>
+    dplyr::relocate("cohort_definition_id")
+
+  newCohort <- newCohort |>
     dplyr::compute(name = name, temporary = FALSE) |>
     omopgenerics::newCohortTable(
       cohortSetRef = newSettings,
@@ -156,51 +153,91 @@ stratifyCohorts <- function(cohort,
 }
 
 getNewSettingsStrata <- function(set, strata, counts) {
-  lapply(strata, function(x) {
-    values <- counts |>
-      dplyr::select(dplyr::all_of(x)) |>
-      as.list() |>
-      lapply(unique)
-    set |>
-      dplyr::cross_join(
-        tidyr::expand_grid(!!!values) |>
-          tidyr::unite(
-            col = "cohort_name", dplyr::all_of(x), sep = "_", remove = FALSE
-          ) |>
-          dplyr::mutate("strata_columns" = paste0(x, collapse = "; ")) |>
-          dplyr::relocate("strata_columns")
+  if (nrow(counts) > 0) {
+    newSettings <- lapply(strata, function(x) {
+      values <- counts |>
+        dplyr::select(dplyr::all_of(x)) |>
+        as.list() |>
+        lapply(unique)
+      set |>
+        dplyr::cross_join(
+          tidyr::expand_grid(!!!values) |>
+            tidyr::unite(
+              col = "cohort_name", dplyr::all_of(x), sep = "_", remove = FALSE
+            ) |>
+            dplyr::mutate("strata_columns" = paste0(x, collapse = "; ")) |>
+            dplyr::relocate("strata_columns")
+        )
+    }) |>
+      dplyr::bind_rows() |>
+      dplyr::mutate(
+        "cohort_name" = paste0(.data$target_cohort_name, "_", tolower(.data$cohort_name)),
+        "cohort_definition_id" = dplyr::row_number()
       )
-  }) |>
-    dplyr::bind_rows() |>
-    dplyr::mutate(
-      "cohort_name" = paste0(.data$target_cohort_name, "_", tolower(.data$cohort_name)),
-      "cohort_definition_id" = dplyr::row_number()
-    )
-}
-
-getNewAttritionStrata <- function(originalAttrition, set, counts) {
-  numCohorts <- nrow(set)
-  newAttrition <- rep(list(originalAttrition), numCohorts)
-  for (k in seq_len(numCohorts)) {
-    tcdi <- set$target_cohort_id[k]
-    ccdi <- set$cohort_definition_id[k]
-    strata <- set$strata_columns[k] |> strsplit(split = "; ") |> unlist()
-    newAttrition[[k]] <- newAttrition[[k]] |>
-      dplyr::filter(.data$cohort_definition_id == .env$tcdi) |>
-      dplyr::mutate("cohort_definition_id" = .env$ccdi)
-    count <- counts |>
-      dplyr::filter(.data$cohort_definition_id == .env$tcdi)
-    for (i in seq_along(strata)) {
-      strat <- strata[i]
-      val <- set[[strat]][k]
-      reason <- paste0("filter strata: ", strat, " == ", val)
-      count <- count |>
-        dplyr::filter(.data[[strat]] == .env$val)
-      newAttrition[[k]] <- newAttrition[[k]] |>
-        addAttritionLine(reason, count)
-    }
+  } else {
+    strataCols <- unique(unlist(strata))
+    toFillEmptySet <- rep("NA_character_", length(strataCols)) |>
+      rlang::parse_exprs() |>
+      rlang::set_names(c(strataCols))
+    newSettings <- set |>
+      dplyr::cross_join(tidyr::expand_grid(
+        strata_columns = lapply(strata, function(x) {paste0(x, collapse = "; ")}) |> unlist()
+      )) |>
+      dplyr::mutate(
+        !!!toFillEmptySet,
+        "cohort_name" = paste0(.data$target_cohort_name, "_", tolower(.data$strata_columns)),
+        "cohort_definition_id" = dplyr::row_number()
+      )
   }
-  newAttrition |> dplyr::bind_rows()
+  return(newSettings)
+}
+getNewCodelistStrata <- function(codelist, set, strataCols) {
+  newCodelist <- set |>
+    dplyr::select(c("cohort_definition_id", "target_cohort_id")) |>
+    dplyr::inner_join(
+      codelist |>
+        dplyr::rename("target_cohort_id" = "cohort_definition_id"),
+      by = "target_cohort_id",
+      relationship = "many-to-many"
+    ) |>
+    dplyr::select(!"target_cohort_id")
+  return(newCodelist)
+}
+getNewAttritionStrata <- function(originalAttrition, set, counts) {
+  if (nrow(counts) > 0) {
+    numCohorts <- nrow(set)
+    newAttrition <- rep(list(originalAttrition), numCohorts)
+    for (k in seq_len(numCohorts)) {
+      tcdi <- set$target_cohort_id[k]
+      ccdi <- set$cohort_definition_id[k]
+      strata <- set$strata_columns[k] |> strsplit(split = "; ") |> unlist()
+      newAttrition[[k]] <- newAttrition[[k]] |>
+        dplyr::filter(.data$cohort_definition_id == .env$tcdi) |>
+        dplyr::mutate("cohort_definition_id" = .env$ccdi)
+      count <- counts |>
+        dplyr::filter(.data$cohort_definition_id == .env$tcdi)
+      for (i in seq_along(strata)) {
+        strat <- strata[i]
+        val <- set[[strat]][k]
+        reason <- paste0("filter strata: ", strat, " == ", val)
+        count <- count |>
+          dplyr::filter(.data[[strat]] == .env$val)
+        newAttrition[[k]] <- newAttrition[[k]] |>
+          addAttritionLine(reason, count)
+      }
+    }
+    newAttrition <- newAttrition |> dplyr::bind_rows()
+  } else {
+    newAttrition <- originalAttrition |>
+      dplyr::rename("target_cohort_id" = "cohort_definition_id") |>
+      dplyr::inner_join(
+        set |> dplyr::select(cohort_definition_id, target_cohort_id),
+        by = "target_cohort_id",
+        relationship = "many-to-many"
+      ) |>
+      dplyr::select(!"target_cohort_id")
+  }
+  return(newAttrition)
 }
 addAttritionLine <- function(oldAttrition, reason, count) {
   nr <- sum(count$number_records)
