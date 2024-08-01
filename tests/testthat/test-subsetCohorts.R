@@ -167,5 +167,28 @@ test_that("Testing minCohortCount argument", {
   expect_error(cdm$subset_cohort1 <- subsetCohorts(cdm$cohort1, cohortId = NULL, minCohortCount = Inf, name = "cohort2"))
   expect_error(cdm$subset_cohort1 <- subsetCohorts(cdm$cohort1, cohortId = NULL, minCohortCount = "one", name = "cohort2"))
 
+  cdm$cohort1 <- cdm$cohort1 |>
+    omopgenerics::newCohortTable(
+      cohortSetRef = dplyr::bind_rows(
+        settings(cdm$cohort1),
+        dplyr::tibble(cohort_definition_id = 4, cohort_name = "cohort_4")
+      ),
+      cohortAttritionRef = dplyr::bind_rows(
+        attrition(cdm$cohort1),
+        dplyr::tibble(cohort_definition_id = 4, number_records = 0,  number_subjects = 0))
+    )
+
+  cdm$sub1 <- cdm$cohort1 |> subsetCohorts(cohortId = 1:4, name = "sub1")
+  expect_equal(cdm$sub1 |> collectCohort(1), cdm$cohort1 |> collectCohort(1))
+  expect_equal(cdm$sub1 |> collectCohort(2), cdm$cohort1 |> collectCohort(2))
+  expect_equal(cdm$sub1 |> collectCohort(3), cdm$cohort1 |> collectCohort(3))
+  expect_equal(cdm$sub1 |> collectCohort(4), cdm$cohort1 |> collectCohort(4))
+
+  cdm$sub2 <- cdm$cohort1 |> subsetCohorts(cohortId = 4, name = "sub2")
+  expect_equal(settings(cdm$sub2), dplyr::tibble(cohort_definition_id = 4, cohort_name = "cohort_4"))
+
+  cdm$sub3 <- cdm$cohort1 |> subsetCohorts(cohortId = 4, minCohortCount = 1, name = "sub3")
+  expect_true(nrow(settings(cdm$sub3)) == 0)
+
   PatientProfiles::mockDisconnect(cdm)
 })
