@@ -42,9 +42,15 @@ test_that("simple stratification", {
   cdm <- cdm |> copyCdm()
 
   expect_no_error(cdm$cohort1 <- stratifyCohorts(cdm$cohort1, strata = list()))
+  expect_true(all(colnames(cdm$cohort1) == c(
+    "cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date", "extra_column", "blood_type", "sex", "age_group"
+    )))
   expect_no_error(
     cdm$new_cohort <- stratifyCohorts(cdm$cohort1, name = "new_cohort", strata = list())
   )
+  expect_true(all(colnames(cdm$new_cohort) == c(
+    "cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date", "extra_column", "blood_type", "sex", "age_group"
+  )))
   expect_no_error(
     cdm$new_cohort <- cdm$cohort1 |>
       stratifyCohorts(
@@ -78,7 +84,26 @@ test_that("simple stratification", {
   cdm <- omopgenerics::emptyCohortTable(cdm, "empty_cohort")
   cdm$empty_cohort <- cdm$empty_cohort|> PatientProfiles::addSex(name = "empty_cohort")
   expect_no_error(cdm$empty_cohort <- stratifyCohorts(cdm$empty_cohort, strata = list("sex")))
-  expect_true(cdm$empty_cohort |> dplyr::tally() |>dplyr::pull("n") == 0)
+  expect_true(cdm$empty_cohort |> dplyr::tally() |> dplyr::pull("n") == 0)
+  expect_true(all(colnames(settings(cdm$empty_cohort)) == c(
+    'cohort_definition_id', 'cohort_name', 'target_cohort_id', 'target_cohort_name', 'target_cohort_table_name', 'strata_columns', 'sex'
+  )))
+
+  cdm$cohort_strata <- cdm$empty_cohort |>
+    PatientProfiles::addDemographics(
+      ageGroup = list(c(0,50), c(51, 150)),
+      priorObservation = FALSE,
+      futureObservation = FALSE,
+      name = "cohort_strata"
+    ) |>
+    CohortConstructor::stratifyCohorts(
+      strata = list("sex", "age_group", c("sex", "age_group"))
+    )
+  expect_true(cdm$cohort_strata |> dplyr::tally() |> dplyr::pull("n") == 0)
+  expect_true(all(colnames(settings(cdm$cohort_strata)) == c(
+    'cohort_definition_id', 'cohort_name', 'target_cohort_id', 'target_cohort_name', 'target_cohort_table_name', 'strata_columns', 'sex', 'age_group'
+  )))
+  expect_true(all(settings(cdm$cohort_strata)$cohort_definition_id == 1:3))
 
   # extra columns in settings and strata
   attr(cdm$cohort1, "cohort_set") <- attr(cdm$cohort1, "cohort_set") |> dplyr::mutate(sex = NA)
@@ -87,6 +112,43 @@ test_that("simple stratification", {
 
   # no column in the cohort
   expect_error(cdm$new_cohort <- stratifyCohorts(cdm$cohort1, strata = list("not_a_column")))
+
+  PatientProfiles::mockDisconnect(cdm)
+
+  cdm <- mockCohortConstructor(conditionOccurrence = TRUE)
+  cdm <- copyCdm(cdm)
+  # one cohort empty
+  cdm$cohort <- CohortConstructor::conceptCohort(
+    cdm = cdm,
+    conceptSet = list("a" = 123456789, "b" = 1),
+    name = "cohort"
+  )
+  cdm$cohort_strata <- cdm$cohort |>
+    PatientProfiles::addDemographics(
+      ageGroup = list(c(0,50), c(51, 150)),
+      priorObservation = FALSE,
+      futureObservation = FALSE,
+      name = "cohort_strata"
+    ) |>
+    CohortConstructor::stratifyCohorts(
+      strata = list("sex", "age_group", c("sex", "age_group"))
+    )
+  expect_equal(
+    settings(cdm$cohort_strata),
+    dplyr::tibble(
+      cohort_definition_id = 1:10,
+      cohort_name = c("a_female", "a_male", "b_female", "b_male", "a_0_to_50", "b_0_to_50",
+                      "a_female_0_to_50", "a_male_0_to_50", "b_female_0_to_50", "b_male_0_to_50"),
+      target_cohort_id = c(1, 1, 2, 2, 1, 2, 1, 1, 2, 2),
+      target_cohort_name = c("a", "a", "b", "b", "a", "b", "a", "a", "b", "b"),
+      cdm_version = "5.3",
+      vocabulary_version = "mock",
+      target_cohort_table_name = "cohort_strata",
+      strata_columns = c(rep("sex", 4), rep("age_group", 2), rep("sex; age_group", 4)),
+      sex = c(rep(c("Female", "Male"), 2), NA_character_, NA_character_, rep(c("Female", "Male"), 2)),
+      age_group = c(rep(NA_character_, 4), rep("0 to 50", 6))
+    )
+  )
 
   PatientProfiles::mockDisconnect(cdm)
 })

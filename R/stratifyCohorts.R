@@ -50,7 +50,7 @@ stratifyCohorts <- function(cohort,
 
   # no strata
   if (length(strata) == 0) {
-    cohort <- subsetCohorts(cohort = cohort, cohortId = cohortId, name = name)
+    cohort <- cohort |> subsetCohorts(cohortId = cohortId, name = name)
     return(cohort)
   }
 
@@ -58,21 +58,23 @@ stratifyCohorts <- function(cohort,
   # create new attributes
   strataCols <- unique(unlist(strata))
   set <- settings(cohort) |>
-    dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>
+    dplyr::filter(.data$cohort_definition_id %in% .env$cohortId)
+  # drop columns from set
+  dropCols <- colnames(set)[colnames(set) %in% c(strataCols, "target_cohort_id", "target_cohort_name", "strata_columns")]
+  if (length(dropCols) > 0) {
+    cli::cli_inform(c(
+      "!" = "{dropCols} {?is/are} present in settings and strata. These settings
+      column will overwritten."
+    ))
+    set <- set |> dplyr::select(!dplyr::all_of(dropCols))
+  }
+  set <- set |>
     dplyr::mutate("target_cohort_table_name" = tableName(cohort)) |>
+    dplyr::select(!dplyr::any_of(c("target_cohort_id", "target_cohort_name", "strata_columns"))) |>
     dplyr::rename(
       "target_cohort_id" = "cohort_definition_id",
       "target_cohort_name" = "cohort_name"
     )
-  # drop columns from set
-  dropCols <- colnames(set)[colnames(set) %in% strataCols]
-  if (length(dropCols) > 0) {
-    cli::cli_inform(c(
-      "!" = "{dropCols} {?is/are} present in settings and strata. Settings
-      column will be not considered."
-    ))
-    set <- set |> dplyr::select(!dplyr::all_of(dropCols))
-  }
 
   counts <- cohort |>
     dplyr::group_by(dplyr::across(dplyr::all_of(c(
