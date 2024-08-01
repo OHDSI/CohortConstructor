@@ -187,8 +187,11 @@ test_that("Testing minCohortCount argument", {
   cdm$sub2 <- cdm$cohort1 |> subsetCohorts(cohortId = 4, name = "sub2")
   expect_equal(settings(cdm$sub2), dplyr::tibble(cohort_definition_id = 4, cohort_name = "cohort_4"))
 
-  cdm$sub3 <- cdm$cohort1 |> subsetCohorts(cohortId = 4, minCohortCount = 1, name = "sub3")
+  cdm$sub3 <- cdm$cohort1 |>
+    dplyr::mutate(extra_col = 1) |>
+    subsetCohorts(cohortId = 4, minCohortCount = 1, name = "sub3")
   expect_true(nrow(settings(cdm$sub3)) == 0)
+  expect_true("extra_col" %in% colnames(cdm$sub3))
 
   PatientProfiles::mockDisconnect(cdm)
 })
