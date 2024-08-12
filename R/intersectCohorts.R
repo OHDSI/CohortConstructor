@@ -94,11 +94,11 @@ intersectCohorts <- function(cohort,
     dplyr::as_tibble() %>%
     dplyr::filter(dplyr::if_any(dplyr::everything(), ~ . != 0)) %>%
     addNames() %>%
-    dplyr::mutate(cohort_definition_id = dplyr::row_number())
+    dplyr::mutate(cohort_definition_id = as.integer(dplyr::row_number()))
 
   if (!mutuallyExclusive) {
     dic <- cohSet %>%
-      dplyr::mutate(cohort_definition_id = dplyr::row_number()) %>%
+      dplyr::mutate(cohort_definition_id = as.integer(dplyr::row_number())) %>%
       dplyr::select("cohort_name", "cohort_definition_id")
     cohSet <- cohSet %>%
       dplyr::select(-"cohort_name", -"cohort_definition_id") %>%
@@ -191,8 +191,8 @@ intersectCohorts <- function(cohort,
   # attrition
   counts <- cohortOut |>
     dplyr::group_by(.data$cohort_definition_id) |>
-    dplyr::summarise(number_records = dplyr::n(),
-                     number_subjects = dplyr::n_distinct(.data$subject_id)) |>
+    dplyr::summarise(number_records = as.integer(dplyr::n()),
+                     number_subjects = as.integer(dplyr::n_distinct(.data$subject_id))) |>
     dplyr::collect() |>
     dplyr::right_join(cohSet |>
                       dplyr::select("cohort_definition_id"),
