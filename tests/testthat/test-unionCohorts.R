@@ -61,6 +61,14 @@ test_that("unionCohorts works", {
   expect_true(attrition(cdm$cohort4)$cohort_definition_id == 1)
   expect_true(cohortCount(cdm$cohort4)$cohort_definition_id == 1)
 
+  # union 2 empty cohorts
+  cdm$cohort5 <- conceptCohort(cdm = cdm, conceptSet = list("a"= 1, "b" = 2), name = "cohort5")
+  cdm$cohort6 <- cdm$cohort5 |> unionCohorts(name = "cohort6")
+  expect_true(nrow(attrition(cdm$cohort6)) == 1)
+  expect_true(attrition(cdm$cohort6)$number_records == 0)
+
+  cdm$cohort5 <- cdm$cohort5 |> unionCohorts(name = "cohort5")
+
   PatientProfiles::mockDisconnect(cdm)
 })
 
