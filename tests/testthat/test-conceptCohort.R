@@ -112,7 +112,7 @@ test_that("simple example", {
       "cdm_version" = attr(cdm, "cdm_version"), "vocabulary_version" = "mock"
       )
   )
-  expect_identical(cohortCodelist(cohort, 1), omopgenerics::newCodelist(list(a = 1)))
+  expect_identical(cohortCodelist(cohort, 1), omopgenerics::newCodelist(list(a = 1L)))
   cohort <- cohort |>
     dplyr::collect() |>
     dplyr::as_tibble() |>
@@ -184,7 +184,7 @@ test_that("simple example duckdb", {
       "cdm_version" = attr(cdm, "cdm_version"), "vocabulary_version" = "mock"
       )
   )
-  expect_identical(cohortCodelist(cohort, 1), omopgenerics::newCodelist(list(a = 1)))
+  expect_identical(cohortCodelist(cohort, 1), omopgenerics::newCodelist(list(a = 1L)))
   cohort <- cohort |>
     dplyr::collect() |>
     dplyr::as_tibble() |>
