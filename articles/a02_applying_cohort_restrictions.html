@@ -85,8 +85,8 @@ and another for users of acetaminophen.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 3</span></span></span>
 <span><span class="co">#&gt;   cohort_definition_id number_records number_subjects</span></span>
 <span><span class="co">#&gt;                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1            830             830</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                    2           <span style="text-decoration: underline;">9</span>365            <span style="text-decoration: underline;">2</span>580</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1           <span style="text-decoration: underline;">9</span>365            <span style="text-decoration: underline;">2</span>580</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                    2            830             830</span></span></code></pre></div>
 <p>As well as our medication cohorts, let’s also make another cohort
 containing individuals with a record of a GI bleed. Later we’ll use this
 cohort when specifying inclusion/ exclusion criteria.</p>
@@ -109,8 +109,8 @@ see that after this we have one record per person for each cohort.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 3</span></span></span>
 <span><span class="co">#&gt;   cohort_definition_id number_records number_subjects</span></span>
 <span><span class="co">#&gt;                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1            830             830</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                    2           <span style="text-decoration: underline;">2</span>580            <span style="text-decoration: underline;">2</span>580</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1           <span style="text-decoration: underline;">2</span>580            <span style="text-decoration: underline;">2</span>580</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                    2            830             830</span></span></code></pre></div>
 <p>Note, applying this criteria later after applying other criteria
 would result in a different result. Here we’re requiring that
 individuals meet inclusion criteria at the time of their first use of
@@ -188,8 +188,8 @@ individuals have one or more intersections with the GI bleed cohort.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 3</span></span></span>
 <span><span class="co">#&gt;   cohort_definition_id number_records number_subjects</span></span>
 <span><span class="co">#&gt;                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1              0               0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                    2              7               7</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1              7               7</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                    2              0               0</span></span></code></pre></div>
 <p>Instead of requiring that individuals have history of GI bleed, we
 could instead require that they are don’t have any history of it. In
 this case we can again use the <code><a href="../reference/requireCohortIntersect.html">requireCohortIntersect()</a></code>
@@ -208,8 +208,8 @@ it.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 3</span></span></span>
 <span><span class="co">#&gt;   cohort_definition_id number_records number_subjects</span></span>
 <span><span class="co">#&gt;                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1            179             179</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                    2             94              94</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1             94              94</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                    2            179             179</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

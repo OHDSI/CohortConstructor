@@ -96,7 +96,7 @@ birthday and leave at age 65 or</p>
 <span><span class="fu"><a href="https://darwin-eu-dev.github.io/omopgenerics/reference/settings.html" class="external-link">settings</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">working_age_cohort</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 3</span></span></span>
 <span><span class="co">#&gt;   cohort_definition_id cohort_name  age_range</span></span>
-<span><span class="co">#&gt;                  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span></span>
+<span><span class="co">#&gt;                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1 demographics 18_65</span></span>
 <span><span class="fu"><a href="https://darwin-eu-dev.github.io/omopgenerics/reference/cohortCount.html" class="external-link">cohortCount</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">working_age_cohort</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 3</span></span></span>
@@ -117,7 +117,7 @@ birthday and leave at age 65 or</p>
 <span>            median_start_age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span>, </span>
 <span>            max_start_age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Source:   SQL [1 x 3]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB v1.0.0 [unknown@Linux 6.5.0-1025-azure:R 4.4.1//tmp/RtmpYulY6d/file1a41660dc39c.duckdb]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB v1.0.0 [unknown@Linux 6.5.0-1025-azure:R 4.4.1//tmp/Rtmpd19E4E/file1ab93d072c5c.duckdb]</span></span></span>
 <span><span class="co">#&gt;   min_start_age median_start_age max_start_age</span></span>
 <span><span class="co">#&gt;           <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>            17               18            18</span></span>
@@ -128,7 +128,7 @@ birthday and leave at age 65 or</p>
 <span>            median_start_age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span>, </span>
 <span>            max_start_age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Source:   SQL [1 x 3]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB v1.0.0 [unknown@Linux 6.5.0-1025-azure:R 4.4.1//tmp/RtmpYulY6d/file1a41660dc39c.duckdb]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB v1.0.0 [unknown@Linux 6.5.0-1025-azure:R 4.4.1//tmp/Rtmpd19E4E/file1ab93d072c5c.duckdb]</span></span></span>
 <span><span class="co">#&gt;   min_start_age median_start_age max_start_age</span></span>
 <span><span class="co">#&gt;           <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>            31               57            65</span></span></code></pre></div>
@@ -143,8 +143,8 @@ birthday and leave at age 65 or</p>
 <span></span>
 <span><span class="va">drug_codes</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; - 3355_diclofenac (1 codes)</span></span>
-<span><span class="co">#&gt; - 161_acetaminophen (7 codes)</span></span></code></pre></div>
+<span><span class="co">#&gt; - 161_acetaminophen (7 codes)</span></span>
+<span><span class="co">#&gt; - 3355_diclofenac (1 codes)</span></span></code></pre></div>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">medications</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/conceptCohort.html">conceptCohort</a></span><span class="op">(</span>cdm <span class="op">=</span> <span class="va">cdm</span>, </span>
 <span>                                 conceptSet <span class="op">=</span> <span class="va">drug_codes</span>, </span>
@@ -154,14 +154,14 @@ birthday and leave at age 65 or</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 4</span></span></span>
 <span><span class="co">#&gt;   cohort_definition_id cohort_name       cdm_version vocabulary_version</span></span>
 <span><span class="co">#&gt;                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1 3355_diclofenac   5.3         v5.0 18-JAN-19    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                    2 161_acetaminophen 5.3         v5.0 18-JAN-19</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1 161_acetaminophen 5.3         v5.0 18-JAN-19    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                    2 3355_diclofenac   5.3         v5.0 18-JAN-19</span></span>
 <span><span class="fu"><a href="https://darwin-eu-dev.github.io/omopgenerics/reference/cohortCount.html" class="external-link">cohortCount</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">medications</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 3</span></span></span>
 <span><span class="co">#&gt;   cohort_definition_id number_records number_subjects</span></span>
 <span><span class="co">#&gt;                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1            830             830</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                    2          <span style="text-decoration: underline;">13</span>908            <span style="text-decoration: underline;">2</span>679</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1          <span style="text-decoration: underline;">13</span>908            <span style="text-decoration: underline;">2</span>679</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                    2            830             830</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="concept-based-cohort-creation-for-measurements">Concept based cohort creation for measurements<a class="anchor" aria-label="anchor" href="#concept-based-cohort-creation-for-measurements"></a>

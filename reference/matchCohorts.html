@@ -105,6 +105,15 @@ considered. Cohorts not included will be removed from the cohort set.</p></dd>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>     intersect, setdiff, setequal, union</span>
 <span class="r-in"><span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="mockCohortConstructor.html">mockCohortConstructor</a></span><span class="op">(</span>nPerson <span class="op">=</span> <span class="fl">200</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #BBBB00;">!</span> 6 casted columns in <span style="font-weight: bold;">person</span> as do not match expected column type:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `gender_concept_id` from <span style="color: #0000BB;">numeric</span> to <span style="color: #0000BB;">integer</span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `year_of_birth` from <span style="color: #0000BB;">numeric</span> to <span style="color: #0000BB;">integer</span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `month_of_birth` from <span style="color: #0000BB;">numeric</span> to <span style="color: #0000BB;">integer</span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `day_of_birth` from <span style="color: #0000BB;">numeric</span> to <span style="color: #0000BB;">integer</span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `race_concept_id` from <span style="color: #0000BB;">logical</span> to <span style="color: #0000BB;">integer</span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `ethnicity_concept_id` from <span style="color: #0000BB;">logical</span> to <span style="color: #0000BB;">integer</span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #BBBB00;">!</span> 1 casted column in <span style="font-weight: bold;">observation_period</span> as do not match expected column type:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `period_type_concept_id` from <span style="color: #0000BB;">logical</span> to <span style="color: #0000BB;">integer</span></span>
 <span class="r-in"><span><span class="va">cdm</span><span class="op">$</span><span class="va">new_matched_cohort</span> <span class="op">&lt;-</span> <span class="va">cdm</span><span class="op">$</span><span class="va">cohort2</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu">matchCohorts</span><span class="op">(</span></span></span>
 <span class="r-in"><span>    name <span class="op">=</span> <span class="st">"new_matched_cohort"</span>,</span></span>
@@ -121,11 +130,35 @@ considered. Cohorts not included will be removed from the cohort set.</p></dd>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Creating copy of target cohort.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> 1 cohort to be matched.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Creating controls cohorts.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #BBBB00;">!</span> 2 casted columns in <span style="font-weight: bold;">tmp_004_og_035_1723582818 (cohort_attrition)</span> as do not</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   match expected column type:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `number_records` from <span style="color: #0000BB;">numeric</span> to <span style="color: #0000BB;">integer</span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `number_subjects` from <span style="color: #0000BB;">numeric</span> to <span style="color: #0000BB;">integer</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Excluding cases from controls</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #BBBB00;">!</span> 1 casted column in <span style="font-weight: bold;">tmp_004_og_035_1723582818 (cohort_attrition)</span> as do not</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   match expected column type:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `reason_id` from <span style="color: #0000BB;">numeric</span> to <span style="color: #0000BB;">integer</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Matching by gender_concept_id and year_of_birth</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #BBBB00;">!</span> 1 casted column in <span style="font-weight: bold;">tmp_004_og_034_1723582818 (cohort_attrition)</span> as do not</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   match expected column type:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `reason_id` from <span style="color: #0000BB;">numeric</span> to <span style="color: #0000BB;">integer</span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #BBBB00;">!</span> 1 casted column in <span style="font-weight: bold;">tmp_004_og_035_1723582818 (cohort_attrition)</span> as do not</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   match expected column type:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `reason_id` from <span style="color: #0000BB;">numeric</span> to <span style="color: #0000BB;">integer</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Removing controls that were not in observation at index date</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #BBBB00;">!</span> 1 casted column in <span style="font-weight: bold;">tmp_004_og_035_1723582818 (cohort_attrition)</span> as do not</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   match expected column type:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `reason_id` from <span style="color: #0000BB;">numeric</span> to <span style="color: #0000BB;">integer</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> cohort columns will be reordered to macth the expected order:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   cohort_definition_id, subject_id, cohort_start_date, and cohort_end_date.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Excluding target records whose pair is not in observation</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #BBBB00;">!</span> 1 casted column in <span style="font-weight: bold;">tmp_004_og_034_1723582818 (cohort_attrition)</span> as do not</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   match expected column type:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `reason_id` from <span style="color: #0000BB;">numeric</span> to <span style="color: #0000BB;">integer</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Adjusting ratio</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #BBBB00;">!</span> 1 casted column in <span style="font-weight: bold;">tmp_004_og_035_1723582818 (cohort_attrition)</span> as do not</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   match expected column type:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `reason_id` from <span style="color: #0000BB;">numeric</span> to <span style="color: #0000BB;">integer</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Binding both cohorts</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Done</span>
 <span class="r-in"><span><span class="va">cdm</span><span class="op">$</span><span class="va">new_matched_cohort</span></span></span>
@@ -133,16 +166,16 @@ considered. Cohorts not included will be removed from the cohort set.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: DuckDB v1.0.0 [unknown@Linux 6.5.0-1025-azure:R 4.4.1/:memory:]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    cohort_definition_id subject_id cohort_start_date cohort_end_date cluster_id</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>                    1        118 1975-11-28        1981-05-30               6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>                    1         56 2007-09-28        2008-07-15              18</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>                    1         63 2008-08-23        2008-09-02              19</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>                    1         20 1985-08-15        1990-06-06              27</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>                    1        117 2002-09-07        2003-04-27              30</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>                    1         19 2003-06-22        2005-07-21              36</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>                    1         84 1999-04-06        2000-04-12              42</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>                    1         81 2009-08-19        2010-12-05              46</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>                    1         94 2017-11-01        2018-07-05              59</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>                    1        119 1982-09-08        1989-01-29              67</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>                    1         94 2017-11-01        2018-07-05              59</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>                    1        119 1978-01-10        1982-09-07              65</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>                    1         62 2017-01-18        2017-04-26              74</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>                    1        120 2008-12-12        2009-02-06              79</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>                    1         83 2011-01-15        2011-02-06              94</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>                    1        118 1975-11-28        1981-05-30               6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>                    1         56 2007-09-28        2008-07-15              18</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>                    1         20 1990-06-07        1993-11-05              27</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>                    1        117 2002-09-07        2003-04-27              30</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>                    1         19 2003-06-22        2005-07-21              35</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ more rows</span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
