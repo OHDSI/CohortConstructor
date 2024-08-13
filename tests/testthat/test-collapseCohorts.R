@@ -178,3 +178,58 @@ test_that("out of observation", {
   PatientProfiles::mockDisconnect(cdm)
 })
 
+test_that("infitine", {
+
+  cdm <- omock::mockCdmFromTables()
+  cdm$person <- dplyr::tibble(
+    "person_id" = c(1, 2, 3),
+    "gender_concept_id" = 1,
+    "year_of_birth" = 1990,
+    "race_concept_id" = 1,
+    "ethnicity_concept_id" = 1
+  )
+  cdm$observation_period <-  dplyr::tibble(
+    "observation_period_id" = c(1, 2, 3),
+    "person_id" = c(1, 2, 3),
+    "observation_period_start_date" = as.Date("2000-01-01"),
+    "observation_period_end_date" = as.Date("2024-01-01"),
+    "period_type_concept_id" = 1
+  )
+  cdm$cohort <- dplyr::tibble(
+    "cohort_definition_id" = c(1,1,1,2),
+    "subject_id" = c(1, 2, 3, 3),
+    "cohort_start_date" = as.Date(c("2020-01-01", "2020-01-01",
+                                  "2020-01-01", "2021-01-01")),
+    "cohort_end_date" = as.Date(c("2022-01-01", "2022-01-01",
+                                "2022-01-01", "2023-01-01"))
+  )
+  cdm$cohort <- omopgenerics::newCohortTable(cdm$cohort)
+
+  cdm <- cdm |> copyCdm()
+  # for each person and each cohort id we should go from
+  # first cohort start to last cohort entry
+  cdm$cohort_collapsed <- cdm$cohort |>
+                  collapseCohorts(gap = Inf,
+                                  name = "cohort_collapsed")
+  expect_true(nrow(cdm$cohort_collapsed |>
+    dplyr::collect()) == 4)
+  expect_true(all(cdm$cohort_collapsed |>
+                     dplyr::filter(cohort_definition_id == 1) |>
+                     dplyr::pull("cohort_start_date") ==
+                as.Date("2020-01-01")))
+  expect_true(all(cdm$cohort_collapsed |>
+                    dplyr::filter(cohort_definition_id == 2) |>
+                    dplyr::pull("cohort_start_date") ==
+                    as.Date("2021-01-01")))
+
+  expect_true(all(cdm$cohort_collapsed |>
+                    dplyr::filter(cohort_definition_id == 1) |>
+                    dplyr::pull("cohort_end_date") ==
+                    as.Date("2022-01-01")))
+  expect_true(all(cdm$cohort_collapsed |>
+                    dplyr::filter(cohort_definition_id == 2) |>
+                    dplyr::pull("cohort_end_date") ==
+                    as.Date("2023-01-01")))
+
+
+})
