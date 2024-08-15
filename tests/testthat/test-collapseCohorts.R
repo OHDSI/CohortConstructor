@@ -202,9 +202,9 @@ test_that("infitine", {
     "cohort_end_date" = as.Date(c("2022-01-01", "2022-01-01",
                                 "2022-01-01", "2023-01-01"))
   )
-  cdm$cohort <- omopgenerics::newCohortTable(cdm$cohort)
 
   cdm <- cdm |> copyCdm()
+  cdm$cohort <- omopgenerics::newCohortTable(cdm$cohort)
   # for each person and each cohort id we should go from
   # first cohort start to last cohort entry
   cdm$cohort_collapsed <- cdm$cohort |>
