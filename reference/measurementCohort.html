@@ -159,15 +159,6 @@ independently of their value as number will be included.</p></dd>
 <span class="r-in"><span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu">CDMConnector</span><span class="fu">::</span><span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/copy_cdm_to.html" class="external-link">copyCdmTo</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  con <span class="op">=</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">duckdb</span><span class="fu">::</span><span class="fu"><a href="https://r.duckdb.org/reference/duckdb.html" class="external-link">duckdb</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  cdm <span class="op">=</span> <span class="va">cdm</span>, schema <span class="op">=</span> <span class="st">"main"</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #BBBB00;">!</span> 6 casted columns in <span style="font-weight: bold;">person</span> as do not match expected column type:</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `gender_concept_id` from <span style="color: #0000BB;">numeric</span> to <span style="color: #0000BB;">integer</span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `year_of_birth` from <span style="color: #0000BB;">numeric</span> to <span style="color: #0000BB;">integer</span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `month_of_birth` from <span style="color: #0000BB;">numeric</span> to <span style="color: #0000BB;">integer</span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `day_of_birth` from <span style="color: #0000BB;">numeric</span> to <span style="color: #0000BB;">integer</span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `race_concept_id` from <span style="color: #0000BB;">logical</span> to <span style="color: #0000BB;">integer</span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `ethnicity_concept_id` from <span style="color: #0000BB;">logical</span> to <span style="color: #0000BB;">integer</span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #BBBB00;">!</span> 1 casted column in <span style="font-weight: bold;">observation_period</span> as do not match expected column type:</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `period_type_concept_id` from <span style="color: #0000BB;">logical</span> to <span style="color: #0000BB;">integer</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">cdm</span><span class="op">$</span><span class="va">cohort</span> <span class="op">&lt;-</span> <span class="fu">measurementCohort</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  cdm <span class="op">=</span> <span class="va">cdm</span>,</span></span>
@@ -176,23 +167,21 @@ independently of their value as number will be included.</p></dd>
 <span class="r-in"><span>  valueAsConcept <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4124457</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  valueAsNumber <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"8876"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">70</span>, <span class="fl">120</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #BBBB00;">!</span> `codelist` contains numeric values, they are casted to integers.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Getting records in observation.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Applying measurement requirements.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Creating cohort attributes.</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #BBBB00;">!</span> 1 casted column in <span style="font-weight: bold;">cohort (cohort_codelist)</span> as do not match expected column</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span>   type:</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `concept_id` from <span style="color: #0000BB;">numeric</span> to <span style="color: #0000BB;">integer</span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #BBBB00;">!</span> 1 casted column in <span style="font-weight: bold;">cohort</span> as do not match expected column type:</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `subject_id` from <span style="color: #0000BB;">numeric</span> to <span style="color: #0000BB;">integer</span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #BBBB00;">!</span> 1 column in <span style="font-weight: bold;">cohort</span> do not match expected column type:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `subject_id` is <span style="color: #0000BB;">numeric</span> but expected <span style="color: #0000BB;">integer</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Cohort <span style="font-weight: bold;">cohort</span> created.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">cdm</span><span class="op">$</span><span class="va">cohort</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Source:   SQL [2 x 4]</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Source:   table&lt;main.cohort&gt; [2 x 4]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: DuckDB v1.0.0 [unknown@Linux 6.5.0-1025-azure:R 4.4.1/:memory:]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   cohort_definition_id subject_id cohort_start_date cohort_end_date</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>                    1          1 2000-07-01        2000-07-01     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>                    1          3 2015-02-19        2015-02-19     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>         </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>                    1          3 2015-02-19        2015-02-19     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>                    1          1 2000-07-01        2000-07-01     </span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
