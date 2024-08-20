@@ -149,6 +149,7 @@ unerafiedConceptCohort <- function(cdm,
     dplyr::filter(.data$domain_id %in% .env$domains)
 
   cohorts <- list()
+  tmpName <- omopgenerics::uniqueTableName()
   for (k in seq_along(tableRef$domain_id)) {
     domain <- tableRef$domain_id[k]
     table <- tableRef$table[k]
@@ -189,7 +190,8 @@ unerafiedConceptCohort <- function(cdm,
           utils::head(1) |>
           dplyr::tally() |>
           dplyr::pull("n") > 0) {
-        cohorts[[k]] <- tempCohort
+        cohorts[[k]] <- tempCohort |>
+          dplyr::compute(name = paste0(tmpName, k))
       }
     } else {
       cli::cli_warn(c(
@@ -210,9 +212,7 @@ unerafiedConceptCohort <- function(cdm,
   cohort <- Reduce(dplyr::union_all, cohorts) |>
     dplyr::compute(name = name, temporary = FALSE)
 
-  cohort <- cohort |>
-    dplyr::compute(name = name,
-                   temporary = FALSE)
+  omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with(tmpName))
 
   return(cohort)
 }
