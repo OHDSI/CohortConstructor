@@ -89,7 +89,7 @@ trimDemographics <- function(cohort,
   }
 
   newSet <- reqDemographicsCohortSet(set = settings(cohort),
-                                     targetIds = cohortId,
+                                     targetIds = as.integer(cohortId),
                                      ageRange = ageRange,
                                      sex = sex,
                                      minPriorObservation = minPriorObservation,
@@ -107,15 +107,31 @@ trimDemographics <- function(cohort,
     dplyr::left_join(
       cdm[[tmpName]] |>
         dplyr::mutate(
-          target_cohort_rand01 = dplyr::if_else(
-            is.na(.data$target_cohort_rand01), .data$cohort_definition_id, .data$target_cohort_rand01
+          target_cohort_rand01 = as.integer(dplyr::if_else(
+            is.na(.data$target_cohort_rand01),
+            .data$cohort_definition_id,
+            .data$target_cohort_rand01
           )
-        ) |>
+        )) |>
         dplyr::rename("sex_req" = "sex"),
       by = "target_cohort_rand01",
       relationship = "many-to-many"
     ) |>
-    dplyr::compute(name = tmpNewCohort, temporary = FALSE) |>
+    dplyr::compute(name = tmpNewCohort, temporary = FALSE)
+
+  # make sure cohort variables are first
+  orderVars <- c("cohort_definition_id",
+                 "subject_id",
+                 "cohort_start_date",
+                 "cohort_end_date",
+                 colnames(newCohort)[!colnames(newCohort) %in%
+                                       c("cohort_definition_id",
+                                         "subject_id",
+                                         "cohort_start_date",
+                                         "cohort_end_date")])
+
+    newCohort <- newCohort |>
+    dplyr::select(dplyr::all_of(orderVars)) |>
     omopgenerics::newCohortTable(
       cohortSetRef = newSet,
       cohortAttritionRef = newAtt,

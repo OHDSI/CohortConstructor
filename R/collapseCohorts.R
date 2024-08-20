@@ -26,7 +26,9 @@ collapseCohorts <- function(cohort,
   cohort <- validateCohortTable(cohort, dropExtraColumns = TRUE)
   ids <- settings(cohort)$cohort_definition_id
   cohortId <- validateCohortId(cohortId, ids)
+  if(gap != Inf){
   gap <- validateGap(gap)
+  }
 
   # temp tables
   tablePrefix <- omopgenerics::tmpPrefix()
@@ -46,8 +48,12 @@ collapseCohorts <- function(cohort,
       dplyr::compute(name = tmpNewCohort, temporary = FALSE)
   }
 
-  if (gap > 0) {
-    newCohort <- newCohort |> joinOverlap(gap = gap)
+  if(gap == Inf){
+    newCohort <- newCohort |>
+      joinAll()
+  } else if (gap > 0) {
+    newCohort <- newCohort |>
+      joinOverlap(gap = gap)
   }
 
   if (!all(ids %in% cohortId)) {

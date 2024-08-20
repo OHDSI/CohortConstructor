@@ -49,11 +49,11 @@ demographicsCohort <- function(cdm,
       "cohort_start_date" = "observation_period_start_date",
       "cohort_end_date" = "observation_period_end_date"
     ) |>
-    dplyr::mutate("cohort_definition_id" = 1) |>
+    dplyr::mutate("cohort_definition_id" = 1L) |>
     dplyr::compute(name = name, temporary = FALSE) |>
     omopgenerics::newCohortTable(
       cohortSetRef = dplyr::tibble(
-        "cohort_definition_id" = 1, "cohort_name" = "demographics"
+        "cohort_definition_id" = 1L, "cohort_name" = "demographics"
       ),
       cohortAttritionRef = NULL,
       cohortCodelistRef = NULL,

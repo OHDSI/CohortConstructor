@@ -301,7 +301,7 @@ splitOverlap <- function(x,
     dplyr::compute()
 }
 
-#' Join overlapping periods in single periods.
+#' Join overlapping periods in single periods using gap.
 #'
 #' @param x Table in the cdm.
 #' @param gap Distance between exposures to consider that they overlap.
@@ -373,6 +373,39 @@ joinOverlap <- function(cohort,
 
   return(x)
 }
+
+#' Join all periods into single periods.
+#'
+#' @param x Table in the cdm.
+#' @param startDate Column that indicates the start of periods.
+#' @param endDate Column that indicates the end of periods.
+#' @param by Variables to group by.
+#'
+#' @noRd
+#'
+#' @return Table in the cdm with startDate, endDate and by as columns. Periods are not
+#' going to overlap between each other.
+#'
+joinAll <- function(cohort,
+                    startDate = "cohort_start_date",
+                    endDate = "cohort_end_date",
+                    by = c("cohort_definition_id", "subject_id")) {
+
+  if (cohort |> dplyr::tally() |> dplyr::pull("n") == 0) {
+    return(cohort)
+  }
+
+  x <- cohort |>
+    dplyr::group_by(dplyr::across(by)) |>
+    dplyr::summarise(cohort_start_date =
+                       min(.data$cohort_start_date, na.rm = TRUE),
+                     cohort_end_date =
+                       max(.data$cohort_end_date, na.rm = TRUE)) |>
+    dplyr::ungroup()
+
+  return(x)
+}
+
 
 #' Get random identifiers not present in a table based on a prefix.
 #'
