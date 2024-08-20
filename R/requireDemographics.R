@@ -345,7 +345,20 @@ demographicsFilter <- function(cohort,
         dplyr::rename("sex_req" = "sex"),
       by = "target_cohort_rand01",
       relationship = "many-to-many"
-    ) |>
+    )
+
+  orderVars <- c("cohort_definition_id",
+                 "subject_id",
+                 "cohort_start_date",
+                 "cohort_end_date",
+                 colnames(workingTable)[!colnames(workingTable) %in%
+                                       c("cohort_definition_id",
+                                         "subject_id",
+                                         "cohort_start_date",
+                                         "cohort_end_date")])
+
+  workingTable <- workingTable |>
+    dplyr::select(dplyr::all_of(orderVars)) |>
     dplyr::compute(name = workingName, temporary = FALSE) |>
     omopgenerics::newCohortTable(
       cohortSetRef = newSet,

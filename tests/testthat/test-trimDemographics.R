@@ -4,31 +4,31 @@ test_that("simple duckdb checks", {
   cdm <- omopgenerics::cdmFromTables(
     tables = list(
       "person" = dplyr::tibble(
-        "person_id" = c(1, 2, 3),
-        "gender_concept_id" = c(8507, 8532, 8532),
-        "year_of_birth" = c(1993, 2000, 2005),
-        "month_of_birth" = c(4, 1, 8),
-        "day_of_birth" = c(19, 15, 20),
-        "race_concept_id" = 0,
-        "ethnicity_concept_id" = 0
+        "person_id" = as.integer(c(1, 2, 3)),
+        "gender_concept_id" = as.integer(c(8507, 8532, 8532)),
+        "year_of_birth" = as.integer(c(1993, 2000, 2005)),
+        "month_of_birth" = as.integer(c(4, 1, 8)),
+        "day_of_birth" = as.integer(c(19, 15, 20)),
+        "race_concept_id" = as.integer(0),
+        "ethnicity_concept_id" = as.integer(0)
       ),
       "observation_period" = dplyr::tibble(
-        "observation_period_id" = 1:4,
-        "person_id" = c(1, 2, 2, 3),
+        "observation_period_id" = as.integer(1:4),
+        "person_id" = as.integer(c(1, 2, 2, 3)),
         "observation_period_start_date" = as.Date(c(
           "1993-04-19", "2010-03-12", "2031-08-23", "2020-10-06"
         )),
         "observation_period_end_date" = as.Date(c(
           "2033-10-11", "2017-01-01", "2045-03-12", "2100-12-31"
         )),
-        "period_type_concept_id" = 0
+        "period_type_concept_id" = as.integer(0)
       )
     ),
     cdmName = "test cohortconstructor",
     cohortTables = list(
       "cohort1" = dplyr::tibble(
-        "cohort_definition_id" = c(1, 1, 1, 2),
-        "subject_id" = c(1, 2, 3, 1),
+        "cohort_definition_id" = as.integer(c(1, 1, 1, 2)),
+        "subject_id" = as.integer(c(1, 2, 3, 1)),
         "cohort_start_date" = as.Date(c(
           "2032-01-19", "2039-11-12", "2036-03-16", "2003-12-15"
         )),
@@ -68,7 +68,7 @@ test_that("simple duckdb checks", {
   expect_identical(
     x,
     dplyr::tibble(
-      "subject_id" = c(1, 2, 3),
+      "subject_id" = as.integer(c(1, 2, 3)),
       "cohort_start_date" = as.Date(c(
         "2033-04-19", "2040-01-15", "2045-08-20"
       )),
@@ -89,7 +89,7 @@ test_that("simple duckdb checks", {
   expect_identical(
     x,
     dplyr::tibble(
-      "subject_id" = c(2, 3),
+      "subject_id" = as.integer(c(2, 3)),
       "cohort_start_date" = as.Date(c("2040-01-15", "2045-08-20")),
       "cohort_end_date" = as.Date(c("2045-01-12", "2065-08-19"))
     )
@@ -156,7 +156,7 @@ test_that("simple duckdb checks", {
   expect_identical(
     x,
     dplyr::tibble(
-      "subject_id" = c(1, 2, 3),
+      "subject_id" = as.integer(c(1, 2, 3)),
       "cohort_start_date" = as.Date(c("1993-04-19", "2010-03-12", "2020-10-06")),
       "cohort_end_date" = as.Date(c("2013-04-18", "2017-01-01", "2025-08-19"))
     )
@@ -172,7 +172,7 @@ test_that("simple duckdb checks", {
   expect_identical(
     x,
     dplyr::tibble(
-      "subject_id" = c(1, 2, 3),
+      "subject_id" = as.integer(c(1, 2, 3)),
       "cohort_start_date" = as.Date(c("1994-04-19", "2011-03-12", "2021-10-06")),
       "cohort_end_date" = as.Date(c("2013-04-18", "2017-01-01", "2025-08-19"))
     )
@@ -195,10 +195,10 @@ test_that("simple duckdb checks", {
         sex == val & age_range == "0_Inf" & min_prior_observation == 0 &
           min_future_observation == 0
       ) |>
-      dplyr::pull(cohort_definition_id)
+      dplyr::pull("cohort_definition_id")
     id2 <- settings(cdm$obs2) |>
       dplyr::filter(sex == val) |>
-      dplyr::pull(cohort_definition_id)
+      dplyr::pull("cohort_definition_id")
     expect_true(compareCohort(cdm$obs1, id1, cdm$obs2, id2))
   }
 
@@ -220,12 +220,12 @@ test_that("simple duckdb checks", {
         sex == "Both" & age_range == val[k] & min_prior_observation == 0 &
           min_future_observation == 0
       ) |>
-      dplyr::pull(cohort_definition_id)
+      dplyr::pull("cohort_definition_id")
     id2 <- settings(cdm$obs3) |>
       dplyr::filter(
         age_range == val[k]
       ) |>
-      dplyr::pull(cohort_definition_id)
+      dplyr::pull("cohort_definition_id")
     expect_true(compareCohort(cdm$obs1, id1, cdm$obs3, id2))
   }
 
@@ -245,10 +245,10 @@ test_that("simple duckdb checks", {
         sex == "Both" & age_range == "0_Inf" & min_prior_observation == val &
           min_future_observation == 0
       ) |>
-      dplyr::pull(cohort_definition_id)
+      dplyr::pull("cohort_definition_id")
     id2 <- settings(cdm$obs4) |>
       dplyr::filter(min_prior_observation == val) |>
-      dplyr::pull(cohort_definition_id)
+      dplyr::pull("cohort_definition_id")
     expect_true(compareCohort(cdm$obs1, id1, cdm$obs4, id2))
   }
 
@@ -268,10 +268,10 @@ test_that("simple duckdb checks", {
         sex == "Both" & age_range == "0_Inf" & min_prior_observation == 0 &
           min_future_observation == val
       ) |>
-      dplyr::pull(cohort_definition_id)
+      dplyr::pull("cohort_definition_id")
     id2 <- settings(cdm$obs5) |>
       dplyr::filter(min_future_observation == val) |>
-      dplyr::pull(cohort_definition_id)
+      dplyr::pull("cohort_definition_id")
     expect_true(compareCohort(cdm$obs1, id1, cdm$obs5, id2))
   }
 
@@ -291,7 +291,7 @@ test_that("simple duckdb checks", {
   expect_identical(
     x,
     dplyr::tibble(
-      "subject_id" = c(1, 2, 3),
+      "subject_id" = as.integer(c(1, 2, 3)),
       "cohort_start_date" = as.Date(c("1993-04-19", "2010-03-12", "2020-10-06")),
       "cohort_end_date" = as.Date(c("2013-04-18", "2017-01-01", "2025-08-19"))
     )
@@ -303,7 +303,7 @@ test_that("simple duckdb checks", {
   expect_identical(
     x,
     dplyr::tibble(
-      "subject_id" = c(1, 2),
+      "subject_id" = as.integer(c(1, 2)),
       "cohort_start_date" = as.Date(c("1998-04-18", "2015-03-11")),
       "cohort_end_date" = as.Date(c("2013-04-18", "2017-01-01"))
     )
@@ -315,7 +315,7 @@ test_that("simple duckdb checks", {
   expect_identical(
     x,
     dplyr::tibble(
-      "subject_id" = 1,
+      "subject_id" = as.integer(1),
       "cohort_start_date" = as.Date(c("2001-07-06")),
       "cohort_end_date" = as.Date(c("2013-04-18"))
     )
@@ -375,7 +375,7 @@ test_that("cohort Id, name, additional columns", {
   expect_equal(
     settings(cdm$cohort3),
     dplyr::tibble(
-      cohort_definition_id = 1:3,
+      cohort_definition_id = as.integer(1:3),
       cohort_name = c("cohort_1_1", "cohort_2", "cohort_1_2"),
       sex = c("Male", "Both", "Male"),
       min_prior_observation = c(0, 0, 400)
