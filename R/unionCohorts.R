@@ -29,10 +29,10 @@
 #'
 #' }
 unionCohorts <- function(cohort,
-                        cohortId = NULL,
-                        gap = 0,
-                        cohortName = NULL,
-                        name = tableName(cohort)) {
+                         cohortId = NULL,
+                         gap = 0,
+                         cohortName = NULL,
+                         name = tableName(cohort)) {
   # checks
   name <- validateName(name)
   validateCohortTable(cohort)
@@ -75,13 +75,6 @@ unionCohorts <- function(cohort,
     return(cohort)
   }
 
-  # union cohort
-  newCohort <- cohort |>
-    dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>
-    joinOverlap(by = "subject_id", gap = gap) |>
-    dplyr::mutate(cohort_definition_id = 1) |>
-    dplyr::compute(name = name, temporary = FALSE)
-
   # cohort set
   names <- omopgenerics::settings(cohort)|>
     dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>
@@ -93,17 +86,12 @@ unionCohorts <- function(cohort,
     cohort_definition_id = 1, cohort_name = cohortName, gap = gap
   )
 
-  # cohort attrition
-  cohAtt <- newCohort |>
-    dplyr::group_by(.data$cohort_definition_id) |>
-    dplyr::summarise(number_records = dplyr::n(),
-                     number_subjects = dplyr::n_distinct(.data$subject_id)) |>
-    dplyr::mutate(
-      "reason_id" = 1,
-      "reason" = "Initial qualifying events",
-      "excluded_records" = 0,
-      "excluded_subjects" = 0
-    )
+  # union cohort
+  newCohort <- cohort |>
+    dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>
+    joinOverlap(by = "subject_id", gap = gap) |>
+    dplyr::mutate(cohort_definition_id = 1) |>
+    dplyr::compute(name = name, temporary = FALSE)
 
   # concept list
   cohCodelist <- attr(cohort, "cohort_codelist")
@@ -115,7 +103,7 @@ unionCohorts <- function(cohort,
   newCohort <- newCohort |>
     omopgenerics::newCohortTable(
       cohortSetRef = cohSet,
-      cohortAttritionRef = cohAtt,
+      cohortAttritionRef = NULL,
       cohortCodelistRef = cohCodelist,
       .softValidation = TRUE
     )

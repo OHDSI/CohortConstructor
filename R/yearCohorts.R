@@ -145,8 +145,8 @@ yearCohorts <- function(cohort,
           dplyr::mutate(
             "excluded_subjects" = .data$excluded_subjects - .data$number_subjects,
             "excluded_records" = .data$excluded_records - .data$number_records,
-            "reason_id" = .data$reason_id + 1,
-            "reason" = .env$reason
+            "reason_id" = .data$reason_id + 1L,
+            "reason" = .env$reason |> as.character()
           )
       )
   }
