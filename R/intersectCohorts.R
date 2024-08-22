@@ -324,6 +324,8 @@ joinOverlap <- function(cohort,
     return(cohort)
   }
 
+  cohortTblName <- omopgenerics::tableName(cohort)
+
   start <- cohort |>
     dplyr::rename("date" := !!startDate) |>
     dplyr::select(dplyr::all_of(c(by, "date"))) |>
@@ -338,9 +340,13 @@ joinOverlap <- function(cohort,
         date = "date", number = gap, interval = "day"
       )))
   }
+  workingTbl <- omopgenerics::uniqueTableName()
   x <- start |>
     dplyr::union_all(end) |>
-    dplyr::group_by_at(by) |>
+    dplyr::compute(temporary = FALSE,
+                   name = workingTbl)
+  x <- x |>
+    dplyr::group_by(dplyr::pick(by)) |>
     dplyr::arrange(.data$date, .data$date_id) |>
     dplyr::mutate("cum_id" = cumsum(.data$date_id)) |>
     dplyr::filter(
@@ -369,7 +375,11 @@ joinOverlap <- function(cohort,
 
   x <- x |>
     dplyr::relocate(dplyr::all_of(c(by, startDate, endDate))) |>
-    dplyr::distinct()
+    dplyr::distinct() |>
+    dplyr::compute(temporary = FALSE,
+                   name = cohortTblName)
+
+  omopgenerics::dropTable(cdm = cdm, name = workingTbl)
 
   return(x)
 }

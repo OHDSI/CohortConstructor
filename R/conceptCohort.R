@@ -108,10 +108,9 @@ conceptCohort <- function(cdm,
   }
 
   cli::cli_inform(c("i" = "Collapsing records."))
-  cdm[[name]] <- fulfillCohortReqs(cdm = cdm, name = name) |>
-    dplyr::compute(name = name,
-                   temporary = FALSE,
-                   overwrite = TRUE)
+  cdm[[name]] <- fulfillCohortReqs(cdm = cdm, name = name)
+  cdm[[name]] <- cdm[[name]] |>
+    joinOverlap(gap = 0)
 
   cli::cli_inform(c("i" = "Creating cohort attributes."))
   cdm[[name]] <- cdm[[name]] |>
@@ -149,6 +148,9 @@ unerafiedConceptCohort <- function(cdm,
     dplyr::filter(.data$domain_id %in% .env$domains)
 
   cohorts <- list()
+  workingTblNames <- paste0(omopgenerics::uniqueTableName(),
+                            "_",
+                            1:length(tableRef$domain_id))
   for (k in seq_along(tableRef$domain_id)) {
     domain <- tableRef$domain_id[k]
     table <- tableRef$table[k]
@@ -183,7 +185,9 @@ unerafiedConceptCohort <- function(cdm,
           .data$cohort_start_date,
           .data$cohort_end_date
         )) |>
-        dplyr::filter(.data$cohort_start_date <= .data$cohort_end_date)
+        dplyr::filter(.data$cohort_start_date <= .data$cohort_end_date) |>
+        dplyr::compute(temporary = FALSE,
+                       name = workingTblNames[k])
       cohorts[[domain]] <- tempCohort
       if (tempCohort |>
           utils::head(1) |>
@@ -214,6 +218,8 @@ unerafiedConceptCohort <- function(cdm,
     dplyr::compute(name = name,
                    temporary = FALSE)
 
+  omopgenerics::dropTable(cdm, name = workingTblNames)
+
   return(cohort)
 }
 
@@ -237,7 +243,7 @@ fulfillCohortReqs <- function(cdm, name){
     dplyr::select(
       -"prior_observation", -"future_observation", -"concept_id"
     ) |>
-    joinOverlap(gap = 0)
+    dplyr::compute(temporary = FALSE, name = name)
 }
 
 
