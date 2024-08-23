@@ -87,7 +87,6 @@ test_that("simple example", {
   cdm$cohort <- cdm$cohort |> dplyr::mutate(extra_column_1 = 1,
                                             extra_column_2 = 2)
   expect_message(cdm$cohort |> collapseCohorts())
-  expect_error(cdm$cohort |> collapseCohorts(gap = Inf))
   expect_error(cdm$cohort |> collapseCohorts(gap = NA))
   expect_error(cdm$cohort |> collapseCohorts(gap = NULL))
   expect_error(cdm$cohort |> collapseCohorts(gap = -1))

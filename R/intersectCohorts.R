@@ -324,6 +324,7 @@ joinOverlap <- function(cohort,
     return(cohort)
   }
 
+  cdm <- omopgenerics::cdmReference(cohort)
   cohortTblName <- omopgenerics::tableName(cohort)
 
   start <- cohort |>
