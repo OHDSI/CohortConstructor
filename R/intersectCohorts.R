@@ -320,6 +320,8 @@ joinOverlap <- function(cohort,
                         endDate = "cohort_end_date",
                         by = c("cohort_definition_id", "subject_id")) {
 
+  omopgenerics::validateCohortArgument(cohort)
+
   if (cohort |> dplyr::tally() |> dplyr::pull("n") == 0) {
     return(cohort)
   }
