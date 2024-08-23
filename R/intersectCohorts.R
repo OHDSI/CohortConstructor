@@ -173,8 +173,9 @@ intersectCohorts <- function(cohort,
   cdm <- omopgenerics::dropTable(cdm = cdm, name = tempName)
 
   if (cohortOut |> dplyr::tally() |> dplyr::pull("n") > 0) {
-    cohortOut <- joinOverlap(cohort = cohortOut, gap = gap) %>%
-      dplyr::compute(name = name, temporary = FALSE)
+    cohortOut <- cohortOut %>%
+      dplyr::compute(name = name, temporary = FALSE) |>
+      joinOverlap(name = name, gap = gap)
   }
 
   if (!mutuallyExclusive) {
@@ -304,6 +305,7 @@ splitOverlap <- function(x,
 #' Join overlapping periods in single periods using gap.
 #'
 #' @param x Table in the cdm.
+#' @param name Table name
 #' @param gap Distance between exposures to consider that they overlap.
 #' @param startDate Column that indicates the start of periods.
 #' @param endDate Column that indicates the end of periods.
@@ -315,19 +317,17 @@ splitOverlap <- function(x,
 #' going to overlap between each other.
 #'
 joinOverlap <- function(cohort,
+                        name,
                         gap = 0,
                         startDate = "cohort_start_date",
                         endDate = "cohort_end_date",
                         by = c("cohort_definition_id", "subject_id")) {
-
-  omopgenerics::validateCohortArgument(cohort)
 
   if (cohort |> dplyr::tally() |> dplyr::pull("n") == 0) {
     return(cohort)
   }
 
   cdm <- omopgenerics::cdmReference(cohort)
-  cohortTblName <- omopgenerics::tableName(cohort)
 
   start <- cohort |>
     dplyr::rename("date" := !!startDate) |>
@@ -380,7 +380,7 @@ joinOverlap <- function(cohort,
     dplyr::relocate(dplyr::all_of(c(by, startDate, endDate))) |>
     dplyr::distinct() |>
     dplyr::compute(temporary = FALSE,
-                   name = cohortTblName)
+                   name = name)
 
   omopgenerics::dropTable(cdm = cdm, name = workingTbl)
 

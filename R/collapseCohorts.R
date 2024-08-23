@@ -53,7 +53,8 @@ collapseCohorts <- function(cohort,
       joinAll()
   } else if (gap > 0) {
     newCohort <- newCohort |>
-      joinOverlap(gap = gap)
+      joinOverlap(name = name,
+                  gap = gap)
   }
 
   if (!all(ids %in% cohortId)) {

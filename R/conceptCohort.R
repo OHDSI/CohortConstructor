@@ -107,11 +107,6 @@ conceptCohort <- function(cdm,
     return(cdm[[name]])
   }
 
-  cli::cli_inform(c("i" = "Collapsing records."))
-  cdm[[name]] <- fulfillCohortReqs(cdm = cdm, name = name)
-  cdm[[name]] <- cdm[[name]] |>
-    joinOverlap(gap = 0)
-
   cli::cli_inform(c("i" = "Creating cohort attributes."))
   cdm[[name]] <- cdm[[name]] |>
     omopgenerics::newCohortTable(
@@ -120,6 +115,18 @@ conceptCohort <- function(cdm,
       cohortCodelistRef = cohortCodelist,
       .softValidation = TRUE
     )
+
+  cli::cli_inform(c("i" = "Applying cohort requirements."))
+  cdm[[name]] <- fulfillCohortReqs(cdm = cdm, name = name) |>
+    omopgenerics::recordCohortAttrition("cohort requirements")
+
+  cli::cli_inform(c("i" = "Collapsing records."))
+  cdm[[name]] <- cdm[[name]] |>
+    joinOverlap(name = name,
+                gap = 0) |>
+    omopgenerics::recordCohortAttrition("Overlapping records collapsed")
+
+
 
   cli::cli_inform(c("v" = "Cohort {.strong {name}} created."))
 

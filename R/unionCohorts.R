@@ -89,7 +89,8 @@ unionCohorts <- function(cohort,
   # union cohort
   newCohort <- cohort |>
     dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>
-    joinOverlap(by = "subject_id", gap = gap) |>
+    joinOverlap(name = name,
+                by = "subject_id", gap = gap) |>
     dplyr::mutate(cohort_definition_id = 1) |>
     dplyr::compute(name = name, temporary = FALSE)
 
