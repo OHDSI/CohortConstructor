@@ -173,8 +173,9 @@ intersectCohorts <- function(cohort,
   cdm <- omopgenerics::dropTable(cdm = cdm, name = tempName)
 
   if (cohortOut |> dplyr::tally() |> dplyr::pull("n") > 0) {
-    cohortOut <- joinOverlap(cohort = cohortOut, gap = gap) %>%
-      dplyr::compute(name = name, temporary = FALSE)
+    cohortOut <- cohortOut %>%
+      dplyr::compute(name = name, temporary = FALSE) |>
+      joinOverlap(name = name, gap = gap)
   }
 
   if (!mutuallyExclusive) {
@@ -304,6 +305,7 @@ splitOverlap <- function(x,
 #' Join overlapping periods in single periods using gap.
 #'
 #' @param x Table in the cdm.
+#' @param name Table name
 #' @param gap Distance between exposures to consider that they overlap.
 #' @param startDate Column that indicates the start of periods.
 #' @param endDate Column that indicates the end of periods.
@@ -315,6 +317,7 @@ splitOverlap <- function(x,
 #' going to overlap between each other.
 #'
 joinOverlap <- function(cohort,
+                        name,
                         gap = 0,
                         startDate = "cohort_start_date",
                         endDate = "cohort_end_date",
@@ -323,6 +326,8 @@ joinOverlap <- function(cohort,
   if (cohort |> dplyr::tally() |> dplyr::pull("n") == 0) {
     return(cohort)
   }
+
+  cdm <- omopgenerics::cdmReference(cohort)
 
   start <- cohort |>
     dplyr::rename("date" := !!startDate) |>
@@ -338,9 +343,13 @@ joinOverlap <- function(cohort,
         date = "date", number = gap, interval = "day"
       )))
   }
+  workingTbl <- omopgenerics::uniqueTableName()
   x <- start |>
     dplyr::union_all(end) |>
-    dplyr::group_by_at(by) |>
+    dplyr::compute(temporary = FALSE,
+                   name = workingTbl)
+  x <- x |>
+    dplyr::group_by(dplyr::pick(by)) |>
     dplyr::arrange(.data$date, .data$date_id) |>
     dplyr::mutate("cum_id" = cumsum(.data$date_id)) |>
     dplyr::filter(
@@ -369,7 +378,11 @@ joinOverlap <- function(cohort,
 
   x <- x |>
     dplyr::relocate(dplyr::all_of(c(by, startDate, endDate))) |>
-    dplyr::distinct()
+    dplyr::distinct() |>
+    dplyr::compute(temporary = FALSE,
+                   name = name)
+
+  omopgenerics::dropTable(cdm = cdm, name = workingTbl)
 
   return(x)
 }

@@ -51,9 +51,9 @@ exitAtObservationEnd <- function(cohort,
         .data$cohort_end_date
       )
     ) |>
-    # no overlapping periods
-    joinOverlap() |>
     dplyr::compute(name = name, temporary = FALSE) |>
+    # no overlapping periods
+    joinOverlap(name = name) |>
     omopgenerics::newCohortTable(.softValidation = TRUE) |>
     omopgenerics::recordCohortAttrition(
       reason = "Exit at observation period end date",
@@ -115,20 +115,26 @@ exitAtDeath <- function(cohort,
         .data$date_of_death,
         .data$cohort_end_date
       )
-    ) %>%
-    {if (requireDeath) {
-      dplyr::filter(
-        .,
-        !is.na(.data$date_of_death) | !.data$cohort_definition_id %in% .env$cohortId
+    )
+
+  if (requireDeath) {
+    newCohort <- newCohort |>
+      dplyr::filter(!is.na(.data$date_of_death) |
+                      !.data$cohort_definition_id %in% .env$cohortId
       ) |>
         dplyr::compute(name = name, temporary = FALSE) |>
         omopgenerics::recordCohortAttrition(
           reason = "No death recorded",
           cohortId = cohortId
         )
-    } else . } |>
+  } else {
+    newCohort <- newCohort |>
+      dplyr::compute(name = name, temporary = FALSE)
+    }
+
+  newCohort <- newCohort |>
     # no overlapping periods
-    joinOverlap() |>
+    joinOverlap(name = name) |>
     dplyr::compute(name = name, temporary = FALSE) |>
     omopgenerics::newCohortTable(.softValidation = TRUE) |>
     omopgenerics::recordCohortAttrition(
