@@ -186,10 +186,6 @@ unerafiedConceptCohort <- function(cdm,
             dplyr::select("concept_id", "cohort_definition_id"),
           by = "concept_id"
         ) |>
-        dplyr::filter(!is.na(.data$cohort_start_date),
-                      .data$cohort_start_date <= .data$cohort_end_date) |>
-        dplyr::mutate(cohort_end_date = dplyr::coalesce(.data$cohort_end_date,
-                                                        .data$cohort_start_date)) |>
         dplyr::compute(temporary = FALSE,
                        name = workingTblNames[k])
       cohorts[[domain]] <- tempCohort
@@ -216,6 +212,11 @@ unerafiedConceptCohort <- function(cdm,
 
   cli::cli_inform(c("i" = "Combining tables."))
   cohort <- Reduce(dplyr::union_all, cohorts) |>
+    dplyr::compute(name = name, temporary = FALSE) |>
+    dplyr::filter(!is.na(.data$cohort_start_date),
+                .data$cohort_start_date <= .data$cohort_end_date) |>
+    dplyr::mutate(cohort_end_date = dplyr::coalesce(.data$cohort_end_date,
+                                                    .data$cohort_start_date)) |>
     dplyr::compute(name = name, temporary = FALSE)
 
   omopgenerics::dropTable(cdm, name = workingTblNames)
@@ -234,7 +235,6 @@ fulfillCohortReqs <- function(cdm, name){
       futureObservationType = "date"
     ) |>
     dplyr::compute(temporary = FALSE, name = name)
-  Sys.sleep(1)
   cdm[[name]] |>
     dplyr::filter(
       .data$prior_observation <= .data$cohort_start_date
