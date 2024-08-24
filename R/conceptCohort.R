@@ -186,13 +186,10 @@ unerafiedConceptCohort <- function(cdm,
             dplyr::select("concept_id", "cohort_definition_id"),
           by = "concept_id"
         ) |>
-        dplyr::filter(!is.na(.data$cohort_start_date)) |>
-        dplyr::mutate(cohort_end_date = dplyr::if_else(
-          is.na(.data$cohort_end_date),
-          .data$cohort_start_date,
-          .data$cohort_end_date
-        )) |>
-        dplyr::filter(.data$cohort_start_date <= .data$cohort_end_date) |>
+        dplyr::filter(!is.na(.data$cohort_start_date),
+                      .data$cohort_start_date <= .data$cohort_end_date) |>
+        dplyr::mutate(cohort_end_date = dplyr::coalesce(.data$cohort_end_date,
+                                                        .data$cohort_start_date)) |>
         dplyr::compute(temporary = FALSE,
                        name = workingTblNames[k])
       cohorts[[domain]] <- tempCohort
@@ -221,10 +218,6 @@ unerafiedConceptCohort <- function(cdm,
   cohort <- Reduce(dplyr::union_all, cohorts) |>
     dplyr::compute(name = name, temporary = FALSE)
 
-  cohort <- cohort |>
-    dplyr::compute(name = name,
-                   temporary = FALSE)
-
   omopgenerics::dropTable(cdm, name = workingTblNames)
 
   return(cohort)
@@ -233,13 +226,16 @@ unerafiedConceptCohort <- function(cdm,
 fulfillCohortReqs <- function(cdm, name){
   # if start is out of observation, drop cohort entry
   # if end is after observation end, set cohort end as observation end
-  cdm[[name]] |>
-    PatientProfiles::addDemographics(
+  cdm[[name]] <- cdm[[name]] |>
+    PatientProfiles::addDemographicsQuery(
       age = FALSE,
       sex = FALSE,
       priorObservationType = "date",
       futureObservationType = "date"
     ) |>
+    dplyr::compute(temporary = FALSE, name = name)
+  Sys.sleep(1)
+  cdm[[name]] |>
     dplyr::filter(
       .data$prior_observation <= .data$cohort_start_date
     ) |>
