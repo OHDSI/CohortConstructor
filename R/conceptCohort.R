@@ -28,6 +28,8 @@
 #' @param conceptSet A conceptSet, which can either be a codelist
 #' or a conceptSetExpression.
 #' @param name Name of the cohort in the cdm object.
+#' @param useIndexes Whether to apply indexes to cohort table.
+#' Currently will only be applied if using Postgres.
 #'
 #' @export
 #'
@@ -45,7 +47,8 @@
 #' }
 conceptCohort <- function(cdm,
                           conceptSet,
-                          name) {
+                          name,
+                          useIndexes = TRUE) {
 
   # initial input validation
   cdm <- validateCdm(cdm)
@@ -115,6 +118,11 @@ conceptCohort <- function(cdm,
       cohortCodelistRef = cohortCodelist,
       .softValidation = TRUE
     )
+
+  if(isTRUE(useIndexes)){
+  cli::cli_inform("Adding indexes to cohort table")
+  addCohortTableIndexes(cdm = cdm, name = name)
+  }
 
   cli::cli_inform(c("i" = "Applying cohort requirements."))
   cdm[[name]] <- fulfillCohortReqs(cdm = cdm, name = name) |>
@@ -318,4 +326,20 @@ reportConceptsFromUnsopportedDomains <- function(cdm,
       "x" = "Domain {.strong {ud$domain_id[k]}} ({ud$n[k]} concept{?s}) excluded because it is not supported."
     ))
   }
+}
+
+addCohortTableIndexes <- function(cdm, name){
+
+  # if postgres
+  dbType <- attr(attr(cdm[[name]], "tbl_source"), "source_type")
+  if(dbType == "postgresql"){
+   con <- attr(attr(cdm[[name]], "tbl_source"), "dbcon")
+   schema <- attr(attr(cdm[[name]], "tbl_source"), "write_schema")[["schema"]]
+   prefix <- attr(attr(cdm[[name]], "tbl_source"), "write_schema")[["prefix"]]
+   query <- paste0("CREATE INDEX idx_subject_id_cohort_start_date ON ",
+                   paste0(schema,".", prefix, name),
+                   " (subject_id, cohort_start_date);")
+   suppressMessages(DBI::dbExecute(con, query))
+  }
+
 }

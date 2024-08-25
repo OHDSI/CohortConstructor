@@ -4,7 +4,7 @@
 \alias{conceptCohort}
 \title{Create cohorts based on a concept set}
 \usage{
-conceptCohort(cdm, conceptSet, name)
+conceptCohort(cdm, conceptSet, name, useIndexes = TRUE)
 }
 \arguments{
 \item{cdm}{A cdm reference.}
@@ -13,6 +13,9 @@ conceptCohort(cdm, conceptSet, name)
 or a conceptSetExpression.}
 
 \item{name}{Name of the cohort in the cdm object.}
+
+\item{useIndexes}{Whether to apply indexes to cohort table.
+Currently will only be applied if using Postgres.}
 }
 \value{
 A cohort table
