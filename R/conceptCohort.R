@@ -186,13 +186,6 @@ unerafiedConceptCohort <- function(cdm,
             dplyr::select("concept_id", "cohort_definition_id"),
           by = "concept_id"
         ) |>
-        dplyr::filter(!is.na(.data$cohort_start_date)) |>
-        dplyr::mutate(cohort_end_date = dplyr::if_else(
-          is.na(.data$cohort_end_date),
-          .data$cohort_start_date,
-          .data$cohort_end_date
-        )) |>
-        dplyr::filter(.data$cohort_start_date <= .data$cohort_end_date) |>
         dplyr::compute(temporary = FALSE,
                        name = workingTblNames[k])
       cohorts[[domain]] <- tempCohort
@@ -219,11 +212,15 @@ unerafiedConceptCohort <- function(cdm,
 
   cli::cli_inform(c("i" = "Combining tables."))
   cohort <- Reduce(dplyr::union_all, cohorts) |>
+    dplyr::select("cohort_definition_id",
+                  "subject_id",
+                  "cohort_start_date",
+                  "cohort_end_date") |>
+    dplyr::filter(!is.na(.data$cohort_start_date),
+                .data$cohort_start_date <= .data$cohort_end_date) |>
+    dplyr::mutate(cohort_end_date = dplyr::coalesce(.data$cohort_end_date,
+                                                    .data$cohort_start_date)) |>
     dplyr::compute(name = name, temporary = FALSE)
-
-  cohort <- cohort |>
-    dplyr::compute(name = name,
-                   temporary = FALSE)
 
   omopgenerics::dropTable(cdm, name = workingTblNames)
 
@@ -233,13 +230,16 @@ unerafiedConceptCohort <- function(cdm,
 fulfillCohortReqs <- function(cdm, name){
   # if start is out of observation, drop cohort entry
   # if end is after observation end, set cohort end as observation end
-  cdm[[name]] |>
-    PatientProfiles::addDemographics(
+  cdm[[name]] <- cdm[[name]] |>
+    PatientProfiles::addDemographicsQuery(
       age = FALSE,
       sex = FALSE,
       priorObservationType = "date",
       futureObservationType = "date"
     ) |>
+    dplyr::compute(temporary = FALSE, name = name)
+
+  cdm[[name]] |>
     dplyr::filter(
       .data$prior_observation <= .data$cohort_start_date
     ) |>
@@ -248,7 +248,7 @@ fulfillCohortReqs <- function(cdm, name){
       .data$cohort_end_date, .data$future_observation)
     ) |>
     dplyr::select(
-      -"prior_observation", -"future_observation", -"concept_id"
+      -"prior_observation", -"future_observation"
     ) |>
     dplyr::compute(temporary = FALSE, name = name)
 }
