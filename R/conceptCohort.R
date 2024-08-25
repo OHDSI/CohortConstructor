@@ -212,7 +212,10 @@ unerafiedConceptCohort <- function(cdm,
 
   cli::cli_inform(c("i" = "Combining tables."))
   cohort <- Reduce(dplyr::union_all, cohorts) |>
-    dplyr::compute(name = name, temporary = FALSE) |>
+    dplyr::select("cohort_definition_id",
+                  "subject_id",
+                  "cohort_start_date",
+                  "cohort_end_date") |>
     dplyr::filter(!is.na(.data$cohort_start_date),
                 .data$cohort_start_date <= .data$cohort_end_date) |>
     dplyr::mutate(cohort_end_date = dplyr::coalesce(.data$cohort_end_date,
@@ -235,6 +238,7 @@ fulfillCohortReqs <- function(cdm, name){
       futureObservationType = "date"
     ) |>
     dplyr::compute(temporary = FALSE, name = name)
+
   cdm[[name]] |>
     dplyr::filter(
       .data$prior_observation <= .data$cohort_start_date
@@ -244,7 +248,7 @@ fulfillCohortReqs <- function(cdm, name){
       .data$cohort_end_date, .data$future_observation)
     ) |>
     dplyr::select(
-      -"prior_observation", -"future_observation", -"concept_id"
+      -"prior_observation", -"future_observation"
     ) |>
     dplyr::compute(temporary = FALSE, name = name)
 }

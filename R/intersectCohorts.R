@@ -330,12 +330,10 @@ joinOverlap <- function(cohort,
   cdm <- omopgenerics::cdmReference(cohort)
 
   start <- cohort |>
-    dplyr::rename("date" := !!startDate) |>
-    dplyr::select(dplyr::all_of(c(by, "date"))) |>
+    dplyr::select(by, "date" := !!startDate) |>
     dplyr::mutate("date_id" = -1)
   end <- cohort |>
-    dplyr::rename("date" := !!endDate) |>
-    dplyr::select(dplyr::all_of(c(by, "date"))) |>
+    dplyr::select(by, "date" := !!endDate) |>
     dplyr::mutate("date_id" = 1)
   if (gap > 0) {
     end <- end %>%
@@ -348,18 +346,17 @@ joinOverlap <- function(cohort,
     dplyr::union_all(end) |>
     dplyr::compute(temporary = FALSE,
                    name = workingTbl)
+
   x <- x |>
     dplyr::group_by(dplyr::pick(by)) |>
     dplyr::arrange(.data$date, .data$date_id) |>
-    dplyr::mutate("cum_id" = cumsum(.data$date_id)) |>
+    dplyr::mutate("cum_id" = cumsum(.data$date_id),
+                  "name" = dplyr::if_else(
+                    .data$date_id == -1, .env$startDate, .env$endDate),
+                  "era_id" = dplyr::if_else(.data$date_id == -1, 1, 0)
+    ) |>
     dplyr::filter(
       .data$cum_id == 0 | (.data$cum_id == -1 & .data$date_id == -1)
-    ) |>
-    dplyr::mutate(
-      "name" = dplyr::if_else(
-        .data$date_id == -1, .env$startDate, .env$endDate
-      ),
-      "era_id" = dplyr::if_else(.data$date_id == -1, 1, 0)
     ) |>
     dplyr::mutate("era_id" = cumsum(as.numeric(.data$era_id))) |>
     dplyr::ungroup() |>
@@ -367,8 +364,12 @@ joinOverlap <- function(cohort,
     dplyr::select(
       dplyr::all_of(c(by, "era_id", "name", "date"))
     ) |>
+    dplyr::compute(temporary = FALSE,
+                   name = name) |>
     tidyr::pivot_wider(names_from = "name", values_from = "date") |>
-    dplyr::select(-"era_id")
+    dplyr::select(-"era_id") |>
+    dplyr::compute(temporary = FALSE,
+                   name = name)
   if (gap > 0) {
     x <- x %>%
       dplyr::mutate(!!endDate:= as.Date(!!CDMConnector::dateadd(
