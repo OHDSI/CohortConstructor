@@ -47,13 +47,14 @@
 #' }
 conceptCohort <- function(cdm,
                           conceptSet,
-                          name,
-                          useIndexes = TRUE) {
+                          name) {
 
   # initial input validation
   cdm <- validateCdm(cdm)
   name <- validateName(name)
   conceptSet <- validateConceptSet(conceptSet)
+
+  useIndexes <- getOption("CohortConstructor.use_indexes")
 
   # empty concept set
   cohortSet <- conceptSetToCohortSet(conceptSet, cdm)

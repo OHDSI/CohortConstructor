@@ -4,7 +4,7 @@
 \alias{conceptCohort}
 \title{Create cohorts based on a concept set}
 \usage{
-conceptCohort(cdm, conceptSet, name, useIndexes = TRUE)
+conceptCohort(cdm, conceptSet, name)
 }
 \arguments{
 \item{cdm}{A cdm reference.}
