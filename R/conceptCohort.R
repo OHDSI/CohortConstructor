@@ -52,6 +52,8 @@ conceptCohort <- function(cdm,
   name <- validateName(name)
   conceptSet <- validateConceptSet(conceptSet)
 
+  useIndexes <- getOption("CohortConstructor.use_indexes")
+
   # empty concept set
   cohortSet <- conceptSetToCohortSet(conceptSet, cdm)
   if (length(conceptSet) == 0) {
@@ -68,6 +70,11 @@ conceptCohort <- function(cdm,
   cdm <- uploadCohortCodelistToCdm(cdm = cdm,
                                    cohortCodelist = cohortCodelist,
                                    tableCohortCodelist = tableCohortCodelist)
+
+  if(!isFALSE(useIndexes)){
+    addIndex(cdm = cdm, name = tableCohortCodelist,
+             cols = "concept_id")
+    }
 
   # report codes from unsupported domains
   reportConceptsFromUnsopportedDomains(cdm = cdm,
@@ -115,6 +122,11 @@ conceptCohort <- function(cdm,
       cohortCodelistRef = cohortCodelist,
       .softValidation = TRUE
     )
+
+  if(!isFALSE(useIndexes)){
+  addIndex(cdm = cdm, name = name,
+           cols = c("subject_id", "cohort_start_date"))
+  }
 
   cli::cli_inform(c("i" = "Applying cohort requirements."))
   cdm[[name]] <- fulfillCohortReqs(cdm = cdm, name = name) |>
@@ -228,29 +240,24 @@ unerafiedConceptCohort <- function(cdm,
 }
 
 fulfillCohortReqs <- function(cdm, name){
-  # if start is out of observation, drop cohort entry
-  # if end is after observation end, set cohort end as observation end
-  cdm[[name]] <- cdm[[name]] |>
-    PatientProfiles::addDemographicsQuery(
-      age = FALSE,
-      sex = FALSE,
-      priorObservationType = "date",
-      futureObservationType = "date"
+  # 1) if start is out of observation, drop cohort entry
+  # 2) if end is after observation end, set cohort end as observation end
+  cdm[[name]] |>
+    dplyr::left_join(cdm$observation_period |>
+                       dplyr::select("person_id",
+                                     "observation_period_start_date",
+                                     "observation_period_end_date"),
+                     by = c("subject_id" = "person_id")) |>
+    dplyr::filter(.data$cohort_start_date >= .data$observation_period_start_date,
+                  .data$cohort_start_date <= .data$observation_period_end_date) |>
+    dplyr::mutate(cohort_end_date = dplyr::if_else(
+      .data$observation_period_end_date >= .data$cohort_end_date,
+      .data$cohort_end_date, .data$observation_period_end_date)
     ) |>
+    dplyr::select("cohort_definition_id", "subject_id",
+                  "cohort_start_date", "cohort_end_date") |>
     dplyr::compute(temporary = FALSE, name = name)
 
-  cdm[[name]] |>
-    dplyr::filter(
-      .data$prior_observation <= .data$cohort_start_date
-    ) |>
-    dplyr::mutate(cohort_end_date = dplyr::if_else(
-      .data$future_observation >= .data$cohort_end_date,
-      .data$cohort_end_date, .data$future_observation)
-    ) |>
-    dplyr::select(
-      -"prior_observation", -"future_observation"
-    ) |>
-    dplyr::compute(temporary = FALSE, name = name)
 }
 
 
@@ -296,7 +303,9 @@ uploadCohortCodelistToCdm <- function(cdm, cohortCodelist, tableCohortCodelist){
     dplyr::left_join(cdm[["concept"]] |>
                        dplyr::select("concept_id", "domain_id"),
                      by = "concept_id") |>
-    dplyr::mutate("domain_id" = tolower(.data$domain_id)) |>
+    dplyr::mutate(
+      "concept_id" = as.integer(.data$concept_id),
+      "domain_id" = tolower(.data$domain_id)) |>
     dplyr::compute(name = tableCohortCodelist,
                    temporary = FALSE,
                    overwrite = TRUE)
@@ -319,3 +328,25 @@ reportConceptsFromUnsopportedDomains <- function(cdm,
     ))
   }
 }
+
+addIndex <- function(cdm, name, cols){
+
+  dbType <- attr(attr(cdm[[name]], "tbl_source"), "source_type")
+  if(dbType == "postgresql"){
+    cli::cli_inform("Adding indexes to table")
+    con <- attr(attr(cdm[[name]], "tbl_source"), "dbcon")
+    schema <- attr(attr(cdm[[name]], "tbl_source"), "write_schema")[["schema"]]
+    prefix <- attr(attr(cdm[[name]], "tbl_source"), "write_schema")[["prefix"]]
+    cols <- paste0(cols, collapse = ",")
+
+    query <- paste0("CREATE INDEX ON ",
+                    paste0(schema,".", prefix, name),
+                    " (",
+                    cols,
+                    ");")
+    suppressMessages(DBI::dbExecute(con, query))
+  }
+
+
+}
+
