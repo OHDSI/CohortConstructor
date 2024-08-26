@@ -13,9 +13,6 @@ conceptCohort(cdm, conceptSet, name)
 or a conceptSetExpression.}
 
 \item{name}{Name of the cohort in the cdm object.}
-
-\item{useIndexes}{Whether to apply indexes to cohort table.
-Currently will only be applied if using Postgres.}
 }
 \value{
 A cohort table

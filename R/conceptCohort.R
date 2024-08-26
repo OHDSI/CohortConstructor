@@ -28,8 +28,6 @@
 #' @param conceptSet A conceptSet, which can either be a codelist
 #' or a conceptSetExpression.
 #' @param name Name of the cohort in the cdm object.
-#' @param useIndexes Whether to apply indexes to cohort table.
-#' Currently will only be applied if using Postgres.
 #'
 #' @export
 #'
@@ -73,9 +71,10 @@ conceptCohort <- function(cdm,
                                    cohortCodelist = cohortCodelist,
                                    tableCohortCodelist = tableCohortCodelist)
 
-  if(isTRUE(useIndexes)){
+  if(!isFALSE(useIndexes)){
     cli::cli_inform("Adding indexes to codelist table")
-    addCodelistIndexes(cdm = cdm, name = tableCohortCodelist)
+    addIndex(cdm = cdm, name = tableCohortCodelist,
+             cols = "concept_id")
     }
 
   # report codes from unsupported domains
@@ -125,9 +124,10 @@ conceptCohort <- function(cdm,
       .softValidation = TRUE
     )
 
-  if(isTRUE(useIndexes)){
+  if(!isFALSE(useIndexes)){
   cli::cli_inform("Adding indexes to cohort table")
-  addCohortTableIndexes(cdm = cdm, name = name)
+  addIndex(cdm = cdm, name = name,
+           cols = c("subject_id", "cohort_start_date"))
   }
 
   cli::cli_inform(c("i" = "Applying cohort requirements."))
@@ -336,35 +336,23 @@ reportConceptsFromUnsopportedDomains <- function(cdm,
   }
 }
 
-
-addCodelistIndexes <- function(cdm, name){
+addIndex <- function(cdm, name, cols){
 
   dbType <- attr(attr(cdm[[name]], "tbl_source"), "source_type")
   if(dbType == "postgresql"){
     con <- attr(attr(cdm[[name]], "tbl_source"), "dbcon")
     schema <- attr(attr(cdm[[name]], "tbl_source"), "write_schema")[["schema"]]
     prefix <- attr(attr(cdm[[name]], "tbl_source"), "write_schema")[["prefix"]]
+    cols <- paste0(cols, collapse = ",")
+
     query <- paste0("CREATE INDEX ON ",
                     paste0(schema,".", prefix, name),
-                    " (concept_id);")
+                    " (",
+                    cols,
+                    ");")
     suppressMessages(DBI::dbExecute(con, query))
   }
 
-}
-
-
-addCohortTableIndexes <- function(cdm, name){
-
-  dbType <- attr(attr(cdm[[name]], "tbl_source"), "source_type")
-  if(dbType == "postgresql"){
-   con <- attr(attr(cdm[[name]], "tbl_source"), "dbcon")
-   schema <- attr(attr(cdm[[name]], "tbl_source"), "write_schema")[["schema"]]
-   prefix <- attr(attr(cdm[[name]], "tbl_source"), "write_schema")[["prefix"]]
-   query <- paste0("CREATE INDEX ON ",
-                   paste0(schema,".", prefix, name),
-                   " (subject_id, cohort_start_date);")
-   suppressMessages(DBI::dbExecute(con, query))
-  }
 
 }
 
