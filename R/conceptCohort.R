@@ -309,7 +309,9 @@ uploadCohortCodelistToCdm <- function(cdm, cohortCodelist, tableCohortCodelist){
     dplyr::left_join(cdm[["concept"]] |>
                        dplyr::select("concept_id", "domain_id"),
                      by = "concept_id") |>
-    dplyr::mutate("domain_id" = tolower(.data$domain_id)) |>
+    dplyr::mutate(
+      "concept_id" = as.integer(.data$concept_id),
+      "domain_id" = tolower(.data$domain_id)) |>
     dplyr::compute(name = tableCohortCodelist,
                    temporary = FALSE,
                    overwrite = TRUE)
@@ -341,7 +343,7 @@ addCodelistIndexes <- function(cdm, name){
     con <- attr(attr(cdm[[name]], "tbl_source"), "dbcon")
     schema <- attr(attr(cdm[[name]], "tbl_source"), "write_schema")[["schema"]]
     prefix <- attr(attr(cdm[[name]], "tbl_source"), "write_schema")[["prefix"]]
-   query <- paste0("CREATE INDEX ON ",
+    query <- paste0("CREATE INDEX ON ",
                     paste0(schema,".", prefix, name),
                     " (concept_id);")
     suppressMessages(DBI::dbExecute(con, query))
