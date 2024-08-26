@@ -4,7 +4,7 @@
 \alias{conceptCohort}
 \title{Create cohorts based on a concept set}
 \usage{
-conceptCohort(cdm, conceptSet, name)
+conceptCohort(cdm, conceptSet, name, exit = "event_end_date")
 }
 \arguments{
 \item{cdm}{A cdm reference.}
@@ -13,6 +13,9 @@ conceptCohort(cdm, conceptSet, name)
 or a conceptSetExpression.}
 
 \item{name}{Name of the cohort in the cdm object.}
+
+\item{exit}{How the cohort end date is defined. Can be either
+"event_end_date" or "event_start_date".}
 }
 \value{
 A cohort table
