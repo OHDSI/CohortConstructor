@@ -28,6 +28,8 @@
 #' @param conceptSet A conceptSet, which can either be a codelist
 #' or a conceptSetExpression.
 #' @param name Name of the cohort in the cdm object.
+#' @param exit How the cohort end date is defined. Can be either
+#' "event_end_date" or "event_start_date".
 #'
 #' @export
 #'
@@ -45,12 +47,16 @@
 #' }
 conceptCohort <- function(cdm,
                           conceptSet,
-                          name) {
+                          name,
+                          exit = "event_end_date") {
 
   # initial input validation
   cdm <- validateCdm(cdm)
   name <- validateName(name)
   conceptSet <- validateConceptSet(conceptSet)
+  omopgenerics::assertChoice(exit,
+                             c("event_start_date",
+                               "event_end_date"))
 
   useIndexes <- getOption("CohortConstructor.use_indexes")
 
@@ -88,7 +94,8 @@ conceptCohort <- function(cdm,
                                         cohortCodelist = cohortCodelist,
                                         tableCohortCodelist = tableCohortCodelist,
                                         name = name,
-                                        extraCols = NULL)
+                                        extraCols = NULL,
+                                        exit = exit)
 
   omopgenerics::dropTable(cdm = cdm,
                           name = tableCohortCodelist)
@@ -155,7 +162,8 @@ unerafiedConceptCohort <- function(cdm,
                                    cohortCodelist,
                                    tableCohortCodelist,
                                    name,
-                                   extraCols){
+                                   extraCols,
+                                   exit){
 
 
   domains <- sort(cdm[[tableCohortCodelist]] |>
@@ -175,7 +183,11 @@ unerafiedConceptCohort <- function(cdm,
     table <- tableRef$table[k]
     concept <- tableRef$concept[k]
     start <- tableRef$start[k]
-    end <- tableRef$end[k]
+    if(exit == "event_start_date"){
+      end <- start
+    } else {
+      end <- tableRef$end[k]
+    }
     n <- cdm[[tableCohortCodelist]] |>
       dplyr::filter(.data$domain_id %in% .env$domain) |>
       dplyr::tally() |>

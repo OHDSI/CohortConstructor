@@ -473,3 +473,74 @@ test_that("table not present in the cdm", {
 
   PatientProfiles::mockDisconnect(cdm)
 })
+
+test_that("cohort exit as event start date", {
+  cdm <- omock::mockCdmReference() |>
+    omock::mockCdmFromTables(tables = list("cohort" = dplyr::tibble(
+      "cohort_definition_id" = 1L,
+      "subject_id" = c(1L, 2L, 3L),
+      "cohort_start_date" = as.Date("2020-01-01"),
+      "cohort_end_date" = as.Date("2029-12-31")
+    )))
+  cdm <- omopgenerics::insertTable(
+    cdm = cdm, name = "concept", table = dplyr::tibble(
+      "concept_id" = 1L,
+      "concept_name" = "my concept",
+      "domain_id" = "drug",
+      "vocabulary_id" = NA,
+      "concept_class_id" = NA,
+      "concept_code" = NA,
+      "valid_start_date" = NA,
+      "valid_end_date" = NA
+    )
+  )
+  cdm <- omopgenerics::insertTable(
+    cdm = cdm, name = "drug_exposure", table = dplyr::tibble(
+      "drug_exposure_id" = c(1L, 2L),
+      "person_id" = c(1L, 1L),
+      "drug_concept_id" = c(1L, 1L),
+      "drug_exposure_start_date" = as.Date(c("2020-01-01",
+                                     "2020-01-04")),
+      "drug_exposure_end_date" = as.Date(c("2020-01-10",
+                                           "2020-01-14")),
+      "drug_type_concept_id" = 1L
+    ) )
+
+  cdm <- cdm |> copyCdm()
+
+  expect_no_error(cdm$cohort_1 <- conceptCohort(cdm = cdm,
+                                          conceptSet = list(a = 1L),
+                                          name = "cohort_1",
+                                          exit = "event_end_date"))
+ # one entry from first start to second end
+   expect_true(nrow(cdm$cohort_1 |>
+    dplyr::collect()) == 1)
+   expect_true(cdm$cohort_1 |>
+     dplyr::pull("cohort_start_date") == as.Date(c("2020-01-01")))
+   expect_true(cdm$cohort_1 |>
+                 dplyr::pull("cohort_end_date") == as.Date(c("2020-01-14")))
+
+ # exit as event start
+ expect_no_error(cdm$cohort_1 <- conceptCohort(cdm = cdm,
+                                               conceptSet = list(a = 1),
+                                               name = "cohort_1",
+                                               exit = "event_start_date"))
+ expect_true(nrow(cdm$cohort_1 |>
+                    dplyr::collect()) == 2)
+ expect_identical(sort(as.Date(cdm$cohort_1 |>
+               dplyr::pull("cohort_start_date"))),
+               c(as.Date("2020-01-01"),
+                       "2020-01-04"))
+ expect_identical(sort(as.Date(cdm$cohort_1 |>
+                                 dplyr::pull("cohort_end_date"))),
+                  c(as.Date("2020-01-01"),
+                    "2020-01-04"))
+
+ # expected error
+ expect_error(cdm$cohort_1 <- conceptCohort(cdm = cdm,
+                                               conceptSet = list(a = 1L),
+                                               name = "cohort_1",
+                                               exit = "not_an_option"))
+
+
+})
