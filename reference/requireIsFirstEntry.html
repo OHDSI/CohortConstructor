@@ -47,12 +47,7 @@ cohort entry per person.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">requireIsFirstEntry</span><span class="op">(</span></span>
-<span>  <span class="va">cohort</span>,</span>
-<span>  cohortId <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  indexDate <span class="op">=</span> <span class="st">"cohort_start_date"</span>,</span>
-<span>  name <span class="op">=</span> <span class="fu"><a href="https://darwin-eu-dev.github.io/omopgenerics/reference/tableName.html" class="external-link">tableName</a></span><span class="op">(</span><span class="va">cohort</span><span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">requireIsFirstEntry</span><span class="op">(</span><span class="va">cohort</span>, cohortId <span class="op">=</span> <span class="cn">NULL</span>, name <span class="op">=</span> <span class="fu"><a href="https://darwin-eu-dev.github.io/omopgenerics/reference/tableName.html" class="external-link">tableName</a></span><span class="op">(</span><span class="va">cohort</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -67,10 +62,6 @@ cohort entry per person.</p>
 <dd><p>IDs of the cohorts to modify. If NULL, all cohorts will be
 used; otherwise, only the specified cohorts will be modified, and the
 rest will remain unchanged.</p></dd>
-
-
-<dt id="arg-indexdate">indexDate<a class="anchor" aria-label="anchor" href="#arg-indexdate"></a></dt>
-<dd><p>Column name in cohort that contains the date to restrict on.</p></dd>
 
 
 <dt id="arg-name">name<a class="anchor" aria-label="anchor" href="#arg-name"></a></dt>
