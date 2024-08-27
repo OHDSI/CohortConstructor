@@ -118,11 +118,10 @@ requireIsFirstEntry <- function(cohort,
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
   cohortId <- validateCohortId(cohortId, ids)
 
-
   cohort <- cohort |>
     dplyr::group_by(.data$subject_id,.data$cohort_definition_id) |>
     dplyr::filter(
-      "cohort_start_date" == min(.data$cohort_start_date, na.rm = TRUE) |
+      .data$cohort_start_date == min(.data$cohort_start_date, na.rm = TRUE) |
         (!.data$cohort_definition_id %in% .env$cohortId)
     ) |>
     dplyr::ungroup() |>
@@ -170,7 +169,7 @@ requireIsLastEntry <- function(cohort,
   cohort <- cohort |>
     dplyr::group_by(.data$subject_id,.data$cohort_definition_id) |>
     dplyr::filter(
-      !cohort_start_date == max(.data$cohort_start_date, na.rm = TRUE) |
+      .data$cohort_start_date == max(.data$cohort_start_date, na.rm = TRUE) |
         (!.data$cohort_definition_id %in% .env$cohortId)
     ) |>
     dplyr::ungroup() |>

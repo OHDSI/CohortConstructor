@@ -62,6 +62,10 @@ test_that("requireIsFirstEntry, cohortIds & name arguments", {
 
 test_that("errors", {
   testthat::skip_on_cran()
+  cdm <- omock::mockCdmReference() |>
+    omock::mockPerson(n = 3) |>
+    omock::mockObservationPeriod() |>
+    omock::mockCohort(numberCohorts = 1, recordPerson = 2)
 
   expect_error(cdm$cohort |> requireIsFirstEntry(name = 1))
   expect_error(cdm$cohort1 <- cdm$cohort |> requireIsFirstEntry(name = "cohort2"))
@@ -114,7 +118,6 @@ test_that("requireIsLastEntry", {
   expect_error(cdm$cohort |> dplyr::collect() |> requireIsLastEntry())
   expect_warning(cdm$cohort |> requireIsLastEntry(cohortId = c(1, 5)))
 })
-
 
 test_that("requireEntry", {
   testthat::skip_on_cran()
