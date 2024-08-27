@@ -12,8 +12,6 @@
 #' @param sex Can be "Both", "Male" or "Female".
 #' @param minPriorObservation A minimum number of prior observation days in
 #' the database.
-#' @param minFutureObservation A minimum number of future observation days in
-#' the database.
 #'
 #' @return A cohort table
 #'
@@ -33,8 +31,7 @@ demographicsCohort <- function(cdm,
                                name,
                                ageRange = NULL,
                                sex = NULL,
-                               minPriorObservation = NULL,
-                               minFutureObservation = NULL) {
+                               minPriorObservation = NULL) {
   # initial checks
   cdm <- validateCdm(cdm)
   name <- validateName(name)
@@ -66,7 +63,6 @@ demographicsCohort <- function(cdm,
     ageRange = ageRange,
     sex = sex,
     minPriorObservation = minPriorObservation,
-    minFutureObservation = minFutureObservation,
     name = name
   )
 

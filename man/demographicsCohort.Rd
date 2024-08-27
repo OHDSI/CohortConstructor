@@ -9,8 +9,7 @@ demographicsCohort(
   name,
   ageRange = NULL,
   sex = NULL,
-  minPriorObservation = NULL,
-  minFutureObservation = NULL
+  minPriorObservation = NULL
 )
 }
 \arguments{
@@ -23,9 +22,6 @@ demographicsCohort(
 \item{sex}{Can be "Both", "Male" or "Female".}
 
 \item{minPriorObservation}{A minimum number of prior observation days in
-the database.}
-
-\item{minFutureObservation}{A minimum number of future observation days in
 the database.}
 }
 \value{
