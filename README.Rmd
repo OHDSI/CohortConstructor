@@ -15,8 +15,6 @@ knitr::opts_chunk$set(
 
 # CohortConstructor <img src="man/figures/logo.png" align="right" height="180"/>
 
-> **This package is currently experimental. Please use with care and report any issues you might come across.**
-
 <!-- badges: start -->
 [![CRAN status](https://www.r-pkg.org/badges/version/CohortConstructor)](https://CRAN.R-project.org/package=CohortConstructor)
 [![R-CMD-check](https://github.com/OHDSI/CohortConstructor/workflows/R-CMD-check/badge.svg)](https://github.com/OHDSI/CohortConstructor/actions)
@@ -24,11 +22,16 @@ knitr::opts_chunk$set(
 
 <!-- badges: end -->
 
-The goal of CohortConstructor is to support the creation and manipulation of cohorts in the OMOP Common Data Model. 
+The goal of CohortConstructor is to support the creation and manipulation of study cohorts in data mapped to the OMOP CDM.  
 
 ## Installation
 
-You can install the development version of CohortConstructor from [GitHub](https://github.com/) with:
+The package can be installed from CRAN:
+```{r, eval = FALSE}
+install.packages("CohortConstructor")
+```
+
+Or you can install the development version of CohortConstructor from [GitHub](https://github.com/):
 
 ```{r, eval = FALSE}
 # install.packages("devtools")
@@ -37,30 +40,40 @@ devtools::install_github("ohdsi/CohortConstructor")
 
 ## Creating and manipulating cohorts
 
-To illustrate how the functionality let's create a CDM reference for the Eunomia dataset Using the CDMConnector package.  
+To illustrate how the functionality let's create a set of fracture cohorts using the Eunomia dataset. We'll first load required packages and create a cdm reference for the data.
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
+library(omopgenerics)
 library(CDMConnector)
 library(PatientProfiles)
 library(dplyr)
 library(CohortConstructor)
+library(CohortCharacteristics)
+```
 
+```{r, message=TRUE, warning=FALSE}
 con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomia_dir())
 cdm <- cdm_from_con(con, cdm_schema = "main", 
                     write_schema = c(prefix = "my_study_", schema = "main"))
-print(cdm)
+cdm
 ```
 
-### Generating concept based cohorts
+### Generating concept-based fracture cohorts
 
-We start by making a concept based cohort. For this we only need to provide concept sets and we will get a cohort back, with cohort end date the event date associated with the records, overlapping records collapsed, and only records in observation kept.
+We will start by making a simple concept-based cohort for each of our fracture of interest. First we create a codelist for each ankle, forearm and hip fractures (note, we just use one code for each because we are using synthetic data). 
+
+```{r, message=TRUE}
+fracture_codes <- newCodelist(list("ankle_fracture" = 4059173L,
+                                   "forearm_fracture" = 4278672L,
+                                   "hip_fracture" = 4230399L))
+fracture_codes
+```
+
+Now we can quickly create a set of cohorts for each fracture type. For this we only need to provide the codes we have defined and we will get a cohort back, with cohort end date set as the event date associated with the records, overlapping records collapsed, and only records in observation kept.
 
 ```{r}
 cdm$fractures <- cdm |> 
-  conceptCohort(conceptSet = list(
-    "ankle_fracture" = 4059173,
-    "forearm_fracture" = 4278672,
-    "hip_fracture" = 4230399),
+  conceptCohort(conceptSet = fracture_codes,
   name = "fractures")
 ```
 
@@ -72,9 +85,29 @@ cohort_count(cdm$fractures) %>% glimpse()
 attrition(cdm$fractures) %>% glimpse()
 ```
 
+### Create an overall fracture cohort
+
+So far we have created three separate fracture cohorts. Let's say we also want a cohort of people with any of the fractures. We could union our three cohorts to create this overall cohort like so:
+
+```{r, message=FALSE}
+cdm$any_fracture <- cdm$fractures |> 
+  CohortConstructor::unionCohorts(cohortName = "any_fracture", name = "any_fracture")
+cdm <- bind(cdm$fractures,
+            cdm$any_fracture, 
+            name = "fractures")
+```
+
+
+```{r, message=FALSE}
+settings(cdm$fractures)
+cohortCount(cdm$fractures)
+```
+
+
+
 ### Require in date range
 
-Once we have created our base cohort, we can then start applying additional cohort requirements. For example, first we can require that individuals' cohort start date fall within a certain date range.
+Once we have created our base fracture cohort, we can then start applying additional cohort requirements. For example, first we can require that individuals' cohort start date fall within a certain date range.
 
 ```{r}
 cdm$fractures <- cdm$fractures %>% 
@@ -114,40 +147,31 @@ attrition(cdm$fractures) %>%
 
 ### Require presence in another cohort
 
-We can also require that individuals are in another cohort over some window. Here for example we require that study participants are in a GI bleed cohort any time prior up to their entry in the fractures cohort.
+We can also require that individuals are (or are not) in another cohort over some window. Here for example we require that study participants are in a GI bleed cohort any time prior up to their entry in the fractures cohort.
 
 ```{r}
 cdm$gibleed <- cdm |> 
-  conceptCohort(conceptSet = list("gibleed" = 192671),
+  conceptCohort(conceptSet = list("gibleed" = 192671L),
   name = "gibleed")
 
 cdm$fractures <- cdm$fractures %>% 
   requireCohortIntersect(targetCohortTable = "gibleed",
-                             window = c(-Inf, 0))
+                         intersections = 0,
+                         window = c(-Inf, 0))
 ```
 
 ```{r}
 attrition(cdm$fractures) %>% 
-  filter(reason == "In cohort gibleed between -Inf & 0 days relative to cohort_start_date") %>% 
+  filter(reason == "Not in cohort gibleed between -Inf & 0 days relative to cohort_start_date") %>% 
   glimpse()
 ```
-
-### Combining cohorts
-
-Currently we have separate fracture cohorts. 
-
-Let's say we want to create a cohort of people with any of the fractures. We could create this cohort like so:
-
-```{r}
-cdm$fractures <- cdm$fractures |> 
-  CohortConstructor::unionCohorts()
-
-settings(cdm$fractures)
-cohortCount(cdm$fractures)
-```
-
 
 ```{r}
 cdmDisconnect(cdm)
 ```
+
+### More information
+CohortConstructor provides much more functionality for creating and manipulating cohorts. See the package website for more details.
+
+
 
