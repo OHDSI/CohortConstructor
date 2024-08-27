@@ -238,3 +238,66 @@ test_that("infitine", {
 
 
 })
+
+test_that("multiple observation periods", {
+# collapse should respect observation end dates
+
+  cdm <- omock::mockCdmReference() |>
+    omock::mockCdmFromTables(tables = list("cohort" = dplyr::tibble(
+      "cohort_definition_id" = 1,
+      "subject_id" = c(1),
+      "cohort_start_date" = as.Date("2020-01-01"),
+      "cohort_end_date" = as.Date("2020-01-01")
+    )))
+  cdm <- omopgenerics::insertTable(
+    cdm = cdm, name = "concept", table = dplyr::tibble(
+      "concept_id" = 1,
+      "concept_name" = "my concept",
+      "domain_id" = "drUg",
+      "vocabulary_id" = NA,
+      "concept_class_id" = NA,
+      "concept_code" = NA,
+      "valid_start_date" = NA,
+      "valid_end_date" = NA
+    )
+  )
+  cdm <- omopgenerics::insertTable(
+    cdm = cdm, name = "drug_exposure", table = dplyr::tibble(
+      "drug_exposure_id" = c(1L, 2L),
+      "person_id" = 1L,
+      "drug_concept_id" = 1L,
+      "drug_exposure_start_date" = as.Date(c("2020-01-01", "2021-01-01")),
+      "drug_exposure_end_date" =  as.Date(c("2020-01-15", "2021-01-15")),
+      "drug_type_concept_id" = 1L
+    ))
+  cdm <- omopgenerics::insertTable(
+    cdm = cdm, name = "observation_period", table = dplyr::tibble(
+      "observation_period_id" = c(1L, 2L),
+      "person_id" = 1L,
+      "period_type_concept_id" = 1L,
+      "observation_period_start_date" = as.Date(c("2020-01-01", "2021-01-01")),
+      "observation_period_end_date" =  as.Date(c("2020-06-01", "2021-06-01"))
+    ))
+
+  cdm <- cdm |> copyCdm()
+
+  expect_no_error(cdm$cohort_1 <- conceptCohort(cdm = cdm,
+                                          conceptSet = list(a = 1),
+                                          name = "cohort_1"))
+
+  # should not have been combined as they are in different observation periods
+  expect_no_error(cdm$cohort_1  <- cdm$cohort_1  |>
+                    collapseCohorts(gap = 500, name = "cohort_1"))
+  expect_true(nrow(cdm$cohort_1 |>
+         dplyr::collect()) == 2)
+
+  expect_no_error(cdm$cohort_1 <- conceptCohort(cdm = cdm,
+                                                conceptSet = list(a = 1),
+                                                name = "cohort_1"))
+  expect_no_error(cdm$cohort_1  <- cdm$cohort_1  |>
+                    collapseCohorts(gap = Inf, name = "cohort_1"))
+  expect_true(nrow(cdm$cohort_1 |>
+                     dplyr::collect()) == 2)
+
+
+})
