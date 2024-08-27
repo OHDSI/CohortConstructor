@@ -50,11 +50,15 @@ collapseCohorts <- function(cohort,
 
   if(gap == Inf){
     newCohort <- newCohort |>
-      joinAll()
+      addObservationPeriodId() |>
+      joinAll(by = c("cohort_definition_id", "subject_id",
+                     "observation_period_id"))
   } else if (gap > 0) {
     newCohort <- newCohort |>
+      addObservationPeriodId() |>
       joinOverlap(name = name,
-                  gap = gap)
+                  gap = gap, by = c("cohort_definition_id", "subject_id",
+                                    "observation_period_id"))
   }
 
   if (!all(ids %in% cohortId)) {
@@ -72,4 +76,56 @@ collapseCohorts <- function(cohort,
   omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with(tablePrefix))
 
   return(newCohort)
+}
+
+
+addObservationPeriodId <- function(x,
+                                   indexDate = "cohort_start_date") {
+
+  cdm <- omopgenerics::cdmReference(x)
+  xName <- omopgenerics::tableName(x)
+  if(!is.na(xName) &&
+     omopgenerics::tableName(x) == "observation_period"){
+    cli::cli_abort("addObservationPeriodId cannot be used on the observation period table")
+  }
+  personVariable <- c("person_id", "subject_id")
+  personVariable <- personVariable[personVariable %in% colnames(x)]
+
+  # drop variable if it already exists
+  if("observation_period_id" %in% colnames(x)){
+    cli::cli_warn(c("!" = "Existing observation_period_id column will be overwritten"))
+    x <- x |>
+      dplyr::select(!dplyr::all_of("observation_period_id"))
+  }
+
+  # if empty table, return with variable name added
+  if(x |> utils::head(1) |> dplyr::tally() |> dplyr::pull("n") == 0){
+    return(x |>
+             dplyr::mutate(observation_period_id = as.integer(NA)))
+  }
+
+  currentObsId <- x |>
+    dplyr::select(dplyr::all_of(c(personVariable,
+                                  indexDate))) |>
+    dplyr::left_join(
+      cdm$observation_period |>
+        dplyr::select(dplyr::all_of(c("person_id",
+                                      "observation_period_id",
+                                      "observation_period_start_date",
+                                      "observation_period_end_date"
+        ))) |>
+        dplyr::rename(!!personVariable := "person_id"),
+      by = personVariable) |>
+    dplyr::filter(
+      .data[[indexDate]] <= .data[["observation_period_end_date"]] &&
+        .data[[indexDate]] >= .data[["observation_period_start_date"]]) |>
+    dplyr::select(dplyr::all_of(c(personVariable,
+                                  indexDate,
+                                  "observation_period_id")))
+
+ x |>
+    dplyr::left_join(currentObsId,
+                     by = c(personVariable, indexDate))
+
+
 }
