@@ -25,7 +25,6 @@ requireIsEntry <- function(cohort,
                            entryRange,
                            cohortId = NULL,
                            name = tableName(cohort)) {
-
   # checks
   name <- validateName(name)
   validateCohortTable(cohort)
@@ -35,38 +34,41 @@ requireIsEntry <- function(cohort,
   cohortId <- validateCohortId(cohortId, ids)
 
   omopgenerics::assertNumeric(entryRange, integerish = TRUE, min = 0)
-  if(length(entryRange) < 1 | length(entryRange) > 2){
+  if (length(entryRange) < 1 || length(entryRange) > 2) {
     cli::cli_abort("entryRange must be lenght 1 or 2")
   }
 
-  if(length(entryRange) == 1){
+  if (length(entryRange) == 1) {
     minEntry <- entryRange
-    maxEntry <-entryRange
+    maxEntry <- entryRange
   } else {
     minEntry <- entryRange[1]
     maxEntry <- entryRange[2]
   }
 
-  if(minEntry == 1 && maxEntry == Inf){
-    return(cohort |>
-             dplyr::compute(name = name, temporary = FALSE) |>
-             omopgenerics::newCohortTable(.softValidation = TRUE) |>
-             omopgenerics::recordCohortAttrition("Restricted to entries between {minEntry} and {maxEntry}",
-                                                 cohortId = cohortId))
+  if (minEntry == 1 && maxEntry == Inf) {
+    return(
+      cohort |>
+        dplyr::compute(name = name, temporary = FALSE) |>
+        omopgenerics::newCohortTable(.softValidation = TRUE) |>
+        omopgenerics::recordCohortAttrition(
+          "Restricted to entries between {minEntry} and {maxEntry}",
+          cohortId = cohortId
+        )
+    )
   }
 
   cohort <- cohort |>
     dplyr::arrange(.data$cohort_start_date) |>
-    dplyr::group_by(.data$subject_id,.data$cohort_definition_id) |>
+    dplyr::group_by(.data$subject_id, .data$cohort_definition_id) |>
     dplyr::mutate(entry = dplyr::row_number())
 
-  if(maxEntry == Inf){
+  if (maxEntry == Inf) {
     cohort <- cohort  |>
       dplyr::filter(.data$entry >= {{minEntry}})
   } else {
     cohort <- cohort |>
-      dplyr::filter(.data$entry >= {{minEntry}},
-                    .data$entry <= {{maxEntry}})
+      dplyr::filter(.data$entry >= {{minEntry}}, .data$entry <= {{maxEntry}})
   }
 
   cohort <- cohort |>
@@ -109,7 +111,6 @@ requireIsEntry <- function(cohort,
 requireIsFirstEntry <- function(cohort,
                                 cohortId = NULL,
                                 name = tableName(cohort)) {
-
   # checks
   name <- validateName(name)
   validateCohortTable(cohort)
@@ -119,7 +120,7 @@ requireIsFirstEntry <- function(cohort,
   cohortId <- validateCohortId(cohortId, ids)
 
   cohort <- cohort |>
-    dplyr::group_by(.data$subject_id,.data$cohort_definition_id) |>
+    dplyr::group_by(.data$subject_id, .data$cohort_definition_id) |>
     dplyr::filter(
       .data$cohort_start_date == min(.data$cohort_start_date, na.rm = TRUE) |
         (!.data$cohort_definition_id %in% .env$cohortId)
@@ -156,8 +157,7 @@ requireIsFirstEntry <- function(cohort,
 #'
 requireIsLastEntry <- function(cohort,
                                cohortId = NULL,
-                               name = tableName(cohort)){
-
+                               name = tableName(cohort)) {
   # checks
   name <- validateName(name)
   validateCohortTable(cohort)
@@ -167,7 +167,7 @@ requireIsLastEntry <- function(cohort,
   cohortId <- validateCohortId(cohortId, ids)
 
   cohort <- cohort |>
-    dplyr::group_by(.data$subject_id,.data$cohort_definition_id) |>
+    dplyr::group_by(.data$subject_id, .data$cohort_definition_id) |>
     dplyr::filter(
       .data$cohort_start_date == max(.data$cohort_start_date, na.rm = TRUE) |
         (!.data$cohort_definition_id %in% .env$cohortId)

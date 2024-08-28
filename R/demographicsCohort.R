@@ -23,7 +23,8 @@
 #'
 #' cdm <- mockCohortConstructor()
 #'
-#' cohort <-  cdm |> demographicsCohort(name = "cohort3", ageRange = c(18,40), sex = "Male")
+#' cohort <-  cdm |>
+#'     demographicsCohort(name = "cohort3", ageRange = c(18,40), sex = "Male")
 #'
 #' attrition(cohort)
 #' }
@@ -37,10 +38,10 @@ demographicsCohort <- function(cdm,
   name <- validateName(name)
 
   cdm[[name]] <- cdm$observation_period |>
-    dplyr::inner_join(
-      cdm$person |> dplyr::select("person_id") |> dplyr::distinct(),
-      by = "person_id"
-    ) |>
+    dplyr::inner_join(cdm$person |>
+                        dplyr::select("person_id") |>
+                        dplyr::distinct(),
+                      by = "person_id") |>
     dplyr::select(
       "subject_id" = "person_id",
       "cohort_start_date" = "observation_period_start_date",
@@ -50,7 +51,8 @@ demographicsCohort <- function(cdm,
     dplyr::compute(name = name, temporary = FALSE) |>
     omopgenerics::newCohortTable(
       cohortSetRef = dplyr::tibble(
-        "cohort_definition_id" = 1L, "cohort_name" = "demographics"
+        "cohort_definition_id" = 1L,
+        "cohort_name" = "demographics"
       ),
       cohortAttritionRef = NULL,
       cohortCodelistRef = NULL,

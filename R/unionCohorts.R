@@ -47,17 +47,22 @@ unionCohorts <- function(cohort,
   if (length(cohortId) < 2) {
     cli::cli_abort("Settings of cohort table must contain at least two cohorts.")
   }
-  assertNumeric(gap, integerish = TRUE, min = 0, length = 1)
+  assertNumeric(gap,
+                integerish = TRUE,
+                min = 0,
+                length = 1)
   assertCharacter(cohortName, length = 1, null = TRUE)
 
   if (length(cohortName) == 0) {
-    names <- omopgenerics::settings(cohort)|>
+    names <- omopgenerics::settings(cohort) |>
       dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>
       dplyr::pull("cohort_name")
     cohortName <- paste0(names, collapse = "_")
   }
   cohSet <- dplyr::tibble(
-    cohort_definition_id = 1L, cohort_name = cohortName, gap = gap
+    cohort_definition_id = 1L,
+    cohort_name = cohortName,
+    gap = gap
   )
 
   # union cohort
@@ -65,12 +70,11 @@ unionCohorts <- function(cohort,
   tmpTable  <- omopgenerics::uniqueTableName()
   unionedCohort <- cohort |>
     dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>
-    joinOverlap(name = name,
-                by = "subject_id", gap = gap) |>
+    joinOverlap(name = name, by = "subject_id", gap = gap) |>
     dplyr::mutate(cohort_definition_id = 1L) |>
     dplyr::compute(name = tmpTable, temporary = FALSE)
   cohCodelist <- attr(cohort, "cohort_codelist")
-  if(!is.null(cohCodelist)) {
+  if (!is.null(cohCodelist)) {
     cohCodelist <- cohCodelist |> dplyr::mutate("cohort_definition_id" = 1)
   }
   unionedCohort <- unionedCohort |>
@@ -81,13 +85,11 @@ unionCohorts <- function(cohort,
       .softValidation = TRUE
     )
 
-  if(isFALSE(keepOriginalCohorts)){
-  cdm[[name]] <- unionedCohort |>
-    dplyr::compute(name = name, temporary = FALSE)
+  if (isFALSE(keepOriginalCohorts)) {
+    cdm[[name]] <- unionedCohort |>
+      dplyr::compute(name = name, temporary = FALSE)
   } else {
-    cdm <- bind(cohort,
-                unionedCohort,
-                name = name)
+    cdm <- bind(cohort, unionedCohort, name = name)
   }
 
 

@@ -48,10 +48,13 @@ stratifyCohorts <- function(cohort,
 
   cdm <- omopgenerics::cdmReference(cohort)
 
-  if (length(strata) == 0 | sum(cohortCount(cohort)$number_records) == 0) {
-    return(
-      subsetCohorts(cohort = cohort, cohortId = cohortId, name = name)
-    )
+  if (length(strata) == 0 ||
+    sum(cohortCount(cohort)$number_records) == 0) {
+    return(subsetCohorts(
+      cohort = cohort,
+      cohortId = cohortId,
+      name = name
+    ))
   }
 
   strataCols <- unique(unlist(strata))
@@ -60,11 +63,14 @@ stratifyCohorts <- function(cohort,
     dplyr::filter(.data$cohort_definition_id %in% .env$cohortId)
   # drop columns from set
   dropCols <- colnames(set)[colnames(set) %in% c(
-    strataCols, "target_cohort_id", "target_cohort_name", "target_cohort_table_name", "strata_columns")]
+    strataCols,
+    "target_cohort_id",
+    "target_cohort_name",
+    "target_cohort_table_name",
+    "strata_columns"
+  )]
   if (length(dropCols) > 0) {
-    cli::cli_inform(c(
-      "!" = "{dropCols} {?is/are} will be overwritten in settings."
-    ))
+    cli::cli_inform(c("!" = "{dropCols} {?is/are} will be overwritten in settings."))
     set <- set |> dplyr::select(!dplyr::all_of(dropCols))
   }
   set <- set |>
@@ -97,9 +103,14 @@ stratifyCohorts <- function(cohort,
     cdm = cdm,
     name = nm,
     table = newSettings |>
-      dplyr::select(dplyr::all_of(c(
-        "cohort_definition_id", "target_cohort_id", "strata_columns", strataCols
-      )))
+      dplyr::select(dplyr::all_of(
+        c(
+          "cohort_definition_id",
+          "target_cohort_id",
+          "strata_columns",
+          strataCols
+        )
+      ))
   )
 
   newCohort <- list()
@@ -108,9 +119,7 @@ stratifyCohorts <- function(cohort,
       dplyr::rename("target_cohort_id" = "cohort_definition_id") |>
       dplyr::inner_join(
         cdm[[nm]] |>
-          dplyr::filter(
-            .data$strata_columns == !!paste0(strata[[k]], collapse = "; ")
-          ) |>
+          dplyr::filter(.data$strata_columns == !!paste0(strata[[k]], collapse = "; ")) |>
           dplyr::select(
             "cohort_definition_id",
             "target_cohort_id",
@@ -134,9 +143,7 @@ stratifyCohorts <- function(cohort,
     dplyr::select(!"target_cohort_id")
 
   newCohort <- purrr::reduce(newCohort, dplyr::union_all) |>
-    dplyr::select(!dplyr::all_of(c(
-      "target_cohort_id", strataCols[removeStrata]
-    ))) |>
+    dplyr::select(!dplyr::all_of(c("target_cohort_id", strataCols[removeStrata]))) |>
     dplyr::compute(name = name, temporary = FALSE) |>
     omopgenerics::newCohortTable(
       cohortSetRef = newSettings,
@@ -160,7 +167,10 @@ getNewSettingsStrata <- function(set, strata, counts) {
       dplyr::cross_join(
         tidyr::expand_grid(!!!values) |>
           tidyr::unite(
-            col = "cohort_name", dplyr::all_of(x), sep = "_", remove = FALSE
+            col = "cohort_name",
+            dplyr::all_of(x),
+            sep = "_",
+            remove = FALSE
           ) |>
           dplyr::mutate("strata_columns" = paste0(x, collapse = "; ")) |>
           dplyr::relocate("strata_columns")
@@ -179,7 +189,9 @@ getNewAttritionStrata <- function(originalAttrition, set, counts) {
   for (k in seq_len(numCohorts)) {
     tcdi <- set$target_cohort_id[k]
     ccdi <- set$cohort_definition_id[k]
-    strata <- set$strata_columns[k] |> strsplit(split = "; ") |> unlist()
+    strata <- set$strata_columns[k] |>
+      strsplit(split = "; ") |>
+      unlist()
     newAttrition[[k]] <- newAttrition[[k]] |>
       dplyr::filter(.data$cohort_definition_id == .env$tcdi) |>
       dplyr::mutate("cohort_definition_id" = .env$ccdi)

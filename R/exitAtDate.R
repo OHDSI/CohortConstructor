@@ -40,9 +40,7 @@ exitAtObservationEnd <- function(cohort,
 
   # create new cohort
   newCohort <- cohort |>
-    PatientProfiles::addFutureObservation(
-      futureObservationType = "date"
-    ) |>
+    PatientProfiles::addFutureObservation(futureObservationType = "date") |>
     # exit at observation end
     dplyr::mutate(
       "cohort_end_date" = dplyr::if_else(
@@ -55,10 +53,7 @@ exitAtObservationEnd <- function(cohort,
     # no overlapping periods
     joinOverlap(name = name) |>
     omopgenerics::newCohortTable(.softValidation = TRUE) |>
-    omopgenerics::recordCohortAttrition(
-      reason = "Exit at observation period end date",
-      cohortId = cohortId
-    )
+    omopgenerics::recordCohortAttrition(reason = "Exit at observation period end date", cohortId = cohortId)
 
   return(newCohort)
 }
@@ -111,7 +106,8 @@ exitAtDeath <- function(cohort,
     # exit
     dplyr::mutate(
       "cohort_end_date" = dplyr::if_else(
-        .data$cohort_definition_id %in% .env$cohortId & !is.na(.data$date_of_death),
+        .data$cohort_definition_id %in% .env$cohortId &
+          !is.na(.data$date_of_death),
         .data$date_of_death,
         .data$cohort_end_date
       )
@@ -120,27 +116,20 @@ exitAtDeath <- function(cohort,
   if (requireDeath) {
     newCohort <- newCohort |>
       dplyr::filter(!is.na(.data$date_of_death) |
-                      !.data$cohort_definition_id %in% .env$cohortId
-      ) |>
-        dplyr::compute(name = name, temporary = FALSE) |>
-        omopgenerics::recordCohortAttrition(
-          reason = "No death recorded",
-          cohortId = cohortId
-        )
+                      !.data$cohort_definition_id %in% .env$cohortId) |>
+      dplyr::compute(name = name, temporary = FALSE) |>
+      omopgenerics::recordCohortAttrition(reason = "No death recorded", cohortId = cohortId)
   } else {
     newCohort <- newCohort |>
       dplyr::compute(name = name, temporary = FALSE)
-    }
+  }
 
   newCohort <- newCohort |>
     # no overlapping periods
     joinOverlap(name = name) |>
     dplyr::compute(name = name, temporary = FALSE) |>
     omopgenerics::newCohortTable(.softValidation = TRUE) |>
-    omopgenerics::recordCohortAttrition(
-      reason = "Exit at death",
-      cohortId = cohortId
-    )
+    omopgenerics::recordCohortAttrition(reason = "Exit at death", cohortId = cohortId)
 
   return(newCohort)
 }

@@ -13,26 +13,36 @@ validateCdm <- function(cdm) {
 }
 
 validateCohortTable <- function(cohort, dropExtraColumns = FALSE) {
-  if(!"cohort_table" %in% class(cohort) ||
-     !all(c("cohort_definition_id", "subject_id",
-            "cohort_start_date", "cohort_end_date") %in%
-          colnames(cohort))){
+  if (!"cohort_table" %in% class(cohort) ||
+    !all(
+      c(
+        "cohort_definition_id",
+        "subject_id",
+        "cohort_start_date",
+        "cohort_end_date"
+      ) %in%
+        colnames(cohort)
+    )) {
     cli::cli_abort("cohort must be a `cohort_table`")
   }
   if (dropExtraColumns) {
     extraColumns <- colnames(cohort)
     extraColumns <- extraColumns[!extraColumns %in% c(
-      "cohort_definition_id", "subject_id", "cohort_start_date",
+      "cohort_definition_id",
+      "subject_id",
+      "cohort_start_date",
       "cohort_end_date"
     )]
     if (length(extraColumns) > 0) {
-      cli::cli_inform(c(
-        "!" = "extra columns will be dropped from cohort table:
-        {paste0(extraColumns, collapse = ', ')}."
-      ))
+      cli::cli_inform(
+        c("!" = "extra columns will be dropped from cohort table:
+        {paste0(extraColumns, collapse = ', ')}.")
+      )
       cohort <- cohort |>
         dplyr::select(
-          "cohort_definition_id", "subject_id", "cohort_start_date",
+          "cohort_definition_id",
+          "subject_id",
+          "cohort_start_date",
           "cohort_end_date"
         )
     }
@@ -43,11 +53,14 @@ validateCohortTable <- function(cohort, dropExtraColumns = FALSE) {
 validateCohortColumn <- function(columns, cohort, class = NULL) {
   for (column in columns) {
     assertCharacter(column)
-    if(!column %in% colnames(cohort)){
+    if (!column %in% colnames(cohort)) {
       cli::cli_abort("{column} must be a column in the cohort table.")
     }
     if (!is.null(class)) {
-      if (all(!cohort |> dplyr::pull(!!column) |> class() |> unique() %in% class)) {
+      if (all(!cohort |>
+        dplyr::pull(!!column) |>
+        class() |>
+        unique() %in% class)) {
         cli::cli_abort("{column} must be a column of class {class} in the cohort table.")
       }
     }
@@ -61,11 +74,13 @@ validateCohortId <- function(cohortId, ids) {
     cohortId <- ids
   } else {
     indNot <- !cohortId %in% ids
-    if (sum(indNot)>0) {
+    if (sum(indNot) > 0) {
       if (sum(indNot) == length(cohortId)) {
         cli::cli_abort("No valid cohort ids supplied.")
       } else {
-        cli::cli_warn("{paste0(cohortId[indNot], collapse = ', ')} {?is/are} not in the cohort table and won't be used.")
+        cli::cli_warn(
+          "{paste0(cohortId[indNot], collapse = ', ')} {?is/are} not in the cohort table and won't be used."
+        )
         cohortId <- cohortId[!indNot]
       }
     }
@@ -73,15 +88,15 @@ validateCohortId <- function(cohortId, ids) {
   return(cohortId)
 }
 
-validateDateRange <- function(dateRange){
-  if(!"Date" %in% class(dateRange) & !all(is.na(dateRange))){
+validateDateRange <- function(dateRange) {
+  if (!"Date" %in% class(dateRange) && !all(is.na(dateRange))) {
     cli::cli_abort("dateRange is not a date")
   }
-  if(length(dateRange) != 2){
+  if (length(dateRange) != 2) {
     cli::cli_abort("dateRange must be length two")
   }
   if (!any(is.na(dateRange))) {
-    if(dateRange[1]>dateRange[2]){
+    if (dateRange[1] > dateRange[2]) {
       cli::cli_abort("First date in dateRange cannot be after the second")
     }
   }
@@ -94,10 +109,10 @@ validateName <- function(name) {
     "*" = "lowercase character vector of length 1",
     "*" = "NA or NULL values are not allowed"
   )
-  if (!is.character(name) | length(name) != 1 | is.na(name)) {
+  if (!is.character(name) || length(name) != 1 || is.na(name)) {
     cli::cli_abort(em)
   }
-  if (tolower(name) != name){
+  if (tolower(name) != name) {
     cli::cli_abort(em)
   }
   return(invisible(name))
@@ -106,7 +121,9 @@ validateName <- function(name) {
 validateConceptSet <- function(conceptSet) {
   # while is.list does not work for tibbles:
   if (!"list" %in% class(conceptSet)) {
-    cli::cli_abort("{substitute(conceptSet)} must be a list; it can not contain NA; it has to be named; elements must have class: numeric.")
+    cli::cli_abort(
+      "{substitute(conceptSet)} must be a list; it can not contain NA; it has to be named; elements must have class: numeric."
+    )
   }
   omopgenerics::newCodelist(conceptSet)
 }
@@ -121,7 +138,10 @@ validateDemographicRequirements <- function(ageRange,
                                             minFutureObservation,
                                             null = FALSE) {
   # ageRange:
-  if (!is.list(ageRange) & !is.null(ageRange)) {ageRange <- list(ageRange)}
+  if (!is.list(ageRange) &&
+    !is.null(ageRange)) {
+    ageRange <- list(ageRange)
+  }
   assertList(ageRange, class = "numeric", null = null)
   if (!is.null(ageRange)) {
     for (i in seq_along(ageRange)) {
@@ -131,7 +151,7 @@ validateDemographicRequirements <- function(ageRange,
       if (ageRange[[i]][1] > ageRange[[i]][2]) {
         cli::cli_abort("Upper `ageRange` value must be equal or higher than lower `ageRange` value.")
       }
-      if (ageRange[[i]][1] < 0 | ageRange[[i]][2] < 0) {
+      if (ageRange[[i]][1] < 0 || ageRange[[i]][2] < 0) {
         cli::cli_abort("Both `ageRange` components must be >= 0.")
       }
     }
@@ -139,7 +159,7 @@ validateDemographicRequirements <- function(ageRange,
 
   # sex:
   assertCharacter(sex, null = null)
-  if (!all(sex %in% c("Male", "Female", "Both")) & !is.null(sex)) {
+  if (!all(sex %in% c("Male", "Female", "Both")) && !is.null(sex)) {
     cli::cli_abort("`sex` must be from: 'Male', 'Female', and 'Both'.")
   }
 
@@ -149,14 +169,24 @@ validateDemographicRequirements <- function(ageRange,
       cli::cli_abort("`minPriorObservation` cannot be infinite.")
     }
   }
-  assertNumeric(minPriorObservation, integerish = TRUE, min = 0, null = TRUE)
+  assertNumeric(
+    minPriorObservation,
+    integerish = TRUE,
+    min = 0,
+    null = TRUE
+  )
   # minFutureObservation:
   if (!is.null(minFutureObservation)) {
     if (all(is.infinite(minFutureObservation))) {
       cli::cli_abort("`minFutureObservation` cannot be infinite.")
     }
   }
-  assertNumeric(minFutureObservation, integerish = TRUE, min = 0, null = TRUE)
+  assertNumeric(
+    minFutureObservation,
+    integerish = TRUE,
+    min = 0,
+    null = TRUE
+  )
 
   return(ageRange)
 }
@@ -165,50 +195,58 @@ validateStrata <- function(strata, cohort) {
   assertList(strata, class = "character")
   colsCohort <- colnames(cohort)
   colsStrata <- unique(unlist(strata))
-  misisngCols <- colsStrata[!colsStrata %in%colsCohort]
+  misisngCols <- colsStrata[!colsStrata %in% colsCohort]
   if (length(misisngCols) > 0) {
-    cli::cli_abort(
-      "{misisngCols} column{?s} {?is/are} not present in cohort table"
-    )
+    cli::cli_abort("{misisngCols} column{?s} {?is/are} not present in cohort table")
   }
   return(strata)
 }
 
 validateValueAsNumber <- function(valueAsNumber) {
-  assertList(valueAsNumber, named = TRUE, class = "numeric", null = TRUE)
+  assertList(valueAsNumber,
+    named = TRUE,
+    class = "numeric",
+    null = TRUE
+  )
   for (i in seq_along(valueAsNumber)) {
     if (length(valueAsNumber[[i]]) != 2) {
       cli::cli_abort("Each numeric vector in `valueAsNumber` list must be of length 2.")
     }
     if (valueAsNumber[[i]][1] > valueAsNumber[[i]][2]) {
-      cli::cli_abort("Upper `valueAsNumber` value must be equal or higher than lower `valueAsNumber` value.")
+      cli::cli_abort(
+        "Upper `valueAsNumber` value must be equal or higher than lower `valueAsNumber` value."
+      )
     }
   }
 }
 
 validateN <- function(n) {
-  assertNumeric(n, integerish = TRUE, min = 0, length = 1)
+  assertNumeric(n,
+    integerish = TRUE,
+    min = 0,
+    length = 1
+  )
 }
 
 
-validateIntersections <- function(intersections){
-
-  if(length(intersections) == 1){
+validateIntersections <- function(intersections) {
+  if (length(intersections) == 1) {
     intersections <- c(intersections, intersections)
   }
-  if(length(intersections) != 2){
+  if (length(intersections) != 2) {
     cli::cli_abort("intersections must be of length 1 or 2, but is length {length(intersections)}")
   }
-  if(intersections[1] < 0){
-    cli::cli_abort("intersections lower limit must be equal or greater than zero but is {intersections[[1]]}")
+  if (intersections[1] < 0) {
+    cli::cli_abort(
+      "intersections lower limit must be equal or greater than zero but is {intersections[[1]]}"
+    )
   }
-  if(intersections[1] > intersections[2]){
+  if (intersections[1] > intersections[2]) {
     cli::cli_abort("Second value for intersections must be equal or greater than the first")
   }
-  if(intersections[1] == Inf){
+  if (intersections[1] == Inf) {
     cli::cli_abort("First value for intersections cannot be Inf")
   }
 
   intersections
 }
-

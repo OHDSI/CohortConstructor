@@ -288,7 +288,7 @@ assertNumeric <- function(x,
     }
 
     # assert integerish
-    if (integerish & base::length(xNoNa) > 0) {
+    if (integerish && base::length(xNoNa) > 0) {
       err <- max(abs(xNoNa - round(xNoNa)))
       if (err > 0.0001) {
         cli::cli_abort(errorMessage, call = call)
@@ -296,14 +296,14 @@ assertNumeric <- function(x,
     }
 
     # assert lower bound
-    if (!is.infinite(min) & base::length(xNoNa) > 0) {
+    if (!is.infinite(min) && base::length(xNoNa) > 0) {
       if (base::min(xNoNa) < min) {
         cli::cli_abort(errorMessage, call = call)
       }
     }
 
     # assert upper bound
-    if (!is.infinite(max) & base::length(xNoNa) > 0) {
+    if (!is.infinite(max) && base::length(xNoNa) > 0) {
       if (base::max(xNoNa) > max) {
         cli::cli_abort(errorMessage, call = call)
       }
@@ -359,12 +359,10 @@ assertNull <- function(x, null, errorMessage, call) {
 #'
 #' @noRd
 #'
-assertDate <- function(x,
-                       length,
-                       call = parent.frame()) {
+assertDate <- function(x, length, call = parent.frame()) {
   # create error message
   errorMessage <- paste0(substitute(x), " must be an object of class Date.")
-  if (! class(x) %in% "Date") {
+  if (!class(x) %in% "Date") {
     cli::cli_abort(errorMessage, call = call)
   }
   errorMessage <- paste0(substitute(x), " must have length = ", length)

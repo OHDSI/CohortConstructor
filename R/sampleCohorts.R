@@ -38,15 +38,16 @@ sampleCohorts <- function(cohort,
     dplyr::select("subject_id", "cohort_definition_id") |>
     dplyr::distinct() |>
     dplyr::slice_sample(n = n) |>
-    dplyr::left_join(cohort,
-                     by = c("subject_id", "cohort_definition_id")) |>
+    dplyr::left_join(cohort, by = c("subject_id", "cohort_definition_id")) |>
     dplyr::union_all(cohort |>
-                       dplyr::filter(!(.data$cohort_definition_id %in% .env$cohortId))) |>
+      dplyr::filter(!(
+        .data$cohort_definition_id %in% .env$cohortId
+      ))) |>
     dplyr::ungroup() |>
     omopgenerics::recordCohortAttrition(
-      reason = paste0("Sample ",n," individuals"),
+      reason = paste0("Sample ", n, " individuals"),
       cohortId = cohortId
-      ) |>
+    ) |>
     dplyr::compute(name = name, temporary = FALSE)
 
   return(cohort)

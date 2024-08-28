@@ -32,7 +32,7 @@ yearCohorts <- function(cohort,
   cohort <- validateCohortTable(cohort)
   ids <- settings(cohort)$cohort_definition_id
   cohortId <- validateCohortId(cohortId, ids)
-  assertNumeric(years, integerish = T)
+  assertNumeric(years, integerish = TRUE)
   name <- validateName(name)
 
   if (length(years) == 0) {
@@ -91,14 +91,16 @@ yearCohorts <- function(cohort,
     dplyr::mutate(!!!startDates, !!!endDates) |>
     dplyr::select(!c("cohort_start_date", "cohort_end_date")) |>
     tidyr::pivot_longer(
-      cols = dplyr::starts_with(c("cohort_start_date", "cohort_end_date")),
+      cols = dplyr::starts_with(c(
+        "cohort_start_date", "cohort_end_date"
+      )),
       names_to = c(".value", "year"),
       names_pattern = "(cohort_start_date|cohort_end_date)_(\\d+)"
     ) |>
     dplyr::filter(.data$cohort_start_date <= .data$cohort_end_date) |>
     dplyr::mutate("year" = as.integer(.data$year)) |>
     dplyr::inner_join(cdm[[tmpName]], by = c("cohort_definition_id", "year")) |>
-    dplyr::select(-"cohort_definition_id", - "year") |>
+    dplyr::select(-"cohort_definition_id", -"year") |>
     dplyr::rename("cohort_definition_id" = "new_cohort_definition_id") |>
     dplyr::compute(name = name, temporary = FALSE)
 
@@ -119,9 +121,7 @@ yearCohorts <- function(cohort,
   originalAttrition <- attrition(cohort)
   newAttrition <- list()
   for (k in newSet$cohort_definition_id) {
-    targetId <- newSet$target_cohort_definition_id[
-      newSet$cohort_definition_id == k
-    ]
+    targetId <- newSet$target_cohort_definition_id[newSet$cohort_definition_id == k]
     yr <- newSet$year[newSet$cohort_definition_id == k]
     reason <- "Restrict to observations between: {yr}-01-01 and {yr}-12-31" |>
       glue::glue()
