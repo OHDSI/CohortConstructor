@@ -315,7 +315,9 @@ splitOverlap <- function(x,
         dplyr::ungroup(),
       by = c(by, id)
     ) %>%
-    dplyr::select(dplyr::all_of(by),!!start := dplyr::all_of(is),!!end := dplyr::all_of(ie)) %>%
+    dplyr::select(dplyr::all_of(by),
+                  !!start := dplyr::all_of(is),
+                  !!end := dplyr::all_of(ie)) %>%
     dplyr::compute()
 }
 

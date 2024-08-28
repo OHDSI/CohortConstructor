@@ -199,7 +199,7 @@ measurementCohort <- function(cdm,
     dplyr::compute(name = name, temporary = FALSE)
 
 
-  if (!is.null(valueAsConcept) | !is.null(valueAsNumber)) {
+  if (!is.null(valueAsConcept) || !is.null(valueAsNumber)) {
     cli::cli_inform(c("i" = "Applying measurement requirements."))
     filterExpr <- getFilterExpression(valueAsConcept, valueAsNumber)
     cohort <- cohort |>

@@ -49,7 +49,7 @@ stratifyCohorts <- function(cohort,
   cdm <- omopgenerics::cdmReference(cohort)
 
   if (length(strata) == 0 ||
-      sum(cohortCount(cohort)$number_records) == 0) {
+    sum(cohortCount(cohort)$number_records) == 0) {
     return(subsetCohorts(
       cohort = cohort,
       cohortId = cohortId,
@@ -75,8 +75,10 @@ stratifyCohorts <- function(cohort,
   }
   set <- set |>
     dplyr::mutate("target_cohort_table_name" = tableName(cohort)) |>
-    dplyr::rename("target_cohort_id" = "cohort_definition_id",
-                  "target_cohort_name" = "cohort_name")
+    dplyr::rename(
+      "target_cohort_id" = "cohort_definition_id",
+      "target_cohort_name" = "cohort_name"
+    )
 
 
   # get counts for attrition
@@ -187,7 +189,9 @@ getNewAttritionStrata <- function(originalAttrition, set, counts) {
   for (k in seq_len(numCohorts)) {
     tcdi <- set$target_cohort_id[k]
     ccdi <- set$cohort_definition_id[k]
-    strata <- set$strata_columns[k] |> strsplit(split = "; ") |> unlist()
+    strata <- set$strata_columns[k] |>
+      strsplit(split = "; ") |>
+      unlist()
     newAttrition[[k]] <- newAttrition[[k]] |>
       dplyr::filter(.data$cohort_definition_id == .env$tcdi) |>
       dplyr::mutate("cohort_definition_id" = .env$ccdi)

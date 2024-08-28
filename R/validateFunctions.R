@@ -14,23 +14,25 @@ validateCdm <- function(cdm) {
 
 validateCohortTable <- function(cohort, dropExtraColumns = FALSE) {
   if (!"cohort_table" %in% class(cohort) ||
-      !all(
-        c(
-          "cohort_definition_id",
-          "subject_id",
-          "cohort_start_date",
-          "cohort_end_date"
-        ) %in%
+    !all(
+      c(
+        "cohort_definition_id",
+        "subject_id",
+        "cohort_start_date",
+        "cohort_end_date"
+      ) %in%
         colnames(cohort)
-      )) {
+    )) {
     cli::cli_abort("cohort must be a `cohort_table`")
   }
   if (dropExtraColumns) {
     extraColumns <- colnames(cohort)
-    extraColumns <- extraColumns[!extraColumns %in% c("cohort_definition_id",
-                                                      "subject_id",
-                                                      "cohort_start_date",
-                                                      "cohort_end_date")]
+    extraColumns <- extraColumns[!extraColumns %in% c(
+      "cohort_definition_id",
+      "subject_id",
+      "cohort_start_date",
+      "cohort_end_date"
+    )]
     if (length(extraColumns) > 0) {
       cli::cli_inform(
         c("!" = "extra columns will be dropped from cohort table:
@@ -55,7 +57,10 @@ validateCohortColumn <- function(columns, cohort, class = NULL) {
       cli::cli_abort("{column} must be a column in the cohort table.")
     }
     if (!is.null(class)) {
-      if (all(!cohort |> dplyr::pull(!!column) |> class() |> unique() %in% class)) {
+      if (all(!cohort |>
+        dplyr::pull(!!column) |>
+        class() |>
+        unique() %in% class)) {
         cli::cli_abort("{column} must be a column of class {class} in the cohort table.")
       }
     }
@@ -134,7 +139,7 @@ validateDemographicRequirements <- function(ageRange,
                                             null = FALSE) {
   # ageRange:
   if (!is.list(ageRange) &&
-      !is.null(ageRange)) {
+    !is.null(ageRange)) {
     ageRange <- list(ageRange)
   }
   assertList(ageRange, class = "numeric", null = null)
@@ -199,9 +204,10 @@ validateStrata <- function(strata, cohort) {
 
 validateValueAsNumber <- function(valueAsNumber) {
   assertList(valueAsNumber,
-             named = TRUE,
-             class = "numeric",
-             null = TRUE)
+    named = TRUE,
+    class = "numeric",
+    null = TRUE
+  )
   for (i in seq_along(valueAsNumber)) {
     if (length(valueAsNumber[[i]]) != 2) {
       cli::cli_abort("Each numeric vector in `valueAsNumber` list must be of length 2.")
@@ -216,9 +222,10 @@ validateValueAsNumber <- function(valueAsNumber) {
 
 validateN <- function(n) {
   assertNumeric(n,
-                integerish = TRUE,
-                min = 0,
-                length = 1)
+    integerish = TRUE,
+    min = 0,
+    length = 1
+  )
 }
 
 

@@ -23,7 +23,8 @@
 #'
 #' cdm <- mockCohortConstructor()
 #'
-#' cohort <-  cdm |> demographicsCohort(name = "cohort3", ageRange = c(18,40), sex = "Male")
+#' cohort <-  cdm |>
+#'     demographicsCohort(name = "cohort3", ageRange = c(18,40), sex = "Male")
 #'
 #' attrition(cohort)
 #' }
@@ -37,7 +38,9 @@ demographicsCohort <- function(cdm,
   name <- validateName(name)
 
   cdm[[name]] <- cdm$observation_period |>
-    dplyr::inner_join(cdm$person |> dplyr::select("person_id") |> dplyr::distinct(),
+    dplyr::inner_join(cdm$person |>
+                        dplyr::select("person_id") |>
+                        dplyr::distinct(),
                       by = "person_id") |>
     dplyr::select(
       "subject_id" = "person_id",

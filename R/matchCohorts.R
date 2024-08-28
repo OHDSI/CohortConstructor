@@ -53,7 +53,10 @@ matchCohorts <- function(cohort,
   y <- cohort |>
     dplyr::filter(.data$cohort_definition_id %in% cohortId) |>
     dplyr::group_by(.data$cohort_definition_id, .data$subject_id) |>
-    dplyr::filter(dplyr::n() >= 2) |> dplyr::ungroup() |> dplyr::tally() |> dplyr::pull()
+    dplyr::filter(dplyr::n() >= 2) |>
+    dplyr::ungroup() |>
+    dplyr::tally() |>
+    dplyr::pull()
   if (y != 0) {
     cli::cli_warn(
       "Multiple records per person detected. The matchCohorts() function is designed to operate under the assumption that there is only one record per person within each cohort. If this assumption is not met, each record will be treated independently. As a result, the same individual may be matched multiple times, leading to inconsistent and potentially misleading results."
