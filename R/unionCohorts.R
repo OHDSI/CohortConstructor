@@ -12,6 +12,9 @@
 #' that will be merged in a single cohort entry
 #' @param cohortName Name of the returned cohort. If NULL, the cohort name will
 #' be created by collapsing the individual cohort names, separated by "_".
+#' @param keepOriginalCohorts If TRUE the original cohorts and the newly
+#' created union cohort will be returned. If FALSE only the new cohort will be
+#' returned.
 #' @param name Name of the new cohort table.
 #'
 #' @export
@@ -32,6 +35,7 @@ unionCohorts <- function(cohort,
                          cohortId = NULL,
                          gap = 0,
                          cohortName = NULL,
+                         keepOriginalCohorts = FALSE,
                          name = tableName(cohort)) {
   # checks
   name <- validateName(name)
@@ -40,73 +44,52 @@ unionCohorts <- function(cohort,
   validateCDM(cdm)
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
   cohortId <- validateCohortId(cohortId, ids)
+  if (length(cohortId) < 2) {
+    cli::cli_abort("Settings of cohort table must contain at least two cohorts.")
+  }
   assertNumeric(gap, integerish = TRUE, min = 0, length = 1)
   assertCharacter(cohortName, length = 1, null = TRUE)
 
-  if (length(cohortId) < 2) {
-    cli::cli_warn("At least 2 cohort id must be provided to do the union.")
-    # set
-    set <- cohort |>
-      omopgenerics::settings() |>
-      dplyr::filter(.data$cohort_definition_id == .env$cohortId)
-    if (is.null(cohortName)) {cohortName <- set$cohort_name}
-    # codelist
-    cohCodelist <- attr(cohort, "cohort_codelist")
-    if(!is.null(cohCodelist)) {
-      cohCodelist <- cohCodelist |>
-        dplyr::filter(.data$cohort_definition_id == .env$cohortId) |>
-        dplyr::mutate("cohort_definition_id" = 1)
-    }
-    # update properly
-    cohort <- cohort |>
-      dplyr::filter(.data$cohort_definition_id == .env$cohortId) |>
-      dplyr::mutate(cohort_definition_id = 1) |>
-      dplyr::compute(name = name, temporary = FALSE) |>
-      omopgenerics::newCohortTable(
-        cohortSetRef = set |>
-          dplyr::mutate(cohort_definition_id = 1, cohort_name = cohortName),
-        cohortAttritionRef = cohort |>
-          omopgenerics::attrition() |>
-          dplyr::filter(.data$cohort_definition_id == .env$cohortId) |>
-          dplyr::mutate(cohort_definition_id = 1),
-        cohortCodelistRef = cohCodelist,
-        .softValidation = TRUE
-      )
-    return(cohort)
-  }
-
-  # cohort set
-  names <- omopgenerics::settings(cohort)|>
-    dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>
-    dplyr::pull("cohort_name")
   if (length(cohortName) == 0) {
+    names <- omopgenerics::settings(cohort)|>
+      dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>
+      dplyr::pull("cohort_name")
     cohortName <- paste0(names, collapse = "_")
   }
   cohSet <- dplyr::tibble(
-    cohort_definition_id = 1, cohort_name = cohortName, gap = gap
+    cohort_definition_id = 1L, cohort_name = cohortName, gap = gap
   )
 
   # union cohort
-  newCohort <- cohort |>
+  # save to a separate table so can append to original cohorts at the end
+  tmpTable  <- omopgenerics::uniqueTableName()
+  unionedCohort <- cohort |>
     dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>
     joinOverlap(name = name,
                 by = "subject_id", gap = gap) |>
-    dplyr::mutate(cohort_definition_id = 1) |>
-    dplyr::compute(name = name, temporary = FALSE)
-
-  # concept list
+    dplyr::mutate(cohort_definition_id = 1L) |>
+    dplyr::compute(name = tmpTable, temporary = FALSE)
   cohCodelist <- attr(cohort, "cohort_codelist")
   if(!is.null(cohCodelist)) {
     cohCodelist <- cohCodelist |> dplyr::mutate("cohort_definition_id" = 1)
   }
-
-  # new cohort
-  newCohort <- newCohort |>
+  unionedCohort <- unionedCohort |>
     omopgenerics::newCohortTable(
       cohortSetRef = cohSet,
       cohortAttritionRef = NULL,
       cohortCodelistRef = cohCodelist,
       .softValidation = TRUE
     )
-  return(newCohort)
+
+  if(isFALSE(keepOriginalCohorts)){
+  cdm[[name]] <- unionedCohort |>
+    dplyr::compute(name = name, temporary = FALSE)
+  } else {
+    cdm <- bind(cohort,
+                unionedCohort,
+                name = name)
+  }
+
+
+  return(cdm[[name]])
 }
