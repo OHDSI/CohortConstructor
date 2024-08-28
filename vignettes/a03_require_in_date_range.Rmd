@@ -1,8 +1,8 @@
 ---
-title: "Cohort manipulations"
+title: "a03_require_in_date_range"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{a04_cohort_algebra}
+  %\VignetteIndexEntry{a03_require_in_date_range}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -17,10 +17,3 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(CohortConstructor)
 ```
-
-
-Intersection
-
-Union 
-
-etc
