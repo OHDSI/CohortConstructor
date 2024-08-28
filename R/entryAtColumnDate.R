@@ -96,4 +96,3 @@ entryAtLastDate <- function(cohort,
     exit = FALSE
   )
 }
-

@@ -67,11 +67,17 @@ requireCohortIntersect <- function(cohort,
   upper_limit <- as.integer(upper_limit)
 
 
-  cols <- unique(c("cohort_definition_id", "subject_id",
-                   "cohort_start_date", "cohort_end_date",
-                   indexDate))
+  cols <- unique(
+    c(
+      "cohort_definition_id",
+      "subject_id",
+      "cohort_start_date",
+      "cohort_end_date",
+      indexDate
+    )
+  )
 
-  if(is.list(window)){
+  if (is.list(window)) {
     window_start <- window[[1]][1]
     window_end <- window[[1]][2]
   } else {
@@ -79,15 +85,15 @@ requireCohortIntersect <- function(cohort,
     window_end <- window[2]
   }
 
-  if(length(targetCohortTable) > 1){
+  if (length(targetCohortTable) > 1) {
     cli::cli_abort("Only one target cohort table is currently supported")
   }
 
-  if(length(targetCohortId) > 1){
+  if (length(targetCohortId) > 1) {
     cli::cli_abort("Only one target cohort is currently supported")
   }
 
-  if(is.null(targetCohortId)){
+  if (is.null(targetCohortId)) {
     targetCohortId <- omopgenerics::settings(cdm[[targetCohortTable]]) %>%
       dplyr::pull("cohort_definition_id")
   }
@@ -111,37 +117,44 @@ requireCohortIntersect <- function(cohort,
     )
 
   subsetCohort <- subsetCohort %>%
-      dplyr::mutate(lower_limit = .env$lower_limit,
-                    upper_limit = .env$upper_limit) |>
-      dplyr::filter((.data$intersect_cohort >= .data$lower_limit &
-                    .data$intersect_cohort <= .data$upper_limit) |
-                    (!.data$cohort_definition_id %in% .env$cohortId)) %>%
-      dplyr::select(cols)
+    dplyr::mutate(lower_limit = .env$lower_limit,
+                  upper_limit = .env$upper_limit) |>
+    dplyr::filter((
+      .data$intersect_cohort >= .data$lower_limit &
+        .data$intersect_cohort <= .data$upper_limit
+    ) |
+      (!.data$cohort_definition_id %in% .env$cohortId)
+    ) %>%
+    dplyr::select(cols)
 
   # attrition reason
-  if(all(intersections == 0)){
-    reason <- glue::glue("Not in cohort {target_name} between {window_start} & ",
-                         "{window_end} days relative to {indexDate}")
-  } else if (intersections[[1]] != intersections[[2]]){
-    reason <- glue::glue("In cohort {target_name} between {window_start} & ",
-                         "{window_end} days relative to {indexDate} between ",
-                         "{intersections[[1]]} and {intersections[[2]]} times")
+  if (all(intersections == 0)) {
+    reason <- glue::glue(
+      "Not in cohort {target_name} between {window_start} & ",
+      "{window_end} days relative to {indexDate}"
+    )
+  } else if (intersections[[1]] != intersections[[2]]) {
+    reason <- glue::glue(
+      "In cohort {target_name} between {window_start} & ",
+      "{window_end} days relative to {indexDate} between ",
+      "{intersections[[1]]} and {intersections[[2]]} times"
+    )
   } else {
-    reason <- glue::glue("In cohort {target_name} between {window_start} & ",
-                         "{window_end} days relative to {indexDate} ",
-                         "{intersections[[1]]} times")
+    reason <- glue::glue(
+      "In cohort {target_name} between {window_start} & ",
+      "{window_end} days relative to {indexDate} ",
+      "{intersections[[1]]} times"
+    )
   }
   if (!is.null(censorDate)) {
     reason <- glue::glue("{reason}, censoring at {censorDate}")
   }
 
   x <- cohort %>%
-    dplyr::inner_join(subsetCohort,
-                      by = c(cols)) %>%
+    dplyr::inner_join(subsetCohort, by = c(cols)) %>%
     dplyr::compute(name = name, temporary = FALSE) %>%
     omopgenerics::newCohortTable(.softValidation = TRUE) %>%
     omopgenerics::recordCohortAttrition(reason = reason, cohortId = cohortId)
 
   return(x)
 }
-

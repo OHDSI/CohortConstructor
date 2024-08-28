@@ -43,8 +43,6 @@ mockCohortConstructor <- function(nPerson = 10,
                                   con = DBI::dbConnect(duckdb::duckdb()),
                                   writeSchema = "main",
                                   seed = 123) {
-
-
   if (is.null(tables)) {
     cdm <- omock::mockCdmReference() |>
       omock::mockVocabularyTables(concept = conceptTable) |>
@@ -53,12 +51,11 @@ mockCohortConstructor <- function(nPerson = 10,
       omock::mockCohort(name = "cohort1") |>
       omock::mockCohort(name = "cohort2", numberCohorts = 2)
   } else {
-    cdm <- omock::mockCdmFromTables(tables = tables,
-                                    seed = seed) |>
+    cdm <- omock::mockCdmFromTables(tables = tables, seed = seed) |>
       omock::mockVocabularyTables(concept = conceptTable)
   }
 
-  if (!is.null(conceptIdClass) & !is.null(conceptId)) {
+  if (!is.null(conceptIdClass) && !is.null(conceptId)) {
     cdm <- cdm |> omock::mockConcepts(conceptSet = conceptId, domain = conceptIdClass)
   }
 
@@ -79,17 +76,18 @@ mockCohortConstructor <- function(nPerson = 10,
   }
 
   if (!is.null(otherTables)) {
-    cdm <- cdm |> omopgenerics::insertTable(name = names(otherTables),
-                                            table = otherTables[[1]])
+    cdm <- cdm |> omopgenerics::insertTable(name = names(otherTables), table = otherTables[[1]])
   }
 
   cdm$person <- cdm$person |>
-    dplyr::mutate(gender_concept_id = as.integer(.data$gender_concept_id),
-                  year_of_birth = as.integer(.data$year_of_birth),
-                  month_of_birth = as.integer(.data$month_of_birth),
-                  day_of_birth = as.integer(.data$day_of_birth),
-                  race_concept_id = as.integer(.data$race_concept_id),
-                  ethnicity_concept_id = as.integer(.data$ethnicity_concept_id))
+    dplyr::mutate(
+      gender_concept_id = as.integer(.data$gender_concept_id),
+      year_of_birth = as.integer(.data$year_of_birth),
+      month_of_birth = as.integer(.data$month_of_birth),
+      day_of_birth = as.integer(.data$day_of_birth),
+      race_concept_id = as.integer(.data$race_concept_id),
+      ethnicity_concept_id = as.integer(.data$ethnicity_concept_id)
+    )
 
   cdm$observation_period  <- cdm$observation_period  |>
     dplyr::mutate(period_type_concept_id = as.integer(.data$period_type_concept_id))
@@ -97,7 +95,12 @@ mockCohortConstructor <- function(nPerson = 10,
 
 
   if (!is.null(con)) {
-    cdm <- CDMConnector::copyCdmTo(con = con, cdm = cdm, schema = writeSchema, overwrite = TRUE)
+    cdm <- CDMConnector::copyCdmTo(
+      con = con,
+      cdm = cdm,
+      schema = writeSchema,
+      overwrite = TRUE
+    )
   }
 
   return(cdm)

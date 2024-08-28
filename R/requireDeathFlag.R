@@ -48,11 +48,17 @@ requireDeathFlag <- function(cohort,
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
   cohortId <- validateCohortId(cohortId, ids)
 
-  cols <- unique(c("cohort_definition_id", "subject_id",
-                   "cohort_start_date", "cohort_end_date",
-                   indexDate))
+  cols <- unique(
+    c(
+      "cohort_definition_id",
+      "subject_id",
+      "cohort_start_date",
+      "cohort_end_date",
+      indexDate
+    )
+  )
 
-  if(is.list(window)){
+  if (is.list(window)) {
     window_start <- window[[1]][1]
     window_end <- window[[1]][2]
   } else {
@@ -69,12 +75,10 @@ requireDeathFlag <- function(cohort,
       deathFlagName = "death"
     )
 
-  if(isFALSE(negate)){
+  if (isFALSE(negate)) {
     subsetCohort <- subsetCohort %>%
-      dplyr::filter(
-        .data$death == 1 |
-          (!.data$cohort_definition_id %in% cohortId)
-      ) %>%
+      dplyr::filter(.data$death == 1 |
+                      (!.data$cohort_definition_id %in% cohortId)) %>%
       dplyr::select(!"death")
     # attrition reason
     reason <- glue::glue("Death between {window_start} & ",
@@ -82,10 +86,8 @@ requireDeathFlag <- function(cohort,
   } else {
     # ie require absence instead of presence
     subsetCohort <- subsetCohort %>%
-      dplyr::filter(
-        .data$death != 1 |
-          (!.data$cohort_definition_id %in% cohortId)
-      ) %>%
+      dplyr::filter(.data$death != 1 |
+                      (!.data$cohort_definition_id %in% cohortId)) %>%
       dplyr::select(!"death")
     # attrition reason
     reason <- glue::glue("Alive between {window_start} & ",
@@ -97,8 +99,7 @@ requireDeathFlag <- function(cohort,
   }
 
   x <- cohort %>%
-    dplyr::inner_join(subsetCohort,
-                      by = c(cols)) %>%
+    dplyr::inner_join(subsetCohort, by = c(cols)) %>%
     dplyr::compute(name = name, temporary = FALSE) %>%
     omopgenerics::newCohortTable(.softValidation = TRUE) %>%
     omopgenerics::recordCohortAttrition(reason = reason, cohortId = cohortId)

@@ -29,4 +29,3 @@ PatientProfiles::startDateColumn
 #' @importFrom PatientProfiles endDateColumn
 #' @export
 PatientProfiles::endDateColumn
-

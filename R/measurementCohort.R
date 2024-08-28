@@ -104,19 +104,22 @@ measurementCohort <- function(cdm,
   cohortCodelist <- lapply(conceptSet, dplyr::as_tibble) |>
     dplyr::bind_rows(.id = "cohort_name") |>
     dplyr::inner_join(cohortSet, by = "cohort_name") |>
-    dplyr::select("cohort_definition_id", "concept_id"  = "value", "codelist_name" = "cohort_name") |>
+    dplyr::select("cohort_definition_id",
+                  "concept_id"  = "value",
+                  "codelist_name" = "cohort_name") |>
     dplyr::mutate("type" = "index event") |>
     addDomains(cdm)
 
   ud <- cohortCodelist |>
-    dplyr::filter(!tolower(.data$domain_id) %in% "measurement" | is.na(.data$domain_id)) |>
+    dplyr::filter(!tolower(.data$domain_id) %in% "measurement" |
+                    is.na(.data$domain_id)) |>
     dplyr::tally() |>
     dplyr::pull("n")
 
   if (ud > 0) {
-    cli::cli_inform(c(
-      "x" = "{.strong {ud}} concept{?s} excluded because don't correspond to the `Measurement` domain."
-    ))
+    cli::cli_inform(
+      c("x" = "{.strong {ud}} concept{?s} excluded because don't correspond to the `Measurement` domain.")
+    )
   }
 
   cohortCodelist <- cohortCodelist |>
@@ -133,11 +136,9 @@ measurementCohort <- function(cdm,
       "value_as_concept_id",
       "unit_concept_id"
     ) |>
-    dplyr::inner_join(
-      cohortCodelist |>
-        dplyr::select("concept_id", "cohort_definition_id"),
-      by = "concept_id"
-    ) |>
+    dplyr::inner_join(cohortCodelist |>
+                        dplyr::select("concept_id", "cohort_definition_id"),
+                      by = "concept_id") |>
     dplyr::filter(!is.na(.data$cohort_start_date)) |>
     dplyr::compute(name = name, temporary = FALSE)
 
@@ -147,10 +148,9 @@ measurementCohort <- function(cdm,
     matching_ids <- valueAsConcept[!matches]
 
     if (length(matching_ids) > 0) {
-      cli::cli_inform(c(
-        "i" = "These valueAsConcept don't exist for the input measurement concepts:",
-        paste(matching_ids, collapse = ", ")
-      ))
+      cli::cli_inform(
+        c("i" = "These valueAsConcept don't exist for the input measurement concepts:", paste(matching_ids, collapse = ", "))
+      )
     }
   }
 
@@ -160,10 +160,9 @@ measurementCohort <- function(cdm,
     matching_ids <- names(valueAsNumber)[!matches]
 
     if (length(matching_ids) > 0) {
-      cli::cli_inform(c(
-        "i" = "These unit concepts don't exist for the input measurement concepts:",
-        paste(matching_ids, collapse = ", ")
-      ))
+      cli::cli_inform(
+        c("i" = "These unit concepts don't exist for the input measurement concepts:", paste(matching_ids, collapse = ", "))
+      )
     }
   }
 
@@ -172,10 +171,10 @@ measurementCohort <- function(cdm,
     cli::cli_inform(c("i" = "No table could be subsetted, returning empty cohort."))
     cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name)
     cdm[[name]] <- cdm[[name]] |>
-      dplyr::select(
-        "cohort_definition_id", "subject_id", "cohort_start_date",
-        "cohort_end_date"
-      ) |>
+      dplyr::select("cohort_definition_id",
+                    "subject_id",
+                    "cohort_start_date",
+                    "cohort_end_date") |>
       omopgenerics::newCohortTable(
         cohortSetRef = cohortSet,
         cohortAttritionRef = NULL,
@@ -207,16 +206,19 @@ measurementCohort <- function(cdm,
       dplyr::filter(!!!filterExpr) |>
       dplyr::compute(name = name, temporary = FALSE)
 
-    if (cohort |> dplyr::tally() |> dplyr::pull("n") == 0){
-      cli::cli_warn("There are no subjects with the specified value_as_concept_id or value_as_number.")
+    if (cohort |> dplyr::tally() |> dplyr::pull("n") == 0) {
+      cli::cli_warn(
+        "There are no subjects with the specified value_as_concept_id or value_as_number."
+      )
     }
 
   }
 
   cohort <- cohort |>
-    dplyr::select(
-      "cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date"
-    ) |>
+    dplyr::select("cohort_definition_id",
+                  "subject_id",
+                  "cohort_start_date",
+                  "cohort_end_date") |>
     dplyr::distinct() |>
     dplyr::compute(name = name, temporary = FALSE)
 
@@ -250,7 +252,7 @@ getFilterExpression <- function(valueAsConcept, valueAsNumber) {
   }
 
   if (!is.null(valueAsConcept)) {
-    expFilter[ii+1] <- ".data$value_as_concept_id %in% .env$valueAsConcept"
+    expFilter[ii + 1] <- ".data$value_as_concept_id %in% .env$valueAsConcept"
   }
 
   return(paste0(expFilter, collapse = " | ") |>  rlang::parse_exprs())
@@ -259,9 +261,9 @@ getFilterExpression <- function(valueAsConcept, valueAsNumber) {
 addDomains <- function(cohortCodelist, cdm) {
   # insert table as temporary
   tmpName <- omopgenerics::uniqueTableName()
-  cdm <- omopgenerics::insertTable(
-    cdm = cdm, name = tmpName, table = cohortCodelist
-  )
+  cdm <- omopgenerics::insertTable(cdm = cdm,
+                                   name = tmpName,
+                                   table = cohortCodelist)
   cdm[[tmpName]] <- cdm[[tmpName]] |> dplyr::compute()
 
   cohortCodelist <- cdm[["concept"]] |>

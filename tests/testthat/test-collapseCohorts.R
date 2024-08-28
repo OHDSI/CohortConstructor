@@ -14,8 +14,8 @@ test_that("simple example", {
       "vocabulary_id" = as.integer(NA),
       "concept_class_id" = as.integer(NA),
       "concept_code" = as.integer(NA),
-      "valid_start_date" = as.integer(NA),
-      "valid_end_date" = as.integer(NA)
+      "valid_start_date" = as.Date(NA),
+      "valid_end_date" = as.Date(NA)
     )
   )
   cdm <- omopgenerics::insertTable(
@@ -100,28 +100,28 @@ test_that("out of observation", {
   testthat::skip_on_cran()
   cdm <- omock::mockCdmReference() |>
     omock::mockCdmFromTables(tables = list("cohort" = dplyr::tibble(
-      "cohort_definition_id" = 1,
-      "subject_id" = c(1, 2, 3),
+      "cohort_definition_id" = 1L,
+      "subject_id" = c(1L, 2L, 3L),
       "cohort_start_date" = as.Date("2020-01-01"),
       "cohort_end_date" = as.Date("2029-12-31")
     )))
   cdm <- omopgenerics::insertTable(
     cdm = cdm, name = "concept", table = dplyr::tibble(
-      "concept_id" = 1,
+      "concept_id" = 1L,
       "concept_name" = "my concept",
-      "domain_id" = "drUg",
-      "vocabulary_id" = NA,
-      "concept_class_id" = NA,
-      "concept_code" = NA,
-      "valid_start_date" = NA,
-      "valid_end_date" = NA
+      "domain_id" = "drug",
+      "vocabulary_id" = as.integer(NA),
+      "concept_class_id" = as.integer(NA),
+      "concept_code" = as.integer(NA),
+      "valid_start_date" = as.integer(NA),
+      "valid_end_date" = as.integer(NA)
     )
   )
   cdm <- omopgenerics::insertTable(
     cdm = cdm, name = "drug_exposure", table = dplyr::tibble(
-      "drug_exposure_id" = 1:11,
-      "person_id" = c(1, 1, 1, 1, 2, 2, 3, 1, 1, 1, 1),
-      "drug_concept_id" = c(1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1),
+      "drug_exposure_id" = as.integer(1:11),
+      "person_id" = as.integer(c(1, 1, 1, 1, 2, 2, 3, 1, 1, 1, 1)),
+      "drug_concept_id" = as.integer(c(1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1)),
       "drug_exposure_start_date" = c(0, 300, 1500, 750, 10, 800, 150, 1800, 1801, 1802, 1803),
       "drug_exposure_end_date" = c(400, 800, 1600, 1550, 2000, 1000, 600, 1800, 1801, 1802, 1803),
       "drug_type_concept_id" = 1
@@ -134,7 +134,7 @@ test_that("out of observation", {
 
   cdm <- cdm |> copyCdm()
 
-  expect_no_error(cohort <- conceptCohort(cdm = cdm, conceptSet = list(a = 1), name = "cohort"))
+  expect_no_error(cohort <- conceptCohort(cdm = cdm, conceptSet = list(a = 1L), name = "cohort"))
 
   expect_no_error(sameCohort <- cohort |> collapseCohorts(gap = 0, name = "new_cohort"))
   expect_identical(settings(sameCohort), settings(cohort))
@@ -187,22 +187,22 @@ test_that("infitine", {
 
   cdm <- omock::mockCdmFromTables()
   cdm$person <- dplyr::tibble(
-    "person_id" = c(1, 2, 3),
-    "gender_concept_id" = 1,
-    "year_of_birth" = 1990,
-    "race_concept_id" = 1,
-    "ethnicity_concept_id" = 1
+    "person_id" = c(1L, 2L, 3L),
+    "gender_concept_id" = 1L,
+    "year_of_birth" = 1990L,
+    "race_concept_id" = 1L,
+    "ethnicity_concept_id" = 1L
   )
   cdm$observation_period <-  dplyr::tibble(
-    "observation_period_id" = c(1, 2, 3),
-    "person_id" = c(1, 2, 3),
+    "observation_period_id" = c(1L, 2L, 3L),
+    "person_id" = c(1L, 2L, 3L),
     "observation_period_start_date" = as.Date("2000-01-01"),
     "observation_period_end_date" = as.Date("2024-01-01"),
-    "period_type_concept_id" = 1
+    "period_type_concept_id" = 1L
   )
   cdm$cohort <- dplyr::tibble(
-    "cohort_definition_id" = c(1,1,1,2),
-    "subject_id" = c(1, 2, 3, 3),
+    "cohort_definition_id" = c(1L, 1L, 1L, 2L),
+    "subject_id" = c(1L, 2L, 3L, 3L),
     "cohort_start_date" = as.Date(c("2020-01-01", "2020-01-01",
                                   "2020-01-01", "2021-01-01")),
     "cohort_end_date" = as.Date(c("2022-01-01", "2022-01-01",
@@ -244,21 +244,21 @@ test_that("multiple observation periods", {
 
   cdm <- omock::mockCdmReference() |>
     omock::mockCdmFromTables(tables = list("cohort" = dplyr::tibble(
-      "cohort_definition_id" = 1,
-      "subject_id" = c(1),
+      "cohort_definition_id" = 1L,
+      "subject_id" = 1L,
       "cohort_start_date" = as.Date("2020-01-01"),
       "cohort_end_date" = as.Date("2020-01-01")
     )))
   cdm <- omopgenerics::insertTable(
     cdm = cdm, name = "concept", table = dplyr::tibble(
-      "concept_id" = 1,
+      "concept_id" = 1L,
       "concept_name" = "my concept",
-      "domain_id" = "drUg",
-      "vocabulary_id" = NA,
-      "concept_class_id" = NA,
-      "concept_code" = NA,
-      "valid_start_date" = NA,
-      "valid_end_date" = NA
+      "domain_id" = "drug",
+      "vocabulary_id" = as.integer(NA),
+      "concept_class_id" = as.integer(NA),
+      "concept_code" = as.integer(NA),
+      "valid_start_date" = as.Date(NA),
+      "valid_end_date" = as.Date(NA)
     )
   )
   cdm <- omopgenerics::insertTable(
@@ -282,7 +282,7 @@ test_that("multiple observation periods", {
   cdm <- cdm |> copyCdm()
 
   expect_no_error(cdm$cohort_1 <- conceptCohort(cdm = cdm,
-                                          conceptSet = list(a = 1),
+                                          conceptSet = list(a = 1L),
                                           name = "cohort_1"))
 
   # should not have been combined as they are in different observation periods
@@ -292,7 +292,7 @@ test_that("multiple observation periods", {
          dplyr::collect()) == 2)
 
   expect_no_error(cdm$cohort_1 <- conceptCohort(cdm = cdm,
-                                                conceptSet = list(a = 1),
+                                                conceptSet = list(a = 1L),
                                                 name = "cohort_1"))
   expect_no_error(cdm$cohort_1  <- cdm$cohort_1  |>
                     collapseCohorts(gap = Inf, name = "cohort_1"))
