@@ -30,7 +30,7 @@ reference:
 - subtitle: Concatanate cohort entries
 - contents:
   - matches("collapseCohorts")
-- subtitle: Sample cohorts
+- subtitle: Filter cohorts
 - contents:
   - matches("subsetCohorts|sampleCohorts")
 - subtitle: Split cohorts
