@@ -20,9 +20,8 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/a00_introduction.html">Introduction</a></li>
     <li><a class="dropdown-item" href="../articles/a01_building_base_cohorts.html">Building base cohorts</a></li>
-    <li><a class="dropdown-item" href="../articles/a02_require_specific_cohort_entry.html">a02_require_specific_cohort_entry</a></li>
-    <li><a class="dropdown-item" href="../articles/a03_require_in_date_range.html">a03_require_in_date_range</a></li>
-    <li><a class="dropdown-item" href="../articles/a04_require_demographics.html">a03_require_demographics</a></li>
+    <li><a class="dropdown-item" href="../articles/a02_cohort_table_requirements.html">Apply cohort table related requirements</a></li>
+    <li><a class="dropdown-item" href="../articles/a03_require_demographics.html">a03_require_demographics</a></li>
     <li><a class="dropdown-item" href="../articles/a04_require_intersections.html">a04_require_intersections</a></li>
     <li><a class="dropdown-item" href="../articles/a05_update_cohort_start_end.html">a04_update_cohort_start_end</a></li>
     <li><a class="dropdown-item" href="../articles/a06_concatanate_cohorts.html">a05_concatanate_cohorts</a></li>
@@ -74,7 +73,7 @@
         <dd>Create cohorts measurement based cohorts</dd>
       </dl></div><div class="section level2">
 
-      <h3 id="limit-to-an-individuals-first-last-or-a-specific-range-of-cohort-entries">Limit to an individuals first, last, or a specific range of cohort entries<a class="anchor" aria-label="anchor" href="#limit-to-an-individuals-first-last-or-a-specific-range-of-cohort-entries"></a></h3>
+      <h3 id="apply-cohort-table-related-requirements">Apply cohort table related requirements<a class="anchor" aria-label="anchor" href="#apply-cohort-table-related-requirements"></a></h3>
 
 
 
@@ -84,6 +83,12 @@
 
 
       <dl><dt>
+
+          <code><a href="requireInDateRange.html">requireInDateRange()</a></code>
+
+        </dt>
+        <dd>Require that an index date is within a date range</dd>
+      </dl><dl><dt>
 
           <code><a href="requireIsEntry.html">requireIsEntry()</a></code>
 
@@ -101,23 +106,12 @@
 
         </dt>
         <dd>Restrict cohort to last entry per person</dd>
-      </dl></div><div class="section level2">
+      </dl><dl><dt>
 
-      <h3 id="impose-date-requirements-on-existing-cohorts">Impose date requirements on existing cohorts<a class="anchor" aria-label="anchor" href="#impose-date-requirements-on-existing-cohorts"></a></h3>
-
-
-
-    </div><div class="section level2">
-
-
-
-
-      <dl><dt>
-
-          <code><a href="requireInDateRange.html">requireInDateRange()</a></code>
+          <code><a href="requireMinimumCohortCount.html">requireMinimumCohortCount()</a></code>
 
         </dt>
-        <dd>Require that an index date is within a date range</dd>
+        <dd>Generate a cohort table using a subset of cohorts from another table.</dd>
       </dl></div><div class="section level2">
 
       <h3 id="impose-singular-demographic-requirements-on-existing-cohorts">Impose singular demographic requirements on existing cohorts<a class="anchor" aria-label="anchor" href="#impose-singular-demographic-requirements-on-existing-cohorts"></a></h3>
@@ -314,7 +308,7 @@
           <code><a href="subsetCohorts.html">subsetCohorts()</a></code>
 
         </dt>
-        <dd>Generate a cohort table using a subset of cohorts from another table.</dd>
+        <dd>Generate a cohort table keeping a subset of cohorts.</dd>
       </dl></div><div class="section level2">
 
       <h3 id="split-cohorts">Split cohorts<a class="anchor" aria-label="anchor" href="#split-cohorts"></a></h3>
