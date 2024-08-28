@@ -39,7 +39,8 @@ library(CohortConstructor)
 
 cdm <- mockCohortConstructor()
 
-cohort <-  cdm |> demographicsCohort(name = "cohort3", ageRange = c(18,40), sex = "Male")
+cohort <-  cdm |>
+    demographicsCohort(name = "cohort3", ageRange = c(18,40), sex = "Male")
 
 attrition(cohort)
 }

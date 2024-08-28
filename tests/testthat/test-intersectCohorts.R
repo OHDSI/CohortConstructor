@@ -217,7 +217,7 @@ test_that("intersectCohorts", {
   PatientProfiles::mockDisconnect(cdm)
 })
 
-test_that("only return comb", {
+test_that("keepOriginalCohorts", {
   testthat::skip_on_cran()
   # combination = null
   cdm_local <- omock::mockCdmReference() |>
@@ -230,7 +230,7 @@ test_that("only return comb", {
 
   cdm$cohort2 <- intersectCohorts(
     cohort = cdm$cohort1, name = "cohort2",
-    mutuallyExclusive = FALSE, returnOnlyComb = TRUE
+    mutuallyExclusive = FALSE, keepOriginalCohorts = TRUE
   )
   expect_true(nrow(dplyr::collect(cdm$cohort2)) == 0)
   expect_true(all(
@@ -246,7 +246,7 @@ test_that("only return comb", {
   # nUll combination, return individuals
   cdm$cohort4 <- intersectCohorts(
     cohort = cdm$cohort1, name = "cohort4",
-    mutuallyExclusive = FALSE, returnOnlyComb = FALSE
+    mutuallyExclusive = FALSE, keepOriginalCohorts = FALSE
   )
   expect_true(nrow(dplyr::collect(cdm$cohort4)) == nrow(dplyr::collect(cdm$cohort1)))
   expect_true(all(
@@ -268,7 +268,7 @@ test_that("only return comb", {
   cdm <- cdm_local |> copyCdm()
   cdm$cohort3 <- intersectCohorts(
     cohort = cdm$cohort1, name = "cohort3",
-    mutuallyExclusive = FALSE, returnOnlyComb = TRUE, gap = 1
+    mutuallyExclusive = FALSE, keepOriginalCohorts = TRUE, gap = 1
   )
   expect_equal(
     cdm$cohort3 |>
@@ -302,7 +302,7 @@ test_that("only return comb", {
 
   cdm$cohort4 <- intersectCohorts(
     cohort = cdm$cohort1, name = "cohort4",
-    mutuallyExclusive = TRUE, returnOnlyComb = TRUE, gap = 1
+    mutuallyExclusive = TRUE, keepOriginalCohorts = TRUE, gap = 1
   )
 
   expect_equal(
@@ -447,7 +447,7 @@ test_that("codelist", {
   expect_true(all(codes |> dplyr::pull("cohort_definition_id") |> sort() == c(1, 1, 2, 3, 3, 3)))
 
   # only comb
-  cdm$cohort4 <- intersectCohorts(cdm$cohort1, returnOnlyComb = TRUE, name = "cohort4")
+  cdm$cohort4 <- intersectCohorts(cdm$cohort1, keepOriginalCohorts = TRUE, name = "cohort4")
   expect_true(all(
     cdm$cohort4 %>% dplyr::pull("cohort_start_date") %>% sort() ==
       c("2012-01-21", "2014-02-09")
