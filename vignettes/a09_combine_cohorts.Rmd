@@ -1,0 +1,19 @@
+---
+title: "a08_combine_cohorts"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{a08_combine_cohorts}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(CohortConstructor)
+```

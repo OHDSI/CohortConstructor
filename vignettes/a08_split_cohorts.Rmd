@@ -1,0 +1,19 @@
+---
+title: "a07_split_cohorts"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{a07_split_cohorts}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(CohortConstructor)
+```
