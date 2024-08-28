@@ -13,7 +13,9 @@
 #' in a single cohort record.
 #' @param mutuallyExclusive Whether the generated cohorts are mutually
 #' exclusive or not.
-#' @param returnOnlyComb Whether to only get the combination cohort back
+#' @param keepOriginalCohorts If TRUE the original cohorts and the newly
+#' created intersection cohort will be returned. If FALSE only the new cohort
+#' will be returned.
 #' @param name Name of the new cohort with the demographic requirements.
 #'
 #' @export
@@ -38,7 +40,7 @@ intersectCohorts <- function(cohort,
                              cohortId = NULL,
                              gap = 0,
                              mutuallyExclusive = FALSE,
-                             returnOnlyComb = FALSE,
+                             keepOriginalCohorts = FALSE,
                              name = tableName(cohort)) {
   # checks
   name <- validateName(name)
@@ -52,7 +54,7 @@ intersectCohorts <- function(cohort,
                 min = 0,
                 length = 1)
   assertLogical(mutuallyExclusive, length = 1)
-  assertLogical(returnOnlyComb, length = 1)
+  assertLogical(keepOriginalCohorts, length = 1)
 
   if (length(cohortId) < 2) {
     cli::cli_warn("At least 2 cohort id must be provided to do the intersection.")
@@ -118,7 +120,7 @@ intersectCohorts <- function(cohort,
     )), na.rm = TRUE)) %>%
     dplyr::filter(.data$sum == 1) %>%
     dplyr::pull("cohort_definition_id")
-  if (returnOnlyComb) {
+  if (keepOriginalCohorts) {
     cohSet <- cohSet |>
       dplyr::filter(!.data$cohort_definition_id %in% .env$individualId) %>%
       dplyr::group_by(.data$cohort_name) %>%
@@ -139,7 +141,7 @@ intersectCohorts <- function(cohort,
       )
   )
 
-  if (!returnOnlyComb && !mutuallyExclusive && gap < 1) {
+  if (!keepOriginalCohorts && !mutuallyExclusive && gap < 1) {
     nameComputing <- omopgenerics::uniqueTableName()
     # if not mutually exclusive --> cohorts in = individual cohorts out:
     # cohort in cannot be recover after splitting (if joinOverlap with gap = 1 is
@@ -212,7 +214,7 @@ intersectCohorts <- function(cohort,
       dplyr::starts_with("number"),
       ~ dplyr::if_else(is.na(.x), 0L, as.integer(.x))
     ))
-  cohAtt <- intersectCohortAttrition(cohort, cohSet, counts, returnOnlyComb, mutuallyExclusive)
+  cohAtt <- intersectCohortAttrition(cohort, cohSet, counts, keepOriginalCohorts, mutuallyExclusive)
 
   # concept codelists
   codelist <- attr(cohort, "cohort_codelist")
@@ -249,7 +251,7 @@ intersectCohorts <- function(cohort,
   return(cohortOut)
 }
 
-#' To split overlaping periods in non overlaping period.
+#' To split overlapping periods in non overlapping period.
 #'
 #' @param x Table in the cdm.
 #' @param start Column that indicates the start of periods.
@@ -522,7 +524,7 @@ notMutuallyEclusiveCohortSet <- function(cs) {
 intersectCohortAttrition <- function(cohort,
                                      cohortSet,
                                      counts,
-                                     returnOnlyComb,
+                                     keepOriginalCohorts,
                                      mutuallyExclusive) {
   # attrition
   # intersect cohorts
@@ -541,7 +543,7 @@ intersectCohortAttrition <- function(cohort,
       "excluded_records" = 0,
       "excluded_subjects" = 0
     )
-  if (!returnOnlyComb) {
+  if (!keepOriginalCohorts) {
     # individual cohorts
     individualId <- cohortSet$cohort_definition_id[!cohortSet$cohort_definition_id %in% intersectId]
     cohAtt <- cohAtt |>

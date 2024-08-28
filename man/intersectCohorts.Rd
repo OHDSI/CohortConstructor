@@ -10,7 +10,7 @@ intersectCohorts(
   cohortId = NULL,
   gap = 0,
   mutuallyExclusive = FALSE,
-  returnOnlyComb = FALSE,
+  keepOriginalCohorts = FALSE,
   name = tableName(cohort)
 )
 }
@@ -26,7 +26,9 @@ in a single cohort record.}
 \item{mutuallyExclusive}{Whether the generated cohorts are mutually
 exclusive or not.}
 
-\item{returnOnlyComb}{Whether to only get the combination cohort back}
+\item{keepOriginalCohorts}{If TRUE the original cohorts and the newly
+created intersection cohort will be returned. If FALSE only the new cohort
+will be returned.}
 
 \item{name}{Name of the new cohort with the demographic requirements.}
 }
