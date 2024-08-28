@@ -31,7 +31,7 @@ The package can be installed from CRAN:
 install.packages("CohortConstructor")
 ```
 
-Or you can install the development version of CohortConstructor from [GitHub](https://github.com/):
+Or you can install the development version of the package from GitHub:
 
 ```{r, eval = FALSE}
 # install.packages("devtools")
@@ -40,7 +40,7 @@ devtools::install_github("ohdsi/CohortConstructor")
 
 ## Creating and manipulating cohorts
 
-To illustrate how the functionality let's create a set of fracture cohorts using the Eunomia dataset. We'll first load required packages and create a cdm reference for the data.
+To illustrate the functionality provided by CohortConstructor let's create a set of fracture cohorts using the Eunomia dataset. We'll first load required packages and create a cdm reference for the data.
 
 ```{r, message=FALSE, warning=FALSE}
 library(omopgenerics)
@@ -90,20 +90,16 @@ attrition(cdm$fractures) %>% glimpse()
 So far we have created three separate fracture cohorts. Let's say we also want a cohort of people with any of the fractures. We could union our three cohorts to create this overall cohort like so:
 
 ```{r, message=FALSE}
-cdm$any_fracture <- cdm$fractures |> 
-  CohortConstructor::unionCohorts(cohortName = "any_fracture", name = "any_fracture")
-cdm <- bind(cdm$fractures,
-            cdm$any_fracture, 
-            name = "fractures")
+cdm$fractures <- unionCohorts(cdm$fractures,
+                              cohortName = "any_fracture", 
+                              keepOriginalCohorts = TRUE,
+                              name ="fractures")
 ```
-
 
 ```{r, message=FALSE}
 settings(cdm$fractures)
 cohortCount(cdm$fractures)
 ```
-
-
 
 ### Require in date range
 

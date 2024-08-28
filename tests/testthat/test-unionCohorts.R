@@ -55,12 +55,6 @@ test_that("unionCohorts works", {
       )))
   expect_true(settings(cdm$cohort3)$cohort_name == "cohort_1_cohort_2")
 
-  # 1 cohort
-  cdm$cohort4 <- unionCohorts(cdm$cohort1, cohortId = 2, cohortName = "newname", name = "cohort4")
-  expect_equal(settings(cdm$cohort4), dplyr::tibble(cohort_definition_id = 1, cohort_name = "newname"))
-  expect_true(attrition(cdm$cohort4)$cohort_definition_id == 1)
-  expect_true(cohortCount(cdm$cohort4)$cohort_definition_id == 1)
-
   # union 2 empty cohorts
   cdm$cohort5 <- conceptCohort(cdm = cdm, conceptSet = list("a"= 1, "b" = 2), name = "cohort5")
   cdm$cohort6 <- cdm$cohort5 |> unionCohorts(name = "cohort6")
@@ -68,6 +62,7 @@ test_that("unionCohorts works", {
   expect_true(attrition(cdm$cohort6)$number_records == 0)
 
   cdm$cohort5 <- cdm$cohort5 |> unionCohorts(name = "cohort5")
+
 
   PatientProfiles::mockDisconnect(cdm)
 })
@@ -154,15 +149,13 @@ test_that("Expected behaviour", {
     omock::mockObservationPeriod() |>
     omock::mockCohort(name = c("cohort"), numberCohorts = 4, seed = 8, recordPerson = 2)
   cdm <- cdm_local |> copyCdm()
-  expect_warning(
+  expect_error(
     cohort <- unionCohorts(cdm$cohort,
                            cohortId = 1,
                            gap = 0,
                            cohortName = NULL,
                            name = "cohort1")
   )
-  expect_true(cohort |> dplyr::anti_join(cdm$cohort, by = colnames(cohort)) |>
-                dplyr::tally() |> dplyr::pull("n") == 0)
   expect_error(
     cohort <- unionCohorts(cdm$cohort,
                            cohortId = NULL,
@@ -275,6 +268,28 @@ test_that("test codelist", {
   expect_true(all(codes |> dplyr::pull("concept_id") |> sort() == c(1, 2, 3)))
   expect_true(all(codes |> dplyr::pull("type") |> sort() == rep("index event", 3)))
   expect_true(all(codes |> dplyr::pull("cohort_definition_id") |> sort() == c(1, 1, 1)))
+
+  PatientProfiles::mockDisconnect(cdm)
+})
+
+test_that("keep original cohorts", {
+  cdm_local <- omock::mockCdmReference() |>
+    omock::mockPerson(n = 4) |>
+    omock::mockObservationPeriod() |>
+    omock::mockCohort(name = c("cohort1"), numberCohorts = 4)
+  cdm <- cdm_local |> copyCdm()
+
+  start_settings <- settings(cdm$cohort1)
+
+  cdm$cohort2 <- unionCohorts(cdm$cohort1,
+                              name = "cohort2",
+                              keepOriginalCohorts = FALSE)
+  expect_true(nrow(settings(cdm$cohort2)) == 1)
+
+  cdm$cohort3 <- unionCohorts(cdm$cohort1,
+                              name = "cohort3",
+                              keepOriginalCohorts = TRUE)
+  expect_true(nrow(settings(cdm$cohort3)) == nrow(start_settings) + 1)
 
   PatientProfiles::mockDisconnect(cdm)
 })
