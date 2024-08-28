@@ -80,7 +80,6 @@ matchCohorts <- function(cohort,
   cdm[[target]] <- subsetCohorts(
     cohort = cohort,
     cohortId = cohortId,
-    minCohortCount = 0,
     name = target
   )
 
