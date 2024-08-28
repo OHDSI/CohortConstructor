@@ -27,9 +27,21 @@ reference:
 - subtitle: Update cohort start and end dates
 - contents:
   - matches("^trim|exit|entry")
-- subtitle: Cohort manipulations
+- subtitle: Concatanate cohort entries
 - contents:
-  - matches("collapseCohorts|intersectCohorts|matchCohorts|subsetCohorts|unionCohorts|yearCohorts|stratifyCohorts|sampleCohorts")
+  - matches("collapseCohorts")
+- subtitle: Sample cohorts
+- contents:
+  - matches("subsetCohorts|sampleCohorts")
+- subtitle: Split cohorts
+- contents:
+  - matches("yearCohorts|stratifyCohorts")
+- subtitle: Combine cohorts
+- contents:
+  - matches("intersectCohorts|unionCohorts")
+- subtitle: Match cohorts
+- contents:
+  - matches("matchCohorts")
 - subtitle: Mock data
 - contents:
   - matches("mockCohortConstructor")
