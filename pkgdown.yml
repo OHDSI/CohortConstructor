@@ -4,10 +4,17 @@ pkgdown_sha: ~
 articles:
   a00_introduction: a00_introduction.html
   a01_building_base_cohorts: a01_building_base_cohorts.html
-  a02_applying_cohort_restrictions: a02_applying_cohort_restrictions.html
-  a03_age_sex_matching: a03_age_sex_matching.html
-  a04_cohort_manipulations: a04_cohort_manipulations.html
-last_built: 2024-08-28T11:15Z
+  a02_require_specific_cohort_entry: a02_require_specific_cohort_entry.html
+  a03_require_in_date_range: a03_require_in_date_range.html
+  a04_require_demographics: a04_require_demographics.html
+  a04_require_intersections: a04_require_intersections.html
+  a05_update_cohort_start_end: a05_update_cohort_start_end.html
+  a06_concatanate_cohorts: a06_concatanate_cohorts.html
+  a07_filter_cohorts: a07_filter_cohorts.html
+  a08_split_cohorts: a08_split_cohorts.html
+  a09_combine_cohorts: a09_combine_cohorts.html
+  a10_match_cohorts: a10_match_cohorts.html
+last_built: 2024-08-28T11:54Z
 urls:
   reference: https://ohdsi.github.io/CohortConstructor/reference
   article: https://ohdsi.github.io/CohortConstructor/articles
