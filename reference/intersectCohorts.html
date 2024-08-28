@@ -62,7 +62,7 @@ that overlap combined and kept. Cohort entries are when an individual was in
 <span>  cohortId <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  gap <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  mutuallyExclusive <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  returnOnlyComb <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  keepOriginalCohorts <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  name <span class="op">=</span> <span class="fu"><a href="https://darwin-eu-dev.github.io/omopgenerics/reference/tableName.html" class="external-link">tableName</a></span><span class="op">(</span><span class="va">cohort</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -90,8 +90,10 @@ in a single cohort record.</p></dd>
 exclusive or not.</p></dd>
 
 
-<dt id="arg-returnonlycomb">returnOnlyComb<a class="anchor" aria-label="anchor" href="#arg-returnonlycomb"></a></dt>
-<dd><p>Whether to only get the combination cohort back</p></dd>
+<dt id="arg-keeporiginalcohorts">keepOriginalCohorts<a class="anchor" aria-label="anchor" href="#arg-keeporiginalcohorts"></a></dt>
+<dd><p>If TRUE the original cohorts and the newly
+created intersection cohort will be returned. If FALSE only the new cohort
+will be returned.</p></dd>
 
 
 <dt id="arg-name">name<a class="anchor" aria-label="anchor" href="#arg-name"></a></dt>
