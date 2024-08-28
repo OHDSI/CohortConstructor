@@ -1,8 +1,8 @@
 ---
-title: "a03_require_in_date_range"
+title: "Apply cohort table related requirements"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{a03_require_in_date_range}
+  %\VignetteIndexEntry{a02_cohort_table_requirements}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
