@@ -6,12 +6,9 @@ reference:
 - subtitle: Build base cohorts
 - contents:
   - matches("conceptCohort|demographicsCohort|measurementCohort")
-- subtitle: Limit to an individuals first, last, or a specific range of cohort entries
+- subtitle: Apply cohort table related requirements
 - contents:
-  - matches("requireIsFirstEntry|requireIsLastEntry|requireIsEntry")
-- subtitle: Impose date requirements on existing cohorts
-- contents:
-  - matches("requireInDateRange")
+  - matches("requireMinimumCohortCount|requireInDateRange|requireIsFirstEntry|requireIsLastEntry|requireIsEntry")
 - subtitle: Impose singular demographic requirements on existing cohorts
 - contents:
   - matches("requireAge|requireSex|requirePriorObservation|requireFutureObservation")
