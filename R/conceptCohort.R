@@ -59,10 +59,6 @@ conceptCohort <- function(cdm,
   conceptSet <- validateConceptSet(conceptSet)
   omopgenerics::assertChoice(exit, c("event_start_date", "event_end_date"))
   omopgenerics::assertLogical(useSourceFields, length = 1)
-  if(isTRUE(useSourceFields)){
-    cli::cli_abort("useSourceFields as TRUE not yet supported")
-  }
-
 
   useIndexes <- getOption("CohortConstructor.use_indexes")
 
@@ -109,7 +105,8 @@ conceptCohort <- function(cdm,
     tableCohortCodelist = tableCohortCodelist,
     name = name,
     extraCols = NULL,
-    exit = exit
+    exit = exit,
+    useSourceFields = useSourceFields
   )
 
   omopgenerics::dropTable(cdm = cdm, name = tableCohortCodelist)
@@ -181,7 +178,8 @@ unerafiedConceptCohort <- function(cdm,
                                    tableCohortCodelist,
                                    name,
                                    extraCols,
-                                   exit) {
+                                   exit,
+                                   useSourceFields) {
   domains <- sort(cdm[[tableCohortCodelist]] |>
     dplyr::select("domain_id") |>
     dplyr::distinct() |>
@@ -190,6 +188,12 @@ unerafiedConceptCohort <- function(cdm,
   tableRef <- domainsData |>
     dplyr::filter(.data$domain_id %in% .env$domains)
 
+  if(isFALSE(useSourceFields)){
+    fields <- "concept"
+  } else {
+    fields <- c("concept", "source")
+  }
+
   cohorts <- list()
   workingTblNames <- paste0(
     omopgenerics::uniqueTableName(),
@@ -197,9 +201,14 @@ unerafiedConceptCohort <- function(cdm,
     seq_along(tableRef$domain_id)
   )
   for (k in seq_along(tableRef$domain_id)) {
+  for (j in seq_along(fields)){
     domain <- tableRef$domain_id[k]
     table <- tableRef$table[k]
-    concept <- tableRef$concept[k]
+    if(fields[j] == "concept"){
+      concept <- tableRef$concept[k]
+    } else {
+      concept <- tableRef$source[k]
+    }
     start <- tableRef$start[k]
     if (exit == "event_start_date") {
       end <- start
@@ -228,7 +237,7 @@ unerafiedConceptCohort <- function(cdm,
             dplyr::select("concept_id", "cohort_definition_id"),
           by = "concept_id"
         ) |>
-        dplyr::compute(temporary = FALSE, name = workingTblNames[k])
+        dplyr::compute(temporary = FALSE, name = paste(workingTblNames[k], "_", j))
       cohorts[[domain]] <- tempCohort
       if (tempCohort |>
         utils::head(1) |>
@@ -242,6 +251,7 @@ unerafiedConceptCohort <- function(cdm,
       )
     }
   }
+    }
 
   cohorts <- cohorts %>%
     purrr::discard(is.null)
@@ -266,7 +276,7 @@ unerafiedConceptCohort <- function(cdm,
     dplyr::mutate(cohort_end_date = dplyr::coalesce(.data$cohort_end_date, .data$cohort_start_date)) |>
     dplyr::compute(name = name, temporary = FALSE)
 
-  omopgenerics::dropTable(cdm, name = workingTblNames)
+  omopgenerics::dropTable(cdm, name = dplyr::starts_with(workingTblNames))
 
   return(cohort)
 }

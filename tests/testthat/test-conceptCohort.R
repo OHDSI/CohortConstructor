@@ -544,3 +544,59 @@ test_that("cohort exit as event start date", {
 
 
 })
+
+test_that("use source field concepts", {
+  cdm <- omock::mockCdmReference() |>
+    omock::mockCdmFromTables(tables = list("cohort" = dplyr::tibble(
+      "cohort_definition_id" = 1L,
+      "subject_id" = c(1L, 2L, 3L),
+      "cohort_start_date" = as.Date("2020-01-01"),
+      "cohort_end_date" = as.Date("2029-12-31")
+    )))
+  cdm <- omopgenerics::insertTable(
+    cdm = cdm, name = "concept", table = dplyr::tibble(
+      "concept_id" = 99L,
+      "concept_name" = "my_non_standard_concept",
+      "domain_id" = "drug",
+      "vocabulary_id" = NA,
+      "concept_class_id" = NA,
+      "concept_code" = NA,
+      "valid_start_date" = NA,
+      "valid_end_date" = NA
+    )
+  )
+  cdm <- omopgenerics::insertTable(
+    cdm = cdm, name = "drug_exposure", table = dplyr::tibble(
+      "drug_exposure_id" = c(1L, 2L),
+      "person_id" = c(1L, 1L),
+      "drug_concept_id" = c(1L, 1L),
+      "drug_exposure_start_date" = as.Date(c("2020-01-01",
+                                             "2020-01-04")),
+      "drug_exposure_end_date" = as.Date(c("2020-01-10",
+                                           "2020-01-14")),
+      "drug_type_concept_id" = 1L,
+      "drug_source_concept_id" = 99L
+    ) )
+
+  cdm <- cdm |> copyCdm()
+
+  # no records if we only look at standard concepts
+  expect_no_error(cdm$cohort_1a <- conceptCohort(cdm = cdm,
+                                                conceptSet = list(a = 99L),
+                                                name = "cohort_1a",
+                                                exit = "event_end_date",
+                                                useSourceFields = FALSE))
+  expect_true(nrow(cdm$cohort_1a |>
+    dplyr::collect()) == 0)
+
+  # records if we also look at source fields
+  expect_no_error(cdm$cohort_1b <- conceptCohort(cdm = cdm,
+                                                 conceptSet = list(a = 99L),
+                                                 name = "cohort_1b",
+                                                 exit = "event_end_date",
+                                                 useSourceFields = TRUE))
+  expect_true(nrow(cdm$cohort_1b |>
+                     dplyr::collect()) > 0)
+
+
+})
