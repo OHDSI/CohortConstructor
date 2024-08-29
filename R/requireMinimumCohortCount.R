@@ -1,50 +1,5 @@
-#' Generate a cohort table using a subset of cohorts from another table.
-#'
-#' @description
-#' `requireMinimumCohortCount()` filters an existing cohort table, keeping only
-#' records from cohorts with a minimum number of individuals
-#'
-#' @param cohort A cohort table in a cdm reference.
-#' @param cohortId IDs of the cohorts to apply minimum cell count requirement.
-#' If NULL it will be applied to all cohorts.
-#' @param minCohortCount The minimum count of sbjects for a cohort to be
-#' included.
-#' @param name Name of the new cohort with the demographic requirements.
-#'
-#' @return Cohort table
-#'
-#' @export
-#'
-#' @examples
-#' \donttest{
-#' library(CohortConstructor)
-#'
-#' cdm <- mockCohortConstructor(nPerson = 100)
-#'
-#' cdm$cohort1 |>
-#' requireMinimumCohortCount(minCohortCount = 5)
-#' }
-requireMinimumCohortCount <- function(cohort,
-                                      cohortId,
-                                      minCohortCount = 5,
-                                      name = tableName(cohort)){
 
-  cdm <- omopgenerics::cdmReference(cohort)
-
-  cohortsToDrop <- cohortCount(cohort) |>
-    dplyr::filter(.data$number_subjects < minCohortCount) |>
-    dplyr::pull("cohort_definition_id")
-
-  cdm[[name]] <- cohort |>
-    dplyr::filter(!.data$cohort_definition_id %in% {{cohortsToDrop}}) |>
-    dplyr::compute(temporary = FALSE,
-                   name = name) |>
-    omopgenerics::recordCohortAttrition(
-      reason = "Fewer than minimum cohort count of {minCohortCount}")
-
-  cdm[[name]]
-}
-#' Generate a cohort table using a subset of cohorts from another table.
+#' Filter cohorts to keep only records for those with a minimum amount of subjects
 #'
 #' @description
 #' `requireMinimumCohortCount()` filters an existing cohort table, keeping only
@@ -85,8 +40,13 @@ requireMinimumCohortCount <- function(cohort,
                   .data$number_subjects < minCohortCount) |>
     dplyr::pull("cohort_definition_id")
 
+
+  if(length(cohortsToDrop) > 0){
+    cohort <- cohort |>
+      dplyr::filter(!.data$cohort_definition_id %in% {{cohortsToDrop}})
+  }
+
   cdm[[name]] <- cohort |>
-    dplyr::filter(!.data$cohort_definition_id %in% {{cohortsToDrop}}) |>
     dplyr::compute(temporary = FALSE,
                    name = name) |>
     omopgenerics::recordCohortAttrition(
