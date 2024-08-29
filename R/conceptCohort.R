@@ -58,9 +58,9 @@ conceptCohort <- function(cdm,
   name <- validateName(name)
   conceptSet <- validateConceptSet(conceptSet)
   omopgenerics::assertChoice(exit, c("event_start_date", "event_end_date"))
-  omopgenerics::assertLogical(source, length = 1)
-  if(isTRUE(source)){
-    cli::cli_abort("source as TRUE not yet supported")
+  omopgenerics::assertLogical(useSourceFields, length = 1)
+  if(isTRUE(useSourceFields)){
+    cli::cli_abort("useSourceFields as TRUE not yet supported")
   }
 
 
