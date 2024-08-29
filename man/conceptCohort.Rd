@@ -4,7 +4,13 @@
 \alias{conceptCohort}
 \title{Create cohorts based on a concept set}
 \usage{
-conceptCohort(cdm, conceptSet, name, exit = "event_end_date")
+conceptCohort(
+  cdm,
+  conceptSet,
+  name,
+  exit = "event_end_date",
+  useSourceFields = FALSE
+)
 }
 \arguments{
 \item{cdm}{A cdm reference.}
@@ -16,6 +22,10 @@ or a conceptSetExpression.}
 
 \item{exit}{How the cohort end date is defined. Can be either
 "event_end_date" or "event_start_date".}
+
+\item{useSourceFields}{If TRUE, the source concept_id fields will also be
+used when identifying relevant clinical records. If FALSE, only the standard
+concept_id fields will be used.}
 }
 \value{
 A cohort table
