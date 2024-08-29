@@ -30,6 +30,9 @@
 #' @param name Name of the cohort in the cdm object.
 #' @param exit How the cohort end date is defined. Can be either
 #' "event_end_date" or "event_start_date".
+#' @param useSourceFields If TRUE, the source concept_id fields will also be
+#' used when identifying relevant clinical records. If FALSE, only the standard
+#' concept_id fields will be used.
 #'
 #' @export
 #'
@@ -45,12 +48,21 @@
 #'
 #' cohort |> attrition()
 #' }
-conceptCohort <- function(cdm, conceptSet, name, exit = "event_end_date") {
+conceptCohort <- function(cdm,
+                          conceptSet,
+                          name,
+                          exit = "event_end_date",
+                          useSourceFields = FALSE) {
   # initial input validation
   cdm <- validateCdm(cdm)
   name <- validateName(name)
   conceptSet <- validateConceptSet(conceptSet)
   omopgenerics::assertChoice(exit, c("event_start_date", "event_end_date"))
+  omopgenerics::assertLogical(source, length = 1)
+  if(isTRUE(source)){
+    cli::cli_abort("source as TRUE not yet supported")
+  }
+
 
   useIndexes <- getOption("CohortConstructor.use_indexes")
 
@@ -74,9 +86,11 @@ conceptCohort <- function(cdm, conceptSet, name, exit = "event_end_date") {
   )
 
   if (!isFALSE(useIndexes)) {
-    addIndex(cdm = cdm,
-             name = tableCohortCodelist,
-             cols = "concept_id")
+    addIndex(
+      cdm = cdm,
+      name = tableCohortCodelist,
+      cols = "concept_id"
+    )
   }
 
   # report codes from unsupported domains
@@ -102,15 +116,17 @@ conceptCohort <- function(cdm, conceptSet, name, exit = "event_end_date") {
   cdm[[tableCohortCodelist]] <- NULL
 
   if (cdm[[name]] |>
-      utils::head(1) |>
-      dplyr::tally() |>
-      dplyr::pull("n") == 0) {
+    utils::head(1) |>
+    dplyr::tally() |>
+    dplyr::pull("n") == 0) {
     cli::cli_inform(c("i" = "No cohort entries found, returning empty cohort table."))
     cdm[[name]] <- cdm[[name]] |>
-      dplyr::select("cohort_definition_id",
-                    "subject_id",
-                    "cohort_start_date",
-                    "cohort_end_date") |>
+      dplyr::select(
+        "cohort_definition_id",
+        "subject_id",
+        "cohort_start_date",
+        "cohort_end_date"
+      ) |>
       omopgenerics::newCohortTable(
         cohortSetRef = cohortSet,
         cohortAttritionRef = NULL,
@@ -167,17 +183,19 @@ unerafiedConceptCohort <- function(cdm,
                                    extraCols,
                                    exit) {
   domains <- sort(cdm[[tableCohortCodelist]] |>
-                    dplyr::select("domain_id") |>
-                    dplyr::distinct() |>
-                    dplyr::pull())
+    dplyr::select("domain_id") |>
+    dplyr::distinct() |>
+    dplyr::pull())
 
   tableRef <- domainsData |>
     dplyr::filter(.data$domain_id %in% .env$domains)
 
   cohorts <- list()
-  workingTblNames <- paste0(omopgenerics::uniqueTableName(),
-                            "_",
-                            seq_along(tableRef$domain_id))
+  workingTblNames <- paste0(
+    omopgenerics::uniqueTableName(),
+    "_",
+    seq_along(tableRef$domain_id)
+  )
   for (k in seq_along(tableRef$domain_id)) {
     domain <- tableRef$domain_id[k]
     table <- tableRef$table[k]
@@ -213,9 +231,9 @@ unerafiedConceptCohort <- function(cdm,
         dplyr::compute(temporary = FALSE, name = workingTblNames[k])
       cohorts[[domain]] <- tempCohort
       if (tempCohort |>
-          utils::head(1) |>
-          dplyr::tally() |>
-          dplyr::pull("n") > 0) {
+        utils::head(1) |>
+        dplyr::tally() |>
+        dplyr::pull("n") > 0) {
         cohorts[[k]] <- tempCohort
       }
     } else {
@@ -235,10 +253,12 @@ unerafiedConceptCohort <- function(cdm,
 
   cli::cli_inform(c("i" = "Combining tables."))
   cohort <- Reduce(dplyr::union_all, cohorts) |>
-    dplyr::select("cohort_definition_id",
-                  "subject_id",
-                  "cohort_start_date",
-                  "cohort_end_date") |>
+    dplyr::select(
+      "cohort_definition_id",
+      "subject_id",
+      "cohort_start_date",
+      "cohort_end_date"
+    ) |>
     dplyr::filter(
       !is.na(.data$cohort_start_date),
       .data$cohort_start_date <= .data$cohort_end_date
@@ -275,12 +295,13 @@ fulfillCohortReqs <- function(cdm, name) {
         .data$observation_period_end_date
       )
     ) |>
-    dplyr::select("cohort_definition_id",
-                  "subject_id",
-                  "cohort_start_date",
-                  "cohort_end_date") |>
+    dplyr::select(
+      "cohort_definition_id",
+      "subject_id",
+      "cohort_start_date",
+      "cohort_end_date"
+    ) |>
     dplyr::compute(temporary = FALSE, name = name)
-
 }
 
 
@@ -306,8 +327,9 @@ conceptSetToCohortCodelist <- function(conceptSet) {
     dplyr::bind_rows(.id = "cohort_name") |>
     dplyr::inner_join(cohortSet, by = "cohort_name") |>
     dplyr::select("cohort_definition_id",
-                  "concept_id"  = "value",
-                  "codelist_name" = "cohort_name") |>
+      "concept_id" = "value",
+      "codelist_name" = "cohort_name"
+    ) |>
     dplyr::mutate("type" = "index event")
 }
 
@@ -322,14 +344,16 @@ uploadCohortCodelistToCdm <- function(cdm, cohortCodelist, tableCohortCodelist) 
 
   cdm[[tableCohortCodelist]] <- cdm[[tableCohortCodelist]] |>
     dplyr::left_join(cdm[["concept"]] |>
-                       dplyr::select("concept_id", "domain_id"), by = "concept_id") |>
+      dplyr::select("concept_id", "domain_id"), by = "concept_id") |>
     dplyr::mutate(
       "concept_id" = as.integer(.data$concept_id),
       "domain_id" = tolower(.data$domain_id)
     ) |>
-    dplyr::compute(name = tableCohortCodelist,
-                   temporary = FALSE,
-                   overwrite = TRUE)
+    dplyr::compute(
+      name = tableCohortCodelist,
+      temporary = FALSE,
+      overwrite = TRUE
+    )
 
   cdm
 }
@@ -358,13 +382,13 @@ addIndex <- function(cdm, name, cols) {
     prefix <- attr(attr(cdm[[name]], "tbl_source"), "write_schema")[["prefix"]]
     cols <- paste0(cols, collapse = ",")
 
-    query <- paste0("CREATE INDEX ON ",
-                    paste0(schema, ".", prefix, name),
-                    " (",
-                    cols,
-                    ");")
+    query <- paste0(
+      "CREATE INDEX ON ",
+      paste0(schema, ".", prefix, name),
+      " (",
+      cols,
+      ");"
+    )
     suppressMessages(DBI::dbExecute(con, query))
   }
-
-
 }

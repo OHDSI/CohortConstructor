@@ -2,15 +2,8 @@
 % Please edit documentation in R/requireMinimumCohortCount.R
 \name{requireMinimumCohortCount}
 \alias{requireMinimumCohortCount}
-\title{Generate a cohort table using a subset of cohorts from another table.}
+\title{Filter cohorts to keep only records for those with a minimum amount of subjects}
 \usage{
-requireMinimumCohortCount(
-  cohort,
-  cohortId = NULL,
-  minCohortCount = 5,
-  name = tableName(cohort)
-)
-
 requireMinimumCohortCount(
   cohort,
   cohortId = NULL,
@@ -31,25 +24,12 @@ included.}
 }
 \value{
 Cohort table
-
-Cohort table
 }
 \description{
 \code{requireMinimumCohortCount()} filters an existing cohort table, keeping only
 records from cohorts with a minimum number of individuals
-
-\code{requireMinimumCohortCount()} filters an existing cohort table, keeping only
-records from cohorts with a minimum number of individuals
 }
 \examples{
-\donttest{
-library(CohortConstructor)
-
-cdm <- mockCohortConstructor(nPerson = 100)
-
-cdm$cohort1 |>
-requireMinimumCohortCount(minCohortCount = 5)
-}
 \donttest{
 library(CohortConstructor)
 
