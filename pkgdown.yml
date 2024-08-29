@@ -13,7 +13,7 @@ articles:
   a08_split_cohorts: a08_split_cohorts.html
   a09_combine_cohorts: a09_combine_cohorts.html
   a10_match_cohorts: a10_match_cohorts.html
-last_built: 2024-08-28T18:52Z
+last_built: 2024-08-29T10:33Z
 urls:
   reference: https://ohdsi.github.io/CohortConstructor/reference
   article: https://ohdsi.github.io/CohortConstructor/articles
