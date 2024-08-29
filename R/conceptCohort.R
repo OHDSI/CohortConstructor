@@ -269,11 +269,11 @@ unerafiedConceptCohort <- function(cdm,
       "cohort_start_date",
       "cohort_end_date"
     ) |>
+    dplyr::mutate(cohort_end_date = dplyr::coalesce(.data$cohort_end_date, .data$cohort_start_date)) |>
     dplyr::filter(
       !is.na(.data$cohort_start_date),
       .data$cohort_start_date <= .data$cohort_end_date
     ) |>
-    dplyr::mutate(cohort_end_date = dplyr::coalesce(.data$cohort_end_date, .data$cohort_start_date)) |>
     dplyr::compute(name = name, temporary = FALSE)
 
   omopgenerics::dropTable(cdm, name = dplyr::starts_with(workingTblNames))
