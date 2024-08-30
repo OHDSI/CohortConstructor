@@ -51,7 +51,8 @@ collapseCohorts <- function(cohort,
         "cohort_definition_id",
         "subject_id",
         "observation_period_id"
-      ))
+      )) |>
+      dplyr::select(!"observation_period_id")
   } else if (gap > 0) {
     newCohort <- newCohort |>
       PatientProfiles::addObservationPeriodId() |>
@@ -63,7 +64,8 @@ collapseCohorts <- function(cohort,
           "subject_id",
           "observation_period_id"
         )
-      )
+      ) |>
+      dplyr::select(!"observation_period_id")
   }
   if (!all(ids %in% cohortId)) {
     newCohort <- unchangedCohort |>
