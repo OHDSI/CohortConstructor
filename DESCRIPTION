@@ -54,7 +54,8 @@ Suggests:
     RPostgres,
     odbc,
     CohortCharacteristics,
-    ggplot2
+    ggplot2,
+    DiagrammeR
 Config/testthat/edition: 3
 Config/testthat/parallel: true
 VignetteBuilder: knitr
