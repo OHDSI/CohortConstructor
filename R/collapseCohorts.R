@@ -28,17 +28,15 @@ collapseCohorts <- function(cohort,
   if (gap != Inf) {
     gap <- validateGap(gap)
   }
-
   # temp tables
   tablePrefix <- omopgenerics::tmpPrefix()
-  tmpNewCohort <- omopgenerics::uniqueTableName(tablePrefix)
-
+  tmpNewCohort <- paste0(omopgenerics::uniqueTableName(tablePrefix), "_1")
   if (all(ids %in% cohortId)) {
     newCohort <- cohort |>
       dplyr::compute(name = tmpNewCohort, temporary = FALSE) |>
       omopgenerics::newCohortTable(.softValidation = TRUE)
   } else {
-    tmpUnchanged <- omopgenerics::uniqueTableName(tablePrefix)
+    tmpUnchanged <- paste0(omopgenerics::uniqueTableName(tablePrefix), "_2")
     unchangedCohort <- cohort |>
       dplyr::filter(!.data$cohort_definition_id %in% .env$cohortId) |>
       dplyr::compute(name = tmpUnchanged, temporary = FALSE)
@@ -46,7 +44,6 @@ collapseCohorts <- function(cohort,
       dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>
       dplyr::compute(name = tmpNewCohort, temporary = FALSE)
   }
-
   if (gap == Inf) {
     newCohort <- newCohort |>
       PatientProfiles::addObservationPeriodId() |>
@@ -54,27 +51,31 @@ collapseCohorts <- function(cohort,
         "cohort_definition_id",
         "subject_id",
         "observation_period_id"
-      ))
+      )) |>
+      dplyr::select(!"observation_period_id")
   } else if (gap > 0) {
     newCohort <- newCohort |>
       PatientProfiles::addObservationPeriodId() |>
       joinOverlap(
-        name = name,
+        name = tmpNewCohort,
         gap = gap,
         by = c(
           "cohort_definition_id",
           "subject_id",
           "observation_period_id"
         )
-      )
+      ) |>
+      dplyr::select(!"observation_period_id")
   }
-
   if (!all(ids %in% cohortId)) {
-    newCohort <- unchangedCohort |> dplyr::union_all(newCohort)
+    newCohort <- unchangedCohort |>
+      dplyr::union_all(newCohort)|>
+      dplyr::compute(name = name, temporary = FALSE)
+  } else {
+    newCohort <- newCohort |>
+      dplyr::compute(name = name, temporary = FALSE)
   }
-
   newCohort <- newCohort |>
-    dplyr::compute(name = name, temporary = FALSE) |>
     omopgenerics::newCohortTable(.softValidation = TRUE) |>
     omopgenerics::recordCohortAttrition(
       reason = "Collapse cohort with a gap of {gap} days.",
