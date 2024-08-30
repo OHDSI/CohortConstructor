@@ -1,5 +1,5 @@
 ---
-title: "a03_require_demographics"
+title: "Demographic Requirements"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{a03_require_demographics}

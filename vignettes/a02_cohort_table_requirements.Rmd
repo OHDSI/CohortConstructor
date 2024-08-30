@@ -1,5 +1,5 @@
 ---
-title: "Apply cohort table related requirements"
+title: "Cohort Requirements"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{a02_cohort_table_requirements}
@@ -16,6 +16,163 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(CohortConstructor)
+library(CohortCharacteristics)
+library(ggplot2)
 ```
 
-Test
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  eval = TRUE, message = FALSE, warning = FALSE,
+  comment = "#>"
+)
+
+library(CDMConnector)
+library(dplyr, warn.conflicts = FALSE)
+
+if (Sys.getenv("EUNOMIA_DATA_FOLDER") == ""){
+  Sys.setenv("EUNOMIA_DATA_FOLDER" = file.path(tempdir(), "eunomia"))}
+if (!dir.exists(Sys.getenv("EUNOMIA_DATA_FOLDER"))){ dir.create(Sys.getenv("EUNOMIA_DATA_FOLDER"))
+  downloadEunomiaData()  
+}
+```
+
+For this example we'll use the Eunomia synthetic data from the CDMConnector package.
+
+```{r}
+library(CDMConnector)
+library(CohortConstructor)
+con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomia_dir())
+cdm <- cdm_from_con(con, cdm_schema = "main", 
+                    write_schema = c(prefix = "my_study_", schema = "main"))
+```
+
+Let's start by creating two drug cohorts, one for users of diclofenac and another for users of acetaminophen.
+
+```{r}
+cdm$medications <- conceptCohort(cdm = cdm, 
+                                 conceptSet = list("diclofenac" = 1124300,
+                                                   "acetaminophen" = 1127433), 
+                                 name = "medications")
+
+settings(cdm$medications)
+cohortCount(cdm$medications)
+```
+Cohort 1 contains users of acetaminophen and has 2580 subjects and 9365 records. Cohort 2 contains users of diclofenac and has 830 subjects and 830 records. 
+
+## Keep only the first record per person
+
+Individuals can contribute multiple records per cohort. However now we'll keep only their earliest cohort entry of the remaining records using `requireIsFirstEntry()` from CohortConstructor.
+
+```{r}
+cdm$medications <- cdm$medications %>% 
+  requireIsFirstEntry()
+
+summary_attrition <- summariseCohortAttrition(cdm$medications)
+plotCohortAttrition(summary_attrition, cohortId = 1)
+```
+
+The flow chart above illustrates changes to cohort 1 (acetaminophen users) when restricted to only the first record for each individual. While the number of individuals remains unchanged, 6,785 records are excluded.
+
+## Keep only a specific range of records
+
+We can also choose a specific range of records using `requireIsEntry()` from CohortConstructor. 
+
+```{r, include = FALSE}
+cdm$medications <- conceptCohort(cdm = cdm, 
+                                 conceptSet = list("diclofenac" = 1124300,
+                                                   "acetaminophen" = 1127433), 
+                                 name = "medications")
+```
+
+```{r}
+cdm$medications <- cdm$medications %>%
+  requireIsEntry(c(1,5)) 
+
+summary_attrition <- summariseCohortAttrition(cdm$medications)
+plotCohortAttrition(summary_attrition, cohortId = 1)
+```
+The flow chart above illustrates the changes to cohort 1 when restricted to only the first five records for each individual. While the number of individuals remains unchanged, 6,785 records are excluded.
+
+
+## Keep only the last record per person
+
+It is also possible to only include the last record for each individual using `requireIsLastEntry()` from CohortConstructor. 
+
+```{r, include = FALSE}
+cdm$medications <- conceptCohort(cdm = cdm, 
+                                 conceptSet = list("diclofenac" = 1124300,
+                                                   "acetaminophen" = 1127433), 
+                                 name = "medications")
+```
+
+```{r}
+cdm$medications <- cdm$medications %>% 
+  requireIsLastEntry()
+
+summary_attrition <- summariseCohortAttrition(cdm$medications)
+plotCohortAttrition(summary_attrition, cohortId = 1)
+```
+
+The flow chart above illustrates changes to cohort 1 when restricted to only the last record for each individual. While the number of individuals remains unchanged, 6,785 records are excluded.
+
+## Keep only records within a date range
+
+Individuals may contribute multiple records over extended periods. We can define the study's start and end dates, filtering out records that fall outside the specified date range using the `requireInDateRang` function from CohortConstructor.
+
+```{r, include = FALSE}
+cdm$medications <- conceptCohort(cdm = cdm, 
+                                 conceptSet = list("diclofenac" = 1124300,
+                                                   "acetaminophen" = 1127433), 
+                                 name = "medications")
+```
+
+```{r}
+cdm$medications <- cdm$medications %>% 
+  requireInDateRange(dateRange = as.Date(c("2010-01-01", "2015-01-01")))
+
+summary_attrition <- summariseCohortAttrition(cdm$medications)
+plotCohortAttrition(summary_attrition, cohortId = 1)
+```
+The flow chart above illustrates the changes to cohort 1 when restricted to a specified date range. 1,948 individuals and 8,660 records are excluded.
+
+## Keep only records from cohorts with a minimum number of individuals
+
+Some studies might require a minimum cohort size. We can define the minimum size, filtering out records that are smaller than required, using the `requireMinimumCohortCount` function from CohortConstructor.
+
+```{r, include = FALSE}
+cdm$medications <- conceptCohort(cdm = cdm, 
+                                 conceptSet = list("diclofenac" = 1124300,
+                                                   "acetaminophen" = 1127433), 
+                                 name = "medications")
+```
+
+```{r}
+cdm$medications <- cdm$medications %>% 
+  requireMinimumCohortCount(minCohortCount = 1000)
+
+summary_attrition <- summariseCohortAttrition(cdm$medications)
+plotCohortAttrition(summary_attrition, cohortId = 1)
+```
+Cohort 1 includes 2,580 individuals, so none were excluded due to the minimum cohort size restriction of 1,000.
+
+## Running multiple requirements
+
+Multiple restrictions can be applied to a cohort, however care needs to be taken that the restrictions are placed in the correct order. For example, it is recommended to apply the minimum size restriction last. 
+
+```{r, include = FALSE}
+cdm$medications <- conceptCohort(cdm = cdm, 
+                                 conceptSet = list("diclofenac" = 1124300,
+                                                   "acetaminophen" = 1127433), 
+                                 name = "medications")
+```
+
+```{r}
+cdm$medications <- cdm$medications %>% 
+  requireIsFirstEntry() %>%
+  requireInDateRange(dateRange = as.Date(c("2010-01-01", "2016-01-01")))
+
+summary_attrition <- summariseCohortAttrition(cdm$medications)
+plotCohortAttrition(summary_attrition, cohortId = 1)
+```
+The flow chart above illustrates the changes to cohort 1 when restricted to only include the first record of each individual over a specified date range. 2,529 individuals and 9,314 records are excluded. 
