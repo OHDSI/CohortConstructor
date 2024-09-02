@@ -1,10 +1,7 @@
 ---
-title: "a04_require_intersections"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{a04_require_intersections}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+title: "a04_require_intersections_2"
+output: html_document
+date: "2024-09-02"
 ---
 
 ```{r, include = FALSE}
@@ -52,54 +49,9 @@ cdm$gi_bleed <- conceptCohort(cdm = cdm,
                               name = "gi_bleed")
 ```
 
-## Keep only the first record per person
-
-Individuals can contribute multiple records per cohort. However now we'll keep only their earliest cohort entry of the remaining records using `requireIsFirstEntry()` from CohortConstructor. We can see that after this we have one record per person for each cohort.
-
-```{r}
-cdm$medications <- cdm$medications %>% 
-  requireIsFirstEntry()
-
-cohortCount(cdm$medications)
-```
-
-Note, applying this criteria later after applying other criteria would result in a different result. Here we're requiring that individuals meet inclusion criteria at the time of their first use of diclofenac or acetaminophen.
-
-## Applying restrictions on patient demographics
-
-Using `requireDemographics()` we'll require that individuals in our medications cohort are female and, relative to their cohort start date, are between 18 and 85 with at least 30 days of prior observation time in the database.
-
-```{r}
-cdm$medications <- cdm$medications %>% 
-  requireDemographics(indexDate = "cohort_start_date", 
-                      ageRange = list(c(18, 85)),
-                      sex = "Female", 
-                      minPriorObservation = 30)
-```
-
-We can then see how many people have people have been excluded based on these demographic requirements.
-
 ```{r}
 cohort_attrition(cdm$medications) %>% 
   dplyr::filter(reason == "Demographic requirements") %>% 
-  dplyr::glimpse()
-```
-
-## Restrictions on calendar dates
-
-Next we can use `requireInDateRange()` to keep only those records where cohort entry was between a particular date range.
-
-```{r}
-cdm$medications <- cdm$medications %>% 
-  requireInDateRange(indexDate = "cohort_start_date", 
-                     dateRange = as.Date(c("2000-01-01", "2015-01-01")))
-```
-
-Again, we can track cohort attrition
-
-```{r}
-cohort_attrition(cdm$medications) %>% 
-  dplyr::filter(reason == "cohort_start_date between 2000-01-01 and 2015-01-01") %>% 
   dplyr::glimpse()
 ```
 
