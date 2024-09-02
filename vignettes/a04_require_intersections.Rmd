@@ -8,7 +8,6 @@ vignette: >
 ---
 
 ```{r, include = FALSE}
-
 knitr::opts_chunk$set(
   collapse = TRUE,
   eval = TRUE, message = FALSE, warning = FALSE,
