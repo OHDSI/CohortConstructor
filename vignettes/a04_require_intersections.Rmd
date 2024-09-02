@@ -44,8 +44,12 @@ cdm$medications <- conceptCohort(cdm = cdm,
                                  name = "medications")
 cohortCount(cdm$medications)
 ```
+<<<<<<< Updated upstream
 
 As well as our medication cohorts, let's also make another cohort containing individuals with a record of a GI bleed. Later we'll use this cohort when specifying inclusion/ exclusion criteria.
+=======
+As well as our medication cohorts, let's also make another cohort containing individuals with a record of a cystitis. Later we'll use this cohort when specifying inclusion / exclusion criteria.
+>>>>>>> Stashed changes
 
 ```{r}
 cdm$gi_bleed <- conceptCohort(cdm = cdm,  
@@ -109,9 +113,15 @@ cohort_attrition(cdm$medications) %>%
 We could require that individuals in our medication cohorts have a history of GI bleed. To do this we can use the `requireCohortIntersect()` function, requiring that individuals have one or more intersections with the GI bleed cohort.
 
 ```{r}
+<<<<<<< Updated upstream
 cdm$medications_gi_bleed <- cdm$medications  %>%
   requireCohortIntersect(intersections = c(1,Inf),
                          targetCohortTable = "gi_bleed", 
+=======
+cdm$medications_cystitis <- cdm$medications  %>%
+  requireCohortIntersect(intersections = c(1,Inf),
+                         targetCohortTable = "cystitis", 
+>>>>>>> Stashed changes
                          targetCohortId = 1,
                          indexDate = "cohort_start_date", 
                          window = c(-Inf, 0), 
