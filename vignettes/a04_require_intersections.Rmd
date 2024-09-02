@@ -1,5 +1,5 @@
 ---
-title: "a04_require_intersections"
+title: "Presence and Absence Requirements"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{a04_require_intersections}
@@ -8,7 +8,19 @@ vignette: >
 ---
 
 ```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
 
+```{r setup}
+library(CohortConstructor)
+library(CohortCharacteristics)
+library(ggplot2)
+```
+
+```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   eval = TRUE, message = FALSE, warning = FALSE,
@@ -28,8 +40,6 @@ if (!dir.exists(Sys.getenv("EUNOMIA_DATA_FOLDER"))){ dir.create(Sys.getenv("EUNO
 For this example we'll use the Eunomia synthetic data from the CDMConnector package.
 
 ```{r}
-library(CDMConnector)
-library(CohortConstructor)
 con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomia_dir())
 cdm <- cdm_from_con(con, cdm_schema = "main", 
                     write_schema = c(prefix = "my_study_", schema = "main"))
@@ -42,92 +52,175 @@ cdm$medications <- conceptCohort(cdm = cdm,
                                  conceptSet = list("diclofenac" = 1124300,
                                                    "acetaminophen" = 1127433), 
                                  name = "medications")
+
+settings(cdm$medications)
 cohortCount(cdm$medications)
 ```
 
-As well as our medication cohorts, let's also make another cohort containing individuals with a record of a GI bleed. Later we'll use this cohort when specifying inclusion/ exclusion criteria.
+As well as our medication cohorts, let's also make another cohort containing individuals with a record of a cystitis. Later we'll use this cohort when specifying inclusion/ exclusion criteria.
 
 ```{r}
-cdm$gi_bleed <- conceptCohort(cdm = cdm,  
-                              conceptSet = list("gi_bleed" = 192671),
-                              name = "gi_bleed")
-```
+cdm$cystitis <- conceptCohort(cdm = cdm,  
+                              conceptSet = list("cystitis" = 195588),
+                              name = "cystitis")
 
-## Keep only the first record per person
-
-Individuals can contribute multiple records per cohort. However now we'll keep only their earliest cohort entry of the remaining records using `requireIsFirstEntry()` from CohortConstructor. We can see that after this we have one record per person for each cohort.
-
-```{r}
-cdm$medications <- cdm$medications %>% 
-  requireIsFirstEntry()
-
-cohortCount(cdm$medications)
-```
-
-Note, applying this criteria later after applying other criteria would result in a different result. Here we're requiring that individuals meet inclusion criteria at the time of their first use of diclofenac or acetaminophen.
-
-## Applying restrictions on patient demographics
-
-Using `requireDemographics()` we'll require that individuals in our medications cohort are female and, relative to their cohort start date, are between 18 and 85 with at least 30 days of prior observation time in the database.
-
-```{r}
-cdm$medications <- cdm$medications %>% 
-  requireDemographics(indexDate = "cohort_start_date", 
-                      ageRange = list(c(18, 85)),
-                      sex = "Female", 
-                      minPriorObservation = 30)
-```
-
-We can then see how many people have people have been excluded based on these demographic requirements.
-
-```{r}
-cohort_attrition(cdm$medications) %>% 
-  dplyr::filter(reason == "Demographic requirements") %>% 
-  dplyr::glimpse()
-```
-
-## Restrictions on calendar dates
-
-Next we can use `requireInDateRange()` to keep only those records where cohort entry was between a particular date range.
-
-```{r}
-cdm$medications <- cdm$medications %>% 
-  requireInDateRange(indexDate = "cohort_start_date", 
-                     dateRange = as.Date(c("2000-01-01", "2015-01-01")))
-```
-
-Again, we can track cohort attrition
-
-```{r}
-cohort_attrition(cdm$medications) %>% 
-  dplyr::filter(reason == "cohort_start_date between 2000-01-01 and 2015-01-01") %>% 
-  dplyr::glimpse()
+settings(cdm$cystitis)
+cohortCount(cdm$cystitis)
 ```
 
 ## Restrictions on cohort presence
 
-We could require that individuals in our medication cohorts have a history of GI bleed. To do this we can use the `requireCohortIntersect()` function, requiring that individuals have one or more intersections with the GI bleed cohort.
+We could require that individuals in our medication cohorts have a history of cystitis. To do this we can use the `requireCohortIntersect()` function, requiring that individuals have one or more intersections with the cystitis cohort.
 
 ```{r}
-cdm$medications_gi_bleed <- cdm$medications  %>%
-  requireCohortIntersect(intersections = c(1,Inf),
-                         targetCohortTable = "gi_bleed", 
+cdm$medications_cystitis <- cdm$medications  %>%
+  requireCohortIntersect(intersections = c(1,3),
+                         targetCohortTable = "cystitis", 
                          targetCohortId = 1,
                          indexDate = "cohort_start_date", 
-                         window = c(-Inf, 0), 
-                         name = "medications_gi_bleed")
-cohort_count(cdm$medications_gi_bleed)
+                         window = c(-365, 0), 
+                         name = "medications_cystitis")
+
+summary_attrition <- summariseCohortAttrition(cdm$medications_cystitis)
+plotCohortAttrition(summary_attrition, cohortId = 1)
 ```
 
-Instead of requiring that individuals have history of GI bleed, we could instead require that they are don't have any history of it. In this case we can again use the `requireCohortIntersect()` function, but this time set the intersections argument to 0 to require individuals' absence in this other cohort rather than their presence in it.
+The flow chart above illustrates the changes to cohort 1 (users of acetaminophen) when restricted to only include individuals that intersect with the cystitis cohort at least once. 
+
+Instead of requiring that individuals have history of cystitis, we could instead require that they are don't have any history of it. In this case we can again use the `requireCohortIntersect()` function, but this time set the intersections argument to 0 to require individuals' absence in this other cohort rather than their presence in it.
 
 ```{r}
-cdm$medications_no_gi_bleed <- cdm$medications %>%
+cdm$medications_no_cystitis <- cdm$medications %>%
   requireCohortIntersect(intersections = 0,
-                         targetCohortTable = "gi_bleed", 
+                         targetCohortTable = "cystitis", 
                          targetCohortId = 1,
                          indexDate = "cohort_start_date", 
-                         window = c(-Inf, 0), 
-                         name = "medications_no_gi_bleed") 
-cohort_count(cdm$medications_no_gi_bleed)
+                         window = c(-365, 0), 
+                         name = "medications_no_cystitis") 
+
+summary_attrition <- summariseCohortAttrition(cdm$medications_no_cystitis)
+plotCohortAttrition(summary_attrition, cohortId = 1)
 ```
+
+The flow chart above illustrates the changes to cohort 1 when restricted to only include individuals that have no intersections with the cystitis cohort. 
+
+## Restrictions on cohort concepts
+
+Another way of ensuring the individuals in our medication cohorts have a history of cystitis is to use the `requireCohortIntersect()` function. This filters a cohort requiring that individuals are seen (or not seen) to have events related to a specific concept.
+
+
+```{r, include = FALSE}
+cdm <- cdm_from_con(con, cdm_schema = "main", 
+                    write_schema = c(prefix = "my_study_", schema = "main"))
+
+cdm$medications <- conceptCohort(cdm = cdm, 
+                                 conceptSet = list("diclofenac" = 1124300,
+                                                   "acetaminophen" = 1127433), 
+                                 name = "medications")
+```
+
+```{r}
+cdm$medications_cystitis <-  requireConceptIntersect(
+  cohort = cdm$medications,
+  conceptSet = list("cystitis" = 195588),
+  window = c(-365, 0),
+  name = "medications_cystitis")
+
+summary_attrition <- summariseCohortAttrition(cdm$medications_cystitis)
+plotCohortAttrition(summary_attrition, cohortId = 1)
+```
+
+The flow chart above illustrates the changes to cohort 1 when restricted to only include individuals that are seen to have events related to cystitis in the 365 days leading up to the cohort start date.
+
+```{r}
+cdm$medications_no_cystitis <-  requireConceptIntersect(
+  cohort = cdm$medications,
+  conceptSet = list("cystitis" = 195588),
+  window = c(-365, 0),
+  name = "medications_no_cystitis",
+  intersections = 0)
+
+summary_attrition <- summariseCohortAttrition(cdm$medications_no_cystitis)
+plotCohortAttrition(summary_attrition, cohortId = 1)
+```
+
+The flow chart above illustrates the changes to cohort 1 when restricted to only include individuals that are not seen to have events related to cystitis in the 365 days leading up to the cohort start date.
+
+
+## Restrictions on clinical tables
+
+It is also possible to use the `requireTableIntersect()` function to filter a cohort include or exclude individuals with a history of cystitis. It filters a cohort based on whether an individual is seen (or not seen) to have a record in a clinical table.
+
+```{r, include = FALSE}
+cdm <- cdm_from_con(con, cdm_schema = "main", 
+                    write_schema = c(prefix = "my_study_", schema = "main"))
+
+cdm$medications <- conceptCohort(cdm = cdm, 
+                                 conceptSet = list("diclofenac" = 1124300,
+                                                   "acetaminophen" = 1127433), 
+                                 name = "medications")
+
+cdm$cystitis <- conceptCohort(cdm = cdm,  
+                              conceptSet = list("cystitis" = 195588),
+                              name = "cystitis")
+```
+
+```{r}
+cdm$medications_cystitis <- requireTableIntersect(
+                        cohort = cdm$medications,
+                        tableName = "cystitis",
+                        indexDate = "cohort_start_date",
+                        window = c(-365, 0),
+                        name = "medications_cystitis")
+
+summary_attrition <- summariseCohortAttrition(cdm$medications_cystitis)
+plotCohortAttrition(summary_attrition, cohortId = 1)
+```
+
+The flow chart above illustrates the changes to cohort 1 when restricted to only include individuals that are seen to have a record in the cystitis table in the 365 days leading up to the cohort start date.
+
+```{r}
+cdm$medications_no_cystitis <- requireTableIntersect(
+                        cohort = cdm$medications,
+                        tableName = "cystitis",
+                        indexDate = "cohort_start_date",
+                        window = c(-365, 0),
+                        name = "medications_no_cystitis",
+                        intersections = 0)
+
+summary_attrition <- summariseCohortAttrition(cdm$medications_no_cystitis)
+plotCohortAttrition(summary_attrition, cohortId = 1)
+```
+
+The flow chart above illustrates the changes to cohort 1 when restricted to only include individuals that are not seen to have a record in the cystitis table in the 365 days leading up to the cohort start date.
+
+## Restrictions on death records
+
+We can also restrict our cohort to include individuals who seen (or not seen) to have a death by using the `requireDeathFlag()` function.
+
+```{r, include = FALSE}
+cdm <- cdm_from_con(con, cdm_schema = "main", 
+                    write_schema = c(prefix = "my_study_", schema = "main"))
+
+cdm$medications <- conceptCohort(cdm = cdm, 
+                                 conceptSet = list("diclofenac" = 1124300,
+                                                   "acetaminophen" = 1127433), 
+                                 name = "medications")
+
+cdm$cystitis <- conceptCohort(cdm = cdm,  
+                              conceptSet = list("cystitis" = 195588),
+                              name = "cystitis")
+```
+
+```{r}
+cdm$medications_deaths <- requireDeathFlag(
+                        cohort = cdm$medications,
+                        window = list(c(0,Inf)),
+                        name = "medications_deaths",
+                        negate = TRUE)
+
+summary_attrition <- summariseCohortAttrition(cdm$medications_deaths)
+plotCohortAttrition(summary_attrition, cohortId = 1)
+```
+
+The flow chart above illustrates the changes to cohort 1 when restricted to only include individuals that are seen to have a death on or after the cohort start date.
