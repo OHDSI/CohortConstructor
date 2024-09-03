@@ -210,8 +210,8 @@ getNewAttritionStrata <- function(originalAttrition, set, counts) {
   newAttrition |> dplyr::bind_rows()
 }
 addAttritionLine <- function(oldAttrition, reason, count) {
-  nr <- sum(count$number_records)
-  ns <- sum(count$number_subjects)
+  nr <- as.integer(sum(count$number_records))
+  ns <- as.integer(sum(count$number_subjects))
   oldAttrition |>
     dplyr::union_all(
       oldAttrition |>
@@ -222,7 +222,7 @@ addAttritionLine <- function(oldAttrition, reason, count) {
           "excluded_subjects" = .data$number_subjects - .env$ns,
           "number_records" = .env$nr,
           "number_subjects" = .env$ns,
-          "reason_id" = .data$reason_id + 1
+          "reason_id" = .data$reason_id + 1L
         )
     )
 }

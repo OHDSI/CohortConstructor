@@ -44,6 +44,7 @@ sampleCohorts <- function(cohort,
         .data$cohort_definition_id %in% .env$cohortId
       ))) |>
     dplyr::ungroup() |>
+    dplyr::relocate(dplyr::all_of(omopgenerics::cohortColumns("cohort"))) |>
     omopgenerics::recordCohortAttrition(
       reason = paste0("Sample ", n, " individuals"),
       cohortId = cohortId
