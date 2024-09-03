@@ -1,5 +1,5 @@
 ---
-title: "a04_update_cohort_start_end"
+title: "Update cohort start and end dates"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{a04_update_cohort_start_end}
@@ -16,4 +16,41 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(CohortConstructor)
+library(CohortCharacteristics)
+library(ggplot2)
+```
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  eval = TRUE, message = FALSE, warning = FALSE,
+  comment = "#>"
+)
+
+library(CDMConnector)
+library(dplyr, warn.conflicts = FALSE)
+
+if (Sys.getenv("EUNOMIA_DATA_FOLDER") == ""){
+  Sys.setenv("EUNOMIA_DATA_FOLDER" = file.path(tempdir(), "eunomia"))}
+if (!dir.exists(Sys.getenv("EUNOMIA_DATA_FOLDER"))){ dir.create(Sys.getenv("EUNOMIA_DATA_FOLDER"))
+  downloadEunomiaData()  
+}
+```
+
+For this example we'll use the Eunomia synthetic data from the CDMConnector package.
+
+```{r}
+con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomia_dir())
+cdm <- cdm_from_con(con, cdm_schema = "main", 
+                    write_schema = c(prefix = "my_study_", schema = "main"))
+```
+
+Let's start by creating two drug cohorts, one for users of diclofenac and another for users of acetaminophen.
+
+```{r}
+cdm$medications <- conceptCohort(cdm = cdm, 
+                                 conceptSet = list("diclofenac" = 1124300,
+                                                   "acetaminophen" = 1127433), 
+                                 name = "medications")
+cohortCount(cdm$medications)
 ```
