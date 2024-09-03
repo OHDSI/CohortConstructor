@@ -24,7 +24,7 @@ people. All records of these individuals are preserved."><meta property="og:imag
     <li><a class="dropdown-item" href="../articles/a01_building_base_cohorts.html">Building base cohorts</a></li>
     <li><a class="dropdown-item" href="../articles/a02_cohort_table_requirements.html">Cohort Requirements</a></li>
     <li><a class="dropdown-item" href="../articles/a03_require_demographics.html">Demographic Requirements</a></li>
-    <li><a class="dropdown-item" href="../articles/a04_require_intersections.html">a04_require_intersections</a></li>
+    <li><a class="dropdown-item" href="../articles/a04_require_intersections.html">Requirements on Presence and Absence</a></li>
     <li><a class="dropdown-item" href="../articles/a05_update_cohort_start_end.html">a04_update_cohort_start_end</a></li>
     <li><a class="dropdown-item" href="../articles/a06_concatanate_cohorts.html">a05_concatanate_cohorts</a></li>
     <li><a class="dropdown-item" href="../articles/a07_filter_cohorts.html">a06_filter_cohorts</a></li>
@@ -96,16 +96,16 @@ considered. Cohorts not included will not be sampled.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: DuckDB v1.0.0 [unknown@Linux 6.5.0-1025-azure:R 4.4.1/:memory:]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    cohort_definition_id subject_id cohort_start_date cohort_end_date</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>                    1         14 1986-11-29        1987-12-14     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>                    1         14 1987-12-15        1988-03-19     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>                    1         23 2001-02-04        2004-06-17     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>                    1         29 2006-07-07        2006-10-01     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>                    1         29 2006-10-02        2006-11-23     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>                    1         29 2006-11-24        2008-03-21     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>                    1         32 1991-09-11        2002-11-15     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>                    1         35 2018-01-07        2018-02-19     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>                    1         35 2018-02-20        2018-03-22     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>                    1         42 2000-09-08        2001-02-17     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>                    1         13 2014-06-24        2014-06-29     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>                    1         13 2014-06-30        2014-08-07     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>                    1         26 2007-02-24        2010-05-06     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>                    1         33 2017-01-20        2017-03-02     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>                    1         33 2017-03-03        2017-06-07     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>                    1         39 2003-03-18        2003-04-11     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>                    1         39 2003-04-12        2003-05-10     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>                    1         39 2003-05-11        2007-11-15     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>                    1         45 1998-02-22        2000-05-25     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>                    1         45 2000-05-26        2007-09-06     </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ more rows</span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
