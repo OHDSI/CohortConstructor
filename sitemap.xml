@@ -42,7 +42,7 @@
 <url><loc>https://ohdsi.github.io/CohortConstructor/reference/requireIsEntry.html</loc></url>
 <url><loc>https://ohdsi.github.io/CohortConstructor/reference/requireIsFirstEntry.html</loc></url>
 <url><loc>https://ohdsi.github.io/CohortConstructor/reference/requireIsLastEntry.html</loc></url>
-<url><loc>https://ohdsi.github.io/CohortConstructor/reference/requireMinimumCohortCount.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/reference/requireMinCohortCount.html</loc></url>
 <url><loc>https://ohdsi.github.io/CohortConstructor/reference/requirePriorObservation.html</loc></url>
 <url><loc>https://ohdsi.github.io/CohortConstructor/reference/requireSex.html</loc></url>
 <url><loc>https://ohdsi.github.io/CohortConstructor/reference/requireTableIntersect.html</loc></url>

@@ -181,11 +181,11 @@ individuals<a class="anchor" aria-label="anchor" href="#keep-only-records-from-c
 </h2>
 <p>Some studies might require a minimum cohort size. We can define the
 minimum size, filtering out records that are smaller than required,
-using the <code>requireMinimumCohortCount</code> function from
+using the <code>requireMinCohortCount</code> function from
 CohortConstructor.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">medications</span> <span class="op">&lt;-</span> <span class="va">cdm</span><span class="op">$</span><span class="va">medications</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/requireMinimumCohortCount.html">requireMinimumCohortCount</a></span><span class="op">(</span>minCohortCount <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="../reference/requireMinCohortCount.html">requireMinCohortCount</a></span><span class="op">(</span>minCohortCount <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">summary_attrition</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu-dev.github.io/CohortCharacteristics/reference/summariseCohortAttrition.html" class="external-link">summariseCohortAttrition</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">medications</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://darwin-eu-dev.github.io/CohortCharacteristics/reference/plotCohortAttrition.html" class="external-link">plotCohortAttrition</a></span><span class="op">(</span><span class="va">summary_attrition</span>, cohortId <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
