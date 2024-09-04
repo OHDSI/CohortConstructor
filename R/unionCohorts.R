@@ -75,9 +75,10 @@ unionCohorts <- function(cohort,
     dplyr::compute(name = tmpTable, temporary = FALSE)
   cohCodelist <- attr(cohort, "cohort_codelist")
   if (!is.null(cohCodelist)) {
-    cohCodelist <- cohCodelist |> dplyr::mutate("cohort_definition_id" = 1)
+    cohCodelist <- cohCodelist |> dplyr::mutate("cohort_definition_id" = 1L)
   }
   unionedCohort <- unionedCohort |>
+    dplyr::relocate(dplyr::all_of(omopgenerics::cohortColumns("cohort"))) |>
     omopgenerics::newCohortTable(
       cohortSetRef = cohSet,
       cohortAttritionRef = NULL,

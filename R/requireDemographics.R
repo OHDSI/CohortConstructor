@@ -522,6 +522,7 @@ demographicsFilter <- function(cohort,
                           )
                         )) |>
     dplyr::select(!"target_cohort_rand01") |>
+    dplyr::relocate(dplyr::all_of(omopgenerics::cohortColumns("cohort"))) |>
     dplyr::compute(name = name, temporary = FALSE) |>
     omopgenerics::newCohortTable(
       cohortSetRef = newSet,

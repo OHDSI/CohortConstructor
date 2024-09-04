@@ -127,25 +127,10 @@ trimDemographics <- function(cohort,
       by = "target_cohort_rand01",
       relationship = "many-to-many"
     ) |>
+    dplyr::relocate(dplyr::all_of(omopgenerics::cohortColumns("cohort"))) |>
     dplyr::compute(name = tmpNewCohort, temporary = FALSE)
 
-  # make sure cohort variables are first
-  orderVars <- c(
-    "cohort_definition_id",
-    "subject_id",
-    "cohort_start_date",
-    "cohort_end_date",
-    colnames(newCohort)[!colnames(newCohort) %in%
-      c(
-        "cohort_definition_id",
-        "subject_id",
-        "cohort_start_date",
-        "cohort_end_date"
-      )]
-  )
-
   newCohort <- newCohort |>
-    dplyr::select(dplyr::all_of(orderVars)) |>
     omopgenerics::newCohortTable(
       cohortSetRef = newSet,
       cohortAttritionRef = newAtt,
@@ -342,6 +327,7 @@ trimDemographics <- function(cohort,
         )
       )), by = unique(c("target_cohort_rand01", "subject_id"))) |>
     dplyr::select(!"target_cohort_rand01") |>
+    dplyr::relocate(dplyr::all_of(omopgenerics::cohortColumns("cohort"))) |>
     dplyr::compute(name = name, temporary = FALSE) |>
     omopgenerics::newCohortTable(
       cohortSetRef = newSet,

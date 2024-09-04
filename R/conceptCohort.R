@@ -318,7 +318,7 @@ fulfillCohortReqs <- function(cdm, name) {
 conceptSetToCohortSet <- function(conceptSet, cdm) {
   cohSet <- dplyr::tibble("cohort_name" = names(conceptSet)) |>
     dplyr::mutate(
-      "cohort_definition_id" = dplyr::row_number(),
+      "cohort_definition_id" = as.integer(dplyr::row_number()),
       "cdm_version" = attr(cdm, "cdm_version"),
       "vocabulary_version" = CodelistGenerator::getVocabVersion(cdm)
     )
@@ -331,16 +331,17 @@ conceptSetToCohortSet <- function(conceptSet, cdm) {
 
 conceptSetToCohortCodelist <- function(conceptSet) {
   cohortSet <- dplyr::tibble("cohort_name" = names(conceptSet)) |>
-    dplyr::mutate("cohort_definition_id" = dplyr::row_number())
+    dplyr::mutate("cohort_definition_id" = as.integer(dplyr::row_number()))
 
   lapply(conceptSet, dplyr::as_tibble) |>
     dplyr::bind_rows(.id = "cohort_name") |>
     dplyr::inner_join(cohortSet, by = "cohort_name") |>
+    dplyr::mutate("type" = "index event", "value" = as.integer(.data$value)) |>
     dplyr::select("cohort_definition_id",
+      "codelist_name" = "cohort_name",
       "concept_id" = "value",
-      "codelist_name" = "cohort_name"
-    ) |>
-    dplyr::mutate("type" = "index event")
+      "type"
+    )
 }
 
 # upload codes to cdm and add domain

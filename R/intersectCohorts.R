@@ -538,10 +538,10 @@ intersectCohortAttrition <- function(cohort,
   cohAtt <- counts |>
     dplyr::filter(.data$cohort_definition_id %in% .env$intersectId) |>
     dplyr::mutate(
-      "reason_id" = 1,
+      "reason_id" = 1L,
       "reason" = "Initial qualifying events",
-      "excluded_records" = 0,
-      "excluded_subjects" = 0
+      "excluded_records" = 0L,
+      "excluded_subjects" = 0L
     )
   if (!keepOriginalCohorts) {
     # individual cohorts
@@ -613,7 +613,7 @@ addAttritionReason <- function(att, counts, ids, reason) {
           ) |>
           dplyr::select("cohort_definition_id", "reason_id") |>
           dplyr::rowwise() |>
-          dplyr::mutate("reason_id" = .data$reason_id + 1, "reason" = reason),
+          dplyr::mutate("reason_id" = .data$reason_id + 1L, "reason" = reason),
         by = "cohort_definition_id"
       ) |>
       dplyr::select(dplyr::all_of(

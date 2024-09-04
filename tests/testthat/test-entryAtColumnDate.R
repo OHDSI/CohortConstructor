@@ -3,8 +3,8 @@ test_that("entry at first date", {
   cdm <- mockCohortConstructor(
     tables = list(
       "cohort" = dplyr::tibble(
-        cohort_definition_id = 1,
-        subject_id = c(1, 2, 3, 4, 4),
+        cohort_definition_id = 1L,
+        subject_id = c(1, 2, 3, 4, 4)  |> as.integer(),
         cohort_start_date = as.Date(c("2000-06-03", "2000-01-01", "2015-01-15", "1989-12-09", "2000-12-09")),
         cohort_end_date = as.Date(c("2001-09-01", "2001-01-12", "2015-02-15", "1990-12-09", "2002-12-09")),
         other_date_1 = as.Date(c("2001-08-01", "2001-01-01", "2015-01-15", NA, "2002-12-09")),
@@ -59,8 +59,8 @@ test_that("entry at last date", {
   cdm <- mockCohortConstructor(
     tables = list(
       "cohort" = dplyr::tibble(
-        cohort_definition_id = c(1, 1, 2, 2, 2),
-        subject_id = c(1, 2, 3, 4, 4),
+        cohort_definition_id = c(1, 1, 2, 2, 2) |> as.integer(),
+        subject_id = c(1, 2, 3, 4, 4) |> as.integer(),
         cohort_start_date = as.Date(c("2000-06-03", "2000-01-01", "2015-01-15", "1989-12-09", "2000-12-09")),
         cohort_end_date = as.Date(c("2001-10-01", "2001-04-15", "2015-02-15", "1990-12-09", "2002-12-09")),
         other_date_1 = as.Date(c("2001-09-02", "2001-01-01", "2015-01-15", "1989-11-09", "2002-12-09")),

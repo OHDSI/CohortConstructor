@@ -24,17 +24,13 @@ test_that("adding days to cohort start", {
   cdm$cohort_1 <- padCohortStart(cdm$cohort,
                                  days = 2,
                                  name = "cohort_1")
-  expect_identical(cdm$cohort_1 |>
-                     dplyr::pull("cohort_start_date"),
-                   as.Date("2020-01-05"))
-
+  expect_identical(cdm$cohort_1 |> dplyr::pull("cohort_start_date"), as.Date("2020-01-05"))
 
   # minus days
   cdm$cohort_2 <- padCohortStart(cdm$cohort,
                                  days = -2,
                                  name = "cohort_2")
-  expect_identical(cdm$cohort_2 |>
-                     dplyr::pull("cohort_start_date"),
+  expect_identical(cdm$cohort_2 |> dplyr::pull("cohort_start_date"),
                    as.Date("2020-01-01"))
 
   # minus days goes outside of current observation period
@@ -135,6 +131,4 @@ test_that("adding days to cohort start", {
     cohortId = 1,
     name = "my_cohort 1"
   ))
-
-
 })
