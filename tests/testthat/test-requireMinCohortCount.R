@@ -1,4 +1,4 @@
-test_that("testing requireMinimumCohortCount", {
+test_that("testing requireMinCohortCount", {
   testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 1) |>
@@ -13,7 +13,7 @@ test_that("testing requireMinimumCohortCount", {
   startAttrition <- attrition(cdm$cohort1)
 
   # restrict all cohorts - all will be dropped
-  cdm$cohort1_a <- requireMinimumCohortCount(cdm$cohort1,
+  cdm$cohort1_a <- requireMinCohortCount(cdm$cohort1,
     minCohortCount = 5,
     name = "cohort1_a"
   )
@@ -27,7 +27,7 @@ test_that("testing requireMinimumCohortCount", {
     dplyr::pull("number_subjects") == 0))
 
   # restrict specific cohort
-  cdm$cohort1_b <- requireMinimumCohortCount(cdm$cohort1,
+  cdm$cohort1_b <- requireMinCohortCount(cdm$cohort1,
     minCohortCount = 5,
     cohortId = c(1, 2),
     name = "cohort1_b"
@@ -51,7 +51,7 @@ test_that("testing requireMinimumCohortCount", {
 
 
   # nobody to drop
-  cdm$cohort1_c <- requireMinimumCohortCount(cdm$cohort1,
+  cdm$cohort1_c <- requireMinCohortCount(cdm$cohort1,
     minCohortCount = 0,
     name = "cohort1_c"
   )
@@ -67,35 +67,35 @@ test_that("testing requireMinimumCohortCount", {
   expect_identical(attrition(cdm$cohort1), startAttrition)
 
   # expect errors
-  expect_error(cdm$cohort2 <- requireMinimumCohortCount("cohort1",
+  expect_error(cdm$cohort2 <- requireMinCohortCount("cohort1",
     cohortId = 1,
     name = "cohort2"
   ))
-  expect_error(cdm$cohort2 <- requireMinimumCohortCount("cohort1",
+  expect_error(cdm$cohort2 <- requireMinCohortCount("cohort1",
     minCohortCount = -10,
     name = "cohort2"
   ))
-  expect_error(cdm$cohort2 <- requireMinimumCohortCount(cdm$cohort1,
+  expect_error(cdm$cohort2 <- requireMinCohortCount(cdm$cohort1,
     minCohortCount = "1",
     name = "cohort2"
   ))
-  expect_error(cdm$cohort2 <- requireMinimumCohortCount(cdm$cohort1,
+  expect_error(cdm$cohort2 <- requireMinCohortCount(cdm$cohort1,
     minCohortCount = Inf,
     name = "cohort2"
   ))
-  expect_error(cdm$cohort2 <- requireMinimumCohortCount(cdm$cohort1,
+  expect_error(cdm$cohort2 <- requireMinCohortCount(cdm$cohort1,
     minCohortCount = c(1, 2),
     name = "cohort2"
   ))
-  expect_error(cdm$cohort2 <- requireMinimumCohortCount(cdm$cohort1,
+  expect_error(cdm$cohort2 <- requireMinCohortCount(cdm$cohort1,
     cohortId = "1",
     name = "cohort2"
   ))
-  expect_error(cdm$cohort2 <- requireMinimumCohortCount(cdm$cohort1,
+  expect_error(cdm$cohort2 <- requireMinCohortCount(cdm$cohort1,
     cohortId = 2,
     name = "cohort3"
   ))
-  expect_error(cdm$cohort2 <- requireMinimumCohortCount(cdm$cohort1,
+  expect_error(cdm$cohort2 <- requireMinCohortCount(cdm$cohort1,
     cohortId = 10,
     name = "cohort2"
   ))
