@@ -79,11 +79,13 @@ list in some time window around an index date.</p>
 
 
 <dt id="arg-conceptset">conceptSet<a class="anchor" aria-label="anchor" href="#arg-conceptset"></a></dt>
-<dd><p>Concept set list.</p></dd>
+<dd><p>A conceptSet, which can either be a codelist
+or a conceptSetExpression.</p></dd>
 
 
 <dt id="arg-window">window<a class="anchor" aria-label="anchor" href="#arg-window"></a></dt>
-<dd><p>Window to consider events over.</p></dd>
+<dd><p>A list of vectors specifying minimum and maximum days from
+<code>indexDate</code> to consider events over.</p></dd>
 
 
 <dt id="arg-intersections">intersections<a class="anchor" aria-label="anchor" href="#arg-intersections"></a></dt>
@@ -95,31 +97,32 @@ intersections must match this.</p></dd>
 <dt id="arg-cohortid">cohortId<a class="anchor" aria-label="anchor" href="#arg-cohortid"></a></dt>
 <dd><p>IDs of the cohorts to modify. If NULL, all cohorts will be
 used; otherwise, only the specified cohorts will be modified, and the
-rest will remain unchanged..</p></dd>
+rest will remain unchanged.</p></dd>
 
 
 <dt id="arg-indexdate">indexDate<a class="anchor" aria-label="anchor" href="#arg-indexdate"></a></dt>
-<dd><p>Variable in x that contains the date to compute the
-intersection.</p></dd>
+<dd><p>Name of the column in the cohort that contains the date to
+compute the intersection.</p></dd>
 
 
 <dt id="arg-targetstartdate">targetStartDate<a class="anchor" aria-label="anchor" href="#arg-targetstartdate"></a></dt>
-<dd><p>Date of reference in cohort table, either for start
-(in overlap) or on its own (for incidence).</p></dd>
+<dd><p>Start date of reference in cohort table.</p></dd>
 
 
 <dt id="arg-targetenddate">targetEndDate<a class="anchor" aria-label="anchor" href="#arg-targetenddate"></a></dt>
-<dd><p>Date of reference in cohort table, either for end
-(overlap) or NULL (if incidence).</p></dd>
+<dd><p>End date of reference in cohort table. If NULL,
+incidence of target event in the window will be considered as intersection,
+otherwise prevalence of that event will be used as intersection (overlap
+between cohort and event).</p></dd>
 
 
 <dt id="arg-censordate">censorDate<a class="anchor" aria-label="anchor" href="#arg-censordate"></a></dt>
 <dd><p>Whether to censor overlap events at a specific date or a
-column date of x.</p></dd>
+column date of the cohort.</p></dd>
 
 
 <dt id="arg-name">name<a class="anchor" aria-label="anchor" href="#arg-name"></a></dt>
-<dd><p>Name of the new cohort with the future observation restriction.</p></dd>
+<dd><p>Name of the new cohort table created in the cdm object.</p></dd>
 
 </dl></div>
     <div class="section level2">

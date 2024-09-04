@@ -76,7 +76,8 @@ window around an index date.</p>
 
 
 <dt id="arg-window">window<a class="anchor" aria-label="anchor" href="#arg-window"></a></dt>
-<dd><p>Window to consider events over.</p></dd>
+<dd><p>A list of vectors specifying minimum and maximum days from
+<code>indexDate</code> to consider events over.</p></dd>
 
 
 <dt id="arg-cohortid">cohortId<a class="anchor" aria-label="anchor" href="#arg-cohortid"></a></dt>
@@ -86,13 +87,13 @@ rest will remain unchanged.</p></dd>
 
 
 <dt id="arg-indexdate">indexDate<a class="anchor" aria-label="anchor" href="#arg-indexdate"></a></dt>
-<dd><p>Variable in x that contains the date to compute the
-intersection.</p></dd>
+<dd><p>Name of the column in the cohort that contains the date to
+use as time 0 for window days.</p></dd>
 
 
 <dt id="arg-censordate">censorDate<a class="anchor" aria-label="anchor" href="#arg-censordate"></a></dt>
 <dd><p>Whether to censor overlap events at a specific date or a
-column date of x.</p></dd>
+column date of the cohort.</p></dd>
 
 
 <dt id="arg-negate">negate<a class="anchor" aria-label="anchor" href="#arg-negate"></a></dt>
@@ -101,7 +102,7 @@ rather than inclusion (i.e. require absence in another cohort).</p></dd>
 
 
 <dt id="arg-name">name<a class="anchor" aria-label="anchor" href="#arg-name"></a></dt>
-<dd><p>Name of the new cohort with the future observation restriction.</p></dd>
+<dd><p>Name of the new cohort table created in the cdm object.</p></dd>
 
 </dl></div>
     <div class="section level2">

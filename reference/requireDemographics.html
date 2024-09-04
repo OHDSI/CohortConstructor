@@ -86,33 +86,32 @@ demographics characteristics on which to restrict on.</p></dd>
 
 
 <dt id="arg-agerange">ageRange<a class="anchor" aria-label="anchor" href="#arg-agerange"></a></dt>
-<dd><p>A list of minimum and maximum age.</p></dd>
+<dd><p>A list of vectors specifying minimum and maximum age.</p></dd>
 
 
 <dt id="arg-sex">sex<a class="anchor" aria-label="anchor" href="#arg-sex"></a></dt>
-<dd><p>Can be "Both", "Male" or "Female". If one of the latter, only
-those with that sex will be included.</p></dd>
+<dd><p>Can be "Both", "Male" or "Female".</p></dd>
 
 
 <dt id="arg-minpriorobservation">minPriorObservation<a class="anchor" aria-label="anchor" href="#arg-minpriorobservation"></a></dt>
-<dd><p>A minimum number of prior observation days in
-the database.</p></dd>
+<dd><p>A minimum number of continuous prior observation
+days in the database.</p></dd>
 
 
 <dt id="arg-minfutureobservation">minFutureObservation<a class="anchor" aria-label="anchor" href="#arg-minfutureobservation"></a></dt>
-<dd><p>A minimum number of future observation days in
-the database.</p></dd>
+<dd><p>A minimum number of continuous future observation
+days in the database.</p></dd>
 
 
 <dt id="arg-requirementinteractions">requirementInteractions<a class="anchor" aria-label="anchor" href="#arg-requirementinteractions"></a></dt>
 <dd><p>If TRUE, cohorts will be created for
-all combinations of ageGroup, sex, and daysPriorObservation. If FALSE, only the
-first value specified for the other factors will be used. Consequently,
+all combinations of ageGroup, sex, and daysPriorObservation. If FALSE, only
+the first value specified for the other factors will be used. Consequently,
 order of values matters when requirementInteractions is FALSE.</p></dd>
 
 
 <dt id="arg-name">name<a class="anchor" aria-label="anchor" href="#arg-name"></a></dt>
-<dd><p>Name of the new cohort with the demographic requirements.</p></dd>
+<dd><p>Name of the new cohort table created in the cdm object.</p></dd>
 
 </dl></div>
     <div class="section level2">
