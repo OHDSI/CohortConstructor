@@ -6,17 +6,15 @@
 #' that overlap combined and kept. Cohort entries are when an individual was in
 #' _both_ of the cohorts.
 #'
-#' @param cohort A cohort table in a cdm reference.
-#' @param cohortId IDs of the cohorts to include. If NULL all cohorts will be
-#' considered. Cohorts not included will be removed from the cohort set.
-#' @param gap Number of days between two subsequent cohort entries to be merged
-#' in a single cohort record.
+#' @inheritParams cohortDoc
+#' @inheritParams cohortIdSubsetDoc
+#' @inheritParams gapDoc
+#' @inheritParams nameDoc
 #' @param mutuallyExclusive Whether the generated cohorts are mutually
 #' exclusive or not.
 #' @param keepOriginalCohorts If TRUE the original cohorts and the newly
 #' created intersection cohort will be returned. If FALSE only the new cohort
 #' will be returned.
-#' @param name Name of the new cohort with the demographic requirements.
 #'
 #' @export
 #'

@@ -16,11 +16,11 @@ unionCohorts(
 \arguments{
 \item{cohort}{A cohort table in a cdm reference.}
 
-\item{cohortId}{IDs of the cohorts to include. If NULL all cohorts will be
-considered. Cohorts not included will be removed from the cohort set.}
+\item{cohortId}{IDs of the cohorts to include. Cohorts not included will be
+removed from the cohort set.}
 
-\item{gap}{Number of days between two subsequent cohort entries of a subject
-that will be merged in a single cohort entry}
+\item{gap}{Number of days between two subsequent cohort entries to be merged
+in a single cohort record.}
 
 \item{cohortName}{Name of the returned cohort. If NULL, the cohort name will
 be created by collapsing the individual cohort names, separated by "_".}
@@ -29,7 +29,7 @@ be created by collapsing the individual cohort names, separated by "_".}
 created union cohort will be returned. If FALSE only the new cohort will be
 returned.}
 
-\item{name}{Name of the new cohort table.}
+\item{name}{Name of the new cohort table created in the cdm object.}
 }
 \value{
 A cohort table.

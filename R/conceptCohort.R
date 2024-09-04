@@ -24,10 +24,9 @@
 #' * If a record ends outside of an observation period it will be
 #'  trimmed so as to end at the preceding observation period end date.
 #'
-#' @param cdm A cdm reference.
-#' @param conceptSet A conceptSet, which can either be a codelist
-#' or a conceptSetExpression.
-#' @param name Name of the cohort in the cdm object.
+#' @inheritParams cdmDoc
+#' @inheritParams conceptSetDoc
+#' @inheritParams nameDoc
 #' @param exit How the cohort end date is defined. Can be either
 #' "event_end_date" or "event_start_date".
 #' @param useSourceFields If TRUE, the source concept_id fields will also be

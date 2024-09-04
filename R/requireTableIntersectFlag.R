@@ -5,24 +5,11 @@
 #' that an individual is seen (or not seen) to have a record (or no records) in
 #' a clinical table in some time window around an index date.
 #'
-#' @param cohort A cohort table in a cdm reference.
-#' @param tableName Name of the table to check for intersect.
-#' @param window Window to consider events over.
-#' @param intersections A range indicating number of intersections for
-#' criteria to be fulfilled. If a single number is passed, the number of
-#' intersections must match this.
-#' @param indexDate Variable in x that contains the date to compute the
-#' intersection.
-#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
-#' used; otherwise, only the specified cohorts will be modified, and the
-#' rest will remain unchanged.
-#' @param targetStartDate Date of reference in cohort table, either for start
-#' (in overlap) or on its own (for incidence).
-#' @param targetEndDate Date of reference in cohort table, either for end
-#' (overlap) or NULL (if incidence).
-#' @param censorDate Whether to censor overlap events at a specific date or a
-#' column date of x.
-#' @param name Name of the new cohort with the future observation restriction.
+#' @inheritParams requireIntersectDoc
+#' @inheritParams cohortDoc
+#' @inheritParams cohortIdModifyDoc
+#' @inheritParams windowDoc
+#' @inheritParams nameDoc
 #'
 #' @return Cohort table with only those in the other table kept (or those that
 #' are not in the table if negate = TRUE)

@@ -17,8 +17,8 @@ intersectCohorts(
 \arguments{
 \item{cohort}{A cohort table in a cdm reference.}
 
-\item{cohortId}{IDs of the cohorts to include. If NULL all cohorts will be
-considered. Cohorts not included will be removed from the cohort set.}
+\item{cohortId}{IDs of the cohorts to include. Cohorts not included will be
+removed from the cohort set.}
 
 \item{gap}{Number of days between two subsequent cohort entries to be merged
 in a single cohort record.}
@@ -30,7 +30,7 @@ exclusive or not.}
 created intersection cohort will be returned. If FALSE only the new cohort
 will be returned.}
 
-\item{name}{Name of the new cohort with the demographic requirements.}
+\item{name}{Name of the new cohort table created in the cdm object.}
 }
 \value{
 A cohort table.

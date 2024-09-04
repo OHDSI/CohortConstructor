@@ -4,12 +4,11 @@
 #' `stratifyCohorts()` creates new cohorts, splitting an existing cohort based
 #' on specified columns on which to stratify on.
 #'
-#' @param cohort A cohort table in a cdm reference.
+#' @inheritParams cohortDoc
+#' @inheritParams cohortIdSubsetDoc
+#' @inheritParams nameDoc
 #' @param strata A strata list that point to columns in cohort table.
-#' @param cohortId IDs of the cohorts to include. If NULL all cohorts will be
-#' considered. Cohorts not included will be removed from the cohort set.
 #' @param removeStrata Whether to remove strata columns from final cohort table.
-#' @param name Name of the new cohort.
 #'
 #' @return Cohort table stratified.
 #'

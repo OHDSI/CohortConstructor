@@ -4,14 +4,10 @@
 #' `entryAtFirstDate()` resets cohort start date based on a set of specified
 #' column dates. The first date that occurs is chosen.
 #'
-#' @param cohort A cohort table in a cdm reference.
-#' @param dateColumns Date columns in the cohort table to consider.
-#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
-#' used; otherwise, only the specified cohorts will be modified, and the
-#' rest will remain unchanged.
-#' @param returnReason If TRUE it will return a column stating which column in
-#' `dateColumns` is used as a new cohort end date.
-#' @param name Name of the new cohort with the restriction.
+#' @inheritParams cohortDoc
+#' @inheritParams cohortIdModifyDoc
+#' @inheritParams columnDateDoc
+#' @inheritParams nameDoc
 #'
 #' @return The cohort table.
 #'
@@ -52,14 +48,14 @@ entryAtFirstDate <- function(cohort,
 
 #' Set cohort start date to the last of a set of column dates
 #'
-#' @param cohort A cohort table in a cdm reference.
-#' @param dateColumns description
-#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
-#' used; otherwise, only the specified cohorts will be modified, and the
-#' rest will remain unchanged.
-#' @param returnReason If TRUE it will return a column stating which column in
-#' `dateColumns` is used as a new cohort end date. description
-#' @param name Name of the new cohort with the restriction.
+#' @description
+#' `entryAtLastDate()` resets cohort end date based on a set of specified
+#' column dates. The last date is chosen.
+#'
+#' @inheritParams cohortDoc
+#' @inheritParams cohortIdModifyDoc
+#' @inheritParams columnDateDoc
+#' @inheritParams nameDoc
 #'
 #' @return The cohort table.
 #'

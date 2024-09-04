@@ -4,11 +4,10 @@
 #' `sampleCohorts()` samples an existing cohort table for a given number of
 #' people. All records of these individuals are preserved.
 #'
-#' @param cohort A cohort table in a cdm reference.
-#' @param cohortId IDs of the cohorts to include. If NULL all cohorts will be
-#' considered. Cohorts not included will not be sampled.
+#' @inheritParams cohortDoc
+#' @inheritParams cohortIdSubsetDoc
+#' @inheritParams nameDoc
 #' @param n Number of people to be sampled for each included cohort.
-#' @param name Name of the new sampled cohort.
 #'
 #' @return Cohort table with the specified cohorts sampled.
 #'

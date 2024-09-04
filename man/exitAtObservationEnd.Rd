@@ -13,7 +13,7 @@ exitAtObservationEnd(cohort, cohortId = NULL, name = tableName(cohort))
 used; otherwise, only the specified cohorts will be modified, and the
 rest will remain unchanged.}
 
-\item{name}{Name of the new cohort with the restriction.}
+\item{name}{Name of the new cohort table created in the cdm object.}
 }
 \value{
 The cohort table.
