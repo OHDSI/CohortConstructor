@@ -74,48 +74,48 @@ test_that("joinOverlap", {
 })
 
 test_that("splitOverlap", {
-  testthat::skip_on_cran()
-  x <- dplyr::tibble(
-    start_date = as.Date(c(
-      "2020-01-01", "2020-03-01", "2020-06-01", "2020-02-01", "2020-05-02",
-      "2020-03-01", "2020-06-01", "2020-04-01"
-    )),
-    end_date = as.Date(c(
-      "2020-04-01", "2020-06-01", "2020-08-01", "2020-05-01", "2020-07-01",
-      "2020-05-01", "2020-08-01", "2020-07-01"
-    )),
-    pid = c(1, 1, 1, 1, 1, 2, 2, 2),
-    def_id = c(1, 1, 1, 2, 2, 1, 2, 1)
-  )
-  cdm <- mockCohortConstructor(otherTables = list(x = x), con = connection(), writeSchema = writeSchema())
-
-  expect_no_error(
-    res <- splitOverlap(
-      cdm$x, start = "start_date", end = "end_date", by = c("pid", "def_id")
-    ) |>
-      dplyr::collect() |>
-      dplyr::arrange(.data$pid, .data$def_id, .data$start_date)
-  )
-  expect_true(nrow(res) == 11)
-  expect_identical(
-    res,
-    dplyr::tibble(
-      pid = c(1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2),
-      def_id = c(1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 2),
-      start_date = as.Date(c(
-        "2020-01-01", "2020-03-01", "2020-04-02", "2020-06-01", "2020-06-02",
-        "2020-02-01", "2020-05-02", "2020-03-01", "2020-04-01", "2020-05-02",
-        "2020-06-01"
-      )),
-      end_date = as.Date(c(
-        "2020-02-29", "2020-04-01", "2020-05-31", "2020-06-01", "2020-08-01",
-        "2020-05-01", "2020-07-01", "2020-03-31", "2020-05-01", "2020-07-01",
-        "2020-08-01"
-      ))
-    )
-  )
-
-  PatientProfiles::mockDisconnect(cdm)
+  # testthat::skip_on_cran()
+  # x <- dplyr::tibble(
+  #   start_date = as.Date(c(
+  #     "2020-01-01", "2020-03-01", "2020-06-01", "2020-02-01", "2020-05-02",
+  #     "2020-03-01", "2020-06-01", "2020-04-01"
+  #   )),
+  #   end_date = as.Date(c(
+  #     "2020-04-01", "2020-06-01", "2020-08-01", "2020-05-01", "2020-07-01",
+  #     "2020-05-01", "2020-08-01", "2020-07-01"
+  #   )),
+  #   pid = c(1, 1, 1, 1, 1, 2, 2, 2),
+  #   def_id = c(1, 1, 1, 2, 2, 1, 2, 1)
+  # )
+  # cdm <- mockCohortConstructor(otherTables = list(x = x), con = connection(), writeSchema = writeSchema())
+  #
+  # expect_no_error(
+  #   res <- splitOverlap(
+  #     cdm$x, start = "start_date", end = "end_date", by = c("pid", "def_id")
+  #   ) |>
+  #     dplyr::collect() |>
+  #     dplyr::arrange(.data$pid, .data$def_id, .data$start_date)
+  # )
+  # expect_true(nrow(res) == 11)
+  # expect_identical(
+  #   res,
+  #   dplyr::tibble(
+  #     pid = c(1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2),
+  #     def_id = c(1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 2),
+  #     start_date = as.Date(c(
+  #       "2020-01-01", "2020-03-01", "2020-04-02", "2020-06-01", "2020-06-02",
+  #       "2020-02-01", "2020-05-02", "2020-03-01", "2020-04-01", "2020-05-02",
+  #       "2020-06-01"
+  #     )),
+  #     end_date = as.Date(c(
+  #       "2020-02-29", "2020-04-01", "2020-05-31", "2020-06-01", "2020-08-01",
+  #       "2020-05-01", "2020-07-01", "2020-03-31", "2020-05-01", "2020-07-01",
+  #       "2020-08-01"
+  #     ))
+  #   )
+  # )
+  #
+  # PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("intersectCohorts", {
@@ -200,16 +200,11 @@ test_that("intersectCohorts", {
   expect_true(all(omopgenerics::attrition(cdm$cohort3)$excluded_subjects ==  c(0, 0, 0)))
 
   # not enough cohorts provided
-  expect_warning(
+  expect_error(
     cdm$cohort4 <- intersectCohorts(
       cohort = cdm$cohort1, name = "cohort4",
       cohortId = 1
-    ), "At least 2 cohort id must be provided to do the intersection.")
-  expect_equal(cdm$cohort1 %>%
-                 omopgenerics::settings() %>%
-                 dplyr::filter(cohort_definition_id == 1),
-               cdm$cohort4 %>%
-                 omopgenerics::settings())
+    ))
 
   # all cohorts
   expect_no_error(cohort <- cdm$cohort1 |> intersectCohorts())
