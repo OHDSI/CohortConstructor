@@ -57,33 +57,22 @@ intersectCohorts <- function(cohort,
   assertLogical(keepOriginalCohorts, length = 1)
 
   if (length(cohortId) < 2) {
-    cli::cli_warn("At least 2 cohort id must be provided to do the intersection.")
-    # update properly
-    cohort <- cohort %>%
-      dplyr::filter(.data$cohort_definition_id == .env$cohortId) %>%
-      dplyr::compute(name = name, temporary = FALSE) %>%
-      omopgenerics::newCohortTable(
-        cohortSetRef = cohort %>%
-          omopgenerics::settings() %>%
-          dplyr::filter(.data$cohort_definition_id == .env$cohortId) %>%
-          dplyr::compute(name = paste0(name, "_set"), temporary = FALSE),
-        cohortAttritionRef = cohort %>%
-          omopgenerics::attrition() %>%
-          dplyr::filter(.data$cohort_definition_id == .env$cohortId) %>%
-          dplyr::compute(
-            name = paste0(name, "_attrition"),
-            temporary = FALSE
-          ),
-        .softValidation = TRUE
-      )
-    return(cohort)
+    cli::cli_abort("Settings of cohort table must contain at least two cohorts.")
   }
 
   # generate cohort
+
+  tblName <- omopgenerics::uniqueTableName()
   cohortOut <- cohort %>%
     dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) %>%
     dplyr::select(-"cohort_definition_id") %>%
-    splitOverlap(by = "subject_id") %>%
+    splitOverlap(by = "subject_id",
+                 name = tblName,
+                 tmp = paste0(tblName, "_tmp_"))
+  CDMConnector::dropTable(cdm,
+                          name = dplyr::starts_with(paste0(tblName, "_tmp_")))
+
+  cohortOut <- cohortOut |>
     PatientProfiles::addCohortIntersectFlag(
       targetCohortTable = omopgenerics::tableName(cohort),
       targetCohortId = cohortId,
@@ -248,12 +237,15 @@ intersectCohorts <- function(cohort,
     .softValidation = TRUE
   )
 
+  CDMConnector::dropTable(cdm, name = tblName)
+
   return(cohortOut)
 }
 
 #' To split overlapping periods in non overlapping period.
 #'
 #' @param x Table in the cdm.
+#' @param tmp Temp table stem
 #' @param start Column that indicates the start of periods.
 #' @param end Column that indicates the end of periods.
 #' @param by Variables to group by.
@@ -264,6 +256,8 @@ intersectCohorts <- function(cohort,
 #' going to overlap between each other.
 #'
 splitOverlap <- function(x,
+                         name,
+                         tmp,
                          start = "cohort_start_date",
                          end = "cohort_end_date",
                          by = c("cohort_definition_id", "subject_id")) {
@@ -288,7 +282,8 @@ splitOverlap <- function(x,
   is <- ids[2]
   ie <- ids[3]
 
-  x %>%
+  tmpTable_1 <- paste0(tmp, "_1")
+  x_a <- x %>%
     dplyr::select(dplyr::all_of(by), !!is := dplyr::all_of(start)) %>%
     dplyr::union_all(
       x %>%
@@ -296,31 +291,42 @@ splitOverlap <- function(x,
         dplyr::mutate(!!is := as.Date(!!CDMConnector::dateadd(is, 1)))
     ) %>%
     dplyr::distinct() %>%
+    dplyr::compute(temporary = FALSE, name = tmpTable_1)
+
+  tmpTable_2 <- paste0(tmp, "_2")
+  x_a <-  x_a %>%
     dplyr::group_by(dplyr::across(dplyr::all_of(by))) %>%
     dbplyr::window_order(.data[[is]]) %>%
     dplyr::mutate(!!id := dplyr::row_number()) %>%
     dbplyr::window_order() %>%
     dplyr::ungroup() %>%
-    dplyr::inner_join(
+    dplyr::compute(temporary = FALSE, name = tmpTable_2)
+
+  tmpTable_3 <- paste0(tmp, "_3")
+  x_b <- x %>%
+    dplyr::select(dplyr::all_of(by), !!ie := dplyr::all_of(end)) %>%
+    dplyr::union_all(
       x %>%
-        dplyr::select(dplyr::all_of(by), !!ie := dplyr::all_of(end)) %>%
-        dplyr::union_all(
-          x %>%
-            dplyr::select(dplyr::all_of(by), !!ie := dplyr::all_of(start)) %>%
-            dplyr::mutate(!!ie := as.Date(!!CDMConnector::dateadd(ie, -1)))
-        ) %>%
-        dplyr::distinct() %>%
-        dplyr::group_by(dplyr::across(dplyr::all_of(by))) %>%
-        dbplyr::window_order(.data[[ie]]) %>%
-        dplyr::mutate(!!id := dplyr::row_number() - 1) %>%
-        dbplyr::window_order() %>%
-        dplyr::ungroup(),
+        dplyr::select(dplyr::all_of(by), !!ie := dplyr::all_of(start)) %>%
+        dplyr::mutate(!!ie := as.Date(!!CDMConnector::dateadd(ie, -1)))
+    ) %>%
+    dplyr::distinct() %>%
+    dplyr::group_by(dplyr::across(dplyr::all_of(by))) %>%
+    dbplyr::window_order(.data[[ie]]) %>%
+    dplyr::mutate(!!id := dplyr::row_number() - 1) %>%
+    dbplyr::window_order() %>%
+    dplyr::ungroup() %>%
+    dplyr::compute(temporary = FALSE, name = tmpTable_3)
+
+  x <-  x_a %>%
+    dplyr::inner_join(
+      x_b,
       by = c(by, id)
     ) %>%
     dplyr::select(dplyr::all_of(by),
                   !!start := dplyr::all_of(is),
                   !!end := dplyr::all_of(ie)) %>%
-    dplyr::compute()
+    dplyr::compute(temporary = FALSE, name = name)
 }
 
 #' Join overlapping periods in single periods using gap.
