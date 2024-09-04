@@ -100,6 +100,14 @@ test_that("adding days to cohort start", {
     as.Date("2020-01-03")
   )
 
+  cdm$my_cohort_2 <- padCohortStart(
+    cdm$my_cohort,
+    days = 2,
+    cohortId = "cohort_1",
+    name = "my_cohort_2"
+  )
+  expect_equal(collectCohort(cdm$my_cohort_1, 1), collectCohort(cdm$my_cohort_2, 1))
+
   # input validation
   expect_error(padCohortStart(
     "my_cohort",

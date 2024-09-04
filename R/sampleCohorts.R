@@ -27,7 +27,7 @@ sampleCohorts <- function(cohort,
                           name = tableName(cohort)) {
   # checks
   cohort <- validateCohortTable(cohort, TRUE)
-  cohortId <- validateCohortId(cohortId, settings(cohort)$cohort_definition_id)
+  cohortId <- validateCohortId(cohortId, settings(cohort))
   n <- validateN(n)
   name <- validateName(name)
 

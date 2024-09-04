@@ -44,7 +44,7 @@ requireDeathFlag <- function(cohort,
   validateCDM(cdm)
   validateCohortColumn(indexDate, cohort, class = "Date")
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
-  cohortId <- validateCohortId(cohortId, ids)
+  cohortId <- validateCohortId(cohortId, settings(cohort))
 
   cols <- unique(
     c(

@@ -80,7 +80,7 @@ test_that("requiring presence in another cohort", {
 
   # cohort Id
   cdm$cohort6 <- requireCohortIntersect(cohort = cdm$cohort2,
-                                            cohortId = 2,
+                                            cohortId = "cohort_2",
                                             targetCohortTable = "cohort1",
                                             targetCohortId = 1,
                                             window = c(0, Inf),

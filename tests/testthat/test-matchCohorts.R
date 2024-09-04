@@ -50,6 +50,15 @@ test_that("matchCohorts runs without errors", {
                                     matchSex = TRUE,
                                     matchYearOfBirth = TRUE,
                                     ratio = 2))
+  expect_true(nrow(settings(a)) == 4)
+
+  expect_no_error(c <- matchCohorts(cohort = cdm$cohort2,
+                                    name = "new_cohort",
+                                    cohortId = c("cohort_1"),
+                                    matchSex = TRUE,
+                                    matchYearOfBirth = TRUE,
+                                    ratio = 2))
+  expect_true(nrow(settings(c)) == 2)
 
   # empty set
   cdm <- omopgenerics::emptyCohortTable(cdm, name = "cohort")

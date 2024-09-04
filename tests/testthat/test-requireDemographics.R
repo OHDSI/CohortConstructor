@@ -249,7 +249,7 @@ test_that("cohortIds", {
   cdm <- cdm_local |> copyCdm()
 
   cdm$new_cohort <- requireSex(cohort = cdm$cohort, cohortId = 1, sex = "Male") |>
-    requirePriorObservation(cohortId = 3, minPriorObservation = 1000, name = "new_cohort")
+    requirePriorObservation(cohortId = "cohort_3", minPriorObservation = 1000, name = "new_cohort")
   expect_true(all(
     omopgenerics::attrition(cdm$new_cohort)$reason ==
       c("Initial qualifying events", "Sex requirement: Male", "Initial qualifying events" ,
@@ -394,7 +394,7 @@ test_that("test more than one restriction", {
   ))
 
   cdm$cohort2 <- cdm$cohort |>
-    requireSex(sex = c("Both", "Male"), name = "cohort2", cohortId = c(1,3)) |>
+    requireSex(sex = c("Both", "Male"), name = "cohort2", cohortId = c("cohort_1", "cohort_3")) |>
     requirePriorObservation(minPriorObservation = c(3, 2), name = "cohort2", cohortId = 1)
   expect_true(all(settings(cdm$cohort2) |> dplyr::arrange(.data$cohort_definition_id) |> dplyr::pull("cohort_name") ==
                     c("cohort_1_1_1", "cohort_2", "cohort_3_1", "cohort_1_2", "cohort_3_2", "cohort_1_1_2")))

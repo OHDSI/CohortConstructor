@@ -344,7 +344,7 @@ test_that("attrition and cohortId", {
     requireAge(ageRange = list(c(0,40)))
 
   cdm$cohort1 <- intersectCohorts(
-    cohort = cdm$cohort1, cohortId = 1:2,
+    cohort = cdm$cohort1, cohortId = c("cohort_1", "cohort_2"),
     name = "cohort1", mutuallyExclusive = TRUE
   )
   expect_true(all(

@@ -31,7 +31,7 @@ padCohortStart <- function(cohort,
 
   cdm <- omopgenerics::cdmReference(cohort)
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
-  cohortId <- validateCohortId(cohortId, ids)
+  cohortId <- validateCohortId(cohortId, settings(cohort))
   days <- omopgenerics::assertNumeric(days, length = 1)
   days <- as.integer(days)
   name <- omopgenerics::validateNameArgument(name)

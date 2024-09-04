@@ -42,6 +42,12 @@ test_that("simple example", {
                     collapseCohorts(gap = 0, name = "new_cohort"))
   expect_identical(settings(sameCohort), settings(cohort))
   expect_identical(cohortCount(sameCohort), cohortCount(cohort))
+
+  # test character id works
+  expect_no_error(sameCohort2 <- cohort |>
+                    collapseCohorts(gap = 0, name = "new_cohort", cohortId = "a"))
+  expect_identical(settings(sameCohort2), settings(cohort))
+  expect_identical(cohortCount(sameCohort2), cohortCount(cohort))
   # expect_identical(
   #   attrition(sameCohort),
   #   attrition(cohort) |>
@@ -84,6 +90,7 @@ test_that("simple example", {
   )
 
   # expected behaviour
+  expect_warning(cdm$cohort |> collapseCohorts(cohortId = c("a", "n")))
   cdm$cohort <- cdm$cohort |> dplyr::mutate(extra_column_1 = 1,
                                             extra_column_2 = 2)
   expect_message(cdm$cohort |> collapseCohorts())
@@ -92,6 +99,7 @@ test_that("simple example", {
   expect_error(cdm$cohort |> collapseCohorts(gap = -1))
   expect_error(cdm$cohort |> collapseCohorts(gap = -Inf))
   expect_error(cdm$cohort |> collapseCohorts(gap = "not a number"))
+
 
   PatientProfiles::mockDisconnect(cdm)
 })

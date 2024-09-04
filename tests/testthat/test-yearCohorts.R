@@ -129,7 +129,7 @@ test_that("yearCohorts - keep name", {
   # simple example
   cdm$cohort <- yearCohorts(cohort = cdm$cohort,
                              years = 1997:2002,
-                             cohortId = NULL)
+                             cohortId = settings(cdm$cohort)$cohort_name)
   expect_equal(settings(cdm$cohort) |> dplyr::arrange(.data$cohort_definition_id),
                dplyr::tibble(
                  cohort_definition_id = 1:6,
