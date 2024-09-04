@@ -43,7 +43,7 @@ matchCohorts <- function(cohort,
   cdm <- omopgenerics::cdmReference(cohort)
   validateCDM(cdm)
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
-  cohortId <- validateCohortId(cohortId, ids)
+  cohortId <- validateCohortId(cohortId, settings(cohort))
   assertNumeric(ratio, min = 0, length = 1)
   assertLogical(matchSex, length = 1)
   assertLogical(matchYearOfBirth, length = 1)

@@ -29,7 +29,7 @@ trimDemographics <- function(cohort,
   # initial validation
   cohort <- validateCohortTable(cohort, FALSE)
   ids <- settings(cohort)$cohort_definition_id
-  cohortId <- validateCohortId(cohortId, ids)
+  cohortId <- validateCohortId(cohortId, settings(cohort))
   ageRange <- validateDemographicRequirements(
     ageRange = ageRange,
     sex = sex,

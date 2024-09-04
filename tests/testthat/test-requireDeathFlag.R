@@ -103,7 +103,7 @@ test_that("not death", {
 
   # censor Id
   cdm$cohort4 <-  requireDeathFlag(cohort = cdm$cohort1,
-                                   cohortId = 1,
+                                   cohortId = "cohort_1",
                                    window = c(0, Inf),
                                    name = "cohort4",
                                    negate = TRUE)

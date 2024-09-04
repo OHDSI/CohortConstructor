@@ -162,7 +162,7 @@ test_that("requiring absence in another table", {
   # cohort Id and name
   cdm$cohort1 <-  requireTableIntersect(cohort = cdm$cohort1,
                                         intersections = 0,
-                                            cohortId = 1,
+                                            cohortId = "cohort_1",
                                             tableName = "table",
                                             targetStartDate = "date_start",
                                             targetEndDate = "date_end",

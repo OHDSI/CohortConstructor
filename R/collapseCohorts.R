@@ -22,7 +22,7 @@ collapseCohorts <- function(cohort,
   validateCDM(cdm)
   cohort <- validateCohortTable(cohort, dropExtraColumns = TRUE)
   ids <- settings(cohort)$cohort_definition_id
-  cohortId <- validateCohortId(cohortId, ids)
+  cohortId <- validateCohortId(cohortId, settings(cohort))
   if (gap != Inf) {
     gap <- validateGap(gap)
   }

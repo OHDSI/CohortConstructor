@@ -30,7 +30,7 @@ requireMinCohortCount <- function(cohort,
                                       name = tableName(cohort)){
 
   cdm <- omopgenerics::cdmReference(cohort)
-  cohortId <- validateCohortId(cohortId, settings(cohort)$cohort_definition_id)
+  cohortId <- validateCohortId(cohortId, settings(cohort))
   name <- validateName(name)
   minCohortCount <- validateN(minCohortCount)
 

@@ -30,7 +30,7 @@ yearCohorts <- function(cohort,
   validateCDM(cdm)
   cohort <- validateCohortTable(cohort)
   ids <- settings(cohort)$cohort_definition_id
-  cohortId <- validateCohortId(cohortId, ids)
+  cohortId <- validateCohortId(cohortId, settings(cohort))
   assertNumeric(years, integerish = TRUE)
   name <- validateName(name)
 

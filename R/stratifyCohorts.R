@@ -41,7 +41,7 @@ stratifyCohorts <- function(cohort,
                             name = tableName(cohort)) {
   # initial checks
   cohort <- validateCohortTable(cohort = cohort)
-  cohortId <- validateCohortId(cohortId, settings(cohort)$cohort_definition_id)
+  cohortId <- validateCohortId(cohortId, settings(cohort))
   strata <- validateStrata(strata, cohort)
   name <- validateName(name)
 

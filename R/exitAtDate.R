@@ -34,7 +34,7 @@ exitAtObservationEnd <- function(cohort,
   cdm <- omopgenerics::cdmReference(cohort)
   validateCDM(cdm)
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
-  cohortId <- validateCohortId(cohortId, ids)
+  cohortId <- validateCohortId(cohortId, settings(cohort))
 
   # create new cohort
   newCohort <- cohort |>
@@ -92,7 +92,7 @@ exitAtDeath <- function(cohort,
   cdm <- omopgenerics::cdmReference(cohort)
   validateCDM(cdm)
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
-  cohortId <- validateCohortId(cohortId, ids)
+  cohortId <- validateCohortId(cohortId, settings(cohort))
   assertLogical(requireDeath, length = 1)
 
 

@@ -11,7 +11,8 @@ NULL
 
 #' Helper for consistent documentation of `cohortId`.
 #'
-#' @param cohortId IDs of the cohorts to include. Cohorts not included will be
+#' @param cohortId Vector identifying which cohorts to include
+#' (cohort_definition_id or cohort_name). Cohorts not included will be
 #' removed from the cohort set.
 #'
 #' @name cohortIdSubsetDoc
@@ -21,7 +22,8 @@ NULL
 
 #' Helper for consistent documentation of `cohortId`.
 #'
-#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
+#' @param cohortId Vector identifying which cohorts to modify
+#' (cohort_definition_id or cohort_name). If NULL, all cohorts will be
 #' used; otherwise, only the specified cohorts will be modified, and the
 #' rest will remain unchanged.
 #'

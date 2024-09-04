@@ -45,7 +45,7 @@ requireConceptIntersect <- function(cohort,
   validateCohortColumn(indexDate, cohort, class = "Date")
   assertList(conceptSet)
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
-  cohortId <- validateCohortId(cohortId, ids)
+  cohortId <- validateCohortId(cohortId, settings(cohort))
   intersections <- validateIntersections(intersections)
 
   lower_limit <- as.integer(intersections[[1]])

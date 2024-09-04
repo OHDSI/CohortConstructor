@@ -172,7 +172,7 @@ test_that("requiring absence in another cohort", {
   # cohort Id
   cdm$cohort3_exclusion_partial <-  requireConceptIntersect(
     cohort = cdm$cohort1,
-    cohortId = 1,
+    cohortId = "cohort_1",
     conceptSet = list(a = 1),
     window = c(-Inf, Inf),
     intersections = 0,

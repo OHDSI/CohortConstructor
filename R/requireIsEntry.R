@@ -29,7 +29,7 @@ requireIsEntry <- function(cohort,
   cdm <- omopgenerics::cdmReference(cohort)
   validateCDM(cdm)
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
-  cohortId <- validateCohortId(cohortId, ids)
+  cohortId <- validateCohortId(cohortId, settings(cohort))
 
   omopgenerics::assertNumeric(entryRange, integerish = TRUE, min = 0)
   if (length(entryRange) < 1 || length(entryRange) > 2) {
@@ -114,7 +114,7 @@ requireIsFirstEntry <- function(cohort,
   cdm <- omopgenerics::cdmReference(cohort)
   validateCDM(cdm)
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
-  cohortId <- validateCohortId(cohortId, ids)
+  cohortId <- validateCohortId(cohortId, settings(cohort))
 
   cohort <- cohort |>
     dplyr::group_by(.data$subject_id, .data$cohort_definition_id) |>
@@ -161,7 +161,7 @@ requireIsLastEntry <- function(cohort,
   cdm <- omopgenerics::cdmReference(cohort)
   validateCDM(cdm)
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
-  cohortId <- validateCohortId(cohortId, ids)
+  cohortId <- validateCohortId(cohortId, settings(cohort))
 
   cohort <- cohort |>
     dplyr::group_by(.data$subject_id, .data$cohort_definition_id) |>

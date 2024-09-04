@@ -18,7 +18,8 @@ requireFutureObservation(
 \item{minFutureObservation}{A minimum number of continuous future observation
 days in the database.}
 
-\item{cohortId}{IDs of the cohorts to modify. If NULL, all cohorts will be
+\item{cohortId}{Vector identifying which cohorts to modify
+(cohort_definition_id or cohort_name). If NULL, all cohorts will be
 used; otherwise, only the specified cohorts will be modified, and the
 rest will remain unchanged.}
 

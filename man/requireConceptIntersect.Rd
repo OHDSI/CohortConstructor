@@ -30,7 +30,8 @@ or a conceptSetExpression.}
 criteria to be fulfilled. If a single number is passed, the number of
 intersections must match this.}
 
-\item{cohortId}{IDs of the cohorts to modify. If NULL, all cohorts will be
+\item{cohortId}{Vector identifying which cohorts to modify
+(cohort_definition_id or cohort_name). If NULL, all cohorts will be
 used; otherwise, only the specified cohorts will be modified, and the
 rest will remain unchanged.}
 
