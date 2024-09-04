@@ -136,7 +136,7 @@ The flow chart above illustrates the changes to cohort 1 when restricted to a sp
 
 ## Keep only records from cohorts with a minimum number of individuals
 
-Some studies might require a minimum cohort size. We can define the minimum size, filtering out records that are smaller than required, using the `requireMinimumCohortCount` function from CohortConstructor.
+Some studies might require a minimum cohort size. We can define the minimum size, filtering out records that are smaller than required, using the `requireMinCohortCount` function from CohortConstructor.
 
 ```{r, include = FALSE}
 cdm$medications <- conceptCohort(cdm = cdm, 
@@ -147,7 +147,7 @@ cdm$medications <- conceptCohort(cdm = cdm,
 
 ```{r}
 cdm$medications <- cdm$medications %>% 
-  requireMinimumCohortCount(minCohortCount = 1000)
+  requireMinCohortCount(minCohortCount = 1000)
 
 summary_attrition <- summariseCohortAttrition(cdm$medications)
 plotCohortAttrition(summary_attrition, cohortId = 1)
