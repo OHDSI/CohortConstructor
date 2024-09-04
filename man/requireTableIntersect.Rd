@@ -22,7 +22,8 @@ requireTableIntersect(
 
 \item{tableName}{Name of the table to check for intersect.}
 
-\item{window}{Window to consider events over.}
+\item{window}{A list of vectors specifying minimum and maximum days from
+\code{indexDate} to consider events over.}
 
 \item{intersections}{A range indicating number of intersections for
 criteria to be fulfilled. If a single number is passed, the number of
@@ -32,19 +33,20 @@ intersections must match this.}
 used; otherwise, only the specified cohorts will be modified, and the
 rest will remain unchanged.}
 
-\item{indexDate}{Variable in x that contains the date to compute the
-intersection.}
+\item{indexDate}{Name of the column in the cohort that contains the date to
+compute the intersection.}
 
-\item{targetStartDate}{Date of reference in cohort table, either for start
-(in overlap) or on its own (for incidence).}
+\item{targetStartDate}{Start date of reference in cohort table.}
 
-\item{targetEndDate}{Date of reference in cohort table, either for end
-(overlap) or NULL (if incidence).}
+\item{targetEndDate}{End date of reference in cohort table. If NULL,
+incidence of target event in the window will be considered as intersection,
+otherwise prevalence of that event will be used as intersection (overlap
+between cohort and event).}
 
 \item{censorDate}{Whether to censor overlap events at a specific date or a
-column date of x.}
+column date of the cohort.}
 
-\item{name}{Name of the new cohort with the future observation restriction.}
+\item{name}{Name of the new cohort table created in the cdm object.}
 }
 \value{
 Cohort table with only those in the other table kept (or those that

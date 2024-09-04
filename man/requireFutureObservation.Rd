@@ -15,8 +15,8 @@ requireFutureObservation(
 \arguments{
 \item{cohort}{A cohort table in a cdm reference.}
 
-\item{minFutureObservation}{A minimum number of future observation days in
-the database.}
+\item{minFutureObservation}{A minimum number of continuous future observation
+days in the database.}
 
 \item{cohortId}{IDs of the cohorts to modify. If NULL, all cohorts will be
 used; otherwise, only the specified cohorts will be modified, and the
@@ -25,7 +25,7 @@ rest will remain unchanged.}
 \item{indexDate}{Variable in cohort that contains the date to compute the
 demographics characteristics on which to restrict on.}
 
-\item{name}{Name of the new cohort with the future observation restriction.}
+\item{name}{Name of the new cohort table created in the cdm object.}
 }
 \value{
 The cohort table with only records for individuals satisfying the

@@ -4,12 +4,10 @@
 #' `requireIsFirstEntry()` filters cohort records, keeping only the first
 #' cohort entry per person.
 #'
-#' @param cohort A cohort table in a cdm reference.
-#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
-#' used; otherwise, only the specified cohorts will be modified, and the
-#' rest will remain unchanged.
+#' @inheritParams cohortDoc
+#' @inheritParams cohortIdModifyDoc
+#' @inheritParams nameDoc
 #' @param entryRange Range for entries to include.
-#' @param name Name of the new cohort with the restriction.
 #'
 #' @return A cohort table in a cdm reference.
 #' @export
@@ -92,10 +90,9 @@ requireIsEntry <- function(cohort,
 #' `requireIsFirstEntry()` filters cohort records, keeping only the first
 #' cohort entry per person.
 #'
-#' @param cohort A cohort table in a cdm reference.
-#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
-#' used; otherwise, only the specified cohorts will be modified, and the
-#' rest will remain unchanged.
+#' @inheritParams cohortDoc
+#' @inheritParams cohortIdModifyDoc
+#' @inheritParams nameDoc
 #' @param name Name of the new cohort with the restriction.
 #'
 #' @return A cohort table in a cdm reference.

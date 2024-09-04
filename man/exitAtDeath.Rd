@@ -21,7 +21,7 @@ rest will remain unchanged.}
 \item{requireDeath}{If TRUE, subjects without a death record will be dropped,
 while if FALSE their end date will be left as is.}
 
-\item{name}{Name of the new cohort with the restriction.}
+\item{name}{Name of the new cohort table created in the cdm object.}
 }
 \value{
 The cohort table.

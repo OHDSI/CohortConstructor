@@ -12,7 +12,7 @@ subsetCohorts(cohort, cohortId, name = tableName(cohort))
 \item{cohortId}{IDs of the cohorts to include. Cohorts not included will be
 removed from the cohort set.}
 
-\item{name}{Name of the new cohort with the demographic requirements.}
+\item{name}{Name of the new cohort table created in the cdm object.}
 }
 \value{
 Cohort table with only cohorts in cohortId.

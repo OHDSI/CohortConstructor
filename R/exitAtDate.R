@@ -4,11 +4,9 @@
 #' `exitAtObservationEnd()` resets cohort end date based on a set of specified
 #' column dates. The last date that occurs is chosen.
 #'
-#' @param cohort A cohort table in a cdm reference.
-#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
-#' used; otherwise, only the specified cohorts will be modified, and the
-#' rest will remain unchanged.
-#' @param name Name of the new cohort with the restriction.
+#' @inheritParams cohortDoc
+#' @inheritParams cohortIdModifyDoc
+#' @inheritParams nameDoc
 #'
 #' @return The cohort table.
 #'
@@ -61,13 +59,11 @@ exitAtObservationEnd <- function(cohort,
 
 #' Set cohort end date to death date
 #'
-#' @param cohort A cohort table in a cdm reference.
-#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
-#' used; otherwise, only the specified cohorts will be modified, and the
-#' rest will remain unchanged.
+#' @inheritParams cohortDoc
+#' @inheritParams cohortIdModifyDoc
+#' @inheritParams nameDoc
 #' @param requireDeath If TRUE, subjects without a death record will be dropped,
 #' while if FALSE their end date will be left as is.
-#' @param name Name of the new cohort with the restriction.
 #'
 #' @return The cohort table.
 #'

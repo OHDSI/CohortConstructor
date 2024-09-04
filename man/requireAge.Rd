@@ -15,7 +15,7 @@ requireAge(
 \arguments{
 \item{cohort}{A cohort table in a cdm reference.}
 
-\item{ageRange}{A list of minimum and maximum age.}
+\item{ageRange}{A list of vectors specifying minimum and maximum age.}
 
 \item{cohortId}{IDs of the cohorts to modify. If NULL, all cohorts will be
 used; otherwise, only the specified cohorts will be modified, and the
@@ -24,7 +24,7 @@ rest will remain unchanged.}
 \item{indexDate}{Variable in cohort that contains the date to compute the
 demographics characteristics on which to restrict on.}
 
-\item{name}{Name of the new cohort with the age requirement.}
+\item{name}{Name of the new cohort table created in the cdm object.}
 }
 \value{
 The cohort table with only records for individuals satisfying the
