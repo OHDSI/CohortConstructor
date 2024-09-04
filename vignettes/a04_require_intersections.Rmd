@@ -1,7 +1,10 @@
 ---
 title: "Requirements on Presence and Absence"
-output: html_document
-date: "2024-09-02"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{a01_building_concept_cohorts}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
