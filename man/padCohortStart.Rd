@@ -11,7 +11,8 @@ padCohortStart(cohort, days, cohortId = NULL, name = tableName(cohort))
 
 \item{days}{Number of day to add to the cohort start date.}
 
-\item{cohortId}{IDs of the cohorts to modify. If NULL, all cohorts will be
+\item{cohortId}{Vector identifying which cohorts to modify
+(cohort_definition_id or cohort_name). If NULL, all cohorts will be
 used; otherwise, only the specified cohorts will be modified, and the
 rest will remain unchanged.}
 

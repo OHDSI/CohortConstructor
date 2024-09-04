@@ -18,7 +18,8 @@ exitAtLastDate(
 \item{dateColumns}{Character vector indicating date columns in the cohort
 table to consider.}
 
-\item{cohortId}{IDs of the cohorts to modify. If NULL, all cohorts will be
+\item{cohortId}{Vector identifying which cohorts to modify
+(cohort_definition_id or cohort_name). If NULL, all cohorts will be
 used; otherwise, only the specified cohorts will be modified, and the
 rest will remain unchanged.}
 

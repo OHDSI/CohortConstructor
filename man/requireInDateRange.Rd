@@ -18,7 +18,8 @@ requireInDateRange(
 \item{dateRange}{A date vector with the minimum and maximum dates between
 which the index date must have been observed.}
 
-\item{cohortId}{IDs of the cohorts to modify. If NULL, all cohorts will be
+\item{cohortId}{Vector identifying which cohorts to modify
+(cohort_definition_id or cohort_name). If NULL, all cohorts will be
 used; otherwise, only the specified cohorts will be modified, and the
 rest will remain unchanged.}
 

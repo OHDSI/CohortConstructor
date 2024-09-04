@@ -17,7 +17,8 @@ intersectCohorts(
 \arguments{
 \item{cohort}{A cohort table in a cdm reference.}
 
-\item{cohortId}{IDs of the cohorts to include. Cohorts not included will be
+\item{cohortId}{Vector identifying which cohorts to include
+(cohort_definition_id or cohort_name). Cohorts not included will be
 removed from the cohort set.}
 
 \item{gap}{Number of days between two subsequent cohort entries to be merged

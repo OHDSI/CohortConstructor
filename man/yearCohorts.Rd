@@ -11,7 +11,8 @@ yearCohorts(cohort, years, cohortId = NULL, name = tableName(cohort))
 
 \item{years}{Numeric vector of years to use to restrict observation to..}
 
-\item{cohortId}{IDs of the cohorts to include. Cohorts not included will be
+\item{cohortId}{Vector identifying which cohorts to include
+(cohort_definition_id or cohort_name). Cohorts not included will be
 removed from the cohort set.}
 
 \item{name}{Name of the new cohort table created in the cdm object.}
