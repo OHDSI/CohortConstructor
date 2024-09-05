@@ -126,16 +126,16 @@ test_that("intersectCohorts", {
     omock::mockCohort(name = c("cohort1"), numberCohorts = 2)
   cdm <- cdm_local |> copyCdm()
 
-  # mutually exclusive
+  # returnNonOverlappingCohorts
   expect_no_error(cdm$cohort2 <- intersectCohorts(
     cohort = cdm$cohort1, name = "cohort2",
-    mutuallyExclusive = TRUE
+    returnNonOverlappingCohorts = TRUE
   ))
-  expect_true(all(omopgenerics::settings(cdm$cohort2)$mutually_exclusive == TRUE))
+  expect_equal(omopgenerics::settings(cdm$cohort2)$non_overlapping,c(NA, TRUE, TRUE))
   expect_true(cdm$cohort2 %>% dplyr::tally() %>% dplyr::pull() == 10)
   expect_true(all(
     CDMConnector::cohortCount(cdm$cohort2) %>%
-      dplyr::arrange(.data$cohort_definition_id) %>%
+      dplyr::arrange(.data$number_records) %>%
       dplyr::pull("number_records") == c(1, 4, 5)
   ))
   expect_true(nrow(omopgenerics::settings(cdm$cohort2)) == 3)
@@ -147,22 +147,23 @@ test_that("intersectCohorts", {
         "2003-06-15", "2005-11-24", "2015-03-05", "2015-03-25", "2015-04-15")
   ))
   expect_true(all(
-    omopgenerics::attrition(cdm$cohort2)$reason ==
-      c("Initial qualifying events", "Mutually exclusive cohorts",
-        "Initial qualifying events", "Mutually exclusive cohorts",
-        "Initial qualifying events")
+    omopgenerics::attrition(cdm$cohort2)$reason |> sort() ==
+      c("Initial qualifying events", "Initial qualifying events",
+        "Initial qualifying events", "Trim to non overlapping entries",
+        "Trim to non overlapping entries")
   ))
   expect_true(all(
-    omopgenerics::attrition(cdm$cohort2)$reason_id ==  c(1, 2, 1, 2, 1)
+    omopgenerics::attrition(cdm$cohort2)$reason_id |> sort() ==  c(1, 1, 1, 2, 2)
   ))
   expect_true(all(
-    omopgenerics::attrition(cdm$cohort2)$excluded_records ==  c(0, 3, 0, 0, 0)
+    omopgenerics::attrition(cdm$cohort2)$excluded_records |> sort() ==  c(0, 0, 0, 0, 3)
   ))
 
-  # not mutually exclusive and gap
+  # not overlap, keep original and gap
   expect_no_error(cdm$cohort3 <- intersectCohorts(
     cohort = cdm$cohort1, name = "cohort3",
-    mutuallyExclusive = FALSE, gap = 1
+    returnNonOverlappingCohorts = FALSE, gap = 1,
+    keepOriginalCohorts = TRUE
   ))
   expect_true(all(omopgenerics::settings(cdm$cohort3)$mutually_exclusive == FALSE))
   expect_true(cdm$cohort3 %>% dplyr::tally() %>% dplyr::pull() == 7)
@@ -225,7 +226,7 @@ test_that("keepOriginalCohorts", {
 
   cdm$cohort2 <- intersectCohorts(
     cohort = cdm$cohort1, name = "cohort2",
-    mutuallyExclusive = FALSE, keepOriginalCohorts = TRUE
+    returnNonOverlappingCohorts = FALSE, keepOriginalCohorts = TRUE
   )
   expect_true(nrow(dplyr::collect(cdm$cohort2)) == 0)
   expect_true(all(
@@ -241,7 +242,7 @@ test_that("keepOriginalCohorts", {
   # nUll combination, return individuals
   cdm$cohort4 <- intersectCohorts(
     cohort = cdm$cohort1, name = "cohort4",
-    mutuallyExclusive = FALSE, keepOriginalCohorts = FALSE
+    returnNonOverlappingCohorts = FALSE, keepOriginalCohorts = FALSE
   )
   expect_true(nrow(dplyr::collect(cdm$cohort4)) == nrow(dplyr::collect(cdm$cohort1)))
   expect_true(all(
@@ -263,7 +264,7 @@ test_that("keepOriginalCohorts", {
   cdm <- cdm_local |> copyCdm()
   cdm$cohort3 <- intersectCohorts(
     cohort = cdm$cohort1, name = "cohort3",
-    mutuallyExclusive = FALSE, keepOriginalCohorts = TRUE, gap = 1
+    returnNonOverlappingCohorts = FALSE, keepOriginalCohorts = TRUE, gap = 1
   )
   expect_equal(
     cdm$cohort3 |>
@@ -297,7 +298,7 @@ test_that("keepOriginalCohorts", {
 
   cdm$cohort4 <- intersectCohorts(
     cohort = cdm$cohort1, name = "cohort4",
-    mutuallyExclusive = TRUE, keepOriginalCohorts = TRUE, gap = 1
+    returnNonOverlappingCohorts = TRUE, keepOriginalCohorts = TRUE, gap = 1
   )
 
   expect_equal(
@@ -340,7 +341,7 @@ test_that("attrition and cohortId", {
 
   cdm$cohort1 <- intersectCohorts(
     cohort = cdm$cohort1, cohortId = c("cohort_1", "cohort_2"),
-    name = "cohort1", mutuallyExclusive = TRUE
+    name = "cohort1", returnNonOverlappingCohorts = TRUE
   )
   expect_true(all(
     omopgenerics::attrition(cdm$cohort1)$reason ==
@@ -421,7 +422,7 @@ test_that("codelist", {
   expect_true(all(codes |> dplyr::pull("cohort_definition_id") |> sort() == c(1, 1, 2, 3, 3, 3)))
 
   # mutually esclusive
-  cdm$cohort3 <- intersectCohorts(cdm$cohort1, mutuallyExclusive = TRUE, name = "cohort3")
+  cdm$cohort3 <- intersectCohorts(cdm$cohort1, returnNonOverlappingCohorts = TRUE, name = "cohort3")
   expect_true(all(
     cdm$cohort3 %>% dplyr::pull("cohort_start_date") %>% sort() ==
       c("2009-12-22", "2010-01-01", "2010-01-11", "2010-05-31", "2012-01-21",
