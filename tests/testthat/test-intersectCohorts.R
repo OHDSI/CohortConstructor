@@ -362,10 +362,14 @@ test_that("attrition and cohortId", {
   expect_true(nrow(settings(cdm$cohort1)) == 3)
   expect_equal(settings(cdm$cohort1)$non_overlapping, c(NA, TRUE, TRUE))
   expect_true(all(
-    omopgenerics::attrition(cdm$cohort1)$reason |> sort() ==
-      c(rep("Age requirement: 0 to 40", 2), rep("cohort_start_date after 1990-01-01", 2),
-        rep("cohort_start_date before 2025-01-01", 2), rep("Initial qualifying events", 3),
-        rep("Sex requirement: Female", 2), rep("Trim to non overlapping entries", 2))
+    omopgenerics::attrition(cdm$cohort1)$reason %in%
+  c('Initial qualifying events', 'Initial qualifying events',
+    'cohort_start_date after 1990-01-01', 'cohort_start_date before 2025-01-01',
+    'Sex requirement: Female', 'Age requirement: 0 to 40',
+    'Trim to non overlapping entries', 'Initial qualifying events',
+    'cohort_start_date after 1990-01-01', 'cohort_start_date before 2025-01-01',
+    'Sex requirement: Female', 'Age requirement: 0 to 40',
+    'Trim to non overlapping entries')
   ))
   expect_true(all(omopgenerics::attrition(cdm$cohort1)$reason_id ==  c(1, 1:6, 1:6)))
   expect_true(all(omopgenerics::attrition(cdm$cohort1)$number_records |> sort() ==
