@@ -293,3 +293,38 @@ test_that("keep original cohorts", {
 
   PatientProfiles::mockDisconnect(cdm)
 })
+
+test_that("multiple observation periods", {
+  cdm_local <- omock::mockCdmReference() |>
+    omock::mockPerson(n = 4) |>
+    omock::mockObservationPeriod()
+  cdm_local$observation_period <- cdm_local$observation_period |>
+    dplyr::filter(person_id != 4) |>
+    dplyr::union_all(dplyr::tibble(
+      observation_period_id = c(4L,5L, 6L),
+      person_id = 4L,
+      observation_period_start_date = c(as.Date("1989-12-09"), as.Date("2003-01-01"), as.Date("2009-02-04")),
+      observation_period_end_date = c(as.Date("2002-12-31"), as.Date("2009-02-03"),as.Date("2013-12-31")),
+      period_type_concept_id = NA
+    )
+    )
+  cdm_local <- cdm_local |>
+    omock::mockCohort(name = c("cohort"), numberCohorts = 3, seed = 11)
+
+  cdm <- cdm_local |> copyCdm()
+
+  cdm$cohort2 <- unionCohorts(cdm$cohort, name = "cohort2", gap = 10000)
+
+  expect_true(cdm$cohort2 |>
+                dplyr::filter(subject_id == 4 & cohort_start_date < as.Date("2003-01-01") &
+                                cohort_end_date > as.Date("2003-01-01")) |>
+                dplyr::tally() |>
+                dplyr::pull() == 0)
+  expect_true(cdm$cohort2 |>
+                dplyr::filter(subject_id == 4 & cohort_start_date < as.Date("2009-02-04") &
+                                cohort_end_date > as.Date("2009-02-04")) |>
+                dplyr::tally() |>
+                dplyr::pull() == 0)
+  PatientProfiles::mockDisconnect(cdm)
+
+})

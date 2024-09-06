@@ -184,6 +184,7 @@ intersectCohorts <- function(cohort,
   cdm <- omopgenerics::dropTable(cdm = cdm, name = tempName)
 
   if (cohortOut |> dplyr::tally() |> dplyr::pull("n") > 0) {
+    class(cohortOut) <- c(class(cohortOut), "cohort_table")
     cohortOut <- cohortOut %>%
       dplyr::compute(name = name, temporary = FALSE) |>
       joinOverlap(name = name, gap = gap)
@@ -350,10 +351,12 @@ joinOverlap <- function(cohort,
   cdm <- omopgenerics::cdmReference(cohort)
 
   start <- cohort |>
-    dplyr::select(by, "date" := !!startDate) |>
+    PatientProfiles::addObservationPeriodId() |>
+    dplyr::select(by, "date" := !!startDate, "observation_period_id") |>
     dplyr::mutate("date_id" = -1)
   end <- cohort |>
-    dplyr::select(by, "date" := !!endDate) |>
+    PatientProfiles::addObservationPeriodId() |>
+    dplyr::select(by, "date" := !!endDate, "observation_period_id") |>
     dplyr::mutate("date_id" = 1)
   if (gap > 0) {
     end <- end %>%
@@ -371,7 +374,7 @@ joinOverlap <- function(cohort,
     dplyr::compute(temporary = FALSE, name = workingTbl)
 
   x <- x |>
-    dplyr::group_by(dplyr::pick(by)) |>
+    dplyr::group_by(dplyr::pick(by), .data$observation_period_id) |>
     dplyr::arrange(.data$date, .data$date_id) |>
     dplyr::mutate(
       "cum_id" = cumsum(.data$date_id),
@@ -383,10 +386,10 @@ joinOverlap <- function(cohort,
     dplyr::mutate("era_id" = cumsum(as.numeric(.data$era_id))) |>
     dplyr::ungroup() |>
     dplyr::arrange() |>
-    dplyr::select(dplyr::all_of(c(by, "era_id", "name", "date"))) |>
+    dplyr::select(dplyr::all_of(c(by, "observation_period_id", "era_id", "name", "date"))) |>
     dplyr::compute(temporary = FALSE, name = name) |>
     tidyr::pivot_wider(names_from = "name", values_from = "date") |>
-    dplyr::select(-"era_id") |>
+    dplyr::select(-"era_id", -"observation_period_id") |>
     dplyr::compute(temporary = FALSE, name = name)
   if (gap > 0) {
     x <- x %>%

@@ -476,3 +476,52 @@ test_that("codelist", {
 
   PatientProfiles::mockDisconnect(cdm)
 })
+
+test_that("multiple observation periods", {
+  cdm_local <- omock::mockCdmReference() |>
+    omock::mockPerson(n = 4) |>
+    omock::mockObservationPeriod()
+  cdm_local$observation_period <- cdm_local$observation_period |>
+    dplyr::filter(person_id != 4) |>
+    dplyr::union_all(dplyr::tibble(
+      observation_period_id = c(4L,5L, 6L),
+      person_id = 4L,
+      observation_period_start_date = c(as.Date("1989-12-09"), as.Date("2003-01-01"), as.Date("2009-02-04")),
+      observation_period_end_date = c(as.Date("2002-12-31"), as.Date("2009-02-03"),as.Date("2013-12-31")),
+      period_type_concept_id = NA
+    )
+    )
+  cdm_local <- cdm_local |>
+    omock::mockCohort(name = c("cohort"), numberCohorts = 3, seed = 11)
+  cdm_local$cohort <- cdm_local$cohort |>
+    dplyr::union_all(dplyr::tibble(
+      cohort_definition_id = c(1L,2L, 3L),
+      subject_id = 4L,
+      cohort_start_date = c(as.Date("2009-04-05"), as.Date("2009-06-07"), as.Date("2009-01-01")),
+      cohort_end_date = c(as.Date("2010-01-01"), as.Date("2009-12-12"), as.Date("2009-02-01"))
+    )
+    )
+  cdm <- cdm_local |> copyCdm()
+
+  cdm$cohort2 <- intersectCohorts(
+    cohort = cdm$cohort, name = "cohort2" ,
+    keepOriginalCohorts = TRUE ,
+    gap = 1000)
+
+  cdm$cohort3 <- intersectCohorts(
+    cohort = cdm$cohort, name = "cohort3" ,
+    keepOriginalCohorts = TRUE)
+
+  expect_true(cdm$cohort2 |>
+                dplyr::tally() |>
+                dplyr::pull() ==
+                5)
+  expect_true(cdm$cohort3 |>
+                dplyr::tally() |>
+                dplyr::pull() ==
+                6)
+
+  PatientProfiles::mockDisconnect(cdm)
+
+
+})
