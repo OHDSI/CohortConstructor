@@ -9,7 +9,7 @@ intersectCohorts(
   cohort,
   cohortId = NULL,
   gap = 0,
-  mutuallyExclusive = FALSE,
+  returnNonOverlappingCohorts = FALSE,
   keepOriginalCohorts = FALSE,
   name = tableName(cohort)
 )
@@ -24,7 +24,7 @@ removed from the cohort set.}
 \item{gap}{Number of days between two subsequent cohort entries to be merged
 in a single cohort record.}
 
-\item{mutuallyExclusive}{Whether the generated cohorts are mutually
+\item{returnNonOverlappingCohorts}{Whether the generated cohorts are mutually
 exclusive or not.}
 
 \item{keepOriginalCohorts}{If TRUE the original cohorts and the newly
