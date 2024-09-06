@@ -317,23 +317,24 @@ test_that("keepOriginalCohorts", {
     cdm$cohort4 |>
       dplyr::filter(.data$cohort_definition_id %in% 1:4) |>
       dplyr::collect() |>
-      dplyr::pull(.data$cohort_start_date),
-    as.Date(c('2015-01-19', '2015-03-25', '2000-06-23', '2005-11-24',
-              '1999-12-19', '1994-06-17', '1999-05-29', '2015-07-07'))
+      dplyr::pull(.data$cohort_start_date) |>
+      sort(),
+    as.Date(c('1994-06-17', '1999-05-29', '1999-12-19', '2000-06-23',
+              '2005-11-24', '2015-01-19', '2015-03-25', '2015-07-07'))
   )
   expect_equal(
     cdm$cohort4 |>
       dplyr::filter(.data$cohort_definition_id %in% 1:4) |>
       dplyr::collect() |>
-      dplyr::pull(cohort_end_date),
-    as.Date(c('2015-03-04', '2015-04-14', '2001-03-29', '2006-09-27',
-              '2001-08-26', '1997-10-21', '2007-08-06', '2015-09-14'))
+      dplyr::pull(cohort_end_date) |> sort(),
+    as.Date(c('1997-10-21', '2001-03-29', '2001-08-26', '2006-09-27',
+              '2007-08-06', '2015-03-04', '2015-04-14', '2015-09-14'))
   )
-  expect_true(all(omopgenerics::attrition(cdm$cohort4)$reason_id |> sort() == c(rep(1, 7), rep(2, 2))))
-  expect_true(all(omopgenerics::attrition(cdm$cohort4)$number_records |> sort() == c(1, 2, rep(4, 6), 5)))
-  expect_true(all(omopgenerics::attrition(cdm$cohort4)$number_subjects |> sort() ==  c(1, 1, 2, 2, rep(3, 5))))
-  expect_true(all(omopgenerics::attrition(cdm$cohort4)$excluded_records |> sort() == c(-1, rep(0, 7), 2)))
-  expect_true(all(omopgenerics::attrition(cdm$cohort4)$excluded_subjects |> sort() == c(rep(0, 8), 1)))
+  expect_true(all(omopgenerics::attrition(cdm$cohort4)$reason_id |> sort() == c(rep(1, 7), rep(2, 3))))
+  expect_true(all(omopgenerics::attrition(cdm$cohort4)$number_records |> sort() == c(0, 1, 2, rep(4, 6), 5)))
+  expect_true(all(omopgenerics::attrition(cdm$cohort4)$number_subjects |> sort() ==  c(0, 1, 1, 2, 2, rep(3, 5))))
+  expect_true(all(omopgenerics::attrition(cdm$cohort4)$excluded_records |> sort() == c(-1, rep(0, 7), 2, 4)))
+  expect_true(all(omopgenerics::attrition(cdm$cohort4)$excluded_subjects |> sort() == c(rep(0, 8), 1, 3)))
 
   PatientProfiles::mockDisconnect(cdm)
 })
