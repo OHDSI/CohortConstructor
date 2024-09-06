@@ -112,9 +112,9 @@ conceptCohort <- function(cdm,
   cdm[[tableCohortCodelist]] <- NULL
 
   if (cdm[[name]] |>
-    utils::head(1) |>
-    dplyr::tally() |>
-    dplyr::pull("n") == 0) {
+      utils::head(1) |>
+      dplyr::tally() |>
+      dplyr::pull("n") == 0) {
     cli::cli_inform(c("i" = "No cohort entries found, returning empty cohort table."))
     cdm[[name]] <- cdm[[name]] |>
       dplyr::select(
@@ -179,19 +179,14 @@ unerafiedConceptCohort <- function(cdm,
                                    extraCols,
                                    exit,
                                    useSourceFields) {
+
   domains <- sort(cdm[[tableCohortCodelist]] |>
-    dplyr::select("domain_id") |>
-    dplyr::distinct() |>
-    dplyr::pull())
+                    dplyr::select("domain_id") |>
+                    dplyr::distinct() |>
+                    dplyr::pull())
 
   tableRef <- domainsData |>
     dplyr::filter(.data$domain_id %in% .env$domains)
-
-  if(isFALSE(useSourceFields)){
-    fields <- "concept"
-  } else {
-    fields <- c("concept", "source")
-  }
 
   cohorts <- list()
   workingTblNames <- paste0(
@@ -200,48 +195,49 @@ unerafiedConceptCohort <- function(cdm,
     seq_along(tableRef$domain_id)
   )
   for (k in seq_along(tableRef$domain_id)) {
-  for (j in seq_along(fields)){
-    domain <- tableRef$domain_id[k]
+
     table <- tableRef$table[k]
-    if(fields[j] == "concept"){
-      concept <- tableRef$concept[k]
-    } else {
-      concept <- tableRef$source[k]
-    }
-    start <- tableRef$start[k]
-    if (exit == "event_start_date") {
-      end <- start
-    } else {
-      end <- tableRef$end[k]
-    }
+    domain <- tableRef$domain_id[k]
     n <- cdm[[tableCohortCodelist]] |>
       dplyr::filter(.data$domain_id %in% .env$domain) |>
       dplyr::tally() |>
       dplyr::pull()
+
     if (table %in% names(cdm)) {
+      name.k <- paste(workingTblNames[k])
+      start <- tableRef$start[k]
+      if (exit == "event_start_date") {
+        end <- start
+      } else {
+        end <- tableRef$end[k]
+      }
       cli::cli_inform(
         c("i" = "Subsetting table {.strong {table}} using {n} concept{?s} with domain: {.strong {domain}}.")
       )
-      tempCohort <- cdm[[table]] |>
-        dplyr::select(
-          "subject_id" = "person_id",
-          "concept_id" = dplyr::all_of(.env$concept),
-          "cohort_start_date" = dplyr::all_of(.env$start),
-          "cohort_end_date" = dplyr::all_of(.env$end),
-          dplyr::all_of(extraCols)
-        ) |>
-        dplyr::inner_join(
-          cdm[[tableCohortCodelist]] |>
-            dplyr::filter(.data$domain_id %in% .env$domain) |>
-            dplyr::select("concept_id", "cohort_definition_id"),
-          by = "concept_id"
-        ) |>
-        dplyr::compute(temporary = FALSE, name = paste(workingTblNames[k], "_", j))
-      cohorts[[domain]] <- tempCohort
+
+      ## Get standard
+      concept <- tableRef$concept[k]
+      tempCohort <- getDomainCohort(
+        cdm, table, concept, start, end, extraCols, tableCohortCodelist,
+        domain, name.k
+      )
+      ## Get source
+      if (isTRUE(useSourceFields)) {
+        concept <- tableRef$source[k]
+        tempCohort <- tempCohort |>
+          dplyr::union_all(
+            getDomainCohort(
+              cdm, table, concept, start, end, extraCols,
+              tableCohortCodelist, domain, name.k, TRUE
+            )
+          ) |>
+          dplyr::compute(name = name.k, temporary = FALSE)
+      }
+
       if (tempCohort |>
-        utils::head(1) |>
-        dplyr::tally() |>
-        dplyr::pull("n") > 0) {
+          utils::head(1) |>
+          dplyr::tally() |>
+          dplyr::pull("n") > 0) {
         cohorts[[k]] <- tempCohort
       }
     } else {
@@ -250,12 +246,12 @@ unerafiedConceptCohort <- function(cdm,
       )
     }
   }
-    }
 
   cohorts <- cohorts %>%
     purrr::discard(is.null)
 
   if (length(cohorts) == 0) {
+    omopgenerics::dropTable(cdm, name = dplyr::starts_with(workingTblNames))
     cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name)
     return(cdm[[name]])
   }
@@ -337,9 +333,9 @@ conceptSetToCohortCodelist <- function(conceptSet) {
     dplyr::inner_join(cohortSet, by = "cohort_name") |>
     dplyr::mutate("type" = "index event", "value" = as.integer(.data$value)) |>
     dplyr::select("cohort_definition_id",
-      "codelist_name" = "cohort_name",
-      "concept_id" = "value",
-      "type"
+                  "codelist_name" = "cohort_name",
+                  "concept_id" = "value",
+                  "type"
     )
 }
 
@@ -354,7 +350,7 @@ uploadCohortCodelistToCdm <- function(cdm, cohortCodelist, tableCohortCodelist) 
 
   cdm[[tableCohortCodelist]] <- cdm[[tableCohortCodelist]] |>
     dplyr::left_join(cdm[["concept"]] |>
-      dplyr::select("concept_id", "domain_id"), by = "concept_id") |>
+                       dplyr::select("concept_id", "domain_id"), by = "concept_id") |>
     dplyr::mutate(
       "concept_id" = as.integer(.data$concept_id),
       "domain_id" = tolower(.data$domain_id)
@@ -401,4 +397,34 @@ addIndex <- function(cdm, name, cols) {
     )
     suppressMessages(DBI::dbExecute(con, query))
   }
+}
+
+getDomainCohort <- function(cdm,
+                            table,
+                            concept,
+                            start,
+                            end,
+                            extraCols,
+                            tableCohortCodelist,
+                            domain,
+                            name,
+                            source = FALSE) {
+  if (source) {
+    name = paste0(name, "_source")
+  }
+  tempCohort <- cdm[[table]] |>
+    dplyr::select(
+      "subject_id" = "person_id",
+      "concept_id" = dplyr::all_of(.env$concept),
+      "cohort_start_date" = dplyr::all_of(.env$start),
+      "cohort_end_date" = dplyr::all_of(.env$end),
+      dplyr::all_of(extraCols)
+    ) |>
+    dplyr::inner_join(
+      cdm[[tableCohortCodelist]] |>
+        dplyr::filter(.data$domain_id %in% .env$domain) |>
+        dplyr::select("concept_id", "cohort_definition_id"),
+      by = "concept_id"
+    ) |>
+    dplyr::compute(temporary = FALSE, name = name)
 }
