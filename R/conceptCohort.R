@@ -204,7 +204,7 @@ unerafiedConceptCohort <- function(cdm,
       dplyr::pull()
 
     if (table %in% names(cdm)) {
-      name.k <- paste(workingTblNames[k])
+      nameK <- paste(workingTblNames[k])
       start <- tableRef$start[k]
       if (exit == "event_start_date") {
         end <- start
@@ -219,7 +219,7 @@ unerafiedConceptCohort <- function(cdm,
       concept <- tableRef$concept[k]
       tempCohort <- getDomainCohort(
         cdm, table, concept, start, end, extraCols, tableCohortCodelist,
-        domain, name.k
+        domain, nameK
       )
       ## Get source
       if (isTRUE(useSourceFields)) {
@@ -228,10 +228,10 @@ unerafiedConceptCohort <- function(cdm,
           dplyr::union_all(
             getDomainCohort(
               cdm, table, concept, start, end, extraCols,
-              tableCohortCodelist, domain, name.k, TRUE
+              tableCohortCodelist, domain, nameK, TRUE
             )
           ) |>
-          dplyr::compute(name = name.k, temporary = FALSE)
+          dplyr::compute(name = nameK, temporary = FALSE)
       }
 
       if (tempCohort |>
