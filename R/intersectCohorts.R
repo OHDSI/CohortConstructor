@@ -147,15 +147,17 @@ intersectCohorts <- function(cohort,
     ) |>
     dplyr::collect() |>
     dplyr::arrange(.data$cohort_definition_id)
+  countsInt <- counts |> dplyr::filter(.data$cohort_definition_id == 1)
   intersectCodelist <- attr(cohort, "cohort_codelist") |>
     dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>
     dplyr::mutate(cohort_definition_id = 1L)
   intersectAttrition <- dplyr::tibble(
-    cohort_definition_id = 1L, number_records = counts$number_records[1],
-    number_subjects = counts$number_subjects[1], reason_id = 1L,
+    cohort_definition_id = 1L, number_records = countsInt$number_records[1],
+    number_subjects = countsInt$number_subjects[1], reason_id = 1L,
     reason = "Initial qualifying events", excluded_records = 0L,
     excluded_subjects = 0L
-  )
+  ) |>
+    dplyr::mutate(dplyr::across(dplyr::starts_with("number_"), ~dplyr::if_else(is.na(.x), 0L, .x)))
 
   if (returnNonOverlappingCohorts) {
     intersectCodelist <- intersectCodelist |>
@@ -198,7 +200,7 @@ intersectCohorts <- function(cohort,
   )
 
   if (keepOriginalCohorts) {
-    cdm <- bind(cdm[[name]], cdm[[originalNm]], name = name)
+    cdm <- bind(cdm[[name]], originalCohorts, name = name)
   }
 
   CDMConnector::dropTable(cdm, name = dplyr::starts_with(uniquePrefix))
@@ -487,6 +489,12 @@ getPriorCohortCount <- function(attr) {
 }
 
 addAttritionReason <- function(att, counts, reason) {
+  counts <- att |>
+    dplyr::distinct(.data$cohort_definition_id) |>
+    dplyr::left_join(counts, by = "cohort_definition_id") |>
+    dplyr::mutate(
+      dplyr::across(dplyr::starts_with("number_"), ~dplyr::if_else(is.na(.x), 0L, .x))
+    )
   dplyr::bind_rows(
     att |>
       dplyr::select(dplyr::all_of(
