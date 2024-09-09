@@ -1,0 +1,61 @@
+---
+title: "CohortConstructor benchmark"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{a11_benchmark}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  warning = FALSE
+)
+```
+
+```{r, echo=FALSE}
+library(visOmopResults)
+library(readr)
+library(omopgenerics)
+library(ggplot2)
+library(CohortCharacteristics)
+library(stringr)
+library(here)
+library(dplyr)
+library(tidyr)
+library(gt)
+
+createRData <- FALSE
+if (createRData) {
+  source("extras", "getBenchmarkResults.R")
+} else {
+  load(here("extras", "benchmark.RData"))
+}
+```
+
+# Introduction
+
+Cohorts are a fundamental building block for studies that use the OMOP CDM, identifying people who satisfy one or more inclusion criteria for a duration of time based on their clinical records. Currently cohorts are typically built using [CIRCE](https://github.com/OHDSI/circe-be) which allows complex cohorts to be represented using JSON. This JSON is then converted to SQL for execution against a database containing data mapped to the OMOP CDM. CIRCE JSON can be created via the [ATLAS](https://github.com/OHDSI/Atlas) graphical user interface or programmatically via the [Capr](https://github.com/OHDSI/Capr) R package. However, although a powerful tool for expressing and operationalising cohort definitions, the SQL generated can be cumbersome especially for complex cohort definitions. Moreover, when multiple cohorts are defined these are typically instantiated independently which can lead to duplication of work.
+
+The CohortConstructor package provides an alternative approach to building cohorts in data mapped to the OMOP CDM.  It promotes cohort building in a pipeline fashion, with creating base cohorts coming first which is then followed by manipulation of these cohorts to apply specific inclusion criteria. 
+
+Rather than constructing cohorts "by definition" where cohorts are built independently, the CohortConstructor introduces the idea of constructing cohorts "by domain", with the aim of reducing repetitive calls to large OMOP tables. More about this approach is described in the [Introduction](https://ohdsi.github.io/CohortConstructor/articles/a00_introduction.html) vignette.
+
+To test the performance of the package we have created a benchmarking script in which we selected 9 phenotypes from the OHDSI library that cover a range of concept domains, entry and inclusion criteria, and cohort exit options. These have been replicated using [CodelistGenerator](https://github.com/darwin-eu/CodelistGenerator) and CohortConstructor, following two approches: first, to emulate Atlas+CIRCE workflow we have instantiated each cohort separately ("by definition"), and second, we have created the 9 cohorts as a set ("by domain").
+
+
+# Timings
+
+## Cohort construction by definition
+
+## Cohort construction by domain
+
+## Use of SQL indexes
+
+# Cohort similarities
+
+# Conclusions
+
+# Methods
