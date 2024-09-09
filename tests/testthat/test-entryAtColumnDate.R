@@ -94,6 +94,23 @@ test_that("entry at last date", {
       c("cohort_end_date", "cohort_end_date", "cohort_start_date", "cohort_start_date", "cohort_start_date")
   ))
 
+  # test character cohort id working
+  expect_warning(cdm$cohort1 <- cdm$cohort |>
+    entryAtLastDate(
+      dateColumns = c("cohort_end_date", "other_date_1", "other_date_2"),
+      returnReason = TRUE,
+      cohortId = c("cohort_2", "cohort_3"),
+      name = "cohort1"
+    ))
+  expect_true(all(
+    cdm$cohort1 %>% dplyr::pull("cohort_start_date") %>% sort() ==
+      c("1990-12-09", "2000-01-01", "2000-06-03", "2002-12-09", "2015-02-15")
+  ))
+  expect_true(all(
+    cdm$cohort1 %>% dplyr::pull("cohort_end_date") %>% sort() ==
+      c("1990-12-09", "2001-04-15", "2001-10-01", "2002-12-09", "2015-02-15")
+  ))
+
   # test not cohort end as columns working
   cdm$cohort <- cdm$cohort |>
     entryAtLastDate(

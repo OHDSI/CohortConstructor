@@ -7,15 +7,17 @@
 collapseCohorts(cohort, cohortId = NULL, gap = 0, name = tableName(cohort))
 }
 \arguments{
-\item{cohort}{A cohort table}
+\item{cohort}{A cohort table in a cdm reference.}
 
-\item{cohortId}{IDs of the cohorts to modify. If NULL, all cohorts will be
+\item{cohortId}{Vector identifying which cohorts to modify
+(cohort_definition_id or cohort_name). If NULL, all cohorts will be
 used; otherwise, only the specified cohorts will be modified, and the
 rest will remain unchanged.}
 
-\item{gap}{Number of days to use when merging cohort entries.}
+\item{gap}{Number of days between two subsequent cohort entries to be merged
+in a single cohort record.}
 
-\item{name}{Name of the cohort table.}
+\item{name}{Name of the new cohort table created in the cdm object.}
 }
 \value{
 A cohort table

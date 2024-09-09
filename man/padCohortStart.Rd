@@ -11,10 +11,12 @@ padCohortStart(cohort, days, cohortId = NULL, name = tableName(cohort))
 
 \item{days}{Number of day to add to the cohort start date.}
 
-\item{cohortId}{If NULL all cohorts will be updated. If a particular set of
-cohort IDs are given then only the corresponding cohorts will be updated.}
+\item{cohortId}{Vector identifying which cohorts to modify
+(cohort_definition_id or cohort_name). If NULL, all cohorts will be
+used; otherwise, only the specified cohorts will be modified, and the
+rest will remain unchanged.}
 
-\item{name}{Name of the new cohort table.}
+\item{name}{Name of the new cohort table created in the cdm object.}
 }
 \value{
 Cohort table

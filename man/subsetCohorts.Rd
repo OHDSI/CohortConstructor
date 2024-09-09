@@ -9,10 +9,11 @@ subsetCohorts(cohort, cohortId, name = tableName(cohort))
 \arguments{
 \item{cohort}{A cohort table in a cdm reference.}
 
-\item{cohortId}{IDs of the cohorts to include. Cohorts not included will be
+\item{cohortId}{Vector identifying which cohorts to include
+(cohort_definition_id or cohort_name). Cohorts not included will be
 removed from the cohort set.}
 
-\item{name}{Name of the new cohort with the demographic requirements.}
+\item{name}{Name of the new cohort table created in the cdm object.}
 }
 \value{
 Cohort table with only cohorts in cohortId.

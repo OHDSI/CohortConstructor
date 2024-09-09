@@ -4,18 +4,7 @@
 #' `trimDemographics()` resets the cohort start and end date based on the
 #' specified demographic criteria is satisfied.
 #'
-#' @param cohort A cohort table in a cdm reference.
-#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
-#' used; otherwise, only the specified cohorts will be modified, and the
-#' rest will remain unchanged.
-#' @param ageRange A list of minimum and maximum age.
-#' @param sex Can be "Both", "Male" or "Female". If one of the latter, only
-#' those with that sex will be included.
-#' @param minPriorObservation A minimum number of prior observation days in
-#' the database.
-#' @param minFutureObservation A minimum number of future observation days in
-#' the database.
-#' @param name Name of the new cohort with the demographic requirements.
+#' @inheritParams requireDemographics
 #'
 #' @return The cohort table with only records for individuals satisfying the
 #' demographic requirements
@@ -40,7 +29,7 @@ trimDemographics <- function(cohort,
   # initial validation
   cohort <- validateCohortTable(cohort, FALSE)
   ids <- settings(cohort)$cohort_definition_id
-  cohortId <- validateCohortId(cohortId, ids)
+  cohortId <- validateCohortId(cohortId, settings(cohort))
   ageRange <- validateDemographicRequirements(
     ageRange = ageRange,
     sex = sex,

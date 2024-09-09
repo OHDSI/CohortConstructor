@@ -337,7 +337,7 @@ test_that("cohort Id, name, additional columns", {
     dplyr::compute(name = "cohort2", temporary = FALSE)
 
   cdm$cohort3 <- trimDemographics(cohort = cdm$cohort2,
-                                  cohortId = 1,
+                                  cohortId = "cohort_1",
                                   ageRange = NULL,
                                   sex = "Male",
                                   minPriorObservation = c(0, 400),

@@ -14,13 +14,15 @@ requireMinCohortCount(
 \arguments{
 \item{cohort}{A cohort table in a cdm reference.}
 
-\item{cohortId}{IDs of the cohorts to apply minimum cell count requirement.
-If NULL it will be applied to all cohorts.}
+\item{cohortId}{Vector identifying which cohorts to modify
+(cohort_definition_id or cohort_name). If NULL, all cohorts will be
+used; otherwise, only the specified cohorts will be modified, and the
+rest will remain unchanged.}
 
 \item{minCohortCount}{The minimum count of sbjects for a cohort to be
 included.}
 
-\item{name}{Name of the new cohort with the demographic requirements.}
+\item{name}{Name of the new cohort table created in the cdm object.}
 }
 \value{
 Cohort table

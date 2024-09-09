@@ -6,12 +6,9 @@
 #' enter the cohort. When they stop satisfying any of the criteria their
 #' cohort entry ends.
 #'
-#' @param cdm A cdm reference.
-#' @param name Name of the new cohort table
-#' @param ageRange A list of vectors specifying minimum and maximum age.
-#' @param sex Can be "Both", "Male" or "Female".
-#' @param minPriorObservation A minimum number of prior observation days in
-#' the database.
+#' @inheritParams cdmDoc
+#' @inheritParams nameDoc
+#' @inheritParams requireDemographicsDoc
 #'
 #' @return A cohort table
 #'

@@ -4,13 +4,12 @@
 #' `matchCohorts()` generate a new cohort matched to individuals in an
 #' existing cohort. Individuals can be matched based on year of birth and sex.
 #'
-#' @param cohort A cohort table in a cdm reference.
-#' @param cohortId IDs of the cohorts to include. If NULL all cohorts will be
-#' considered. Cohorts not included will be removed from the cohort set.
+#' @inheritParams cohortDoc
+#' @inheritParams cohortIdSubsetDoc
+#' @inheritParams nameDoc
 #' @param matchSex Whether to match in sex.
 #' @param matchYearOfBirth Whether to match in year of birth.
 #' @param ratio Number of allowed matches per individual in the target cohort.
-#' @param name Name of the new generated cohort set.
 #'
 #' @return A cohort table.
 #'
@@ -44,7 +43,7 @@ matchCohorts <- function(cohort,
   cdm <- omopgenerics::cdmReference(cohort)
   validateCDM(cdm)
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
-  cohortId <- validateCohortId(cohortId, ids)
+  cohortId <- validateCohortId(cohortId, settings(cohort))
   assertNumeric(ratio, min = 0, length = 1)
   assertLogical(matchSex, length = 1)
   assertLogical(matchYearOfBirth, length = 1)

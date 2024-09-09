@@ -5,17 +5,15 @@
 #' that overlap combined and kept. Cohort entries are when an individual was in
 #' _either_ of the cohorts.
 #'
-#' @param cohort A cohort table in a cdm reference.
-#' @param cohortId IDs of the cohorts to include. If NULL all cohorts will be
-#' considered. Cohorts not included will be removed from the cohort set.
-#' @param gap Number of days between two subsequent cohort entries of a subject
-#' that will be merged in a single cohort entry
+#' @inheritParams cohortDoc
+#' @inheritParams cohortIdSubsetDoc
+#' @inheritParams gapDoc
+#' @inheritParams nameDoc
 #' @param cohortName Name of the returned cohort. If NULL, the cohort name will
 #' be created by collapsing the individual cohort names, separated by "_".
 #' @param keepOriginalCohorts If TRUE the original cohorts and the newly
 #' created union cohort will be returned. If FALSE only the new cohort will be
 #' returned.
-#' @param name Name of the new cohort table.
 #'
 #' @export
 #'
@@ -43,7 +41,7 @@ unionCohorts <- function(cohort,
   cdm <- omopgenerics::cdmReference(cohort)
   validateCDM(cdm)
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
-  cohortId <- validateCohortId(cohortId, ids)
+  cohortId <- validateCohortId(cohortId, settings(cohort))
   if (length(cohortId) < 2) {
     cli::cli_abort("Settings of cohort table must contain at least two cohorts.")
   }

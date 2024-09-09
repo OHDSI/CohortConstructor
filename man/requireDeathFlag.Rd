@@ -17,22 +17,24 @@ requireDeathFlag(
 \arguments{
 \item{cohort}{A cohort table in a cdm reference.}
 
-\item{window}{Window to consider events over.}
+\item{window}{A list of vectors specifying minimum and maximum days from
+\code{indexDate} to consider events over.}
 
-\item{cohortId}{IDs of the cohorts to modify. If NULL, all cohorts will be
+\item{cohortId}{Vector identifying which cohorts to modify
+(cohort_definition_id or cohort_name). If NULL, all cohorts will be
 used; otherwise, only the specified cohorts will be modified, and the
 rest will remain unchanged.}
 
-\item{indexDate}{Variable in x that contains the date to compute the
-intersection.}
+\item{indexDate}{Name of the column in the cohort that contains the date to
+use as time 0 for window days.}
 
 \item{censorDate}{Whether to censor overlap events at a specific date or a
-column date of x.}
+column date of the cohort.}
 
 \item{negate}{If set as TRUE, criteria will be applied as exclusion
 rather than inclusion (i.e. require absence in another cohort).}
 
-\item{name}{Name of the new cohort with the future observation restriction.}
+\item{name}{Name of the new cohort table created in the cdm object.}
 }
 \value{
 Cohort table with only those with a death event kept (or without

@@ -68,12 +68,30 @@ validateCohortColumn <- function(columns, cohort, class = NULL) {
   return(invisible(columns))
 }
 
-validateCohortId <- function(cohortId, ids) {
-  assertNumeric(cohortId, null = TRUE, integerish = TRUE)
+validateCohortId <- function(cohortId, set) {
+  # NULL
   if (is.null(cohortId)) {
-    cohortId <- ids
-  } else {
-    indNot <- !cohortId %in% ids
+    cohortId <- set$cohort_definition_id
+
+  # Character
+  } else if (is.character(cohortId)) {
+    cohortIdIn <- cohortId
+    cohortId <- set |> dplyr::filter(.data$cohort_name %in% .env$cohortId) |> dplyr::pull("cohort_definition_id")
+    indNot <- !cohortIdIn %in% set$cohort_name
+    if (sum(indNot) > 0) {
+      if (sum(indNot) == length(cohortIdIn)) {
+        cli::cli_abort("No valid cohortId supplied.")
+      } else {
+        cli::cli_warn(
+          "{paste0(cohortIdIn[indNot], collapse = ', ')} {?is/are} not in the cohort table and won't be used."
+        )
+      }
+    }
+
+  # Numeric
+  } else if (is.numeric(cohortId)) {
+    assertNumeric(cohortId, null = TRUE, integerish = TRUE)
+    indNot <- !cohortId %in% set$cohort_definition_id
     if (sum(indNot) > 0) {
       if (sum(indNot) == length(cohortId)) {
         cli::cli_abort("No valid cohort ids supplied.")
@@ -84,6 +102,10 @@ validateCohortId <- function(cohortId, ids) {
         cohortId <- cohortId[!indNot]
       }
     }
+
+  # Anything else
+  } else {
+    cli::cli_abort("{.strong cohortId} must be 1) a numeric vector indicating which `cohort_deifnition_id`, 2) a character vector indicating which `cohort_name`, or 3) NULL to use all cohorts in the table.")
   }
   return(cohortId)
 }

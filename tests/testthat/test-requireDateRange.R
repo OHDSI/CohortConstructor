@@ -122,7 +122,7 @@ test_that("trim cohort dates", {
   # cohort id
   cdm$cohort3 <- cdm$cohort2 %>%
     trimToDateRange(dateRange = as.Date(c("2001-01-01", "2005-01-01")),
-                    cohortId = 1,
+                    cohortId = "cohort_1",
                     name = "cohort3")
   expect_true(omopgenerics::cohortCount(cdm$cohort3)$number_records[1] == 1)
   expect_equal(sort(cdm$cohort3 %>%

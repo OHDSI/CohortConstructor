@@ -14,10 +14,9 @@
 #' * If both `valueAsConcept` and `valueAsNumber` are not NULL, records will
 #' be required to have values that fulfill _either_ of the requirements
 #'
-#' @param cdm A cdm reference.
-#' @param conceptSet A conceptSet, which can either be a codelist
-#' or a conceptSetExpression.
-#' @param name Name of the cohort in the cdm object.
+#' @inheritParams cdmDoc
+#' @inheritParams conceptSetDoc
+#' @inheritParams nameDoc
 #' @param valueAsConcept A vector of cohort IDs used to filter measurements.
 #' Only measurements with these values in the `value_as_concept_id` column of
 #' the measurement table will be included. If NULL all entries independently of

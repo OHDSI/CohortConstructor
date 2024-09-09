@@ -15,16 +15,18 @@ requireInDateRange(
 \arguments{
 \item{cohort}{A cohort table in a cdm reference.}
 
-\item{dateRange}{A window of time during which the index date must have
-been observed.}
+\item{dateRange}{A date vector with the minimum and maximum dates between
+which the index date must have been observed.}
 
-\item{cohortId}{IDs of the cohorts to modify. If NULL, all cohorts will be
+\item{cohortId}{Vector identifying which cohorts to modify
+(cohort_definition_id or cohort_name). If NULL, all cohorts will be
 used; otherwise, only the specified cohorts will be modified, and the
 rest will remain unchanged.}
 
-\item{indexDate}{Variable in cohort that contains the index date of interest}
+\item{indexDate}{Name of the column in the cohort that contains the date of
+interest.}
 
-\item{name}{Name of the new cohort with the restriction.}
+\item{name}{Name of the new cohort table created in the cdm object.}
 }
 \value{
 The cohort table with any cohort entries outside of the date range

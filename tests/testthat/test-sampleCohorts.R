@@ -71,6 +71,8 @@ test_that("sampleCohort subsetting all cohorts", {
   test1 <- sampleCohorts(cdm$cohort1, n = 2)
   test2 <- sampleCohorts(cdm$cohort1, cohortId = c(1,2,3), n = 2)
   expect_true(all.equal(test1, test2))
+  test3 <- sampleCohorts(cdm$cohort1, cohortId = paste0("cohort_", c(1,2,3)), n = 2)
+  expect_true(all.equal(test1, test3))
 
   PatientProfiles::mockDisconnect(cdm)
 })

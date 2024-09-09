@@ -2,7 +2,7 @@
 title: "Building base cohorts"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{a01_building_concept_cohorts}
+  %\VignetteIndexEntry{a01_building_base_cohorts}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

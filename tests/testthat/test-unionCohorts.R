@@ -55,6 +55,10 @@ test_that("unionCohorts works", {
       )))
   expect_true(settings(cdm$cohort3)$cohort_name == "cohort_1_cohort_2")
 
+  cdm$cohort4 <- unionCohorts(cdm$cohort1, cohortId = c("cohort_1", "cohort_2"), name = "cohort4")
+  expect_equal(collectCohort(cdm$cohort3, 1), collectCohort(cdm$cohort4, 1))
+  expect_equal(collectCohort(cdm$cohort3, 2), collectCohort(cdm$cohort4, 2))
+
   # union 2 empty cohorts
   cdm$cohort5 <- conceptCohort(cdm = cdm, conceptSet = list("a"= 1, "b" = 2), name = "cohort5")
   cdm$cohort6 <- cdm$cohort5 |> unionCohorts(name = "cohort6")
