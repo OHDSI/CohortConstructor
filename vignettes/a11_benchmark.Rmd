@@ -4,7 +4,8 @@ output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{a11_benchmark}
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}---
+  %\VignetteEncoding{UTF-8}
+---
   
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
