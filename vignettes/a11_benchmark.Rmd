@@ -29,7 +29,9 @@ library(dplyr)
 library(tidyr)
 library(gt)
 library(scales)
+```
 
+```{r}
 # Functions
 niceNum <- function(x, dec = 0) {
   trimws(format(round(as.numeric(x), dec), big.mark = ",", nsmall = dec, scientific = FALSE))
@@ -61,7 +63,9 @@ niceOverlapLabels <- function(labels) {
       )
     )
 }
+```
 
+```{r}
 # Results
 createRData <- FALSE
 if (createRData) {
