@@ -9,12 +9,12 @@ vignette: >
   
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-collapse = TRUE,
-eval = TRUE, 
-warning = FALSE, 
-message = FALSE,
-comment = "#>",
-echo = FALSE
+  collapse = TRUE,
+  eval = TRUE, 
+  warning = FALSE, 
+  message = FALSE,
+  comment = "#>",
+  echo = FALSE
 )
 ```
 
@@ -67,8 +67,6 @@ createRData <- FALSE
 if (createRData) {
   source(here::here("extras", "getBenchmarkResults.R"))
 } else {
-  cat(here::here("extras", "benchmark.RData"))
-  cat(file.exists(here::here("extras", "benchmark.RData")))
   load(here::here("extras", "benchmark.RData"))
 }
 ```
