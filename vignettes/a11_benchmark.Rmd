@@ -21,7 +21,6 @@ echo = FALSE
 ```{r}
 # Packages
 library(visOmopResults)
-library(readr)
 library(omopgenerics)
 library(ggplot2)
 library(CohortCharacteristics)
