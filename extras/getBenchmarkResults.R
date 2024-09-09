@@ -50,6 +50,6 @@ mergeData <- function(data, patterns) {
   return(x)
 }
 
-result_patterns <- c("time", "comparison", "details", "omop", "index_counts", "sql_indexes")
-data <- readData(here("extras", "data")) %>% mergeData(result_patterns)
-save(data, file = here("extras", "benchmark.RData"))
+resultPatterns <- c("time", "comparison", "details", "omop", "index_counts", "sql_indexes")
+benchmarkData <- readData(here("extras", "data")) %>% mergeData(resultPatterns)
+usethis::use_data(benchmarkData, internal = TRUE, overwrite = TRUE)
