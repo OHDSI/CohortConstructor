@@ -29,6 +29,7 @@ library(dplyr)
 library(tidyr)
 library(gt)
 library(scales)
+library(CohortConstructor)
 
 # Functions
 niceNum <- function(x, dec = 0) {
@@ -61,12 +62,6 @@ niceOverlapLabels <- function(labels) {
       )
     )
 }
-
-# Results
-createRData <- FALSE
-if (createRData) {
-  source(here::here("extras", "getBenchmarkResults.R"))
-} 
 ```
 
 # Introduction
@@ -89,7 +84,7 @@ Current results were obtained from a 100,000-person sample of the CPRD GOLD data
 
 The table below show how many records are in OMOP tables used in the benchmark script for each participating database.
 ```{r}
-benchmarkData$omop |>
+CohortConstructor:::benchmarkData$omop |>
   filter(table_name != "death") |>
   select("cdm_name", "OMOP table" = "table_name", "number_records") |>
   mutate(
@@ -122,7 +117,7 @@ The COVID-19 cohort was used to evaluate the performance of common cohort strati
 The following table displays the number of records and subjects for each cohort across the participating databases:
 
 ```{r}
-benchmarkData$details |>
+CohortConstructor:::benchmarkData$details |>
   filterSettings(result_type == "cohort_count") |>
   tidy(addSettings = FALSE) |>
   select(-variable_level, - result_id) |>
@@ -166,7 +161,7 @@ benchmarkData$details |>
 We also computed the overlap between patients in CIRCE and CohortConstructor cohorts, with results shown in the plot below:
 
 ```{r, fig.width=10, fig.height=7}
-overlap <- benchmarkData$comparison |>
+overlap <- CohortConstructor:::benchmarkData$comparison |>
   filterSettings(result_type == "cohort_overlap")
 
 overlap |>
@@ -207,7 +202,7 @@ The following plot shows the times taken to create each cohort using CIRCE and C
 ## TABLE with same results as the plot below.
 
 # header_prefix <- "[header]Time by database (minutes)\n[header_level]"
-# benchmarkData$time |>
+# CohortConstructor:::benchmarkData$time |>
 #   distinct() |>
 #   filter(!grepl("male|set", msg)) |>
 #   mutate(
@@ -240,7 +235,7 @@ The following plot shows the times taken to create each cohort using CIRCE and C
 
 ```{r, fig.width=8, fig.height=7}
 
-benchmarkData$time |>
+CohortConstructor:::benchmarkData$time |>
   distinct() |>
   filter(!grepl("male|set", msg)) |>
   mutate(
@@ -284,7 +279,7 @@ The table below depicts the total time it took to create the nine cohorts when u
 
 ```{r}
 header_prefix <- "[header]Time by tool (minutes)\n[header_level]"
-benchmarkData$time |>
+CohortConstructor:::benchmarkData$time |>
   distinct() |>
   filter(grepl("atlas", msg)) |>
   filter(!grepl("male", msg)) |>
@@ -292,7 +287,7 @@ benchmarkData$time |>
   summarise(time = niceNum(sum(as.numeric(toc) - as.numeric(tic))/60, 2)) |>
   mutate(Tool = "CIRCE") |>
   union_all(
-    benchmarkData$time |>
+    CohortConstructor:::benchmarkData$time |>
       filter(msg == "cc_set_no_strata") |>
       group_by(cdm_name) |>
       summarise(time = niceNum(sum(as.numeric(toc) - as.numeric(tic))/60, 2)) |>
@@ -312,7 +307,7 @@ benchmarkData$time |>
 Cohorts are often stratified in studies. With Atlas cohort definitions, each stratum requires a new CIRCE JSON to be instantiated, while CohortConstructor allows stratifications to be generated from an overall cohort. The following table shows the time taken to create age and sex stratifications for the COVID-19 cohort with both CIRCE and CohortConstructor.
 
 ```{r}
-benchmarkData$time |>
+CohortConstructor:::benchmarkData$time |>
   distinct() |>
   filter(grepl("atlas_covid|set_strata", msg) | msg == "cc_covid") |>
   filter(msg != "atlas_covid") |>
@@ -345,7 +340,7 @@ Four calls were made to `conceptCohort`, each involving a different number of OM
 The plot below shows the computation time with and without SQL indexes for each scenario:
 
 ```{r, fig.width=8, fig.height=7}
-benchmarkData$sql_indexes |>
+CohortConstructor:::benchmarkData$sql_indexes |>
   distinct() |>
   group_by(cdm_name, msg) |>
   summarise(time = sum(as.numeric(toc) - as.numeric(tic))/60, .groups = "drop") |>

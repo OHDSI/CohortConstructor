@@ -10,5 +10,3 @@ domainsData <- dplyr::tribble(
   "visit",       "visit_occurrence",     "visit_concept_id",       "visit_source_concept_id",        "visit_start_date",           "visit_end_date",
   "device",      "device_exposure",      "device_concept_id",      "device_source_concept_id",       "device_exposure_start_date", "device_exposure_end_date"
 )
-
-usethis::use_data(domainsData, internal = TRUE, overwrite = TRUE)
