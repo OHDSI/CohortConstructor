@@ -55,7 +55,12 @@ Suggests:
     odbc,
     CohortCharacteristics,
     ggplot2,
-    DiagrammeR
+    DiagrammeR,
+    visOmopResults,
+    gt,
+    scales,
+    here,
+    ggpubr
 Config/testthat/edition: 3
 Config/testthat/parallel: true
 VignetteBuilder: knitr

@@ -67,6 +67,7 @@ intersectCohorts <- function(cohort,
 
   # get intersections between cohorts
   tblName <- omopgenerics::uniqueTableName(prefix = uniquePrefix)
+  lowerWindow <- ifelse(gap != 0, -gap, gap)
   cohortOut <- cohort %>%
     dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) %>%
     dplyr::select(-"cohort_definition_id") %>%
@@ -74,7 +75,7 @@ intersectCohorts <- function(cohort,
     PatientProfiles::addCohortIntersectFlag(
       targetCohortTable = omopgenerics::tableName(cohort),
       targetCohortId = cohortId,
-      window = c(0, 0),
+      window = c(lowerWindow, gap),
       nameStyle = "{cohort_name}",
       name = tblName
     )
@@ -131,12 +132,12 @@ intersectCohorts <- function(cohort,
     dplyr::inner_join(cdm[[setName]], by = cohortNames) %>%
     dplyr::select("cohort_definition_id", "subject_id",
                   "cohort_start_date", "cohort_end_date") %>%
-    dplyr::compute(name = name, temporary = FALSE)
+    dplyr::compute(name = tblName, temporary = FALSE)
   if (cohortOut |> dplyr::tally() |> dplyr::pull("n") > 0) {
     class(cohortOut) <- c(class(cohortOut), "cohort_table")
     cohortOut <- cohortOut %>%
-      dplyr::compute(name = name, temporary = FALSE) |>
-      joinOverlap(name = name, gap = gap)
+      dplyr::compute(name = tblName, temporary = FALSE) |>
+      joinOverlap(name = tblName, gap = gap)
   }
 
   # attributes
@@ -192,19 +193,29 @@ intersectCohorts <- function(cohort,
     )))
 
   # intersect cohort
-  cdm[[name]] <- omopgenerics::newCohortTable(
-    table = cohortOut,
-    cohortSetRef = cohSet,
-    cohortAttritionRef = intersectAttrition,
-    cohortCodelistRef = intersectCodelist,
-    .softValidation = FALSE
-  )
-
   if (keepOriginalCohorts) {
-    cdm <- bind(cdm[[name]], originalCohorts, name = name)
+    cohortOut <- omopgenerics::newCohortTable(
+      table = cohortOut,
+      cohortSetRef = cohSet,
+      cohortAttritionRef = intersectAttrition,
+      cohortCodelistRef = intersectCodelist,
+      .softValidation = FALSE
+    )
+    cdm <- bind(originalCohorts, cohortOut, name = name)
+  } else {
+    cohortOut <- cohortOut %>%
+      dplyr::compute(name = name, temporary = FALSE)
+    cdm[[name]] <- omopgenerics::newCohortTable(
+      table = cohortOut,
+      cohortSetRef = cohSet,
+      cohortAttritionRef = intersectAttrition,
+      cohortCodelistRef = intersectCodelist,
+      .softValidation = FALSE
+    )
   }
 
   CDMConnector::dropTable(cdm, name = dplyr::starts_with(uniquePrefix))
+  CDMConnector::dropTable(cdm, name = tblName)
 
   return(cdm[[name]])
 }

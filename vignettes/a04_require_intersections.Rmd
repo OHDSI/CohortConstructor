@@ -2,7 +2,7 @@
 title: "Requirements on Presence and Absence"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{a01_building_concept_cohorts}
+  %\VignetteIndexEntry{a04_require_intersections}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
