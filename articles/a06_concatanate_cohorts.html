@@ -5,12 +5,12 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>a05_concatanate_cohorts • CohortConstructor</title>
+<title>Concatenate Cohorts • CohortConstructor</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="a05_concatanate_cohorts">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Concatenate Cohorts">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -38,8 +38,8 @@
     <li><a class="dropdown-item" href="../articles/a02_cohort_table_requirements.html">Cohort Requirements</a></li>
     <li><a class="dropdown-item" href="../articles/a03_require_demographics.html">Demographic Requirements</a></li>
     <li><a class="dropdown-item" href="../articles/a04_require_intersections.html">Requirements on Presence and Absence</a></li>
-    <li><a class="dropdown-item" href="../articles/a05_update_cohort_start_end.html">a04_update_cohort_start_end</a></li>
-    <li><a class="dropdown-item" href="../articles/a06_concatanate_cohorts.html">a05_concatanate_cohorts</a></li>
+    <li><a class="dropdown-item" href="../articles/a05_update_cohort_start_end.html">Update cohort start and end dates</a></li>
+    <li><a class="dropdown-item" href="../articles/a06_concatanate_cohorts.html">Concatenate Cohorts</a></li>
     <li><a class="dropdown-item" href="../articles/a07_filter_cohorts.html">a06_filter_cohorts</a></li>
     <li><a class="dropdown-item" href="../articles/a08_split_cohorts.html">a07_split_cohorts</a></li>
     <li><a class="dropdown-item" href="../articles/a09_combine_cohorts.html">a08_combine_cohorts</a></li>
@@ -61,10 +61,11 @@
 
 
 
-
-<div class="row">
+<link href="a06_concatanate_cohorts_files/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet">
+<script src="a06_concatanate_cohorts_files/htmlwidgets-1.6.4/htmlwidgets.js"></script><script src="a06_concatanate_cohorts_files/viz-1.8.2/viz.js"></script><link href="a06_concatanate_cohorts_files/DiagrammeR-styles-0.2/styles.css" rel="stylesheet">
+<script src="a06_concatanate_cohorts_files/grViz-binding-1.0.11/grViz.js"></script><div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="../logo.png" class="logo" alt=""><h1>a05_concatanate_cohorts</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>Concatenate Cohorts</h1>
             
       
 
@@ -74,7 +75,83 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ohdsi.github.io/CohortConstructor/">CohortConstructor</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ohdsi.github.io/CohortConstructor/">CohortConstructor</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://darwin-eu-dev.github.io/CohortCharacteristics/" class="external-link">CohortCharacteristics</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span></code></pre></div>
+<p>For this example we’ll use the Eunomia synthetic data from the
+CDMConnector package.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">duckdb</span><span class="fu">::</span><span class="fu"><a href="https://r.duckdb.org/reference/duckdb.html" class="external-link">duckdb</a></span><span class="op">(</span><span class="op">)</span>, dbdir <span class="op">=</span> <span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/eunomiaDir.html" class="external-link">eunomia_dir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/cdm_from_con.html" class="external-link">cdm_from_con</a></span><span class="op">(</span><span class="va">con</span>, cdm_schema <span class="op">=</span> <span class="st">"main"</span>, </span>
+<span>                    write_schema <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>prefix <span class="op">=</span> <span class="st">"my_study_"</span>, schema <span class="op">=</span> <span class="st">"main"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>Let’s start by creating two drug cohorts, one for users of diclofenac
+and another for users of acetaminophen.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">medications</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/conceptCohort.html">conceptCohort</a></span><span class="op">(</span>cdm <span class="op">=</span> <span class="va">cdm</span>, </span>
+<span>                                 conceptSet <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"diclofenac"</span> <span class="op">=</span> <span class="fl">1124300</span>,</span>
+<span>                                                   <span class="st">"acetaminophen"</span> <span class="op">=</span> <span class="fl">1127433</span><span class="op">)</span>, </span>
+<span>                                 name <span class="op">=</span> <span class="st">"medications"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://darwin-eu-dev.github.io/omopgenerics/reference/cohortCount.html" class="external-link">cohortCount</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">medications</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 3</span></span></span>
+<span><span class="co">#&gt;   cohort_definition_id number_records number_subjects</span></span>
+<span><span class="co">#&gt;                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1           <span style="text-decoration: underline;">9</span>365            <span style="text-decoration: underline;">2</span>580</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                    2            830             830</span></span></code></pre></div>
+<p>We can merge cohort records using the <code><a href="../reference/collapseCohorts.html">collapseCohorts()</a></code>
+function in the CohortConstructor package. The function allows us to
+specifying the number of days between two cohort entries, which will
+then be merged into a single record.</p>
+<p>Let’s first define a new cohort where records within 1095 days (~ 3
+years) of each other will be merged.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">medications_collapsed</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/collapseCohorts.html">collapseCohorts</a></span><span class="op">(</span></span>
+<span>  cohort <span class="op">=</span> <span class="va">cdm</span><span class="op">$</span><span class="va">medications</span>,</span>
+<span>  gap <span class="op">=</span> <span class="fl">1095</span>,</span>
+<span>  name <span class="op">=</span> <span class="st">"medications_collapsed"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>Let’s compare how this function would change the records of a single
+individual.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">medications</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">subject_id</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Source:   SQL [4 x 4]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB v1.0.0 [unknown@Linux 6.5.0-1025-azure:R 4.4.1//tmp/RtmpLsFl4b/file1ddb3537c5d9.duckdb]</span></span></span>
+<span><span class="co">#&gt;   cohort_definition_id subject_id cohort_start_date cohort_end_date</span></span>
+<span><span class="co">#&gt;                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>         </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1          1 1971-01-04        1971-01-18     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                    1          1 1982-09-11        1982-10-02     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>                    1          1 1980-03-15        1980-03-29     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>                    1          1 1976-10-20        1976-11-03</span></span>
+<span><span class="va">cdm</span><span class="op">$</span><span class="va">medications_collapsed</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">subject_id</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Source:   SQL [3 x 4]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB v1.0.0 [unknown@Linux 6.5.0-1025-azure:R 4.4.1//tmp/RtmpLsFl4b/file1ddb3537c5d9.duckdb]</span></span></span>
+<span><span class="co">#&gt;   cohort_definition_id subject_id cohort_start_date cohort_end_date</span></span>
+<span><span class="co">#&gt;                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>         </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1          1 1971-01-04        1971-01-18     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                    1          1 1976-10-20        1976-11-03     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>                    1          1 1980-03-15        1982-10-02</span></span></code></pre></div>
+<p>Subject 1 initially had 4 records between 1971 and 1982. After
+specifying that records within three years of each other are to be
+merged, the number of records decreases to three. The record from
+1980-03-15 to 1980-03-29 and the record from 1982-09-11 to 1982-10-02
+are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
+<p>Now let’s look at how the cohorts have been changed.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">summary_attrition</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu-dev.github.io/CohortCharacteristics/reference/summariseCohortAttrition.html" class="external-link">summariseCohortAttrition</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">medications_collapsed</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://darwin-eu-dev.github.io/CohortCharacteristics/reference/plotCohortAttrition.html" class="external-link">plotCohortAttrition</a></span><span class="op">(</span><span class="va">summary_attrition</span>, cohortId <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<div class="grViz html-widget html-fill-item" id="htmlwidget-ac96cb3ee4656e2e9ec3" style="width:700px;height:432.632880098888px;"></div>
+<script type="application/json" data-for="htmlwidget-ac96cb3ee4656e2e9ec3">{"x":{"diagram":"digraph {\n\ngraph [layout = \"neato\",\n       outputorder = \"edgesfirst\",\n       bgcolor = \"white\"]\n\nnode [fontname = \"Helvetica\",\n      fontsize = \"10\",\n      shape = \"circle\",\n      fixedsize = \"true\",\n      width = \"0.5\",\n      style = \"filled\",\n      fillcolor = \"aliceblue\",\n      color = \"gray70\",\n      fontcolor = \"gray50\"]\n\nedge [fontname = \"Helvetica\",\n     fontsize = \"8\",\n     len = \"1.5\",\n     color = \"gray80\",\n     arrowsize = \"0.5\"]\n\n  \"1\" [label = \"Initial events\nN subjects = 2,580\nN records = 9,365\", shape = \"box\", penwidth = \"2\", color = \"black\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"11\", fontcolor = \"black\", height = \"0.6\", width = \"1.44\", pos = \"1,4.1!\"] \n  \"2\" [label = \"N subjects = 2,580\nN records = 9,365\", shape = \"box\", penwidth = \"1\", color = \"black\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"11\", fontcolor = \"black\", height = \"0.4\", width = \"1.44\", pos = \"1,3!\"] \n  \"3\" [label = \"N subjects = 2,580\nN records = 9,365\", shape = \"box\", penwidth = \"1\", color = \"black\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"11\", fontcolor = \"black\", height = \"0.4\", width = \"1.44\", pos = \"1,2!\"] \n  \"4\" [label = \"Final events\nN subjects = 2,580\nN records = 7,975\", shape = \"box\", penwidth = \"2\", color = \"black\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"11\", fontcolor = \"black\", height = \"0.6\", width = \"1.44\", pos = \"1,0.7!\"] \n  \"5\" [label = \"N subjects = 0\nN records = 0\", shape = \"box\", color = \"black\", fillcolor = \"#C0C0C0\", fontname = \"Calibri\", fontsize = \"9\", fontcolor = \"black\", height = \"0.4\", width = \"1.2\", pos = \"3,3.5!\"] \n  \"6\" [label = \"cohort requirements\", shape = \"box\", color = \"black\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"10\", fontcolor = \"back\", height = \"0.2\", width = \"2.25\", pos = \"1,3.5!\"] \n  \"7\" [label = \"N subjects = 0\nN records = 0\", shape = \"box\", color = \"black\", fillcolor = \"#C0C0C0\", fontname = \"Calibri\", fontsize = \"9\", fontcolor = \"black\", height = \"0.4\", width = \"1.2\", pos = \"3,2.5!\"] \n  \"8\" [label = \"Overlapping records collapsed\", shape = \"box\", color = \"black\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"10\", fontcolor = \"back\", height = \"0.2\", width = \"2.25\", pos = \"1,2.5!\"] \n  \"9\" [label = \"N subjects = 0\nN records = 1390\", shape = \"box\", color = \"black\", fillcolor = \"#C0C0C0\", fontname = \"Calibri\", fontsize = \"9\", fontcolor = \"black\", height = \"0.4\", width = \"1.2\", pos = \"3,1.4!\"] \n  \"10\" [label = \"Collapse cohort with a\ngap of 1095 days.\", shape = \"box\", color = \"black\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"10\", fontcolor = \"back\", height = \"0.4\", width = \"2.25\", pos = \"1,1.4!\"] \n\"1\"->\"2\" [color = \"black\"] \n\"2\"->\"3\" [color = \"black\"] \n\"3\"->\"4\" [color = \"black\"] \n\"6\"->\"5\" [color = \"black\"] \n\"8\"->\"7\" [color = \"black\"] \n\"10\"->\"9\" [color = \"black\"] \n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script><p>The flow chart above illustrates the changes to cohort 1 (users of
+acetaminophen) when entries within 3 years of each other are merged. We
+see that collapsing the cohort has led to 1,390 fewer records.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">summary_attrition</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu-dev.github.io/CohortCharacteristics/reference/summariseCohortAttrition.html" class="external-link">summariseCohortAttrition</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">medications_collapsed</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://darwin-eu-dev.github.io/CohortCharacteristics/reference/plotCohortAttrition.html" class="external-link">plotCohortAttrition</a></span><span class="op">(</span><span class="va">summary_attrition</span>, cohortId <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
+<div class="grViz html-widget html-fill-item" id="htmlwidget-e5c8c404fe174e4c81bd" style="width:700px;height:432.632880098888px;"></div>
+<script type="application/json" data-for="htmlwidget-e5c8c404fe174e4c81bd">{"x":{"diagram":"digraph {\n\ngraph [layout = \"neato\",\n       outputorder = \"edgesfirst\",\n       bgcolor = \"white\"]\n\nnode [fontname = \"Helvetica\",\n      fontsize = \"10\",\n      shape = \"circle\",\n      fixedsize = \"true\",\n      width = \"0.5\",\n      style = \"filled\",\n      fillcolor = \"aliceblue\",\n      color = \"gray70\",\n      fontcolor = \"gray50\"]\n\nedge [fontname = \"Helvetica\",\n     fontsize = \"8\",\n     len = \"1.5\",\n     color = \"gray80\",\n     arrowsize = \"0.5\"]\n\n  \"1\" [label = \"Initial events\nN subjects = 850\nN records = 850\", shape = \"box\", penwidth = \"2\", color = \"black\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"11\", fontcolor = \"black\", height = \"0.6\", width = \"1.28\", pos = \"1,4.1!\"] \n  \"2\" [label = \"N subjects = 830\nN records = 830\", shape = \"box\", penwidth = \"1\", color = \"black\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"11\", fontcolor = \"black\", height = \"0.4\", width = \"1.28\", pos = \"1,3!\"] \n  \"3\" [label = \"N subjects = 830\nN records = 830\", shape = \"box\", penwidth = \"1\", color = \"black\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"11\", fontcolor = \"black\", height = \"0.4\", width = \"1.28\", pos = \"1,2!\"] \n  \"4\" [label = \"Final events\nN subjects = 830\nN records = 830\", shape = \"box\", penwidth = \"2\", color = \"black\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"11\", fontcolor = \"black\", height = \"0.6\", width = \"1.28\", pos = \"1,0.7!\"] \n  \"5\" [label = \"N subjects = 20\nN records = 20\", shape = \"box\", color = \"black\", fillcolor = \"#C0C0C0\", fontname = \"Calibri\", fontsize = \"9\", fontcolor = \"black\", height = \"0.4\", width = \"1.2\", pos = \"3,3.5!\"] \n  \"6\" [label = \"cohort requirements\", shape = \"box\", color = \"black\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"10\", fontcolor = \"back\", height = \"0.2\", width = \"2.25\", pos = \"1,3.5!\"] \n  \"7\" [label = \"N subjects = 0\nN records = 0\", shape = \"box\", color = \"black\", fillcolor = \"#C0C0C0\", fontname = \"Calibri\", fontsize = \"9\", fontcolor = \"black\", height = \"0.4\", width = \"1.2\", pos = \"3,2.5!\"] \n  \"8\" [label = \"Overlapping records collapsed\", shape = \"box\", color = \"black\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"10\", fontcolor = \"back\", height = \"0.2\", width = \"2.25\", pos = \"1,2.5!\"] \n  \"9\" [label = \"N subjects = 0\nN records = 0\", shape = \"box\", color = \"black\", fillcolor = \"#C0C0C0\", fontname = \"Calibri\", fontsize = \"9\", fontcolor = \"black\", height = \"0.4\", width = \"1.2\", pos = \"3,1.4!\"] \n  \"10\" [label = \"Collapse cohort with a\ngap of 1095 days.\", shape = \"box\", color = \"black\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"10\", fontcolor = \"back\", height = \"0.4\", width = \"2.25\", pos = \"1,1.4!\"] \n\"1\"->\"2\" [color = \"black\"] \n\"2\"->\"3\" [color = \"black\"] \n\"3\"->\"4\" [color = \"black\"] \n\"6\"->\"5\" [color = \"black\"] \n\"8\"->\"7\" [color = \"black\"] \n\"10\"->\"9\" [color = \"black\"] \n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script><p>The flow chart above illustrates the changes to cohort 2 (users of
+diclofenac) when entries within 3 years of each other are merged. Since
+this cohort only has one record per individual the function
+collapseCohorts() had no impact on the final number of records.</p>
   </main>
 </div>
 
