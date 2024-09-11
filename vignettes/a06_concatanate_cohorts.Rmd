@@ -76,11 +76,18 @@ cdm$medications_collapsed %>%
 ```
 Subject 1 initially had 4 records between 1971 and 1982. After specifying that records within three years of each other are to be merged, the number of records decreases to three. The record from 1980-03-15 to 1980-03-29 and the record from 1982-09-11 to 1982-10-02 are merged to create a new record from 1980-03-15 to 1982-10-02. 
 
-Now let's look at how the cohort has been changed. 
+Now let's look at how the cohorts have been changed. 
 
 ```{r}
 summary_attrition <- summariseCohortAttrition(cdm$medications_collapsed)
 plotCohortAttrition(summary_attrition, cohortId = 1)
 ```
 
-The flow chart above illustrates the changes to cohort 1 (users of acetaminophen) when entries within 3 years of each other. We see that collapsing the cohort has led to 1,390 fewer records.
+The flow chart above illustrates the changes to cohort 1 (users of acetaminophen) when entries within 3 years of each other are merged. We see that collapsing the cohort has led to 1,390 fewer records.
+
+```{r}
+summary_attrition <- summariseCohortAttrition(cdm$medications_collapsed)
+plotCohortAttrition(summary_attrition, cohortId = 2)
+```
+
+The flow chart above illustrates the changes to cohort 2 (users of diclofenac) when entries within 3 years of each other are merged. Since this cohort only has one record per individual the function collapseCohorts() had no impact on the final number of records.
