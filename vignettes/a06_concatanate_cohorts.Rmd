@@ -1,5 +1,5 @@
 ---
-title: "a05_concatanate_cohorts"
+title: "Concatenate Cohorts"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{a05_concatanate_cohorts}
@@ -16,4 +16,78 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(CohortConstructor)
+library(CohortCharacteristics)
+library(ggplot2)
 ```
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  eval = TRUE, message = FALSE, warning = FALSE,
+  comment = "#>"
+)
+
+library(CDMConnector)
+library(dplyr, warn.conflicts = FALSE)
+
+if (Sys.getenv("EUNOMIA_DATA_FOLDER") == ""){
+  Sys.setenv("EUNOMIA_DATA_FOLDER" = file.path(tempdir(), "eunomia"))}
+if (!dir.exists(Sys.getenv("EUNOMIA_DATA_FOLDER"))){ dir.create(Sys.getenv("EUNOMIA_DATA_FOLDER"))
+  downloadEunomiaData()  
+}
+```
+
+For this example we'll use the Eunomia synthetic data from the CDMConnector package.
+
+```{r}
+con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomia_dir())
+cdm <- cdm_from_con(con, cdm_schema = "main", 
+                    write_schema = c(prefix = "my_study_", schema = "main"))
+```
+
+Let's start by creating two drug cohorts, one for users of diclofenac and another for users of acetaminophen.
+
+```{r}
+cdm$medications <- conceptCohort(cdm = cdm, 
+                                 conceptSet = list("diclofenac" = 1124300,
+                                                   "acetaminophen" = 1127433), 
+                                 name = "medications")
+cohortCount(cdm$medications)
+```
+We can merge cohort records using the `collapseCohorts()` function in the CohortConstructor package. The function allows us to specifying the number of days between two cohort entries, which will then be merged into a single record.
+
+Let's first define a new cohort where records within 1095 days (~ 3 years) of each other will be merged.
+
+```{r}
+cdm$medications_collapsed <- collapseCohorts(
+  cohort = cdm$medications,
+  gap = 1095,
+  name = "medications_collapsed"
+)
+```
+
+Let's compare how this function would change the records of a single individual.
+
+```{r}
+cdm$medications %>%
+  filter(subject_id == 1)
+cdm$medications_collapsed %>%
+  filter(subject_id == 1)
+```
+Subject 1 initially had 4 records between 1971 and 1982. After specifying that records within three years of each other are to be merged, the number of records decreases to three. The record from 1980-03-15 to 1980-03-29 and the record from 1982-09-11 to 1982-10-02 are merged to create a new record from 1980-03-15 to 1982-10-02. 
+
+Now let's look at how the cohorts have been changed. 
+
+```{r}
+summary_attrition <- summariseCohortAttrition(cdm$medications_collapsed)
+plotCohortAttrition(summary_attrition, cohortId = 1)
+```
+
+The flow chart above illustrates the changes to cohort 1 (users of acetaminophen) when entries within 3 years of each other are merged. We see that collapsing the cohort has led to 1,390 fewer records.
+
+```{r}
+summary_attrition <- summariseCohortAttrition(cdm$medications_collapsed)
+plotCohortAttrition(summary_attrition, cohortId = 2)
+```
+
+The flow chart above illustrates the changes to cohort 2 (users of diclofenac) when entries within 3 years of each other are merged. Since this cohort only has one record per individual the function collapseCohorts() had no impact on the final number of records.
