@@ -60,19 +60,19 @@ mockCohortConstructor <- function(nPerson = 10,
   }
 
   if (drugExposure) {
-    cdm <- cdm |> omock::mockDrugExposure()
+    cdm <- cdm |> omock::mockDrugExposure(seed = seed)
   }
 
   if (conditionOccurrence) {
-    cdm <- cdm |> omock::mockConditionOccurrence()
+    cdm <- cdm |> omock::mockConditionOccurrence(seed = seed)
   }
 
   if (death) {
-    cdm <- cdm |> omock::mockDeath()
+    cdm <- cdm |> omock::mockDeath(seed = seed)
   }
 
   if (measurement) {
-    cdm <- cdm |> omock::mockMeasurement()
+    cdm <- cdm |> omock::mockMeasurement(seed = seed)
   }
 
   if (!is.null(otherTables)) {
