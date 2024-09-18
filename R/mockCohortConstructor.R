@@ -46,10 +46,10 @@ mockCohortConstructor <- function(nPerson = 10,
   if (is.null(tables)) {
     cdm <- omock::mockCdmReference() |>
       omock::mockVocabularyTables(concept = conceptTable) |>
-      omock::mockPerson(nPerson = nPerson) |>
-      omock::mockObservationPeriod() |>
+      omock::mockPerson(nPerson = nPerson,seed = seed) |>
+      omock::mockObservationPeriod(seed = seed) |>
       omock::mockCohort(name = "cohort1") |>
-      omock::mockCohort(name = "cohort2", numberCohorts = 2)
+      omock::mockCohort(name = "cohort2", numberCohorts = 2, seed = seed)
   } else {
     cdm <- omock::mockCdmFromTables(tables = tables, seed = seed) |>
       omock::mockVocabularyTables(concept = conceptTable)

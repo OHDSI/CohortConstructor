@@ -33,7 +33,7 @@ Imports:
     glue,
     magrittr,
     omopgenerics (>= 0.2.1),
-    PatientProfiles (>= 1.1.0),
+    PatientProfiles (>= 1.2.0),
     purrr,
     rlang,
     tidyr,
@@ -68,4 +68,5 @@ Depends:
     R (>= 4.1)
 URL: https://ohdsi.github.io/CohortConstructor/
 Remotes:
-    darwin-eu-dev/PatientProfiles
+    darwin-eu-dev/PatientProfiles,
+    OHDSI/omock
