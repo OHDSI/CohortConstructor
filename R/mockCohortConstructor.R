@@ -46,10 +46,10 @@ mockCohortConstructor <- function(nPerson = 10,
   if (is.null(tables)) {
     cdm <- omock::mockCdmReference() |>
       omock::mockVocabularyTables(concept = conceptTable) |>
-      omock::mockPerson(nPerson = nPerson) |>
-      omock::mockObservationPeriod() |>
-      omock::mockCohort(name = "cohort1") |>
-      omock::mockCohort(name = "cohort2", numberCohorts = 2)
+      omock::mockPerson(nPerson = nPerson,seed = seed) |>
+      omock::mockObservationPeriod(seed = seed) |>
+      omock::mockCohort(name = "cohort1", seed = seed) |>
+      omock::mockCohort(name = "cohort2", numberCohorts = 2, seed = seed)
   } else {
     cdm <- omock::mockCdmFromTables(tables = tables, seed = seed) |>
       omock::mockVocabularyTables(concept = conceptTable)
@@ -60,19 +60,19 @@ mockCohortConstructor <- function(nPerson = 10,
   }
 
   if (drugExposure) {
-    cdm <- cdm |> omock::mockDrugExposure()
+    cdm <- cdm |> omock::mockDrugExposure(seed = seed)
   }
 
   if (conditionOccurrence) {
-    cdm <- cdm |> omock::mockConditionOccurrence()
+    cdm <- cdm |> omock::mockConditionOccurrence(seed = seed)
   }
 
   if (death) {
-    cdm <- cdm |> omock::mockDeath()
+    cdm <- cdm |> omock::mockDeath(seed = seed)
   }
 
   if (measurement) {
-    cdm <- cdm |> omock::mockMeasurement()
+    cdm <- cdm |> omock::mockMeasurement(seed = seed)
   }
 
   if (!is.null(otherTables)) {

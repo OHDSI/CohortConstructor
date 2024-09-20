@@ -283,8 +283,8 @@ test_that("excluded concepts in codelist", {
 test_that("out of observation", {
   testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4) |>
-    omock::mockObservationPeriod()
+    omock::mockPerson(n = 4, seed = 1) |>
+    omock::mockObservationPeriod(seed = 1)
   cdm_local$concept <- dplyr::tibble(
     "concept_id" = c(1, 2),
     "concept_name" = c("my concept 1", "my concept 2"),
@@ -343,8 +343,8 @@ test_that("out of observation", {
   # event starts out, end in (subject 3)
   # no concept 2
   cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4) |>
-    omock::mockObservationPeriod()
+    omock::mockPerson(n = 4, seed = 1) |>
+    omock::mockObservationPeriod(seed = 1)
   cdm_local$concept <- dplyr::tibble(
     "concept_id" = c(1, 2),
     "concept_name" = c("my concept 1", "my concept 2"),
@@ -384,8 +384,8 @@ test_that("out of observation", {
   # out of observation (subject 3)
   # overlapping (subject 4)
   cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4) |>
-    omock::mockObservationPeriod()
+    omock::mockPerson(n = 4, seed = 1) |>
+    omock::mockObservationPeriod(seed = 1)
   cdm_local$concept <- dplyr::tibble(
     "concept_id" = c(1, 2),
     "concept_name" = c("my concept 1", "my concept 2"),

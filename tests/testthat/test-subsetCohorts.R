@@ -1,7 +1,7 @@
 test_that("subsetCohort works", {
   cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4) |>
-    omock::mockObservationPeriod() |>
+    omock::mockPerson(n = 4, seed = 1) |>
+    omock::mockObservationPeriod(seed = 1) |>
     omock::mockCohort(name = c("cohort1"), numberCohorts = 5, seed = 2)
   cdm <- cdm_local |> copyCdm()
 
@@ -48,9 +48,9 @@ test_that("subsetCohort works", {
 test_that("codelist works", {
   testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4) |>
-    omock::mockObservationPeriod() |>
-    omock::mockCohort()
+    omock::mockPerson(n = 4,seed = 1) |>
+    omock::mockObservationPeriod(seed = 1) |>
+    omock::mockCohort(seed = 1)
   cdm_local$concept <- dplyr::tibble(
     "concept_id" = c(1, 2, 3),
     "concept_name" = c("my concept 1", "my concept 2", "my concept 3"),
@@ -97,8 +97,8 @@ test_that("codelist works", {
 test_that("Expected behaviour", {
   testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4) |>
-    omock::mockObservationPeriod() |>
+    omock::mockPerson(n = 4,seed = 1) |>
+    omock::mockObservationPeriod(seed = 1) |>
     omock::mockCohort(name = c("cohort1"), numberCohorts = 5, seed = 2)
   cdm <- cdm_local |> copyCdm()
 
