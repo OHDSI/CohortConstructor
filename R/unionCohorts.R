@@ -68,15 +68,17 @@ unionCohorts <- function(cohort,
   tmpTable  <- omopgenerics::uniqueTableName()
   unionedCohort <- cohort |>
     dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>
-    joinOverlap(name = name, by = "subject_id", gap = gap) |>
+    joinOverlap(name = tmpTable,
+                by = "subject_id",
+                gap = gap) |>
     dplyr::mutate(cohort_definition_id = 1L) |>
+    dplyr::relocate(dplyr::all_of(omopgenerics::cohortColumns("cohort"))) |>
     dplyr::compute(name = tmpTable, temporary = FALSE)
   cohCodelist <- attr(cohort, "cohort_codelist")
   if (!is.null(cohCodelist)) {
     cohCodelist <- cohCodelist |> dplyr::mutate("cohort_definition_id" = 1L)
   }
   unionedCohort <- unionedCohort |>
-    dplyr::relocate(dplyr::all_of(omopgenerics::cohortColumns("cohort"))) |>
     omopgenerics::newCohortTable(
       cohortSetRef = cohSet,
       cohortAttritionRef = NULL,
@@ -91,6 +93,7 @@ unionCohorts <- function(cohort,
     cdm <- bind(cohort, unionedCohort, name = name)
   }
 
+  CDMConnector::dropTable(cdm, name = tmpTable)
 
   return(cdm[[name]])
 }
