@@ -151,7 +151,6 @@ conceptCohort <- function(cdm,
   }
 
   cli::cli_inform(c("i" = "Applying cohort requirements."))
-  browser()
   cdm[[name]] <- fulfillCohortReqs(cdm = cdm, name = name)
   cdm[[name]] <- omopgenerics::newCohortTable(table = cdm[[name]],
                                               cohortAttritionRef = NULL,
