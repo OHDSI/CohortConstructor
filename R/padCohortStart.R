@@ -28,14 +28,15 @@ padCohortStart <- function(cohort,
                            days,
                            cohortId = NULL,
                            name = tableName(cohort)) {
-
-  cdm <- omopgenerics::cdmReference(cohort)
-  ids <- omopgenerics::settings(cohort)$cohort_definition_id
-  cohortId <- validateCohortId(cohortId, settings(cohort))
+  # validate input
+  name <- omopgenerics::validateNameArgument(name, validation = "warning")
+  cohort <- omopgenerics::validateCohortArgument(cohort)
+  cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   days <- omopgenerics::assertNumeric(days, length = 1)
   days <- as.integer(days)
-  name <- omopgenerics::validateNameArgument(name)
+  cohortId <- validateCohortId(cohortId, settings(cohort))
 
+  ids <- omopgenerics::settings(cohort)$cohort_definition_id
   if(length(cohortId) < length(ids)) {
   # if only a subset of ids are provided then only update these
   cohort <- cohort %>%

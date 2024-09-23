@@ -37,14 +37,13 @@ requireDeathFlag <- function(cohort,
                              negate = FALSE,
                              name = tableName(cohort)) {
   # checks
-  name <- validateName(name)
-  assertLogical(negate, length = 1)
-  validateCohortTable(cohort)
-  cdm <- omopgenerics::cdmReference(cohort)
-  validateCDM(cdm)
+  name <- omopgenerics::validateNameArgument(name, validation = "warning")
+  cohort <- omopgenerics::validateCohortArgument(cohort)
   validateCohortColumn(indexDate, cohort, class = "Date")
-  ids <- omopgenerics::settings(cohort)$cohort_definition_id
+  cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   cohortId <- validateCohortId(cohortId, settings(cohort))
+  window <- omopgenerics::validateWindowArgument(window)
+  omopgenerics::assertLogical(negate, length = 1)
 
   cols <- unique(
     c(
@@ -56,13 +55,8 @@ requireDeathFlag <- function(cohort,
     )
   )
 
-  if (is.list(window)) {
-    window_start <- window[[1]][1]
-    window_end <- window[[1]][2]
-  } else {
-    window_start <- window[1]
-    window_end <- window[2]
-  }
+  window_start <- window[[1]][1]
+  window_end <- window[[1]][2]
 
   subsetCohort <- cohort %>%
     dplyr::select(dplyr::all_of(.env$cols)) %>%

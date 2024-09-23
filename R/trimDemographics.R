@@ -26,9 +26,10 @@ trimDemographics <- function(cohort,
                              minPriorObservation = NULL,
                              minFutureObservation = NULL,
                              name = tableName(cohort)) {
-  # initial validation
-  cohort <- validateCohortTable(cohort, FALSE)
-  ids <- settings(cohort)$cohort_definition_id
+  # checks
+  name <- omopgenerics::validateNameArgument(name, validation = "warning")
+  cohort <- omopgenerics::validateCohortArgument(cohort)
+  cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   cohortId <- validateCohortId(cohortId, settings(cohort))
   ageRange <- validateDemographicRequirements(
     ageRange = ageRange,
@@ -37,9 +38,8 @@ trimDemographics <- function(cohort,
     minFutureObservation = minFutureObservation,
     null = TRUE
   )
-  name <- validateName(name)
 
-  cdm <- omopgenerics::cdmReference(cohort)
+  ids <- settings(cohort)$cohort_definition_id
 
   # replace age Inf to avoid potential sql issues
   for (j in seq_along(ageRange)) {

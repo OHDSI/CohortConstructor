@@ -38,15 +38,14 @@ requireConceptIntersect <- function(cohort,
                                     censorDate = NULL,
                                     name = tableName(cohort)) {
   # checks
-  name <- validateName(name)
-  validateCohortTable(cohort)
-  cdm <- omopgenerics::cdmReference(cohort)
-  validateCDM(cdm)
+  name <- omopgenerics::validateNameArgument(name, validation = "warning")
+  cohort <- omopgenerics::validateCohortArgument(cohort)
   validateCohortColumn(indexDate, cohort, class = "Date")
-  assertList(conceptSet)
-  ids <- omopgenerics::settings(cohort)$cohort_definition_id
+  cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
+  window <- omopgenerics::validateWindowArgument(window)
   cohortId <- validateCohortId(cohortId, settings(cohort))
   intersections <- validateIntersections(intersections)
+  conceptSet <- omopgenerics::validateConceptSetArgument(conceptSet, cdm)
 
   lower_limit <- as.integer(intersections[[1]])
   upper_limit <- intersections[[2]]
@@ -63,13 +62,8 @@ requireConceptIntersect <- function(cohort,
     )
   )
 
-  if (is.list(window)) {
-    window_start <- window[[1]][1]
-    window_end <- window[[1]][2]
-  } else {
-    window_start <- window[1]
-    window_end <- window[2]
-  }
+  window_start <- window[[1]][1]
+  window_end <- window[[1]][2]
 
   if (length(conceptSet) > 1) {
     cli::cli_abort("We currently suport 1 concept set.")

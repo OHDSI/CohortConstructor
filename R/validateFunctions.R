@@ -1,17 +1,3 @@
-validateCDM <- function(cdm) {
-  if (!isTRUE(inherits(cdm, "cdm_reference"))) {
-    cli::cli_abort("cohort must be part of a cdm reference")
-  }
-  return(invisible(cdm))
-}
-
-validateCdm <- function(cdm) {
-  if (!isTRUE(inherits(cdm, "cdm_reference"))) {
-    cli::cli_abort("cdm must be a cdm_reference object.")
-  }
-  return(invisible(cdm))
-}
-
 validateCohortTable <- function(cohort, dropExtraColumns = FALSE) {
   if (!"cohort_table" %in% class(cohort) ||
     !all(
@@ -52,7 +38,7 @@ validateCohortTable <- function(cohort, dropExtraColumns = FALSE) {
 
 validateCohortColumn <- function(columns, cohort, class = NULL) {
   for (column in columns) {
-    assertCharacter(column)
+    omopgenerics::assertCharacter(column)
     if (!column %in% colnames(cohort)) {
       cli::cli_abort("{column} must be a column in the cohort table.")
     }
@@ -68,7 +54,7 @@ validateCohortColumn <- function(columns, cohort, class = NULL) {
   return(invisible(columns))
 }
 
-validateCohortId <- function(cohortId, set) {
+validateCohortId <- function(cohortId, set, call = parent.frame()) {
   # NULL
   if (is.null(cohortId)) {
     cohortId <- set$cohort_definition_id
@@ -80,24 +66,24 @@ validateCohortId <- function(cohortId, set) {
     indNot <- !cohortIdIn %in% set$cohort_name
     if (sum(indNot) > 0) {
       if (sum(indNot) == length(cohortIdIn)) {
-        cli::cli_abort("No valid cohortId supplied.")
+        cli::cli_abort("No valid cohortId supplied.", call = call)
       } else {
         cli::cli_warn(
-          "{paste0(cohortIdIn[indNot], collapse = ', ')} {?is/are} not in the cohort table and won't be used."
+          "{paste0(cohortIdIn[indNot], collapse = ', ')} {?is/are} not in the cohort table and won't be used.", call = call
         )
       }
     }
 
   # Numeric
   } else if (is.numeric(cohortId)) {
-    assertNumeric(cohortId, null = TRUE, integerish = TRUE)
+    omopgenerics::assertNumeric(cohortId, null = TRUE, integerish = TRUE)
     indNot <- !cohortId %in% set$cohort_definition_id
     if (sum(indNot) > 0) {
       if (sum(indNot) == length(cohortId)) {
-        cli::cli_abort("No valid cohort ids supplied.")
+        cli::cli_abort("No valid cohort ids supplied.", call = call)
       } else {
         cli::cli_warn(
-          "{paste0(cohortId[indNot], collapse = ', ')} {?is/are} not in the cohort table and won't be used."
+          "{paste0(cohortId[indNot], collapse = ', ')} {?is/are} not in the cohort table and won't be used.", call = call
         )
         cohortId <- cohortId[!indNot]
       }
@@ -105,7 +91,7 @@ validateCohortId <- function(cohortId, set) {
 
   # Anything else
   } else {
-    cli::cli_abort("{.strong cohortId} must be 1) a numeric vector indicating which `cohort_deifnition_id`, 2) a character vector indicating which `cohort_name`, or 3) NULL to use all cohorts in the table.")
+    cli::cli_abort("{.strong cohortId} must be 1) a numeric vector indicating which `cohort_deifnition_id`, 2) a character vector indicating which `cohort_name`, or 3) NULL to use all cohorts in the table.", call = call)
   }
   return(cohortId)
 }
@@ -122,36 +108,7 @@ validateDateRange <- function(dateRange) {
       cli::cli_abort("First date in dateRange cannot be after the second")
     }
   }
-}
-
-validateName <- function(name) {
-  em <- c(
-    "x" = "{name} it is not a valid value for name.",
-    "i" = "It must be:",
-    "*" = "lowercase character vector of length 1",
-    "*" = "NA or NULL values are not allowed"
-  )
-  if (!is.character(name) || length(name) != 1 || is.na(name)) {
-    cli::cli_abort(em)
-  }
-  if (tolower(name) != name) {
-    cli::cli_abort(em)
-  }
-  return(invisible(name))
-}
-
-validateConceptSet <- function(conceptSet) {
-  # while is.list does not work for tibbles:
-  if (!"list" %in% class(conceptSet)) {
-    cli::cli_abort(
-      "{substitute(conceptSet)} must be a list; it can not contain NA; it has to be named; elements must have class: numeric."
-    )
-  }
-  omopgenerics::newCodelist(conceptSet)
-}
-
-validateGap <- function(gap) {
-  assertNumeric(gap, integerish = TRUE, min = 0)
+  return(invisible(dateRange))
 }
 
 validateDemographicRequirements <- function(ageRange,
@@ -164,7 +121,7 @@ validateDemographicRequirements <- function(ageRange,
     !is.null(ageRange)) {
     ageRange <- list(ageRange)
   }
-  assertList(ageRange, class = "numeric", null = null)
+  omopgenerics::assertList(ageRange, class = "numeric", null = null)
   if (!is.null(ageRange)) {
     for (i in seq_along(ageRange)) {
       if (length(ageRange[[i]]) != 2) {
@@ -180,7 +137,7 @@ validateDemographicRequirements <- function(ageRange,
   }
 
   # sex:
-  assertCharacter(sex, null = null)
+  omopgenerics::assertCharacter(sex, null = null)
   if (!all(sex %in% c("Male", "Female", "Both")) && !is.null(sex)) {
     cli::cli_abort("`sex` must be from: 'Male', 'Female', and 'Both'.")
   }
@@ -191,7 +148,7 @@ validateDemographicRequirements <- function(ageRange,
       cli::cli_abort("`minPriorObservation` cannot be infinite.")
     }
   }
-  assertNumeric(
+  omopgenerics::assertNumeric(
     minPriorObservation,
     integerish = TRUE,
     min = 0,
@@ -203,7 +160,7 @@ validateDemographicRequirements <- function(ageRange,
       cli::cli_abort("`minFutureObservation` cannot be infinite.")
     }
   }
-  assertNumeric(
+  omopgenerics::assertNumeric(
     minFutureObservation,
     integerish = TRUE,
     min = 0,
@@ -214,7 +171,7 @@ validateDemographicRequirements <- function(ageRange,
 }
 
 validateStrata <- function(strata, cohort) {
-  assertList(strata, class = "character")
+  omopgenerics::assertList(strata, class = "character")
   colsCohort <- colnames(cohort)
   colsStrata <- unique(unlist(strata))
   misisngCols <- colsStrata[!colsStrata %in% colsCohort]
@@ -225,7 +182,7 @@ validateStrata <- function(strata, cohort) {
 }
 
 validateValueAsNumber <- function(valueAsNumber) {
-  assertList(valueAsNumber,
+  omopgenerics::assertList(valueAsNumber,
     named = TRUE,
     class = "numeric",
     null = TRUE
@@ -243,13 +200,10 @@ validateValueAsNumber <- function(valueAsNumber) {
 }
 
 validateN <- function(n) {
-  assertNumeric(n,
-    integerish = TRUE,
-    min = 0,
-    length = 1
+  omopgenerics::assertNumeric(
+    n, integerish = TRUE, min = 0, length = 1, max = 9999999999999
   )
 }
-
 
 validateIntersections <- function(intersections) {
   if (length(intersections) == 1) {
@@ -270,5 +224,5 @@ validateIntersections <- function(intersections) {
     cli::cli_abort("First value for intersections cannot be Inf")
   }
 
-  intersections
+  return(invisible(intersections))
 }

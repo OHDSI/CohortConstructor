@@ -37,12 +37,11 @@ requireCohortIntersect <- function(cohort,
                                    censorDate = NULL,
                                    name = tableName(cohort)) {
   # checks
-  name <- validateName(name)
-  validateCohortTable(cohort)
-  cdm <- omopgenerics::cdmReference(cohort)
-  validateCDM(cdm)
+  name <- omopgenerics::validateNameArgument(name, validation = "warning")
+  cohort <- omopgenerics::validateCohortArgument(cohort)
   validateCohortColumn(indexDate, cohort, class = "Date")
-  ids <- omopgenerics::settings(cohort)$cohort_definition_id
+  cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
+  window <- omopgenerics::validateWindowArgument(window)
   cohortId <- validateCohortId(cohortId, settings(cohort))
   intersections <- validateIntersections(intersections)
 
@@ -50,7 +49,6 @@ requireCohortIntersect <- function(cohort,
   upper_limit <- intersections[[2]]
   upper_limit[is.infinite(upper_limit)] <- as.integer(999999)
   upper_limit <- as.integer(upper_limit)
-
 
   cols <- unique(
     c(
@@ -62,13 +60,8 @@ requireCohortIntersect <- function(cohort,
     )
   )
 
-  if (is.list(window)) {
-    window_start <- window[[1]][1]
-    window_end <- window[[1]][2]
-  } else {
-    window_start <- window[1]
-    window_end <- window[2]
-  }
+  window_start <- window[[1]][1]
+  window_end <- window[[1]][2]
 
   if (length(targetCohortTable) > 1) {
     cli::cli_abort("Only one target cohort table is currently supported")

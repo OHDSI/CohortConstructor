@@ -4,7 +4,7 @@ test_that("unionCohorts works", {
     omock::mockObservationPeriod(seed = 1) |>
     omock::mockCohort(name = c("cohort1"), numberCohorts = 4, seed = 1)
   cdm <- cdm_local |> copyCdm()
-  # simple example
+   # simple example
   cdm$cohort2 <- unionCohorts(cdm$cohort1, name = "cohort2")
   expect_true(all(
     cdm$cohort2 %>% dplyr::pull("cohort_start_date") %>% sort() ==

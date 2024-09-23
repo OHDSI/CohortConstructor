@@ -133,7 +133,7 @@ test_that("adding days to cohort start", {
     cohortId = 99,
     name = "my_cohort_1"
   ))
-  expect_error(padCohortStart(
+  expect_warning(padCohortStart(
     cdm$my_cohort,
     days = 2,
     cohortId = 1,

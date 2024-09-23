@@ -29,11 +29,9 @@ exitAtObservationEnd <- function(cohort,
                                  cohortId = NULL,
                                  name = tableName(cohort)) {
   # checks
-  name <- validateName(name)
   cohort <- validateCohortTable(cohort, dropExtraColumns = TRUE)
-  cdm <- omopgenerics::cdmReference(cohort)
-  validateCDM(cdm)
-  ids <- omopgenerics::settings(cohort)$cohort_definition_id
+  name <- omopgenerics::validateNameArgument(name, validation = "warning")
+  cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   cohortId <- validateCohortId(cohortId, settings(cohort))
 
   # create new cohort
@@ -87,14 +85,11 @@ exitAtDeath <- function(cohort,
                         requireDeath = FALSE,
                         name = tableName(cohort)) {
   # checks
-  name <- validateName(name)
+  name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cohort <- validateCohortTable(cohort, dropExtraColumns = TRUE)
-  cdm <- omopgenerics::cdmReference(cohort)
-  validateCDM(cdm)
-  ids <- omopgenerics::settings(cohort)$cohort_definition_id
+  cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   cohortId <- validateCohortId(cohortId, settings(cohort))
-  assertLogical(requireDeath, length = 1)
-
+  omopgenerics::assertLogical(requireDeath, length = 1)
 
   # create new cohort
   newCohort <- cohort |>

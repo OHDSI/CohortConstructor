@@ -23,7 +23,7 @@
 #'
 #' cdm$my_cohort <- cdm$cohort1 |>
 #'   addAge(ageGroup = list("child" = c(0, 17), "adult" = c(18, Inf))) |>
-#'   addSex() |>
+#'   addSex(name = "my_cohort") |>
 #'   stratifyCohorts(
 #'     strata = list("sex", c("sex", "age_group")), name = "my_cohort"
 #'   )
@@ -33,19 +33,19 @@
 #' settings(cdm$my_cohort)
 #'
 #' attrition(cdm$my_cohort)
-#' }
+#'}
 stratifyCohorts <- function(cohort,
                             strata,
                             cohortId = NULL,
                             removeStrata = TRUE,
                             name = tableName(cohort)) {
-  # initial checks
-  cohort <- validateCohortTable(cohort = cohort)
+  # checks
+  name <- omopgenerics::validateNameArgument(name, validation = "warning")
+  cohort <- omopgenerics::validateCohortArgument(cohort)
+  cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   cohortId <- validateCohortId(cohortId, settings(cohort))
   strata <- validateStrata(strata, cohort)
-  name <- validateName(name)
-
-  cdm <- omopgenerics::cdmReference(cohort)
+  omopgenerics::assertLogical(removeStrata, length = 1)
 
   if (length(strata) == 0 ||
     sum(cohortCount(cohort)$number_records) == 0) {

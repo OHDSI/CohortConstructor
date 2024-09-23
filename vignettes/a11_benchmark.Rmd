@@ -97,7 +97,7 @@ CohortConstructor:::benchmarkData$omop |>
   ) |>
   arrange(.data$`OMOP table`) |>
   pivot_wider(names_from = c("cdm_name"), values_from = c("number_records"), names_prefix = "[header]Database\n[header_level]") |>
-  visOmopResults::gtTable() |>
+  visOmopResults::formatTable() |>
   tab_style(style = list(cell_fill(color = "#e1e1e1"), cell_text(weight = "bold")),
             locations = cells_column_labels()) |>
   tab_style(style = list(cell_text(weight = "bold")),
@@ -119,7 +119,7 @@ The following table displays the number of records and subjects for each cohort 
 ```{r}
 CohortConstructor:::benchmarkData$details |>
   filterSettings(result_type == "cohort_count") |>
-  tidy(addSettings = FALSE) |>
+  tidySummarisedResult(settingsColumns = character()) |>
   select(-variable_level, - result_id) |>
   distinct() |>
   filter(grepl("cc_|atlas_", cohort_name)) |>
@@ -151,7 +151,7 @@ CohortConstructor:::benchmarkData$details |>
   arrange(`Cohort name`) |>
   select(-cohort_name) |>
   pivot_wider(names_from = c("Tool", "variable_name"), values_from = c("count"), names_prefix = "[header]Tool\n[header_level]", names_sep = "\n[header_level]") %>%
-  visOmopResults::gtTable(groupColumn = "cdm_name") |>
+  visOmopResults::formatTable(groupColumn = "cdm_name") |>
   tab_style(style = list(cell_fill(color = "#e1e1e1"), cell_text(weight = "bold")),
             locations = cells_column_labels()) |>
   tab_style(style = list(cell_text(weight = "bold")),

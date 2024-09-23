@@ -41,7 +41,7 @@ cdm <- mockCohortConstructor()
 
 cdm$my_cohort <- cdm$cohort1 |>
   addAge(ageGroup = list("child" = c(0, 17), "adult" = c(18, Inf))) |>
-  addSex() |>
+  addSex(name = "my_cohort") |>
   stratifyCohorts(
     strata = list("sex", c("sex", "age_group")), name = "my_cohort"
   )

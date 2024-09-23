@@ -26,10 +26,11 @@ sampleCohorts <- function(cohort,
                           n,
                           name = tableName(cohort)) {
   # checks
-  cohort <- validateCohortTable(cohort, TRUE)
+  name <- omopgenerics::validateNameArgument(name, validation = "warning")
+  cohort <- omopgenerics::validateCohortArgument(cohort)
+  cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   cohortId <- validateCohortId(cohortId, settings(cohort))
   n <- validateN(n)
-  name <- validateName(name)
 
   cohort <- cohort |>
     dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>

@@ -101,14 +101,13 @@ exitAtColumnDate <- function(cohort,
                              name,
                              exit) {
   # checks
-  name <- validateName(name)
-  validateCohortTable(cohort)
-  cdm <- omopgenerics::cdmReference(cohort)
-  validateCDM(cdm)
-  ids <- omopgenerics::settings(cohort)$cohort_definition_id
+  name <- omopgenerics::validateNameArgument(name, validation = "warning")
+  cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
+  cohort <- omopgenerics::validateCohortArgument(cohort)
   cohortId <- validateCohortId(cohortId, settings(cohort))
-  assertLogical(returnReason, length = 1)
   validateCohortColumn(dateColumns, cohort, "Date")
+  omopgenerics::assertLogical(returnReason, length = 1)
+  ids <- omopgenerics::settings(cohort)$cohort_definition_id
 
   if (order == "first") {
     atDateFunction <- rlang::expr(min(.data$new_date_0123456789, na.rm = TRUE)) # NA always removed in SQL
