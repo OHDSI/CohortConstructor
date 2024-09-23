@@ -56,7 +56,22 @@ cohortCount(cdm$medications)
 ```
 
 ```{r}
-cdm$medications_sample <- sampleCohorts(cdm$medications,cohortId = 1, n = 100, name = "medications_sample")
+#cdm$medications_sample <- sampleCohorts(cdm$medications,cohortId = 1, n = 100, name = "medications_sample")
 
-cohortCount(cdm$medications_sample)
+#cohortCount(cdm$medications_sample)
+```
+
+```{r}
+cohort <- cdm$medications
+cohortId = 1
+n = 100
+name = "sample_medications"
+
+cohort <- validateCohortTable(cohort, TRUE)
+cohortId <- validateCohortId(cohortId, settings(cohort))
+  n <- validateN(n)
+  name <- validateName(name)
+  
+cohort <- cohort |>
+  dplyr::filter(.data$cohort_definition_id %in% .env$cohortId)
 ```
