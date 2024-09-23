@@ -27,7 +27,7 @@ people. All records of these individuals are preserved."><meta property="og:imag
     <li><a class="dropdown-item" href="../articles/a04_require_intersections.html">Requirements on Presence and Absence</a></li>
     <li><a class="dropdown-item" href="../articles/a05_update_cohort_start_end.html">Update cohort start and end dates</a></li>
     <li><a class="dropdown-item" href="../articles/a06_concatanate_cohorts.html">Concatenate Cohorts</a></li>
-    <li><a class="dropdown-item" href="../articles/a07_filter_cohorts.html">a06_filter_cohorts</a></li>
+    <li><a class="dropdown-item" href="../articles/a07_filter_cohorts.html">Filter Cohorts</a></li>
     <li><a class="dropdown-item" href="../articles/a08_split_cohorts.html">a07_split_cohorts</a></li>
     <li><a class="dropdown-item" href="../articles/a09_combine_cohorts.html">a08_combine_cohorts</a></li>
     <li><a class="dropdown-item" href="../articles/a10_match_cohorts.html">Generate a matched age and sex cohort</a></li>
@@ -66,9 +66,10 @@ people. All records of these individuals are preserved.</p>
 
 
 <dt id="arg-cohortid">cohortId<a class="anchor" aria-label="anchor" href="#arg-cohortid"></a></dt>
-<dd><p>Vector identifying which cohorts to include
-(cohort_definition_id or cohort_name). Cohorts not included will be
-removed from the cohort set.</p></dd>
+<dd><p>Vector identifying which cohorts to modify
+(cohort_definition_id or cohort_name). If NULL, all cohorts will be
+used; otherwise, only the specified cohorts will be modified, and the
+rest will remain unchanged.</p></dd>
 
 
 <dt id="arg-n">n<a class="anchor" aria-label="anchor" href="#arg-n"></a></dt>
@@ -97,15 +98,15 @@ removed from the cohort set.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    cohort_definition_id subject_id cohort_start_date cohort_end_date</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>         </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>                    1          4 1998-12-14        2002-02-14     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>                    1         15 2018-03-20        2018-04-01     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>                    1         17 2009-06-18        2013-02-01     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>                    1         38 1978-07-24        1979-07-04     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>                    1         38 1979-07-05        1982-01-31     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>                    1         52 1991-10-19        1992-12-11     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>                    1         54 2014-11-14        2016-06-22     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>                    1         57 2006-11-15        2008-07-24     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>                    1         60 1995-02-28        1995-05-06     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>                    1         60 1995-05-07        2000-07-03     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>                    1         12 2000-11-15        2013-03-04     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>                    1         13 1991-04-14        1992-10-21     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>                    1         13 1992-11-03        2000-11-27     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>                    1         22 2013-01-01        2013-03-07     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>                    1         37 1999-02-05        2002-12-01     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>                    1         50 2019-04-24        2019-05-04     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>                    1         50 2019-05-05        2019-05-07     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>                    1         50 2019-05-08        2019-06-02     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>                    1         54 2014-11-14        2016-06-22     </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ more rows</span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>

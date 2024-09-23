@@ -40,7 +40,7 @@
     <li><a class="dropdown-item" href="../articles/a04_require_intersections.html">Requirements on Presence and Absence</a></li>
     <li><a class="dropdown-item" href="../articles/a05_update_cohort_start_end.html">Update cohort start and end dates</a></li>
     <li><a class="dropdown-item" href="../articles/a06_concatanate_cohorts.html">Concatenate Cohorts</a></li>
-    <li><a class="dropdown-item" href="../articles/a07_filter_cohorts.html">a06_filter_cohorts</a></li>
+    <li><a class="dropdown-item" href="../articles/a07_filter_cohorts.html">Filter Cohorts</a></li>
     <li><a class="dropdown-item" href="../articles/a08_split_cohorts.html">a07_split_cohorts</a></li>
     <li><a class="dropdown-item" href="../articles/a09_combine_cohorts.html">a08_combine_cohorts</a></li>
     <li><a class="dropdown-item" href="../articles/a10_match_cohorts.html">Generate a matched age and sex cohort</a></li>
@@ -124,7 +124,7 @@ birthday and leave at age 65 or</p>
 <span>            median_start_age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span>, </span>
 <span>            max_start_age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Source:   SQL [1 x 3]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB v1.0.0 [unknown@Linux 6.8.0-1014-azure:R 4.4.1//tmp/RtmpIu3sM5/file1bfc64abcdeb.duckdb]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB v1.0.0 [unknown@Linux 6.8.0-1014-azure:R 4.4.1//tmp/RtmpagpSuT/file1c5c1a558bcb.duckdb]</span></span></span>
 <span><span class="co">#&gt;   min_start_age median_start_age max_start_age</span></span>
 <span><span class="co">#&gt;           <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>            17               18            18</span></span>
@@ -135,7 +135,7 @@ birthday and leave at age 65 or</p>
 <span>            median_start_age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span>, </span>
 <span>            max_start_age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Source:   SQL [1 x 3]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB v1.0.0 [unknown@Linux 6.8.0-1014-azure:R 4.4.1//tmp/RtmpIu3sM5/file1bfc64abcdeb.duckdb]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB v1.0.0 [unknown@Linux 6.8.0-1014-azure:R 4.4.1//tmp/RtmpagpSuT/file1c5c1a558bcb.duckdb]</span></span></span>
 <span><span class="co">#&gt;   min_start_age median_start_age max_start_age</span></span>
 <span><span class="co">#&gt;           <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>            31               57            65</span></span></code></pre></div>
