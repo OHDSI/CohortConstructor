@@ -85,7 +85,7 @@ measurementCohort <- function(cdm,
   # initial input validation
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cdm <- omopgenerics::validateCdmArgument(cdm)
-  conceptSet <- omopgenerics::validateConceptSet(conceptSet, cdm)
+  conceptSet <- omopgenerics::validateConceptSetArgument(conceptSet, cdm)
   omopgenerics::assertNumeric(valueAsConcept, integerish = TRUE, null = TRUE)
   validateValueAsNumber(valueAsNumber)
 
