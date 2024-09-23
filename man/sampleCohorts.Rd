@@ -9,9 +9,10 @@ sampleCohorts(cohort, cohortId = NULL, n, name = tableName(cohort))
 \arguments{
 \item{cohort}{A cohort table in a cdm reference.}
 
-\item{cohortId}{Vector identifying which cohorts to include
-(cohort_definition_id or cohort_name). Cohorts not included will be
-removed from the cohort set.}
+\item{cohortId}{Vector identifying which cohorts to modify
+(cohort_definition_id or cohort_name). If NULL, all cohorts will be
+used; otherwise, only the specified cohorts will be modified, and the
+rest will remain unchanged.}
 
 \item{n}{Number of people to be sampled for each included cohort.}
 
