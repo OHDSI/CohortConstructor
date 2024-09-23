@@ -1,9 +1,9 @@
 test_that("yearCohorts - change name", {
   testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4) |>
-    omock::mockObservationPeriod() |>
-    omock::mockCohort(name = c("cohort"))
+    omock::mockPerson(n = 4,seed = 1) |>
+    omock::mockObservationPeriod(seed = 1) |>
+    omock::mockCohort(name = c("cohort"),seed = 1)
   cdm <- cdm_local |> copyCdm()
 
   # simple example
@@ -20,11 +20,11 @@ test_that("yearCohorts - change name", {
                  target_cohort_name = "cohort_1"
                ))
   expect_true(all(cdm$cohort1 |> dplyr::pull("cohort_start_date") |> sort() ==
-      c("1997-10-22", "1998-01-01", "1999-01-01", "2001-03-30", "2002-01-01")))
+      c("1999-05-03", "2000-01-01", "2001-01-01")))
   expect_true(all(cdm$cohort1 |> dplyr::pull("cohort_end_date") |> sort() ==
-      c("1997-12-31", "1998-12-31", "1999-05-28", "2001-12-31", "2002-12-31")))
-  expect_true(all(cdm$cohort1 |> dplyr::pull("subject_id") |> sort() == c(1, 1, 4, 4, 4)))
-  expect_true(all(cdm$cohort1 |> dplyr::pull("cohort_definition_id") |> sort() == c(1:3, 5:6)))
+      c("1999-12-31", "2000-12-31", "2001-06-15")))
+  expect_true(all(cdm$cohort1 |> dplyr::pull("subject_id") |> sort() == c(2,2,2)))
+  expect_true(all(cdm$cohort1 |> dplyr::pull("cohort_definition_id") |> sort() == c(3,4,5)))
   expect_true(all(attrition(cdm$cohort1)$reason == c(
     'Initial qualifying events', 'Restrict to observations between: 1997-01-01 and 1997-12-31',
     'Initial qualifying events', 'Restrict to observations between: 1998-01-01 and 1998-12-31',
@@ -36,9 +36,9 @@ test_that("yearCohorts - change name", {
 
  # more than 1 cohort
   cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4) |>
-    omock::mockObservationPeriod() |>
-    omock::mockCohort(name = c("cohort"), numberCohorts = 3)
+    omock::mockPerson(n = 4,seed = 1) |>
+    omock::mockObservationPeriod(seed = 1) |>
+    omock::mockCohort(name = c("cohort"), numberCohorts = 3, seed = 1)
   cdm <- cdm_local |> copyCdm()
   # all cohorts
   cdm$cohort1 <- yearCohorts(cohort = cdm$cohort,
@@ -58,11 +58,11 @@ test_that("yearCohorts - change name", {
                  target_cohort_name = rep(paste0("cohort_", 1:3), 4)
                ))
   expect_true(all(cdm$cohort1 |> dplyr::pull("cohort_start_date") |> sort() ==
-                    c("2005-01-01", "2005-01-01", "2005-01-01", "2006-01-01", "2006-01-01", "2007-01-01")))
+                    c("2005-01-01", "2005-01-01", "2005-01-01", "2006-01-01", "2007-01-01")))
   expect_true(all(cdm$cohort1 |> dplyr::pull("cohort_end_date") |> sort() ==
-                    c("2005-11-23", "2005-12-31", "2005-12-31", "2006-09-27", "2006-12-31", "2007-08-06")))
-  expect_true(all(cdm$cohort1 |> dplyr::pull("subject_id") |> sort() == c(1, 1, 1, 4, 4, 4)))
-  expect_true(all(cdm$cohort1 |> dplyr::pull("cohort_definition_id") |> sort() == c(1:3, 5:6, 9)))
+                    c("2005-01-15", "2005-07-19", "2005-12-31", "2006-12-31", "2007-01-17")))
+  expect_true(all(cdm$cohort1 |> dplyr::pull("subject_id") |> sort() == c(1, 1, 1, 1, 1)))
+  expect_true(all(cdm$cohort1 |> dplyr::pull("cohort_definition_id") |> sort() == c(1, 2, 3, 6, 9)))
   expect_true(all(attrition(cdm$cohort1)$reason == c(
     'Initial qualifying events', 'Restrict to observations between: 2005-01-01 and 2005-12-31',
     'Initial qualifying events', 'Restrict to observations between: 2005-01-01 and 2005-12-31',
@@ -77,7 +77,7 @@ test_that("yearCohorts - change name", {
     'Initial qualifying events', 'Restrict to observations between: 2008-01-01 and 2008-12-31',
     'Initial qualifying events', 'Restrict to observations between: 2008-01-01 and 2008-12-31'
   )))
-  expect_true(all(cohortCount(cdm$cohort1)$number_records == c(1, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0)))
+  expect_true(all(cohortCount(cdm$cohort1)$number_records == c(1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0)))
 
   # just 1 cohort
   cdm$cohort1 <- yearCohorts(cohort = cdm$cohort,
@@ -97,7 +97,7 @@ test_that("yearCohorts - change name", {
   expect_true(all(cdm$cohort1 |> dplyr::pull("cohort_start_date") |> sort() ==
                     c("2005-01-01")))
   expect_true(all(cdm$cohort1 |> dplyr::pull("cohort_end_date") |> sort() ==
-                    c("2005-11-23")))
+                    c("2005-07-19")))
   expect_true(all(cdm$cohort1 |> dplyr::pull("subject_id") |> sort() == 1))
   expect_true(all(cdm$cohort1 |> dplyr::pull("cohort_definition_id") |> sort() == 1))
   expect_true(all(attrition(cdm$cohort1)$reason == c(
@@ -121,15 +121,15 @@ test_that("yearCohorts - change name", {
 test_that("yearCohorts - keep name", {
   testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4) |>
-    omock::mockObservationPeriod() |>
-    omock::mockCohort(name = c("cohort"))
+    omock::mockPerson(n = 4, seed = 1) |>
+    omock::mockObservationPeriod(seed = 1) |>
+    omock::mockCohort(name = c("cohort"), seed = 1)
   cdm <- cdm_local |> copyCdm()
 
   # simple example
   cdm$cohort <- yearCohorts(cohort = cdm$cohort,
                              years = 1997:2002,
-                             cohortId = NULL)
+                             cohortId = settings(cdm$cohort)$cohort_name)
   expect_equal(settings(cdm$cohort) |> dplyr::arrange(.data$cohort_definition_id),
                dplyr::tibble(
                  cohort_definition_id = 1:6,
@@ -139,11 +139,11 @@ test_that("yearCohorts - keep name", {
                  target_cohort_name = "cohort_1"
                ))
   expect_true(all(cdm$cohort |> dplyr::pull("cohort_start_date") |> sort() ==
-                    c("1997-10-22", "1998-01-01", "1999-01-01", "2001-03-30", "2002-01-01")))
+                    c("1999-05-03", "2000-01-01", "2001-01-01")))
   expect_true(all(cdm$cohort |> dplyr::pull("cohort_end_date") |> sort() ==
-                    c("1997-12-31", "1998-12-31", "1999-05-28", "2001-12-31", "2002-12-31")))
-  expect_true(all(cdm$cohort |> dplyr::pull("subject_id") |> sort() == c(1, 1, 4, 4, 4)))
-  expect_true(all(cdm$cohort |> dplyr::pull("cohort_definition_id") |> sort() == c(1:3, 5:6)))
+                    c("1999-12-31", "2000-12-31", "2001-06-15")))
+  expect_true(all(cdm$cohort |> dplyr::pull("subject_id") |> sort() == c(2, 2, 2)))
+  expect_true(all(cdm$cohort |> dplyr::pull("cohort_definition_id") |> sort() == c(3, 4, 5)))
   expect_true(all(attrition(cdm$cohort)$reason == c(
     'Initial qualifying events', 'Restrict to observations between: 1997-01-01 and 1997-12-31',
     'Initial qualifying events', 'Restrict to observations between: 1998-01-01 and 1998-12-31',
@@ -155,9 +155,9 @@ test_that("yearCohorts - keep name", {
 
   # more than 1 cohort
   cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4) |>
-    omock::mockObservationPeriod() |>
-    omock::mockCohort(name = c("cohort"), numberCohorts = 3)
+    omock::mockPerson(n = 4, seed = 1) |>
+    omock::mockObservationPeriod(seed = 1) |>
+    omock::mockCohort(name = c("cohort"), numberCohorts = 3, seed = 1)
   cdm <- cdm_local |> copyCdm()
 
   # just 1 cohort
@@ -177,7 +177,7 @@ test_that("yearCohorts - keep name", {
   expect_true(all(cdm$cohort |> dplyr::pull("cohort_start_date") |> sort() ==
                     c("2005-01-01")))
   expect_true(all(cdm$cohort |> dplyr::pull("cohort_end_date") |> sort() ==
-                    c("2005-11-23")))
+                    c("2005-07-19")))
   expect_true(all(cdm$cohort |> dplyr::pull("subject_id") |> sort() == c(1)))
   expect_true(all(cdm$cohort |> dplyr::pull("cohort_definition_id") |> sort() == c(1)))
   expect_true(all(attrition(cdm$cohort)$reason == c(

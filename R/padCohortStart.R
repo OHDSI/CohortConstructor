@@ -8,11 +8,10 @@
 #' * If subtracting day means that cohort start would be before observation
 #' period start then the cohort entry will be dropped.
 #'
-#' @param cohort A cohort table in a cdm reference.
+#' @inheritParams cohortDoc
+#' @inheritParams cohortIdModifyDoc
+#' @inheritParams nameDoc
 #' @param days Number of day to add to the cohort start date.
-#' @param cohortId If NULL all cohorts will be updated. If a particular set of
-#' cohort IDs are given then only the corresponding cohorts will be updated.
-#' @param name Name of the new cohort table.
 #'
 #' @return Cohort table
 #' @export
@@ -32,7 +31,7 @@ padCohortStart <- function(cohort,
 
   cdm <- omopgenerics::cdmReference(cohort)
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
-  cohortId <- validateCohortId(cohortId, ids)
+  cohortId <- validateCohortId(cohortId, settings(cohort))
   days <- omopgenerics::assertNumeric(days, length = 1)
   days <- as.integer(days)
   name <- omopgenerics::validateNameArgument(name)

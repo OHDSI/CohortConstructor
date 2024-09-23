@@ -1,7 +1,7 @@
 test_that("sampleCohort subsetting one cohort", {
   cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4) |>
-    omock::mockObservationPeriod() |>
+    omock::mockPerson(n = 4, seed = 1) |>
+    omock::mockObservationPeriod(seed = 1) |>
     omock::mockCohort(name = c("cohort1"), numberCohorts = 5, seed = 2)
   cdm <- CDMConnector::copyCdmTo(con = DBI::dbConnect(duckdb::duckdb()),
                                  cdm = cdm_local,
@@ -29,19 +29,19 @@ test_that("sampleCohort subsetting one cohort", {
 
 test_that("sampleCohort subsetting multiple cohorts", {
   cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 10) |>
-    omock::mockObservationPeriod() |>
+    omock::mockPerson(n = 10,seed = 1) |>
+    omock::mockObservationPeriod(seed = 1) |>
     omock::mockCohort(name = c("cohort1"), numberCohorts = 3, seed = 2)
   cdm <- CDMConnector::copyCdmTo(con = DBI::dbConnect(duckdb::duckdb()),
                                  cdm = cdm_local,
                                  schema = "main",
                                  overwrite = TRUE)
 
-  cdm$cohort1 <- sampleCohorts(cdm$cohort1, n = 5)
+  cdm$cohort1 <- sampleCohorts(cdm$cohort1, n = 4)
   expect_true(all(attrition(cdm$cohort1) |>
-                dplyr::filter(reason == "Sample 5 individuals") |>
+                dplyr::filter(reason == "Sample 4 individuals") |>
                 dplyr::arrange(cohort_definition_id) |>
-                dplyr::pull("number_subjects") == c(5,5,4)))
+                dplyr::pull("number_subjects") == c(4,4,4)))
 
   # Subset it again but only cohorts 1 and 3
   cdm$cohort2 <- sampleCohorts(cdm$cohort1, c(1,3), 4, name = "cohort2")
@@ -53,15 +53,15 @@ test_that("sampleCohort subsetting multiple cohorts", {
   expect_true(all(attrition(cdm$cohort2) |>
                 dplyr::filter(reason == "Sample 4 individuals") |>
                 dplyr::arrange(cohort_definition_id) |>
-                dplyr::pull("excluded_subjects") == c(1,0)))
+                dplyr::pull("excluded_subjects") == c(1,0,1,2,0)))
 
   PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("sampleCohort subsetting all cohorts", {
   cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4) |>
-    omock::mockObservationPeriod() |>
+    omock::mockPerson(n = 4,seed = 1) |>
+    omock::mockObservationPeriod(seed = 1) |>
     omock::mockCohort(name = c("cohort1"), numberCohorts = 3, seed = 2)
   cdm <- CDMConnector::copyCdmTo(con = DBI::dbConnect(duckdb::duckdb()),
                                  cdm = cdm_local,
@@ -71,6 +71,8 @@ test_that("sampleCohort subsetting all cohorts", {
   test1 <- sampleCohorts(cdm$cohort1, n = 2)
   test2 <- sampleCohorts(cdm$cohort1, cohortId = c(1,2,3), n = 2)
   expect_true(all.equal(test1, test2))
+  test3 <- sampleCohorts(cdm$cohort1, cohortId = paste0("cohort_", c(1,2,3)), n = 2)
+  expect_true(all.equal(test1, test3))
 
   PatientProfiles::mockDisconnect(cdm)
 })

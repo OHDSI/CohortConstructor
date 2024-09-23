@@ -9,7 +9,7 @@ intersectCohorts(
   cohort,
   cohortId = NULL,
   gap = 0,
-  mutuallyExclusive = FALSE,
+  returnNonOverlappingCohorts = FALSE,
   keepOriginalCohorts = FALSE,
   name = tableName(cohort)
 )
@@ -17,20 +17,21 @@ intersectCohorts(
 \arguments{
 \item{cohort}{A cohort table in a cdm reference.}
 
-\item{cohortId}{IDs of the cohorts to include. If NULL all cohorts will be
-considered. Cohorts not included will be removed from the cohort set.}
+\item{cohortId}{Vector identifying which cohorts to include
+(cohort_definition_id or cohort_name). Cohorts not included will be
+removed from the cohort set.}
 
 \item{gap}{Number of days between two subsequent cohort entries to be merged
 in a single cohort record.}
 
-\item{mutuallyExclusive}{Whether the generated cohorts are mutually
+\item{returnNonOverlappingCohorts}{Whether the generated cohorts are mutually
 exclusive or not.}
 
 \item{keepOriginalCohorts}{If TRUE the original cohorts and the newly
 created intersection cohort will be returned. If FALSE only the new cohort
 will be returned.}
 
-\item{name}{Name of the new cohort with the demographic requirements.}
+\item{name}{Name of the new cohort table created in the cdm object.}
 }
 \value{
 A cohort table.

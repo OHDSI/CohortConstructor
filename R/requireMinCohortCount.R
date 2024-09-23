@@ -2,15 +2,14 @@
 #' Filter cohorts to keep only records for those with a minimum amount of subjects
 #'
 #' @description
-#' `requireMinimumCohortCount()` filters an existing cohort table, keeping only
+#' `requireMinCohortCount()` filters an existing cohort table, keeping only
 #' records from cohorts with a minimum number of individuals
 #'
-#' @param cohort A cohort table in a cdm reference.
-#' @param cohortId IDs of the cohorts to apply minimum cell count requirement.
-#' If NULL it will be applied to all cohorts.
+#' @inheritParams cohortDoc
+#' @inheritParams cohortIdModifyDoc
+#' @inheritParams nameDoc
 #' @param minCohortCount The minimum count of sbjects for a cohort to be
 #' included.
-#' @param name Name of the new cohort with the demographic requirements.
 #'
 #' @return Cohort table
 #'
@@ -23,15 +22,15 @@
 #' cdm <- mockCohortConstructor(nPerson = 100)
 #'
 #' cdm$cohort1 |>
-#' requireMinimumCohortCount(minCohortCount = 5)
+#' requireMinCohortCount(minCohortCount = 5)
 #' }
-requireMinimumCohortCount <- function(cohort,
+requireMinCohortCount <- function(cohort,
                                       cohortId = NULL,
                                       minCohortCount = 5,
                                       name = tableName(cohort)){
 
   cdm <- omopgenerics::cdmReference(cohort)
-  cohortId <- validateCohortId(cohortId, settings(cohort)$cohort_definition_id)
+  cohortId <- validateCohortId(cohortId, settings(cohort))
   name <- validateName(name)
   minCohortCount <- validateN(minCohortCount)
 

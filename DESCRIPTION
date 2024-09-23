@@ -33,7 +33,7 @@ Imports:
     glue,
     magrittr,
     omopgenerics (>= 0.2.1),
-    PatientProfiles (>= 1.1.0),
+    PatientProfiles (>= 1.2.0),
     purrr,
     rlang,
     tidyr,
@@ -55,12 +55,15 @@ Suggests:
     odbc,
     CohortCharacteristics,
     ggplot2,
-    DiagrammeR
+    DiagrammeR,
+    visOmopResults,
+    gt,
+    scales,
+    here,
+    ggpubr
 Config/testthat/edition: 3
 Config/testthat/parallel: true
 VignetteBuilder: knitr
 Depends: 
     R (>= 4.1)
 URL: https://ohdsi.github.io/CohortConstructor/
-Remotes:
-    darwin-eu-dev/PatientProfiles

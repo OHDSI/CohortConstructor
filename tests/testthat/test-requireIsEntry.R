@@ -1,9 +1,9 @@
 test_that("test restrict to first entry works", {
   cdm <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 3) |>
-    omock::mockObservationPeriod() |>
-    omock::mockCohort(name = "cohort1", numberCohorts = 1, recordPerson = 2) |>
-    omock::mockCohort(name = "cohort2", numberCohorts = 2, recordPerson = 2)
+    omock::mockPerson(n = 3, seed = 1) |>
+    omock::mockObservationPeriod(seed = 1) |>
+    omock::mockCohort(name = "cohort1", numberCohorts = 1, recordPerson = 2,seed = 1) |>
+    omock::mockCohort(name = "cohort2", numberCohorts = 2, recordPerson = 2,seed = 1)
 
   expect_true(all(cdm$cohort1 |> CohortConstructor::requireIsFirstEntry() |>
                     dplyr::pull(cohort_start_date) == c("2001-05-29", "1999-07-30", "2015-01-23")))
@@ -13,19 +13,19 @@ test_that("test restrict to first entry works", {
 
   expect_true(all(cdm$cohort2 |> CohortConstructor::requireIsFirstEntry() |>
                     dplyr::pull(cohort_start_date) ==
-                    c("2001-05-29", "1999-07-30", "2015-01-23", "2002-10-09", "1999-04-16")))
+                    c("2001-05-29", "1999-07-30", "2015-01-23", "2002-10-09", "1999-04-16", "2015-02-22")))
 
   expect_true(all(cdm$cohort2 |> CohortConstructor::requireIsFirstEntry() |>
-                    dplyr::pull(subject_id) == c(1:3, 1:2)))
+                    dplyr::pull(subject_id) == c(1:3, 1:3)))
 
 })
 
 test_that("requireIsFirstEntry, cohortIds & name arguments", {
   testthat::skip_on_cran()
   cdm <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 3) |>
-    omock::mockObservationPeriod() |>
-    omock::mockCohort(numberCohorts = 3, recordPerson = 2)
+    omock::mockPerson(n = 3,seed = 1) |>
+    omock::mockObservationPeriod(seed = 1) |>
+    omock::mockCohort(numberCohorts = 3, recordPerson = 2,seed = 1)
 
   expect_no_error(
     cdm$new_cohort <- CohortConstructor::requireIsFirstEntry(
@@ -45,13 +45,13 @@ test_that("requireIsFirstEntry, cohortIds & name arguments", {
                dplyr::tibble(cohort_definition_id = 1, number_records = 3, number_subjects = 3))
   expect_true(all(cdm$new_cohort |>  dplyr::pull(cohort_start_date) ==
                     c("2001-05-29", "1999-07-30", "2015-01-23", "2002-10-09", "2003-09-12",
-                      "1999-04-16", "2000-03-09", "2000-05-05", "2015-02-22", "2015-03-24",
-                      "2002-09-28", "1999-08-25", "1999-12-14", "1999-12-24")))
+                      "1999-04-16", "2000-03-09", "2000-05-05", "2015-02-22", "2002-09-28",
+                      "1999-08-25", "1999-12-14", "1999-12-24", "2000-04-02", "2000-08-11")))
   expect_true(all(cdm$new_cohort |> dplyr::pull(cohort_end_date) ==
                     c("2002-10-23", "2001-10-02", "2015-02-16", "2003-09-11", "2009-03-19",
-                      "2000-03-08", "2000-05-04", "2001-04-01", "2015-03-23", "2015-06-11",
-                      "2008-10-13", "1999-12-13", "1999-12-23", "2000-04-01")))
-  expect_true(all(cdm$new_cohort |> dplyr::pull(subject_id) == c(1, 2, 3, 1, 1, 2, 2, 2, 3, 3, 1, 2, 2, 2)))
+                      "2000-03-08", "2000-05-04", "2001-04-01", "2015-03-23", "2008-10-13",
+                      "1999-12-13", "1999-12-23", "2000-04-01", "2000-08-10", "2000-09-13")))
+  expect_true(all(cdm$new_cohort |> dplyr::pull(subject_id) == c(1, 2, 3, 1, 1, 2, 2, 2, 3, 1, 2, 2, 2, 2,2)))
   expect_true(all(
     omopgenerics::attrition(cdm$new_cohort)$reason  ==
       c("Initial qualifying events", "Restricted to first entry",
@@ -63,9 +63,9 @@ test_that("requireIsFirstEntry, cohortIds & name arguments", {
 test_that("errors", {
   testthat::skip_on_cran()
   cdm <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 3) |>
-    omock::mockObservationPeriod() |>
-    omock::mockCohort(numberCohorts = 1, recordPerson = 2)
+    omock::mockPerson(n = 3,seed = 1) |>
+    omock::mockObservationPeriod(seed = 1) |>
+    omock::mockCohort(numberCohorts = 1, recordPerson = 2,seed = 1)
 
   expect_error(cdm$cohort |> requireIsFirstEntry(name = 1))
   expect_error(cdm$cohort1 <- cdm$cohort |> requireIsFirstEntry(name = "cohort2"))
@@ -77,9 +77,9 @@ test_that("errors", {
 test_that("requireIsLastEntry", {
   testthat::skip_on_cran()
   cdm <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 3) |>
-    omock::mockObservationPeriod() |>
-    omock::mockCohort(numberCohorts = 3, recordPerson = 2)
+    omock::mockPerson(n = 3,seed = 1) |>
+    omock::mockObservationPeriod(seed = 1) |>
+    omock::mockCohort(numberCohorts = 3, recordPerson = 2,seed = 1)
 
   cdm$new_cohort <- CohortConstructor::requireIsLastEntry(
     cohort = cdm$cohort,
@@ -96,15 +96,15 @@ test_that("requireIsLastEntry", {
   expect_equal(counts_new |> dplyr::filter(cohort_definition_id == 1),
                dplyr::tibble(cohort_definition_id = 1, number_records = 3, number_subjects = 3))
   expect_true(all(cdm$new_cohort |>  dplyr::pull(cohort_start_date) ==
-                    c("2004-01-08", "1999-07-30", "2015-03-11", "2002-10-09", "2003-09-12",
-                      "1999-04-16", "2000-03-09", "2000-05-05", "2015-02-22", "2015-03-24",
-                      "2002-09-28", "1999-08-25", "1999-12-14", "1999-12-24")))
+                    c("2004-01-08", "1999-07-30", "2015-02-17", "2002-10-09", "2003-09-12",
+                      "1999-04-16", "2000-03-09", "2000-05-05", "2015-02-22", "2002-09-28",
+                      "1999-08-25", "1999-12-14", "1999-12-24", "2000-04-02", "2000-08-11")))
   expect_true(all(cdm$new_cohort |> dplyr::pull(cohort_end_date) ==
-                    c("2009-10-03", "2001-10-02", "2015-04-13", "2003-09-11", "2009-03-19",
-                      "2000-03-08", "2000-05-04", "2001-04-01", "2015-03-23", "2015-06-11",
-                      "2008-10-13", "1999-12-13", "1999-12-23", "2000-04-01")))
+                    c("2009-10-03", "2001-10-02", "2015-03-10", "2003-09-11", "2009-03-19",
+                      "2000-03-08", "2000-05-04", "2001-04-01", "2015-03-23", "2008-10-13",
+                      "1999-12-13", "1999-12-23", "2000-04-01", "2000-08-10", "2000-09-13")))
   expect_true(all(cdm$new_cohort |> dplyr::pull(subject_id) ==
-                    c(1, 2, 3, 1, 1, 2, 2, 2, 3, 3, 1, 2, 2, 2)))
+                    c(1, 2, 3, 1, 1, 2, 2, 2, 3, 1, 2, 2, 2, 2, 2)))
   expect_true(all(omopgenerics::attrition(cdm$new_cohort)$reason == c(
     c("Initial qualifying events", "Restricted to last entry", "Initial qualifying events",
       "Initial qualifying events"))
@@ -122,11 +122,11 @@ test_that("requireIsLastEntry", {
 test_that("requireEntry", {
   testthat::skip_on_cran()
   cdm <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 10) |>
-    omock::mockObservationPeriod() |>
+    omock::mockPerson(n = 10,seed = 1) |>
+    omock::mockObservationPeriod(seed = 1) |>
     omock::mockCohort(name = "cohort1",
                       numberCohorts = 1,
-                      recordPerson = 4)
+                      recordPerson = 4,seed = 1)
 
   # 1 to inf will leave the cohort table unchanged
   cdm$cohort1_a <- requireIsEntry(
@@ -177,11 +177,12 @@ test_that("requireEntry", {
 
  # mock cohort
  cdm_local <- omock::mockCdmReference() |>
-   omock::mockPerson(n = 10) |>
-   omock::mockObservationPeriod() |>
+   omock::mockPerson(n = 10,seed = 1) |>
+   omock::mockObservationPeriod(seed = 1) |>
    omock::mockCohort(name = "cohort1",
                      numberCohorts = 1,
-                     recordPerson = 4)
+                     recordPerson = 4,
+                     seed = 1)
  cdm <- cdm_local |> copyCdm()
  cdm <- omopgenerics::insertTable(cdm, "observation_period",
                            data.frame(observation_period_id = c(1,2),

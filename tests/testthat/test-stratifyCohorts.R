@@ -56,6 +56,18 @@ test_that("simple stratification", {
   # 3 cdi * 3 blood * 2 age + 3 cdi * 2 sex
   expect_true(cdm$new_cohort |> settings() |> nrow() == 24)
 
+  expect_no_error(
+    cdm$new_cohort_1 <- cdm$cohort1 |>
+      stratifyCohorts(
+        cohortId = "cohort_1",
+        strata = list(c("blood_type", "age_group"), "sex"),
+        removeStrata = FALSE,
+        name = "new_cohort_1"
+      )
+  )
+  # 3 cdi * 3 blood * 2 age + 3 cdi * 2 sex
+  expect_true(cdm$new_cohort_1 |> settings() |> nrow() == 8)
+
   cdi <- settings(cdm$new_cohort) |>
     dplyr::filter(.data$blood_type == "A" & .data$age_group == "adult")
   expect_true(nrow(cdi) == 3)

@@ -4,12 +4,10 @@
 #' `collapseCohorts()` concatenates cohort records, allowing for some number
 #' of days between one finishing and the next starting.
 #'
-#' @param cohort A cohort table
-#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
-#' used; otherwise, only the specified cohorts will be modified, and the
-#' rest will remain unchanged.
-#' @param gap Number of days to use when merging cohort entries.
-#' @param name Name of the cohort table.
+#' @inheritParams cohortDoc
+#' @inheritParams cohortIdModifyDoc
+#' @inheritParams gapDoc
+#' @inheritParams nameDoc
 #'
 #' @export
 #'
@@ -24,7 +22,7 @@ collapseCohorts <- function(cohort,
   validateCDM(cdm)
   cohort <- validateCohortTable(cohort, dropExtraColumns = TRUE)
   ids <- settings(cohort)$cohort_definition_id
-  cohortId <- validateCohortId(cohortId, ids)
+  cohortId <- validateCohortId(cohortId, settings(cohort))
   if (gap != Inf) {
     gap <- validateGap(gap)
   }

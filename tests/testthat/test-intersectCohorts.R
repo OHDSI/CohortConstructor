@@ -1,338 +1,392 @@
-test_that("getIdentifier", {
-  x <- dplyr::tibble(a = 1)
-
-  expect_no_error(id <- getIdentifier(x))
-
-  expect_true(getIdentifier(x, len = 5) |> length() == 5)
-  expect_true(getIdentifier(x, nchar = 2) |> nchar() == 2)
-  expect_true(getIdentifier(x, prefix = "id_", nchar = 2) |> nchar() == 5)
-  expect_true(getIdentifier(x, prefix = "id_", nchar = 8) |> substr(1, 3) == "id_")
-})
-
-test_that("joinOverlap", {
-  # testthat::skip_on_cran()
-  # x <- dplyr::tibble(
-  #   start_date = as.Date(c(
-  #     "2020-01-01", "2020-03-01", "2020-06-01", "2020-02-01", "2020-05-02",
-  #     "2020-03-01", "2020-06-01", "2020-04-01"
-  #   )),
-  #   end_date = as.Date(c(
-  #     "2020-04-01", "2020-06-01", "2020-08-01", "2020-05-01", "2020-07-01",
-  #     "2020-05-01", "2020-08-01", "2020-07-01"
-  #   )),
-  #   pid = c(1, 1, 1, 1, 1, 2, 2, 2),
-  #   def_id = c(1, 1, 1, 2, 2, 1, 1, 2)
-  # )
-  #
-  # cdm <- mockCohortConstructor(otherTables = list(x = x),
-  #                              con = connection(),
-  #                              writeSchema = writeSchema())
-  # # gap = 0
-  # res <- joinOverlap(
-  #   cdm$x, startDate = "start_date", endDate = "end_date", by = c("pid", "def_id")
-  # ) |>
-  #   dplyr::collect() |>
-  #   dplyr::arrange(.data$pid, .data$def_id, .data$start_date)
-  # expect_true(nrow(res) == 6)
-  # expect_equal(
-  #   res |> dplyr::arrange(.data$start_date, .data$end_date) |> dplyr::select("pid", "def_id", "start_date", "end_date"),
-  #   dplyr::tibble(
-  #     pid = c(1, 1, 2, 2, 1, 2),
-  #     def_id = c(1, 2, 1, 2, 2, 1),
-  #     start_date = as.Date(c(
-  #       "2020-01-01", "2020-02-01", "2020-03-01", "2020-04-01", "2020-05-02", "2020-06-01"
-  #     )),
-  #     end_date = as.Date(c(
-  #       "2020-08-01", "2020-05-01", "2020-05-01", "2020-07-01", "2020-07-01", "2020-08-01"
-  #     ))
-  #   )
-  # )
-  #
-  # # gap = 1
-  # res <- joinOverlap(
-  #   cdm$x, start = "start_date", end = "end_date", by = c("pid", "def_id"), gap = 1
-  # ) |>
-  #   dplyr::collect() |>
-  #   dplyr::arrange(.data$pid, .data$def_id, .data$start_date)
-  #
-  # expect_true(nrow(res) == 5)
-  # expect_equal(
-  #   res |> dplyr::arrange(.data$start_date, .data$end_date) |> dplyr::select("pid", "def_id", "start_date", "end_date"),
-  #   dplyr::tibble(
-  #     pid = c(1, 1, 2, 2, 2),
-  #     def_id = c(1, 2, 1, 2, 1),
-  #     start_date = as.Date(c(
-  #       "2020-01-01", "2020-02-01", "2020-03-01", "2020-04-01", "2020-06-01"
-  #     )),
-  #     end_date = as.Date(c(
-  #       "2020-08-01", "2020-07-01", "2020-05-01", "2020-07-01", "2020-08-01"
-  #     ))
-  #   )
-  # )
-  #
-  # PatientProfiles::mockDisconnect(cdm)
-})
-
-test_that("splitOverlap", {
-  testthat::skip_on_cran()
-  x <- dplyr::tibble(
-    start_date = as.Date(c(
-      "2020-01-01", "2020-03-01", "2020-06-01", "2020-02-01", "2020-05-02",
-      "2020-03-01", "2020-06-01", "2020-04-01"
-    )),
-    end_date = as.Date(c(
-      "2020-04-01", "2020-06-01", "2020-08-01", "2020-05-01", "2020-07-01",
-      "2020-05-01", "2020-08-01", "2020-07-01"
-    )),
-    pid = c(1, 1, 1, 1, 1, 2, 2, 2),
-    def_id = c(1, 1, 1, 2, 2, 1, 2, 1)
-  )
-  cdm <- mockCohortConstructor(otherTables = list(x = x), con = connection(), writeSchema = writeSchema())
-
-  expect_no_error(
-    res <- splitOverlap(
-      cdm$x, start = "start_date", end = "end_date", by = c("pid", "def_id")
-    ) |>
-      dplyr::collect() |>
-      dplyr::arrange(.data$pid, .data$def_id, .data$start_date)
-  )
-  expect_true(nrow(res) == 11)
-  expect_identical(
-    res,
-    dplyr::tibble(
-      pid = c(1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2),
-      def_id = c(1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 2),
-      start_date = as.Date(c(
-        "2020-01-01", "2020-03-01", "2020-04-02", "2020-06-01", "2020-06-02",
-        "2020-02-01", "2020-05-02", "2020-03-01", "2020-04-01", "2020-05-02",
-        "2020-06-01"
-      )),
-      end_date = as.Date(c(
-        "2020-02-29", "2020-04-01", "2020-05-31", "2020-06-01", "2020-08-01",
-        "2020-05-01", "2020-07-01", "2020-03-31", "2020-05-01", "2020-07-01",
-        "2020-08-01"
-      ))
+test_that("intersect example - two cohorts", {
+  cdm_local <- omock::mockCdmReference() |>
+    omock::mockPerson(n = 2)
+  cdm_local <- omopgenerics::insertTable(
+    cdm = cdm_local,
+    name = "observation_period",
+    table = data.frame(
+      observation_period_id = c(1L, 2L),
+      person_id = c(1L, 2L),
+      observation_period_start_date = as.Date(c("2018-01-01")),
+      observation_period_end_date = as.Date(c("2022-03-01")),
+      period_type_concept_id = 1L
     )
   )
+  cdm_local <- omopgenerics::insertTable(
+    cdm = cdm_local,
+    name = "my_cohort",
+    data.frame(
+      cohort_definition_id = c(1L, 2L, 2L),
+      subject_id = c(1L, 1L, 2L),
+      cohort_start_date = as.Date(c("2018-01-03", "2020-06-01",
+                                    "2020-01-03")),
+      cohort_end_date = as.Date(c("2021-01-10", "2020-06-10",
+                                  "2020-01-10"))
+    ))
+  cdm <- cdm_local |> copyCdm()
+  cdm$my_cohort <- cdm$my_cohort |>
+    omopgenerics::newCohortTable()
 
-  PatientProfiles::mockDisconnect(cdm)
+  # person 1 has an intersection
+  # they are in both cohorts between 1st June and 10th June 2020
+  cdm$my_cohort_2 <- intersectCohorts(
+    cohort = cdm$my_cohort,
+    name = "my_cohort_2" ,
+    keepOriginalCohorts = FALSE,
+    gap = 0)
+  expect_true(nrow(cdm$my_cohort_2 |>
+                     dplyr::collect()) == 1L)
+  expect_true(cdm$my_cohort_2 |>
+                dplyr::pull("subject_id") == 1L)
+  expect_equal(cdm$my_cohort_2 |>
+                 dplyr::pull("cohort_start_date"),
+               as.Date("2020-06-01"))
+  expect_equal(cdm$my_cohort_2 |>
+                 dplyr::pull("cohort_end_date"),
+               as.Date("2020-06-10"))
 })
 
-test_that("intersectCohorts", {
-  testthat::skip_on_cran()
+test_that("intersect example - three cohorts", {
   cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4) |>
-    omock::mockObservationPeriod() |>
-    omock::mockCohort(name = c("cohort1"), numberCohorts = 2)
+    omock::mockPerson(n = 2)
+  cdm_local <- omopgenerics::insertTable(
+    cdm = cdm_local,
+    name = "observation_period",
+    table = data.frame(
+      observation_period_id = c(1L, 2L),
+      person_id = c(1L, 2L),
+      observation_period_start_date = as.Date(c("2018-01-01")),
+      observation_period_end_date = as.Date(c("2022-03-01")),
+      period_type_concept_id = 1L
+    )
+  )
+  cdm_local <- omopgenerics::insertTable(
+    cdm = cdm_local,
+    name = "my_cohort",
+    data.frame(
+      cohort_definition_id = c(1L, 2L, 3L, 2L),
+      subject_id = c(1L, 1L, 1L, 2L),
+      cohort_start_date = as.Date(c("2018-01-03", "2020-06-01", "2020-06-03",
+                                    "2020-01-03")),
+      cohort_end_date = as.Date(c("2021-01-10", "2020-06-10", "2020-06-09",
+                                  "2020-01-10"))
+    ))
+  cdm <- cdm_local |> copyCdm()
+  cdm$my_cohort <- cdm$my_cohort |>
+    omopgenerics::newCohortTable()
+
+  # person 1 has an intersection
+  # they are in all three cohorts between 3rd June and 9th June 2020
+  cdm$my_cohort_2 <- intersectCohorts(
+    cohort = cdm$my_cohort,
+    name = "my_cohort_2" ,
+    keepOriginalCohorts = FALSE,
+    gap = 0)
+  expect_true(nrow(cdm$my_cohort_2 |>
+                     dplyr::collect()) == 1L)
+  expect_true(cdm$my_cohort_2 |>
+                dplyr::pull("subject_id") == 1L)
+  expect_equal(cdm$my_cohort_2 |>
+                 dplyr::pull("cohort_start_date"),
+               as.Date("2020-06-03"))
+  expect_equal(cdm$my_cohort_2 |>
+                 dplyr::pull("cohort_end_date"),
+               as.Date("2020-06-09"))
+
+  PatientProfiles::mockDisconnect(cdm)
+
+})
+
+test_that("intersect example - nobody with intersection", {
+  cdm_local <- omock::mockCdmReference() |>
+    omock::mockPerson(n = 2)
+  cdm_local <- omopgenerics::insertTable(
+    cdm = cdm_local,
+    name = "observation_period",
+    table = data.frame(
+      observation_period_id = c(1L, 2L),
+      person_id = c(1L, 2L),
+      observation_period_start_date = as.Date(c("2018-01-01")),
+      observation_period_end_date = as.Date(c("2022-03-01")),
+      period_type_concept_id = 1L
+    )
+  )
+  cdm_local <- omopgenerics::insertTable(
+    cdm = cdm_local,
+    name = "my_cohort",
+    data.frame(
+      cohort_definition_id = c(1L, 2L, 2L),
+      subject_id = c(1L, 1L, 2L),
+      cohort_start_date = as.Date(c("2018-01-03", "2020-06-01",
+                                    "2020-01-03")),
+      cohort_end_date = as.Date(c("2019-01-10", "2020-06-10",
+                                  "2020-01-10"))
+    ))
+  cdm <- cdm_local |> copyCdm()
+  cdm$my_cohort <- cdm$my_cohort |>
+    omopgenerics::newCohortTable()
+
+  # person 1 has an intersection
+  # they are in both cohorts between 1st June and 10th June 2020
+  cdm$my_cohort_2 <- intersectCohorts(
+    cohort = cdm$my_cohort,
+    name = "my_cohort_2" ,
+    keepOriginalCohorts = FALSE,
+    gap = 0)
+  expect_true(nrow(cdm$my_cohort_2 |>
+                     dplyr::collect()) == 0)
+  expect_true(nrow(settings(cdm$my_cohort_2) |>
+                     dplyr::collect()) == 1)
+
+  PatientProfiles::mockDisconnect(cdm)
+
+})
+
+test_that("intersect with gap", {
+  cdm_local <- omock::mockCdmReference() |>
+    omock::mockPerson(n = 1)
+  cdm_local <- omopgenerics::insertTable(
+    cdm = cdm_local,
+    name = "observation_period",
+    table = data.frame(
+      observation_period_id = c(1L),
+      person_id = c(1L),
+      observation_period_start_date = as.Date(c("2018-01-01")),
+      observation_period_end_date = as.Date(c("2020-03-01")),
+      period_type_concept_id = 1L
+    )
+  )
+  cdm_local <- omopgenerics::insertTable(
+    cdm = cdm_local,
+    name = "my_cohort",
+    data.frame(
+      cohort_definition_id = c(1L, 2L),
+      subject_id = c(1L, 1L),
+      cohort_start_date = as.Date(c("2018-01-03", "2020-01-03")),
+      cohort_end_date = as.Date(c("2018-01-10", "2020-01-10"))
+    ))
   cdm <- cdm_local |> copyCdm()
 
-  # mutually exclusive
-  expect_no_error(cdm$cohort2 <- intersectCohorts(
-    cohort = cdm$cohort1, name = "cohort2",
-    mutuallyExclusive = TRUE
-  ))
-  expect_true(all(omopgenerics::settings(cdm$cohort2)$mutually_exclusive == TRUE))
-  expect_true(cdm$cohort2 %>% dplyr::tally() %>% dplyr::pull() == 10)
-  expect_true(all(
-    CDMConnector::cohortCount(cdm$cohort2) %>%
-      dplyr::arrange(.data$cohort_definition_id) %>%
-      dplyr::pull("number_records") == c(1, 4, 5)
-  ))
-  expect_true(nrow(omopgenerics::settings(cdm$cohort2)) == 3)
-  expect_true(all(
-    cdm$cohort2 %>%
-      dplyr::pull("cohort_start_date") %>%
-      sort() ==
-      c("1997-10-22", "2000-06-23", "2001-03-30" ,"2001-07-16", "2001-12-04",
-        "2003-06-15", "2005-11-24", "2015-03-05", "2015-03-25", "2015-04-15")
-  ))
-  expect_true(all(
-    omopgenerics::attrition(cdm$cohort2)$reason ==
-      c("Initial qualifying events", "Mutually exclusive cohorts",
-        "Initial qualifying events", "Mutually exclusive cohorts",
-        "Initial qualifying events")
-  ))
-  expect_true(all(
-    omopgenerics::attrition(cdm$cohort2)$reason_id ==  c(1, 2, 1, 2, 1)
-  ))
-  expect_true(all(
-    omopgenerics::attrition(cdm$cohort2)$excluded_records ==  c(0, 3, 0, 0, 0)
-  ))
+  cdm$my_cohort <- cdm$my_cohort |>
+    omopgenerics::newCohortTable()
 
-  # not mutually exclusive and gap
-  expect_no_error(cdm$cohort3 <- intersectCohorts(
-    cohort = cdm$cohort1, name = "cohort3",
-    mutuallyExclusive = FALSE, gap = 1
-  ))
-  expect_true(all(omopgenerics::settings(cdm$cohort3)$mutually_exclusive == FALSE))
-  expect_true(cdm$cohort3 %>% dplyr::tally() %>% dplyr::pull() == 7)
-  expect_true(all(
-    omopgenerics::cohortCount(cdm$cohort3) %>%
-      dplyr::arrange(.data$cohort_definition_id) %>%
-      dplyr::pull("number_records") == c(4, 4, 2)
-  ))
-  expect_true(all(
-    omopgenerics::cohortCount(cdm$cohort3) %>%
-      dplyr::arrange(.data$cohort_definition_id) %>%
-      dplyr::pull("number_subjects") == c(3, 2, 2)
-  ))
-  expect_true(nrow(omopgenerics::settings(cdm$cohort3)) == 3)
-  expect_true(all(
-    cdm$cohort3 %>%
-      dplyr::pull("cohort_start_date") %>%
-      sort() ==
-      c("1997-10-22", "2000-06-23", "2001-03-30", "2001-03-30", "2015-03-05", "2015-03-25", "2015-03-25")
-  ))
-  expect_true(all(
-    cdm$cohort3 %>%
-      dplyr::pull("cohort_end_date") %>%
-      sort() ==
-      c("1999-05-28", "2005-11-23", "2005-11-23", "2006-09-27", "2015-04-14", "2015-04-14", "2015-07-06")
-  ))
-  expect_true(all(
-    omopgenerics::attrition(cdm$cohort3)$reason ==
-      c("Initial qualifying events", "Initial qualifying events", "Initial qualifying events")
-  ))
-  expect_true(all(omopgenerics::attrition(cdm$cohort3)$reason_id ==  c(1, 1, 1)))
-  expect_true(all(omopgenerics::attrition(cdm$cohort3)$number_records ==  c(4, 4, 2)))
-  expect_true(all(omopgenerics::attrition(cdm$cohort3)$number_subjects ==  c(3, 2, 2)))
-  expect_true(all(omopgenerics::attrition(cdm$cohort3)$excluded_records ==  c(0, 0, 0)))
-  expect_true(all(omopgenerics::attrition(cdm$cohort3)$excluded_subjects ==  c(0, 0, 0)))
+  # with gap of zero there should be no intersect records
+  cdm$my_cohort_2 <- intersectCohorts(
+    cohort = cdm$my_cohort,
+    name = "my_cohort_2" ,
+    keepOriginalCohorts = FALSE,
+    gap = 0)
+  expect_true(nrow(cdm$my_cohort_2 |>
+                     dplyr::collect()) == 0L)
 
-  # not enough cohorts provided
-  expect_warning(
-    cdm$cohort4 <- intersectCohorts(
-      cohort = cdm$cohort1, name = "cohort4",
-      cohortId = 1
-    ), "At least 2 cohort id must be provided to do the intersection.")
-  expect_equal(cdm$cohort1 %>%
-                 omopgenerics::settings() %>%
-                 dplyr::filter(cohort_definition_id == 1),
-               cdm$cohort4 %>%
-                 omopgenerics::settings())
-
-  # all cohorts
-  expect_no_error(cohort <- cdm$cohort1 |> intersectCohorts())
+  # but if we do use a sufficient gap we will have a record
+  cdm$my_cohort_3 <- intersectCohorts(
+    cohort = cdm$my_cohort,
+    name = "my_cohort_3" ,
+    keepOriginalCohorts = FALSE,
+    gap = 5000)
+  expect_true(nrow(cdm$my_cohort_3 |>
+                     dplyr::collect()) == 1L)
+  expect_true(cdm$my_cohort_3 |>
+                dplyr::pull("subject_id") == 1L)
+  expect_equal(cdm$my_cohort_3 |>
+                 dplyr::pull("cohort_start_date"),
+               as.Date("2018-01-03"))
+  expect_equal(cdm$my_cohort_3 |>
+                 dplyr::pull("cohort_end_date"),
+               as.Date("2020-01-10"))
 
   PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("keepOriginalCohorts", {
-  testthat::skip_on_cran()
-  # combination = null
   cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4) |>
-    omock::mockObservationPeriod() |>
-    omock::mockCohort(name = c("cohort1"), numberCohorts = 2, seed = 2)
-  cdm_local$cohort1 <- cdm_local$cohort1 |>
-    dplyr::filter(cohort_end_date != as.Date("2015-04-17"))
+    omock::mockPerson(n = 2)
+  cdm_local <- omopgenerics::insertTable(
+    cdm = cdm_local,
+    name = "observation_period",
+    table = data.frame(
+      observation_period_id = c(1L, 2L),
+      person_id = c(1L, 2L),
+      observation_period_start_date = as.Date(c("2018-01-01")),
+      observation_period_end_date = as.Date(c("2022-03-01")),
+      period_type_concept_id = 1L
+    )
+  )
+  cdm_local <- omopgenerics::insertTable(
+    cdm = cdm_local,
+    name = "my_cohort",
+    data.frame(
+      cohort_definition_id = c(1L, 2L, 2L),
+      subject_id = c(1L, 1L, 2L),
+      cohort_start_date = as.Date(c("2018-01-03", "2020-06-01",
+                                    "2020-01-03")),
+      cohort_end_date = as.Date(c("2021-01-10", "2020-06-10",
+                                  "2020-01-10"))
+    ))
   cdm <- cdm_local |> copyCdm()
+  cdm$my_cohort <- cdm$my_cohort |>
+    omopgenerics::newCohortTable()
 
-  cdm$cohort2 <- intersectCohorts(
-    cohort = cdm$cohort1, name = "cohort2",
-    mutuallyExclusive = FALSE, keepOriginalCohorts = TRUE
-  )
-  expect_true(nrow(dplyr::collect(cdm$cohort2)) == 0)
-  expect_true(all(
-    omopgenerics::attrition(cdm$cohort2)$reason ==
-      c("Initial qualifying events")
-  ))
-  expect_true(omopgenerics::attrition(cdm$cohort2)$reason_id == 1)
-  expect_true(omopgenerics::attrition(cdm$cohort2)$number_records == 0)
-  expect_true(omopgenerics::attrition(cdm$cohort2)$number_subjects == 0)
-  expect_true(omopgenerics::attrition(cdm$cohort2)$excluded_records == 0)
-  expect_true(omopgenerics::attrition(cdm$cohort2)$excluded_subjects == 0)
+  # person 1 has an intersection
+  # they are in both cohorts between 1st June and 10th June 2020
+  cdm$my_cohort_2 <- intersectCohorts(
+    cohort = cdm$my_cohort,
+    name = "my_cohort_2" ,
+    keepOriginalCohorts = TRUE,
+    gap = 0)
 
-  # nUll combination, return individuals
-  cdm$cohort4 <- intersectCohorts(
-    cohort = cdm$cohort1, name = "cohort4",
-    mutuallyExclusive = FALSE, keepOriginalCohorts = FALSE
-  )
-  expect_true(nrow(dplyr::collect(cdm$cohort4)) == nrow(dplyr::collect(cdm$cohort1)))
-  expect_true(all(
-    omopgenerics::attrition(cdm$cohort4)$reason ==
-      c("Initial qualifying events", "Initial qualifying events", "Initial qualifying events")
-  ))
-  expect_true(all(omopgenerics::attrition(cdm$cohort4)$reason_id == c(1, 1, 1)))
-  expect_true(all(omopgenerics::attrition(cdm$cohort4)$number_records == c(4, 4, 0)))
-  expect_true(all(omopgenerics::attrition(cdm$cohort4)$number_subjects == c(3, 2, 0)))
-  expect_true(all(omopgenerics::attrition(cdm$cohort4)$excluded_records == c(0, 0, 0)))
-  expect_true(all(omopgenerics::attrition(cdm$cohort4)$excluded_subjects == c(0, 0, 0)))
-  expect_true(nrow(cdm$cohort1 |> dplyr::anti_join(cdm$cohort4, by = colnames(cdm$cohort4)) |> dplyr::collect()) == 0)
+  expect_true(nrow(settings(cdm$my_cohort) |>
+    dplyr::inner_join(settings(cdm$my_cohort_2),
+                      by = c("cohort_definition_id", "cohort_name"))) == 2)
 
-  # not null combination
-  cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4) |>
-    omock::mockObservationPeriod() |>
-    omock::mockCohort(name = c("cohort1"), numberCohorts = 3)
-  cdm <- cdm_local |> copyCdm()
-  cdm$cohort3 <- intersectCohorts(
-    cohort = cdm$cohort1, name = "cohort3",
-    mutuallyExclusive = FALSE, keepOriginalCohorts = TRUE, gap = 1
-  )
-  expect_equal(
-    cdm$cohort3 |>
-      dplyr::collect() %>%
-      dplyr::arrange(.data$cohort_start_date) %>%
-      dplyr::pull(.data$cohort_start_date),
-    as.Date(c("1997-10-22", "2001-03-30", "2015-03-05", "2015-03-25", "2015-03-25", "2015-03-25"))
-  )
-  expect_equal(
-    cdm$cohort3 |>
-      dplyr::collect() %>%
-      dplyr::arrange(cohort_end_date) %>%
-      dplyr::pull(cohort_end_date),
-    as.Date(c("1999-05-28", "2005-11-23", "2015-04-14", "2015-04-14", "2015-04-14", "2015-07-06"))
-  )
-  expect_true(nrow(omopgenerics::settings(cdm$cohort3)) == 4)
-  expect_true(all(omopgenerics::settings(cdm$cohort3)$cohort_1 == c(1, 1, 1, 0)))
-  expect_true(all(omopgenerics::settings(cdm$cohort3)$cohort_2 == c(1, 1, 0, 1)))
-  expect_true(all(omopgenerics::settings(cdm$cohort3)$cohort_3 == c(0, 1, 1, 1)))
-  expect_false(any(omopgenerics::settings(cdm$cohort3)$mutually_exclusive))
-  expect_true(all(
-    omopgenerics::attrition(cdm$cohort3)$reason ==
-      c("Initial qualifying events", "Initial qualifying events",
-        "Initial qualifying events", "Initial qualifying events")
-  ))
-  expect_true(all(omopgenerics::attrition(cdm$cohort3)$reason_id == c(1, 1, 1, 1)))
-  expect_true(all(omopgenerics::attrition(cdm$cohort3)$number_records == c(2, 1, 2, 1)))
-  expect_true(all(omopgenerics::attrition(cdm$cohort3)$number_subjects ==  c(2, 1, 2, 1)))
-  expect_true(all(omopgenerics::attrition(cdm$cohort3)$excluded_records == c(0, 0, 0, 0)))
-  expect_true(all(omopgenerics::attrition(cdm$cohort3)$excluded_subjects == c(0, 0, 0, 0)))
+  # with returnNonOverlappingCohorts
+  cdm$my_cohort_3 <- intersectCohorts(
+    cohort = cdm$my_cohort,
+    name = "my_cohort_3" ,
+    keepOriginalCohorts = TRUE,
+    returnNonOverlappingCohorts = TRUE,
+    gap = 0)
+  expect_true(nrow(settings(cdm$my_cohort) |>
+                     dplyr::inner_join(settings(cdm$my_cohort_3),
+                                       by = c("cohort_definition_id", "cohort_name"))) == 2)
 
-  cdm$cohort4 <- intersectCohorts(
-    cohort = cdm$cohort1, name = "cohort4",
-    mutuallyExclusive = TRUE, keepOriginalCohorts = TRUE, gap = 1
-  )
+  # nobody with intersection
+  cdm$my_cohort <- cdm$my_cohort |>
+    dplyr::filter(cohort_start_date != "2020-06-01") |>
+    omopgenerics::recordCohortAttrition("filter")
+  cdm$my_cohort_4 <- intersectCohorts(
+    cohort = cdm$my_cohort,
+    name = "my_cohort_4" ,
+    keepOriginalCohorts = TRUE,
+    gap = 0)
+  expect_true(nrow(settings(cdm$my_cohort) |>
+                     dplyr::inner_join(settings(cdm$my_cohort_4),
+                                       by = c("cohort_definition_id", "cohort_name"))) == 2)
 
-  expect_equal(
-    cdm$cohort4 |>
-      dplyr::collect() %>%
-      dplyr::arrange(.data$cohort_start_date) %>%
-      dplyr::pull(.data$cohort_start_date),
-    as.Date(c("1997-10-22", "2001-03-30", "2015-03-05", "2015-03-25", "2015-04-15"))
-  )
-  expect_equal(
-    cdm$cohort4 |>
-      dplyr::collect() %>%
-      dplyr::arrange(cohort_end_date) %>%
-      dplyr::pull(cohort_end_date),
-    as.Date(c("1999-05-28", "2005-11-23", "2015-03-24", "2015-04-14", "2015-07-06"))
-  )
-  expect_true(nrow(omopgenerics::settings(cdm$cohort4)) == 4)
-  expect_true(all(omopgenerics::settings(cdm$cohort4)$cohort_1 == c(1, 1, 1, 0)))
-  expect_true(all(omopgenerics::settings(cdm$cohort4)$cohort_2 == c(1, 1, 0, 1)))
-  expect_true(all(omopgenerics::settings(cdm$cohort4)$cohort_3 == c(0, 1, 1, 1)))
-  expect_true(all(omopgenerics::settings(cdm$cohort4)$mutually_exclusive))
+  cdm$my_cohort_5 <- intersectCohorts(
+    cohort = cdm$my_cohort,
+    name = "my_cohort_5" ,
+    keepOriginalCohorts = TRUE,
+    returnNonOverlappingCohorts = TRUE,
+    gap = 0)
+  expect_true(nrow(settings(cdm$my_cohort) |>
+                     dplyr::inner_join(settings(cdm$my_cohort_5),
+                                       by = c("cohort_definition_id", "cohort_name"))) == 2)
 
   PatientProfiles::mockDisconnect(cdm)
+
+})
+
+test_that("returnNonOverlappingCohorts - two cohorts", {
+  cdm_local <- omock::mockCdmReference() |>
+    omock::mockPerson(n = 2)
+  cdm_local <- omopgenerics::insertTable(
+    cdm = cdm_local,
+    name = "observation_period",
+    table = data.frame(
+      observation_period_id = c(1L, 2L),
+      person_id = c(1L, 2L),
+      observation_period_start_date = as.Date(c("2018-01-01")),
+      observation_period_end_date = as.Date(c("2022-03-01")),
+      period_type_concept_id = 1L
+    )
+  )
+  cdm_local <- omopgenerics::insertTable(
+    cdm = cdm_local,
+    name = "my_cohort",
+    data.frame(
+      cohort_definition_id = c(1L, 2L, 2L),
+      subject_id = c(1L, 1L, 2L),
+      cohort_start_date = as.Date(c("2018-01-03", "2020-06-01",
+                                    "2020-01-03")),
+      cohort_end_date = as.Date(c("2021-01-10", "2020-06-10",
+                                  "2020-01-10"))
+    ))
+  cdm <- cdm_local |> copyCdm()
+  cdm$my_cohort <- cdm$my_cohort |>
+    omopgenerics::newCohortTable()
+
+  # person 1 has an intersection
+  # they are in both cohorts between 1st June and 10th June 2020
+  cdm$my_cohort_2 <- intersectCohorts(
+    cohort = cdm$my_cohort,
+    name = "my_cohort_2" ,
+    keepOriginalCohorts = FALSE,
+    returnNonOverlappingCohorts = TRUE,
+    gap = 0)
+  # subject 1 now has two records for when they were in cohort 1 and not cohort 2
+  onlyCohort1 <- settings(cdm$my_cohort_2) |>
+    dplyr::filter(cohort_name == "only_in_cohort_1") |>
+    dplyr::pull("cohort_definition_id")
+  expect_true(all(sort(cdm$my_cohort_2 |>
+    dplyr::filter(cohort_definition_id == !!onlyCohort1) |>
+    dplyr::pull(cohort_start_date)) == as.Date(c("2018-01-03", "2020-06-11"))))
+
+  PatientProfiles::mockDisconnect(cdm)
+
+})
+
+test_that("returnNonOverlappingCohorts - three cohorts", {
+  cdm_local <- omock::mockCdmReference() |>
+    omock::mockPerson(n = 2)
+  cdm_local <- omopgenerics::insertTable(
+    cdm = cdm_local,
+    name = "observation_period",
+    table = data.frame(
+      observation_period_id = c(1L, 2L),
+      person_id = c(1L, 2L),
+      observation_period_start_date = as.Date(c("2018-01-01")),
+      observation_period_end_date = as.Date(c("2022-03-01")),
+      period_type_concept_id = 1L
+    )
+  )
+  cdm_local <- omopgenerics::insertTable(
+    cdm = cdm_local,
+    name = "my_cohort",
+    data.frame(
+      cohort_definition_id = c(1L, 2L, 3L, 2L),
+      subject_id = c(1L, 1L, 1L, 2L),
+      cohort_start_date = as.Date(c("2018-01-03", "2020-06-01", "2020-06-03",
+                                    "2020-01-03")),
+      cohort_end_date = as.Date(c("2021-01-10", "2020-06-10", "2020-06-09",
+                                  "2020-01-10"))
+    ))
+  cdm <- cdm_local |> copyCdm()
+  cdm$my_cohort <- cdm$my_cohort |>
+    omopgenerics::newCohortTable()
+
+  # person 1 has an intersection
+  # they are in all three cohorts between 3rd June and 9th June 2020
+  # were only in cohort 1 between 1st March 2018 and 31st May 2020, and
+  # between 11th June 2020 and 10th January 2021
+  cdm$my_cohort_2 <- intersectCohorts(
+    cohort = cdm$my_cohort,
+    name = "my_cohort_2" ,
+    keepOriginalCohorts = FALSE,
+    returnNonOverlappingCohorts = TRUE,
+    gap = 0)
+
+  # subject 1 now has two records for when they were in cohort 1 and not cohort 2 or cohort 3
+  onlyCohort1 <- settings(cdm$my_cohort_2) |>
+    dplyr::filter(cohort_name == "only_in_cohort_1") |>
+    dplyr::pull("cohort_definition_id")
+  expect_true(all(sort(cdm$my_cohort_2 |>
+                         dplyr::filter(cohort_definition_id == !!onlyCohort1) |>
+                         dplyr::pull(cohort_start_date)) == as.Date(c("2018-01-03", "2020-06-11"))))
+  expect_true(all(sort(cdm$my_cohort_2 |>
+                         dplyr::filter(cohort_definition_id == !!onlyCohort1) |>
+                         dplyr::pull(cohort_end_date)) == as.Date(c("2020-05-31", "2021-01-10"))))
+
+  PatientProfiles::mockDisconnect(cdm)
+
 })
 
 test_that("attrition and cohortId", {
   testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4) |>
-    omock::mockObservationPeriod() |>
+    omock::mockPerson(n = 4, seed = 1) |>
+    omock::mockObservationPeriod(seed = 1) |>
     omock::mockCohort(name = c("cohort1"), numberCohorts = 4, seed = 2)
   cdm_local$person <- cdm_local$person |>
     dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
@@ -344,27 +398,33 @@ test_that("attrition and cohortId", {
     requireAge(ageRange = list(c(0,40)))
 
   cdm$cohort1 <- intersectCohorts(
-    cohort = cdm$cohort1, cohortId = 1:2,
-    name = "cohort1", mutuallyExclusive = TRUE
+    cohort = cdm$cohort1, cohortId = c("cohort_1", "cohort_2"),
+    name = "cohort1", returnNonOverlappingCohorts = TRUE,
+    keepOriginalCohorts = FALSE
   )
+  expect_true(nrow(settings(cdm$cohort1)) == 3)
+  expect_equal(settings(cdm$cohort1)$non_overlapping, c(NA, TRUE, TRUE))
   expect_true(all(
-    omopgenerics::attrition(cdm$cohort1)$reason ==
-      c("Initial qualifying events",  "cohort_start_date after 1990-01-01",  "cohort_start_date before 2025-01-01",
-        "Sex requirement: Female", "Age requirement: 0 to 40", "Mutually exclusive cohorts",
-        "Initial qualifying events",  "cohort_start_date after 1990-01-01",  "cohort_start_date before 2025-01-01",
-        "Sex requirement: Female", "Age requirement: 0 to 40", "Mutually exclusive cohorts",
-        "Initial qualifying events" )
+    omopgenerics::attrition(cdm$cohort1)$reason %in%
+  c('Initial qualifying events', 'Initial qualifying events',
+    'cohort_start_date after 1990-01-01', 'cohort_start_date before 2025-01-01',
+    'Sex requirement: Female', 'Age requirement: 0 to 40',
+    'Trim to non overlapping entries', 'Initial qualifying events',
+    'cohort_start_date after 1990-01-01', 'cohort_start_date before 2025-01-01',
+    'Sex requirement: Female', 'Age requirement: 0 to 40',
+    'Trim to non overlapping entries')
   ))
-  expect_true(all(omopgenerics::attrition(cdm$cohort1)$reason_id ==  c(1:6, 1:6, 1)))
-  expect_true(all(omopgenerics::attrition(cdm$cohort1)$number_records ==
-                    c(4, 4, 4, 1, 1, 1, 4, 4, 4, 0, 0, 0, 0)))
-  expect_true(all(omopgenerics::attrition(cdm$cohort1)$number_subjects ==
-                    c(3, 3, 3, 1, 1, 1, 2, 2, 2, 0, 0, 0, 0)))
-  expect_true(all(omopgenerics::attrition(cdm$cohort1)$excluded_records ==
-                    c(0, 0, 0, 3, 0, 0, 0, 0, 0, 4, 0, 0, 0)))
-  expect_true(all(omopgenerics::attrition(cdm$cohort1)$excluded_subjects ==
-                    c(0, 0, 0, 2, 0, 0, 0, 0, 0, 2, 0, 0, 0)))
-  expect_true(all(omopgenerics::settings(cdm$cohort1)$cohort_name == c("cohort_1", "cohort_2", "cohort_1_cohort_2")))
+  expect_true(all(omopgenerics::attrition(cdm$cohort1)$reason_id ==  c(1, 1:6, 1:6)))
+  expect_true(all(omopgenerics::attrition(cdm$cohort1)$number_records |> sort() ==
+                    c(0, 1, 1, 2, 2, 2, 2, 4, 4, 4, 4, 4, 4)))
+  expect_true(all(omopgenerics::attrition(cdm$cohort1)$number_subjects |> sort() ==
+                    c(0, 1, 1, 1, 1, 1, 1, 3, 3, 3, 3, 3, 3)))
+  expect_true(all(omopgenerics::attrition(cdm$cohort1)$excluded_records |> sort() ==
+                    c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3)))
+  expect_true(all(omopgenerics::attrition(cdm$cohort1)$excluded_subjects |> sort() ==
+                    c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 2)))
+  expect_true(all(omopgenerics::settings(cdm$cohort1)$cohort_name |> sort() ==
+                    c("cohort_1_cohort_2", "only_in_cohort_1", "only_in_cohort_2")))
 
   PatientProfiles::mockDisconnect(cdm)
 })
@@ -408,46 +468,45 @@ test_that("codelist", {
   cdm$cohort2 <- intersectCohorts(cdm$cohort1, name = "cohort2")
   expect_true(all(
     cdm$cohort2 %>% dplyr::pull("cohort_start_date") %>% sort() ==
-      c("2009-12-22", "2010-01-01", "2010-01-11", "2010-05-31", "2012-01-21",
-        "2012-01-21", "2012-09-27", "2014-02-09", "2014-02-09", "2014-12-06")
+      c("2012-01-21", "2014-02-09")
   ))
   expect_true(all(
     cdm$cohort2 %>% dplyr::pull("cohort_end_date") %>% sort() ==
-      c("2010-05-04", "2011-08-24", "2012-03-11", "2012-03-11", "2014-02-09",
-        "2014-03-31", "2014-03-31", "2014-05-20", "2014-12-10", "2015-06-24")
+      c("2012-03-11", "2014-03-31")
   ))
   expect_true(all(
-    cdm$cohort2 %>% dplyr::pull("subject_id") %>% sort() == c(1, 1, 1, 1, 1, 1, 2, 3, 3, 3)
+    cdm$cohort2 %>% dplyr::pull("subject_id") %>% sort() == c(1, 1)
   ))
   codes <- attr(cdm$cohort2, "cohort_codelist")
-  expect_true(all(codes |> dplyr::pull("codelist_name") |> sort() == c(rep("c1", 4), rep("c2", 2))))
-  expect_true(all(codes |> dplyr::pull("concept_id") |> sort() == c(1, 1, 2, 2, 3, 3)))
-  expect_true(all(codes |> dplyr::pull("type") |> sort()== rep("index event", 6)))
-  expect_true(all(codes |> dplyr::pull("cohort_definition_id") |> sort() == c(1, 1, 2, 3, 3, 3)))
+  expect_true(all(codes |> dplyr::pull("codelist_name") |> sort() == c(rep("c1", 2), "c2")))
+  expect_true(all(codes |> dplyr::pull("concept_id") |> sort() == c(1, 2, 3)))
+  expect_true(all(codes |> dplyr::pull("type") |> sort() == rep("index event", 3)))
+  expect_true(all(codes |> dplyr::pull("cohort_definition_id") |> sort() == c(1, 1, 1)))
 
   # mutually esclusive
-  cdm$cohort3 <- intersectCohorts(cdm$cohort1, mutuallyExclusive = TRUE, name = "cohort3")
+  cdm$cohort3 <- intersectCohorts(cdm$cohort1, returnNonOverlappingCohorts = TRUE, name = "cohort3")
+  expect_equal(collectCohort(cdm$cohort3, 1), collectCohort(cdm$cohort2, 1))
   expect_true(all(
     cdm$cohort3 %>% dplyr::pull("cohort_start_date") %>% sort() ==
-      c("2009-12-22", "2010-01-01", "2010-01-11", "2010-05-31", "2012-01-21",
-        "2012-03-12", "2012-09-27", "2014-02-09", "2014-04-01", "2014-12-06")
+      c('2009-12-22', '2010-01-01', '2010-01-11', '2010-05-31', '2012-01-21',
+        '2012-03-12', '2012-09-27', '2014-02-09', '2014-04-01', '2014-12-06')
   ))
   expect_true(all(
     cdm$cohort3 %>% dplyr::pull("cohort_end_date") %>% sort() ==
-      c("2010-05-04", "2011-08-24", "2012-01-20", "2012-03-11", "2014-02-08",
-        "2014-02-09", "2014-03-31", "2014-05-20", "2014-12-10", "2015-06-24")
+      c('2010-05-04', '2011-08-24', '2012-01-20', '2012-03-11', '2014-02-08',
+        '2014-02-09', '2014-03-31', '2014-05-20', '2014-12-10', '2015-06-24')
   ))
   expect_true(all(
     cdm$cohort3 %>% dplyr::pull("subject_id") %>% sort() == c(1, 1, 1, 1, 1, 1, 2, 3, 3, 3)
   ))
-  codes <- attr(cdm$cohort2, "cohort_codelist")
+  codes <- attr(cdm$cohort3, "cohort_codelist")
   expect_true(all(codes |> dplyr::pull("codelist_name") |> sort() == c(rep("c1", 4), rep("c2", 2))))
   expect_true(all(codes |> dplyr::pull("concept_id") |> sort() == c(1, 1, 2, 2, 3, 3)))
   expect_true(all(codes |> dplyr::pull("type") |> sort()== rep("index event", 6)))
-  expect_true(all(codes |> dplyr::pull("cohort_definition_id") |> sort() == c(1, 1, 2, 3, 3, 3)))
+  expect_true(all(codes |> dplyr::pull("cohort_definition_id") |> sort() == c(1, 1, 1, 2, 2, 3)))
 
   # only comb
-  cdm$cohort4 <- intersectCohorts(cdm$cohort1, keepOriginalCohorts = TRUE, name = "cohort4")
+  cdm$cohort4 <- intersectCohorts(cdm$cohort1, keepOriginalCohorts = FALSE, name = "cohort4")
   expect_true(all(
     cdm$cohort4 %>% dplyr::pull("cohort_start_date") %>% sort() ==
       c("2012-01-21", "2014-02-09")
@@ -469,10 +528,66 @@ test_that("codelist", {
   cdm <- omopgenerics::bind(cdm$cohort, cdm$cohort1, name = "cohort5")
   cdm$cohort6 <- intersectCohorts(cdm$cohort5, name = "cohort6")
   codes <- attr(cdm$cohort6, "cohort_codelist")
-  expect_true(all(codes |> dplyr::pull("codelist_name") |> sort() == c(rep("c1", 8), rep("c2", 4))))
-  expect_true(all(codes |> dplyr::pull("concept_id") |> sort() == c(rep(1, 4), rep(2, 4), rep(3, 4))))
-  expect_true(all(codes |> dplyr::pull("type") |> sort() == rep("index event", 12)))
-  expect_true(all(codes |> dplyr::pull("cohort_definition_id") |> sort() == c(2, 2, 3, 3, 4, 5, 6, 6, 6, 7, 7, 7)))
+  expect_true(all(codes |> dplyr::pull("codelist_name") |> sort() == c(rep("c1", 2), "c2")))
+  expect_true(all(codes |> dplyr::pull("concept_id") |> sort() == c(1, 2, 3)))
+  expect_true(all(codes |> dplyr::pull("type") |> sort() == rep("index event", 3)))
+  expect_true(all(codes |> dplyr::pull("cohort_definition_id") |> sort() == c(1, 1, 1)))
+
+  PatientProfiles::mockDisconnect(cdm)
+})
+
+test_that("records combined for gap must be in the same observation period", {
+  cdm_local <- omock::mockCdmReference() |>
+    omock::mockPerson(n = 2)
+  cdm_local <- omopgenerics::insertTable(
+    cdm = cdm_local,
+    name = "observation_period",
+    table = data.frame(
+      observation_period_id = c(1L, 2L, 3L),
+      person_id = c(1L, 1L, 2L),
+      observation_period_start_date = as.Date(c("2018-01-01",
+                                                "2020-01-01",
+                                                "2018-01-01")),
+      observation_period_end_date = as.Date(c("2019-01-01",
+                                              "2020-03-01",
+                                              "2020-03-01")),
+      period_type_concept_id = 1L
+    )
+  )
+  cdm_local <- omopgenerics::insertTable(
+    cdm = cdm_local,
+    name = "my_cohort",
+    data.frame(
+      cohort_definition_id = c(1L, 2L, 1L, 2L),
+      subject_id = c(1L, 1L, 2L, 2L),
+      cohort_start_date = as.Date(c("2018-01-03", "2020-01-03",
+                                    "2018-01-03", "2020-01-03")),
+      cohort_end_date = as.Date(c("2018-01-10", "2020-01-10",
+                                  "2018-01-10", "2020-01-10"))
+    ))
+  cdm <- cdm_local |> copyCdm()
+
+  cdm$my_cohort <- cdm$my_cohort |>
+    omopgenerics::newCohortTable()
+
+  # cohort entries are identical
+  # but person 1 has two observation periods, so their records should not be
+  # combined
+  cdm$my_cohort_2 <- intersectCohorts(
+    cohort = cdm$my_cohort,
+    name = "my_cohort_2" ,
+    keepOriginalCohorts = FALSE,
+    gap = 5000)
+  expect_true(nrow(cdm$my_cohort_2 |>
+                     dplyr::collect()) == 1L)
+  expect_true(cdm$my_cohort_2 |>
+                dplyr::pull("subject_id") == 2L)
+  expect_equal(cdm$my_cohort_2 |>
+                 dplyr::pull("cohort_start_date"),
+               as.Date("2018-01-03"))
+  expect_equal(cdm$my_cohort_2 |>
+                 dplyr::pull("cohort_end_date"),
+               as.Date("2020-01-10"))
 
   PatientProfiles::mockDisconnect(cdm)
 })

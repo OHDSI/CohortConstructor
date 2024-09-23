@@ -1,5 +1,5 @@
 test_that("mearurementCohorts works", {
-  cdm <- mockCohortConstructor(con = NULL)
+  cdm <- mockCohortConstructor(con = NULL, seed = 1)
   cdm$concept <- cdm$concept |>
     dplyr::union_all(
       dplyr::tibble(
@@ -207,7 +207,7 @@ test_that("mearurementCohorts works", {
 
 test_that("expected errors", {
   testthat::skip_on_cran()
-  cdm <- mockCohortConstructor(con = NULL)
+  cdm <- mockCohortConstructor(con = NULL, seed = 1)
   cdm$concept <- cdm$concept |>
     dplyr::union_all(
       dplyr::tibble(

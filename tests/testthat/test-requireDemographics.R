@@ -1,9 +1,9 @@
 test_that("test it works and expected errors", {
   testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 10) |>
-    omock::mockObservationPeriod() |>
-    omock::mockCohort()
+    omock::mockPerson(n = 10, seed = 1) |>
+    omock::mockObservationPeriod(seed = 1) |>
+    omock::mockCohort(seed = 1)
   # to remove in new omock
   cdm_local$person <- cdm_local$person |>
     dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
@@ -129,17 +129,16 @@ test_that("test it works and expected errors", {
 test_that("restrictions applied to single cohort", {
   testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 1) |>
-    omock::mockObservationPeriod() |>
-    omock::mockCohort(recordPerson = 3)
+    omock::mockPerson(n = 1,seed = 1) |>
+    omock::mockObservationPeriod(seed = 1) |>
+    omock::mockCohort(recordPerson = 3,seed = 1)
   # to remove in new omock
   cdm_local$person <- cdm_local$person |>
     dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
   cdm <- cdm_local |> copyCdm()
-
   cdm$cohort1 <- cdm$cohort %>%
     requireDemographics(ageRange = list(c(0, 5)), name = "cohort1")
-  expect_true("2001-07-30" == cdm$cohort1 %>% dplyr::pull("cohort_start_date"))
+  expect_true(all(c("2001-03-30", "2003-06-15") == cdm$cohort1 %>% dplyr::pull("cohort_start_date")))
   expect_true(all(
     c("Initial qualifying events", "Age requirement: 0 to 5", "Sex requirement: Both",
       "Prior observation requirement: 0 days", "Future observation requirement: 0 days") ==
@@ -176,9 +175,9 @@ test_that("restrictions applied to single cohort", {
 test_that("ignore existing cohort extra variables", {
   testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 1) |>
-    omock::mockObservationPeriod() |>
-    omock::mockCohort(recordPerson = 3)
+    omock::mockPerson(n = 1,seed = 1) |>
+    omock::mockObservationPeriod(seed = 1) |>
+    omock::mockCohort(recordPerson = 3,seed = 1)
   # to remove in new omock
   cdm_local$person <- cdm_local$person |>
     dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
@@ -215,9 +214,9 @@ test_that("ignore existing cohort extra variables", {
 test_that("external columns kept after requireDemographics", {
   testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 1) |>
-    omock::mockObservationPeriod() |>
-    omock::mockCohort(recordPerson = 3)
+    omock::mockPerson(n = 1,seed = 1) |>
+    omock::mockObservationPeriod(seed = 1) |>
+    omock::mockCohort(recordPerson = 3,seed = 1)
   cdm_local$cohort <- cdm_local$cohort %>%
     dplyr::mutate(
       col_extra1 = as.numeric(subject_id) + 1,
@@ -240,23 +239,23 @@ test_that("external columns kept after requireDemographics", {
 test_that("cohortIds", {
   testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 3) |>
-    omock::mockObservationPeriod() |>
-    omock::mockCohort(numberCohorts = 3)
+    omock::mockPerson(n = 3,seed = 1) |>
+    omock::mockObservationPeriod(seed = 1) |>
+    omock::mockCohort(numberCohorts = 3,seed = 1)
   # to remove in new omock
   cdm_local$person <- cdm_local$person |>
     dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
   cdm <- cdm_local |> copyCdm()
 
-  cdm$new_cohort <- requireSex(cohort = cdm$cohort, cohortId = 1, sex = "Male") |>
-    requirePriorObservation(cohortId = 3, minPriorObservation = 1000, name = "new_cohort")
+  cdm$new_cohort <- requireSex(cohort = cdm$cohort, cohortId = 1, sex = "Male", name = "new_cohort") |>
+    requirePriorObservation(cohortId = "cohort_3", minPriorObservation = 1000, name = "new_cohort")
   expect_true(all(
     omopgenerics::attrition(cdm$new_cohort)$reason ==
       c("Initial qualifying events", "Sex requirement: Male", "Initial qualifying events" ,
         "Initial qualifying events", "Prior observation requirement: 1000 days")
   ))
-  expect_true(all(cdm$new_cohort |> dplyr::pull("cohort_definition_id") == c(2,2,2,3)))
-  expect_true(all(cdm$new_cohort |> dplyr::pull("subject_id") == c(2,2,2,1)))
+  expect_true(all(cdm$new_cohort |> dplyr::pull("cohort_definition_id") == c(2,2,2)))
+  expect_true(all(cdm$new_cohort |> dplyr::pull("subject_id") == c(1,1,1)))
 
   PatientProfiles::mockDisconnect(cdm)
 })
@@ -264,9 +263,9 @@ test_that("cohortIds", {
 test_that("test more than one restriction", {
   testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 3) |>
-    omock::mockObservationPeriod() |>
-    omock::mockCohort(numberCohorts = 3)
+    omock::mockPerson(n = 3,seed = 1) |>
+    omock::mockObservationPeriod(seed = 1) |>
+    omock::mockCohort(numberCohorts = 3,seed = 1)
   # to remove in new omock
   cdm_local$person <- cdm_local$person |>
     dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
@@ -277,21 +276,21 @@ test_that("test more than one restriction", {
     requireAge(ageRange = list(c(0,19), c(20, 40), c(0, 40)), name = "cohort1")
   expect_true(all(
     cdm$cohort1 |> dplyr::pull("cohort_definition_id") |> sort() ==
-      c(1, 1, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7, 8, 8, 8, 9, 9)
+      c(1, 1, 2, 2, 2, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7, 9, 9, 9)
   ))
   expect_true(all(
     cdm$cohort1 |> dplyr::pull("cohort_start_date") |> sort() ==
-      c('1999-08-27', '1999-08-27', '2000-01-07', '2000-01-07', '2000-04-10',
-        '2000-04-10', '2001-02-13', '2001-02-13', '2001-07-30', '2001-07-30',
-        '2003-03-02', '2003-03-02', '2004-01-21', '2004-01-21', '2015-01-25',
-        '2015-01-25', '2015-04-09', '2015-04-09')
+      c("1999-11-16", "1999-11-16", "1999-12-17", "1999-12-17", "1999-12-19",
+        "1999-12-19", "2000-05-15", "2000-05-15", "2000-06-23", "2000-06-23",
+        "2001-07-16", "2001-07-16", "2001-12-04", "2001-12-04", "2003-06-15",
+        "2003-06-15", "2004-09-11", "2004-09-11")
   ))
   expect_true(all(
     cdm$cohort1 |> dplyr::pull("cohort_end_date") |> sort() ==
-      c('2000-04-09', '2000-04-09', '2001-02-12', '2001-02-12', '2001-03-23',
-        '2001-03-23', '2001-07-15', '2001-07-15', '2004-01-20', '2004-01-20',
-        '2004-07-30', '2004-07-30', '2005-05-04', '2005-05-04', '2015-06-16',
-        '2015-06-16', '2015-06-26', '2015-06-26')
+      c("1999-12-18", "1999-12-18", "2000-05-14", "2000-05-14", "2001-02-23",
+        "2001-02-23", "2001-07-15", "2001-07-15", "2001-08-26", "2001-08-26",
+        "2001-12-03", "2001-12-03", "2004-09-10", "2004-09-10", "2005-07-25",
+        "2005-07-25", "2006-09-27", "2006-09-27")
   ))
   expect_true(all(
     attrition(cdm$cohort1)$reason |> sort() ==
@@ -304,7 +303,7 @@ test_that("test more than one restriction", {
   ))
   expect_true(all(
     attrition(cdm$cohort1)$number_records |> sort() ==
-      c(0, 1, 1, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3)
+      c(0, 0, 1, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3)
   ))
   expect_true(all(settings(cdm$cohort1)$age_range |> unique() == c("0_19", "0_40", "20_40")))
   expect_true(all(settings(cdm$cohort1)$cohort_name |> unique() ==
@@ -316,23 +315,25 @@ test_that("test more than one restriction", {
     requireAge(ageRange = list(c(0,19), c(20, 40), c(0, 40), c(0, 150)), name = "cohort2")
   expect_true(all(
     cdm$cohort2 |> dplyr::pull("cohort_definition_id") |> sort() ==
-      c(1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 6, 7, 7, 7, 8, 8, 8, 9, 9, 9, 10, 11, 11, 11, 12, 12)
+      c(1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 5, 5, 5, 7, 7, 7, 8, 8, 8, 9, 9, 9, 10, 12, 12, 12)
   ))
   expect_true(all(
     cdm$cohort2 |> dplyr::pull("cohort_start_date") |> sort() ==
-      c('1999-08-27', '1999-08-27', '1999-08-27', '2000-01-07', '2000-01-07', '2000-01-07',
-        '2000-04-10', '2000-04-10', '2000-04-10', '2001-02-13', '2001-02-13', '2001-02-13',
-        '2001-07-30', '2001-07-30', '2001-07-30', '2003-03-02', '2003-03-02', '2003-03-02',
-        '2004-01-21', '2004-01-21', '2004-01-21', '2015-01-25', '2015-01-25', '2015-01-25',
-        '2015-04-09', '2015-04-09', '2015-04-09')
+      c("1999-11-16", "1999-11-16", "1999-11-16", "1999-12-17", "1999-12-17",
+        "1999-12-17", "1999-12-19", "1999-12-19", "1999-12-19", "2000-05-15",
+        "2000-05-15", "2000-05-15", "2000-06-23", "2000-06-23", "2000-06-23",
+        "2001-07-16", "2001-07-16", "2001-07-16", "2001-12-04", "2001-12-04",
+        "2001-12-04", "2003-06-15", "2003-06-15", "2003-06-15", "2004-09-11",
+        "2004-09-11", "2004-09-11")
   ))
   expect_true(all(
     cdm$cohort2 |> dplyr::pull("cohort_end_date") |> sort() ==
-      c('2000-04-09', '2000-04-09', '2000-04-09', '2001-02-12', '2001-02-12', '2001-02-12',
-        '2001-03-23', '2001-03-23', '2001-03-23', '2001-07-15', '2001-07-15', '2001-07-15',
-        '2004-01-20', '2004-01-20', '2004-01-20', '2004-07-30', '2004-07-30', '2004-07-30',
-        '2005-05-04', '2005-05-04', '2005-05-04', '2015-06-16', '2015-06-16', '2015-06-16',
-        '2015-06-26', '2015-06-26', '2015-06-26')
+      c("1999-12-18", "1999-12-18", "1999-12-18", "2000-05-14", "2000-05-14",
+        "2000-05-14", "2001-02-23", "2001-02-23", "2001-02-23", "2001-07-15",
+        "2001-07-15", "2001-07-15", "2001-08-26", "2001-08-26", "2001-08-26",
+        "2001-12-03", "2001-12-03", "2001-12-03", "2004-09-10", "2004-09-10",
+        "2004-09-10", "2005-07-25", "2005-07-25", "2005-07-25", "2006-09-27",
+        "2006-09-27", "2006-09-27")
   ))
   expect_true(all(settings(cdm$cohort2)$age_range |> unique() == c("0_150", "0_19", "0_40", "20_40")))
   expect_true(all(colnames(settings(cdm$cohort2)) %in% c("cohort_definition_id", "cohort_name", "age_range")))
@@ -347,8 +348,8 @@ test_that("test more than one restriction", {
 
   # one empty output cohort
   cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 3) |>
-    omock::mockObservationPeriod() |>
+    omock::mockPerson(n = 3,seed = 1) |>
+    omock::mockObservationPeriod(seed = 1) |>
     omock::mockCohort(numberCohorts = 3, seed = 4)
   # to remove in new omock
   cdm_local$person <- cdm_local$person |>
@@ -394,7 +395,7 @@ test_that("test more than one restriction", {
   ))
 
   cdm$cohort2 <- cdm$cohort |>
-    requireSex(sex = c("Both", "Male"), name = "cohort2", cohortId = c(1,3)) |>
+    requireSex(sex = c("Both", "Male"), name = "cohort2", cohortId = c("cohort_1", "cohort_3")) |>
     requirePriorObservation(minPriorObservation = c(3, 2), name = "cohort2", cohortId = 1)
   expect_true(all(settings(cdm$cohort2) |> dplyr::arrange(.data$cohort_definition_id) |> dplyr::pull("cohort_name") ==
                     c("cohort_1_1_1", "cohort_2", "cohort_3_1", "cohort_1_2", "cohort_3_2", "cohort_1_1_2")))
@@ -413,8 +414,8 @@ test_that("test more than one restriction", {
 test_that("codelist kept with >1 requirement", {
   testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4) |>
-    omock::mockObservationPeriod()
+    omock::mockPerson(n = 4,seed = 1) |>
+    omock::mockObservationPeriod(seed = 1)
   # to remove in new omock
   cdm_local$person <- cdm_local$person |>
     dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
@@ -462,8 +463,8 @@ test_that("codelist kept with >1 requirement", {
 test_that("settings with extra columns", {
   testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 3) |>
-    omock::mockObservationPeriod() |>
+    omock::mockPerson(n = 3,seed = 1) |>
+    omock::mockObservationPeriod(seed = 1) |>
     omock::mockCohort(numberCohorts = 3, seed = 4)
   # to remove in new omock
   cdm_local$person <- cdm_local$person |>
@@ -494,8 +495,8 @@ test_that("settings with extra columns", {
 test_that("requireInteractions", {
   testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 3) |>
-    omock::mockObservationPeriod() |>
+    omock::mockPerson(n = 3,seed = 1) |>
+    omock::mockObservationPeriod(seed = 1) |>
     omock::mockCohort(numberCohorts = 3, seed = 4)
   # to remove in new omock
   cdm_local$person <- cdm_local$person |>

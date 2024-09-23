@@ -4,24 +4,10 @@
 #' `requireDemographics()` filters cohort records, keeping only records where
 #' individuals satisfy the specified demographic criteria.
 #'
-#' @param cohort A cohort table in a cdm reference.
-#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
-#' used; otherwise, only the specified cohorts will be modified, and the
-#' rest will remain unchanged.
-#' @param indexDate Variable in cohort that contains the date to compute the
-#' demographics characteristics on which to restrict on.
-#' @param ageRange A list of minimum and maximum age.
-#' @param sex Can be "Both", "Male" or "Female". If one of the latter, only
-#' those with that sex will be included.
-#' @param minPriorObservation A minimum number of prior observation days in
-#' the database.
-#' @param minFutureObservation A minimum number of future observation days in
-#' the database.
-#' @param requirementInteractions If TRUE, cohorts will be created for
-#' all combinations of ageGroup, sex, and daysPriorObservation. If FALSE, only the
-#' first value specified for the other factors will be used. Consequently,
-#' order of values matters when requirementInteractions is FALSE.
-#' @param name Name of the new cohort with the demographic requirements.
+#' @inheritParams cohortDoc
+#' @inheritParams cohortIdModifyDoc
+#' @inheritParams nameDoc
+#' @inheritParams requireDemographicsDoc
 #'
 #' @return The cohort table with only records for individuals satisfying the
 #' demographic requirements
@@ -71,14 +57,7 @@ requireDemographics <- function(cohort,
 #' `requireAge()` filters cohort records, keeping only records where individuals
 #' satisfy the specified age criteria.
 #'
-#' @param cohort A cohort table in a cdm reference.
-#' @param ageRange A list of minimum and maximum age.
-#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
-#' used; otherwise, only the specified cohorts will be modified, and the
-#' rest will remain unchanged.
-#' @param indexDate Variable in cohort that contains the date to compute the
-#' demographics characteristics on which to restrict on.
-#' @param name Name of the new cohort with the age requirement.
+#' @inheritParams requireDemographics
 #'
 #' @return The cohort table with only records for individuals satisfying the
 #' age requirement
@@ -122,13 +101,7 @@ requireAge <- function(cohort,
 #' `requireSex()` filters cohort records, keeping only records where individuals
 #' satisfy the specified sex criteria.
 #'
-#' @param cohort A cohort table in a cdm reference.
-#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
-#' used; otherwise, only the specified cohorts will be modified, and the
-#' rest will remain unchanged.
-#' @param sex Can be "Both", "Male" or "Female". If one of the latter, only
-#' those with that sex will be included.
-#' @param name Name of the new cohort with the sex requirements.
+#' @inheritParams requireDemographics
 #'
 #' @return The cohort table with only records for individuals satisfying the
 #' sex requirement
@@ -170,15 +143,7 @@ requireSex <- function(cohort,
 #' `requirePriorObservation()` filters cohort records, keeping only records
 #' where individuals satisfy the specified prior observation criteria.
 #'
-#' @param cohort A cohort table in a cdm reference.
-#' @param minPriorObservation A minimum number of prior observation days in
-#' the database.
-#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
-#' used; otherwise, only the specified cohorts will be modified, and the
-#' rest will remain unchanged.
-#' @param indexDate Variable in cohort that contains the date to compute the
-#' demographics characteristics on which to restrict on.
-#' @param name Name of the new cohort with the prior observation restriction.
+#' @inheritParams requireDemographics
 #'
 #' @return The cohort table with only records for individuals satisfying the
 #' prior observation requirement
@@ -222,15 +187,7 @@ requirePriorObservation <- function(cohort,
 #' `requireFutureObservation()` filters cohort records, keeping only records
 #' where individuals satisfy the specified future observation criteria.
 #'
-#' @param cohort A cohort table in a cdm reference.
-#' @param minFutureObservation A minimum number of future observation days in
-#' the database.
-#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
-#' used; otherwise, only the specified cohorts will be modified, and the
-#' rest will remain unchanged.
-#' @param indexDate Variable in cohort that contains the date to compute the
-#' demographics characteristics on which to restrict on.
-#' @param name Name of the new cohort with the future observation restriction.
+#' @inheritParams requireDemographics
 #'
 #' @return The cohort table with only records for individuals satisfying the
 #' future observation requirement
@@ -289,7 +246,7 @@ demographicsFilter <- function(cohort,
   validateCDM(cdm)
   validateCohortColumn(indexDate, cohort, class = "Date")
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
-  cohortId <- validateCohortId(cohortId, ids)
+  cohortId <- validateCohortId(cohortId, settings(cohort))
   ageRange <- validateDemographicRequirements(ageRange, sex, minPriorObservation, minFutureObservation)
 
   # output cohort attributes ----
@@ -522,6 +479,7 @@ demographicsFilter <- function(cohort,
                           )
                         )) |>
     dplyr::select(!"target_cohort_rand01") |>
+    dplyr::relocate(dplyr::all_of(omopgenerics::cohortColumns("cohort"))) |>
     dplyr::compute(name = name, temporary = FALSE) |>
     omopgenerics::newCohortTable(
       cohortSetRef = newSet,

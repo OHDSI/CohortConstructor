@@ -4,12 +4,11 @@
 #' `stratifyCohorts()` creates new cohorts, splitting an existing cohort based
 #' on specified columns on which to stratify on.
 #'
-#' @param cohort A cohort table in a cdm reference.
+#' @inheritParams cohortDoc
+#' @inheritParams cohortIdSubsetDoc
+#' @inheritParams nameDoc
 #' @param strata A strata list that point to columns in cohort table.
-#' @param cohortId IDs of the cohorts to include. If NULL all cohorts will be
-#' considered. Cohorts not included will be removed from the cohort set.
 #' @param removeStrata Whether to remove strata columns from final cohort table.
-#' @param name Name of the new cohort.
 #'
 #' @return Cohort table stratified.
 #'
@@ -42,7 +41,7 @@ stratifyCohorts <- function(cohort,
                             name = tableName(cohort)) {
   # initial checks
   cohort <- validateCohortTable(cohort = cohort)
-  cohortId <- validateCohortId(cohortId, settings(cohort)$cohort_definition_id)
+  cohortId <- validateCohortId(cohortId, settings(cohort))
   strata <- validateStrata(strata, cohort)
   name <- validateName(name)
 
@@ -144,6 +143,7 @@ stratifyCohorts <- function(cohort,
 
   newCohort <- purrr::reduce(newCohort, dplyr::union_all) |>
     dplyr::select(!dplyr::all_of(c("target_cohort_id", strataCols[removeStrata]))) |>
+    dplyr::relocate(dplyr::all_of(omopgenerics::cohortColumns("cohort"))) |>
     dplyr::compute(name = name, temporary = FALSE) |>
     omopgenerics::newCohortTable(
       cohortSetRef = newSettings,
@@ -210,8 +210,8 @@ getNewAttritionStrata <- function(originalAttrition, set, counts) {
   newAttrition |> dplyr::bind_rows()
 }
 addAttritionLine <- function(oldAttrition, reason, count) {
-  nr <- sum(count$number_records)
-  ns <- sum(count$number_subjects)
+  nr <- as.integer(sum(count$number_records))
+  ns <- as.integer(sum(count$number_subjects))
   oldAttrition |>
     dplyr::union_all(
       oldAttrition |>
@@ -222,7 +222,7 @@ addAttritionLine <- function(oldAttrition, reason, count) {
           "excluded_subjects" = .data$number_subjects - .env$ns,
           "number_records" = .env$nr,
           "number_subjects" = .env$ns,
-          "reason_id" = .data$reason_id + 1
+          "reason_id" = .data$reason_id + 1L
         )
     )
 }

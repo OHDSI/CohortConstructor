@@ -1,8 +1,8 @@
 test_that("requiring death", {
   testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4) |>
-    omock::mockObservationPeriod() |>
+    omock::mockPerson(n = 4, seed = 1) |>
+    omock::mockObservationPeriod(seed = 1) |>
     omock::mockCohort(name = c("cohort1"), numberCohorts = 2)
   cdm_local$death <- dplyr::tibble(
     person_id = c(1,3),
@@ -53,10 +53,10 @@ test_that("requiring death", {
                                    cohortId = 1,
                                    window = c(0, 365),
                                    name = "cohort6")
-  expect_true(all(cdm$cohort6 |> dplyr::pull("subject_id") |> sort() %in% c(1, 1, 1, 3, 3)))
+  expect_true(all(cdm$cohort6 |> dplyr::pull("subject_id") |> sort() %in% c(2,2,2,2)))
   expect_true(all(
     cdm$cohort6 |> dplyr::pull("cohort_start_date") |> sort() ==
-      c("2000-06-23", "2001-07-16", "2001-12-04", "2015-03-05", "2015-03-25")
+      c("1999-04-19", "2000-02-04", "2000-03-12", "2000-08-05")
   ))
   expect_true(all(omopgenerics::attrition(cdm$cohort6)$reason ==
                     c("Initial qualifying events",
@@ -77,8 +77,8 @@ test_that("requiring death", {
 test_that("not death", {
   testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4) |>
-    omock::mockObservationPeriod() |>
+    omock::mockPerson(n = 4, seed = 1) |>
+    omock::mockObservationPeriod(seed = 1) |>
     omock::mockCohort(name = c("cohort1"), numberCohorts = 2, seed = 3)
   cdm_local$death <- dplyr::tibble(
     person_id = c(1,3),
@@ -103,14 +103,14 @@ test_that("not death", {
 
   # censor Id
   cdm$cohort4 <-  requireDeathFlag(cohort = cdm$cohort1,
-                                   cohortId = 1,
+                                   cohortId = "cohort_1",
                                    window = c(0, Inf),
                                    name = "cohort4",
                                    negate = TRUE)
-  expect_true(all(cdm$cohort4 |> dplyr::pull("subject_id") |> sort() == c(1, 1, 2, 4, 4, 4)))
+  expect_true(all(cdm$cohort4 |> dplyr::pull("subject_id") |> sort() == c(1, 1, 1, 2, 4, 4)))
   expect_true(all(
     cdm$cohort4 |> dplyr::pull("cohort_start_date") |> sort() ==
-      c("1990-10-29", "1992-08-05", "1997-04-25", "2000-01-06", "2003-05-31", "2003-07-20")
+      c("1992-02-15", "1992-04-20", "1999-07-17", "2001-09-10", "2002-08-02", "2004-06-18")
   ))
   expect_true(all(omopgenerics::attrition(cdm$cohort4)$reason ==
                     c("Initial qualifying events", "Alive between 0 & Inf days relative to cohort_start_date",

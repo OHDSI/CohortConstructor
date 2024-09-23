@@ -1,8 +1,8 @@
 test_that("require flag in concept", {
   cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4) |>
-    omock::mockObservationPeriod() |>
-    omock::mockCohort(name = c("cohort1"), numberCohorts = 2)
+    omock::mockPerson(n = 4, seed = 1) |>
+    omock::mockObservationPeriod(seed = 1) |>
+    omock::mockCohort(name = c("cohort1"), numberCohorts = 2, seed = 1)
   cdm_local$concept <- dplyr::tibble(
     "concept_id" = 1,
     "concept_name" = "my concept",
@@ -38,7 +38,7 @@ test_that("require flag in concept", {
   expect_true(all(cdm$cohort3 |> dplyr::pull("subject_id") ==
                     rep(1, 5)))
   expect_true(all(cdm$cohort3 |> dplyr::pull("cohort_start_date") |> sort() ==
-                    c("2000-06-23", "2001-03-30", "2001-07-16", "2001-12-04", "2003-06-15")))
+                    c("2001-03-24", "2001-11-28", "2002-01-30", "2002-06-13", "2003-05-17", "2004-03-11")))
 
   expect_true(all(omopgenerics::attrition(cdm$cohort3)$reason ==
                     c("Initial qualifying events",
@@ -52,9 +52,9 @@ test_that("require flag in concept", {
                                               window = c(-Inf, Inf),
                                               name = "cohort4")
   expect_true(all(cdm$cohort4 |> dplyr::pull("subject_id") ==
-                    c(rep(1, 5), 3)))
+                    c(rep(1, 6))))
   expect_true(all(cdm$cohort4 |> dplyr::pull("cohort_start_date") |> sort() ==
-                    c("2000-06-23", "2001-03-30", "2001-07-16", "2001-12-04", "2003-06-15", "2015-03-05")))
+                    c("2001-03-24", "2001-11-28", "2002-01-30", "2002-06-13", "2003-05-17", "2004-03-11")))
   expect_true(all(omopgenerics::attrition(cdm$cohort4)$reason ==
                     c("Initial qualifying events",
                       "Concept a between -Inf & Inf days relative to cohort_start_date between 1 and Inf",
@@ -113,9 +113,9 @@ test_that("require flag in concept", {
 test_that("requiring absence in another cohort", {
   testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4) |>
-    omock::mockObservationPeriod() |>
-    omock::mockCohort(name = c("cohort1"), numberCohorts = 2)
+    omock::mockPerson(n = 4, seed = 1) |>
+    omock::mockObservationPeriod(seed = 1) |>
+    omock::mockCohort(name = c("cohort1"), numberCohorts = 2, seed = 1)
   cdm_local$concept <- dplyr::tibble(
     "concept_id" = 1,
     "concept_name" = "my concept",
@@ -172,16 +172,16 @@ test_that("requiring absence in another cohort", {
   # cohort Id
   cdm$cohort3_exclusion_partial <-  requireConceptIntersect(
     cohort = cdm$cohort1,
-    cohortId = 1,
+    cohortId = "cohort_1",
     conceptSet = list(a = 1),
     window = c(-Inf, Inf),
     intersections = 0,
     name = "cohort3_exclusion_partial"
   )
   expect_true(all(cdm$cohort3_exclusion_partial |> dplyr::pull("subject_id") |> sort() ==
-                    c(1, 1, 1, 3, 3, 4)))
+                    c(1, 1, 1, 1, 2, 3)))
   expect_true(all(cdm$cohort3_exclusion_partial |> dplyr::pull("cohort_start_date") |> sort() ==
-                    c("1997-10-22", "2000-06-23", "2001-07-16", "2001-12-04", "2015-03-05", "2015-03-25")))
+                    c("1999-05-03", "2001-03-24", "2001-11-28", "2002-01-30", "2002-06-13", "2015-02-25")))
   expect_true(all(omopgenerics::attrition(cdm$cohort3_exclusion_partial)$reason ==
                     c("Initial qualifying events",
                       "Not in concept a between -Inf & Inf days relative to cohort_start_date",
@@ -201,7 +201,7 @@ test_that("different intersection count requirements", {
     cohort_end_date = as.Date('2020-01-01'))
 
   cdm_local <- omock::mockCdmReference() |>
-    omock::mockCdmFromTables(tables = list("cohort1" = cohort1))
+    omock::mockCdmFromTables(tables = list("cohort1" = cohort1), seed = 1)
 
   cdm_local$concept <- dplyr::tibble(
     "concept_id" = 1,

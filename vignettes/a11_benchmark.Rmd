@@ -1,0 +1,369 @@
+---
+title: "CohortConstructor benchmark"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{a11_benchmark}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+  
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  eval = TRUE, 
+  warning = FALSE, 
+  message = FALSE,
+  comment = "#>",
+  echo = FALSE
+)
+```
+
+```{r}
+# Packages
+library(visOmopResults)
+library(omopgenerics)
+library(ggplot2)
+library(CohortCharacteristics)
+library(stringr)
+library(dplyr)
+library(tidyr)
+library(gt)
+library(scales)
+library(CohortConstructor)
+
+# Functions
+niceNum <- function(x, dec = 0) {
+  trimws(format(round(as.numeric(x), dec), big.mark = ",", nsmall = dec, scientific = FALSE))
+}
+niceOverlapLabels <- function(labels) {
+  new_labels <- gsub("_", " ", gsub(" and.*|cc_", "", labels))
+  tibble("Cohort name" = new_labels) |>
+    mutate(
+      "Cohort name" = str_to_sentence(gsub("_", " ", gsub("cc_|atlas_", "", new_labels))),
+      "Cohort name" = case_when(
+        grepl("Asthma", .data[["Cohort name"]]) ~ "Asthma without COPD",
+        grepl("Covid", .data[["Cohort name"]]) ~ gsub("Covid|Covid", "COVID-19", `Cohort name`),
+        grepl("eutropenia", .data[["Cohort name"]]) ~ "Acquired neutropenia or unspecified leukopenia",
+        grepl("Hosp", .data[["Cohort name"]]) ~ "Inpatient hospitalisation",
+        grepl("First", .data[["Cohort name"]]) ~ "First major depression",
+        grepl("fluoro", .data[["Cohort name"]]) ~ "New fluoroquinolone users",
+        grepl("Beta", .data[["Cohort name"]]) ~ "New users of beta blockers nested in essential hypertension",
+        .default = .data[["Cohort name"]]
+      ),
+      "Cohort name" = if_else(
+        grepl("COVID", .data[["Cohort name"]]), 
+        gsub(" female", ": female", gsub(" male", ": male", .data[["Cohort name"]])),
+        .data[["Cohort name"]]
+      ),
+      "Cohort name" = if_else(
+        grepl(" to ", .data[["Cohort name"]]), 
+        gsub("male ", "male, ", .data[["Cohort name"]]),
+        .data[["Cohort name"]]
+      )
+    )
+}
+```
+
+# Introduction
+
+Cohorts are a fundamental building block for studies that use the OMOP CDM, identifying people who satisfy one or more inclusion criteria for a duration of time based on their clinical records. Currently cohorts are typically built using [CIRCE](https://github.com/OHDSI/circe-be) which allows complex cohorts to be represented using JSON. This JSON is then converted to SQL for execution against a database containing data mapped to the OMOP CDM. CIRCE JSON can be created via the [ATLAS](https://github.com/OHDSI/Atlas) GUI or programmatically via the [Capr](https://github.com/OHDSI/Capr) R package. However, although a powerful tool for expressing and operationalising cohort definitions, the SQL generated can be cumbersome especially for complex cohort definitions, moreover cohorts are instantiated independently, leading to duplicated work.
+
+The CohortConstructor package offers an alternative approach, emphasizing cohort building in a pipeline format. It first creates base cohorts and then applies specific inclusion criteria. Unlike the "by definition" approach, where::here cohorts are built independently, CohortConstructor follows a "by domain" approach, which minimizes redundant queries to large OMOP tables. More details on this approach can be found in the [Introduction vignette](https://ohdsi.github.io/CohortConstructor/articles/a00_introduction.html).
+
+We benchmarked this package using nine phenotypes from the [OHDSI Phenotype library](https://github.com/OHDSI/PhenotypeLibrary) that cover a range of concept domains, entry and inclusion criteria, and cohort exit options. We replicated these cohorts using [CodelistGenerator](https://github.com/darwin-eu/CodelistGenerator) and CohortConstructor to assess computational time and agreement between CIRCE and CohortConstructor.
+
+## Code and collaboration
+
+The benchmarking code is available on the [BenchmarkCohortConstructor](https://github.com/oxford-pharmacoepi/BenchmarkCohortConstructor) repository on GitHub. 
+
+If you are interested in running the code on your database, feel free to reach out to us for assistance, and we can also update the vignette with your results! :)
+
+## Databases
+
+Current results were obtained from a 100,000-person sample of the CPRD GOLD database on Postgres. 
+
+The table below show how many records are in OMOP tables used in the benchmark script for each participating database.
+```{r}
+CohortConstructor:::benchmarkData$omop |>
+  filter(table_name != "death") |>
+  select("cdm_name", "OMOP table" = "table_name", "number_records") |>
+  mutate(
+    number_records = niceNum(number_records, 0),
+    "OMOP table" = factor(
+      `OMOP table`,
+      levels = c("person", "observation_period", "drug_exposure", "condition_occurrence", 
+                 "procedure_occurrence", "visit_occurrence", "measurement", "observation")
+    )
+  ) |>
+  arrange(.data$`OMOP table`) |>
+  pivot_wider(names_from = c("cdm_name"), values_from = c("number_records"), names_prefix = "[header]Database\n[header_level]") |>
+  visOmopResults::gtTable() |>
+  tab_style(style = list(cell_fill(color = "#e1e1e1"), cell_text(weight = "bold")),
+            locations = cells_column_labels()) |>
+  tab_style(style = list(cell_text(weight = "bold")),
+            locations = cells_body(columns = 1))
+```
+
+
+
+# Cohorts
+
+We replicated the following cohorts from the OHDSI phenotype library: COVID-19 (ID 56), inpatient hospitalisation (23),  new users of beta blockers nested in essential hypertension (1049), transverse myelitis (63), major non cardiac surgery (1289), asthma without COPD (27), endometriosis procedure (722), new fluoroquinolone users (1043), acquired neutropenia or unspecified leukopenia (213). 
+
+The COVID-19 cohort was used to evaluate the performance of common cohort stratifications. To compare the package with CIRCE, we created definitions in Atlas, stratified by age groups and sex, which are available in the [benchmark GitHub repository](https://github.com/oxford-pharmacoepi/BenchmarkCohortConstructor/tree/main/JSONCohorts) with the benchmark code.
+
+## Cohort counts and overlap
+
+The following table displays the number of records and subjects for each cohort across the participating databases:
+
+```{r}
+CohortConstructor:::benchmarkData$details |>
+  filterSettings(result_type == "cohort_count") |>
+  tidy(addSettings = FALSE) |>
+  select(-variable_level, - result_id) |>
+  distinct() |>
+  filter(grepl("cc_|atlas_", cohort_name)) |>
+  mutate(
+    Tool = case_when(grepl("cc", cohort_name) ~ "CohortConstructor", grepl("atlas", cohort_name) ~ "CIRCE", .default = NA),
+    "Cohort name" = str_to_sentence(gsub("_", " ", gsub("cc_|atlas_", "", cohort_name))),
+    variable_name = stringr::str_to_sentence(gsub("_", " ", .data$variable_name)),
+    "Cohort name" = case_when(
+      grepl("Asthma", .data[["Cohort name"]]) ~ "Asthma without COPD",
+      grepl("Covid", .data[["Cohort name"]]) ~ gsub("Covid|Covid", "COVID-19", `Cohort name`),
+      grepl("eutropenia", .data[["Cohort name"]]) ~ "Acquired neutropenia or unspecified leukopenia",
+      grepl("Hosp", .data[["Cohort name"]]) ~ "Inpatient hospitalisation",
+      grepl("First", .data[["Cohort name"]]) ~ "First major depression",
+      grepl("fluoro", .data[["Cohort name"]]) ~ "New fluoroquinolone users",
+      grepl("Beta", .data[["Cohort name"]]) ~ "New users of beta blockers nested in essential hypertension",
+      .default = .data[["Cohort name"]]
+    ),
+    "Cohort name" = if_else(
+      grepl("COVID", .data[["Cohort name"]]), 
+      gsub(" female", ": female", gsub(" male", ": male", .data[["Cohort name"]])),
+      .data[["Cohort name"]]
+    ),
+    "Cohort name" = if_else(
+      grepl(" to ", .data[["Cohort name"]]), 
+      gsub("male ", "male, ", .data[["Cohort name"]]),
+      .data[["Cohort name"]]
+    )
+  ) |>
+  arrange(`Cohort name`) |>
+  select(-cohort_name) |>
+  pivot_wider(names_from = c("Tool", "variable_name"), values_from = c("count"), names_prefix = "[header]Tool\n[header_level]", names_sep = "\n[header_level]") %>%
+  visOmopResults::gtTable(groupColumn = "cdm_name") |>
+  tab_style(style = list(cell_fill(color = "#e1e1e1"), cell_text(weight = "bold")),
+            locations = cells_column_labels()) |>
+  tab_style(style = list(cell_text(weight = "bold")),
+            locations = cells_body(columns = 1:2))
+```
+
+We also computed the overlap between patients in CIRCE and CohortConstructor cohorts, with results shown in the plot below:
+
+```{r, fig.width=10, fig.height=7}
+overlap <- CohortConstructor:::benchmarkData$comparison |>
+  filterSettings(result_type == "cohort_overlap")
+
+overlap |>
+  splitGroup() |>
+  filter(grepl("atlas_", cohort_name_comparator) & grepl("cc_", cohort_name_reference)) |>
+  filter(gsub("atlas_", "", cohort_name_comparator) == gsub("cc_", "", cohort_name_reference)) |>
+  uniteGroup(cols = c("cohort_name_reference", "cohort_name_comparator")) |>
+  newSummarisedResult() |>
+  plotCohortOverlap(facet = "cdm_name") +
+  scale_y_discrete(labels = niceOverlapLabels) +
+  theme(
+    # legend.title = element_blank(),
+    # axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, size = 12),
+    legend.text = element_text(size = 10),
+    strip.text = element_text(size = 14),
+    axis.text.x = element_text(size = 12),  
+    axis.title.x = element_text(size = 14),  
+    axis.title.y = element_text(size = 14)   
+  ) 
+```
+
+# Performance
+
+To evaluate CohortConstructor performance we generated each of the CIRCE cohorts using functionalities provided by both CodelistGenerator and CohortConstructor, and measured the computational time taken.
+
+Two different approaches with CohortConstructor were tested: 
+
+- *By definition*: we created each of the cohorts seprately.
+
+- *By domain*: All nine targeted cohorts were created together in a set, following the by domain approach described in the [Introduction vignette](https://ohdsi.github.io/CohortConstructor/articles/a00_introduction.html). Briefly, this approach involves creating all base cohorts at once, requiring only one call to each involved OMOP table.
+
+
+## By definition
+
+The following plot shows the times taken to create each cohort using CIRCE and CohortConstructor when each cohorts were created separately.
+
+```{r}
+## TABLE with same results as the plot below.
+
+# header_prefix <- "[header]Time by database (minutes)\n[header_level]"
+# CohortConstructor:::benchmarkData$time |>
+#   distinct() |>
+#   filter(!grepl("male|set", msg)) |>
+#   mutate(
+#     time = niceNum((as.numeric(toc) - as.numeric(tic))/60, 2),
+#     Tool = if_else(grepl("cc", msg), "CohortConstructor", "CIRCE"),
+#     "Cohort name" = str_to_sentence(gsub("_", " ", gsub("cc_|atlas_", "", msg)))
+#   ) |>
+#   select(-c("tic", "toc", "msg", "callback_msg")) |>
+#   pivot_wider(names_from = "cdm_name", values_from = "time", names_prefix = header_prefix) |>
+#   select(c("Cohort name", "Tool", paste0(header_prefix, data$time$cdm_name |> unique()))) |>
+#   mutate(
+#     "Cohort name" = case_when(
+#       grepl("Asthma", .data[["Cohort name"]]) ~ "Asthma without COPD",
+#       grepl("Covid", .data[["Cohort name"]]) ~ "COVID-19",
+#       grepl("eutropenia", .data[["Cohort name"]]) ~ "Acquired neutropenia or unspecified leukopenia",
+#       grepl("Hosp", .data[["Cohort name"]]) ~ "Inpatient hospitalisation",
+#       grepl("First", .data[["Cohort name"]]) ~ "First major depression",
+#       grepl("fluoro", .data[["Cohort name"]]) ~ "New fluoroquinolone users",
+#       grepl("Beta", .data[["Cohort name"]]) ~ "New users of beta blockers nested in essential hypertension",
+#       .default = .data[["Cohort name"]]
+#     )
+#   ) |>
+#   arrange(`Cohort name`) |>
+#   gtTable(colsToMergeRows = "all_columns") |>
+#   tab_style(style = list(cell_fill(color = "#e1e1e1"), cell_text(weight = "bold")), 
+#             locations = cells_column_labels()) |>
+#   tab_style(style = list(cell_text(weight = "bold")), 
+#             locations = cells_body(columns = 1:2)) 
+```
+
+```{r, fig.width=8, fig.height=7}
+
+CohortConstructor:::benchmarkData$time |>
+  distinct() |>
+  filter(!grepl("male|set", msg)) |>
+  mutate(
+    time = (as.numeric(toc) - as.numeric(tic))/60,
+    Tool = if_else(grepl("cc", msg), "CohortConstructor", "CIRCE"),
+    "Cohort name" = str_to_sentence(gsub("_", " ", gsub("cc_|atlas_", "", msg)))
+  ) |>
+  select(-c("tic", "toc", "msg", "callback_msg")) |>
+  mutate(
+    "Cohort name" = case_when(
+      grepl("Asthma", .data[["Cohort name"]]) ~ "Asthma without COPD",
+      grepl("Covid", .data[["Cohort name"]]) ~ "COVID-19",
+      grepl("eutropenia", .data[["Cohort name"]]) ~ "Acquired neutropenia or unspecified leukopenia",
+      grepl("Hosp", .data[["Cohort name"]]) ~ "Inpatient hospitalisation",
+      grepl("First", .data[["Cohort name"]]) ~ "First major depression",
+      grepl("fluoro", .data[["Cohort name"]]) ~ "New fluoroquinolone users",
+      grepl("Beta", .data[["Cohort name"]]) ~ "New users of beta blockers nested in essential hypertension",
+      .default = .data[["Cohort name"]]
+    )
+  ) |>
+  arrange(`Cohort name`) |>
+  ggplot(aes(x = `Cohort name`, y = time, colour = Tool)) +
+  geom_point(size = 3) +
+  ylab("Time (minutes)") +
+  scale_x_discrete(labels = label_wrap(20)) +
+  theme(
+    legend.title = element_blank(),
+    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, size = 12),
+    legend.text = element_text(size = 12),
+    strip.text = element_text(size = 14),
+    axis.text.y = element_text(size = 12),  
+    axis.title.x = element_text(size = 14),  
+    axis.title.y = element_text(size = 14)   
+  ) +
+  facet_wrap(vars(cdm_name))
+```
+
+## By domain
+
+The table below depicts the total time it took to create the nine cohorts when using the *by domain* approach for CohortConstructor.
+
+```{r}
+header_prefix <- "[header]Time by tool (minutes)\n[header_level]"
+CohortConstructor:::benchmarkData$time |>
+  distinct() |>
+  filter(grepl("atlas", msg)) |>
+  filter(!grepl("male", msg)) |>
+  group_by(cdm_name) |>
+  summarise(time = niceNum(sum(as.numeric(toc) - as.numeric(tic))/60, 2)) |>
+  mutate(Tool = "CIRCE") |>
+  union_all(
+    CohortConstructor:::benchmarkData$time |>
+      filter(msg == "cc_set_no_strata") |>
+      group_by(cdm_name) |>
+      summarise(time = niceNum(sum(as.numeric(toc) - as.numeric(tic))/60, 2)) |>
+      mutate(Tool = "CohortConstructor")
+  ) |>
+  pivot_wider(names_from = "Tool", values_from = "time", names_prefix = header_prefix) |>
+  select(c("Database_name" = "cdm_name", starts_with(header_prefix))) |>
+  gtTable(colsToMergeRows = "all_columns") |>
+  tab_style(style = list(cell_fill(color = "#e1e1e1"), cell_text(weight = "bold")), 
+            locations = cells_column_labels()) |>
+  tab_style(style = list(cell_text(weight = "bold")), 
+            locations = cells_body(columns = 1)) 
+```
+
+## Cohort stratification
+
+Cohorts are often stratified in studies. With Atlas cohort definitions, each stratum requires a new CIRCE JSON to be instantiated, while CohortConstructor allows stratifications to be generated from an overall cohort. The following table shows the time taken to create age and sex stratifications for the COVID-19 cohort with both CIRCE and CohortConstructor.
+
+```{r}
+CohortConstructor:::benchmarkData$time |>
+  distinct() |>
+  filter(grepl("atlas_covid|set_strata", msg) | msg == "cc_covid") |>
+  filter(msg != "atlas_covid") |>
+  mutate(Tool = if_else(grepl("cc", msg), "CohortConstructor", "CIRCE")) |>
+  group_by(cdm_name, Tool) |>
+  summarise(time = niceNum(sum(as.numeric(toc) - as.numeric(tic))/60, 2), .groups = "drop") |>
+  pivot_wider(names_from = "Tool", values_from = "time", names_prefix = "[header]Time (minutes)\n[header_level]") |>
+  select("Database" = "cdm_name", starts_with("[header]Time")) |>
+  gtTable(colsToMergeRows = "all_columns") |>
+  tab_style(style = list(cell_fill(color = "#e1e1e1"), cell_text(weight = "bold")), 
+            locations = cells_column_labels()) |>
+  tab_style(style = list(cell_text(weight = "bold")), 
+            locations = cells_body(columns = 1)) 
+```
+
+## Use of SQL indexes
+
+For Postgres SQL databases, the package uses indexes in `conceptCohort` by default. To evaluate how much these indexes reduce computation time, we instantiated a subset of concept sets from the benchmark, both with and without indexes.
+
+Four calls were made to `conceptCohort`, each involving a different number of OMOP tables. The combinations were:
+
+1) Drug exposure
+
+2) Drug exposure + condition occurrence
+
+3) Drug exposure + condition occurrence + procedure occurrence
+
+4) Drug exposure + condition occurrence + procedure occurrence + measurement
+
+The plot below shows the computation time with and without SQL indexes for each scenario:
+
+```{r, fig.width=8, fig.height=7}
+CohortConstructor:::benchmarkData$sql_indexes |>
+  distinct() |>
+  group_by(cdm_name, msg) |>
+  summarise(time = sum(as.numeric(toc) - as.numeric(tic))/60, .groups = "drop") |>
+  mutate(
+    Index = if_else(grepl("No index", msg), "Without SQL index", "With SQL index"),
+    Domains = str_to_sentence(gsub("No index: |Index: | domains| domain", "", msg))
+  ) |>
+  ggplot(aes(x = Domains, y = time, colour = Index)) +
+  geom_point(size = 3) +
+  ylab("Time (minutes)") +
+  scale_x_discrete(labels = label_wrap(15)) +
+  theme(
+    legend.title=element_blank(),
+    legend.text = element_text(size = 12),
+    strip.text = element_text(size = 14),
+    # axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, size = 12), 
+    axis.text.x = element_text(size = 12),
+    axis.text.y = element_text(size = 12),  
+    axis.title.x = element_text(size = 14),  
+    axis.title.y = element_text(size = 14)   
+  ) +
+  facet_wrap(vars(cdm_name))
+
+```
+
+

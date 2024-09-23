@@ -3,11 +3,10 @@
 #' @description
 #' `yearCohorts()` splits a cohort into multiple cohorts, one for each year.
 #'
-#' @param cohort A cohort table in a cdm reference.
-#' @param years Numeric vector of years to use to restrict observation to.
-#' @param cohortId IDs of the cohorts to include. If NULL all cohorts will be
-#' considered. Cohorts not included will be removed from the cohort set.
-#' @param name Name of the new cohort table.
+#' @inheritParams cohortDoc
+#' @inheritParams cohortIdSubsetDoc
+#' @inheritParams nameDoc
+#' @param years Numeric vector of years to use to restrict observation to..
 #'
 #' @return A cohort table.
 #'
@@ -31,7 +30,7 @@ yearCohorts <- function(cohort,
   validateCDM(cdm)
   cohort <- validateCohortTable(cohort)
   ids <- settings(cohort)$cohort_definition_id
-  cohortId <- validateCohortId(cohortId, ids)
+  cohortId <- validateCohortId(cohortId, settings(cohort))
   assertNumeric(years, integerish = TRUE)
   name <- validateName(name)
 
@@ -166,6 +165,7 @@ yearCohorts <- function(cohort,
 
   # new cohort
   cohort <- cohort |>
+    dplyr::relocate(dplyr::all_of(omopgenerics::cohortColumns("cohort"))) |>
     dplyr::compute(name = name, temporary = FALSE) |>
     omopgenerics::newCohortTable(
       cohortSetRef = newSet,
