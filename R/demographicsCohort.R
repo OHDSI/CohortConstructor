@@ -31,8 +31,8 @@ demographicsCohort <- function(cdm,
                                sex = NULL,
                                minPriorObservation = NULL) {
   # initial checks
-  cdm <- validateCdm(cdm)
-  name <- validateName(name)
+  name <- omopgenerics::validateNameArgument(name, validation = "warning")
+  cdm <- omopgenerics::validateCdmArgument(cdm)
 
   cdm[[name]] <- cdm$observation_period |>
     dplyr::inner_join(cdm$person |>

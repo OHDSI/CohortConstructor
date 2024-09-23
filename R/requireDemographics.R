@@ -240,14 +240,14 @@ demographicsFilter <- function(cohort,
                                reqFutureObservation,
                                requirementInteractions) {
   # checks
-  name <- validateName(name)
-  validateCohortTable(cohort)
-  cdm <- omopgenerics::cdmReference(cohort)
-  validateCDM(cdm)
+  name <- omopgenerics::validateNameArgument(name, validation = "warning")
+  cohort <- omopgenerics::validateCohortArgument(cohort)
   validateCohortColumn(indexDate, cohort, class = "Date")
-  ids <- omopgenerics::settings(cohort)$cohort_definition_id
+  cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   cohortId <- validateCohortId(cohortId, settings(cohort))
   ageRange <- validateDemographicRequirements(ageRange, sex, minPriorObservation, minFutureObservation)
+
+  ids <- omopgenerics::settings(cohort)$cohort_definition_id
 
   # output cohort attributes ----
   reqCols <- c("age_range",

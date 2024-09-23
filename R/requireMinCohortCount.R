@@ -25,13 +25,14 @@
 #' requireMinCohortCount(minCohortCount = 5)
 #' }
 requireMinCohortCount <- function(cohort,
-                                      cohortId = NULL,
-                                      minCohortCount = 5,
-                                      name = tableName(cohort)){
-
-  cdm <- omopgenerics::cdmReference(cohort)
+                                  cohortId = NULL,
+                                  minCohortCount = 5,
+                                  name = tableName(cohort)){
+  # checks
+  name <- omopgenerics::validateNameArgument(name, validation = "warning")
+  cohort <- omopgenerics::validateCohortArgument(cohort)
+  cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   cohortId <- validateCohortId(cohortId, settings(cohort))
-  name <- validateName(name)
   minCohortCount <- validateN(minCohortCount)
 
   cohortsToDrop <- cohortCount(cohort) |>
@@ -46,10 +47,11 @@ requireMinCohortCount <- function(cohort,
   }
 
   cdm[[name]] <- cohort |>
-    dplyr::compute(temporary = FALSE,
-                   name = name) |>
+    dplyr::compute(temporary = FALSE, name = name) |>
     omopgenerics::recordCohortAttrition(
-      reason = "Fewer than minimum cohort count of {minCohortCount}")
+      reason = "Fewer than minimum cohort count of {minCohortCount}",
+      cohortId = cohortsToDrop
+      )
 
   cdm[[name]]
 }

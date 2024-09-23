@@ -24,11 +24,10 @@ requireIsEntry <- function(cohort,
                            cohortId = NULL,
                            name = tableName(cohort)) {
   # checks
-  name <- validateName(name)
-  validateCohortTable(cohort)
-  cdm <- omopgenerics::cdmReference(cohort)
-  validateCDM(cdm)
-  ids <- omopgenerics::settings(cohort)$cohort_definition_id
+  name <- omopgenerics::validateNameArgument(name, validation = "warning")
+  cohort <- omopgenerics::validateCohortArgument(cohort)
+  validateCohortColumn(indexDate, cohort, class = "Date")
+  cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   cohortId <- validateCohortId(cohortId, settings(cohort))
 
   omopgenerics::assertNumeric(entryRange, integerish = TRUE, min = 0)
@@ -109,11 +108,10 @@ requireIsFirstEntry <- function(cohort,
                                 cohortId = NULL,
                                 name = tableName(cohort)) {
   # checks
-  name <- validateName(name)
-  validateCohortTable(cohort)
-  cdm <- omopgenerics::cdmReference(cohort)
-  validateCDM(cdm)
-  ids <- omopgenerics::settings(cohort)$cohort_definition_id
+  name <- omopgenerics::validateNameArgument(name, validation = "warning")
+  cohort <- omopgenerics::validateCohortArgument(cohort)
+  validateCohortColumn(indexDate, cohort, class = "Date")
+  cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   cohortId <- validateCohortId(cohortId, settings(cohort))
 
   cohort <- cohort |>
@@ -156,11 +154,10 @@ requireIsLastEntry <- function(cohort,
                                cohortId = NULL,
                                name = tableName(cohort)) {
   # checks
-  name <- validateName(name)
-  validateCohortTable(cohort)
-  cdm <- omopgenerics::cdmReference(cohort)
-  validateCDM(cdm)
-  ids <- omopgenerics::settings(cohort)$cohort_definition_id
+  name <- omopgenerics::validateNameArgument(name, validation = "warning")
+  cohort <- omopgenerics::validateCohortArgument(cohort)
+  validateCohortColumn(indexDate, cohort, class = "Date")
+  cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   cohortId <- validateCohortId(cohortId, settings(cohort))
 
   cohort <- cohort |>

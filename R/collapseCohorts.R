@@ -18,14 +18,13 @@ collapseCohorts <- function(cohort,
                             gap = 0,
                             name = tableName(cohort)) {
   # input validation
-  cdm <- omopgenerics::cdmReference(cohort)
-  validateCDM(cdm)
   cohort <- validateCohortTable(cohort, dropExtraColumns = TRUE)
-  ids <- settings(cohort)$cohort_definition_id
+  name <- omopgenerics::validateNameArgument(name, validation = "warning")
+  cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   cohortId <- validateCohortId(cohortId, settings(cohort))
-  if (gap != Inf) {
-    gap <- validateGap(gap)
-  }
+  omopgenerics::assertNumeric(gap, integerish = TRUE, min = 0, length = 1)
+  ids <- settings(cohort)$cohort_definition_id
+
   # temp tables
   tablePrefix <- omopgenerics::tmpPrefix()
   tmpNewCohort <- paste0(omopgenerics::uniqueTableName(tablePrefix), "_1")

@@ -25,14 +25,12 @@ yearCohorts <- function(cohort,
                         years,
                         cohortId = NULL,
                         name = tableName(cohort)) {
-  # initial checks
-  cdm <- omopgenerics::cdmReference(cohort)
-  validateCDM(cdm)
-  cohort <- validateCohortTable(cohort)
-  ids <- settings(cohort)$cohort_definition_id
+  # checks
+  name <- omopgenerics::validateNameArgument(name, validation = "warning")
+  cohort <- omopgenerics::validateCohortArgument(cohort)
+  cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   cohortId <- validateCohortId(cohortId, settings(cohort))
-  assertNumeric(years, integerish = TRUE)
-  name <- validateName(name)
+  omopgenerics::assertNumeric(years, integerish = TRUE)
 
   if (length(years) == 0) {
     cohort <- cohort |>

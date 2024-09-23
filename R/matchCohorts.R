@@ -38,15 +38,13 @@ matchCohorts <- function(cohort,
   cli::cli_inform("Starting matching")
 
   # validate initial input
-  name <- validateName(name)
-  validateCohortTable(cohort)
-  cdm <- omopgenerics::cdmReference(cohort)
-  validateCDM(cdm)
-  ids <- omopgenerics::settings(cohort)$cohort_definition_id
+  name <- omopgenerics::validateNameArgument(name, validation = "warning")
+  cohort <- omopgenerics::validateCohortArgument(cohort)
+  cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   cohortId <- validateCohortId(cohortId, settings(cohort))
-  assertNumeric(ratio, min = 0, length = 1)
-  assertLogical(matchSex, length = 1)
-  assertLogical(matchYearOfBirth, length = 1)
+  omopgenerics::assertNumeric(ratio, min = 0, length = 1)
+  omopgenerics::assertLogical(matchSex, length = 1)
+  omopgenerics::assertLogical(matchYearOfBirth, length = 1)
 
   # Check if there are repeated people within the cohort
   y <- cohort |>

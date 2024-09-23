@@ -36,20 +36,16 @@ unionCohorts <- function(cohort,
                          keepOriginalCohorts = FALSE,
                          name = tableName(cohort)) {
   # checks
-  name <- validateName(name)
-  validateCohortTable(cohort)
-  cdm <- omopgenerics::cdmReference(cohort)
-  validateCDM(cdm)
-  ids <- omopgenerics::settings(cohort)$cohort_definition_id
+  name <- omopgenerics::validateNameArgument(name, validation = "warning")
+  cohort <- omopgenerics::validateCohortArgument(cohort)
+  cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   cohortId <- validateCohortId(cohortId, settings(cohort))
+  omopgenerics::assertNumeric(gap, integerish = TRUE, min = 0, length = 1)
+  cohortName <- omopgenerics::validateNameArgument(cohortName, validation = "warning")
+
   if (length(cohortId) < 2) {
     cli::cli_abort("Settings of cohort table must contain at least two cohorts.")
   }
-  assertNumeric(gap,
-                integerish = TRUE,
-                min = 0,
-                length = 1)
-  assertCharacter(cohortName, length = 1, null = TRUE)
 
   if (length(cohortName) == 0) {
     names <- omopgenerics::settings(cohort) |>

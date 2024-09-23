@@ -53,9 +53,9 @@ conceptCohort <- function(cdm,
                           exit = "event_end_date",
                           useSourceFields = FALSE) {
   # initial input validation
-  cdm <- validateCdm(cdm)
-  name <- validateName(name)
-  conceptSet <- validateConceptSet(conceptSet)
+  name <- omopgenerics::validateNameArgument(name, validation = "warning")
+  cdm <- omopgenerics::validateCdmArgument(cdm)
+  conceptSet <- omopgenerics::validateConceptSetArgument(conceptSet, cdm)
   omopgenerics::assertChoice(exit, c("event_start_date", "event_end_date"))
   omopgenerics::assertLogical(useSourceFields, length = 1)
 

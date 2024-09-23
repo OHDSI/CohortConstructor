@@ -24,10 +24,10 @@ subsetCohorts <- function(cohort,
                           cohortId,
                           name = tableName(cohort)) {
   # checks
-  cohort <- validateCohortTable(cohort)
-  cdm <- omopgenerics::cdmReference(cohort)
+  name <- omopgenerics::validateNameArgument(name, validation = "warning")
+  cohort <- omopgenerics::validateCohortArgument(cohort)
+  cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   cohortId <- validateCohortId(cohortId, settings(cohort))
-  name <- validateName(name)
 
   cdm[[name]] <- cohort |>
     dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>
