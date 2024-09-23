@@ -23,7 +23,7 @@
 #' cdm <- mockCohortConstructor(conditionOccurrence = TRUE)
 #' cdm$cohort2 <-  requireConceptIntersect(
 #'   cohort = cdm$cohort1,
-#'   conceptSet = list(a = 1),
+#'   conceptSet = list(a = 194152),
 #'   window = c(-Inf, 0),
 #'   name = "cohort2")
 #'   }

@@ -328,7 +328,8 @@ test_that("cohort Id, name, additional columns", {
   testthat::skip_on_cran()
   cdm <- mockCohortConstructor(nPerson = 5,
                                con = connection(),
-                               writeSchema = writeSchema())
+                               writeSchema = writeSchema(),
+                               seed = 1)
   cdm$cohort2 <- cdm$cohort2 |>
     dplyr::mutate(
       col_extra1 = as.numeric(subject_id) + 1,
@@ -352,9 +353,9 @@ test_that("cohort Id, name, additional columns", {
   expect_equal(
     x1,
     dplyr::tibble(
-      subject_id = c(1, 1, 2, 3, 5) |> as.integer(),
-      cohort_start_date = as.Date(c("2001-04-03", "2002-05-07", "1999-07-26", "2015-02-19", "2012-06-12")),
-      cohort_end_date = as.Date(c("2002-05-06", "2005-11-07", "2002-09-17", "2015-06-27", "2012-09-09"))
+      subject_id = c(1, 1, 2, 3) |> as.integer(),
+      cohort_start_date = as.Date(c("2001-04-03", "2002-05-07", "1999-07-26", "2015-02-19")),
+      cohort_end_date = as.Date(c("2002-05-06", "2005-11-07", "2002-09-17", "2015-06-27"))
     )
   )
   expect_equal(

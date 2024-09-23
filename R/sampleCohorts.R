@@ -5,7 +5,7 @@
 #' people. All records of these individuals are preserved.
 #'
 #' @inheritParams cohortDoc
-#' @inheritParams cohortIdSubsetDoc
+#' @inheritParams cohortIdModifyDoc
 #' @inheritParams nameDoc
 #' @param n Number of people to be sampled for each included cohort.
 #'

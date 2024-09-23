@@ -385,8 +385,8 @@ test_that("returnNonOverlappingCohorts - three cohorts", {
 test_that("attrition and cohortId", {
   testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4) |>
-    omock::mockObservationPeriod() |>
+    omock::mockPerson(n = 4, seed = 1) |>
+    omock::mockObservationPeriod(seed = 1) |>
     omock::mockCohort(name = c("cohort1"), numberCohorts = 4, seed = 2)
   cdm_local$person <- cdm_local$person |>
     dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
@@ -416,13 +416,13 @@ test_that("attrition and cohortId", {
   ))
   expect_true(all(omopgenerics::attrition(cdm$cohort1)$reason_id ==  c(1, 1:6, 1:6)))
   expect_true(all(omopgenerics::attrition(cdm$cohort1)$number_records |> sort() ==
-                    c(0, 0, 0, 0, 1, 1, 1, 4, 4, 4, 4, 4, 4)))
+                    c(0, 1, 1, 2, 2, 2, 2, 4, 4, 4, 4, 4, 4)))
   expect_true(all(omopgenerics::attrition(cdm$cohort1)$number_subjects |> sort() ==
-                    c(0, 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3)))
+                    c(0, 1, 1, 1, 1, 1, 1, 3, 3, 3, 3, 3, 3)))
   expect_true(all(omopgenerics::attrition(cdm$cohort1)$excluded_records |> sort() ==
-                    c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 4)))
+                    c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3)))
   expect_true(all(omopgenerics::attrition(cdm$cohort1)$excluded_subjects |> sort() ==
-                    c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2)))
+                    c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 2)))
   expect_true(all(omopgenerics::settings(cdm$cohort1)$cohort_name |> sort() ==
                     c("cohort_1_cohort_2", "only_in_cohort_1", "only_in_cohort_2")))
 
