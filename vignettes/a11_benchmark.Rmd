@@ -130,7 +130,7 @@ CohortConstructor:::benchmarkData$comparison |>
     axis.title.y = element_text(size = 14)   
   ) +
   facet_wrap("cdm_name") +
-  scale_fill_discrete(labels = c("CohortConstructor", "Both", "CIRCE"))
+  scale_fill_discrete(labels = c("CIRCE", "Both", "CohortConstructor"))
 ```
 
 # Performance
@@ -253,10 +253,11 @@ CohortConstructor:::benchmarkData$sql_indexes |>
   summarise(time = sum(as.numeric(toc) - as.numeric(tic))/60, .groups = "drop") |>
   mutate(
     Index = if_else(grepl("No index", msg), "Without SQL index", "With SQL index"),
-    Domains = str_to_sentence(gsub("No index: |Index: | domains| domain", "", msg))
+    Domains = str_to_sentence(gsub("No index: |Index: | domains| domain", "", msg)),
+    Domains = gsub("procedure ", "procedure, ", Domains)
   ) |>
-  ggplot(aes(y = Domains, x = time, colour = Index)) +
-  geom_point(size = 3) +
+  ggplot(aes(y = Domains, x = time, colour = Index, fill = Index)) +
+  geom_col(position = "dodge", width = 0.6) +
   xlab("Time (minutes)") +
   scale_y_discrete(labels = label_wrap(15)) +
   theme(
