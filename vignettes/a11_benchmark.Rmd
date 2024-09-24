@@ -186,9 +186,9 @@ The following plot shows the times taken to create each cohort using CIRCE and C
 ```{r, fig.width=10, fig.height=7}
 
 CohortConstructor:::benchmarkData$time_definition |>
-  ggplot(aes(y = `Cohort name`, x = time, colour = Tool)) +
-  geom_point(size = 3) +
-  ylab("Time (minutes)") +
+  ggplot(aes(y = `Cohort name`, x = time, colour = Tool, fill = Tool)) +
+  geom_col(position = "dodge", width = 0.6) +
+  xlab("Time (minutes)") +
   scale_y_discrete(labels = label_wrap(20)) +
   theme(
     legend.title = element_blank(),

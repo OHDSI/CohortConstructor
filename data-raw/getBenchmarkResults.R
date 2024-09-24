@@ -155,7 +155,7 @@ benchmarkData$time_definition <- benchmarkDataPre$time |>
   arrange(`Cohort name`)
 
 ### time domain
-header_prefix <- "[header]Time by tool (minutes)\n[header_level]"
+header_prefix <- "[header]Time (minutes)\n[header_level]"
 benchmarkData$time_domain <- benchmarkDataPre$time |>
   distinct() |>
   filter(grepl("atlas", msg)) |>
