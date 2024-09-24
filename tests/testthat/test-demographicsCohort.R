@@ -147,6 +147,17 @@ test_that("Example: mixture of parameters", {
     omock::mockObservationPeriod() |>
     omock::mockCohort(name = c("cohort1"), numberCohorts = 5, seed = 2)
   cdm <- cdm_local |> copyCdm()
+
+  isDuckdb <- attr(omopgenerics::cdmSource(cdm), "source_type") == "duckdb"
+  if(isDuckdb){
+    startTempTables <- countDuckdbTempTables(
+      con = attr(omopgenerics::cdmSource(cdm),
+                 "dbcon"))
+    startPermanentTables <- countDuckdbPermanentTables(
+      con = attr(omopgenerics::cdmSource(cdm),
+                 "dbcon"))
+  }
+
   expect_no_error(
     cdm$cohort3 <- cdm |>
       demographicsCohort(name = "cohort3",
@@ -154,6 +165,22 @@ test_that("Example: mixture of parameters", {
                          sex = "Male",
                          minPriorObservation = 25)
   )
+
+  if(isDuckdb){
+    endTempTables <- countDuckdbTempTables(
+      con = attr(omopgenerics::cdmSource(cdm),
+                 "dbcon"))
+    endPermanentTables <- countDuckdbPermanentTables(
+      con = attr(omopgenerics::cdmSource(cdm),
+                 "dbcon"))
+    # we should have only added 4 permanent tables (the new cohort table and
+    # three tables with settings, attrition, and codelist)
+    # no temp tables will have been created
+    expect_true(startTempTables == endTempTables)
+    expect_true(
+      startPermanentTables + 4 == endPermanentTables
+    )
+  }
 
   cdm$cohort3 <- cdm$cohort3 |>
     PatientProfiles::addPriorObservation()
