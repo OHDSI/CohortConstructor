@@ -29,6 +29,7 @@ Authors:
   \item Yuchen Guo \email{yuchen.guo@ndorms.ox.ac.uk} (\href{https://orcid.org/0000-0002-0847-4855}{ORCID})
   \item Xihang Chen \email{xihang.chen@ndorms.ox.ac.uk} (\href{https://orcid.org/0009-0001-8112-8959}{ORCID})
   \item Kim Lopez \email{kim.lopez@spc.ox.ac.uk} (\href{https://orcid.org/0000-0002-8462-8668}{ORCID})
+  \item Elin Rowlands \email{elin.rowlands@ndorms.ox.ac.uk} (\href{https://orcid.org/0009-0005-5166-0417}{ORCID})
 }
 
 }

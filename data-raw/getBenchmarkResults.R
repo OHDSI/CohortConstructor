@@ -192,3 +192,6 @@ benchmarkData$comparison <- benchmarkDataPre$comparison |>
 
 ### sql indexes
 benchmarkData$sql_indexes <- benchmarkDataPre$sql_indexes
+
+
+usethis::use_data(benchmarkData, internal = FALSE, overwrite = TRUE)
