@@ -98,8 +98,33 @@ test_that("simple example", {
   )
 
   cdm <- cdm |> copyCdm()
-
-  expect_no_error(cohort <- conceptCohort(cdm = cdm, conceptSet = list(a = 1), name = "cohort"))
+  isDuckdb <- attr(omopgenerics::cdmSource(cdm), "source_type") == "duckdb"
+  if(isDuckdb){
+  startTempTables <- countDuckdbTempTables(
+    con = attr(omopgenerics::cdmSource(cdm),
+                               "dbcon"))
+  startPermanentTables <- countDuckdbPermanentTables(
+    con = attr(omopgenerics::cdmSource(cdm),
+               "dbcon"))
+  }
+  expect_no_error(cohort <- conceptCohort(cdm = cdm,
+                                          conceptSet = list(a = 1),
+                                          name = "my_cohort"))
+  if(isDuckdb){
+    endTempTables <- countDuckdbTempTables(
+      con = attr(omopgenerics::cdmSource(cdm),
+                 "dbcon"))
+    endPermanentTables <- countDuckdbPermanentTables(
+      con = attr(omopgenerics::cdmSource(cdm),
+                 "dbcon"))
+    # we should have only added 4 permanent tables (the new cohort table and
+    # three tables with settings, attrition, and codelist)
+    # no temp tables will have been created
+    expect_true(startTempTables == endTempTables)
+    expect_true(
+      startPermanentTables + 4 == endPermanentTables
+    )
+  }
 
   expect_true(cohort |> dplyr::tally() |> dplyr::pull() == 4)
   expect_true(cohortCount(cohort)$number_records == 4)
