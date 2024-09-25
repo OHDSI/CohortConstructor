@@ -236,7 +236,7 @@ test_that("test exactMatchingCohort with a ratio bigger than 1", {
     cdm[["new_cohort"]] %>%
       cohortCount() |>
       dplyr::filter(.data$cohort_definition_id %in% omopgenerics::getCohortId(
-        cdm$new_cohort, "cohort_1"
+        cdm$new_cohort, "cohort_1_matched"
       )) %>%
       dplyr::pull("number_subjects") |>
       sum() == 2
@@ -245,7 +245,7 @@ test_that("test exactMatchingCohort with a ratio bigger than 1", {
     cdm[["new_cohort"]] %>%
       cohortCount() |>
       dplyr::filter(.data$cohort_definition_id %in% omopgenerics::getCohortId(
-        cdm$new_cohort, "cohort_1_matched"
+        cdm$new_cohort, "matched_to_cohort_1"
       )) %>%
       dplyr::pull("number_subjects") |>
       sum() == 8
@@ -254,7 +254,7 @@ test_that("test exactMatchingCohort with a ratio bigger than 1", {
     cdm[["new_cohort"]] %>%
       cohortCount() |>
       dplyr::filter(.data$cohort_definition_id %in% omopgenerics::getCohortId(
-        cdm$new_cohort, "cohort_2"
+        cdm$new_cohort, "cohort_2_matched"
       )) %>%
       dplyr::pull("number_subjects") |>
       sum() == 2
@@ -263,7 +263,7 @@ test_that("test exactMatchingCohort with a ratio bigger than 1", {
     cdm[["new_cohort"]] %>%
       cohortCount() |>
       dplyr::filter(.data$cohort_definition_id %in% omopgenerics::getCohortId(
-        cdm$new_cohort, "cohort_2_matched"
+        cdm$new_cohort, "matched_to_cohort_2"
       )) %>%
       dplyr::pull("number_subjects") |>
       sum() == 8
