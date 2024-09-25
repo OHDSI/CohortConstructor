@@ -6,6 +6,12 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>CohortConstructor benchmark • CohortConstructor</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
@@ -109,14 +115,25 @@ repository on GitHub.</p>
 <p>If you are interested in running the code on your database, feel free
 to reach out to us for assistance, and we can also update the vignette
 with your results! :)</p>
-</div>
-<div class="section level3">
-<h3 id="databases">Databases<a class="anchor" aria-label="anchor" href="#databases"></a>
-</h3>
-<p>Current results were obtained from a 100,000-person sample of the
-CPRD GOLD database on Postgres.</p>
-<p>The table below show how many records are in OMOP tables used in the
-benchmark script for each participating database.</p>
+<p>The benchmark script was executed against the following four
+databases:</p>
+<ul>
+<li><p><strong>CPRD Gold</strong>: A primary care database from the UK,
+capturing data mostly from Northern Ireland, Wales, and Scotland
+clinics. The benchmark utilized a 100,000-person sample from this
+dataset, which is managed using PostgreSQL.</p></li>
+<li><p><strong>CPRD Aurum</strong>: Another UK primary care database,
+primarily covering clinics in England. This database is managed on SQL
+Server.</p></li>
+<li><p><strong>Coriva</strong>: A sample of approximately 400,000
+patients from the Estonia National Health Insurance database, managed on
+PostgreSQL.</p></li>
+<li><p><strong>OHDSI SQL Server</strong>: A mock OMOP CDM dataset
+provided by OHDSI, hosted on SQL Server.</p></li>
+</ul>
+<p>The table below presents the number of records in the OMOP tables
+used in the benchmark script for each of the participating
+databases.</p>
 <div id="mwlefoodfi" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>#mwlefoodfi table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
@@ -570,54 +587,105 @@ benchmark script for each participating database.</p>
 <thead>
 <tr class="gt_col_headings gt_spanner_row">
 <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="2" colspan="1" style="text-align: center; font-weight: bold; background-color: #E1E1E1;" scope="col" id="OMOP table">OMOP table</th>
-      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="1" style="background-color: #C8C8C8; text-align: center; font-weight: bold;" scope="col" id="Database">
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="4" style="background-color: #C8C8C8; text-align: center; font-weight: bold;" scope="colgroup" id="Database">
         <span class="gt_column_spanner">Database</span>
       </th>
     </tr>
 <tr class="gt_col_headings">
-<th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="background-color: #E1E1E1; text-align: center; font-weight: bold;" scope="col" id="CPRD Gold 100k">CPRD Gold 100k</th>
+<th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="background-color: #E1E1E1; text-align: center; font-weight: bold;" scope="col" id="CPRD Aurum">CPRD Aurum</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="background-color: #E1E1E1; text-align: center; font-weight: bold;" scope="col" id="CORIVA-Estonia">CORIVA-Estonia</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="background-color: #E1E1E1; text-align: center; font-weight: bold;" scope="col" id="CPRD Gold 100k">CPRD Gold 100k</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="background-color: #E1E1E1; text-align: center; font-weight: bold;" scope="col" id="OHDSI SQL server">OHDSI SQL server</th>
     </tr>
 </thead>
 <tbody class="gt_table_body">
 <tr>
-<td headers="OMOP table" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">person</td>
+<td headers="OMOP table" class="gt_row gt_left" style="text-align: left; font-weight: bold;">person</td>
+<td headers="[header]Database
+[header_level]CPRD Aurum" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">47,193,158</td>
+<td headers="[header]Database
+[header_level]CORIVA-Estonia" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">438,433</td>
 <td headers="[header]Database
 [header_level]CPRD Gold 100k" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">100,000</td>
+<td headers="[header]Database
+[header_level]OHDSI SQL server" class="gt_row gt_right" style="text-align: right;">1,000</td>
 </tr>
 <tr>
-<td headers="OMOP table" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">observation_period</td>
+<td headers="OMOP table" class="gt_row gt_left" style="text-align: left; font-weight: bold;">observation_period</td>
+<td headers="[header]Database
+[header_level]CPRD Aurum" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">47,193,158</td>
+<td headers="[header]Database
+[header_level]CORIVA-Estonia" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">438,433</td>
 <td headers="[header]Database
 [header_level]CPRD Gold 100k" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">100,000</td>
+<td headers="[header]Database
+[header_level]OHDSI SQL server" class="gt_row gt_right" style="text-align: right;">1,048</td>
 </tr>
 <tr>
-<td headers="OMOP table" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">drug_exposure</td>
+<td headers="OMOP table" class="gt_row gt_left" style="text-align: left; font-weight: bold;">drug_exposure</td>
+<td headers="[header]Database
+[header_level]CPRD Aurum" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">3,256,609,138</td>
+<td headers="[header]Database
+[header_level]CORIVA-Estonia" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">31,265,445</td>
 <td headers="[header]Database
 [header_level]CPRD Gold 100k" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">12,403,195</td>
+<td headers="[header]Database
+[header_level]OHDSI SQL server" class="gt_row gt_right" style="text-align: right;">49,542</td>
 </tr>
 <tr>
-<td headers="OMOP table" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">condition_occurrence</td>
+<td headers="OMOP table" class="gt_row gt_left" style="text-align: left; font-weight: bold;">condition_occurrence</td>
+<td headers="[header]Database
+[header_level]CPRD Aurum" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">2,110,992,846</td>
+<td headers="[header]Database
+[header_level]CORIVA-Estonia" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">40,957,155</td>
 <td headers="[header]Database
 [header_level]CPRD Gold 100k" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">3,191,739</td>
+<td headers="[header]Database
+[header_level]OHDSI SQL server" class="gt_row gt_right" style="text-align: right;">160,322</td>
 </tr>
 <tr>
-<td headers="OMOP table" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">procedure_occurrence</td>
+<td headers="OMOP table" class="gt_row gt_left" style="text-align: left; font-weight: bold;">procedure_occurrence</td>
+<td headers="[header]Database
+[header_level]CPRD Aurum" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">2,267,113,392</td>
+<td headers="[header]Database
+[header_level]CORIVA-Estonia" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">14,545,615</td>
 <td headers="[header]Database
 [header_level]CPRD Gold 100k" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">1,914,271</td>
+<td headers="[header]Database
+[header_level]OHDSI SQL server" class="gt_row gt_right" style="text-align: right;">62,189</td>
 </tr>
 <tr>
-<td headers="OMOP table" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">visit_occurrence</td>
+<td headers="OMOP table" class="gt_row gt_left" style="text-align: left; font-weight: bold;">visit_occurrence</td>
+<td headers="[header]Database
+[header_level]CPRD Aurum" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">7,091,248,835</td>
+<td headers="[header]Database
+[header_level]CORIVA-Estonia" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">38,037,330</td>
 <td headers="[header]Database
 [header_level]CPRD Gold 100k" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">9,183,206</td>
+<td headers="[header]Database
+[header_level]OHDSI SQL server" class="gt_row gt_right" style="text-align: right;">47,457</td>
 </tr>
 <tr>
-<td headers="OMOP table" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">measurement</td>
+<td headers="OMOP table" class="gt_row gt_left" style="text-align: left; font-weight: bold;">measurement</td>
+<td headers="[header]Database
+[header_level]CPRD Aurum" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">8,255,241,316</td>
+<td headers="[header]Database
+[header_level]CORIVA-Estonia" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">39,378,570</td>
 <td headers="[header]Database
 [header_level]CPRD Gold 100k" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">10,913,588</td>
+<td headers="[header]Database
+[header_level]OHDSI SQL server" class="gt_row gt_right" style="text-align: right;">2,858</td>
 </tr>
 <tr>
-<td headers="OMOP table" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">observation</td>
+<td headers="OMOP table" class="gt_row gt_left" style="text-align: left; font-weight: bold;">observation</td>
+<td headers="[header]Database
+[header_level]CPRD Aurum" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">16,425,069,199</td>
+<td headers="[header]Database
+[header_level]CORIVA-Estonia" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">37,010,044</td>
 <td headers="[header]Database
 [header_level]CPRD Gold 100k" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">11,107,039</td>
+<td headers="[header]Database
+[header_level]OHDSI SQL server" class="gt_row gt_right" style="text-align: right;">13,481</td>
 </tr>
 </tbody>
 </table>
@@ -1118,6 +1186,462 @@ each cohort across the participating databases:</p>
 </thead>
 <tbody class="gt_table_body">
 <tr class="gt_group_heading_row">
+<th colspan="5" class="gt_group_heading" style="background-color: #E9E9E9; font-weight: bold;" scope="colgroup" id="CPRD Aurum">CPRD Aurum</th>
+    </tr>
+<tr class="gt_row_group_first">
+<td headers="CPRD Aurum  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">Acquired neutropenia or unspecified leukopenia</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">1429966</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">632966</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">1302498</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">633030</td>
+</tr>
+<tr>
+<td headers="CPRD Aurum  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">Asthma without COPD</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">4009925</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">4009925</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">3934106</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">3934106</td>
+</tr>
+<tr>
+<td headers="CPRD Aurum  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">COVID-19</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">5600429</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">4452410</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">6206907</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">4452196</td>
+</tr>
+<tr>
+<td headers="CPRD Aurum  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">COVID-19: female</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">3111643</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">2434062</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">3452138</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">2438759</td>
+</tr>
+<tr>
+<td headers="CPRD Aurum  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">COVID-19: female, 0 to 50</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">2172113</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">1730180</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">2382039</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">1730116</td>
+</tr>
+<tr>
+<td headers="CPRD Aurum  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">COVID-19: female, 51 to 150</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">939818</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">708838</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">1070099</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">708643</td>
+</tr>
+<tr>
+<td headers="CPRD Aurum  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">COVID-19: male</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">2488786</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">2018348</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">2754769</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">2020625</td>
+</tr>
+<tr>
+<td headers="CPRD Aurum  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">COVID-19: male, 0 to 50</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">1709375</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">1422999</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">1862219</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">1422962</td>
+</tr>
+<tr>
+<td headers="CPRD Aurum  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">COVID-19: male, 51 to 150</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">779629</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">597804</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">892550</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">597663</td>
+</tr>
+<tr>
+<td headers="CPRD Aurum  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">Endometriosis procedure</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">139</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">108</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">77</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">77</td>
+</tr>
+<tr>
+<td headers="CPRD Aurum  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">Inpatient hospitalisation</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">0</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">0</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">0</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">0</td>
+</tr>
+<tr>
+<td headers="CPRD Aurum  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">Major non cardiac surgery</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">1932745</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">1932745</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">1932745</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">1932745</td>
+</tr>
+<tr>
+<td headers="CPRD Aurum  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">New fluoroquinolone users</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">1765274</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">1765274</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">1817439</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">1817439</td>
+</tr>
+<tr>
+<td headers="CPRD Aurum  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">New users of beta blockers nested in essential hypertension</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">98592</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">98592</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">102589</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">102589</td>
+</tr>
+<tr>
+<td headers="CPRD Aurum  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">Transverse myelitis</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">11930</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">4040</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">5818</td>
+<td headers="CPRD Aurum  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">4119</td>
+</tr>
+<tr class="gt_group_heading_row">
+<th colspan="5" class="gt_group_heading" style="background-color: #E9E9E9; font-weight: bold;" scope="colgroup" id="CORIVA-Estonia">CORIVA-Estonia</th>
+    </tr>
+<tr class="gt_row_group_first">
+<td headers="CORIVA-Estonia  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">Acquired neutropenia or unspecified leukopenia</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">2231</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">634</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">2188</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">634</td>
+</tr>
+<tr>
+<td headers="CORIVA-Estonia  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">Asthma without COPD</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">25867</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">25867</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">25867</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">25867</td>
+</tr>
+<tr>
+<td headers="CORIVA-Estonia  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">COVID-19</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">421053</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">193435</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">435059</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">193435</td>
+</tr>
+<tr>
+<td headers="CORIVA-Estonia  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">COVID-19: female</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">235740</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">105849</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">243773</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">106322</td>
+</tr>
+<tr>
+<td headers="CORIVA-Estonia  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">COVID-19: female, 0 to 50</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">150121</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">69168</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">155256</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">69168</td>
+</tr>
+<tr>
+<td headers="CORIVA-Estonia  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">COVID-19: female, 51 to 150</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">85620</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">37154</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">88517</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">37154</td>
+</tr>
+<tr>
+<td headers="CORIVA-Estonia  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">COVID-19: male</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">185313</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">87586</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">191286</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">87891</td>
+</tr>
+<tr>
+<td headers="CORIVA-Estonia  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">COVID-19: male, 0 to 50</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">130252</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">63558</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">134415</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">63558</td>
+</tr>
+<tr>
+<td headers="CORIVA-Estonia  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">COVID-19: male, 51 to 150</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">55062</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">24333</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">56871</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">24333</td>
+</tr>
+<tr>
+<td headers="CORIVA-Estonia  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">Endometriosis procedure</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">0</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">0</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">0</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">0</td>
+</tr>
+<tr>
+<td headers="CORIVA-Estonia  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">Inpatient hospitalisation</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">267010</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">133705</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">267010</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">133705</td>
+</tr>
+<tr>
+<td headers="CORIVA-Estonia  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">Major non cardiac surgery</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">4025</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">4025</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">4025</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">4025</td>
+</tr>
+<tr>
+<td headers="CORIVA-Estonia  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">New fluoroquinolone users</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">39712</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">39712</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">39712</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">39712</td>
+</tr>
+<tr>
+<td headers="CORIVA-Estonia  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">New users of beta blockers nested in essential hypertension</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">18967</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">18967</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">18967</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">18967</td>
+</tr>
+<tr>
+<td headers="CORIVA-Estonia  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">Transverse myelitis</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">27</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">10</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">12</td>
+<td headers="CORIVA-Estonia  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">10</td>
+</tr>
+<tr class="gt_group_heading_row">
 <th colspan="5" class="gt_group_heading" style="background-color: #E9E9E9; font-weight: bold;" scope="colgroup" id="CPRD Gold 100k">CPRD Gold 100k</th>
     </tr>
 <tr class="gt_row_group_first">
@@ -1345,6 +1869,234 @@ each cohort across the participating databases:</p>
 [header_level]CohortConstructor
 [header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">11</td>
 </tr>
+<tr class="gt_group_heading_row">
+<th colspan="5" class="gt_group_heading" style="background-color: #E9E9E9; font-weight: bold;" scope="colgroup" id="OHDSI SQL server">OHDSI SQL server</th>
+    </tr>
+<tr class="gt_row_group_first">
+<td headers="OHDSI SQL server  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">Acquired neutropenia or unspecified leukopenia</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">151</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">86</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">106</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">86</td>
+</tr>
+<tr>
+<td headers="OHDSI SQL server  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">Asthma without COPD</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">126</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">126</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">126</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">126</td>
+</tr>
+<tr>
+<td headers="OHDSI SQL server  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">COVID-19</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">0</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">0</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">0</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">0</td>
+</tr>
+<tr>
+<td headers="OHDSI SQL server  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">COVID-19: female</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">0</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">0</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">0</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">0</td>
+</tr>
+<tr>
+<td headers="OHDSI SQL server  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">COVID-19: female, 0 to 50</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">0</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">0</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">0</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">0</td>
+</tr>
+<tr>
+<td headers="OHDSI SQL server  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">COVID-19: female, 51 to 150</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">0</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">0</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">0</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">0</td>
+</tr>
+<tr>
+<td headers="OHDSI SQL server  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">COVID-19: male</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">0</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">0</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">0</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">0</td>
+</tr>
+<tr>
+<td headers="OHDSI SQL server  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">COVID-19: male, 0 to 50</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">0</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">0</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">0</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">0</td>
+</tr>
+<tr>
+<td headers="OHDSI SQL server  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">COVID-19: male, 51 to 150</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">0</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">0</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">0</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">0</td>
+</tr>
+<tr>
+<td headers="OHDSI SQL server  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">Endometriosis procedure</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">0</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">0</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">0</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">0</td>
+</tr>
+<tr>
+<td headers="OHDSI SQL server  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">Inpatient hospitalisation</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">522</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">321</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">522</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">321</td>
+</tr>
+<tr>
+<td headers="OHDSI SQL server  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">Major non cardiac surgery</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">88</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">88</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">92</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">92</td>
+</tr>
+<tr>
+<td headers="OHDSI SQL server  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">New fluoroquinolone users</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">145</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">145</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">145</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">145</td>
+</tr>
+<tr>
+<td headers="OHDSI SQL server  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">New users of beta blockers nested in essential hypertension</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">112</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">112</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">112</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">112</td>
+</tr>
+<tr>
+<td headers="OHDSI SQL server  Cohort name" class="gt_row gt_left" style="text-align: left; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">Transverse myelitis</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CIRCE
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">0</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CIRCE
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">0</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">0</td>
+<td headers="OHDSI SQL server  [header]Tool
+[header_level]CohortConstructor
+[header_level]Number subjects" class="gt_row gt_right" style="text-align: right;">0</td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -1374,7 +2126,7 @@ at once, requiring only one call to each involved OMOP table.</p></li>
 <p>The following plot shows the times taken to create each cohort using
 CIRCE and CohortConstructor when each cohorts were created
 separately.</p>
-<p><img src="a11_benchmark_files/figure-html/unnamed-chunk-7-1.png" width="768"></p>
+<p><img src="a11_benchmark_files/figure-html/unnamed-chunk-7-1.png" width="960"></p>
 </div>
 <div class="section level3">
 <h3 id="by-domain">By domain<a class="anchor" aria-label="anchor" href="#by-domain"></a>
@@ -1844,13 +2596,36 @@ CohortConstructor.</p>
       <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="background-color: #E1E1E1; text-align: center; font-weight: bold;" scope="col" id="CohortConstructor">CohortConstructor</th>
     </tr>
 </thead>
-<tbody class="gt_table_body"><tr>
+<tbody class="gt_table_body">
+<tr>
+<td headers="Database_name" class="gt_row gt_left" style="text-align: left; font-weight: bold;">CORIVA-Estonia</td>
+<td headers="[header]Time by tool (minutes)
+[header_level]CIRCE" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">9.51</td>
+<td headers="[header]Time by tool (minutes)
+[header_level]CohortConstructor" class="gt_row gt_right" style="text-align: right;">9.95</td>
+</tr>
+<tr>
+<td headers="Database_name" class="gt_row gt_left" style="text-align: left; font-weight: bold;">CPRD Aurum</td>
+<td headers="[header]Time by tool (minutes)
+[header_level]CIRCE" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">3,288.11</td>
+<td headers="[header]Time by tool (minutes)
+[header_level]CohortConstructor" class="gt_row gt_right" style="text-align: right;">109.08</td>
+</tr>
+<tr>
 <td headers="Database_name" class="gt_row gt_left" style="text-align: left; font-weight: bold;">CPRD Gold 100k</td>
 <td headers="[header]Time by tool (minutes)
 [header_level]CIRCE" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">73.41</td>
 <td headers="[header]Time by tool (minutes)
 [header_level]CohortConstructor" class="gt_row gt_right" style="text-align: right;">7.85</td>
-</tr></tbody>
+</tr>
+<tr>
+<td headers="Database_name" class="gt_row gt_left" style="text-align: left; font-weight: bold;">OHDSI SQL server</td>
+<td headers="[header]Time by tool (minutes)
+[header_level]CIRCE" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">2.89</td>
+<td headers="[header]Time by tool (minutes)
+[header_level]CohortConstructor" class="gt_row gt_right" style="text-align: right;">18.56</td>
+</tr>
+</tbody>
 </table>
 </div>
 </div>
@@ -2325,13 +3100,36 @@ CohortConstructor.</p>
       <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="background-color: #E1E1E1; text-align: center; font-weight: bold;" scope="col" id="CohortConstructor">CohortConstructor</th>
     </tr>
 </thead>
-<tbody class="gt_table_body"><tr>
+<tbody class="gt_table_body">
+<tr>
+<td headers="Database" class="gt_row gt_left" style="text-align: left; font-weight: bold;">CORIVA-Estonia</td>
+<td headers="[header]Time (minutes)
+[header_level]CIRCE" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">14.38</td>
+<td headers="[header]Time (minutes)
+[header_level]CohortConstructor" class="gt_row gt_right" style="text-align: right;">23.51</td>
+</tr>
+<tr>
+<td headers="Database" class="gt_row gt_left" style="text-align: left; font-weight: bold;">CPRD Aurum</td>
+<td headers="[header]Time (minutes)
+[header_level]CIRCE" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">3,300.18</td>
+<td headers="[header]Time (minutes)
+[header_level]CohortConstructor" class="gt_row gt_right" style="text-align: right;">241.81</td>
+</tr>
+<tr>
 <td headers="Database" class="gt_row gt_left" style="text-align: left; font-weight: bold;">CPRD Gold 100k</td>
 <td headers="[header]Time (minutes)
-[header_level]CIRCE" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">93.25</td>
+[header_level]CIRCE" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">166.66</td>
 <td headers="[header]Time (minutes)
-[header_level]CohortConstructor" class="gt_row gt_right" style="text-align: right;">1.17</td>
-</tr></tbody>
+[header_level]CohortConstructor" class="gt_row gt_right" style="text-align: right;">19.52</td>
+</tr>
+<tr>
+<td headers="Database" class="gt_row gt_left" style="text-align: left; font-weight: bold;">OHDSI SQL server</td>
+<td headers="[header]Time (minutes)
+[header_level]CIRCE" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">4.56</td>
+<td headers="[header]Time (minutes)
+[header_level]CohortConstructor" class="gt_row gt_right" style="text-align: right;">46.64</td>
+</tr>
+</tbody>
 </table>
 </div>
 </div>
@@ -2354,7 +3152,7 @@ measurement</p></li>
 </ol>
 <p>The plot below shows the computation time with and without SQL
 indexes for each scenario:</p>
-<p><img src="a11_benchmark_files/figure-html/unnamed-chunk-10-1.png" width="768"></p>
+<p><img src="a11_benchmark_files/figure-html/unnamed-chunk-10-1.png" width="960"></p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
