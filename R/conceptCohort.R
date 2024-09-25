@@ -382,12 +382,26 @@ reportConceptsFromUnsopportedDomains <- function(cdm,
 }
 
 addIndex <- function(cdm, name, cols) {
-  dbType <- attr(attr(cdm[[name]], "tbl_source"), "source_type")
+  tblSource <- attr(cdm[[name]], "tbl_source")
+  if(is.null(tblSource)){
+    return(invisible(NULL))
+  }
+  dbType <- attr(tblSource, "source_type")
+  if(is.null(dbType)){
+    return(invisible(NULL))
+  }
+
   if (dbType == "postgresql") {
     cli::cli_inform("Adding indexes to table")
-    con <- attr(attr(cdm[[name]], "tbl_source"), "dbcon")
-    schema <- attr(attr(cdm[[name]], "tbl_source"), "write_schema")[["schema"]]
-    prefix <- attr(attr(cdm[[name]], "tbl_source"), "write_schema")[["prefix"]]
+    con <- attr(cdm, "dbcon")
+    schema <- attr(cdm, "write_schema")
+    if(length(schema) > 1){
+      prefix <- attr(cdm, "write_schema")["prefix"]
+      schema <- attr(cdm, "write_schema")["schema"]
+    } else {
+      prefix <- NULL
+    }
+
     cols <- paste0(cols, collapse = ",")
 
     query <- paste0(
@@ -399,6 +413,9 @@ addIndex <- function(cdm, name, cols) {
     )
     suppressMessages(DBI::dbExecute(con, query))
   }
+
+    return(invisible(NULL))
+
 }
 
 getDomainCohort <- function(cdm,
