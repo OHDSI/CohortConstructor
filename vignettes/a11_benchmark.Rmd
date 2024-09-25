@@ -119,18 +119,18 @@ benchmarkData$details |>
 We also computed the overlap between patients in CIRCE and CohortConstructor cohorts, with results shown in the plot below:
 
 ```{r, fig.width=10, fig.height=7}
-# benchmarkData$comparison |>
-#   plotCohortOverlap() +
-#   scale_y_discrete(labels = niceOverlapLabels) +
-#   theme(
-#     legend.text = element_text(size = 10),
-#     strip.text = element_text(size = 14),
-#     axis.text.x = element_text(size = 12),  
-#     axis.title.x = element_text(size = 14),  
-#     axis.title.y = element_text(size = 14)   
-#   ) +
-#   facet_wrap("cdm_name") +
-#   scale_fill_discrete(labels = c("CIRCE", "Both", "CohortConstructor"))
+benchmarkData$comparison |>
+  plotCohortOverlap() +
+  scale_y_discrete(labels = niceOverlapLabels) +
+  theme(
+    legend.text = element_text(size = 10),
+    strip.text = element_text(size = 14),
+    axis.text.x = element_text(size = 12),
+    axis.title.x = element_text(size = 14),
+    axis.title.y = element_text(size = 14)
+  ) +
+  facet_wrap("cdm_name") +
+  scale_fill_discrete(labels = c("CIRCE", "Both", "CohortConstructor"))
 ```
 
 # Performance
