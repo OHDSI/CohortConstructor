@@ -128,6 +128,8 @@ matchCohorts <- function(cohort,
         ) |>
         dplyr::left_join(
           settings(cdm[[target]]) |>
+            dplyr::mutate(
+              "cohort_name" = paste0(.data$cohort_name, "_matched")) |>
             dplyr::select("cohort_definition_id", "target_cohort_name" = "cohort_name"),
           by = "cohort_definition_id"
         ) |>
@@ -149,6 +151,8 @@ matchCohorts <- function(cohort,
     omopgenerics::newCohortTable(
       cohortSetRef = settings(cdm[[target]]) |>
         dplyr::select("cohort_definition_id", "cohort_name") |>
+        dplyr::mutate(
+          "cohort_name" = paste0(.data$cohort_name, "_matched")) |>
         dplyr::mutate(
           "target_table_name" = omopgenerics::tableName(cohort),
           "target_cohort_id" = .data$cohort_definition_id,
@@ -208,7 +212,7 @@ getNewCohort <- function(cohort, cohortId, control) {
     dplyr::relocate(dplyr::all_of(omopgenerics::cohortColumns("cohort"))) |>
     omopgenerics::newCohortTable(
       cohortSetRef = settings(cohort) |>
-        dplyr::mutate("cohort_name" = paste0(.data$cohort_name, "_matched")),
+        dplyr::mutate("cohort_name" = paste0("matched_to_", .data$cohort_name)),
       cohortAttritionRef = dplyr::tibble(
         "cohort_definition_id" = as.integer(cohortId),
         "number_records" = controls |> dplyr::tally() |> dplyr::pull() |> as.integer(),
