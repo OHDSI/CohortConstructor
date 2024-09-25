@@ -42,3 +42,6 @@ reference:
 - subtitle: Mock data
 - contents:
   - matches("mockCohortConstructor")
+- subtitle: Results from benchmarking
+- contents:
+  - matches("benchmarkData")

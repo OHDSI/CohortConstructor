@@ -1,6 +1,6 @@
 Package: CohortConstructor
 Title: Build and Manipulate Study Cohorts Using a Common Data Model
-Version: 0.2.2
+Version: 0.3.0
 Authors@R: c(
     person("Edward", "Burn", , "edward.burn@ndorms.ox.ac.uk", 
     role = c("aut", "cre"), comment = c(ORCID = "0000-0002-9286-1128")),
@@ -17,7 +17,9 @@ Authors@R: c(
     person("Xihang", "Chen", , "xihang.chen@ndorms.ox.ac.uk", 
     role = c("aut"), comment = c(ORCID = "0009-0001-8112-8959")),
     person("Kim", "Lopez", , "kim.lopez@spc.ox.ac.uk", 
-    role = "aut", comment = c(ORCID = "0000-0002-8462-8668")))
+    role = "aut", comment = c(ORCID = "0000-0002-8462-8668")),
+    person("Elin", "Rowlands", , "elin.rowlands@ndorms.ox.ac.uk", 
+    role = "aut", comment = c(ORCID = "0009-0005-5166-0417")))
 Description: Create and manipulate study cohorts in data mapped to the 
     Observational Medical Outcomes Partnership Common Data Model.
 License: Apache License (>= 2)
@@ -67,5 +69,4 @@ VignetteBuilder: knitr
 Depends: 
     R (>= 4.1)
 URL: https://ohdsi.github.io/CohortConstructor/
-Remotes:
-    darwin-eu/visOmopResults
+LazyData: true

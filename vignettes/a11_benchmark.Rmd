@@ -87,7 +87,7 @@ The benchmark script was executed against the following four databases:
 The table below presents the number of records in the OMOP tables used in the benchmark script for each of the participating databases.
 
 ```{r}
-CohortConstructor:::benchmarkData$omop |>
+benchmarkData$omop |>
   visOmopResults::formatTable() |>
   tab_style(style = list(cell_fill(color = "#e1e1e1"), cell_text(weight = "bold")),
             locations = cells_column_labels()) |>
@@ -108,7 +108,7 @@ The COVID-19 cohort was used to evaluate the performance of common cohort strati
 The following table displays the number of records and subjects for each cohort across the participating databases:
 
 ```{r}
-CohortConstructor:::benchmarkData$details |>
+benchmarkData$details |>
   visOmopResults::formatTable(groupColumn = "cdm_name") |>
   tab_style(style = list(cell_fill(color = "#e1e1e1"), cell_text(weight = "bold")),
             locations = cells_column_labels()) |>
@@ -119,18 +119,18 @@ CohortConstructor:::benchmarkData$details |>
 We also computed the overlap between patients in CIRCE and CohortConstructor cohorts, with results shown in the plot below:
 
 ```{r, fig.width=10, fig.height=7}
-CohortConstructor:::benchmarkData$comparison |>
-  plotCohortOverlap() +
-  scale_y_discrete(labels = niceOverlapLabels) +
-  theme(
-    legend.text = element_text(size = 10),
-    strip.text = element_text(size = 14),
-    axis.text.x = element_text(size = 12),  
-    axis.title.x = element_text(size = 14),  
-    axis.title.y = element_text(size = 14)   
-  ) +
-  facet_wrap("cdm_name") +
-  scale_fill_discrete(labels = c("CIRCE", "Both", "CohortConstructor"))
+# benchmarkData$comparison |>
+#   plotCohortOverlap() +
+#   scale_y_discrete(labels = niceOverlapLabels) +
+#   theme(
+#     legend.text = element_text(size = 10),
+#     strip.text = element_text(size = 14),
+#     axis.text.x = element_text(size = 12),  
+#     axis.title.x = element_text(size = 14),  
+#     axis.title.y = element_text(size = 14)   
+#   ) +
+#   facet_wrap("cdm_name") +
+#   scale_fill_discrete(labels = c("CIRCE", "Both", "CohortConstructor"))
 ```
 
 # Performance
@@ -152,7 +152,7 @@ The following plot shows the times taken to create each cohort using CIRCE and C
 ## TABLE with same results as the plot below.
 
 # header_prefix <- "[header]Time by database (minutes)\n[header_level]"
-# CohortConstructor:::benchmarkData$time |>
+# benchmarkData$time |>
 #   distinct() |>
 #   filter(!grepl("male|set", msg)) |>
 #   mutate(
@@ -185,7 +185,7 @@ The following plot shows the times taken to create each cohort using CIRCE and C
 
 ```{r, fig.width=10, fig.height=7}
 
-CohortConstructor:::benchmarkData$time_definition |>
+benchmarkData$time_definition |>
   ggplot(aes(y = `Cohort name`, x = time, colour = Tool, fill = Tool)) +
   geom_col(position = "dodge", width = 0.6) +
   xlab("Time (minutes)") +
@@ -209,7 +209,7 @@ The table below depicts the total time it took to create the nine cohorts when u
 
 ```{r}
 header_prefix <- "[header]Time by tool (minutes)\n[header_level]"
-CohortConstructor:::benchmarkData$time_domain |>
+benchmarkData$time_domain |>
   gtTable(colsToMergeRows = "all_columns") |>
   tab_style(style = list(cell_fill(color = "#e1e1e1"), cell_text(weight = "bold")), 
             locations = cells_column_labels()) |>
@@ -222,7 +222,7 @@ CohortConstructor:::benchmarkData$time_domain |>
 Cohorts are often stratified in studies. With Atlas cohort definitions, each stratum requires a new CIRCE JSON to be instantiated, while CohortConstructor allows stratifications to be generated from an overall cohort. The following table shows the time taken to create age and sex stratifications for the COVID-19 cohort with both CIRCE and CohortConstructor.
 
 ```{r}
-CohortConstructor:::benchmarkData$time_strata |>
+benchmarkData$time_strata |>
   gtTable(colsToMergeRows = "all_columns") |>
   tab_style(style = list(cell_fill(color = "#e1e1e1"), cell_text(weight = "bold")), 
             locations = cells_column_labels()) |>
@@ -247,7 +247,7 @@ Four calls were made to `conceptCohort`, each involving a different number of OM
 The plot below shows the computation time with and without SQL indexes for each scenario:
 
 ```{r, fig.width=10, fig.height=7}
-CohortConstructor:::benchmarkData$sql_indexes |>
+benchmarkData$sql_indexes |>
   distinct() |>
   group_by(cdm_name, msg) |>
   summarise(time = sum(as.numeric(toc) - as.numeric(tic))/60, .groups = "drop") |>

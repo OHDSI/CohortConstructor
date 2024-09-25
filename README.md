@@ -117,15 +117,15 @@ cohort_count(cdm$fractures) %>% glimpse()
 #> $ number_records       <int> 464, 569, 138
 #> $ number_subjects      <int> 427, 510, 132
 attrition(cdm$fractures) %>% glimpse()
-#> Rows: 9
+#> Rows: 3
 #> Columns: 7
-#> $ cohort_definition_id <int> 1, 1, 1, 2, 2, 2, 3, 3, 3
-#> $ number_records       <int> 464, 464, 464, 569, 569, 569, 138, 138, 138
-#> $ number_subjects      <int> 427, 427, 427, 510, 510, 510, 132, 132, 132
-#> $ reason_id            <int> 1, 2, 3, 1, 2, 3, 1, 2, 3
-#> $ reason               <chr> "Initial qualifying events", "cohort requirements…
-#> $ excluded_records     <int> 0, 0, 0, 0, 0, 0, 0, 0, 0
-#> $ excluded_subjects    <int> 0, 0, 0, 0, 0, 0, 0, 0, 0
+#> $ cohort_definition_id <int> 1, 2, 3
+#> $ number_records       <int> 464, 569, 138
+#> $ number_subjects      <int> 427, 510, 132
+#> $ reason_id            <int> 1, 1, 1
+#> $ reason               <chr> "Initial qualifying events", "Initial qualifying …
+#> $ excluded_records     <int> 0, 0, 0
+#> $ excluded_subjects    <int> 0, 0, 0
 ```
 
 ### Create an overall fracture cohort
@@ -219,7 +219,7 @@ attrition(cdm$fractures) %>%
 #> $ cohort_definition_id <int> 1, 2, 3, 4
 #> $ number_records       <int> 43, 64, 22, 129
 #> $ number_subjects      <int> 43, 62, 22, 122
-#> $ reason_id            <int> 6, 6, 6, 4
+#> $ reason_id            <int> 4, 4, 4, 4
 #> $ reason               <chr> "Age requirement: 40 to 65", "Age requirement: 40…
 #> $ excluded_records     <int> 65, 88, 40, 193
 #> $ excluded_subjects    <int> 61, 81, 38, 165
@@ -232,7 +232,7 @@ attrition(cdm$fractures) %>%
 #> $ cohort_definition_id <int> 1, 2, 3, 4
 #> $ number_records       <int> 19, 37, 12, 68
 #> $ number_subjects      <int> 19, 36, 12, 65
-#> $ reason_id            <int> 7, 7, 7, 5
+#> $ reason_id            <int> 5, 5, 5, 5
 #> $ reason               <chr> "Sex requirement: Female", "Sex requirement: Fema…
 #> $ excluded_records     <int> 24, 27, 10, 61
 #> $ excluded_subjects    <int> 24, 26, 10, 57
@@ -265,7 +265,7 @@ attrition(cdm$fractures) %>%
 #> $ cohort_definition_id <int> 1, 2, 3, 4
 #> $ number_records       <int> 14, 30, 10, 54
 #> $ number_subjects      <int> 14, 30, 10, 52
-#> $ reason_id            <int> 10, 10, 10, 8
+#> $ reason_id            <int> 8, 8, 8, 8
 #> $ reason               <chr> "Not in cohort gibleed between -Inf & 0 days rela…
 #> $ excluded_records     <int> 5, 7, 2, 14
 #> $ excluded_subjects    <int> 5, 6, 2, 13
