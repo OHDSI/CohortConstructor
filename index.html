@@ -29,7 +29,7 @@
 
     <a class="navbar-brand me-2" href="index.html">CohortConstructor</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -152,15 +152,15 @@
 <span><span class="co">#&gt; $ number_records       &lt;int&gt; 464, 569, 138</span></span>
 <span><span class="co">#&gt; $ number_subjects      &lt;int&gt; 427, 510, 132</span></span>
 <span><span class="fu"><a href="https://darwin-eu-dev.github.io/omopgenerics/reference/attrition.html" class="external-link">attrition</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Rows: 9</span></span>
+<span><span class="co">#&gt; Rows: 3</span></span>
 <span><span class="co">#&gt; Columns: 7</span></span>
-<span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 1, 1, 1, 2, 2, 2, 3, 3, 3</span></span>
-<span><span class="co">#&gt; $ number_records       &lt;int&gt; 464, 464, 464, 569, 569, 569, 138, 138, 138</span></span>
-<span><span class="co">#&gt; $ number_subjects      &lt;int&gt; 427, 427, 427, 510, 510, 510, 132, 132, 132</span></span>
-<span><span class="co">#&gt; $ reason_id            &lt;int&gt; 1, 2, 3, 1, 2, 3, 1, 2, 3</span></span>
-<span><span class="co">#&gt; $ reason               &lt;chr&gt; "Initial qualifying events", "cohort requirements…</span></span>
-<span><span class="co">#&gt; $ excluded_records     &lt;int&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0</span></span>
-<span><span class="co">#&gt; $ excluded_subjects    &lt;int&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0</span></span></code></pre></div>
+<span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 1, 2, 3</span></span>
+<span><span class="co">#&gt; $ number_records       &lt;int&gt; 464, 569, 138</span></span>
+<span><span class="co">#&gt; $ number_subjects      &lt;int&gt; 427, 510, 132</span></span>
+<span><span class="co">#&gt; $ reason_id            &lt;int&gt; 1, 1, 1</span></span>
+<span><span class="co">#&gt; $ reason               &lt;chr&gt; "Initial qualifying events", "Initial qualifying …</span></span>
+<span><span class="co">#&gt; $ excluded_records     &lt;int&gt; 0, 0, 0</span></span>
+<span><span class="co">#&gt; $ excluded_subjects    &lt;int&gt; 0, 0, 0</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="create-an-overall-fracture-cohort">Create an overall fracture cohort<a class="anchor" aria-label="anchor" href="#create-an-overall-fracture-cohort"></a>
@@ -235,7 +235,7 @@
 <span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 1, 2, 3, 4</span></span>
 <span><span class="co">#&gt; $ number_records       &lt;int&gt; 43, 64, 22, 129</span></span>
 <span><span class="co">#&gt; $ number_subjects      &lt;int&gt; 43, 62, 22, 122</span></span>
-<span><span class="co">#&gt; $ reason_id            &lt;int&gt; 6, 6, 6, 4</span></span>
+<span><span class="co">#&gt; $ reason_id            &lt;int&gt; 4, 4, 4, 4</span></span>
 <span><span class="co">#&gt; $ reason               &lt;chr&gt; "Age requirement: 40 to 65", "Age requirement: 40…</span></span>
 <span><span class="co">#&gt; $ excluded_records     &lt;int&gt; 65, 88, 40, 193</span></span>
 <span><span class="co">#&gt; $ excluded_subjects    &lt;int&gt; 61, 81, 38, 165</span></span>
@@ -248,7 +248,7 @@
 <span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 1, 2, 3, 4</span></span>
 <span><span class="co">#&gt; $ number_records       &lt;int&gt; 19, 37, 12, 68</span></span>
 <span><span class="co">#&gt; $ number_subjects      &lt;int&gt; 19, 36, 12, 65</span></span>
-<span><span class="co">#&gt; $ reason_id            &lt;int&gt; 7, 7, 7, 5</span></span>
+<span><span class="co">#&gt; $ reason_id            &lt;int&gt; 5, 5, 5, 5</span></span>
 <span><span class="co">#&gt; $ reason               &lt;chr&gt; "Sex requirement: Female", "Sex requirement: Fema…</span></span>
 <span><span class="co">#&gt; $ excluded_records     &lt;int&gt; 24, 27, 10, 61</span></span>
 <span><span class="co">#&gt; $ excluded_subjects    &lt;int&gt; 24, 26, 10, 57</span></span></code></pre></div>
@@ -275,7 +275,7 @@
 <span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 1, 2, 3, 4</span></span>
 <span><span class="co">#&gt; $ number_records       &lt;int&gt; 14, 30, 10, 54</span></span>
 <span><span class="co">#&gt; $ number_subjects      &lt;int&gt; 14, 30, 10, 52</span></span>
-<span><span class="co">#&gt; $ reason_id            &lt;int&gt; 10, 10, 10, 8</span></span>
+<span><span class="co">#&gt; $ reason_id            &lt;int&gt; 8, 8, 8, 8</span></span>
 <span><span class="co">#&gt; $ reason               &lt;chr&gt; "Not in cohort gibleed between -Inf &amp; 0 days rela…</span></span>
 <span><span class="co">#&gt; $ excluded_records     &lt;int&gt; 5, 7, 2, 14</span></span>
 <span><span class="co">#&gt; $ excluded_subjects    &lt;int&gt; 5, 6, 2, 13</span></span></code></pre></div>
@@ -323,6 +323,7 @@
 <li>Yuchen Guo <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-0847-4855" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 <li>Xihang Chen <br><small class="roles"> Author </small> <a href="https://orcid.org/0009-0001-8112-8959" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 <li>Kim Lopez <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-8462-8668" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>Elin Rowlands <br><small class="roles"> Author </small> <a href="https://orcid.org/0009-0005-5166-0417" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 </ul>
 </div>
 
@@ -341,7 +342,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Edward Burn, Marti Catala, Nuria Mercade-Besora, Marta Alcalde-Herraiz, Mike Du, Yuchen Guo, Xihang Chen, Kim Lopez.</p>
+  <p>Developed by Edward Burn, Marti Catala, Nuria Mercade-Besora, Marta Alcalde-Herraiz, Mike Du, Yuchen Guo, Xihang Chen, Kim Lopez, Elin Rowlands.</p>
 </div>
 
 <div class="pkgdown-footer-right">

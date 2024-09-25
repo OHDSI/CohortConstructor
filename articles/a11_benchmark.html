@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">CohortConstructor</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -2102,7 +2102,6 @@ each cohort across the participating databases:</p>
 </div>
 <p>We also computed the overlap between patients in CIRCE and
 CohortConstructor cohorts, with results shown in the plot below:</p>
-<p><img src="a11_benchmark_files/figure-html/unnamed-chunk-5-1.png" width="960"></p>
 </div>
 </div>
 <div class="section level2">
@@ -2587,8 +2586,8 @@ CohortConstructor.</p>
 <thead>
 <tr class="gt_col_headings gt_spanner_row">
 <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="2" colspan="1" style="text-align: center; font-weight: bold; background-color: #E1E1E1;" scope="col" id="Database_name">Database_name</th>
-      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="2" style="background-color: #C8C8C8; text-align: center; font-weight: bold;" scope="colgroup" id="Time by tool (minutes)">
-        <span class="gt_column_spanner">Time by tool (minutes)</span>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="2" style="background-color: #C8C8C8; text-align: center; font-weight: bold;" scope="colgroup" id="Time (minutes)">
+        <span class="gt_column_spanner">Time (minutes)</span>
       </th>
     </tr>
 <tr class="gt_col_headings">
@@ -2599,30 +2598,30 @@ CohortConstructor.</p>
 <tbody class="gt_table_body">
 <tr>
 <td headers="Database_name" class="gt_row gt_left" style="text-align: left; font-weight: bold;">CORIVA-Estonia</td>
-<td headers="[header]Time by tool (minutes)
+<td headers="[header]Time (minutes)
 [header_level]CIRCE" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">9.51</td>
-<td headers="[header]Time by tool (minutes)
+<td headers="[header]Time (minutes)
 [header_level]CohortConstructor" class="gt_row gt_right" style="text-align: right;">9.95</td>
 </tr>
 <tr>
 <td headers="Database_name" class="gt_row gt_left" style="text-align: left; font-weight: bold;">CPRD Aurum</td>
-<td headers="[header]Time by tool (minutes)
+<td headers="[header]Time (minutes)
 [header_level]CIRCE" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">3,288.11</td>
-<td headers="[header]Time by tool (minutes)
+<td headers="[header]Time (minutes)
 [header_level]CohortConstructor" class="gt_row gt_right" style="text-align: right;">109.08</td>
 </tr>
 <tr>
 <td headers="Database_name" class="gt_row gt_left" style="text-align: left; font-weight: bold;">CPRD Gold 100k</td>
-<td headers="[header]Time by tool (minutes)
+<td headers="[header]Time (minutes)
 [header_level]CIRCE" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">73.41</td>
-<td headers="[header]Time by tool (minutes)
+<td headers="[header]Time (minutes)
 [header_level]CohortConstructor" class="gt_row gt_right" style="text-align: right;">7.85</td>
 </tr>
 <tr>
 <td headers="Database_name" class="gt_row gt_left" style="text-align: left; font-weight: bold;">OHDSI SQL server</td>
-<td headers="[header]Time by tool (minutes)
+<td headers="[header]Time (minutes)
 [header_level]CIRCE" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">2.89</td>
-<td headers="[header]Time by tool (minutes)
+<td headers="[header]Time (minutes)
 [header_level]CohortConstructor" class="gt_row gt_right" style="text-align: right;">18.56</td>
 </tr>
 </tbody>
@@ -3162,7 +3161,7 @@ indexes for each scenario:</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Edward Burn, Marti Catala, Nuria Mercade-Besora, Marta Alcalde-Herraiz, Mike Du, Yuchen Guo, Xihang Chen, Kim Lopez.</p>
+  <p>Developed by Edward Burn, Marti Catala, Nuria Mercade-Besora, Marta Alcalde-Herraiz, Mike Du, Yuchen Guo, Xihang Chen, Kim Lopez, Elin Rowlands.</p>
 </div>
 
 <div class="pkgdown-footer-right">
