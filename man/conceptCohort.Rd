@@ -18,7 +18,7 @@ conceptCohort(
 \item{conceptSet}{A conceptSet, which can either be a codelist
 or a conceptSetExpression.}
 
-\item{name}{Name of the cohort in the cdm object.}
+\item{name}{Name of the new cohort table created in the cdm object.}
 
 \item{exit}{How the cohort end date is defined. Can be either
 "event_end_date" or "event_start_date".}

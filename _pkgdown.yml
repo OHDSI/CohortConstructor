@@ -8,7 +8,7 @@ reference:
   - matches("conceptCohort|demographicsCohort|measurementCohort")
 - subtitle: Apply cohort table related requirements
 - contents:
-  - matches("requireMinimumCohortCount|requireInDateRange|requireIsFirstEntry|requireIsLastEntry|requireIsEntry")
+  - matches("requireMinCohortCount|requireInDateRange|requireIsFirstEntry|requireIsLastEntry|requireIsEntry")
 - subtitle: Impose singular demographic requirements on existing cohorts
 - contents:
   - matches("requireAge|requireSex|requirePriorObservation|requireFutureObservation")
@@ -42,3 +42,6 @@ reference:
 - subtitle: Mock data
 - contents:
   - matches("mockCohortConstructor")
+- subtitle: Results from benchmarking
+- contents:
+  - matches("benchmarkData")

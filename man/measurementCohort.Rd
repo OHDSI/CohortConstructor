@@ -18,7 +18,7 @@ measurementCohort(
 \item{conceptSet}{A conceptSet, which can either be a codelist
 or a conceptSetExpression.}
 
-\item{name}{Name of the cohort in the cdm object.}
+\item{name}{Name of the new cohort table created in the cdm object.}
 
 \item{valueAsConcept}{A vector of cohort IDs used to filter measurements.
 Only measurements with these values in the \code{value_as_concept_id} column of

@@ -17,22 +17,22 @@ trimDemographics(
 \arguments{
 \item{cohort}{A cohort table in a cdm reference.}
 
-\item{cohortId}{IDs of the cohorts to modify. If NULL, all cohorts will be
+\item{cohortId}{Vector identifying which cohorts to modify
+(cohort_definition_id or cohort_name). If NULL, all cohorts will be
 used; otherwise, only the specified cohorts will be modified, and the
 rest will remain unchanged.}
 
-\item{ageRange}{A list of minimum and maximum age.}
+\item{ageRange}{A list of vectors specifying minimum and maximum age.}
 
-\item{sex}{Can be "Both", "Male" or "Female". If one of the latter, only
-those with that sex will be included.}
+\item{sex}{Can be "Both", "Male" or "Female".}
 
-\item{minPriorObservation}{A minimum number of prior observation days in
-the database.}
+\item{minPriorObservation}{A minimum number of continuous prior observation
+days in the database.}
 
-\item{minFutureObservation}{A minimum number of future observation days in
-the database.}
+\item{minFutureObservation}{A minimum number of continuous future observation
+days in the database.}
 
-\item{name}{Name of the new cohort with the demographic requirements.}
+\item{name}{Name of the new cohort table created in the cdm object.}
 }
 \value{
 The cohort table with only records for individuals satisfying the

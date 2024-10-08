@@ -4,10 +4,9 @@
 #' `subsetCohorts()` filters an existing cohort table, keeping only the records
 #' from cohorts that are specified.
 #'
-#' @param cohort A cohort table in a cdm reference.
-#' @param cohortId IDs of the cohorts to include. Cohorts not included will be
-#' removed from the cohort set.
-#' @param name Name of the new cohort with the demographic requirements.
+#' @inheritParams cohortDoc
+#' @inheritParams cohortIdSubsetDoc
+#' @inheritParams nameDoc
 #'
 #' @return Cohort table with only cohorts in cohortId.
 #'
@@ -25,10 +24,10 @@ subsetCohorts <- function(cohort,
                           cohortId,
                           name = tableName(cohort)) {
   # checks
-  cohort <- validateCohortTable(cohort)
-  cdm <- omopgenerics::cdmReference(cohort)
-  cohortId <- validateCohortId(cohortId, settings(cohort)$cohort_definition_id)
-  name <- validateName(name)
+  name <- omopgenerics::validateNameArgument(name, validation = "warning")
+  cohort <- omopgenerics::validateCohortArgument(cohort)
+  cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
+  cohortId <- validateCohortId(cohortId, settings(cohort))
 
   cdm[[name]] <- cohort |>
     dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>

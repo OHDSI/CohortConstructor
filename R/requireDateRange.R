@@ -4,14 +4,13 @@
 #' `requireInDateRange()` filters cohort records, keeping only those for
 #' which the index date is within the specified date range.
 #'
-#' @param cohort A cohort table in a cdm reference.
-#' @param dateRange A window of time during which the index date must have
-#' been observed.
-#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
-#' used; otherwise, only the specified cohorts will be modified, and the
-#' rest will remain unchanged.
-#' @param indexDate Variable in cohort that contains the index date of interest
-#' @param name Name of the new cohort with the restriction.
+#' @inheritParams cohortDoc
+#' @inheritParams cohortIdModifyDoc
+#' @inheritParams nameDoc
+#' @param dateRange A date vector with the minimum and maximum dates between
+#' which the index date must have been observed.
+#' @param indexDate Name of the column in the cohort that contains the date of
+#' interest.
 #'
 #' @return The cohort table with any cohort entries outside of the date range
 #' dropped
@@ -32,14 +31,12 @@ requireInDateRange <- function(cohort,
                                indexDate = "cohort_start_date",
                                name = tableName(cohort)) {
   # checks
-  name <- validateName(name)
-  validateCohortTable(cohort)
-  cdm <- omopgenerics::cdmReference(cohort)
-  validateCDM(cdm)
+  name <- omopgenerics::validateNameArgument(name, validation = "warning")
+  cohort <- omopgenerics::validateCohortArgument(cohort)
   validateCohortColumn(indexDate, cohort, class = "Date")
-  ids <- omopgenerics::settings(cohort)$cohort_definition_id
-  cohortId <- validateCohortId(cohortId, ids)
-  validateDateRange(dateRange)
+  cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
+  cohortId <- validateCohortId(cohortId, settings(cohort))
+  dateRange <- validateDateRange(dateRange)
 
   # requirement
   if (!is.na(dateRange[1])) {
@@ -106,15 +103,13 @@ trimToDateRange <- function(cohort,
                             endDate = "cohort_end_date",
                             name = tableName(cohort)) {
   # checks
-  name <- validateName(name)
-  validateCohortTable(cohort)
-  cdm <- omopgenerics::cdmReference(cohort)
-  validateCDM(cdm)
+  name <- omopgenerics::validateNameArgument(name, validation = "warning")
+  cohort <- omopgenerics::validateCohortArgument(cohort)
   validateCohortColumn(startDate, cohort, class = "Date")
   validateCohortColumn(endDate, cohort, class = "Date")
-  ids <- omopgenerics::settings(cohort)$cohort_definition_id
-  cohortId <- validateCohortId(cohortId, ids)
-  validateDateRange(dateRange)
+  cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
+  cohortId <- validateCohortId(cohortId, settings(cohort))
+  dateRange <- validateDateRange(dateRange)
 
   # trim start
   if (!is.na(dateRange[1])) {

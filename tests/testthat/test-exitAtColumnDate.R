@@ -94,6 +94,16 @@ test_that("exit at last date", {
   expect_true(all(colnames(cdm$cohort1) ==
                     c("cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date")))
 
+  # test cohort id working
+  cdm$cohort11 <- cdm$cohort |>
+    exitAtLastDate(
+      dateColumns = c("cohort_end_date", "other_date_1", "other_date_2"),
+      returnReason = FALSE,
+      cohortId = c("cohort_1"),
+      name = "cohort11"
+    )
+  expect_equal(collectCohort(cdm$cohort1, 1), collectCohort(cdm$cohort11, 1))
+
   # test not cohort end as columns working
   cdm$cohort <- cdm$cohort |>
     exitAtLastDate(

@@ -5,17 +5,15 @@
 #' that overlap combined and kept. Cohort entries are when an individual was in
 #' _either_ of the cohorts.
 #'
-#' @param cohort A cohort table in a cdm reference.
-#' @param cohortId IDs of the cohorts to include. If NULL all cohorts will be
-#' considered. Cohorts not included will be removed from the cohort set.
-#' @param gap Number of days between two subsequent cohort entries of a subject
-#' that will be merged in a single cohort entry
+#' @inheritParams cohortDoc
+#' @inheritParams cohortIdSubsetDoc
+#' @inheritParams gapDoc
+#' @inheritParams nameDoc
 #' @param cohortName Name of the returned cohort. If NULL, the cohort name will
 #' be created by collapsing the individual cohort names, separated by "_".
 #' @param keepOriginalCohorts If TRUE the original cohorts and the newly
 #' created union cohort will be returned. If FALSE only the new cohort will be
 #' returned.
-#' @param name Name of the new cohort table.
 #'
 #' @export
 #'
@@ -38,20 +36,17 @@ unionCohorts <- function(cohort,
                          keepOriginalCohorts = FALSE,
                          name = tableName(cohort)) {
   # checks
-  name <- validateName(name)
-  validateCohortTable(cohort)
-  cdm <- omopgenerics::cdmReference(cohort)
-  validateCDM(cdm)
-  ids <- omopgenerics::settings(cohort)$cohort_definition_id
-  cohortId <- validateCohortId(cohortId, ids)
+  name <- omopgenerics::validateNameArgument(name, validation = "warning")
+  cohort <- omopgenerics::validateCohortArgument(cohort)
+  cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
+  cohortId <- validateCohortId(cohortId, settings(cohort))
+  omopgenerics::assertNumeric(gap, integerish = TRUE, min = 0, length = 1)
+  omopgenerics::assertCharacter(cohortName, length = 1, null = TRUE)
+  omopgenerics::assertLogical(keepOriginalCohorts, length = 1)
+
   if (length(cohortId) < 2) {
     cli::cli_abort("Settings of cohort table must contain at least two cohorts.")
   }
-  assertNumeric(gap,
-                integerish = TRUE,
-                min = 0,
-                length = 1)
-  assertCharacter(cohortName, length = 1, null = TRUE)
 
   if (length(cohortName) == 0) {
     names <- omopgenerics::settings(cohort) |>
@@ -70,12 +65,15 @@ unionCohorts <- function(cohort,
   tmpTable  <- omopgenerics::uniqueTableName()
   unionedCohort <- cohort |>
     dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>
-    joinOverlap(name = name, by = "subject_id", gap = gap) |>
+    joinOverlap(name = tmpTable,
+                by = "subject_id",
+                gap = gap) |>
     dplyr::mutate(cohort_definition_id = 1L) |>
+    dplyr::relocate(dplyr::all_of(omopgenerics::cohortColumns("cohort"))) |>
     dplyr::compute(name = tmpTable, temporary = FALSE)
   cohCodelist <- attr(cohort, "cohort_codelist")
   if (!is.null(cohCodelist)) {
-    cohCodelist <- cohCodelist |> dplyr::mutate("cohort_definition_id" = 1)
+    cohCodelist <- cohCodelist |> dplyr::mutate("cohort_definition_id" = 1L)
   }
   unionedCohort <- unionedCohort |>
     omopgenerics::newCohortTable(
@@ -92,6 +90,7 @@ unionCohorts <- function(cohort,
     cdm <- bind(cohort, unionedCohort, name = name)
   }
 
+  CDMConnector::dropTable(cdm, name = tmpTable)
 
   return(cdm[[name]])
 }

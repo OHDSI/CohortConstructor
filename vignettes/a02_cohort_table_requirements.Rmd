@@ -10,6 +10,9 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
+  eval = TRUE, 
+  message = FALSE, 
+  warning = FALSE,
   comment = "#>"
 )
 ```
@@ -18,30 +21,22 @@ knitr::opts_chunk$set(
 library(CohortConstructor)
 library(CohortCharacteristics)
 library(ggplot2)
+library(dplyr)
 ```
 
 ```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  eval = TRUE, message = FALSE, warning = FALSE,
-  comment = "#>"
-)
-
-library(CDMConnector)
-library(dplyr, warn.conflicts = FALSE)
-
 if (Sys.getenv("EUNOMIA_DATA_FOLDER") == ""){
   Sys.setenv("EUNOMIA_DATA_FOLDER" = file.path(tempdir(), "eunomia"))}
 if (!dir.exists(Sys.getenv("EUNOMIA_DATA_FOLDER"))){ dir.create(Sys.getenv("EUNOMIA_DATA_FOLDER"))
-  downloadEunomiaData()  
+  CDMConnector::downloadEunomiaData()  
 }
 ```
 
 For this example we'll use the Eunomia synthetic data from the CDMConnector package.
 
 ```{r}
-con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomia_dir())
-cdm <- cdm_from_con(con, cdm_schema = "main", 
+con <- DBI::dbConnect(duckdb::duckdb(), dbdir = CDMConnector::eunomia_dir())
+cdm <- CDMConnector::cdm_from_con(con, cdm_schema = "main", 
                     write_schema = c(prefix = "my_study_", schema = "main"))
 ```
 
@@ -136,7 +131,7 @@ The flow chart above illustrates the changes to cohort 1 when restricted to a sp
 
 ## Keep only records from cohorts with a minimum number of individuals
 
-Some studies might require a minimum cohort size. We can define the minimum size, filtering out records that are smaller than required, using the `requireMinimumCohortCount` function from CohortConstructor.
+Some studies might require a minimum cohort size. We can define the minimum size, filtering out records that are smaller than required, using the `requireMinCohortCount` function from CohortConstructor.
 
 ```{r, include = FALSE}
 cdm$medications <- conceptCohort(cdm = cdm, 
@@ -147,7 +142,7 @@ cdm$medications <- conceptCohort(cdm = cdm,
 
 ```{r}
 cdm$medications <- cdm$medications %>% 
-  requireMinimumCohortCount(minCohortCount = 1000)
+  requireMinCohortCount(minCohortCount = 1000)
 
 summary_attrition <- summariseCohortAttrition(cdm$medications)
 plotCohortAttrition(summary_attrition, cohortId = 1)

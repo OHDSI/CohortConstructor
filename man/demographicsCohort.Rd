@@ -15,14 +15,14 @@ demographicsCohort(
 \arguments{
 \item{cdm}{A cdm reference.}
 
-\item{name}{Name of the new cohort table}
+\item{name}{Name of the new cohort table created in the cdm object.}
 
 \item{ageRange}{A list of vectors specifying minimum and maximum age.}
 
 \item{sex}{Can be "Both", "Male" or "Female".}
 
-\item{minPriorObservation}{A minimum number of prior observation days in
-the database.}
+\item{minPriorObservation}{A minimum number of continuous prior observation
+days in the database.}
 }
 \value{
 A cohort table

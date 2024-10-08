@@ -4,18 +4,7 @@
 #' `trimDemographics()` resets the cohort start and end date based on the
 #' specified demographic criteria is satisfied.
 #'
-#' @param cohort A cohort table in a cdm reference.
-#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
-#' used; otherwise, only the specified cohorts will be modified, and the
-#' rest will remain unchanged.
-#' @param ageRange A list of minimum and maximum age.
-#' @param sex Can be "Both", "Male" or "Female". If one of the latter, only
-#' those with that sex will be included.
-#' @param minPriorObservation A minimum number of prior observation days in
-#' the database.
-#' @param minFutureObservation A minimum number of future observation days in
-#' the database.
-#' @param name Name of the new cohort with the demographic requirements.
+#' @inheritParams requireDemographics
 #'
 #' @return The cohort table with only records for individuals satisfying the
 #' demographic requirements
@@ -37,10 +26,11 @@ trimDemographics <- function(cohort,
                              minPriorObservation = NULL,
                              minFutureObservation = NULL,
                              name = tableName(cohort)) {
-  # initial validation
-  cohort <- validateCohortTable(cohort, FALSE)
-  ids <- settings(cohort)$cohort_definition_id
-  cohortId <- validateCohortId(cohortId, ids)
+  # checks
+  name <- omopgenerics::validateNameArgument(name, validation = "warning")
+  cohort <- omopgenerics::validateCohortArgument(cohort)
+  cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
+  cohortId <- validateCohortId(cohortId, settings(cohort))
   ageRange <- validateDemographicRequirements(
     ageRange = ageRange,
     sex = sex,
@@ -48,9 +38,8 @@ trimDemographics <- function(cohort,
     minFutureObservation = minFutureObservation,
     null = TRUE
   )
-  name <- validateName(name)
 
-  cdm <- omopgenerics::cdmReference(cohort)
+  ids <- settings(cohort)$cohort_definition_id
 
   # replace age Inf to avoid potential sql issues
   for (j in seq_along(ageRange)) {
@@ -127,25 +116,10 @@ trimDemographics <- function(cohort,
       by = "target_cohort_rand01",
       relationship = "many-to-many"
     ) |>
+    dplyr::relocate(dplyr::all_of(omopgenerics::cohortColumns("cohort"))) |>
     dplyr::compute(name = tmpNewCohort, temporary = FALSE)
 
-  # make sure cohort variables are first
-  orderVars <- c(
-    "cohort_definition_id",
-    "subject_id",
-    "cohort_start_date",
-    "cohort_end_date",
-    colnames(newCohort)[!colnames(newCohort) %in%
-      c(
-        "cohort_definition_id",
-        "subject_id",
-        "cohort_start_date",
-        "cohort_end_date"
-      )]
-  )
-
   newCohort <- newCohort |>
-    dplyr::select(dplyr::all_of(orderVars)) |>
     omopgenerics::newCohortTable(
       cohortSetRef = newSet,
       cohortAttritionRef = newAtt,
@@ -342,6 +316,7 @@ trimDemographics <- function(cohort,
         )
       )), by = unique(c("target_cohort_rand01", "subject_id"))) |>
     dplyr::select(!"target_cohort_rand01") |>
+    dplyr::relocate(dplyr::all_of(omopgenerics::cohortColumns("cohort"))) |>
     dplyr::compute(name = name, temporary = FALSE) |>
     omopgenerics::newCohortTable(
       cohortSetRef = newSet,

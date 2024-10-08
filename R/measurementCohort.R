@@ -14,10 +14,9 @@
 #' * If both `valueAsConcept` and `valueAsNumber` are not NULL, records will
 #' be required to have values that fulfill _either_ of the requirements
 #'
-#' @param cdm A cdm reference.
-#' @param conceptSet A conceptSet, which can either be a codelist
-#' or a conceptSetExpression.
-#' @param name Name of the cohort in the cdm object.
+#' @inheritParams cdmDoc
+#' @inheritParams conceptSetDoc
+#' @inheritParams nameDoc
 #' @param valueAsConcept A vector of cohort IDs used to filter measurements.
 #' Only measurements with these values in the `value_as_concept_id` column of
 #' the measurement table will be included. If NULL all entries independently of
@@ -84,10 +83,10 @@ measurementCohort <- function(cdm,
                               valueAsConcept = NULL,
                               valueAsNumber = NULL) {
   # initial input validation
-  cdm <- validateCdm(cdm)
-  name <- validateName(name)
-  conceptSet <- validateConceptSet(conceptSet)
-  assertNumeric(valueAsConcept, integerish = TRUE, null = TRUE)
+  name <- omopgenerics::validateNameArgument(name, validation = "warning")
+  cdm <- omopgenerics::validateCdmArgument(cdm)
+  conceptSet <- omopgenerics::validateConceptSetArgument(conceptSet, cdm)
+  omopgenerics::assertNumeric(valueAsConcept, integerish = TRUE, null = TRUE)
   validateValueAsNumber(valueAsNumber)
 
   # empty concept set
@@ -141,31 +140,6 @@ measurementCohort <- function(cdm,
                       by = "concept_id") |>
     dplyr::filter(!is.na(.data$cohort_start_date)) |>
     dplyr::compute(name = name, temporary = FALSE)
-
-  if (!is.null(valueAsConcept)) {
-    value <- cohort |> dplyr::pull("value_as_concept_id") |> unique()
-    matches <- valueAsConcept %in% value
-    matching_ids <- valueAsConcept[!matches]
-
-    if (length(matching_ids) > 0) {
-      cli::cli_inform(
-        c("i" = "These valueAsConcept don't exist for the input measurement concepts:", paste(matching_ids, collapse = ", "))
-      )
-    }
-  }
-
-  if (!is.null(valueAsNumber)) {
-    unit <- cohort |> dplyr::pull("unit_concept_id") |> unique()
-    matches <- as.numeric(names(valueAsNumber)) %in% as.numeric(unit)
-    matching_ids <- names(valueAsNumber)[!matches]
-
-    if (length(matching_ids) > 0) {
-      cli::cli_inform(
-        c("i" = "These unit concepts don't exist for the input measurement concepts:", paste(matching_ids, collapse = ", "))
-      )
-    }
-  }
-
 
   if (cohort |> dplyr::tally() |> dplyr::pull("n") == 0) {
     cli::cli_inform(c("i" = "No table could be subsetted, returning empty cohort."))

@@ -4,12 +4,10 @@
 #' `requireIsFirstEntry()` filters cohort records, keeping only the first
 #' cohort entry per person.
 #'
-#' @param cohort A cohort table in a cdm reference.
-#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
-#' used; otherwise, only the specified cohorts will be modified, and the
-#' rest will remain unchanged.
+#' @inheritParams cohortDoc
+#' @inheritParams cohortIdModifyDoc
+#' @inheritParams nameDoc
 #' @param entryRange Range for entries to include.
-#' @param name Name of the new cohort with the restriction.
 #'
 #' @return A cohort table in a cdm reference.
 #' @export
@@ -26,12 +24,10 @@ requireIsEntry <- function(cohort,
                            cohortId = NULL,
                            name = tableName(cohort)) {
   # checks
-  name <- validateName(name)
-  validateCohortTable(cohort)
-  cdm <- omopgenerics::cdmReference(cohort)
-  validateCDM(cdm)
-  ids <- omopgenerics::settings(cohort)$cohort_definition_id
-  cohortId <- validateCohortId(cohortId, ids)
+  name <- omopgenerics::validateNameArgument(name, validation = "warning")
+  cohort <- omopgenerics::validateCohortArgument(cohort)
+  cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
+  cohortId <- validateCohortId(cohortId, settings(cohort))
 
   omopgenerics::assertNumeric(entryRange, integerish = TRUE, min = 0)
   if (length(entryRange) < 1 || length(entryRange) > 2) {
@@ -92,10 +88,9 @@ requireIsEntry <- function(cohort,
 #' `requireIsFirstEntry()` filters cohort records, keeping only the first
 #' cohort entry per person.
 #'
-#' @param cohort A cohort table in a cdm reference.
-#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
-#' used; otherwise, only the specified cohorts will be modified, and the
-#' rest will remain unchanged.
+#' @inheritParams cohortDoc
+#' @inheritParams cohortIdModifyDoc
+#' @inheritParams nameDoc
 #' @param name Name of the new cohort with the restriction.
 #'
 #' @return A cohort table in a cdm reference.
@@ -112,12 +107,10 @@ requireIsFirstEntry <- function(cohort,
                                 cohortId = NULL,
                                 name = tableName(cohort)) {
   # checks
-  name <- validateName(name)
-  validateCohortTable(cohort)
-  cdm <- omopgenerics::cdmReference(cohort)
-  validateCDM(cdm)
-  ids <- omopgenerics::settings(cohort)$cohort_definition_id
-  cohortId <- validateCohortId(cohortId, ids)
+  name <- omopgenerics::validateNameArgument(name, validation = "warning")
+  cohort <- omopgenerics::validateCohortArgument(cohort)
+  cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
+  cohortId <- validateCohortId(cohortId, settings(cohort))
 
   cohort <- cohort |>
     dplyr::group_by(.data$subject_id, .data$cohort_definition_id) |>
@@ -159,12 +152,10 @@ requireIsLastEntry <- function(cohort,
                                cohortId = NULL,
                                name = tableName(cohort)) {
   # checks
-  name <- validateName(name)
-  validateCohortTable(cohort)
-  cdm <- omopgenerics::cdmReference(cohort)
-  validateCDM(cdm)
-  ids <- omopgenerics::settings(cohort)$cohort_definition_id
-  cohortId <- validateCohortId(cohortId, ids)
+  name <- omopgenerics::validateNameArgument(name, validation = "warning")
+  cohort <- omopgenerics::validateCohortArgument(cohort)
+  cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
+  cohortId <- validateCohortId(cohortId, settings(cohort))
 
   cohort <- cohort |>
     dplyr::group_by(.data$subject_id, .data$cohort_definition_id) |>

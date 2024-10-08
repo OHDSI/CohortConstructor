@@ -17,12 +17,13 @@ stratifyCohorts(
 
 \item{strata}{A strata list that point to columns in cohort table.}
 
-\item{cohortId}{IDs of the cohorts to include. If NULL all cohorts will be
-considered. Cohorts not included will be removed from the cohort set.}
+\item{cohortId}{Vector identifying which cohorts to include
+(cohort_definition_id or cohort_name). Cohorts not included will be
+removed from the cohort set.}
 
 \item{removeStrata}{Whether to remove strata columns from final cohort table.}
 
-\item{name}{Name of the new cohort.}
+\item{name}{Name of the new cohort table created in the cdm object.}
 }
 \value{
 Cohort table stratified.
@@ -40,7 +41,7 @@ cdm <- mockCohortConstructor()
 
 cdm$my_cohort <- cdm$cohort1 |>
   addAge(ageGroup = list("child" = c(0, 17), "adult" = c(18, Inf))) |>
-  addSex() |>
+  addSex(name = "my_cohort") |>
   stratifyCohorts(
     strata = list("sex", c("sex", "age_group")), name = "my_cohort"
   )

@@ -15,22 +15,25 @@ entryAtLastDate(
 \arguments{
 \item{cohort}{A cohort table in a cdm reference.}
 
-\item{dateColumns}{description}
+\item{dateColumns}{Character vector indicating date columns in the cohort
+table to consider.}
 
-\item{cohortId}{IDs of the cohorts to modify. If NULL, all cohorts will be
+\item{cohortId}{Vector identifying which cohorts to modify
+(cohort_definition_id or cohort_name). If NULL, all cohorts will be
 used; otherwise, only the specified cohorts will be modified, and the
 rest will remain unchanged.}
 
-\item{returnReason}{If TRUE it will return a column stating which column in
-\code{dateColumns} is used as a new cohort end date. description}
+\item{returnReason}{If TRUE it will return a column indicating which of the
+\code{dateColumns} was used.}
 
-\item{name}{Name of the new cohort with the restriction.}
+\item{name}{Name of the new cohort table created in the cdm object.}
 }
 \value{
 The cohort table.
 }
 \description{
-Set cohort start date to the last of a set of column dates
+\code{entryAtLastDate()} resets cohort end date based on a set of specified
+column dates. The last date is chosen.
 }
 \examples{
 \donttest{

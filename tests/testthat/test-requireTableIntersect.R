@@ -1,11 +1,11 @@
 test_that("requiring presence in another table", {
   testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4) |>
-    omock::mockObservationPeriod() |>
-    omock::mockCohort(name = c("cohort1"), numberCohorts = 2)
+    omock::mockPerson(n = 4,seed = 1) |>
+    omock::mockObservationPeriod(seed = 1) |>
+    omock::mockCohort(name = c("cohort1"), numberCohorts = 2,seed = 1)
   cdm_local$table <- dplyr::tibble(
-    person_id = c(1, 3, 4),
+    person_id = c(1, 3, 2),
     date_start = as.Date(c("2002-01-01", "2015-10-01", "2000-01-01")),
     date_end = as.Date(c("2002-01-01", "2015-10-01", "2000-01-01"))
   )
@@ -35,9 +35,9 @@ test_that("requiring presence in another table", {
                                             targetEndDate = "date_end",
                                             window = c(0, Inf),
                                             name = "cohort3")
-  expect_true(all(cdm$cohort3 |> dplyr::pull("subject_id") == c(1, 3, 4, 1, 1, 1, 3)))
+  expect_true(all(cdm$cohort3 |> dplyr::pull("subject_id") == c(2,3,1,1)))
   expect_true(all(cdm$cohort3 |> dplyr::pull("cohort_start_date") ==
-                    c("2001-03-30", "2015-03-25", "1997-10-22", "2000-06-23", "2001-07-16", "2001-12-04", "2015-03-05")))
+                    c("1999-05-03", "2015-02-25", "2001-03-24", "2001-11-28")))
   expect_equal(omopgenerics::attrition(cdm$cohort3)$reason,
                c("Initial qualifying events",
                  "In table table between 0 & Inf days relative to cohort_start_date between 1 and Inf",
@@ -52,8 +52,8 @@ test_that("requiring presence in another table", {
                                             window = c(-Inf, 0),
                                             censorDate = "cohort_end_date",
                                             name = "cohort4")
-  expect_true(cdm$cohort4 |> dplyr::pull("subject_id") == 1)
-  expect_true(cdm$cohort4 |> dplyr::pull("cohort_start_date") == "2003-06-15")
+  expect_true(all(cdm$cohort4 |> dplyr::pull("subject_id") == c(1,1,1,1)))
+  expect_true(all(cdm$cohort4 |> dplyr::pull("cohort_start_date") == c("2003-05-17", "2004-03-11", "2002-01-30", "2002-06-13")))
   expect_equal(omopgenerics::attrition(cdm$cohort4)$reason,
                c("Initial qualifying events",
                  "In table table between -Inf & 0 days relative to cohort_start_date between 1 and Inf, censoring at cohort_end_date",
@@ -69,9 +69,9 @@ test_that("requiring presence in another table", {
                                             window = c(-Inf, 0),
                                             censorDate = "cohort_end_date",
                                             name = "cohort5")
-  expect_true(all(cdm$cohort5 |> dplyr::pull("subject_id") == c(1, 1, 1, 1, 3)))
+  expect_true(all(cdm$cohort5 |> dplyr::pull("subject_id") == c(1, 1, 1, 1, 1,1)))
   expect_true(all(cdm$cohort5 |> dplyr::pull("cohort_start_date") |> sort() ==
-                    c("2000-06-23", "2001-07-16", "2001-12-04", "2003-06-15", "2015-03-05")))
+                    c("2001-03-24", "2001-11-28", "2002-01-30", "2002-06-13", "2003-05-17", "2004-03-11")))
   expect_equal(omopgenerics::attrition(cdm$cohort5)$reason,
                c("Initial qualifying events",
                  "In table table between -Inf & 0 days relative to cohort_start_date between 1 and Inf, censoring at cohort_end_date",
@@ -101,9 +101,9 @@ test_that("requiring presence in another table", {
 test_that("requiring absence in another table", {
   testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4) |>
-    omock::mockObservationPeriod() |>
-    omock::mockCohort(name = c("cohort1"), numberCohorts = 2)
+    omock::mockPerson(n = 4,seed = 1) |>
+    omock::mockObservationPeriod(seed = 1) |>
+    omock::mockCohort(name = c("cohort1"), numberCohorts = 2,seed = 1)
   cdm_local$table <- dplyr::tibble(
     person_id = c(1, 3, 4),
     date_start = as.Date(c("2002-01-01", "2015-10-01", "2000-01-01")),
@@ -119,7 +119,7 @@ test_that("requiring absence in another table", {
                                             window = c(-Inf, Inf),
                                             name = "cohort2")
 
-  expect_true(cdm$cohort2 |> dplyr::pull("subject_id") |> length() == 0)
+  expect_true(cdm$cohort2 |> dplyr::pull("subject_id") |> length() == 1)
   expect_equal(omopgenerics::attrition(cdm$cohort2)$reason,
                c("Initial qualifying events",
                  "Not in table table between -Inf & Inf days relative to cohort_start_date",
@@ -133,8 +133,9 @@ test_that("requiring absence in another table", {
                                             targetEndDate = "date_end",
                                             window = c(0, Inf),
                                             name = "cohort3")
-  expect_true(all(cdm$cohort3 |> dplyr::pull("subject_id") == 1))
-  expect_true(all(cdm$cohort3 |> dplyr::pull("cohort_start_date") == "2003-06-15"))
+  expect_true(all(cdm$cohort3 |> dplyr::pull("subject_id") == c(1,1,2,1,1)))
+  expect_true(all(cdm$cohort3 |> dplyr::pull("cohort_start_date") |> sort() ==
+                    c("1999-05-03", "2002-01-30", "2002-06-13", "2003-05-17", "2004-03-11")))
   expect_equal(omopgenerics::attrition(cdm$cohort3)$reason,
                c("Initial qualifying events",
                  "Not in table table between 0 & Inf days relative to cohort_start_date",
@@ -150,9 +151,9 @@ test_that("requiring absence in another table", {
                                             window = c(-Inf, 0),
                                             censorDate = "cohort_end_date",
                                             name = "cohort4")
-  expect_true(all(cdm$cohort4 |> dplyr::pull("subject_id") == c(1, 3, 4, 1, 1, 1, 3)))
+  expect_true(all(cdm$cohort4 |> dplyr::pull("subject_id") == c(2,3,1,1)))
   expect_true(all((cdm$cohort4 |> dplyr::pull("cohort_start_date") ==
-                 c("2001-03-30", "2015-03-25", "1997-10-22", "2000-06-23", "2001-07-16", "2001-12-04", "2015-03-05"))))
+                 c("1999-05-03", "2015-02-25", "2001-03-24", "2001-11-28"))))
   expect_equal(omopgenerics::attrition(cdm$cohort4)$reason,
                c("Initial qualifying events",
                  "Not in table table between -Inf & 0 days relative to cohort_start_date, censoring at cohort_end_date",
@@ -162,15 +163,16 @@ test_that("requiring absence in another table", {
   # cohort Id and name
   cdm$cohort1 <-  requireTableIntersect(cohort = cdm$cohort1,
                                         intersections = 0,
-                                            cohortId = 1,
+                                            cohortId = "cohort_1",
                                             tableName = "table",
                                             targetStartDate = "date_start",
                                             targetEndDate = "date_end",
                                             window = c(0, Inf),
                                             censorDate = NULL)
-  expect_true(all(cdm$cohort1 |> dplyr::pull("subject_id") |> sort() == c(1, 1, 1, 1, 3)))
+  expect_true(all(cdm$cohort1 |> dplyr::pull("subject_id") |> sort() == c(1, 1, 1, 1, 1, 1, 2)))
   expect_true(all((cdm$cohort1 |> dplyr::pull("cohort_start_date") |> sort() ==
-                     c("2000-06-23", "2001-07-16", "2001-12-04", "2003-06-15", "2015-03-05"))))
+                     c("1999-05-03", "2001-03-24", "2001-11-28", "2002-01-30", "2002-06-13",
+                       "2003-05-17", "2004-03-11"))))
   expect_equal(omopgenerics::attrition(cdm$cohort1)$reason,
                c("Initial qualifying events",
                  "Not in table table between 0 & Inf days relative to cohort_start_date",

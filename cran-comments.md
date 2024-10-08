@@ -1,3 +1,3 @@
 ## R CMD check results
 
-This is a new release. 
+This is a patch releasing, fixing a small issue from the previous release.

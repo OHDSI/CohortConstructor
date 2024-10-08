@@ -1,5 +1,5 @@
 test_that("mearurementCohorts works", {
-  cdm <- mockCohortConstructor(con = NULL)
+  cdm <- mockCohortConstructor(con = NULL, seed = 1)
   cdm$concept <- cdm$concept |>
     dplyr::union_all(
       dplyr::tibble(
@@ -31,7 +31,17 @@ test_that("mearurementCohorts works", {
   )
   cdm <- cdm |> copyCdm()
 
-  # simple example ----
+  isDuckdb <- attr(omopgenerics::cdmSource(cdm), "source_type") == "duckdb"
+  if(isDuckdb){
+    startTempTables <- countDuckdbTempTables(
+      con = attr(omopgenerics::cdmSource(cdm),
+                 "dbcon"))
+    startPermanentTables <- countDuckdbPermanentTables(
+      con = attr(omopgenerics::cdmSource(cdm),
+                 "dbcon"))
+  }
+
+  # simple example
   cdm$cohort <- measurementCohort(
     cdm = cdm,
     name = "cohort",
@@ -39,6 +49,24 @@ test_that("mearurementCohorts works", {
     valueAsConcept = c(4124457),
     valueAsNumber = list("8876" = c(70, 120))
   )
+
+  if(isDuckdb){
+    # endTempTables <- countDuckdbTempTables(
+    #   con = attr(omopgenerics::cdmSource(cdm),
+    #              "dbcon"))
+    endPermanentTables <- countDuckdbPermanentTables(
+      con = attr(omopgenerics::cdmSource(cdm),
+                 "dbcon"))
+    # we should have only added 4 permanent tables (the new cohort table and
+    # three tables with settings, attrition, and codelist)
+    # no temp tables will have been created
+    # expect_true(startTempTables == endTempTables)
+    expect_true(
+      startPermanentTables + 4 == endPermanentTables
+    )
+  }
+
+
   expect_equal(
     collectCohort(cdm$cohort, 1),
     dplyr::tibble(
@@ -207,7 +235,7 @@ test_that("mearurementCohorts works", {
 
 test_that("expected errors", {
   testthat::skip_on_cran()
-  cdm <- mockCohortConstructor(con = NULL)
+  cdm <- mockCohortConstructor(con = NULL, seed = 1)
   cdm$concept <- cdm$concept |>
     dplyr::union_all(
       dplyr::tibble(

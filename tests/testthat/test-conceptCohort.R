@@ -65,14 +65,14 @@ test_that("expected errors and messages", {
 test_that("simple example", {
   cdm <- omock::mockCdmReference() |>
     omock::mockCdmFromTables(tables = list("cohort" = dplyr::tibble(
-      "cohort_definition_id" = 1,
-      "subject_id" = c(1, 2, 3),
+      "cohort_definition_id" = 1L,
+      "subject_id" = c(1L, 2L, 3L),
       "cohort_start_date" = as.Date("2020-01-01"),
       "cohort_end_date" = as.Date("2029-12-31")
     )))
   cdm <- omopgenerics::insertTable(
     cdm = cdm, name = "concept", table = dplyr::tibble(
-      "concept_id" = 1,
+      "concept_id" = 1L,
       "concept_name" = "my concept",
       "domain_id" = "drUg",
       "vocabulary_id" = NA,
@@ -84,9 +84,9 @@ test_that("simple example", {
   )
   cdm <- omopgenerics::insertTable(
     cdm = cdm, name = "drug_exposure", table = dplyr::tibble(
-      "drug_exposure_id" = 1:11,
-      "person_id" = c(1, 1, 1, 1, 2, 2, 3, 1, 1, 1, 1),
-      "drug_concept_id" = c(1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1),
+      "drug_exposure_id" = 1:11 |> as.integer(),
+      "person_id" = c(1, 1, 1, 1, 2, 2, 3, 1, 1, 1, 1) |> as.integer(),
+      "drug_concept_id" = c(1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1) |> as.integer(),
       "drug_exposure_start_date" = c(0, 300, 1500, 750, 10, 800, 150, 1800, 1801, 1802, 1803),
       "drug_exposure_end_date" = c(400, 800, 1600, 1550, 2000, 1000, 600, 1801, 1802, 1803, 1804),
       "drug_type_concept_id" = 1
@@ -98,8 +98,33 @@ test_that("simple example", {
   )
 
   cdm <- cdm |> copyCdm()
-
-  expect_no_error(cohort <- conceptCohort(cdm = cdm, conceptSet = list(a = 1), name = "cohort"))
+  isDuckdb <- attr(omopgenerics::cdmSource(cdm), "source_type") == "duckdb"
+  if(isDuckdb){
+  startTempTables <- countDuckdbTempTables(
+    con = attr(omopgenerics::cdmSource(cdm),
+                               "dbcon"))
+  startPermanentTables <- countDuckdbPermanentTables(
+    con = attr(omopgenerics::cdmSource(cdm),
+               "dbcon"))
+  }
+  expect_no_error(cohort <- conceptCohort(cdm = cdm,
+                                          conceptSet = list(a = 1),
+                                          name = "my_cohort"))
+  if(isDuckdb){
+    endTempTables <- countDuckdbTempTables(
+      con = attr(omopgenerics::cdmSource(cdm),
+                 "dbcon"))
+    endPermanentTables <- countDuckdbPermanentTables(
+      con = attr(omopgenerics::cdmSource(cdm),
+                 "dbcon"))
+    # we should have only added 4 permanent tables (the new cohort table and
+    # three tables with settings, attrition, and codelist)
+    # no temp tables will have been created
+    expect_true(startTempTables == endTempTables)
+    expect_true(
+      startPermanentTables + 4 == endPermanentTables
+    )
+  }
 
   expect_true(cohort |> dplyr::tally() |> dplyr::pull() == 4)
   expect_true(cohortCount(cohort)$number_records == 4)
@@ -283,8 +308,8 @@ test_that("excluded concepts in codelist", {
 test_that("out of observation", {
   testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4) |>
-    omock::mockObservationPeriod()
+    omock::mockPerson(n = 4, seed = 1) |>
+    omock::mockObservationPeriod(seed = 1)
   cdm_local$concept <- dplyr::tibble(
     "concept_id" = c(1, 2),
     "concept_name" = c("my concept 1", "my concept 2"),
@@ -343,8 +368,8 @@ test_that("out of observation", {
   # event starts out, end in (subject 3)
   # no concept 2
   cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4) |>
-    omock::mockObservationPeriod()
+    omock::mockPerson(n = 4, seed = 1) |>
+    omock::mockObservationPeriod(seed = 1)
   cdm_local$concept <- dplyr::tibble(
     "concept_id" = c(1, 2),
     "concept_name" = c("my concept 1", "my concept 2"),
@@ -384,8 +409,8 @@ test_that("out of observation", {
   # out of observation (subject 3)
   # overlapping (subject 4)
   cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4) |>
-    omock::mockObservationPeriod()
+    omock::mockPerson(n = 4, seed = 1) |>
+    omock::mockObservationPeriod(seed = 1)
   cdm_local$concept <- dplyr::tibble(
     "concept_id" = c(1, 2),
     "concept_name" = c("my concept 1", "my concept 2"),

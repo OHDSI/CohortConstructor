@@ -8,6 +8,8 @@
 [![CRAN
 status](https://www.r-pkg.org/badges/version/CohortConstructor)](https://CRAN.R-project.org/package=CohortConstructor)
 [![R-CMD-check](https://github.com/OHDSI/CohortConstructor/workflows/R-CMD-check/badge.svg)](https://github.com/OHDSI/CohortConstructor/actions)
+[![Codecov test
+coverage](https://codecov.io/gh/OHDSI/CohortConstructor/branch/main/graph/badge.svg)](https://app.codecov.io/gh/OHDSI/CohortConstructor?branch=main)
 [![Lifecycle:Experimental](https://img.shields.io/badge/Lifecycle-Experimental-339999)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 
 <!-- badges: end -->
@@ -112,18 +114,18 @@ cohort_count(cdm$fractures) %>% glimpse()
 #> Rows: 3
 #> Columns: 3
 #> $ cohort_definition_id <int> 1, 2, 3
-#> $ number_records       <int> 462, 565, 137
-#> $ number_subjects      <int> 426, 508, 132
+#> $ number_records       <int> 464, 569, 138
+#> $ number_subjects      <int> 427, 510, 132
 attrition(cdm$fractures) %>% glimpse()
-#> Rows: 9
+#> Rows: 3
 #> Columns: 7
-#> $ cohort_definition_id <int> 1, 1, 1, 2, 2, 2, 3, 3, 3
-#> $ number_records       <int> 462, 462, 462, 565, 565, 565, 137, 137, 137
-#> $ number_subjects      <int> 426, 426, 426, 508, 508, 508, 132, 132, 132
-#> $ reason_id            <int> 1, 2, 3, 1, 2, 3, 1, 2, 3
-#> $ reason               <chr> "Initial qualifying events", "cohort requirements…
-#> $ excluded_records     <int> 0, 0, 0, 0, 0, 0, 0, 0, 0
-#> $ excluded_subjects    <int> 0, 0, 0, 0, 0, 0, 0, 0, 0
+#> $ cohort_definition_id <int> 1, 2, 3
+#> $ number_records       <int> 464, 569, 138
+#> $ number_subjects      <int> 427, 510, 132
+#> $ reason_id            <int> 1, 1, 1
+#> $ reason               <chr> "Initial qualifying events", "Initial qualifying …
+#> $ excluded_records     <int> 0, 0, 0
+#> $ excluded_subjects    <int> 0, 0, 0
 ```
 
 ### Create an overall fracture cohort
@@ -134,21 +136,28 @@ our three cohorts to create this overall cohort like so:
 
 ``` r
 cdm$fractures <- unionCohorts(cdm$fractures,
-                                 cohortName = "any_fracture", 
-                                 name ="fractures")
+                              cohortName = "any_fracture", 
+                              keepOriginalCohorts = TRUE,
+                              name ="fractures")
 ```
 
 ``` r
 settings(cdm$fractures)
-#> # A tibble: 1 × 3
-#>   cohort_definition_id cohort_name    gap
-#>                  <int> <chr>        <dbl>
-#> 1                    1 any_fracture     0
+#> # A tibble: 4 × 5
+#>   cohort_definition_id cohort_name      cdm_version vocabulary_version   gap
+#>                  <int> <chr>            <chr>       <chr>              <dbl>
+#> 1                    1 ankle_fracture   5.3         v5.0 18-JAN-19        NA
+#> 2                    2 forearm_fracture 5.3         v5.0 18-JAN-19        NA
+#> 3                    3 hip_fracture     5.3         v5.0 18-JAN-19        NA
+#> 4                    4 any_fracture     <NA>        <NA>                   0
 cohortCount(cdm$fractures)
-#> # A tibble: 1 × 3
+#> # A tibble: 4 × 3
 #>   cohort_definition_id number_records number_subjects
 #>                  <int>          <int>           <int>
-#> 1                    1           1164             922
+#> 1                    1            464             427
+#> 2                    2            569             510
+#> 3                    3            138             132
+#> 4                    4           1171             924
 ```
 
 ### Require in date range
@@ -168,11 +177,11 @@ attributes have been updated
 
 ``` r
 cohort_count(cdm$fractures) %>% glimpse()
-#> Rows: 1
+#> Rows: 4
 #> Columns: 3
-#> $ cohort_definition_id <int> 1
-#> $ number_records       <int> 315
-#> $ number_subjects      <int> 282
+#> $ cohort_definition_id <int> 1, 2, 3, 4
+#> $ number_records       <int> 108, 152, 62, 322
+#> $ number_subjects      <int> 104, 143, 60, 287
 attrition(cdm$fractures) %>% 
   filter(reason == "cohort_start_date between 2000-01-01 & 2020-01-01") %>% 
   glimpse()
@@ -205,28 +214,28 @@ criteria.
 attrition(cdm$fractures) %>% 
   filter(reason == "Age requirement: 40 to 65") %>% 
   glimpse()
-#> Rows: 1
+#> Rows: 4
 #> Columns: 7
-#> $ cohort_definition_id <int> 1
-#> $ number_records       <int> 124
-#> $ number_subjects      <int> 118
-#> $ reason_id            <int> 4
-#> $ reason               <chr> "Age requirement: 40 to 65"
-#> $ excluded_records     <int> 191
-#> $ excluded_subjects    <int> 164
+#> $ cohort_definition_id <int> 1, 2, 3, 4
+#> $ number_records       <int> 43, 64, 22, 129
+#> $ number_subjects      <int> 43, 62, 22, 122
+#> $ reason_id            <int> 4, 4, 4, 4
+#> $ reason               <chr> "Age requirement: 40 to 65", "Age requirement: 40…
+#> $ excluded_records     <int> 65, 88, 40, 193
+#> $ excluded_subjects    <int> 61, 81, 38, 165
 
 attrition(cdm$fractures) %>% 
   filter(reason == "Sex requirement: Female") %>% 
   glimpse()
-#> Rows: 1
+#> Rows: 4
 #> Columns: 7
-#> $ cohort_definition_id <int> 1
-#> $ number_records       <int> 64
-#> $ number_subjects      <int> 62
-#> $ reason_id            <int> 5
-#> $ reason               <chr> "Sex requirement: Female"
-#> $ excluded_records     <int> 60
-#> $ excluded_subjects    <int> 56
+#> $ cohort_definition_id <int> 1, 2, 3, 4
+#> $ number_records       <int> 19, 37, 12, 68
+#> $ number_subjects      <int> 19, 36, 12, 65
+#> $ reason_id            <int> 5, 5, 5, 5
+#> $ reason               <chr> "Sex requirement: Female", "Sex requirement: Fema…
+#> $ excluded_records     <int> 24, 27, 10, 61
+#> $ excluded_subjects    <int> 24, 26, 10, 57
 ```
 
 ### Require presence in another cohort
@@ -251,15 +260,15 @@ cdm$fractures <- cdm$fractures %>%
 attrition(cdm$fractures) %>% 
   filter(reason == "Not in cohort gibleed between -Inf & 0 days relative to cohort_start_date") %>% 
   glimpse()
-#> Rows: 1
+#> Rows: 4
 #> Columns: 7
-#> $ cohort_definition_id <int> 1
-#> $ number_records       <int> 64
-#> $ number_subjects      <int> 62
-#> $ reason_id            <int> 8
+#> $ cohort_definition_id <int> 1, 2, 3, 4
+#> $ number_records       <int> 14, 30, 10, 54
+#> $ number_subjects      <int> 14, 30, 10, 52
+#> $ reason_id            <int> 8, 8, 8, 8
 #> $ reason               <chr> "Not in cohort gibleed between -Inf & 0 days rela…
-#> $ excluded_records     <int> 0
-#> $ excluded_subjects    <int> 0
+#> $ excluded_records     <int> 5, 7, 2, 14
+#> $ excluded_subjects    <int> 5, 6, 2, 13
 ```
 
 ``` r

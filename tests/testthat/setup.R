@@ -51,3 +51,17 @@ copyCdm <- function(cdm) {
     con = connection(), cdm = cdm, schema = writeSchema(), overwrite = TRUE
   )
 }
+countDuckdbTempTables <- function(con){
+  duckdb_temp_tables <- DBI::dbGetQuery(con, "SHOW ALL TABLES")
+  duckdb_temp_tables |>
+    dplyr::filter(database == "temp") |>
+    dplyr::tally() |>
+    dplyr::pull("n")
+}
+countDuckdbPermanentTables <- function(con){
+  duckdb_temp_tables <- DBI::dbGetQuery(con, "SHOW ALL TABLES")
+  duckdb_temp_tables |>
+    dplyr::filter(database != "temp") |>
+    dplyr::tally() |>
+    dplyr::pull("n")
+}

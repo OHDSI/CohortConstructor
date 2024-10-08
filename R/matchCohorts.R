@@ -4,13 +4,12 @@
 #' `matchCohorts()` generate a new cohort matched to individuals in an
 #' existing cohort. Individuals can be matched based on year of birth and sex.
 #'
-#' @param cohort A cohort table in a cdm reference.
-#' @param cohortId IDs of the cohorts to include. If NULL all cohorts will be
-#' considered. Cohorts not included will be removed from the cohort set.
+#' @inheritParams cohortDoc
+#' @inheritParams cohortIdSubsetDoc
+#' @inheritParams nameDoc
 #' @param matchSex Whether to match in sex.
 #' @param matchYearOfBirth Whether to match in year of birth.
 #' @param ratio Number of allowed matches per individual in the target cohort.
-#' @param name Name of the new generated cohort set.
 #'
 #' @return A cohort table.
 #'
@@ -39,15 +38,13 @@ matchCohorts <- function(cohort,
   cli::cli_inform("Starting matching")
 
   # validate initial input
-  name <- validateName(name)
-  validateCohortTable(cohort)
-  cdm <- omopgenerics::cdmReference(cohort)
-  validateCDM(cdm)
-  ids <- omopgenerics::settings(cohort)$cohort_definition_id
-  cohortId <- validateCohortId(cohortId, ids)
-  assertNumeric(ratio, min = 0, length = 1)
-  assertLogical(matchSex, length = 1)
-  assertLogical(matchYearOfBirth, length = 1)
+  name <- omopgenerics::validateNameArgument(name, validation = "warning")
+  cohort <- omopgenerics::validateCohortArgument(cohort)
+  cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
+  cohortId <- validateCohortId(cohortId, settings(cohort))
+  omopgenerics::assertNumeric(ratio, min = 0, length = 1)
+  omopgenerics::assertLogical(matchSex, length = 1)
+  omopgenerics::assertLogical(matchYearOfBirth, length = 1)
 
   # Check if there are repeated people within the cohort
   y <- cohort |>
@@ -70,6 +67,7 @@ matchCohorts <- function(cohort,
 
   if (cohort |> settings() |> nrow() == 0) {
     cdm[[name]] <- cohort |>
+      dplyr::relocate(dplyr::all_of(omopgenerics::cohortColumns("cohort"))) |>
       dplyr::compute(name = name, temporary = FALSE) |>
       omopgenerics::newCohortTable(.softValidation = TRUE)
     return(cdm[[name]])
@@ -117,6 +115,7 @@ matchCohorts <- function(cohort,
 
   # update settings
   cdm[[control]] <- cdm[[control]] |>
+    dplyr::relocate(dplyr::all_of(omopgenerics::cohortColumns("cohort"))) |>
     omopgenerics::newCohortTable(
       cohortSetRef = settings(cdm[[control]]) |>
         dplyr::select("cohort_definition_id", "cohort_name") |>
@@ -129,6 +128,8 @@ matchCohorts <- function(cohort,
         ) |>
         dplyr::left_join(
           settings(cdm[[target]]) |>
+            dplyr::mutate(
+              "cohort_name" = paste0(.data$cohort_name, "_matched")) |>
             dplyr::select("cohort_definition_id", "target_cohort_name" = "cohort_name"),
           by = "cohort_definition_id"
         ) |>
@@ -146,9 +147,12 @@ matchCohorts <- function(cohort,
       .softValidation = TRUE
     )
   cdm[[target]] <- cdm[[target]] |>
+    dplyr::relocate(dplyr::all_of(omopgenerics::cohortColumns("cohort"))) |>
     omopgenerics::newCohortTable(
       cohortSetRef = settings(cdm[[target]]) |>
         dplyr::select("cohort_definition_id", "cohort_name") |>
+        dplyr::mutate(
+          "cohort_name" = paste0(.data$cohort_name, "_matched")) |>
         dplyr::mutate(
           "target_table_name" = omopgenerics::tableName(cohort),
           "target_cohort_id" = .data$cohort_definition_id,
@@ -205,15 +209,16 @@ getNewCohort <- function(cohort, cohortId, control) {
   cdm <- omopgenerics::dropTable(cdm, temp_name)
 
   controls <- controls |>
+    dplyr::relocate(dplyr::all_of(omopgenerics::cohortColumns("cohort"))) |>
     omopgenerics::newCohortTable(
       cohortSetRef = settings(cohort) |>
-        dplyr::mutate("cohort_name" = paste0(.data$cohort_name, "_matched")),
+        dplyr::mutate("cohort_name" = paste0("matched_to_", .data$cohort_name)),
       cohortAttritionRef = dplyr::tibble(
         "cohort_definition_id" = as.integer(cohortId),
-        "number_records" = controls |> dplyr::tally() |> dplyr::pull(),
+        "number_records" = controls |> dplyr::tally() |> dplyr::pull() |> as.integer(),
         "number_subjects" = controls |>
           dplyr::summarise(dplyr::n_distinct(.data$subject_id)) |>
-          dplyr::pull(),
+          dplyr::pull() |> as.integer(),
         "reason_id" = 1L,
         "reason" = "First observation per person",
         "excluded_records" = 0L,
@@ -375,6 +380,7 @@ observationControl <- function(x) {
         .data$cohort_start_date >= .data$observation_period_start_date
     ) |>
     dplyr::select(-"observation_period_start_date") |>
+    dplyr::relocate(dplyr::all_of(omopgenerics::cohortColumns("cohort"))) |>
     dplyr::compute(name = tableName(x), temporary = FALSE) |>
     omopgenerics::recordCohortAttrition(reason = "Exclude individuals not in observation")
 }

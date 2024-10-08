@@ -16,4 +16,162 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(CohortConstructor)
+library(CohortCharacteristics)
+library(ggplot2)
 ```
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  eval = TRUE, message = FALSE, warning = FALSE,
+  comment = "#>"
+)
+
+library(CDMConnector)
+library(dplyr, warn.conflicts = FALSE)
+
+if (Sys.getenv("EUNOMIA_DATA_FOLDER") == ""){
+  Sys.setenv("EUNOMIA_DATA_FOLDER" = file.path(tempdir(), "eunomia"))}
+if (!dir.exists(Sys.getenv("EUNOMIA_DATA_FOLDER"))){ dir.create(Sys.getenv("EUNOMIA_DATA_FOLDER"))
+  downloadEunomiaData()  
+}
+```
+
+For this example we'll use the Eunomia synthetic data from the CDMConnector package.
+
+```{r}
+con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomia_dir())
+cdm <- cdm_from_con(con, cdm_schema = "main", 
+                    write_schema = c(prefix = "my_study_", schema = "main"))
+```
+
+Let's start by creating two drug cohorts, one for users of diclofenac and another for users of acetaminophen.
+
+```{r}
+cdm$medications <- conceptCohort(cdm = cdm, 
+                                 conceptSet = list("diclofenac" = 1124300,
+                                                   "acetaminophen" = 1127433), 
+                                 name = "medications")
+
+settings(cdm$medications)
+cohortCount(cdm$medications)
+```
+
+Cohort 1 contains users of acetaminophen and has 2580 subjects and 9365 records. Cohort 2 contains users of diclofenac and has 830 subjects and 830 records. 
+
+## Restrict cohort by age
+
+We can choose a specific age range for individuals in our cohort using `requireAge()` from CohortConstructor. 
+
+```{r}
+cdm$medications <- cdm$medications %>% 
+  requireAge(indexDate = "cohort_start_date",
+             ageRange = list(c(18,100)))
+
+summary_attrition <- summariseCohortAttrition(cdm$medications)
+plotCohortAttrition(summary_attrition, cohortId = 1)
+```
+The flow chart above illustrates the changes to cohort 1 (users of acetaminophen) when restricted to only include individuals aged 18 to 90. 226 individuals and 2,863 records were excluded. 
+
+The variable 'cohort_start_date' is used so that individuals are filtered based on the age they were when they entered the cohort.  
+
+## Restrict cohort by sex
+
+We can also specify a sex criteria for individuals in our cohort using `requireSex()` from CohortConstructor. 
+
+```{r, include = FALSE}
+cdm$medications <- conceptCohort(cdm = cdm, 
+                                 conceptSet = list("diclofenac" = 1124300,
+                                                   "acetaminophen" = 1127433), 
+                                 name = "medications")
+
+settings(cdm$medications)
+cohortCount(cdm$medications)
+```
+
+```{r}
+cdm$medications <- cdm$medications %>% 
+  requireSex(sex = "Female")
+
+summary_attrition <- summariseCohortAttrition(cdm$medications)
+plotCohortAttrition(summary_attrition, cohortId = 1)
+```
+The flow chart above illustrates the changes to cohort 1 when restricted to only include 'female' individuals. 1,264 individuals and 4,647 records were excluded. 
+
+## Restrict cohort by number of prior observations
+
+We can also specify a minimum number of days of prior observations for each individual using `requirePriorObservation()` from CohortConstructor. 
+
+```{r, include = FALSE}
+cdm$medications <- conceptCohort(cdm = cdm, 
+                                 conceptSet = list("diclofenac" = 1124300,
+                                                   "acetaminophen" = 1127433), 
+                                 name = "medications")
+
+settings(cdm$medications)
+cohortCount(cdm$medications)
+```
+
+```{r}
+cdm$medications <- cdm$medications %>% 
+  requirePriorObservation(indexDate = "cohort_start_date",
+                          minPriorObservation = 365)
+
+summary_attrition <- summariseCohortAttrition(cdm$medications)
+plotCohortAttrition(summary_attrition, cohortId = 1)
+```
+The flow chart above illustrates the changes to cohort 1 when restricted to only include individuals with at least 365 days of prior observations. 5 individuals and 109 records were excluded. 
+
+## Restrict cohort by number of future observations
+
+We can also specify a minimum number of days of prior observations for each individual using `requireFutureObservation()` from CohortConstructor. 
+
+```{r, include = FALSE}
+cdm$medications <- conceptCohort(cdm = cdm, 
+                                 conceptSet = list("diclofenac" = 1124300,
+                                                   "acetaminophen" = 1127433), 
+                                 name = "medications")
+
+settings(cdm$medications)
+cohortCount(cdm$medications)
+```
+
+```{r}
+cdm$medications <- cdm$medications %>% 
+  requireFutureObservation(indexDate = "cohort_start_date",
+                          minFutureObservation = 365)
+
+summary_attrition <- summariseCohortAttrition(cdm$medications)
+plotCohortAttrition(summary_attrition, cohortId = 1)
+```
+The flow chart above illustrates the changes to cohort 1 when restricted to only include individuals with at least 365 days of future observations. 14 individuals and 206 records were excluded.
+
+## Applying multiple demographic requirements to a cohort
+
+We can implement multiple demographic requirements on a cohort using `requireDemographics()` from CohortConstructor. 
+
+```{r, include = FALSE}
+cdm$medications <- conceptCohort(cdm = cdm, 
+                                 conceptSet = list("diclofenac" = 1124300,
+                                                   "acetaminophen" = 1127433), 
+                                 name = "medications")
+
+settings(cdm$medications)
+cohortCount(cdm$medications)
+```
+
+```{r}
+cdm$medications <- cdm$medications %>% 
+  requireDemographics(indexDate = "cohort_start_date",
+                      ageRange = c(18,100),
+                      sex = "Female",
+                      minPriorObservation = 365,
+                      minFutureObservation = 365)
+
+
+
+summary_attrition <- summariseCohortAttrition(cdm$medications)
+plotCohortAttrition(summary_attrition, cohortId = 1)
+```
+
+The flow chart above illustrates the changes to cohort 1 when multiple demographic restrictions, so that only female individuals between 18 and 100 years old, with at least 365 days of prior and future observations are included. 1,413 individuals and 6156 records were excluded.
