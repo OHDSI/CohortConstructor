@@ -57,11 +57,11 @@ cohortCount(cdm$medications)
 We can take a sample from a cohort table using the function `sampleCohort()`. This allows us to specify the number of individuals in each cohort. 
 
 ```{r}
-cdm$medications |> sampleCohorts(cohortId = c(1,2), n = 100)
+cdm$medications |> sampleCohorts(cohortId = NULL, n = 100)
 
 cohortCount(cdm$medications)
 ```
-Note that this function does not reduced the number of records in each cohort, only the number of individuals.
+When cohortId = NULL all cohorts in the table are used. Note that this function does not reduced the number of records in each cohort, only the number of individuals.
 
 It is also possible to only sample one cohort within cohort table, however the remaining cohorts will still remain.
 
