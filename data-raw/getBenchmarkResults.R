@@ -66,6 +66,22 @@ updateCDMname <- function(resultList, old, new) {
   resultList
 }
 
+updateResultType <- function(resultList, old, new) {
+  caseWhen <- "dplyr::case_when("
+  for (k in 1:length(old)) {
+    caseWhen <- glue::glue("{caseWhen} .data$result_type == '{old[k]}' ~ '{new[k]}', ")
+  }
+  caseWhen <- paste0(caseWhen, ".default = .data$result_type)") |>
+    rlang::parse_exprs() |> rlang::set_names("result_type")
+  for (res in names(resultList)) {
+    if ("summarised_result" %in% class(resultList[[res]])) {
+      attr(resultList[[res]], "settings") <- settings(resultList[[res]]) |>
+        dplyr::mutate(cdm_name = !!!caseWhen)
+    }
+  }
+  resultList
+}
+
 # Functions
 niceNum <- function(x, dec = 0) {
   trimws(format(round(as.numeric(x), dec), big.mark = ",", nsmall = dec, scientific = FALSE))
@@ -75,7 +91,8 @@ niceNum <- function(x, dec = 0) {
 resultPatterns <- c("time", "comparison", "details", "omop", "index_counts", "sql_indexes")
 benchmarkDataPre <- readData(here::here("data-raw", "data")) |>
   mergeData(resultPatterns) |>
-  updateCDMname(old = "AurumCDM_202403", new = "CPRD Aurum")
+  updateCDMname(old = "AurumCDM_202403", new = "CPRD Aurum") |>
+  updateResultType(old = "cohort_overlap", new = "summarise_cohort_overlap")
 benchmarkData <- list()
 
 ### omop
@@ -96,8 +113,10 @@ benchmarkData$omop <- benchmarkDataPre$omop |>
 ### details
 benchmarkData$details <- benchmarkDataPre$details |>
   filterSettings(result_type == "cohort_count") |>
+  formatEstimateValue() |>
   splitAll() |>
-  pivotEstimates() |>
+  select(!"estimate_type") |>
+  pivot_wider(names_from = "estimate_name", values_from = "estimate_value") |>
   select(-variable_level, - result_id) |>
   distinct() |>
   filter(grepl("cc_|atlas_", cohort_name)) |>
@@ -183,7 +202,7 @@ benchmarkData$time_strata <- benchmarkDataPre$time |>
 
 ### time comparison
 benchmarkData$comparison <- benchmarkDataPre$comparison |>
-  filterSettings(result_type == "cohort_overlap") |>
+  filterSettings(result_type == "summarise_cohort_overlap") |>
   splitGroup() |>
   filter(grepl("atlas_", cohort_name_comparator) & grepl("cc_", cohort_name_reference)) |>
   filter(gsub("atlas_", "", cohort_name_comparator) == gsub("cc_", "", cohort_name_reference)) |>
