@@ -54,9 +54,55 @@ cdm$medications <- conceptCohort(cdm = cdm,
                                  name = "medications")
 cohortCount(cdm$medications)
 ```
+We can take a sample from a cohort table using the function `sampleCohort()`. This allows us to specify the number of individuals in each cohort. 
 
 ```{r}
-cdm$medications_sample <- sampleCohorts(cdm$medications,cohortId = 1, n = 100, name = "medications_sample")
+cdm$medications |> sampleCohorts(cohortId = NULL, n = 100)
 
-cohortCount(cdm$medications_sample)
+cohortCount(cdm$medications)
+```
+When cohortId = NULL all cohorts in the table are used. Note that this function does not reduced the number of records in each cohort, only the number of individuals.
+
+It is also possible to only sample one cohort within cohort table, however the remaining cohorts will still remain.
+
+```{r include = FALSE, warning = FALSE}
+con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomia_dir())
+cdm <- cdm_from_con(con, cdm_schema = "main", 
+                    write_schema = c(prefix = "my_study_", schema = "main"))
+cdm$medications <- conceptCohort(cdm = cdm, 
+                                 conceptSet = list("diclofenac" = 1124300,
+                                                   "acetaminophen" = 1127433), 
+                                 name = "medications")
+```
+
+```{r}
+cdm$medications <- cdm$medications |> sampleCohorts(cohortId = 2, n = 100)
+
+cohortCount(cdm$medications)
+```
+
+The chosen cohort (users of diclofenac) has been reduced to 100 individuals, as specified in the function, however all individuals from cohort 1 (users of acetaminophen) and their records remain.
+
+If you want to filter the cohort table to only include individuals and records from a specified cohort, you can use the function `subsetCohorts`. 
+
+```{r include = FALSE, warning = FALSE}
+con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomia_dir())
+cdm <- cdm_from_con(con, cdm_schema = "main", 
+                    write_schema = c(prefix = "my_study_", schema = "main"))
+cdm$medications <- conceptCohort(cdm = cdm, 
+                                 conceptSet = list("diclofenac" = 1124300,
+                                                   "acetaminophen" = 1127433), 
+                                 name = "medications")
+```
+
+```{r}
+cdm$medications <- cdm$medications |> subsetCohorts(cohortId = 2)
+cohortCount(cdm$medications)
+```
+The cohort table has been filtered so it now only includes individuals and records from cohort 2. If you want to take a sample of the filtered cohort table then you can use the `sampleCohorts` function.
+
+```{r}
+cdm$medications <- cdm$medications |> sampleCohorts(cohortId = 2, n = 100)
+
+cohortCount(cdm$medications)
 ```
