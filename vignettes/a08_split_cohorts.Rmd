@@ -14,11 +14,15 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
-library(CohortConstructor)
-library(CohortCharacteristics)
-library(ggplot2)
-library(PatientProfiles)
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  eval = TRUE, message = FALSE, warning = FALSE,
+  comment = "#>"
+)
+
+library(CDMConnector)
+library(dplyr, warn.conflicts = FALSE)
 
 if (Sys.getenv("EUNOMIA_DATA_FOLDER") == ""){
   Sys.setenv("EUNOMIA_DATA_FOLDER" = file.path(tempdir(), "eunomia"))}
