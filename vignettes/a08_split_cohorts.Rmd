@@ -19,6 +19,7 @@ library(CohortCharacteristics)
 library(ggplot2)
 library(CDMConnector)
 library(dplyr, warn.conflicts = FALSE)
+library(PatientProfiles)
 
 if (Sys.getenv("EUNOMIA_DATA_FOLDER") == ""){
   Sys.setenv("EUNOMIA_DATA_FOLDER" = file.path(tempdir(), "eunomia"))}
