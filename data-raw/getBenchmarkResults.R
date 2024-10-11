@@ -41,6 +41,12 @@ mergeData <- function(data, patterns) {
     srObs <- sum(lapply(data[grepl(pat, names(data))], class) |> unlist() == "summarised_result")
     if (srObs > 0) {
       if (srObs == srExp) {
+        for(i in seq_along(dataSubset)) {
+          if(!is.null(attr(dataSubset[[i]], "settings"))){
+          attr(dataSubset[[i]], "settings") <-  attr(dataSubset[[i]], "settings") |>
+              mutate(across(.cols = -result_id, as.character))
+          }
+        }
         x[[pat]] <- dataSubset %>% omopgenerics::bind()
       } else {
         cli::cli_abort("Not all results with pattern {pat} have class summarised result.")
