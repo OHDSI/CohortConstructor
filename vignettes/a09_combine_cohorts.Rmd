@@ -15,5 +15,133 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-library(CohortConstructor)
+#library(CohortConstructor)
+library(CohortCharacteristics)
+library(ggplot2)
+```
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  eval = TRUE, message = FALSE, warning = FALSE,
+  comment = "#>"
+)
+
+library(CDMConnector)
+library(dplyr, warn.conflicts = FALSE)
+
+if (Sys.getenv("EUNOMIA_DATA_FOLDER") == ""){
+  Sys.setenv("EUNOMIA_DATA_FOLDER" = file.path(tempdir(), "eunomia"))}
+if (!dir.exists(Sys.getenv("EUNOMIA_DATA_FOLDER"))){ dir.create(Sys.getenv("EUNOMIA_DATA_FOLDER"))
+  downloadEunomiaData()  
+}
+```
+
+For this example we'll use the Eunomia synthetic data from the CDMConnector package.
+
+```{r}
+con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomia_dir())
+cdm <- cdm_from_con(con, cdm_schema = "main", 
+                    write_schema = c(prefix = "my_study_", schema = "main"))
+```
+
+Let's start by creating two drug cohorts, one for users of diclofenac and another for users of acetaminophen.
+
+```{r}
+cdm$medications <- conceptCohort(cdm = cdm, 
+                                 conceptSet = list("diclofenac" = 1124300,
+                                                   "acetaminophen" = 1127433), 
+                                 name = "medications")
+cohortCount(cdm$medications)
+```
+
+To check whether there is an overlap between records in both cohorts using the function `intersectCohorts()`.  
+
+```{r}
+cdm$medintersect <- intersectCohorts(
+  cohort = cdm$medications,
+  name = "medintersect"
+)
+
+cohortCount(cdm$medintersect)
+```
+There are 6 individuals who had overlapping records in the diclofenac and acetaminophen cohorts.
+
+```{r, include=FALSE, warning=FALSE}
+con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomia_dir())
+cdm <- cdm_from_con(con, cdm_schema = "main", 
+                    write_schema = c(prefix = "my_study_", schema = "main"))
+cdm$medications <- conceptCohort(cdm = cdm, 
+                                 conceptSet = list("diclofenac" = 1124300,
+                                                   "acetaminophen" = 1127433), 
+                                 name = "medications")
+```
+
+We can choose the number of days between cohort entries using the `gap` argument.
+
+```{r}
+cdm$medintersect <- intersectCohorts(
+  cohort = cdm$medications,
+  gap = 365,
+  name = "medintersect"
+)
+
+cohortCount(cdm$medintersect)
+```
+There are 94 individuals who had overlapping records (within 365 days) in the diclofenac and acetaminophen cohorts.
+
+We can also combine different cohorts using the function `unionCohorts()`.
+
+```{r}
+cdm$medunion <- unionCohorts(
+  cohort = cdm$medications,
+  name = "medunion"
+)
+
+cohortCount(cdm$medunion)
+```
+We have now created a new cohort which includes individuals in either the diclofenac cohort or the acetaminophen cohort. 
+
+```{r, include=FALSE, warning=FALSE}
+con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomia_dir())
+cdm <- cdm_from_con(con, cdm_schema = "main", 
+                    write_schema = c(prefix = "my_study_", schema = "main"))
+cdm$medications <- conceptCohort(cdm = cdm, 
+                                 conceptSet = list("diclofenac" = 1124300,
+                                                   "acetaminophen" = 1127433), 
+                                 name = "medications")
+```
+
+You can keep the original cohorts in the new table if you use the argument `keepOriginalCohorts = TRUE`.
+```{r}
+cdm$medunion <- unionCohorts(
+  cohort = cdm$medications,
+  name = "medunion",
+  keepOriginalCohorts = TRUE
+)
+
+cohortCount(cdm$medunion)
+```
+
+You can also choose the number of days between two subsequent cohort entries to be merged using the `gap` argument.
+
+```{r, include=FALSE, warning=FALSE}
+con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomia_dir())
+cdm <- cdm_from_con(con, cdm_schema = "main", 
+                    write_schema = c(prefix = "my_study_", schema = "main"))
+cdm$medications <- conceptCohort(cdm = cdm, 
+                                 conceptSet = list("diclofenac" = 1124300,
+                                                   "acetaminophen" = 1127433), 
+                                 name = "medications")
+```
+
+```{r}
+cdm$medunion <- unionCohorts(
+  cohort = cdm$medications,
+  name = "medunion",
+  gap = 365,
+  keepOriginalCohorts = TRUE
+)
+
+cohortCount(cdm$medunion)
 ```
