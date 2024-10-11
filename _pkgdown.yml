@@ -23,7 +23,7 @@ reference:
   - matches("requireDeathFlag")
 - subtitle: Update cohort start and end dates
 - contents:
-  - matches("^trim|exit|entry|padCohortStart")
+  - matches("^trim|exit|entry|padCohortStart|padCohortEnd")
 - subtitle: Concatanate cohort entries
 - contents:
   - matches("collapseCohorts")
