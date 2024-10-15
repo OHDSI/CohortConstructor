@@ -15,6 +15,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
+devtools::install_github("ohdsi/CohortConstructor")
 library(CohortConstructor)
 library(CohortCharacteristics)
 library(ggplot2)
