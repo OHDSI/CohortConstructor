@@ -52,17 +52,14 @@ collapseCohorts <- function(cohort,
       dplyr::select(!"observation_period_id")
   } else if (gap > 0) {
     newCohort <- newCohort |>
-      PatientProfiles::addObservationPeriodId() |>
       joinOverlap(
         name = tmpNewCohort,
         gap = gap,
         by = c(
           "cohort_definition_id",
-          "subject_id",
-          "observation_period_id"
+          "subject_id"
         )
-      ) |>
-      dplyr::select(!"observation_period_id")
+      )
   }
   if (!all(ids %in% cohortId)) {
     newCohort <- unchangedCohort |>
@@ -82,5 +79,3 @@ collapseCohorts <- function(cohort,
 
   return(newCohort)
 }
-
-
