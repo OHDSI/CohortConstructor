@@ -9,11 +9,9 @@
 #' @inheritParams cohortIdSubsetDoc
 #' @inheritParams gapDoc
 #' @inheritParams nameDoc
+#' @inheritParams keepOriginalCohortsDoc
 #' @param cohortName Name of the returned cohort. If NULL, the cohort name will
 #' be created by collapsing the individual cohort names, separated by "_".
-#' @param keepOriginalCohorts If TRUE the original cohorts and the newly
-#' created union cohort will be returned. If FALSE only the new cohort will be
-#' returned.
 #'
 #' @export
 #'

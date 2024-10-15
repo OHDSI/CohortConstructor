@@ -10,11 +10,9 @@
 #' @inheritParams cohortIdSubsetDoc
 #' @inheritParams gapDoc
 #' @inheritParams nameDoc
+#' @inheritParams keepOriginalCohortsDoc
 #' @param returnNonOverlappingCohorts Whether the generated cohorts are mutually
 #' exclusive or not.
-#' @param keepOriginalCohorts If TRUE the original cohorts and the newly
-#' created intersection cohort will be returned. If FALSE only the new cohort
-#' will be returned.
 #'
 #' @export
 #'
