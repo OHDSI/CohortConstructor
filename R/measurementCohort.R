@@ -100,6 +100,7 @@ measurementCohort <- function(cdm,
   }
 
   # create concept set tibble
+  tmpCodelist <- omopgenerics::uniqueTableName()
   cohortCodelist <- lapply(conceptSet, dplyr::as_tibble) |>
     dplyr::bind_rows(.id = "cohort_name") |>
     dplyr::inner_join(cohortSet, by = "cohort_name") |>
@@ -107,7 +108,7 @@ measurementCohort <- function(cdm,
                   "concept_id"  = "value",
                   "codelist_name" = "cohort_name") |>
     dplyr::mutate("type" = "index event") |>
-    addDomains(cdm)
+    addDomains(cdm, tmpCodelist)
 
   ud <- cohortCodelist |>
     dplyr::filter(!tolower(.data$domain_id) %in% "measurement" |
@@ -123,7 +124,7 @@ measurementCohort <- function(cdm,
 
   cohortCodelist <- cohortCodelist |>
     dplyr::filter(tolower(.data$domain_id) %in% "measurement") |>
-    dplyr::compute()
+    dplyr::compute(name = tmpCodelist, temporary = FALSE)
 
   cohort <- cdm$measurement |>
     dplyr::select(
@@ -135,9 +136,10 @@ measurementCohort <- function(cdm,
       "value_as_concept_id",
       "unit_concept_id"
     ) |>
-    dplyr::inner_join(cohortCodelist |>
-                        dplyr::select("concept_id", "cohort_definition_id"),
-                      by = "concept_id") |>
+    dplyr::inner_join(
+      cohortCodelist |> dplyr::select("concept_id", "cohort_definition_id"),
+      by = "concept_id"
+    ) |>
     dplyr::filter(!is.na(.data$cohort_start_date)) |>
     dplyr::compute(name = name, temporary = FALSE)
 
@@ -163,7 +165,8 @@ measurementCohort <- function(cdm,
       age = FALSE,
       sex = FALSE,
       priorObservationType = "date",
-      futureObservationType = "date"
+      futureObservationType = "date",
+      name = name
     ) |>
     dplyr::filter(
       .data$prior_observation <= .data$cohort_start_date,
@@ -208,6 +211,8 @@ measurementCohort <- function(cdm,
 
   cli::cli_inform(c("v" = "Cohort {.strong {name}} created."))
 
+  omopgenerics::dropTable(cdm = cdm, name = tmpCodelist)
+
   return(cohort)
 }
 
@@ -232,19 +237,18 @@ getFilterExpression <- function(valueAsConcept, valueAsNumber) {
   return(paste0(expFilter, collapse = " | ") |>  rlang::parse_exprs())
 }
 
-addDomains <- function(cohortCodelist, cdm) {
+addDomains <- function(cohortCodelist, cdm, name) {
   # insert table as temporary
   tmpName <- omopgenerics::uniqueTableName()
   cdm <- omopgenerics::insertTable(cdm = cdm,
                                    name = tmpName,
                                    table = cohortCodelist)
-  cdm[[tmpName]] <- cdm[[tmpName]] |> dplyr::compute()
 
   cohortCodelist <- cdm[["concept"]] |>
     dplyr::select("concept_id", "domain_id") |>
     dplyr::right_join(cdm[[tmpName]], by = "concept_id") |>
     dplyr::mutate("domain_id" = tolower(.data$domain_id)) |>
-    dplyr::compute()
+    dplyr::compute(name = name, temporary = FALSE)
 
   omopgenerics::dropTable(cdm = cdm, name = tmpName)
 
