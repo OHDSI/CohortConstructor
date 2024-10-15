@@ -59,7 +59,7 @@ cohortCount(cdm$medications)
 To check whether there is an overlap between records in both cohorts using the function `intersectCohorts()`.  
 
 ```{r}
-cdm$medintersect <- intersectCohorts(
+cdm$medintersect <- CohortConstructor::intersectCohorts(
   cohort = cdm$medications,
   name = "medintersect"
 )
@@ -81,7 +81,7 @@ cdm$medications <- conceptCohort(cdm = cdm,
 We can choose the number of days between cohort entries using the `gap` argument.
 
 ```{r}
-cdm$medintersect <- intersectCohorts(
+cdm$medintersect <- CohortConstructor::intersectCohorts(
   cohort = cdm$medications,
   gap = 365,
   name = "medintersect"
@@ -94,7 +94,7 @@ There are 94 individuals who had overlapping records (within 365 days) in the di
 We can also combine different cohorts using the function `unionCohorts()`.
 
 ```{r}
-cdm$medunion <- unionCohorts(
+cdm$medunion <- CohortConstructor::unionCohorts(
   cohort = cdm$medications,
   name = "medunion"
 )
@@ -115,7 +115,7 @@ cdm$medications <- conceptCohort(cdm = cdm,
 
 You can keep the original cohorts in the new table if you use the argument `keepOriginalCohorts = TRUE`.
 ```{r}
-cdm$medunion <- unionCohorts(
+cdm$medunion <- CohortConstructor::unionCohorts(
   cohort = cdm$medications,
   name = "medunion",
   keepOriginalCohorts = TRUE
@@ -137,7 +137,7 @@ cdm$medications <- conceptCohort(cdm = cdm,
 ```
 
 ```{r}
-cdm$medunion <- unionCohorts(
+cdm$medunion <- CohortConstructor::unionCohorts(
   cohort = cdm$medications,
   name = "medunion",
   gap = 365,
