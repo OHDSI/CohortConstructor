@@ -1,5 +1,5 @@
 ---
-title: "a08_combine_cohorts"
+title: "Combine Cohorts"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{a08_combine_cohorts}
@@ -15,7 +15,6 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-devtools::install_github("ohdsi/CohortConstructor")
 library(CohortConstructor)
 library(CohortCharacteristics)
 library(ggplot2)
