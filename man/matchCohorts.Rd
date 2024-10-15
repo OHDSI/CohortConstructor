@@ -10,6 +10,7 @@ matchCohorts(
   matchSex = TRUE,
   matchYearOfBirth = TRUE,
   ratio = 1,
+  keepOriginalCohorts = FALSE,
   name = tableName(cohort)
 )
 }
@@ -25,6 +26,9 @@ removed from the cohort set.}
 \item{matchYearOfBirth}{Whether to match in year of birth.}
 
 \item{ratio}{Number of allowed matches per individual in the target cohort.}
+
+\item{keepOriginalCohorts}{If TRUE the original cohorts will be return
+together with the new ones. If FALSE only the new cohort will be returned.}
 
 \item{name}{Name of the new cohort table created in the cdm object.}
 }

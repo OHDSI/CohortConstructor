@@ -7,6 +7,7 @@
 #' @inheritParams cohortDoc
 #' @inheritParams cohortIdSubsetDoc
 #' @inheritParams nameDoc
+#' @inheritParams keepOriginalCohortsDoc
 #' @param matchSex Whether to match in sex.
 #' @param matchYearOfBirth Whether to match in year of birth.
 #' @param ratio Number of allowed matches per individual in the target cohort.
@@ -34,6 +35,7 @@ matchCohorts <- function(cohort,
                          matchSex = TRUE,
                          matchYearOfBirth = TRUE,
                          ratio = 1,
+                         keepOriginalCohorts = FALSE,
                          name = tableName(cohort)) {
   cli::cli_inform("Starting matching")
 
@@ -64,6 +66,10 @@ matchCohorts <- function(cohort,
   tablePrefix <- omopgenerics::tmpPrefix()
   target <- omopgenerics::uniqueTableName(tablePrefix)
   control <- omopgenerics::uniqueTableName(tablePrefix)
+  if (keepOriginalCohorts) {
+    keep <- omopgenerics::uniqueTableName(tablePrefix)
+    cdm[[keep]] <- subsetCohorts(cohort, cohortId, name = keep)
+  }
 
   if (cohort |> settings() |> nrow() == 0) {
     cdm[[name]] <- cohort |>
@@ -166,8 +172,10 @@ matchCohorts <- function(cohort,
     )
 
   # Bind both cohorts
-  cli::cli_inform(c("Binding both cohorts"))
-  cdm <- omopgenerics::bind(cdm[[target]], cdm[[control]], name = name)
+  cli::cli_inform(c("Binding cohorts"))
+  cohorts <- list(cdm[[target]], cdm[[control]])
+  if (keepOriginalCohorts) cohorts <- c(list(cdm[[keep]]), cohorts)
+  cdm <- do.call(omopgenerics::bind, c(cohorts, "name" = name))
 
   # drop tmp tables
   omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with(tablePrefix))

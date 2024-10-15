@@ -276,3 +276,36 @@ test_that("test exactMatchingCohort with a ratio bigger than 1", {
 
   PatientProfiles::mockDisconnect(cdm)
 })
+
+test_that("keepOriginalCohorts works" , {
+  cdm <- mockCohortConstructor()
+  cohort <- cdm$cohort2 |> matchCohorts(cohortId = 1, keepOriginalCohorts = TRUE, name = "new_cohort")
+  expect_equal(
+    settings(cohort),
+    dplyr::tibble(
+      cohort_definition_id = as.integer(1:3),
+      cohort_name = c("cohort_1", "cohort_1_matched", "matched_to_cohort_1"),
+      target_table_name = c(NA, rep("cohort2", 2)),
+      target_cohort_id = c(NA, 1L, 1L),
+      target_cohort_name = c(NA, "cohort_1_matched", "cohort_1_matched"),
+      match_sex = c(NA, rep(TRUE, 2)),
+      match_year_of_birth = c(NA, rep(TRUE, 2)),
+      match_status = c(NA, "target", "control")
+    )
+  )
+  cohort <- cdm$cohort2 |> matchCohorts(keepOriginalCohorts = TRUE)
+  expect_equal(
+    settings(cohort),
+    dplyr::tibble(
+      cohort_definition_id = as.integer(1:6),
+      cohort_name = c("cohort_1", "cohort_2", "cohort_1_matched", "cohort_2_matched", "matched_to_cohort_1", "matched_to_cohort_2"),
+      target_table_name = c(NA, NA, rep("cohort2", 4)),
+      target_cohort_id = c(NA, NA, 1L, 2L, 1L, 2L),
+      target_cohort_name = c(NA, NA, "cohort_1_matched", "cohort_2_matched", "cohort_1_matched", "cohort_2_matched"),
+      match_sex = c(NA, NA, rep(TRUE, 4)),
+      match_year_of_birth = c(NA, NA, rep(TRUE, 4)),
+      match_status = c(NA, NA, "target", "target", "control", "control")
+    )
+  )
+  PatientProfiles::mockDisconnect(cdm)
+})

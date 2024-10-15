@@ -136,3 +136,11 @@ NULL
 #' @keywords internal
 NULL
 
+#' Helper for consistent documentation of `keepOriginalCohorts`.
+#'
+#' @param keepOriginalCohorts If TRUE the original cohorts will be return
+#' together with the new ones. If FALSE only the new cohort will be returned.
+#'
+#' @name keepOriginalCohortsDoc
+#' @keywords internal
+NULL

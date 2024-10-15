@@ -26,9 +26,8 @@ in a single cohort record.}
 \item{cohortName}{Name of the returned cohort. If NULL, the cohort name will
 be created by collapsing the individual cohort names, separated by "_".}
 
-\item{keepOriginalCohorts}{If TRUE the original cohorts and the newly
-created union cohort will be returned. If FALSE only the new cohort will be
-returned.}
+\item{keepOriginalCohorts}{If TRUE the original cohorts will be return
+together with the new ones. If FALSE only the new cohort will be returned.}
 
 \item{name}{Name of the new cohort table created in the cdm object.}
 }
