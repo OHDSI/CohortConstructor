@@ -21,7 +21,7 @@ test_that("mearurementCohorts works", {
     )
   cdm$measurement <- dplyr::tibble(
     measurement_id = 1:7,
-    person_id = c(1, 1, 2, 3, 3, 1, 1),
+    person_id = as.integer(c(1, 1, 2, 3, 3, 1, 1)),
     measurement_concept_id = c(4326744, 4298393, 4298393, 45770407, 45770407, 123456, 123456),
     measurement_date = as.Date(c("2000-07-01", "2000-12-11", "2002-09-08", "2015-02-19", "2015-02-20", "1900-01-01", "2050-01-01")),
     measurement_type_concept_id = NA,
@@ -51,21 +51,20 @@ test_that("mearurementCohorts works", {
   )
 
   if(isDuckdb){
-    # endTempTables <- countDuckdbTempTables(
-    #   con = attr(omopgenerics::cdmSource(cdm),
-    #              "dbcon"))
+    endTempTables <- countDuckdbTempTables(
+      con = attr(omopgenerics::cdmSource(cdm),
+                 "dbcon"))
     endPermanentTables <- countDuckdbPermanentTables(
       con = attr(omopgenerics::cdmSource(cdm),
                  "dbcon"))
     # we should have only added 4 permanent tables (the new cohort table and
     # three tables with settings, attrition, and codelist)
     # no temp tables will have been created
-    # expect_true(startTempTables == endTempTables)
+    expect_true(startTempTables == endTempTables)
     expect_true(
       startPermanentTables + 4 == endPermanentTables
     )
   }
-
 
   expect_equal(
     collectCohort(cdm$cohort, 1),
