@@ -163,7 +163,8 @@ measurementCohort <- function(cdm,
       age = FALSE,
       sex = FALSE,
       priorObservationType = "date",
-      futureObservationType = "date"
+      futureObservationType = "date",
+      name = name
     ) |>
     dplyr::filter(
       .data$prior_observation <= .data$cohort_start_date,
