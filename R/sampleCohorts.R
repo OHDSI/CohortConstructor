@@ -22,8 +22,8 @@
 #' cdm$cohort2 |> sampleCohorts(cohortId = 1, n = 10)
 #' }
 sampleCohorts <- function(cohort,
-                          cohortId = NULL,
                           n,
+                          cohortId = NULL,
                           name = tableName(cohort)) {
   # checks
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
