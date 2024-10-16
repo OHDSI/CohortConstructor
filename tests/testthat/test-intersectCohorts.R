@@ -608,20 +608,27 @@ test_that("multiple observation periods", {
     )),
     "period_type_concept_id" = NA_integer_
   )
-  cdm_local$cohort <- dplyr::tibble(
-    "cohort_definition_id" = as.integer(c(1, 1, 1, 1, 2, 2)),
-    "subject_id" = as.integer(c(1, 1, 1, 2, 2, 1)),
+  cdm_local$cohort1 <- dplyr::tibble(
+    "cohort_definition_id" = as.integer(c(1, 2, 1, 2)),
+    "subject_id" = as.integer(c(1, 1, 1, 1)),
     "cohort_start_date" = as.Date(c(
-      "2000-01-01", "2000-12-01", "2001-01-01", "2001-01-01", "2002-01-01", "2003-01-01"
+      "2000-01-01", "2000-12-01", "2001-01-01", "2001-01-01"
     )),
     "cohort_end_date" =as.Date(c(
-      "2000-05-20", "2000-12-20", "2001-04-01", "2001-12-30", "2003-01-01", "2004-01-01"
+      "2000-12-20", "2000-12-20", "2001-04-01", "2001-12-30"
     ))
   )
   cdm <- cdm_local |> copyCdm()
-  cdm$cohort <- cdm$cohort |> omopgenerics::newCohortTable()
-  cdm$cohort <- cdm$cohort |> intersectCohorts(gap = 9999)
-  expect_true(cdm$cohort |> dplyr::tally() |> dplyr::pull(n) == 0)
+  cdm$cohort1 <- cdm$cohort1 |> omopgenerics::newCohortTable()
+  cdm$cohort1 <- cdm$cohort1 |> intersectCohorts(gap = 9999)
+  expect_equal(
+    collectCohort(cdm$cohort1, 1),
+    dplyr::tibble(
+      "subject_id" = as.integer(c(1, 1)),
+      "cohort_start_date" = as.Date(c("2001-01-01", "2001-12-30")),
+      "cohort_end_date" = as.Date(c("2000-01-01", "2000-12-20"))
+    )
+  )
 
   PatientProfiles::mockDisconnect(cdm)
 })
