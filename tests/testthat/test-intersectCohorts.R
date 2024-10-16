@@ -591,3 +591,37 @@ test_that("records combined for gap must be in the same observation period", {
 
   PatientProfiles::mockDisconnect(cdm)
 })
+
+test_that("multiple observation periods", {
+  cdm_local <- omock::mockCdmReference() |>
+    omock::mockPerson(n = 4, seed = 1)
+  cdm_local$observation_period <- dplyr::tibble(
+    "observation_period_id" = as.integer(1:7),
+    "person_id" = as.integer(c(1, 1, 1, 2, 2, 3, 4)),
+    "observation_period_start_date" = as.Date(c(
+      "2000-01-01", "2001-01-01", "2003-01-01", "2001-01-01", "2002-01-01",
+      "2000-01-01", "2000-01-01"
+    )),
+    "observation_period_end_date" =as.Date(c(
+      "2000-12-20", "2002-01-01", "2005-01-01", "2001-12-31", "2004-01-01",
+      "2004-01-01", "2003-01-01"
+    )),
+    "period_type_concept_id" = NA_integer_
+  )
+  cdm_local$cohort <- dplyr::tibble(
+    "cohort_definition_id" = as.integer(c(1, 1, 1, 1, 2, 2)),
+    "subject_id" = as.integer(c(1, 1, 1, 2, 2, 1)),
+    "cohort_start_date" = as.Date(c(
+      "2000-01-01", "2000-12-01", "2001-01-01", "2001-01-01", "2002-01-01", "2003-01-01"
+    )),
+    "cohort_end_date" =as.Date(c(
+      "2000-05-20", "2000-12-20", "2001-04-01", "2001-12-30", "2003-01-01", "2004-01-01"
+    ))
+  )
+  cdm <- cdm_local |> copyCdm()
+  cdm$cohort <- cdm$cohort |> omopgenerics::newCohortTable()
+  cdm$cohort <- cdm$cohort |> intersectCohorts(gap = 9999)
+  expect_true(cdm$cohort |> dplyr::tally() |> dplyr::pull(n) == 0)
+
+  PatientProfiles::mockDisconnect(cdm)
+})

@@ -307,5 +307,6 @@ test_that("multiple observation periods", {
   expect_true(nrow(cdm$cohort_1 |>
                      dplyr::collect()) == 2)
 
+  PatientProfiles::mockDisconnect(cdm)
 
 })
