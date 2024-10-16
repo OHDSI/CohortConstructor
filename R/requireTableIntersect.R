@@ -67,6 +67,7 @@ requireTableIntersect <- function(cohort,
     cli::cli_abort("Currently just one table supported.")
   }
 
+  subsetName <- omopgenerics::uniqueTableName()
   subsetCohort <- cohort %>%
     dplyr::select(dplyr::all_of(.env$cols)) %>%
     PatientProfiles::addTableIntersectCount(
@@ -76,7 +77,8 @@ requireTableIntersect <- function(cohort,
       targetEndDate = targetEndDate,
       window = window,
       censorDate = censorDate,
-      nameStyle = "intersect_table"
+      nameStyle = "intersect_table",
+      name = subsetName
     )
 
   subsetCohort <- subsetCohort %>%
@@ -88,7 +90,8 @@ requireTableIntersect <- function(cohort,
     ) |
       (!.data$cohort_definition_id %in% .env$cohortId)
     ) %>%
-    dplyr::select(cols)
+    dplyr::select(cols) %>%
+    dplyr::compute(name = subsetName, temporary = FALSE)
 
   # attrition reason
   if (all(intersections == 0)) {
@@ -118,6 +121,8 @@ requireTableIntersect <- function(cohort,
     dplyr::compute(name = name, temporary = FALSE) %>%
     omopgenerics::newCohortTable(.softValidation = TRUE) %>%
     omopgenerics::recordCohortAttrition(reason = reason, cohortId = cohortId)
+
+  omopgenerics::dropTable(cdm = cdm, name = subsetName)
 
   return(x)
 }

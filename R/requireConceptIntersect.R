@@ -72,6 +72,7 @@ requireConceptIntersect <- function(cohort,
   if (length(conceptSet) == 0) {
     cli::cli_inform(c("i" = "Empty codelist provided, returning input cohort"))
   } else {
+    subsetName <- omopgenerics::uniqueTableName()
     subsetCohort <- cohort %>%
       dplyr::select(dplyr::all_of(.env$cols)) %>%
       PatientProfiles::addConceptIntersectCount(
@@ -81,7 +82,8 @@ requireConceptIntersect <- function(cohort,
         targetEndDate = targetEndDate,
         window = window,
         censorDate = censorDate,
-        nameStyle = "intersect_concept"
+        nameStyle = "intersect_concept",
+        name = subsetName
       )
 
     subsetCohort <- subsetCohort %>%
@@ -93,7 +95,8 @@ requireConceptIntersect <- function(cohort,
       ) |
         (!.data$cohort_definition_id %in% .env$cohortId)
       ) %>%
-      dplyr::select(cols)
+      dplyr::select(cols) %>%
+      dplyr::compute(name = subsetName, temporary = FALSE)
 
     # attrition reason
     if (all(intersections == 0)) {
@@ -123,6 +126,8 @@ requireConceptIntersect <- function(cohort,
       dplyr::compute(name = name, temporary = FALSE) %>%
       omopgenerics::newCohortTable(.softValidation = TRUE) %>%
       omopgenerics::recordCohortAttrition(reason = reason, cohortId = cohortId)
+
+    omopgenerics::dropTable(cdm = cdm, name = subsetName)
   }
 
   return(cohort)

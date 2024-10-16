@@ -81,6 +81,7 @@ requireCohortIntersect <- function(cohort,
     dplyr::filter(.data$cohort_definition_id == .env$targetCohortId) %>%
     dplyr::pull("cohort_name")
 
+  subsetName <- omopgenerics::uniqueTableName()
   subsetCohort <- cohort %>%
     dplyr::select(dplyr::all_of(.env$cols)) %>%
     PatientProfiles::addCohortIntersectCount(
@@ -91,7 +92,8 @@ requireCohortIntersect <- function(cohort,
       targetEndDate = targetEndDate,
       window = window,
       censorDate = censorDate,
-      nameStyle = "intersect_cohort"
+      nameStyle = "intersect_cohort",
+      name = name
     )
 
   subsetCohort <- subsetCohort %>%
@@ -103,7 +105,8 @@ requireCohortIntersect <- function(cohort,
     ) |
       (!.data$cohort_definition_id %in% .env$cohortId)
     ) %>%
-    dplyr::select(cols)
+    dplyr::select(cols) %>%
+    dplyr::compute(name = subsetName, temporary = FALSE)
 
   # attrition reason
   if (all(intersections == 0)) {
@@ -133,6 +136,8 @@ requireCohortIntersect <- function(cohort,
     dplyr::compute(name = name, temporary = FALSE) %>%
     omopgenerics::newCohortTable(.softValidation = TRUE) %>%
     omopgenerics::recordCohortAttrition(reason = reason, cohortId = cohortId)
+
+  omopgenerics::dropTable(cdm = cdm, name = subsetName)
 
   return(x)
 }
