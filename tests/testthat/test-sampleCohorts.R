@@ -8,7 +8,7 @@ test_that("sampleCohort subsetting one cohort", {
                                  schema = "main",
                                  overwrite = TRUE)
 
-  cdm$cohort1 <- sampleCohorts(cdm$cohort1, 1, 2)
+  cdm$cohort1 <- sampleCohorts(cdm$cohort1, n = 2, cohortId = 1)
   expect_true(cdm$cohort1 |>
                 dplyr::filter(cohort_definition_id == 1) |>
                 dplyr::pull("subject_id") |>
@@ -18,7 +18,7 @@ test_that("sampleCohort subsetting one cohort", {
                 dplyr::pull("cohort_definition_id") == 1)
 
   # Subset it again should yield the same cohort
-  test_cohort1 <- sampleCohorts(cdm$cohort1, 1, 2)
+  test_cohort1 <- sampleCohorts(cdm$cohort1, n = 2, cohortId = 1)
   expect_true(all.equal(test_cohort1, cdm$cohort1))
   expect_true(attrition(test_cohort1) |>
                 dplyr::filter(reason == "Sample 2 individuals" & reason_id == 3) |>
