@@ -14,6 +14,12 @@ test_that("entry at first date", {
     con = connection(),
     writeSchema = writeSchema()
   )
+  # remove when omock > 0.3.1
+  cdm$cohort <- cdm$cohort |>
+    dplyr::select("cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date", "other_date_1", "other_date_2") |>
+    dplyr::compute(name = "cohort", temporary = FALSE) |>
+    omopgenerics::newCohortTable()
+
   # works
   cdm$cohort1 <- cdm$cohort |>
     entryAtFirstDate(
@@ -70,6 +76,12 @@ test_that("entry at last date", {
     con = connection(),
     writeSchema = writeSchema()
   )
+
+  # remove when omock > 0.3.1
+  cdm$cohort <- cdm$cohort |>
+    dplyr::select("cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date", "other_date_1", "other_date_2") |>
+    dplyr::compute(name = "cohort", temporary = FALSE) |>
+    omopgenerics::newCohortTable()
 
   # test cohort id working
   cdm$cohort1 <- cdm$cohort |>
