@@ -457,8 +457,6 @@ test_that("codelist", {
       "drug_exposure_start_date" = as.Date(.data$drug_exposure_start_date, origin = "2010-01-01"),
       "drug_exposure_end_date" = as.Date(.data$drug_exposure_end_date, origin = "2010-01-01")
     )
-  cdm_local$observation_period <- cdm_local$observation_period|>
-    dplyr::mutate(observation_period_start_date = as.Date("1990-01-01"), observation_period_end_date = as.Date("2020-01-01"))
 
   cdm <- cdm_local |> copyCdm()
 
