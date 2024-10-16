@@ -56,7 +56,7 @@ mockCohortConstructor <- function(nPerson = 10,
   }
 
   if (!is.null(conceptIdClass) && !is.null(conceptId)) {
-    cdm <- cdm |> omock::mockConcepts(conceptSet = conceptId, domain = conceptIdClass)
+    cdm <- cdm |> omock::mockConcepts(conceptSet = conceptId, domain = conceptIdClass, seed = seed)
   }
 
   if (drugExposure) {
