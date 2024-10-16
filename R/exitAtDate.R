@@ -36,7 +36,7 @@ exitAtObservationEnd <- function(cohort,
 
   # create new cohort
   newCohort <- cohort |>
-    PatientProfiles::addFutureObservation(futureObservationType = "date") |>
+    PatientProfiles::addFutureObservation(futureObservationType = "date", name = name) |>
     # exit at observation end
     dplyr::mutate(
       "cohort_end_date" = dplyr::if_else(
@@ -93,7 +93,7 @@ exitAtDeath <- function(cohort,
 
   # create new cohort
   newCohort <- cohort |>
-    PatientProfiles::addDeathDate() |>
+    PatientProfiles::addDeathDate(name = name) |>
     # exit
     dplyr::mutate(
       "cohort_end_date" = dplyr::if_else(
