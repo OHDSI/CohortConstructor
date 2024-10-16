@@ -290,9 +290,9 @@ demographicsFilter <- function(cohort,
       age  = reqAge,
       sex = reqSex,
       priorObservation = reqPriorObservation,
-      futureObservation = reqFutureObservation
-    ) |>
-    dplyr::compute(name = workingName, temporary = FALSE)
+      futureObservation = reqFutureObservation,
+      name = workingName
+    )
 
   # all output cohorts in one table to filter all at the same time:
   workingTable <- workingTable |>

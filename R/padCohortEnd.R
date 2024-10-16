@@ -51,7 +51,8 @@ padCohortEnd <- function(cohort,
     cohort <- cohort |>
       PatientProfiles::addFutureObservationQuery(
         futureObservationType = "date",
-        futureObservationName = futureObsCol)
+        futureObservationName = futureObsCol
+        )
   }
 
   if(length(cohortId) < length(ids)) {
