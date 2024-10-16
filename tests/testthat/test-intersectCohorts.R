@@ -625,8 +625,8 @@ test_that("multiple observation periods", {
     collectCohort(cdm$cohort1, 1),
     dplyr::tibble(
       "subject_id" = as.integer(c(1, 1)),
-      "cohort_start_date" = as.Date(c("2001-01-01", "2001-12-30")),
-      "cohort_end_date" = as.Date(c("2000-01-01", "2000-12-20"))
+      "cohort_start_date" = as.Date(c("2000-01-01", "2001-01-01")),
+      "cohort_end_date" = as.Date(c("2000-12-20", "2001-12-30"))
     )
   )
 
