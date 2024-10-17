@@ -6,21 +6,21 @@
 \usage{
 requireMinCohortCount(
   cohort,
+  minCohortCount,
   cohortId = NULL,
-  minCohortCount = 5,
   name = tableName(cohort)
 )
 }
 \arguments{
 \item{cohort}{A cohort table in a cdm reference.}
 
+\item{minCohortCount}{The minimum count of sbjects for a cohort to be
+included.}
+
 \item{cohortId}{Vector identifying which cohorts to modify
 (cohort_definition_id or cohort_name). If NULL, all cohorts will be
 used; otherwise, only the specified cohorts will be modified, and the
 rest will remain unchanged.}
-
-\item{minCohortCount}{The minimum count of sbjects for a cohort to be
-included.}
 
 \item{name}{Name of the new cohort table created in the cdm object.}
 }
@@ -38,6 +38,6 @@ library(CohortConstructor)
 cdm <- mockCohortConstructor(nPerson = 100)
 
 cdm$cohort1 |>
-requireMinCohortCount(minCohortCount = 5)
+requireMinCohortCount(5)
 }
 }
