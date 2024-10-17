@@ -56,8 +56,8 @@ records from cohorts with a minimum number of individuals</p>
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">requireMinCohortCount</span><span class="op">(</span></span>
 <span>  <span class="va">cohort</span>,</span>
+<span>  <span class="va">minCohortCount</span>,</span>
 <span>  cohortId <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  minCohortCount <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>  name <span class="op">=</span> <span class="fu"><a href="https://darwin-eu-dev.github.io/omopgenerics/reference/tableName.html" class="external-link">tableName</a></span><span class="op">(</span><span class="va">cohort</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -70,16 +70,16 @@ records from cohorts with a minimum number of individuals</p>
 <dd><p>A cohort table in a cdm reference.</p></dd>
 
 
+<dt id="arg-mincohortcount">minCohortCount<a class="anchor" aria-label="anchor" href="#arg-mincohortcount"></a></dt>
+<dd><p>The minimum count of sbjects for a cohort to be
+included.</p></dd>
+
+
 <dt id="arg-cohortid">cohortId<a class="anchor" aria-label="anchor" href="#arg-cohortid"></a></dt>
 <dd><p>Vector identifying which cohorts to modify
 (cohort_definition_id or cohort_name). If NULL, all cohorts will be
 used; otherwise, only the specified cohorts will be modified, and the
 rest will remain unchanged.</p></dd>
-
-
-<dt id="arg-mincohortcount">minCohortCount<a class="anchor" aria-label="anchor" href="#arg-mincohortcount"></a></dt>
-<dd><p>The minimum count of sbjects for a cohort to be
-included.</p></dd>
 
 
 <dt id="arg-name">name<a class="anchor" aria-label="anchor" href="#arg-name"></a></dt>
@@ -99,7 +99,7 @@ included.</p></dd>
 <span class="r-in"><span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="mockCohortConstructor.html">mockCohortConstructor</a></span><span class="op">(</span>nPerson <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">cdm</span><span class="op">$</span><span class="va">cohort1</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span><span class="fu">requireMinCohortCount</span><span class="op">(</span>minCohortCount <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">requireMinCohortCount</span><span class="op">(</span><span class="fl">5</span><span class="op">)</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>There was 1 warning in `dplyr::summarise()`.</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> In argument: `reason_id = max(.data$reason_id)`.</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> Caused by warning in `max()`:</span>
@@ -108,7 +108,7 @@ included.</p></dd>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span>   type:</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `reason_id` from <span style="color: #0000BB;">numeric</span> to <span style="color: #0000BB;">integer</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Source:   table&lt;main.cohort1&gt; [?? x 4]</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: DuckDB v1.1.0 [unknown@Linux 6.5.0-1025-azure:R 4.4.1/:memory:]</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: DuckDB v1.1.1 [unknown@Linux 6.5.0-1025-azure:R 4.4.1/:memory:]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    cohort_definition_id subject_id cohort_start_date cohort_end_date</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>         </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>                    1          4 1998-12-14        2002-02-14     </span>
