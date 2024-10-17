@@ -131,8 +131,12 @@ intersectCohorts <- function(cohort,
     dplyr::compute(name = tblName, temporary = FALSE)
   if (cohortOut |> dplyr::tally() |> dplyr::pull("n") > 0) {
     cohortOut <- cohortOut %>%
-      dplyr::compute(name = tblName, temporary = FALSE) |>
-      joinOverlap(name = tblName, gap = gap)
+      PatientProfiles::addObservationPeriodId(name = tblName) |>
+      joinOverlap(
+        name = tblName, gap = gap,
+        by = c("observation_period_id", "cohort_definition_id", "subject_id")
+      ) |>
+      dplyr::select(!"observation_period_id")
   }
 
   # attributes

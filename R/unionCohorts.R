@@ -63,9 +63,11 @@ unionCohorts <- function(cohort,
   tmpTable  <- omopgenerics::uniqueTableName()
   unionedCohort <- cohort |>
     dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>
+    PatientProfiles::addObservationPeriodId(name = tmpTable) |>
     joinOverlap(name = tmpTable,
-                by = "subject_id",
+                by = c("observation_period_id", "subject_id"),
                 gap = gap) |>
+    dplyr::select(!"observation_period_id") |>
     dplyr::mutate(cohort_definition_id = 1L) |>
     dplyr::relocate(dplyr::all_of(omopgenerics::cohortColumns("cohort"))) |>
     dplyr::compute(name = tmpTable, temporary = FALSE)
