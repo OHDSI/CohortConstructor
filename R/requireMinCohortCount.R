@@ -22,11 +22,11 @@
 #' cdm <- mockCohortConstructor(nPerson = 100)
 #'
 #' cdm$cohort1 |>
-#' requireMinCohortCount(minCohortCount = 5)
+#' requireMinCohortCount(5)
 #' }
 requireMinCohortCount <- function(cohort,
+                                  minCohortCount,
                                   cohortId = NULL,
-                                  minCohortCount = 5,
                                   name = tableName(cohort)){
   # checks
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
