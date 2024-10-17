@@ -42,10 +42,6 @@ trimDemographics <- function(cohort,
   ids <- settings(cohort)$cohort_definition_id
 
   # replace age Inf to avoid potential sql issues
-  for (j in seq_along(ageRange)) {
-    ageRange[[j]][is.infinite(ageRange[[j]])] <- as.integer(999)
-  }
-
   # temp tables
   tablePrefix <- omopgenerics::tmpPrefix()
   tmpName <- omopgenerics::uniqueTableName(tablePrefix)
@@ -91,6 +87,7 @@ trimDemographics <- function(cohort,
     minFutureObservation = minFutureObservation,
     requirementInteractions = TRUE
   )
+
   # insert settings
   cdm <- omopgenerics::insertTable(
     cdm = cdm,
@@ -152,6 +149,11 @@ trimDemographics <- function(cohort,
   }
   if (!is.null(ageRange)) {
     cli::cli_inform(c("Trim age"))
+
+    for (j in seq_along(ageRange)) {
+      ageRange[[j]][is.infinite(ageRange[[j]])] <- as.integer(999)
+    }
+
     newCohort <- newCohort %>%
       dplyr::mutate(!!!datesAgeRange(ageRange)) %>%
       dplyr::mutate(

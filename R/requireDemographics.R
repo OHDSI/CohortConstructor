@@ -610,10 +610,11 @@ reqDemographicsCohortSet <- function(set,
         .data$cohort_name
       ))
   }
-
   combinations <- combinations |>
-    dplyr::mutate(min_age = as.integer(sub("_.*", "", .data$age_range)), max_age = as.integer(sub(".*_", "", .data$age_range))) |>
-    dplyr::mutate(age_range = stringr::str_replace(.data$age_range, "_999", "_Inf")) |>
+    dplyr::mutate(min_age = as.integer(sub("_.*", "", .data$age_range)),
+                  max_age = sub(".*_", "", .data$age_range)) |>
+    dplyr::mutate(max_age = stringr::str_replace(.data$max_age, "Inf", "999")) |>
+    dplyr::mutate(max_age = as.integer(.data$max_age)) |>
     dplyr::select(!c("group_id"))
 
   # new cohort set

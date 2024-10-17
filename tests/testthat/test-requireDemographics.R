@@ -521,3 +521,25 @@ test_that("requireInteractions", {
   )
   PatientProfiles::mockDisconnect(cdm)
 })
+
+test_that("Inf age", {
+
+  testthat::skip_on_cran()
+  cdm_local <- omock::mockCdmReference() |>
+    omock::mockPerson(n = 3,seed = 1) |>
+    omock::mockObservationPeriod(seed = 1) |>
+    omock::mockCohort(numberCohorts = 3, seed = 4)
+  # to remove in new omock
+  cdm_local$person <- cdm_local$person |>
+    dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
+  cdm <- cdm_local |> copyCdm()
+
+  expect_no_error(cdm$cohort1 <- cdm$cohort |>
+    requireDemographics(ageRange = c(0, Inf),
+                        name = "cohort1"))
+  expect_no_error(cdm$cohort2 <-cdm$cohort |>
+                    requireDemographics(ageRange = list(c(0, 17),
+                                                        c(18,Inf)),
+                                        name = "cohort2"))
+
+})
