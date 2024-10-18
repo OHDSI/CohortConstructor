@@ -7,6 +7,9 @@
 #' @inheritParams cohortDoc
 #' @inheritParams cohortIdModifyDoc
 #' @inheritParams nameDoc
+#' @param limitToCurrentPeriod If TRUE, limits the cohort to one entry per
+#' person, ending at the current observation period. If FALSE, subsequent
+#' observation periods will create new cohort entries.
 #'
 #' @return The cohort table.
 #'
@@ -27,6 +30,7 @@
 #'}
 exitAtObservationEnd <- function(cohort,
                                  cohortId = NULL,
+                                 limitToCurrentPeriod = TRUE,
                                  name = tableName(cohort)) {
   # checks
   cohort <- validateCohortTable(cohort, dropExtraColumns = TRUE)
@@ -34,22 +38,77 @@ exitAtObservationEnd <- function(cohort,
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   cohortId <- validateCohortId(cohortId, settings(cohort))
 
-  # create new cohort
-  newCohort <- cohort |>
-    PatientProfiles::addFutureObservation(futureObservationType = "date", name = name) |>
-    # exit at observation end
+  tmpTable <- omopgenerics::uniqueTableName()
+  if (all(cohortId %in% settings(cohort)$cohort_definition_id)) {
+    newCohort <- cohort |>
+      dplyr::compute(name = tmpTable, temporary = FALSE)
+  } else {
+    newCohort <- cohort |>
+      dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>
+      dplyr::compute(name = tmpTable, temporary = FALSE)
+  }
+
+  newCohort <- newCohort |>
+    dplyr::inner_join(
+      cdm$observation_period |>
+        dplyr::select(
+          "subject_id" = "person_id",
+          "observation_period_start_date",
+          "observation_period_end_date"
+        ),
+      by = "subject_id"
+    ) |>
+    # filter to current or future observation periods
+    dplyr::filter(.data$observation_period_end_date >= .data$cohort_end_date) |>
+    dplyr::compute(name = tmpTable, temporary = FALSE)
+
+  if (limitToCurrentPeriod) {
+    reason <- "Exit at observation period end date, limited to current observation period"
+    newCohort <- newCohort |>
+      # filter to current observation period
+      dplyr::filter(.data$observation_period_start_date <= .data$cohort_start_date) |>
+      dplyr::compute(name = tmpTable, temporary = FALSE)
+
+  } else {
+    reason <- "Exit at observation period end date"
+    newCohort <- newCohort |>
+      # filter to current
+      dplyr::mutate(
+        "cohort_start_date" = dplyr::if_else(
+          .data$cohort_definition_id %in% .env$cohortId &
+            .data$observation_period_start_date > .data$cohort_start_date,
+          .data$observation_period_start_date,
+          .data$cohort_start_date
+        )
+      ) |>
+      dplyr::compute(name = tmpTable, temporary = FALSE)
+  }
+
+  newCohort <- newCohort |>
     dplyr::mutate(
       "cohort_end_date" = dplyr::if_else(
         .data$cohort_definition_id %in% .env$cohortId,
-        .data$future_observation,
+        .data$observation_period_end_date,
         .data$cohort_end_date
       )
     ) |>
-    dplyr::compute(name = name, temporary = FALSE) |>
     # no overlapping periods
-    joinOverlap(name = name) |>
+    joinOverlap(name = tmpTable)
+
+  if (!all(cohortId %in% settings(cohort)$cohort_definition_id)) {
+    newCohort <- newCohort |>
+      dplyr::union_all(
+        cohort |> dplyr::filter(!.data$cohort_definition_d %in% .env$cohortId)
+      ) |>
+      dplyr::compute(name = tmpTable, temporary = FALSE)
+  }
+
+  newCohort <- newCohort |>
+    dplyr::compute(name = name, temporary = FALSE) |>
     omopgenerics::newCohortTable(.softValidation = TRUE) |>
-    omopgenerics::recordCohortAttrition(reason = "Exit at observation period end date", cohortId = cohortId)
+    omopgenerics::recordCohortAttrition(reason = reason, cohortId = cohortId)
+
+  omopgenerics::dropTable(cdm = cdm, name = tmpTable)
 
   return(newCohort)
 }
