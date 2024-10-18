@@ -19,7 +19,7 @@ test_that("exit at observation end", {
   expect_true(all(cdm$cohort |> dplyr::pull(cohort_end_date) |> sort() ==
                     c("2001-11-27", "2002-01-29", "2002-06-12", "2003-06-15", "2005-01-15", "2013-06-29", "2015-10-11")))
   expect_true(all(cdm$cohort |> dplyr::pull(subject_id) |> sort() ==  c(1, 1, 1, 1, 1, 2, 3)))
-  expect_true(all(attrition(cdm$cohort)$reason == c("Initial qualifying events", "Exit at observation period end date", "Initial qualifying events")))
+  expect_true(all(attrition(cdm$cohort)$reason == c("Initial qualifying events", "Exit at observation period end date, limited to current observation period", "Initial qualifying events")))
 
   # additional columns warning
   expect_message(cdm$cohort <- cdm$cohort |> dplyr::mutate(extra_col = 1) |> exitAtObservationEnd())
@@ -110,6 +110,8 @@ test_that("exit at observation end", {
     collectCohort(cdm$cohort3, 2),
     collectCohort(cdm$cohort, 2)
   )
+
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("exit at death date", {
