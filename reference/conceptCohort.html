@@ -119,7 +119,9 @@ trimmed so as to end at the preceding observation period end date.</p></li>
 <span>  <span class="va">conceptSet</span>,</span>
 <span>  <span class="va">name</span>,</span>
 <span>  exit <span class="op">=</span> <span class="st">"event_end_date"</span>,</span>
-<span>  useSourceFields <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  useSourceFields <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  subsetCohort <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  subsetCohortId <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -149,6 +151,18 @@ or a conceptSetExpression.</p></dd>
 <dd><p>If TRUE, the source concept_id fields will also be
 used when identifying relevant clinical records. If FALSE, only the standard
 concept_id fields will be used.</p></dd>
+
+
+<dt id="arg-subsetcohort">subsetCohort<a class="anchor" aria-label="anchor" href="#arg-subsetcohort"></a></dt>
+<dd><p>A cohort table containing individuals for whom cohorts
+will be generated. Only individuals in this table will appear in the
+generated cohort.</p></dd>
+
+
+<dt id="arg-subsetcohortid">subsetCohortId<a class="anchor" aria-label="anchor" href="#arg-subsetcohortid"></a></dt>
+<dd><p>Optional. Specifies cohort IDs from the <code>subsetCohort</code>
+table to include. If none are provided, all cohorts from the <code>subsetCohort</code>
+are included.</p></dd>
 
 </dl></div>
     <div class="section level2">
