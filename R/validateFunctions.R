@@ -1,5 +1,5 @@
 validateCohortTable <- function(cohort, dropExtraColumns = FALSE) {
-  if (!"cohort_table" %in% class(cohort) ||
+  if (!inherits(cohort, "cohort_table") ||
     !all(
       c(
         "cohort_definition_id",
@@ -43,7 +43,7 @@ validateCohortColumn <- function(columns, cohort, class = NULL) {
       cli::cli_abort("{column} must be a column in the cohort table.")
     }
     if (!is.null(class)) {
-      if (all(!cohort |>
+      if (!any(cohort |>
         dplyr::pull(!!column) |>
         class() |>
         unique() %in% class)) {
@@ -97,13 +97,13 @@ validateCohortId <- function(cohortId, set, call = parent.frame()) {
 }
 
 validateDateRange <- function(dateRange) {
-  if (!"Date" %in% class(dateRange) && !all(is.na(dateRange))) {
+  if (!inherits(dateRange, "Date") && !all(is.na(dateRange))) {
     cli::cli_abort("dateRange is not a date")
   }
   if (length(dateRange) != 2) {
     cli::cli_abort("dateRange must be length two")
   }
-  if (!any(is.na(dateRange))) {
+  if (!anyNA(dateRange)) {
     if (dateRange[1] > dateRange[2]) {
       cli::cli_abort("First date in dateRange cannot be after the second")
     }

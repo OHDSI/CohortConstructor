@@ -1,5 +1,5 @@
 ---
-title: "Demographic Requirements"
+title: "Applying demographic requirements to a cohort"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{a03_require_demographics}
@@ -14,7 +14,8 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
+```{r}
+library(CodelistGenerator)
 library(CohortConstructor)
 library(CohortCharacteristics)
 library(ggplot2)
@@ -37,7 +38,7 @@ if (!dir.exists(Sys.getenv("EUNOMIA_DATA_FOLDER"))){ dir.create(Sys.getenv("EUNO
 }
 ```
 
-For this example we'll use the Eunomia synthetic data from the CDMConnector package.
+In this vignette we'll show how requirements related to patient demographics can be applied to a cohort. Again we'll use the Eunomia synthetic data.
 
 ```{r}
 con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomia_dir())
@@ -45,133 +46,75 @@ cdm <- cdm_from_con(con, cdm_schema = "main",
                     write_schema = c(prefix = "my_study_", schema = "main"))
 ```
 
-Let's start by creating two drug cohorts, one for users of diclofenac and another for users of acetaminophen.
+Let's start by creating a cohort of people with a fracture. We'll first look for codes that might represent a fracture and the build a cohort using these codes, setting cohort exit to 180 days after the fracture.
 
 ```{r}
-cdm$medications <- conceptCohort(cdm = cdm, 
-                                 conceptSet = list("diclofenac" = 1124300,
-                                                   "acetaminophen" = 1127433), 
-                                 name = "medications")
+fracture_codes <- getCandidateCodes(cdm, "fracture")
+fracture_codes <- list("fracture" = fracture_codes$concept_id)
+cdm$fracture <- conceptCohort(cdm = cdm, 
+                                 conceptSet = fracture_codes, 
+                                 name = "fracture")
 
-settings(cdm$medications)
-cohortCount(cdm$medications)
+summary_attrition <- summariseCohortAttrition(cdm$fracture)
+plotCohortAttrition(summary_attrition)
 ```
-
-Cohort 1 contains users of acetaminophen and has 2580 subjects and 9365 records. Cohort 2 contains users of diclofenac and has 830 subjects and 830 records. 
 
 ## Restrict cohort by age
 
 We can choose a specific age range for individuals in our cohort using `requireAge()` from CohortConstructor. 
 
 ```{r}
-cdm$medications <- cdm$medications %>% 
+cdm$fracture <- cdm$fracture %>% 
   requireAge(indexDate = "cohort_start_date",
-             ageRange = list(c(18,100)))
+             ageRange = list(c(18, 100)))
 
-summary_attrition <- summariseCohortAttrition(cdm$medications)
-plotCohortAttrition(summary_attrition, cohortId = 1)
+summary_attrition <- summariseCohortAttrition(cdm$fracture)
+plotCohortAttrition(summary_attrition)
 ```
-The flow chart above illustrates the changes to cohort 1 (users of acetaminophen) when restricted to only include individuals aged 18 to 90. 226 individuals and 2,863 records were excluded. 
 
-The variable 'cohort_start_date' is used so that individuals are filtered based on the age they were when they entered the cohort.  
+Note that by default individuals are filtered based on the age they were when they entered the cohort.  
 
 ## Restrict cohort by sex
 
 We can also specify a sex criteria for individuals in our cohort using `requireSex()` from CohortConstructor. 
 
-```{r, include = FALSE}
-cdm$medications <- conceptCohort(cdm = cdm, 
-                                 conceptSet = list("diclofenac" = 1124300,
-                                                   "acetaminophen" = 1127433), 
-                                 name = "medications")
-
-settings(cdm$medications)
-cohortCount(cdm$medications)
-```
-
 ```{r}
-cdm$medications <- cdm$medications %>% 
+cdm$fracture <- cdm$fracture %>% 
   requireSex(sex = "Female")
 
-summary_attrition <- summariseCohortAttrition(cdm$medications)
-plotCohortAttrition(summary_attrition, cohortId = 1)
+summary_attrition <- summariseCohortAttrition(cdm$fracture)
+plotCohortAttrition(summary_attrition)
 ```
-The flow chart above illustrates the changes to cohort 1 when restricted to only include 'female' individuals. 1,264 individuals and 4,647 records were excluded. 
 
 ## Restrict cohort by number of prior observations
 
 We can also specify a minimum number of days of prior observations for each individual using `requirePriorObservation()` from CohortConstructor. 
 
-```{r, include = FALSE}
-cdm$medications <- conceptCohort(cdm = cdm, 
-                                 conceptSet = list("diclofenac" = 1124300,
-                                                   "acetaminophen" = 1127433), 
-                                 name = "medications")
-
-settings(cdm$medications)
-cohortCount(cdm$medications)
-```
-
 ```{r}
-cdm$medications <- cdm$medications %>% 
+cdm$fracture <- cdm$fracture %>% 
   requirePriorObservation(indexDate = "cohort_start_date",
                           minPriorObservation = 365)
 
-summary_attrition <- summariseCohortAttrition(cdm$medications)
-plotCohortAttrition(summary_attrition, cohortId = 1)
-```
-The flow chart above illustrates the changes to cohort 1 when restricted to only include individuals with at least 365 days of prior observations. 5 individuals and 109 records were excluded. 
-
-## Restrict cohort by number of future observations
-
-We can also specify a minimum number of days of prior observations for each individual using `requireFutureObservation()` from CohortConstructor. 
-
-```{r, include = FALSE}
-cdm$medications <- conceptCohort(cdm = cdm, 
-                                 conceptSet = list("diclofenac" = 1124300,
-                                                   "acetaminophen" = 1127433), 
-                                 name = "medications")
-
-settings(cdm$medications)
-cohortCount(cdm$medications)
+summary_attrition <- summariseCohortAttrition(cdm$fracture)
+plotCohortAttrition(summary_attrition)
 ```
 
-```{r}
-cdm$medications <- cdm$medications %>% 
-  requireFutureObservation(indexDate = "cohort_start_date",
-                          minFutureObservation = 365)
-
-summary_attrition <- summariseCohortAttrition(cdm$medications)
-plotCohortAttrition(summary_attrition, cohortId = 1)
-```
-The flow chart above illustrates the changes to cohort 1 when restricted to only include individuals with at least 365 days of future observations. 14 individuals and 206 records were excluded.
+As well as specifying a minimum amount of prior observation, we can require some mimimum amount of follow-up by using `requireFutureObservation()` in a similar way.
 
 ## Applying multiple demographic requirements to a cohort
 
-We can implement multiple demographic requirements on a cohort using `requireDemographics()` from CohortConstructor. 
-
-```{r, include = FALSE}
-cdm$medications <- conceptCohort(cdm = cdm, 
-                                 conceptSet = list("diclofenac" = 1124300,
-                                                   "acetaminophen" = 1127433), 
-                                 name = "medications")
-
-settings(cdm$medications)
-cohortCount(cdm$medications)
-```
+We can implement multiple demographic requirements at the same time by using the more general `requireDemographics()` function.
 
 ```{r}
-cdm$medications <- cdm$medications %>% 
+cdm$fracture <- conceptCohort(cdm = cdm, 
+                                 conceptSet = fracture_codes, 
+                                 name = "fracture") %>% 
   requireDemographics(indexDate = "cohort_start_date",
                       ageRange = c(18,100),
                       sex = "Female",
-                      minPriorObservation = 365,
-                      minFutureObservation = 365)
+                      minPriorObservation = 365, 
+                      minFutureObservation = 30)
 
-
-
-summary_attrition <- summariseCohortAttrition(cdm$medications)
-plotCohortAttrition(summary_attrition, cohortId = 1)
+summary_attrition <- summariseCohortAttrition(cdm$fracture)
+plotCohortAttrition(summary_attrition)
 ```
-
-The flow chart above illustrates the changes to cohort 1 when multiple demographic restrictions, so that only female individuals between 18 and 100 years old, with at least 365 days of prior and future observations are included. 1,413 individuals and 6156 records were excluded.

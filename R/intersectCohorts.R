@@ -473,7 +473,7 @@ getRandom <- function(n) {
 }
 addNames <- function(cs) {
   cols <- colnames(cs)[colnames(cs) != "cohort_definition_id"]
-  cs <- cs %>% dplyr::mutate("cohort_name" = as.character(NA))
+  cs <- cs %>% dplyr::mutate("cohort_name" = NA_character_)
   for (col in cols) {
     cs <- cs %>%
       dplyr::mutate(
@@ -514,7 +514,7 @@ addAttritionReason <- function(att, counts, reason) {
     counts |>
       dplyr::mutate(dplyr::across(
         dplyr::all_of(c("number_records", "number_subjects")),
-        ~ dplyr::if_else(is.na(.x), as.integer(0), as.integer(.x))
+        ~ dplyr::if_else(is.na(.x), 0L, as.integer(.x))
       )) |>
       dplyr::inner_join(att |> getPriorCohortCount(), by = "cohort_definition_id") |>
       dplyr::mutate(

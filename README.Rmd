@@ -41,7 +41,7 @@ devtools::install_github("ohdsi/CohortConstructor")
 
 ## Creating and manipulating cohorts
 
-To illustrate the functionality provided by CohortConstructor let's create a set of fracture cohorts using the Eunomia dataset. We'll first load required packages and create a cdm reference for the data.
+To illustrate the functionality provided by CohortConstructor let's create a cohort of people with a fracture using the Eunomia dataset. We'll first load required packages and create a cdm reference for the data.
 
 ```{r, message=FALSE, warning=FALSE}
 library(omopgenerics)
@@ -61,21 +61,33 @@ cdm
 
 ### Generating concept-based fracture cohorts
 
-We will start by making a simple concept-based cohort for each of our fracture of interest. First we create a codelist for each ankle, forearm and hip fractures (note, we just use one code for each because we are using synthetic data). 
+We will first need to identify codes that could be used to represent fractures of interest. To find these we'll use the CodelistGenerator package (note, we will just find a few codes because we are using synthetic data with a subset of the full vocabularies). 
 
 ```{r, message=TRUE}
-fracture_codes <- newCodelist(list("ankle_fracture" = 4059173L,
-                                   "forearm_fracture" = 4278672L,
-                                   "hip_fracture" = 4230399L))
-fracture_codes
+library(CodelistGenerator)
+
+hip_fx_codes <- getCandidateCodes(cdm, "hip fracture")
+forearm_fx_codes <- getCandidateCodes(cdm, "forearm fracture")
+
+fx_codes <- newCodelist(list("hip_fracture" = hip_fx_codes$concept_id,
+                             "forearm_fracture"= forearm_fx_codes$concept_id))
+fx_codes
 ```
 
-Now we can quickly create a set of cohorts for each fracture type. For this we only need to provide the codes we have defined and we will get a cohort back, with cohort end date set as the event date associated with the records, overlapping records collapsed, and only records in observation kept.
+Now we can quickly create our cohorts. For this we only need to provide the codes we have defined and we will get a cohort back, where we start by setting cohort exit as the same day as event start (the date of the fracture).
 
 ```{r}
 cdm$fractures <- cdm |> 
-  conceptCohort(conceptSet = fracture_codes,
-  name = "fractures")
+  conceptCohort(conceptSet = fx_codes, 
+                exit = "event_start_date", 
+                name = "fractures")
+```
+
+After creating our initial cohort we will update it so that exit is set at up to 180 days after start (so long as individuals' observation end date is on or after this - if not, exit will be at observation period end).
+
+```{r}
+cdm$fractures <- cdm$fractures |> 
+  padCohortEnd(days = 180)
 ```
 
 We can see that our starting cohorts, before we add any additional restrictions, have the following associated settings, counts, and attrition.
@@ -168,7 +180,7 @@ cdmDisconnect(cdm)
 ```
 
 ### More information
-CohortConstructor provides much more functionality for creating and manipulating cohorts. See the package website for more details.
+CohortConstructor provides much more functionality for creating and manipulating cohorts. See the package vignettes for more details.
 
 
 

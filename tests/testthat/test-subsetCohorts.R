@@ -14,8 +14,7 @@ test_that("subsetCohort works", {
     cdm$cohort1 |> dplyr::filter(.data$cohort_definition_id == 1) |> dplyr::pull("cohort_start_date") |> sort() ==
       cdm$cohort2 |> dplyr::pull("cohort_start_date") |> sort()
   ))
-  expect_equal(attrition(cdm$cohort1) |> dplyr::filter(.data$cohort_definition_id == 1),
-               attrition(cdm$cohort2))
+  expect_identical(attrition(cdm$cohort1) |> dplyr::filter(.data$cohort_definition_id == 1), attrition(cdm$cohort2))
 
   # subset more than 1 cohort
   cdm$cohort3 <- subsetCohorts(cdm$cohort1, c(3,4,5), name = "cohort3")
@@ -26,8 +25,7 @@ test_that("subsetCohort works", {
     cdm$cohort1 |> dplyr::filter(.data$cohort_definition_id %in% 3:5) |> dplyr::pull("cohort_start_date") |> sort() ==
       cdm$cohort3 |> dplyr::pull("cohort_start_date") |> sort()
   ))
-  expect_equal(attrition(cdm$cohort1) |> dplyr::filter(.data$cohort_definition_id %in% 3:5),
-               attrition(cdm$cohort3))
+  expect_identical(attrition(cdm$cohort1) |> dplyr::filter(.data$cohort_definition_id %in% 3:5), attrition(cdm$cohort3))
 
   # same name
   cohort <- cdm$cohort1
@@ -39,8 +37,7 @@ test_that("subsetCohort works", {
     cohort |> dplyr::filter(.data$cohort_definition_id %in% 3:5) |> dplyr::pull("cohort_start_date") |> sort() ==
       cdm$cohort1 |> dplyr::pull("cohort_start_date") |> sort()
   ))
-  expect_equal(attrition(cohort) |> dplyr::filter(.data$cohort_definition_id %in% 3:5),
-               attrition(cdm$cohort1))
+  expect_identical(attrition(cohort) |> dplyr::filter(.data$cohort_definition_id %in% 3:5), attrition(cdm$cohort1))
 
   PatientProfiles::mockDisconnect(cdm)
 })
@@ -82,14 +79,12 @@ test_that("codelist works", {
 
   # Subset 1 cohort
   cdm$cohort2 <- subsetCohorts(cdm$cohort1, 1, name = "cohort2")
-  expect_equal(attr(cdm$cohort2, "cohort_codelist") |> dplyr::collect(),
-               attr(cdm$cohort1, "cohort_codelist") |> dplyr::filter(cohort_definition_id == 1) |> dplyr::collect())
+  expect_identical(attr(cdm$cohort2, "cohort_codelist") |> dplyr::collect(), attr(cdm$cohort1, "cohort_codelist") |> dplyr::filter(cohort_definition_id == 1) |> dplyr::collect())
 
   # same name
   cohort <- cdm$cohort1
   cdm$cohort1 <- subsetCohorts(cdm$cohort1, 2)
-  expect_equal(attr(cdm$cohort1, "cohort_codelist") |> dplyr::collect(),
-               attr(cohort, "cohort_codelist") |> dplyr::filter(cohort_definition_id == 2) |> dplyr::collect())
+  expect_identical(attr(cdm$cohort1, "cohort_codelist") |> dplyr::collect(), attr(cohort, "cohort_codelist") |> dplyr::filter(cohort_definition_id == 2) |> dplyr::collect())
 
   PatientProfiles::mockDisconnect(cdm)
 })

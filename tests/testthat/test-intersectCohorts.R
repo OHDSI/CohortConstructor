@@ -38,12 +38,10 @@ test_that("intersect example - two cohorts", {
                      dplyr::collect()) == 1L)
   expect_true(cdm$my_cohort_2 |>
                 dplyr::pull("subject_id") == 1L)
-  expect_equal(cdm$my_cohort_2 |>
-                 dplyr::pull("cohort_start_date"),
-               as.Date("2020-06-01"))
-  expect_equal(cdm$my_cohort_2 |>
-                 dplyr::pull("cohort_end_date"),
-               as.Date("2020-06-10"))
+  expect_identical(cdm$my_cohort_2 |>
+                 dplyr::pull("cohort_start_date"), as.Date("2020-06-01"))
+  expect_identical(cdm$my_cohort_2 |>
+                 dplyr::pull("cohort_end_date"), as.Date("2020-06-10"))
 })
 
 test_that("intersect example - three cohorts", {
@@ -86,12 +84,10 @@ test_that("intersect example - three cohorts", {
                      dplyr::collect()) == 1L)
   expect_true(cdm$my_cohort_2 |>
                 dplyr::pull("subject_id") == 1L)
-  expect_equal(cdm$my_cohort_2 |>
-                 dplyr::pull("cohort_start_date"),
-               as.Date("2020-06-03"))
-  expect_equal(cdm$my_cohort_2 |>
-                 dplyr::pull("cohort_end_date"),
-               as.Date("2020-06-09"))
+  expect_identical(cdm$my_cohort_2 |>
+                 dplyr::pull("cohort_start_date"), as.Date("2020-06-03"))
+  expect_identical(cdm$my_cohort_2 |>
+                 dplyr::pull("cohort_end_date"), as.Date("2020-06-09"))
 
   PatientProfiles::mockDisconnect(cdm)
 
@@ -189,12 +185,10 @@ test_that("intersect with gap", {
                      dplyr::collect()) == 1L)
   expect_true(cdm$my_cohort_3 |>
                 dplyr::pull("subject_id") == 1L)
-  expect_equal(cdm$my_cohort_3 |>
-                 dplyr::pull("cohort_start_date"),
-               as.Date("2018-01-03"))
-  expect_equal(cdm$my_cohort_3 |>
-                 dplyr::pull("cohort_end_date"),
-               as.Date("2020-01-10"))
+  expect_identical(cdm$my_cohort_3 |>
+                 dplyr::pull("cohort_start_date"), as.Date("2018-01-03"))
+  expect_identical(cdm$my_cohort_3 |>
+                 dplyr::pull("cohort_end_date"), as.Date("2020-01-10"))
 
   PatientProfiles::mockDisconnect(cdm)
 })
@@ -403,7 +397,7 @@ test_that("attrition and cohortId", {
     keepOriginalCohorts = FALSE
   )
   expect_true(nrow(settings(cdm$cohort1)) == 3)
-  expect_equal(settings(cdm$cohort1)$non_overlapping, c(NA, TRUE, TRUE))
+  expect_identical(settings(cdm$cohort1)$non_overlapping, c(NA, TRUE, TRUE))
   expect_true(all(
     omopgenerics::attrition(cdm$cohort1)$reason %in%
   c('Initial qualifying events', 'Initial qualifying events',
@@ -485,7 +479,7 @@ test_that("codelist", {
 
   # mutually esclusive
   cdm$cohort3 <- intersectCohorts(cdm$cohort1, returnNonOverlappingCohorts = TRUE, name = "cohort3")
-  expect_equal(collectCohort(cdm$cohort3, 1), collectCohort(cdm$cohort2, 1))
+  expect_identical(collectCohort(cdm$cohort3, 1), collectCohort(cdm$cohort2, 1))
   expect_true(all(
     cdm$cohort3 %>% dplyr::pull("cohort_start_date") %>% sort() ==
       c('2009-12-22', '2010-01-01', '2010-01-11', '2010-05-31', '2012-01-21',
@@ -582,12 +576,10 @@ test_that("records combined for gap must be in the same observation period", {
                      dplyr::collect()) == 1L)
   expect_true(cdm$my_cohort_2 |>
                 dplyr::pull("subject_id") == 2L)
-  expect_equal(cdm$my_cohort_2 |>
-                 dplyr::pull("cohort_start_date"),
-               as.Date("2018-01-03"))
-  expect_equal(cdm$my_cohort_2 |>
-                 dplyr::pull("cohort_end_date"),
-               as.Date("2020-01-10"))
+  expect_identical(cdm$my_cohort_2 |>
+                 dplyr::pull("cohort_start_date"), as.Date("2018-01-03"))
+  expect_identical(cdm$my_cohort_2 |>
+                 dplyr::pull("cohort_end_date"), as.Date("2020-01-10"))
 
   PatientProfiles::mockDisconnect(cdm)
 })
@@ -621,14 +613,11 @@ test_that("multiple observation periods", {
   cdm <- cdm_local |> copyCdm()
   cdm$cohort1 <- cdm$cohort1 |> omopgenerics::newCohortTable()
   cdm$cohort1 <- cdm$cohort1 |> intersectCohorts(gap = 9999)
-  expect_equal(
-    collectCohort(cdm$cohort1, 1),
-    dplyr::tibble(
+  expect_identical(collectCohort(cdm$cohort1, 1), dplyr::tibble(
       "subject_id" = as.integer(c(1, 1)),
       "cohort_start_date" = as.Date(c("2000-01-01", "2001-01-01")),
       "cohort_end_date" = as.Date(c("2000-12-20", "2001-12-30"))
-    )
-  )
+    ))
 
   PatientProfiles::mockDisconnect(cdm)
 })

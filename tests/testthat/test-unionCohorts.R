@@ -56,8 +56,8 @@ test_that("unionCohorts works", {
   expect_true(settings(cdm$cohort3)$cohort_name == "cohort_1_cohort_2")
 
   cdm$cohort4 <- unionCohorts(cdm$cohort1, cohortId = c("cohort_1", "cohort_2"), name = "cohort4")
-  expect_equal(collectCohort(cdm$cohort3, 1), collectCohort(cdm$cohort4, 1))
-  expect_equal(collectCohort(cdm$cohort3, 2), collectCohort(cdm$cohort4, 2))
+  expect_identical(collectCohort(cdm$cohort3, 1), collectCohort(cdm$cohort4, 1))
+  expect_identical(collectCohort(cdm$cohort3, 2), collectCohort(cdm$cohort4, 2))
 
   # union 2 empty cohorts
   cdm$cohort5 <- conceptCohort(cdm = cdm, conceptSet = list("a"= 1, "b" = 2), name = "cohort5")
@@ -326,14 +326,11 @@ test_that("multiple observation periods", {
   )
   cdm <- cdm_local |> copyCdm()
   cdm$cohort <- cdm$cohort |> omopgenerics::newCohortTable() |> unionCohorts(gap = 99999)
-  expect_equal(
-    collectCohort(cdm$cohort, 1),
-    dplyr::tibble(
+  expect_identical(collectCohort(cdm$cohort, 1), dplyr::tibble(
       "subject_id" = as.integer(c(1, 1, 1, 2, 2)),
       "cohort_start_date" = as.Date(c("2000-01-01", "2001-01-01", "2003-01-01", "2001-01-01", "2002-01-01")),
       "cohort_end_date" = as.Date(c("2000-12-20", "2001-04-01", "2004-01-01", "2001-12-30", "2003-01-01"))
-    )
-  )
+    ))
 
   PatientProfiles::mockDisconnect(cdm)
 })

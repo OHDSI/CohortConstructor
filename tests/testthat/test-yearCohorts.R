@@ -11,8 +11,7 @@ test_that("yearCohorts - change name", {
                              years = 1997:2002,
                              cohortId = NULL,
                              name = "cohort1")
-  expect_equal(settings(cdm$cohort1) |> dplyr::arrange(.data$cohort_definition_id),
-               dplyr::tibble(
+  expect_identical(settings(cdm$cohort1) |> dplyr::arrange(.data$cohort_definition_id), dplyr::tibble(
                  cohort_definition_id = 1:6,
                  cohort_name = paste0("cohort_1_", 1997:2002),
                  target_cohort_definition_id = 1,
@@ -45,8 +44,7 @@ test_that("yearCohorts - change name", {
                             years = 2005:2008,
                             cohortId = NULL,
                             name = "cohort1")
-  expect_equal(settings(cdm$cohort1) |> dplyr::arrange(.data$cohort_definition_id),
-               dplyr::tibble(
+  expect_identical(settings(cdm$cohort1) |> dplyr::arrange(.data$cohort_definition_id), dplyr::tibble(
                  cohort_definition_id = 1:12,
                  cohort_name = c(
                    "cohort_1_2005", "cohort_2_2005", "cohort_3_2005", "cohort_1_2006",
@@ -84,8 +82,7 @@ test_that("yearCohorts - change name", {
                              years = 2005:2008,
                              cohortId = 1,
                              name = "cohort1")
-  expect_equal(settings(cdm$cohort1) |> dplyr::arrange(.data$cohort_definition_id),
-               dplyr::tibble(
+  expect_identical(settings(cdm$cohort1) |> dplyr::arrange(.data$cohort_definition_id), dplyr::tibble(
                  cohort_definition_id = 1:4,
                  cohort_name = c(
                    paste0("cohort_1_", 2005:2008)
@@ -113,7 +110,7 @@ test_that("yearCohorts - change name", {
                              years = numeric(),
                              cohortId = 1,
                              name = "cohort1")
-  expect_equal(cdm$cohort1 |> dplyr::collect(), cdm$cohort |> dplyr::collect())
+  expect_identical(cdm$cohort1 |> dplyr::collect(), cdm$cohort |> dplyr::collect())
 
   PatientProfiles::mockDisconnect(cdm)
 })
@@ -130,8 +127,7 @@ test_that("yearCohorts - keep name", {
   cdm$cohort <- yearCohorts(cohort = cdm$cohort,
                              years = 1997:2002,
                              cohortId = settings(cdm$cohort)$cohort_name)
-  expect_equal(settings(cdm$cohort) |> dplyr::arrange(.data$cohort_definition_id),
-               dplyr::tibble(
+  expect_identical(settings(cdm$cohort) |> dplyr::arrange(.data$cohort_definition_id), dplyr::tibble(
                  cohort_definition_id = 1:6,
                  cohort_name = paste0("cohort_1_", 1997:2002),
                  target_cohort_definition_id = 1,
@@ -164,8 +160,7 @@ test_that("yearCohorts - keep name", {
   cdm$cohort <- yearCohorts(cohort = cdm$cohort,
                              years = 2005:2008,
                              cohortId = 1)
-  expect_equal(settings(cdm$cohort) |> dplyr::arrange(.data$cohort_definition_id),
-               dplyr::tibble(
+  expect_identical(settings(cdm$cohort) |> dplyr::arrange(.data$cohort_definition_id), dplyr::tibble(
                  cohort_definition_id = 1:4,
                  cohort_name = c(
                    paste0("cohort_1_", 2005:2008)

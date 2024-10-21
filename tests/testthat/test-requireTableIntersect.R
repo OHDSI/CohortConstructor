@@ -18,13 +18,11 @@ test_that("requiring presence in another table", {
                                             targetEndDate = "date_end",
                                             window = list(c(-Inf, Inf)),
                                             name = "cohort2")
-  expect_equal(colnames(cdm$cohort2), colnames(cdm$cohort1))
+  expect_identical(colnames(cdm$cohort2), colnames(cdm$cohort1))
 
 
-  expect_equal(cdm$cohort2 |> dplyr::pull("subject_id") |> sort(),
-               cdm$cohort1 |> dplyr::pull("subject_id") |> sort())
-  expect_equal(omopgenerics::attrition(cdm$cohort2)$reason,
-               c("Initial qualifying events",
+  expect_identical(cdm$cohort2 |> dplyr::pull("subject_id") |> sort(), cdm$cohort1 |> dplyr::pull("subject_id") |> sort())
+  expect_identical(omopgenerics::attrition(cdm$cohort2)$reason, c("Initial qualifying events",
                  "In table table between -Inf & Inf days relative to cohort_start_date between 1 and Inf",
                  "Initial qualifying events",
                  "In table table between -Inf & Inf days relative to cohort_start_date between 1 and Inf"))
@@ -38,8 +36,7 @@ test_that("requiring presence in another table", {
   expect_true(all(cdm$cohort3 |> dplyr::pull("subject_id") == c(2,3,1,1)))
   expect_true(all(cdm$cohort3 |> dplyr::pull("cohort_start_date") ==
                     c("1999-05-03", "2015-02-25", "2001-03-24", "2001-11-28")))
-  expect_equal(omopgenerics::attrition(cdm$cohort3)$reason,
-               c("Initial qualifying events",
+  expect_identical(omopgenerics::attrition(cdm$cohort3)$reason, c("Initial qualifying events",
                  "In table table between 0 & Inf days relative to cohort_start_date between 1 and Inf",
                  "Initial qualifying events",
                  "In table table between 0 & Inf days relative to cohort_start_date between 1 and Inf"))
@@ -54,8 +51,7 @@ test_that("requiring presence in another table", {
                                             name = "cohort4")
   expect_true(all(cdm$cohort4 |> dplyr::pull("subject_id") == c(1,1,1,1)))
   expect_true(all(cdm$cohort4 |> dplyr::pull("cohort_start_date") == c("2003-05-17", "2004-03-11", "2002-01-30", "2002-06-13")))
-  expect_equal(omopgenerics::attrition(cdm$cohort4)$reason,
-               c("Initial qualifying events",
+  expect_identical(omopgenerics::attrition(cdm$cohort4)$reason, c("Initial qualifying events",
                  "In table table between -Inf & 0 days relative to cohort_start_date between 1 and Inf, censoring at cohort_end_date",
                  "Initial qualifying events",
                  "In table table between -Inf & 0 days relative to cohort_start_date between 1 and Inf, censoring at cohort_end_date"))
@@ -72,8 +68,7 @@ test_that("requiring presence in another table", {
   expect_true(all(cdm$cohort5 |> dplyr::pull("subject_id") == c(1, 1, 1, 1, 1,1)))
   expect_true(all(cdm$cohort5 |> dplyr::pull("cohort_start_date") |> sort() ==
                     c("2001-03-24", "2001-11-28", "2002-01-30", "2002-06-13", "2003-05-17", "2004-03-11")))
-  expect_equal(omopgenerics::attrition(cdm$cohort5)$reason,
-               c("Initial qualifying events",
+  expect_identical(omopgenerics::attrition(cdm$cohort5)$reason, c("Initial qualifying events",
                  "In table table between -Inf & 0 days relative to cohort_start_date between 1 and Inf, censoring at cohort_end_date",
                  "Initial qualifying events"))
 
@@ -120,8 +115,7 @@ test_that("requiring absence in another table", {
                                             name = "cohort2")
 
   expect_true(cdm$cohort2 |> dplyr::pull("subject_id") |> length() == 1)
-  expect_equal(omopgenerics::attrition(cdm$cohort2)$reason,
-               c("Initial qualifying events",
+  expect_identical(omopgenerics::attrition(cdm$cohort2)$reason, c("Initial qualifying events",
                  "Not in table table between -Inf & Inf days relative to cohort_start_date",
                  "Initial qualifying events",
                  "Not in table table between -Inf & Inf days relative to cohort_start_date"))
@@ -136,8 +130,7 @@ test_that("requiring absence in another table", {
   expect_true(all(cdm$cohort3 |> dplyr::pull("subject_id") == c(1,1,2,1,1)))
   expect_true(all(cdm$cohort3 |> dplyr::pull("cohort_start_date") |> sort() ==
                     c("1999-05-03", "2002-01-30", "2002-06-13", "2003-05-17", "2004-03-11")))
-  expect_equal(omopgenerics::attrition(cdm$cohort3)$reason,
-               c("Initial qualifying events",
+  expect_identical(omopgenerics::attrition(cdm$cohort3)$reason, c("Initial qualifying events",
                  "Not in table table between 0 & Inf days relative to cohort_start_date",
                  "Initial qualifying events",
                  "Not in table table between 0 & Inf days relative to cohort_start_date"))
@@ -154,8 +147,7 @@ test_that("requiring absence in another table", {
   expect_true(all(cdm$cohort4 |> dplyr::pull("subject_id") == c(2,3,1,1)))
   expect_true(all((cdm$cohort4 |> dplyr::pull("cohort_start_date") ==
                  c("1999-05-03", "2015-02-25", "2001-03-24", "2001-11-28"))))
-  expect_equal(omopgenerics::attrition(cdm$cohort4)$reason,
-               c("Initial qualifying events",
+  expect_identical(omopgenerics::attrition(cdm$cohort4)$reason, c("Initial qualifying events",
                  "Not in table table between -Inf & 0 days relative to cohort_start_date, censoring at cohort_end_date",
                  "Initial qualifying events",
                  "Not in table table between -Inf & 0 days relative to cohort_start_date, censoring at cohort_end_date"))
@@ -173,8 +165,7 @@ test_that("requiring absence in another table", {
   expect_true(all((cdm$cohort1 |> dplyr::pull("cohort_start_date") |> sort() ==
                      c("1999-05-03", "2001-03-24", "2001-11-28", "2002-01-30", "2002-06-13",
                        "2003-05-17", "2004-03-11"))))
-  expect_equal(omopgenerics::attrition(cdm$cohort1)$reason,
-               c("Initial qualifying events",
+  expect_identical(omopgenerics::attrition(cdm$cohort1)$reason, c("Initial qualifying events",
                  "Not in table table between 0 & Inf days relative to cohort_start_date",
                  "Initial qualifying events"))
 
@@ -218,7 +209,7 @@ test_that("different intersection count requirements", {
   cdm <- cdm_local |> copyCdm()
 
   # no intersections - people not in cohort2
-  expect_equal(sort(cdm$cohort1 |>
+  expect_identical(sort(cdm$cohort1 |>
                       requireTableIntersect(intersections = c(0, 0),
                                             tableName = "drug_exposure",
                                               window = c(-Inf, Inf),
@@ -227,15 +218,14 @@ test_that("different intersection count requirements", {
 
 
   # only one intersection
-  expect_equal(sort(cdm$cohort1 |>
+  expect_identical(sort(cdm$cohort1 |>
                       requireTableIntersect(intersections = c(1, 1),
                                               tableName = "drug_exposure",
                                               window = c(-Inf, Inf),
                                               name = "cohort1_test") |>
-                      dplyr::pull("subject_id")),
-               c(1))
+                      dplyr::pull("subject_id")), c(1))
 
-  expect_equal(sort(cdm$cohort1 |>
+  expect_identical(sort(cdm$cohort1 |>
                       requireTableIntersect(intersections = c(1),
                                               tableName = "drug_exposure",
                                               window = c(-Inf, Inf),
@@ -243,14 +233,14 @@ test_that("different intersection count requirements", {
                       dplyr::pull("subject_id")), c(1))
 
   # 2 intersections
-  expect_equal(sort(cdm$cohort1 |>
+  expect_identical(sort(cdm$cohort1 |>
                       requireTableIntersect(intersections = c(2, 2),
                                               tableName = "drug_exposure",
                                               window = c(-Inf, Inf),
                                               name = "cohort1_test") |>
                       dplyr::pull("subject_id")), c(2))
 
-  expect_equal(sort(cdm$cohort1 |>
+  expect_identical(sort(cdm$cohort1 |>
                       requireTableIntersect(intersections = c(2),
                                               tableName = "drug_exposure",
                                               window = c(-Inf, Inf),
@@ -259,7 +249,7 @@ test_that("different intersection count requirements", {
 
 
   # 2 or more intersections
-  expect_equal(sort(cdm$cohort1 |>
+  expect_identical(sort(cdm$cohort1 |>
                       requireTableIntersect(intersections = c(2, Inf),
                                               tableName = "drug_exposure",
                                               window = c(-Inf, Inf),
@@ -267,7 +257,7 @@ test_that("different intersection count requirements", {
                       dplyr::pull("subject_id")), c(2, 3))
 
   # 2 or 3 intersections
-  expect_equal(sort(cdm$cohort1 |>
+  expect_identical(sort(cdm$cohort1 |>
                       requireTableIntersect(intersections = c(2, 3),
                                               tableName = "drug_exposure",
                                               window = c(-Inf, Inf),

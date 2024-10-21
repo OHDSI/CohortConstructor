@@ -68,8 +68,8 @@ test_that("Example: sex", {
                   check2 = (cohort_end_date == observation_period_end_date)) |>
     dplyr::compute()
 
-  expect_true(all(cdm$cohort3 |> dplyr::pull("check1")== T))
-  expect_true(all(cdm$cohort3 |> dplyr::pull("check2")== T))
+  expect_true(all(cdm$cohort3 |> dplyr::pull("check1")== TRUE))
+  expect_true(all(cdm$cohort3 |> dplyr::pull("check2")== TRUE))
 
   PatientProfiles::mockDisconnect(cdm)
 })
@@ -98,8 +98,8 @@ test_that("Example: ageRange", {
                   check2 = (cohort_end_date <= observation_period_end_date)) |>
     dplyr::compute()
 
-  expect_true(all(cdm$cohort3 |> dplyr::pull("check1")== T))
-  expect_true(all(cdm$cohort3 |> dplyr::pull("check2")== T))
+  expect_true(all(cdm$cohort3 |> dplyr::pull("check1")== TRUE))
+  expect_true(all(cdm$cohort3 |> dplyr::pull("check2")== TRUE))
 
   PatientProfiles::mockDisconnect(cdm)
 })
@@ -127,15 +127,15 @@ test_that("Example: priorObs", {
                   check2 = (cohort_end_date == observation_period_end_date)) |>
     dplyr::compute()
 
-  expect_true(all(cdm$cohort3 |> dplyr::pull("check1")== T))
-  expect_true(all(cdm$cohort3 |> dplyr::pull("check2")== T))
+  expect_true(all(cdm$cohort3 |> dplyr::pull("check1")== TRUE))
+  expect_true(all(cdm$cohort3 |> dplyr::pull("check2")== TRUE))
 
   loc_cohort3 <- cdm$cohort3 |>
     dplyr::collect() |>
     dplyr::mutate(check3 = observation_period_start_date + 15) |>
     dplyr::mutate(check3 = (check3 == cohort_start_date))
 
-  expect_true(all(loc_cohort3 |> dplyr::pull("check3")== T))
+  expect_true(all(loc_cohort3 |> dplyr::pull("check3")== TRUE))
 
   PatientProfiles::mockDisconnect(cdm)
 })
@@ -193,8 +193,8 @@ test_that("Example: mixture of parameters", {
                   check2 = (cohort_end_date == observation_period_end_date)) |>
     dplyr::compute()
 
-  expect_true(all(cdm$cohort3 |> dplyr::pull("check1")== T))
-  expect_true(all(cdm$cohort3 |> dplyr::pull("check2")== T))
+  expect_true(all(cdm$cohort3 |> dplyr::pull("check1")== TRUE))
+  expect_true(all(cdm$cohort3 |> dplyr::pull("check2")== TRUE))
 
   cdm$cohort3 <- cdm$cohort3 |>
     PatientProfiles::addAge()

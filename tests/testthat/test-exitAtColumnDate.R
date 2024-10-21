@@ -111,7 +111,7 @@ test_that("exit at last date", {
       cohortId = c("cohort_1"),
       name = "cohort11"
     )
-  expect_equal(collectCohort(cdm$cohort1, 1), collectCohort(cdm$cohort11, 1))
+  expect_identical(collectCohort(cdm$cohort1, 1), collectCohort(cdm$cohort11, 1))
 
   # test not cohort end as columns working
   cdm$cohort <- cdm$cohort |>

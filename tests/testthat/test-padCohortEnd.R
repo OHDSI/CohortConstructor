@@ -116,11 +116,9 @@ test_that("overlapping entries", {
     dplyr::filter(cohort_definition_id == 2) |>
     dplyr::pull("cohort_end_date"), as.Date("2020-01-14"))
 
-  expect_equal(
-    sort(cdm$cohort |>
+  expect_identical(sort(cdm$cohort |>
     dplyr::filter(cohort_definition_id == 1) |>
-    dplyr::pull("cohort_end_date")),
- sort(cdm$cohort_2 |>
+    dplyr::pull("cohort_end_date")), sort(cdm$cohort_2 |>
         dplyr::filter(cohort_definition_id == 1)  |>
     dplyr::pull("cohort_end_date")))
 

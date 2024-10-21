@@ -12,7 +12,7 @@ readData <- function(path) {
   data <- NULL
   for (file in zipFiles) {
     file <- file.path(path, file)
-    fname = unzip(file, list = TRUE)$Name
+    fname <- unzip(file, list = TRUE)$Name
     fname <- fname[tools::file_ext(fname) == "csv"]
     unzip(file, files = fname, exdir = tempfolder, overwrite = TRUE)
     files <- file.path(tempfolder, fname)
@@ -60,7 +60,7 @@ mergeData <- function(data, patterns) {
 
 updateCDMname <- function(resultList, old, new) {
   caseWhen <- "dplyr::case_when("
-  for (k in 1:length(old)) {
+  for (k in seq_along(old)) {
     caseWhen <- glue::glue("{caseWhen} .data$cdm_name == '{old[k]}' ~ '{new[k]}', ")
   }
   caseWhen <- paste0(caseWhen, ".default = .data$cdm_name)") |>
@@ -74,13 +74,13 @@ updateCDMname <- function(resultList, old, new) {
 
 updateResultType <- function(resultList, old, new) {
   caseWhen <- "dplyr::case_when("
-  for (k in 1:length(old)) {
+  for (k in seq_along(old)) {
     caseWhen <- glue::glue("{caseWhen} .data$result_type == '{old[k]}' ~ '{new[k]}', ")
   }
   caseWhen <- paste0(caseWhen, ".default = .data$result_type)") |>
     rlang::parse_exprs() |> rlang::set_names("result_type")
   for (res in names(resultList)) {
-    if ("summarised_result" %in% class(resultList[[res]])) {
+    if (inherits(resultList[[res]], "summarised_result")) {
       attr(resultList[[res]], "settings") <- settings(resultList[[res]]) |>
         dplyr::mutate(cdm_name = !!!caseWhen)
     }

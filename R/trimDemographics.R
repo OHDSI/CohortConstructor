@@ -151,7 +151,7 @@ trimDemographics <- function(cohort,
     cli::cli_inform(c("Trim age"))
 
     for (j in seq_along(ageRange)) {
-      ageRange[[j]][is.infinite(ageRange[[j]])] <- as.integer(999)
+      ageRange[[j]][is.infinite(ageRange[[j]])] <- 999L
     }
 
     newCohort <- newCohort %>%
