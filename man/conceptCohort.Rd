@@ -9,7 +9,9 @@ conceptCohort(
   conceptSet,
   name,
   exit = "event_end_date",
-  useSourceFields = FALSE
+  useSourceFields = FALSE,
+  subsetCohort = NULL,
+  subsetCohortId = NULL
 )
 }
 \arguments{
@@ -26,6 +28,14 @@ or a conceptSetExpression.}
 \item{useSourceFields}{If TRUE, the source concept_id fields will also be
 used when identifying relevant clinical records. If FALSE, only the standard
 concept_id fields will be used.}
+
+\item{subsetCohort}{A cohort table containing individuals for whom cohorts
+will be generated. Only individuals in this table will appear in the
+generated cohort.}
+
+\item{subsetCohortId}{Optional. Specifies cohort IDs from the \code{subsetCohort}
+table to include. If none are provided, all cohorts from the \code{subsetCohort}
+are included.}
 }
 \value{
 A cohort table
