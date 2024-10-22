@@ -184,7 +184,7 @@ validateStrata <- function(strata, cohort) {
 validateValueAsNumber <- function(valueAsNumber) {
   omopgenerics::assertList(valueAsNumber,
     named = TRUE,
-    class = "numeric",
+    class = c("integer", "numeric"),
     null = TRUE
   )
   for (i in seq_along(valueAsNumber)) {

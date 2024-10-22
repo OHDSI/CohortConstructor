@@ -126,6 +126,7 @@ measurementCohort <- function(cdm,
     dplyr::filter(tolower(.data$domain_id) %in% "measurement") |>
     dplyr::compute(name = tmpCodelist, temporary = FALSE)
 
+  cli::cli_inform(c("i" = "Subsetting measurement table."))
   cohort <- cdm$measurement |>
     dplyr::select(
       "subject_id" = "person_id",
@@ -140,8 +141,27 @@ measurementCohort <- function(cdm,
       cohortCodelist |> dplyr::select("concept_id", "cohort_definition_id"),
       by = "concept_id"
     ) |>
-    dplyr::filter(!is.na(.data$cohort_start_date)) |>
-    dplyr::compute(name = name, temporary = FALSE)
+    dplyr::compute(name = name, temporary = FALSE) |>
+    omopgenerics::newCohortTable(
+      cohortSetRef = cohortSet,
+      cohortCodelistRef = cohortCodelist |> dplyr::collect(),
+      .softValidation = TRUE
+    )
+
+  if (!is.null(valueAsConcept) || !is.null(valueAsNumber)) {
+    cli::cli_inform(c("i" = "Applying measurement requirements."))
+    filterExpr <- getFilterExpression(valueAsConcept, valueAsNumber)
+    cohort <- cohort |>
+      dplyr::filter(!!!filterExpr) |>
+      dplyr::compute(name = name, temporary = FALSE) |>
+      omopgenerics::recordCohortAttrition(reason = "Fulfilling measurement value requirements")
+
+    if (cohort |> dplyr::tally() |> dplyr::pull("n") == 0) {
+      cli::cli_warn(
+        "There are no subjects with the specified value_as_concept_id or value_as_number."
+      )
+    }
+  }
 
   if (cohort |> dplyr::tally() |> dplyr::pull("n") == 0) {
     cli::cli_inform(c("i" = "No table could be subsetted, returning empty cohort."))
@@ -153,7 +173,7 @@ measurementCohort <- function(cdm,
                     "cohort_end_date") |>
       omopgenerics::newCohortTable(
         cohortSetRef = cohortSet,
-        cohortAttritionRef = NULL,
+        cohortAttritionRef = attrition(cohort),
         cohortCodelistRef = cohortCodelist |> dplyr::collect()
       )
     return(cdm[[name]])
@@ -161,35 +181,25 @@ measurementCohort <- function(cdm,
 
   cli::cli_inform(c("i" = "Getting records in observation."))
   cohort <- cohort |>
-    PatientProfiles::addDemographics(
-      age = FALSE,
-      sex = FALSE,
-      priorObservationType = "date",
-      futureObservationType = "date",
-      name = name
+    dplyr::filter(!is.na(.data$cohort_start_date)) |>
+    dplyr::compute(name = name, temporary = FALSE) |>
+    omopgenerics::recordCohortAttrition(reason = "Not missing record date") |>
+    dplyr::left_join(
+      cdm$observation_period |>
+        dplyr::select(
+          "person_id",
+          "observation_period_start_date",
+          "observation_period_end_date"
+        ),
+      by = c("subject_id" = "person_id")
     ) |>
     dplyr::filter(
-      .data$prior_observation <= .data$cohort_start_date,
-      .data$future_observation >= .data$cohort_end_date
+      .data$observation_period_start_date <= .data$cohort_start_date,
+      .data$observation_period_end_date >= .data$cohort_end_date
     ) |>
-    dplyr::select(-"prior_observation", -"future_observation") |>
-    dplyr::compute(name = name, temporary = FALSE)
-
-
-  if (!is.null(valueAsConcept) || !is.null(valueAsNumber)) {
-    cli::cli_inform(c("i" = "Applying measurement requirements."))
-    filterExpr <- getFilterExpression(valueAsConcept, valueAsNumber)
-    cohort <- cohort |>
-      dplyr::filter(!!!filterExpr) |>
-      dplyr::compute(name = name, temporary = FALSE)
-
-    if (cohort |> dplyr::tally() |> dplyr::pull("n") == 0) {
-      cli::cli_warn(
-        "There are no subjects with the specified value_as_concept_id or value_as_number."
-      )
-    }
-
-  }
+    dplyr::select(-"observation_period_start_date", -"observation_period_end_date") |>
+    dplyr::compute(name = name, temporary = FALSE) |>
+    omopgenerics::recordCohortAttrition(reason = "Record in observation")
 
   cohort <- cohort |>
     dplyr::select("cohort_definition_id",
@@ -197,17 +207,13 @@ measurementCohort <- function(cdm,
                   "cohort_start_date",
                   "cohort_end_date") |>
     dplyr::distinct() |>
-    dplyr::compute(name = name, temporary = FALSE)
+    dplyr::compute(name = name, temporary = FALSE) |>
+    omopgenerics::recordCohortAttrition(reason = "Distinct measurement records")
 
   cli::cli_inform(c("i" = "Creating cohort attributes."))
 
   cohort <- cohort |>
-    omopgenerics::newCohortTable(
-      cohortSetRef = cohortSet,
-      cohortAttritionRef = NULL,
-      cohortCodelistRef = cohortCodelist |> dplyr::collect(),
-      .softValidation = TRUE
-    )
+    omopgenerics::newCohortTable(.softValidation = TRUE)
 
   cli::cli_inform(c("v" = "Cohort {.strong {name}} created."))
 

@@ -3,7 +3,7 @@ test_that("mearurementCohorts works", {
   cdm$concept <- cdm$concept |>
     dplyr::union_all(
       dplyr::tibble(
-        concept_id = c(4326744, 4298393, 45770407, 8876, 4124457, 999999, 123456),
+        concept_id = c(4326744, 4298393, 45770407, 8876, 4124457, 999999, 123456) |> as.integer(),
         concept_name = c("Blood pressure", "Systemic blood pressure",
                          "Baseline blood pressure", "millimeter mercury column",
                          "Normal range", "Normal", "outObs"),
@@ -20,14 +20,14 @@ test_that("mearurementCohorts works", {
       )
     )
   cdm$measurement <- dplyr::tibble(
-    measurement_id = 1:7,
+    measurement_id = 1:7L,
     person_id = as.integer(c(1, 1, 2, 3, 3, 1, 1)),
-    measurement_concept_id = c(4326744, 4298393, 4298393, 45770407, 45770407, 123456, 123456),
+    measurement_concept_id = c(4326744, 4298393, 4298393, 45770407, 45770407, 123456, 123456) |> as.integer(),
     measurement_date = as.Date(c("2000-07-01", "2000-12-11", "2002-09-08", "2015-02-19", "2015-02-20", "1900-01-01", "2050-01-01")),
-    measurement_type_concept_id = NA,
-    value_as_number = c(100, 125, NA, NA, NA, NA, NA),
-    value_as_concept_id = c(0, 0, 0, 4124457, 999999, 0, 0),
-    unit_concept_id = c(8876, 8876, 0, 0, 0, 0, 0)
+    measurement_type_concept_id = NA_integer_,
+    value_as_number = c(100, 125, NA, NA, NA, NA, NA) |> as.integer(),
+    value_as_concept_id = c(0, 0, 0, 4124457, 999999, 0, 0) |> as.integer(),
+    unit_concept_id = c(8876, 8876, 0, 0, 0, 0, 0) |> as.integer()
   )
   cdm <- cdm |> copyCdm()
 
@@ -45,9 +45,9 @@ test_that("mearurementCohorts works", {
   cdm$cohort <- measurementCohort(
     cdm = cdm,
     name = "cohort",
-    conceptSet = list("normal_blood_pressure" = c(4326744, 4298393, 45770407)),
+    conceptSet = list("normal_blood_pressure" = c(4326744L, 4298393L, 45770407L)),
     valueAsConcept = c(4124457),
-    valueAsNumber = list("8876" = c(70, 120))
+    valueAsNumber = list("8876" = c(70L, 120L))
   )
 
   if(isDuckdb){
@@ -73,7 +73,22 @@ test_that("mearurementCohorts works", {
       cohort_start_date = as.Date(c("2000-07-01", "2015-02-19")),
       cohort_end_date = as.Date(c("2000-07-01", "2015-02-19"))
     ))
-  expect_true(cdm$cohort |> attrition() |> dplyr::pull("reason") == "Initial qualifying events")
+  expect_identical(
+    cdm$cohort |> attrition() |> dplyr::as_tibble(),
+    dplyr::tibble(
+      "cohort_definition_id" = 1L,
+      "number_records" = c(5L, rep(2L, 4)),
+      "number_subjects" = c(3L, rep(2L, 4)),
+      "reason_id" = 1:5L,
+      "reason" = c(
+        "Initial qualifying events", "Fulfilling measurement value requirements",
+        "Not missing record date", "Record in observation",
+        "Distinct measurement records"
+      ),
+      "excluded_records" = c(0L, 3L, 0L, 0L, 0L),
+      "excluded_subjects" = c(0L, 1L, 0L, 0L, 0L),
+    )
+  )
   expect_true(settings(cdm$cohort)$cohort_name == "normal_blood_pressure")
   codes <- attr(cdm$cohort, "cohort_codelist") |> dplyr::collect()
   expect_true(all(codes$concept_id |> sort() == c(4298393, 4326744, 45770407)))
@@ -89,7 +104,7 @@ test_that("mearurementCohorts works", {
   cdm$cohort3 <- measurementCohort(
     cdm = cdm,
     name = "cohort3",
-    conceptSet = list("normal_blood_pressure" = c(4326744, 4298393, 45770407, 12345)),
+    conceptSet = list("normal_blood_pressure" = c(4326744L, 4298393L, 45770407L, 12345L)),
     valueAsConcept = c(4124457),
     valueAsNumber = list("8876" = c(70, 120))
   )
@@ -100,7 +115,6 @@ test_that("mearurementCohorts works", {
       cohort_start_date = as.Date(c("2000-07-01", "2015-02-19")),
       cohort_end_date = as.Date(c("2000-07-01", "2015-02-19"))
     ))
-  expect_true(cdm$cohort3 |> attrition() |> dplyr::pull("reason") == "Initial qualifying events")
   expect_true(settings(cdm$cohort3)$cohort_name == "normal_blood_pressure")
   codes <- attr(cdm$cohort3, "cohort_codelist") |> dplyr::collect()
   expect_true(all(c(4298393, 4326744, 45770407) %in% codes$concept_id))
@@ -109,7 +123,7 @@ test_that("mearurementCohorts works", {
   cdm$cohort4 <- measurementCohort(
     cdm = cdm,
     name = "cohort4",
-    conceptSet = list("normal_blood_pressure" = c(4326744, 4298393, 45770407))
+    conceptSet = list("normal_blood_pressure" = c(4326744L, 4298393L, 45770407L))
   )
   expect_equal(
     collectCohort(cdm$cohort4, 1),
@@ -118,7 +132,6 @@ test_that("mearurementCohorts works", {
       cohort_start_date = as.Date(c("2000-07-01", "2000-12-11", "2002-09-08", "2015-02-19", "2015-02-20")),
       cohort_end_date = as.Date(c("2000-07-01", "2000-12-11", "2002-09-08", "2015-02-19", "2015-02-20"))
     ))
-  expect_true(cdm$cohort4 |> attrition() |> dplyr::pull("reason") == "Initial qualifying events")
   expect_true(settings(cdm$cohort4)$cohort_name == "normal_blood_pressure")
   codes <- attr(cdm$cohort4, "cohort_codelist") |> dplyr::collect()
   expect_true(all(codes$concept_id  |> sort() == c(4298393, 4326744, 45770407)))
@@ -127,7 +140,7 @@ test_that("mearurementCohorts works", {
   cdm$cohort5 <- measurementCohort(
     cdm = cdm,
     name = "cohort5",
-    conceptSet = list("normal_blood_pressure" = c(4326744, 4298393, 45770407)),
+    conceptSet = list("normal_blood_pressure" = c(4326744L, 4298393L, 45770407L)),
     valueAsNumber = list("8876" = c(70, 120), "908" = c(800, 900))
   )
   expect_equal(
@@ -137,7 +150,6 @@ test_that("mearurementCohorts works", {
       cohort_start_date = as.Date(c("2000-07-01")),
       cohort_end_date = as.Date(c("2000-07-01"))
     ))
-  expect_true(cdm$cohort5 |> attrition() |> dplyr::pull("reason") == "Initial qualifying events")
   expect_true(settings(cdm$cohort5)$cohort_name == "normal_blood_pressure")
   codes <- attr(cdm$cohort5, "cohort_codelist") |> dplyr::collect()
   expect_true(all(codes$concept_id  |> sort() == c(4298393, 4326744, 45770407)))
@@ -146,7 +158,7 @@ test_that("mearurementCohorts works", {
   cdm$cohort6 <- measurementCohort(
     cdm = cdm,
     name = "cohort6",
-    conceptSet = list("normal_blood_pressure" = c(4326744, 4298393, 45770407)),
+    conceptSet = list("normal_blood_pressure" = c(4326744L, 4298393L, 45770407L)),
     valueAsConcept = c(4124457, 999999, 12345)
   )
   expect_equal(
@@ -156,7 +168,6 @@ test_that("mearurementCohorts works", {
       cohort_start_date = as.Date(c("2015-02-19", "2015-02-20")),
       cohort_end_date = as.Date(c("2015-02-19", "2015-02-20"))
     ))
-  expect_true(cdm$cohort6 |> attrition() |> dplyr::pull("reason") == "Initial qualifying events")
   expect_true(settings(cdm$cohort6)$cohort_name == "normal_blood_pressure")
   codes <- attr(cdm$cohort6, "cohort_codelist") |> dplyr::collect()
   expect_true(all(codes$concept_id  |> sort() == c(4298393, 4326744, 45770407)))
@@ -165,7 +176,7 @@ test_that("mearurementCohorts works", {
   cdm$cohort7 <- measurementCohort(
     cdm = cdm,
     name = "cohort7",
-    conceptSet = list("c1" = c(4326744), "c2" = c(4298393, 45770407))
+    conceptSet = list("c1" = c(4326744L), "c2" = c(4298393L, 45770407L))
   )
   expect_equal(
     collectCohort(cdm$cohort7, 1),
@@ -181,7 +192,27 @@ test_that("mearurementCohorts works", {
       cohort_start_date = as.Date(c("2000-12-11", "2002-09-08", "2015-02-19","2015-02-20")),
       cohort_end_date = as.Date(c("2000-12-11", "2002-09-08", "2015-02-19", "2015-02-20"))
     ))
-  expect_true(all(cdm$cohort7 |> attrition() |> dplyr::pull("reason") == c("Initial qualifying events", "Initial qualifying events")))
+  expect_identical(
+    attrition(cdm$cohort7) |> dplyr::as_tibble(),
+    dplyr::tibble(
+      "cohort_definition_id" = c(rep(1L, 4), rep(2L, 4)),
+      "number_records" = c(rep(1L, 4), rep(4L, 4)),
+      "number_subjects" = c(rep(1L, 4), rep(3L, 4)),
+      "reason_id" = rep(1:4L, 2),
+      "reason" = c(
+        "Initial qualifying events",
+        "Not missing record date",
+        "Record in observation",
+        "Distinct measurement records",
+        "Initial qualifying events",
+        "Not missing record date",
+        "Record in observation",
+        "Distinct measurement records"
+      ),
+      "excluded_records" = 0L,
+      "excluded_subjects" = 0L
+    )
+  )
   expect_true(all(all(settings(cdm$cohort7)$cohort_name == c("c1", "c2"))))
   codes <- attr(cdm$cohort7, "cohort_codelist") |> dplyr::collect()
   expect_true(all(codes$concept_id[codes$codelist_name == "c1"] == c(4326744)))
@@ -191,12 +222,11 @@ test_that("mearurementCohorts works", {
   cdm$cohort8 <- measurementCohort(
     cdm = cdm,
     name = "cohort8",
-    conceptSet = list("c1" = c(123456))
+    conceptSet = list("c1" = c(123456L))
   )
   expect_true(all(colnames(cdm$cohort8) ==
                     c("cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date")))
   expect_true(cdm$cohort8 |> dplyr::tally() |> dplyr::pull("n") == 0)
-  expect_true(cdm$cohort8 |> attrition() |> dplyr::pull("reason") == "Initial qualifying events")
   expect_true(settings(cdm$cohort8)$cohort_name == "c1")
   codes <- attr(cdm$cohort8, "cohort_codelist") |> dplyr::collect()
   expect_true(all(codes$concept_id  |> sort() == c(123456)))
@@ -205,10 +235,9 @@ test_that("mearurementCohorts works", {
   cdm$cohort9 <- measurementCohort(
     cdm = cdm,
     name = "cohort9",
-    conceptSet = list("c1" = c(1234567))
+    conceptSet = list("c1" = c(1234567L))
   )
   expect_true(cdm$cohort9 |> dplyr::tally() |> dplyr::pull("n") == 0)
-  expect_true(cdm$cohort9 |> attrition() |> dplyr::pull("reason") == "Initial qualifying events")
   expect_true(settings(cdm$cohort9)$cohort_name == "c1")
   expect_equal(
     colnames(settings(cdm$cohort9)) |> sort(),
@@ -238,7 +267,7 @@ test_that("expected errors", {
   cdm$concept <- cdm$concept |>
     dplyr::union_all(
       dplyr::tibble(
-        concept_id = c(4326744, 4298393, 45770407, 8876, 4124457),
+        concept_id = c(4326744L, 4298393L, 45770407L, 8876L, 4124457L),
         concept_name = c("Blood pressure", "Systemic blood pressure",
                          "Baseline blood pressure", "millimeter mercury column",
                          "Normal range"),
@@ -254,14 +283,14 @@ test_that("expected errors", {
       )
     )
   cdm$measurement <- dplyr::tibble(
-    measurement_id = 1:4,
-    person_id = c(1, 1, 2, 3),
-    measurement_concept_id = c(4326744, 4298393, 4298393, 45770407),
+    measurement_id = 1:4L,
+    person_id = c(1L, 1L, 2L, 3L),
+    measurement_concept_id = c(4326744L, 4298393L, 4298393L, 45770407L),
     measurement_date = as.Date(c("2000-07-01", "2000-12-11", "2002-09-08", "2015-02-19")),
-    measurement_type_concept_id = NA,
-    value_as_number = c(100, 125, NA, NA),
-    value_as_concept_id = c(0, 0, 0, 4124457),
-    unit_concept_id = c(8876, 8876, 0, 0)
+    measurement_type_concept_id = NA_integer_,
+    value_as_number = c(100L, 125L, NA_integer_, NA_integer_),
+    value_as_concept_id = c(0L, 0L, 0L, 4124457L),
+    unit_concept_id = c(8876L, 8876L, 0L, 0L)
   )
   cdm <- cdm |> copyCdm()
 
@@ -270,16 +299,16 @@ test_that("expected errors", {
     measurementCohort(
       cdm = cdm,
       name = "cohort",
-      conceptSet = list(c(4326744, 4298393, 45770407)),
-      valueAsConcept = c(4124457),
-      valueAsNumber = list("8876" = c(70, 120))
+      conceptSet = list(c(4326744L, 4298393L, 45770407L)),
+      valueAsConcept = c(4124457L),
+      valueAsNumber = list("8876" = c(70L, 120L))
     )
   )
   expect_error(
     measurementCohort(
       cdm = cdm,
       name = "cohort",
-      conceptSet = list("name " = c(4326744, 4298393, 45770407)),
+      conceptSet = list("name " = c(4326744L, 4298393L, 45770407L)),
       valueAsConcept = c(4124457),
       valueAsNumber = list("8876" = c(700, 120))
     )
