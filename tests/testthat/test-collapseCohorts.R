@@ -11,9 +11,9 @@ test_that("simple example", {
       "concept_id" = 1L,
       "concept_name" = "my concept",
       "domain_id" = "drug",
-      "vocabulary_id" = as.integer(NA),
-      "concept_class_id" = as.integer(NA),
-      "concept_code" = as.integer(NA),
+      "vocabulary_id" = NA_integer_,
+      "concept_class_id" = NA_integer_,
+      "concept_code" = NA_integer_,
       "valid_start_date" = as.Date(NA),
       "valid_end_date" = as.Date(NA)
     )
@@ -118,11 +118,11 @@ test_that("out of observation", {
       "concept_id" = 1L,
       "concept_name" = "my concept",
       "domain_id" = "drug",
-      "vocabulary_id" = as.integer(NA),
-      "concept_class_id" = as.integer(NA),
-      "concept_code" = as.integer(NA),
-      "valid_start_date" = as.integer(NA),
-      "valid_end_date" = as.integer(NA)
+      "vocabulary_id" = NA_integer_,
+      "concept_class_id" = NA_integer_,
+      "concept_code" = NA_integer_,
+      "valid_start_date" = NA_integer_,
+      "valid_end_date" = NA_integer_
     )
   )
   cdm <- omopgenerics::insertTable(
@@ -262,9 +262,9 @@ test_that("multiple observation periods", {
       "concept_id" = 1L,
       "concept_name" = "my concept",
       "domain_id" = "drug",
-      "vocabulary_id" = as.integer(NA),
-      "concept_class_id" = as.integer(NA),
-      "concept_code" = as.integer(NA),
+      "vocabulary_id" = NA_integer_,
+      "concept_class_id" = NA_integer_,
+      "concept_code" = NA_integer_,
       "valid_start_date" = as.Date(NA),
       "valid_end_date" = as.Date(NA)
     )

@@ -34,8 +34,8 @@ test_that("testing requireMinCohortCount", {
     cohortId = c(1, 2),
     name = "cohort1_b"
   )
-  expect_true(nrow(cdm$cohort1_b |>
-                     dplyr::collect()) > 0)
+  expect_gt(nrow(cdm$cohort1_b |>
+                     dplyr::collect()), 0)
   expect_true(all(cohortCount(cdm$cohort1_b) |>
                     dplyr::filter(cohort_definition_id == 1) |>
                     dplyr::pull("number_records") == 0))

@@ -18,21 +18,18 @@ test_that("test it works and expected errors", {
       minFutureObservation = 40,
       name = "cohort1"
     )
-  expect_true("cohort_table" %in% class(cdm$cohort1))
+  expect_true(inherits(cdm$cohort1, "cohort_table"))
   expect_true(all(cdm$cohort1 |> dplyr::pull("subject_id") == c(1, 1, 3, 4)))
   expect_true(all(cdm$cohort1 |> dplyr::pull("cohort_start_date") ==
                     c("2001-05-30", "2003-05-02", "2015-01-27", "1996-06-30")))
-  expect_equal(
-    settings(cdm$cohort1),
-    dplyr::tibble(
+  expect_identical(settings(cdm$cohort1), dplyr::tibble(
       cohort_definition_id = 1L,
       cohort_name = "cohort_1",
       age_range = "0_35",
       sex = "Both",
       min_prior_observation = 10,
       min_future_observation = 40
-    )
-  )
+    ))
   expect_true(all(
     attrition(cdm$cohort1)$reason ==
       c('Initial qualifying events', 'Age requirement: 0 to 35',
@@ -46,23 +43,19 @@ test_that("test it works and expected errors", {
     requirePriorObservation(minPriorObservation = 10) %>%
     requireFutureObservation(minFutureObservation = 40)
 
-  expect_true("cohort_table" %in% class(cdm$cohort))
-  expect_equal(omopgenerics::attrition(cdm$cohort),
-               omopgenerics::attrition(cdm$cohort1))
+  expect_true(inherits(cdm$cohort, "cohort_table"))
+  expect_identical(omopgenerics::attrition(cdm$cohort), omopgenerics::attrition(cdm$cohort1))
   expect_true(all(cdm$cohort |> dplyr::pull("subject_id") |> sort() == c(1, 1, 3, 4)))
   expect_true(all(cdm$cohort |> dplyr::pull("cohort_start_date") |> sort() ==
                     c("1996-06-30", "2001-05-30", "2003-05-02", "2015-01-27")))
-  expect_equal(
-    settings(cdm$cohort),
-    dplyr::tibble(
+  expect_identical(settings(cdm$cohort), dplyr::tibble(
       cohort_definition_id = 1L,
       cohort_name = "cohort_1",
       min_future_observation = 40,
       min_prior_observation = 10,
       sex = "Both",
       age_range = "0_35"
-    )
-  )
+    ))
   expect_true(all(
     attrition(cdm$cohort)$reason ==
       c('Initial qualifying events', 'Age requirement: 0 to 35',
@@ -154,8 +147,7 @@ test_that("restrictions applied to single cohort", {
 
   cdm$cohort2 <- cdm$cohort %>%
     requireDemographics(sex = "Male", name = "cohort2")
-  expect_equal(dplyr::collect(cdm$cohort)$cohort_start_date,
-               dplyr::collect(cdm$cohort2)$cohort_start_date)
+  expect_identical(dplyr::collect(cdm$cohort)$cohort_start_date, dplyr::collect(cdm$cohort2)$cohort_start_date)
   expect_true(all(
     c("Initial qualifying events", "Age requirement: 0 to 150", "Sex requirement: Male",
       "Prior observation requirement: 0 days", "Future observation requirement: 0 days") ==
@@ -447,15 +439,12 @@ test_that("codelist kept with >1 requirement", {
   cdm$cohort1 <- conceptCohort(cdm = cdm, conceptSet = list(a = 1, b = 2), name = "cohort1")
 
   cdm$cohort2 <- cdm$cohort1 |> requireDemographics(name = "cohort2", minPriorObservation = c(0,3), cohortId = 1)
-  expect_equal(
-    attr(cdm$cohort2, "cohort_codelist") |> dplyr::collect() |> dplyr::arrange(.data$cohort_definition_id),
-    dplyr::tibble(
-      cohort_definition_id = 1:3,
+  expect_identical(attr(cdm$cohort2, "cohort_codelist") |> dplyr::collect() |> dplyr::arrange(.data$cohort_definition_id), dplyr::tibble(
+      cohort_definition_id = as.integer(1:3),
       codelist_name = c("a", "b", "a"),
-      concept_id = c(1, 2, 1),
+      concept_id = as.integer(c(1, 2, 1)),
       type = c("index event", "index event", "index event")
-    )
-  )
+    ))
 
   PatientProfiles::mockDisconnect(cdm)
 })
@@ -477,16 +466,13 @@ test_that("settings with extra columns", {
         dplyr::mutate(sex = "Both", extra1 = 1, extra2 = "hi")
       )
   cdm$cohort <- cdm$cohort |> requireSex(sex = c("Both", "Female"))
-  expect_equal(
-    cdm$cohort |> settings() |> dplyr::arrange(.data$cohort_definition_id),
-    dplyr::tibble(
-      cohort_definition_id = 1:6,
+  expect_identical(cdm$cohort |> settings() |> dplyr::arrange(.data$cohort_definition_id), dplyr::tibble(
+      cohort_definition_id = as.integer(1:6),
       cohort_name = c("cohort_1_1", "cohort_2_1", "cohort_3_1", "cohort_1_2", "cohort_2_2", "cohort_3_2"),
       sex = c(rep("Both", 3), rep("Female", 3)),
       extra1 = 1,
       extra2 = "hi"
-    )
-  )
+    ))
   expect_true(all(colnames(attrition(cdm$cohort)) ==
                     c("cohort_definition_id", "number_records", "number_subjects", "reason_id", "reason", "excluded_records", "excluded_subjects" )))
   PatientProfiles::mockDisconnect(cdm)
@@ -508,17 +494,14 @@ test_that("requireInteractions", {
                         minPriorObservation = c(0, 1),
                         requirementInteractions = FALSE,
                         name = "cohort1")
-  expect_equal(
-    cdm$cohort1 |> settings() |> dplyr::arrange(.data$cohort_definition_id),
-    dplyr::tibble(
-      cohort_definition_id = 1:9,
+  expect_identical(cdm$cohort1 |> settings() |> dplyr::arrange(.data$cohort_definition_id), dplyr::tibble(
+      cohort_definition_id = as.integer(1:9),
       cohort_name = c("cohort_1_1", "cohort_2_1", "cohort_3_1", "cohort_1_2", "cohort_2_2", "cohort_3_2", "cohort_1_3", "cohort_2_3", "cohort_3_3"),
       age_range = "0_150",
       sex = c(rep("Both", 6), rep("Female", 3)),
       min_prior_observation = c(rep(0, 3), rep(1, 3), rep(0, 3)),
       min_future_observation = rep(0, 9)
-    )
-  )
+    ))
   PatientProfiles::mockDisconnect(cdm)
 })
 

@@ -49,7 +49,7 @@ requireConceptIntersect <- function(cohort,
 
   lower_limit <- as.integer(intersections[[1]])
   upper_limit <- intersections[[2]]
-  upper_limit[is.infinite(upper_limit)] <- as.integer(999999)
+  upper_limit[is.infinite(upper_limit)] <- 999999L
   upper_limit <- as.integer(upper_limit)
 
   cols <- unique(

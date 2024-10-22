@@ -189,7 +189,7 @@ exitAtColumnDate <- function(cohort,
   # checks with informative errors
   validateNewCohort(newCohort, cdm, tmpPrefix)
 
-  if (any(!ids %in% cohortId)) {
+  if (!all(ids %in% cohortId)) {
     dateColumns <- dateColumns[!dateColumns %in% c("cohort_end_date", "cohort_start_date")]
     newCohort <- newCohort |>
       # join non modified cohorts

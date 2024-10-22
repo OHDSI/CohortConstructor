@@ -12,7 +12,7 @@ test_that("requiring presence in another cohort", {
                                              targetCohortId = 1,
                                              window = c(-Inf, Inf),
                                              name = "cohort3")
-  expect_equal(colnames(cdm$cohort3), colnames(cdm$cohort1))
+  expect_identical(colnames(cdm$cohort3), colnames(cdm$cohort1))
 
   expect_true(all(cdm$cohort3  %>%
                     dplyr::distinct(subject_id) %>%
@@ -204,68 +204,67 @@ test_that("different intersection count requirements", {
   cdm <- cdm_local |> copyCdm()
 
   # no intersections - people not in cohort2
-  expect_equal(sort(cdm$cohort1 |>
+  expect_identical(sort(cdm$cohort1 |>
     requireCohortIntersect(intersections = c(0, 0),
                          targetCohortId = 1,
                          window = c(-Inf, Inf),
                          targetCohortTable = "cohort2",
                          name = "cohort1_test") |>
-    dplyr::pull("subject_id")), c(4,5,6,7,8,9,10))
+    dplyr::pull("subject_id")), as.integer(c(4,5,6,7,8,9,10)))
 
 
   # only one intersection
-  expect_equal(sort(cdm$cohort1 |>
+  expect_identical(sort(cdm$cohort1 |>
                          requireCohortIntersect(intersections = c(1, 1),
                                                 targetCohortId = 1,
                                                 window = c(-Inf, Inf),
                                                 targetCohortTable = "cohort2",
                                                 name = "cohort1_test") |>
-                         dplyr::pull("subject_id")),
-               c(1))
+                         dplyr::pull("subject_id")), c(1L))
 
-  expect_equal(sort(cdm$cohort1 |>
+  expect_identical(sort(cdm$cohort1 |>
                       requireCohortIntersect(intersections = c(1),
                                              targetCohortId = 1,
                                              window = c(-Inf, Inf),
                                              targetCohortTable = "cohort2",
                                              name = "cohort1_test") |>
-                      dplyr::pull("subject_id")), c(1))
+                      dplyr::pull("subject_id")), c(1L))
 
   # 2 intersections
-  expect_equal(sort(cdm$cohort1 |>
+  expect_identical(sort(cdm$cohort1 |>
                       requireCohortIntersect(intersections = c(2, 2),
                                              targetCohortId = 1,
                                              window = c(-Inf, Inf),
                                              targetCohortTable = "cohort2",
                                              name = "cohort1_test") |>
-                      dplyr::pull("subject_id")), c(2))
+                      dplyr::pull("subject_id")), c(2L))
 
-  expect_equal(sort(cdm$cohort1 |>
+  expect_identical(sort(cdm$cohort1 |>
                       requireCohortIntersect(intersections = c(2),
                                              targetCohortId = 1,
                                              window = c(-Inf, Inf),
                                              targetCohortTable = "cohort2",
                                              name = "cohort1_test") |>
-                      dplyr::pull("subject_id")), c(2))
+                      dplyr::pull("subject_id")), c(2L))
 
 
   # 2 or more intersections
-  expect_equal(sort(cdm$cohort1 |>
+  expect_identical(sort(cdm$cohort1 |>
                       requireCohortIntersect(intersections = c(2, Inf),
                                              targetCohortId = 1,
                                              window = c(-Inf, Inf),
                                              targetCohortTable = "cohort2",
                                              name = "cohort1_test") |>
-                      dplyr::pull("subject_id")), c(2, 3))
+                      dplyr::pull("subject_id")), c(2L, 3L))
 
   # 2 or 3 intersections
-  expect_equal(sort(cdm$cohort1 |>
+  expect_identical(sort(cdm$cohort1 |>
                       requireCohortIntersect(intersections = c(2, 3),
                                              targetCohortId = 1,
                                              window = c(-Inf, Inf),
                                              targetCohortTable = "cohort2",
                                              name = "cohort1_test") |>
-                      dplyr::pull("subject_id")), c(2, 3))
+                      dplyr::pull("subject_id")), c(2L, 3L))
 
 
 

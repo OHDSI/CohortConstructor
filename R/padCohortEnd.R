@@ -1,7 +1,7 @@
 #' Add days to cohort end
 #'
 #' @description
-#' `padCohortStart()` Adds (or subtracts) a certain number of days to the cohort
+#' `padCohortEnd()` Adds (or subtracts) a certain number of days to the cohort
 #' end date. Note:
 #' * If the days added means that cohort end would be after observation
 #' period end date, then observation period end date will be used for cohort

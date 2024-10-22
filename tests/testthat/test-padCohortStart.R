@@ -106,7 +106,7 @@ test_that("adding days to cohort start", {
     cohortId = "cohort_1",
     name = "my_cohort_2"
   )
-  expect_equal(collectCohort(cdm$my_cohort_1, 1), collectCohort(cdm$my_cohort_2, 1))
+  expect_identical(collectCohort(cdm$my_cohort_1, 1), collectCohort(cdm$my_cohort_2, 1))
 
   # input validation
   expect_error(padCohortStart(

@@ -62,7 +62,7 @@ test_that("matchCohorts runs without errors", {
   # empty set
   cdm <- omopgenerics::emptyCohortTable(cdm, name = "cohort")
   expect_no_error(empty_cohort <- matchCohorts(cohort = cdm$cohort, name = "empty_cohort"))
-  expect_equal(cdm$cohort |> dplyr::collect(), empty_cohort |> dplyr::collect())
+  expect_identical(cdm$cohort |> dplyr::collect(), empty_cohort |> dplyr::collect())
 
   # expect errors
   expect_error(matchCohorts(cohort = dplyr::tibble()))
@@ -95,7 +95,7 @@ test_that("matchCohorts, no duplicated people within a cohort", {
     dplyr::filter(cohort_definition_id == 1) %>%
     dplyr::select(subject_id) %>%
     dplyr::pull()
-  expect_true(length(p1) == length(unique(p1)))
+  expect_true(anyDuplicated(p1) == 0L)
 
 
   cdm$cohort2 <- cdm$cohort2 |>
@@ -114,7 +114,7 @@ test_that("matchCohorts, no duplicated people within a cohort", {
     dplyr::select(subject_id) %>%
     dplyr::pull()
 
-  expect_true(length(p1) == length(unique(p1)))
+  expect_true(anyDuplicated(p1) == 0L)
 
   PatientProfiles::mockDisconnect(cdm)
 })
@@ -280,9 +280,7 @@ test_that("test exactMatchingCohort with a ratio bigger than 1", {
 test_that("keepOriginalCohorts works" , {
   cdm <- mockCohortConstructor()
   cohort <- cdm$cohort2 |> matchCohorts(cohortId = 1, keepOriginalCohorts = TRUE, name = "new_cohort")
-  expect_equal(
-    settings(cohort),
-    dplyr::tibble(
+  expect_identical(settings(cohort), dplyr::tibble(
       cohort_definition_id = as.integer(1:3),
       cohort_name = c("cohort_1", "cohort_1_matched", "matched_to_cohort_1"),
       target_table_name = c(NA, rep("cohort2", 2)),
@@ -291,12 +289,9 @@ test_that("keepOriginalCohorts works" , {
       match_sex = c(NA, rep(TRUE, 2)),
       match_year_of_birth = c(NA, rep(TRUE, 2)),
       match_status = c(NA, "target", "control")
-    )
-  )
+    ))
   cohort <- cdm$cohort2 |> matchCohorts(keepOriginalCohorts = TRUE)
-  expect_equal(
-    settings(cohort),
-    dplyr::tibble(
+  expect_identical(settings(cohort), dplyr::tibble(
       cohort_definition_id = as.integer(1:6),
       cohort_name = c("cohort_1", "cohort_2", "cohort_1_matched", "cohort_2_matched", "matched_to_cohort_1", "matched_to_cohort_2"),
       target_table_name = c(NA, NA, rep("cohort2", 4)),
@@ -305,7 +300,6 @@ test_that("keepOriginalCohorts works" , {
       match_sex = c(NA, NA, rep(TRUE, 4)),
       match_year_of_birth = c(NA, NA, rep(TRUE, 4)),
       match_status = c(NA, NA, "target", "target", "control", "control")
-    )
-  )
+    ))
   PatientProfiles::mockDisconnect(cdm)
 })

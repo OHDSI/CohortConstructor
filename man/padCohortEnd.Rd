@@ -22,7 +22,7 @@ rest will remain unchanged.}
 Cohort table
 }
 \description{
-\code{padCohortStart()} Adds (or subtracts) a certain number of days to the cohort
+\code{padCohortEnd()} Adds (or subtracts) a certain number of days to the cohort
 end date. Note:
 \itemize{
 \item If the days added means that cohort end would be after observation

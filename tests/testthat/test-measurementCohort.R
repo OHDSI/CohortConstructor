@@ -66,10 +66,8 @@ test_that("mearurementCohorts works", {
     )
   }
 
-  expect_equal(
-    collectCohort(cdm$cohort, 1),
-    dplyr::tibble(
-      subject_id = c(1, 3),
+  expect_identical(collectCohort(cdm$cohort, 1), dplyr::tibble(
+      subject_id = c(1L, 3L),
       cohort_start_date = as.Date(c("2000-07-01", "2015-02-19")),
       cohort_end_date = as.Date(c("2000-07-01", "2015-02-19"))
     ))
@@ -77,13 +75,10 @@ test_that("mearurementCohorts works", {
   expect_true(settings(cdm$cohort)$cohort_name == "normal_blood_pressure")
   codes <- attr(cdm$cohort, "cohort_codelist") |> dplyr::collect()
   expect_true(all(codes$concept_id |> sort() == c(4298393, 4326744, 45770407)))
-  expect_equal(
-    settings(cdm$cohort),
-    dplyr::tibble(
+  expect_identical(settings(cdm$cohort), dplyr::tibble(
       "cohort_definition_id" = 1L, "cohort_name" = "normal_blood_pressure",
       "cdm_version" = attr(cdm, "cdm_version"), "vocabulary_version" = "mock"
-    )
-  )
+    ))
 
   # non valid concept ----
   cdm$cohort3 <- measurementCohort(
@@ -93,10 +88,8 @@ test_that("mearurementCohorts works", {
     valueAsConcept = c(4124457),
     valueAsNumber = list("8876" = c(70, 120))
   )
-  expect_equal(
-    collectCohort(cdm$cohort3, 1),
-    dplyr::tibble(
-      subject_id = c(1, 3),
+  expect_identical(collectCohort(cdm$cohort3, 1), dplyr::tibble(
+      subject_id = c(1L, 3L),
       cohort_start_date = as.Date(c("2000-07-01", "2015-02-19")),
       cohort_end_date = as.Date(c("2000-07-01", "2015-02-19"))
     ))
@@ -111,10 +104,8 @@ test_that("mearurementCohorts works", {
     name = "cohort4",
     conceptSet = list("normal_blood_pressure" = c(4326744, 4298393, 45770407))
   )
-  expect_equal(
-    collectCohort(cdm$cohort4, 1),
-    dplyr::tibble(
-      subject_id = c(1, 1, 2, 3, 3),
+  expect_identical(collectCohort(cdm$cohort4, 1), dplyr::tibble(
+      subject_id = as.integer(c(1, 1, 2, 3, 3)),
       cohort_start_date = as.Date(c("2000-07-01", "2000-12-11", "2002-09-08", "2015-02-19", "2015-02-20")),
       cohort_end_date = as.Date(c("2000-07-01", "2000-12-11", "2002-09-08", "2015-02-19", "2015-02-20"))
     ))
@@ -130,10 +121,8 @@ test_that("mearurementCohorts works", {
     conceptSet = list("normal_blood_pressure" = c(4326744, 4298393, 45770407)),
     valueAsNumber = list("8876" = c(70, 120), "908" = c(800, 900))
   )
-  expect_equal(
-    collectCohort(cdm$cohort5, 1),
-    dplyr::tibble(
-      subject_id = c(1),
+  expect_identical(collectCohort(cdm$cohort5, 1), dplyr::tibble(
+      subject_id = 1L,
       cohort_start_date = as.Date(c("2000-07-01")),
       cohort_end_date = as.Date(c("2000-07-01"))
     ))
@@ -149,10 +138,8 @@ test_that("mearurementCohorts works", {
     conceptSet = list("normal_blood_pressure" = c(4326744, 4298393, 45770407)),
     valueAsConcept = c(4124457, 999999, 12345)
   )
-  expect_equal(
-    collectCohort(cdm$cohort6, 1),
-    dplyr::tibble(
-      subject_id = c(3, 3),
+  expect_identical(collectCohort(cdm$cohort6, 1), dplyr::tibble(
+      subject_id = c(3L, 3L),
       cohort_start_date = as.Date(c("2015-02-19", "2015-02-20")),
       cohort_end_date = as.Date(c("2015-02-19", "2015-02-20"))
     ))
@@ -167,17 +154,13 @@ test_that("mearurementCohorts works", {
     name = "cohort7",
     conceptSet = list("c1" = c(4326744), "c2" = c(4298393, 45770407))
   )
-  expect_equal(
-    collectCohort(cdm$cohort7, 1),
-    dplyr::tibble(
-      subject_id = c(1),
+  expect_identical(collectCohort(cdm$cohort7, 1), dplyr::tibble(
+      subject_id = c(1L),
       cohort_start_date = as.Date(c("2000-07-01")),
       cohort_end_date = as.Date(c("2000-07-01"))
     ))
-  expect_equal(
-    collectCohort(cdm$cohort7, 2),
-    dplyr::tibble(
-      subject_id = c(1, 2, 3, 3),
+  expect_identical(collectCohort(cdm$cohort7, 2), dplyr::tibble(
+      subject_id = as.integer(c(1, 2, 3, 3)),
       cohort_start_date = as.Date(c("2000-12-11", "2002-09-08", "2015-02-19","2015-02-20")),
       cohort_end_date = as.Date(c("2000-12-11", "2002-09-08", "2015-02-19", "2015-02-20"))
     ))
@@ -210,10 +193,7 @@ test_that("mearurementCohorts works", {
   expect_true(cdm$cohort9 |> dplyr::tally() |> dplyr::pull("n") == 0)
   expect_true(cdm$cohort9 |> attrition() |> dplyr::pull("reason") == "Initial qualifying events")
   expect_true(settings(cdm$cohort9)$cohort_name == "c1")
-  expect_equal(
-    colnames(settings(cdm$cohort9)) |> sort(),
-    c("cdm_version", "cohort_definition_id", "cohort_name", "vocabulary_version")
-  )
+  expect_identical(colnames(settings(cdm$cohort9)) |> sort(), c("cdm_version", "cohort_definition_id", "cohort_name", "vocabulary_version"))
 
   # empty cohort and empty codelist ----
   cdm$cohort10 <- measurementCohort(
@@ -224,10 +204,7 @@ test_that("mearurementCohorts works", {
   expect_true(cdm$cohort10 |> dplyr::tally() |> dplyr::pull("n") == 0)
   expect_true(cdm$cohort10 |> attrition() |> nrow() == 0)
   expect_true(cdm$cohort10 |> settings() |> nrow() == 0)
-  expect_equal(
-    colnames(settings(cdm$cohort10)) |> sort(),
-    c("cdm_version", "cohort_definition_id", "cohort_name", "vocabulary_version")
-  )
+  expect_identical(colnames(settings(cdm$cohort10)) |> sort(), c("cdm_version", "cohort_definition_id", "cohort_name", "vocabulary_version"))
 
   PatientProfiles::mockDisconnect(cdm)
 })
