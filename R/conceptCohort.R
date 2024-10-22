@@ -193,16 +193,13 @@ conceptCohort <- function(cdm,
 
   cli::cli_inform(c("i" = "Applying cohort requirements."))
   cdm[[name]] <- fulfillCohortReqs(cdm = cdm, name = name)
-  cdm[[name]] <- omopgenerics::newCohortTable(table = cdm[[name]],
-                                              cohortAttritionRef = NULL,
-                                              .softValidation = TRUE)
 
   cli::cli_inform(c("i" = "Collapsing records."))
   cdm[[name]] <- cdm[[name]] |>
-    joinOverlap(name = name, gap = 0)
-  cdm[[name]] <- omopgenerics::newCohortTable(table = cdm[[name]],
-                                              cohortAttritionRef = NULL,
-                                              .softValidation = TRUE)
+    joinOverlap(name = name, gap = 0)  |>
+    omopgenerics::recordCohortAttrition(reason = "Collapse overlapping records")
+
+  cdm[[name]] <- omopgenerics::newCohortTable(table = cdm[[name]])
 
   cli::cli_inform(c("v" = "Cohort {.strong {name}} created."))
 
@@ -309,10 +306,6 @@ unerafiedConceptCohort <- function(cdm,
       "cohort_end_date"
     ) |>
     dplyr::mutate(cohort_end_date = dplyr::coalesce(.data$cohort_end_date, .data$cohort_start_date)) |>
-    dplyr::filter(
-      !is.na(.data$cohort_start_date),
-      .data$cohort_start_date <= .data$cohort_end_date
-    ) |>
     dplyr::compute(name = name, temporary = FALSE)
 
   omopgenerics::dropTable(cdm, name = dplyr::starts_with(workingTblNames))
@@ -324,6 +317,12 @@ fulfillCohortReqs <- function(cdm, name) {
   # 1) if start is out of observation, drop cohort entry
   # 2) if end is after observation end, set cohort end as observation end
   cdm[[name]] |>
+    dplyr::filter(
+      !is.na(.data$cohort_start_date),
+      .data$cohort_start_date <= .data$cohort_end_date
+    ) |>
+    dplyr::compute(temporary = FALSE, name = name) |>
+    omopgenerics::recordCohortAttrition(reason = "Record start <= record end") |>
     dplyr::left_join(
       cdm$observation_period |>
         dplyr::select(
@@ -350,7 +349,8 @@ fulfillCohortReqs <- function(cdm, name) {
       "cohort_start_date",
       "cohort_end_date"
     ) |>
-    dplyr::compute(temporary = FALSE, name = name)
+    dplyr::compute(temporary = FALSE, name = name) |>
+    omopgenerics::recordCohortAttrition(reason = "Record in observation")
 }
 
 
