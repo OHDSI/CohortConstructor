@@ -141,20 +141,14 @@ measurementCohort <- function(cdm,
       cohortCodelist |> dplyr::select("concept_id", "cohort_definition_id"),
       by = "concept_id"
     ) |>
-    dplyr::compute(name = name, temporary = FALSE) |>
-    omopgenerics::newCohortTable(
-      cohortSetRef = cohortSet,
-      cohortCodelistRef = cohortCodelist |> dplyr::collect(),
-      .softValidation = TRUE
-    )
+    dplyr::compute(name = name, temporary = FALSE)
 
   if (!is.null(valueAsConcept) || !is.null(valueAsNumber)) {
     cli::cli_inform(c("i" = "Applying measurement requirements."))
     filterExpr <- getFilterExpression(valueAsConcept, valueAsNumber)
     cohort <- cohort |>
       dplyr::filter(!!!filterExpr) |>
-      dplyr::compute(name = name, temporary = FALSE) |>
-      omopgenerics::recordCohortAttrition(reason = "Fulfilling measurement value requirements")
+      dplyr::compute(name = name, temporary = FALSE)
 
     if (cohort |> dplyr::tally() |> dplyr::pull("n") == 0) {
       cli::cli_warn(
@@ -162,6 +156,13 @@ measurementCohort <- function(cdm,
       )
     }
   }
+
+  cohort <- cohort |>
+    omopgenerics::newCohortTable(
+      cohortSetRef = cohortSet,
+      cohortCodelistRef = cohortCodelist |> dplyr::collect(),
+      .softValidation = TRUE
+    )
 
   if (cohort |> dplyr::tally() |> dplyr::pull("n") == 0) {
     cli::cli_inform(c("i" = "No table could be subsetted, returning empty cohort."))

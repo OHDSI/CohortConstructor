@@ -77,16 +77,16 @@ test_that("mearurementCohorts works", {
     cdm$cohort |> attrition() |> dplyr::as_tibble(),
     dplyr::tibble(
       "cohort_definition_id" = 1L,
-      "number_records" = c(5L, rep(2L, 4)),
-      "number_subjects" = c(3L, rep(2L, 4)),
-      "reason_id" = 1:5L,
+      "number_records" = c(rep(2L, 4)),
+      "number_subjects" = c(rep(2L, 4)),
+      "reason_id" = 1:4L,
       "reason" = c(
-        "Initial qualifying events", "Fulfilling measurement value requirements",
+        "Initial qualifying events",
         "Not missing record date", "Record in observation",
         "Distinct measurement records"
       ),
-      "excluded_records" = c(0L, 3L, 0L, 0L, 0L),
-      "excluded_subjects" = c(0L, 1L, 0L, 0L, 0L),
+      "excluded_records" = c(0L, 0L, 0L, 0L),
+      "excluded_subjects" = c(0L, 0L, 0L, 0L),
     )
   )
   expect_true(settings(cdm$cohort)$cohort_name == "normal_blood_pressure")
