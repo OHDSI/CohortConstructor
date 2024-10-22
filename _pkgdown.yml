@@ -1,12 +1,12 @@
 url: https://ohdsi.github.io/CohortConstructor/
 template:
   bootstrap: 5
-  bootswatch: flatly
   light-switch: true
   bslib:
-    bg: "#f2f4f3"
-    fg: "#000000"
-    primary: "#4a5759"
+    primary: "#0054AD"
+    border-radius: 0.5rem
+    btn-border-radius: 0.25rem
+    danger: "#A6081A"
 
 navbar:
   structure:
