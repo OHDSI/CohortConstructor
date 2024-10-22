@@ -440,9 +440,9 @@ test_that("codelist kept with >1 requirement", {
 
   cdm$cohort2 <- cdm$cohort1 |> requireDemographics(name = "cohort2", minPriorObservation = c(0,3), cohortId = 1)
   expect_identical(attr(cdm$cohort2, "cohort_codelist") |> dplyr::collect() |> dplyr::arrange(.data$cohort_definition_id), dplyr::tibble(
-      cohort_definition_id = 1:3,
+      cohort_definition_id = as.integer(1:3),
       codelist_name = c("a", "b", "a"),
-      concept_id = c(1, 2, 1),
+      concept_id = as.integer(c(1, 2, 1)),
       type = c("index event", "index event", "index event")
     ))
 
@@ -467,7 +467,7 @@ test_that("settings with extra columns", {
       )
   cdm$cohort <- cdm$cohort |> requireSex(sex = c("Both", "Female"))
   expect_identical(cdm$cohort |> settings() |> dplyr::arrange(.data$cohort_definition_id), dplyr::tibble(
-      cohort_definition_id = 1:6,
+      cohort_definition_id = as.integer(1:6),
       cohort_name = c("cohort_1_1", "cohort_2_1", "cohort_3_1", "cohort_1_2", "cohort_2_2", "cohort_3_2"),
       sex = c(rep("Both", 3), rep("Female", 3)),
       extra1 = 1,
@@ -495,7 +495,7 @@ test_that("requireInteractions", {
                         requirementInteractions = FALSE,
                         name = "cohort1")
   expect_identical(cdm$cohort1 |> settings() |> dplyr::arrange(.data$cohort_definition_id), dplyr::tibble(
-      cohort_definition_id = 1:9,
+      cohort_definition_id = as.integer(1:9),
       cohort_name = c("cohort_1_1", "cohort_2_1", "cohort_3_1", "cohort_1_2", "cohort_2_2", "cohort_3_2", "cohort_1_3", "cohort_2_3", "cohort_3_3"),
       age_range = "0_150",
       sex = c(rep("Both", 6), rep("Female", 3)),

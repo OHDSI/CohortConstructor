@@ -40,7 +40,7 @@ test_that("requireIsFirstEntry, cohortIds & name arguments", {
   expect_identical(counts |> dplyr::filter(cohort_definition_id %in% 2:3), counts_new |> dplyr::filter(cohort_definition_id %in% 2:3))
   expect_false(counts |> dplyr::filter(cohort_definition_id == 1) %>% dplyr::pull(number_records) ==
                  counts_new |> dplyr::filter(cohort_definition_id == 1) %>% dplyr::pull(number_records))
-  expect_identical(counts_new |> dplyr::filter(cohort_definition_id == 1), dplyr::tibble(cohort_definition_id = 1, number_records = 3, number_subjects = 3))
+  expect_identical(counts_new |> dplyr::filter(cohort_definition_id == 1), dplyr::tibble(cohort_definition_id = 1L, number_records = 3L, number_subjects = 3L))
   expect_true(all(cdm$new_cohort |>  dplyr::pull(cohort_start_date) ==
                     c("2001-05-29", "1999-07-30", "2015-01-23", "2002-10-09", "2003-09-12",
                       "1999-04-16", "2000-03-09", "2000-05-05", "2015-02-22", "2002-09-28",
@@ -90,7 +90,7 @@ test_that("requireIsLastEntry", {
   expect_identical(counts |> dplyr::filter(cohort_definition_id %in% 2:3), counts_new |> dplyr::filter(cohort_definition_id %in% 2:3))
   expect_false(counts |> dplyr::filter(cohort_definition_id == 1) %>% dplyr::pull(number_records) ==
                  counts_new |> dplyr::filter(cohort_definition_id == 1) %>% dplyr::pull(number_records))
-  expect_identical(counts_new |> dplyr::filter(cohort_definition_id == 1), dplyr::tibble(cohort_definition_id = 1, number_records = 3, number_subjects = 3))
+  expect_identical(counts_new |> dplyr::filter(cohort_definition_id == 1), dplyr::tibble(cohort_definition_id = 1L, number_records = 3L, number_subjects = 3L))
   expect_true(all(cdm$new_cohort |>  dplyr::pull(cohort_start_date) ==
                     c("2004-01-08", "1999-07-30", "2015-02-17", "2002-10-09", "2003-09-12",
                       "1999-04-16", "2000-03-09", "2000-05-05", "2015-02-22", "2002-09-28",

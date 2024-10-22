@@ -110,7 +110,7 @@ test_that("trim cohort dates", {
     trimToDateRange(dateRange = as.Date(c("2001-01-01", "2005-01-01")))
 
   expect_identical(sort(cdm$cohort1 %>%
-                      dplyr::pull("subject_id")), c(1, 1, 1, 1, 1, 1, 2))
+                      dplyr::pull("subject_id")), as.integer(c(1, 1, 1, 1, 1, 1, 2)))
   expect_true(all(cdm$cohort1 %>%
                     dplyr::pull("cohort_start_date") ==
                     c("2003-05-17", "2004-03-11", "2001-01-01", "2001-03-24", "2001-11-28", "2002-01-30", "2002-06-13")))
@@ -125,7 +125,7 @@ test_that("trim cohort dates", {
                     name = "cohort3")
   expect_true(omopgenerics::cohortCount(cdm$cohort3)$number_records[1] == 2)
   expect_identical(sort(cdm$cohort3 %>%
-                      dplyr::pull("subject_id")), c(1, 1, 1, 2, 2, 3))
+                      dplyr::pull("subject_id")), as.integer(c(1, 1, 1, 2, 2, 3)))
   expect_identical(omopgenerics::attrition(cdm$cohort3)$reason[
     omopgenerics::attrition(cdm$cohort3)$cohort_definition_id == 1], c("Initial qualifying events", "cohort_start_date >= 2001-01-01", "cohort_end_date <= 2005-01-01"))
   expect_identical(omopgenerics::attrition(cdm$cohort3)$reason[
