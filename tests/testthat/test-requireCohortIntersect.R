@@ -210,7 +210,7 @@ test_that("different intersection count requirements", {
                          window = c(-Inf, Inf),
                          targetCohortTable = "cohort2",
                          name = "cohort1_test") |>
-    dplyr::pull("subject_id")), c(4,5,6,7,8,9,10))
+    dplyr::pull("subject_id")), as.integer(c(4,5,6,7,8,9,10)))
 
 
   # only one intersection
@@ -220,7 +220,7 @@ test_that("different intersection count requirements", {
                                                 window = c(-Inf, Inf),
                                                 targetCohortTable = "cohort2",
                                                 name = "cohort1_test") |>
-                         dplyr::pull("subject_id")), c(1))
+                         dplyr::pull("subject_id")), c(1L))
 
   expect_identical(sort(cdm$cohort1 |>
                       requireCohortIntersect(intersections = c(1),
@@ -228,7 +228,7 @@ test_that("different intersection count requirements", {
                                              window = c(-Inf, Inf),
                                              targetCohortTable = "cohort2",
                                              name = "cohort1_test") |>
-                      dplyr::pull("subject_id")), c(1))
+                      dplyr::pull("subject_id")), c(1L))
 
   # 2 intersections
   expect_identical(sort(cdm$cohort1 |>
@@ -237,7 +237,7 @@ test_that("different intersection count requirements", {
                                              window = c(-Inf, Inf),
                                              targetCohortTable = "cohort2",
                                              name = "cohort1_test") |>
-                      dplyr::pull("subject_id")), c(2))
+                      dplyr::pull("subject_id")), c(2L))
 
   expect_identical(sort(cdm$cohort1 |>
                       requireCohortIntersect(intersections = c(2),
@@ -245,7 +245,7 @@ test_that("different intersection count requirements", {
                                              window = c(-Inf, Inf),
                                              targetCohortTable = "cohort2",
                                              name = "cohort1_test") |>
-                      dplyr::pull("subject_id")), c(2))
+                      dplyr::pull("subject_id")), c(2L))
 
 
   # 2 or more intersections
@@ -255,7 +255,7 @@ test_that("different intersection count requirements", {
                                              window = c(-Inf, Inf),
                                              targetCohortTable = "cohort2",
                                              name = "cohort1_test") |>
-                      dplyr::pull("subject_id")), c(2, 3))
+                      dplyr::pull("subject_id")), c(2L, 3L))
 
   # 2 or 3 intersections
   expect_identical(sort(cdm$cohort1 |>
@@ -264,7 +264,7 @@ test_that("different intersection count requirements", {
                                              window = c(-Inf, Inf),
                                              targetCohortTable = "cohort2",
                                              name = "cohort1_test") |>
-                      dplyr::pull("subject_id")), c(2, 3))
+                      dplyr::pull("subject_id")), c(2L, 3L))
 
 
 
