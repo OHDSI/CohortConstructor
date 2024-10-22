@@ -44,8 +44,8 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="articles/a00_introduction.html">Introduction</a></li>
     <li><a class="dropdown-item" href="articles/a01_building_base_cohorts.html">Building base cohorts</a></li>
-    <li><a class="dropdown-item" href="articles/a02_cohort_table_requirements.html">Cohort Requirements</a></li>
-    <li><a class="dropdown-item" href="articles/a03_require_demographics.html">Demographic Requirements</a></li>
+    <li><a class="dropdown-item" href="articles/a02_cohort_table_requirements.html">Applying cohort table requirements</a></li>
+    <li><a class="dropdown-item" href="articles/a03_require_demographics.html">Applying demographic requirements to a cohort</a></li>
     <li><a class="dropdown-item" href="articles/a04_require_intersections.html">Requirements on Presence and Absence</a></li>
     <li><a class="dropdown-item" href="articles/a05_update_cohort_start_end.html">Update cohort start and end dates</a></li>
     <li><a class="dropdown-item" href="articles/a06_concatanate_cohorts.html">Concatenate Cohorts</a></li>
@@ -91,7 +91,7 @@
 <div class="section level2">
 <h2 id="creating-and-manipulating-cohorts">Creating and manipulating cohorts<a class="anchor" aria-label="anchor" href="#creating-and-manipulating-cohorts"></a>
 </h2>
-<p>To illustrate the functionality provided by CohortConstructor let’s create a set of fracture cohorts using the Eunomia dataset. We’ll first load required packages and create a cdm reference for the data.</p>
+<p>To illustrate the functionality provided by CohortConstructor let’s create a cohort of people with a fracture using the Eunomia dataset. We’ll first load required packages and create a cdm reference for the data.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://darwin-eu-dev.github.io/omopgenerics/" class="external-link">omopgenerics</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://darwin-eu.github.io/CDMConnector/" class="external-link">CDMConnector</a></span><span class="op">)</span></span>
@@ -119,91 +119,112 @@
 <div class="section level3">
 <h3 id="generating-concept-based-fracture-cohorts">Generating concept-based fracture cohorts<a class="anchor" aria-label="anchor" href="#generating-concept-based-fracture-cohorts"></a>
 </h3>
-<p>We will start by making a simple concept-based cohort for each of our fracture of interest. First we create a codelist for each ankle, forearm and hip fractures (note, we just use one code for each because we are using synthetic data).</p>
+<p>We will first need to identify codes that could be used to represent fractures of interest. To find these we’ll use the CodelistGenerator package (note, we will just find a few codes because we are using synthetic data with a subset of the full vocabularies).</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fracture_codes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu-dev.github.io/omopgenerics/reference/newCodelist.html" class="external-link">newCodelist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"ankle_fracture"</span> <span class="op">=</span> <span class="fl">4059173L</span>,</span>
-<span>                                   <span class="st">"forearm_fracture"</span> <span class="op">=</span> <span class="fl">4278672L</span>,</span>
-<span>                                   <span class="st">"hip_fracture"</span> <span class="op">=</span> <span class="fl">4230399L</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">fracture_codes</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://darwin-eu.github.io/CodelistGenerator/" class="external-link">CodelistGenerator</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: package 'CodelistGenerator' was built under R version 4.4.1</span></span>
+<span></span>
+<span><span class="va">hip_fx_codes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/CodelistGenerator/reference/getCandidateCodes.html" class="external-link">getCandidateCodes</a></span><span class="op">(</span><span class="va">cdm</span>, <span class="st">"hip fracture"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Limiting to domains of interest</span></span>
+<span><span class="co">#&gt; Getting concepts to include</span></span>
+<span><span class="co">#&gt; Adding descendants</span></span>
+<span><span class="co">#&gt; Search completed. Finishing up.</span></span>
+<span><span class="co">#&gt; ✔ 1 candidate concept identified</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── 3 codelists ─────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; Time taken: 0 minutes and 0 seconds</span></span>
+<span><span class="va">forearm_fx_codes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/CodelistGenerator/reference/getCandidateCodes.html" class="external-link">getCandidateCodes</a></span><span class="op">(</span><span class="va">cdm</span>, <span class="st">"forearm fracture"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Limiting to domains of interest</span></span>
+<span><span class="co">#&gt; Getting concepts to include</span></span>
+<span><span class="co">#&gt; Adding descendants</span></span>
+<span><span class="co">#&gt; Search completed. Finishing up.</span></span>
+<span><span class="co">#&gt; ✔ 1 candidate concept identified</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; - ankle_fracture (1 codes)</span></span>
+<span><span class="co">#&gt; Time taken: 0 minutes and 0 seconds</span></span>
+<span></span>
+<span><span class="va">fx_codes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu-dev.github.io/omopgenerics/reference/newCodelist.html" class="external-link">newCodelist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"hip_fracture"</span> <span class="op">=</span> <span class="va">hip_fx_codes</span><span class="op">$</span><span class="va">concept_id</span>,</span>
+<span>                             <span class="st">"forearm_fracture"</span><span class="op">=</span> <span class="va">forearm_fx_codes</span><span class="op">$</span><span class="va">concept_id</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">fx_codes</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── 2 codelists ─────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; - forearm_fracture (1 codes)</span></span>
 <span><span class="co">#&gt; - hip_fracture (1 codes)</span></span></code></pre></div>
-<p>Now we can quickly create a set of cohorts for each fracture type. For this we only need to provide the codes we have defined and we will get a cohort back, with cohort end date set as the event date associated with the records, overlapping records collapsed, and only records in observation kept.</p>
+<p>Now we can quickly create a our cohorts. For this we only need to provide the codes we have defined and we will get a cohort back, where we start by setting cohort exit as the same day as event start (the date of the fracture).</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span> <span class="op">&lt;-</span> <span class="va">cdm</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="reference/conceptCohort.html">conceptCohort</a></span><span class="op">(</span>conceptSet <span class="op">=</span> <span class="va">fracture_codes</span>,</span>
-<span>  name <span class="op">=</span> <span class="st">"fractures"</span><span class="op">)</span></span></code></pre></div>
-<p>We can see that our starting cohorts, before we add any additional restrictions, have the following associated settings, counts, and attrition.</p>
+<span>  <span class="fu"><a href="reference/conceptCohort.html">conceptCohort</a></span><span class="op">(</span>conceptSet <span class="op">=</span> <span class="va">fx_codes</span>, </span>
+<span>                exit <span class="op">=</span> <span class="st">"event_start_date"</span>, </span>
+<span>                name <span class="op">=</span> <span class="st">"fractures"</span><span class="op">)</span></span></code></pre></div>
+<p>After creating our initial cohort we will update it so that exit is set at up to 180 days after start (so long as individuals’ observation end date is on or after this - if not, exit will be at observation period end).</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span> <span class="op">&lt;-</span> <span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="reference/padCohortEnd.html">padCohortEnd</a></span><span class="op">(</span>days <span class="op">=</span> <span class="fl">180</span><span class="op">)</span></span></code></pre></div>
+<p>We can see that our starting cohorts, before we add any additional restrictions, have the following associated settings, counts, and attrition.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://darwin-eu-dev.github.io/omopgenerics/reference/settings.html" class="external-link">settings</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Rows: 3</span></span>
+<span><span class="co">#&gt; Rows: 2</span></span>
 <span><span class="co">#&gt; Columns: 4</span></span>
-<span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 1, 2, 3</span></span>
-<span><span class="co">#&gt; $ cohort_name          &lt;chr&gt; "ankle_fracture", "forearm_fracture", "hip_fractu…</span></span>
-<span><span class="co">#&gt; $ cdm_version          &lt;chr&gt; "5.3", "5.3", "5.3"</span></span>
-<span><span class="co">#&gt; $ vocabulary_version   &lt;chr&gt; "v5.0 18-JAN-19", "v5.0 18-JAN-19", "v5.0 18-JAN-…</span></span>
+<span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 1, 2</span></span>
+<span><span class="co">#&gt; $ cohort_name          &lt;chr&gt; "forearm_fracture", "hip_fracture"</span></span>
+<span><span class="co">#&gt; $ cdm_version          &lt;chr&gt; "5.3", "5.3"</span></span>
+<span><span class="co">#&gt; $ vocabulary_version   &lt;chr&gt; "v5.0 18-JAN-19", "v5.0 18-JAN-19"</span></span>
 <span><span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/cohort_count.html" class="external-link">cohort_count</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Rows: 3</span></span>
+<span><span class="co">#&gt; Rows: 2</span></span>
 <span><span class="co">#&gt; Columns: 3</span></span>
-<span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 1, 2, 3</span></span>
-<span><span class="co">#&gt; $ number_records       &lt;int&gt; 464, 569, 138</span></span>
-<span><span class="co">#&gt; $ number_subjects      &lt;int&gt; 427, 510, 132</span></span>
+<span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 1, 2</span></span>
+<span><span class="co">#&gt; $ number_records       &lt;int&gt; 569, 138</span></span>
+<span><span class="co">#&gt; $ number_subjects      &lt;int&gt; 510, 132</span></span>
 <span><span class="fu"><a href="https://darwin-eu-dev.github.io/omopgenerics/reference/attrition.html" class="external-link">attrition</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Rows: 3</span></span>
+<span><span class="co">#&gt; Rows: 4</span></span>
 <span><span class="co">#&gt; Columns: 7</span></span>
-<span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 1, 2, 3</span></span>
-<span><span class="co">#&gt; $ number_records       &lt;int&gt; 464, 569, 138</span></span>
-<span><span class="co">#&gt; $ number_subjects      &lt;int&gt; 427, 510, 132</span></span>
-<span><span class="co">#&gt; $ reason_id            &lt;int&gt; 1, 1, 1</span></span>
-<span><span class="co">#&gt; $ reason               &lt;chr&gt; "Initial qualifying events", "Initial qualifying …</span></span>
-<span><span class="co">#&gt; $ excluded_records     &lt;int&gt; 0, 0, 0</span></span>
-<span><span class="co">#&gt; $ excluded_subjects    &lt;int&gt; 0, 0, 0</span></span></code></pre></div>
+<span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 1, 1, 2, 2</span></span>
+<span><span class="co">#&gt; $ number_records       &lt;int&gt; 569, 569, 138, 138</span></span>
+<span><span class="co">#&gt; $ number_subjects      &lt;int&gt; 510, 510, 132, 132</span></span>
+<span><span class="co">#&gt; $ reason_id            &lt;int&gt; 1, 2, 1, 2</span></span>
+<span><span class="co">#&gt; $ reason               &lt;chr&gt; "Initial qualifying events", "Pad cohort start da…</span></span>
+<span><span class="co">#&gt; $ excluded_records     &lt;int&gt; 0, 0, 0, 0</span></span>
+<span><span class="co">#&gt; $ excluded_subjects    &lt;int&gt; 0, 0, 0, 0</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="create-an-overall-fracture-cohort">Create an overall fracture cohort<a class="anchor" aria-label="anchor" href="#create-an-overall-fracture-cohort"></a>
 </h3>
 <p>So far we have created three separate fracture cohorts. Let’s say we also want a cohort of people with any of the fractures. We could union our three cohorts to create this overall cohort like so:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/unionCohorts.html">unionCohorts</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span>,</span>
 <span>                              cohortName <span class="op">=</span> <span class="st">"any_fracture"</span>, </span>
 <span>                              keepOriginalCohorts <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>                              name <span class="op">=</span><span class="st">"fractures"</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://darwin-eu-dev.github.io/omopgenerics/reference/settings.html" class="external-link">settings</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 4 × 5</span></span>
+<span><span class="co">#&gt; # A tibble: 3 × 5</span></span>
 <span><span class="co">#&gt;   cohort_definition_id cohort_name      cdm_version vocabulary_version   gap</span></span>
 <span><span class="co">#&gt;                  &lt;int&gt; &lt;chr&gt;            &lt;chr&gt;       &lt;chr&gt;              &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1                    1 ankle_fracture   5.3         v5.0 18-JAN-19        NA</span></span>
-<span><span class="co">#&gt; 2                    2 forearm_fracture 5.3         v5.0 18-JAN-19        NA</span></span>
-<span><span class="co">#&gt; 3                    3 hip_fracture     5.3         v5.0 18-JAN-19        NA</span></span>
-<span><span class="co">#&gt; 4                    4 any_fracture     &lt;NA&gt;        &lt;NA&gt;                   0</span></span>
+<span><span class="co">#&gt; 1                    1 forearm_fracture 5.3         v5.0 18-JAN-19        NA</span></span>
+<span><span class="co">#&gt; 2                    2 hip_fracture     5.3         v5.0 18-JAN-19        NA</span></span>
+<span><span class="co">#&gt; 3                    3 any_fracture     &lt;NA&gt;        &lt;NA&gt;                   0</span></span>
 <span><span class="fu"><a href="https://darwin-eu-dev.github.io/omopgenerics/reference/cohortCount.html" class="external-link">cohortCount</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 4 × 3</span></span>
+<span><span class="co">#&gt; # A tibble: 3 × 3</span></span>
 <span><span class="co">#&gt;   cohort_definition_id number_records number_subjects</span></span>
 <span><span class="co">#&gt;                  &lt;int&gt;          &lt;int&gt;           &lt;int&gt;</span></span>
-<span><span class="co">#&gt; 1                    1            464             427</span></span>
-<span><span class="co">#&gt; 2                    2            569             510</span></span>
-<span><span class="co">#&gt; 3                    3            138             132</span></span>
-<span><span class="co">#&gt; 4                    4           1171             924</span></span></code></pre></div>
+<span><span class="co">#&gt; 1                    1            569             510</span></span>
+<span><span class="co">#&gt; 2                    2            138             132</span></span>
+<span><span class="co">#&gt; 3                    3            707             611</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="require-in-date-range">Require in date range<a class="anchor" aria-label="anchor" href="#require-in-date-range"></a>
 </h3>
 <p>Once we have created our base fracture cohort, we can then start applying additional cohort requirements. For example, first we can require that individuals’ cohort start date fall within a certain date range.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span> <span class="op">&lt;-</span> <span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="reference/requireInDateRange.html">requireInDateRange</a></span><span class="op">(</span>dateRange <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2000-01-01"</span>, <span class="st">"2020-01-01"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Now that we’ve applied this date restriction, we can see that our cohort attributes have been updated</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/cohort_count.html" class="external-link">cohort_count</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Rows: 4</span></span>
+<span><span class="co">#&gt; Rows: 3</span></span>
 <span><span class="co">#&gt; Columns: 3</span></span>
-<span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 1, 2, 3, 4</span></span>
-<span><span class="co">#&gt; $ number_records       &lt;int&gt; 108, 152, 62, 322</span></span>
-<span><span class="co">#&gt; $ number_subjects      &lt;int&gt; 104, 143, 60, 287</span></span>
+<span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 1, 2, 3</span></span>
+<span><span class="co">#&gt; $ number_records       &lt;int&gt; 152, 62, 214</span></span>
+<span><span class="co">#&gt; $ number_subjects      &lt;int&gt; 143, 60, 196</span></span>
 <span><span class="fu"><a href="https://darwin-eu-dev.github.io/omopgenerics/reference/attrition.html" class="external-link">attrition</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">reason</span> <span class="op">==</span> <span class="st">"cohort_start_date between 2000-01-01 &amp; 2020-01-01"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -221,43 +242,43 @@
 <h3 id="applying-demographic-requirements">Applying demographic requirements<a class="anchor" aria-label="anchor" href="#applying-demographic-requirements"></a>
 </h3>
 <p>We can also add restrictions on patient characteristics such as age (on cohort start date by default) and sex.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span> <span class="op">&lt;-</span> <span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="reference/requireDemographics.html">requireDemographics</a></span><span class="op">(</span>ageRange <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">40</span>, <span class="fl">65</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>                      sex <span class="op">=</span> <span class="st">"Female"</span><span class="op">)</span></span></code></pre></div>
 <p>Again we can see how many individuals we’ve lost after applying these criteria.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://darwin-eu-dev.github.io/omopgenerics/reference/attrition.html" class="external-link">attrition</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">reason</span> <span class="op">==</span> <span class="st">"Age requirement: 40 to 65"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Rows: 4</span></span>
+<span><span class="co">#&gt; Rows: 3</span></span>
 <span><span class="co">#&gt; Columns: 7</span></span>
-<span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 1, 2, 3, 4</span></span>
-<span><span class="co">#&gt; $ number_records       &lt;int&gt; 43, 64, 22, 129</span></span>
-<span><span class="co">#&gt; $ number_subjects      &lt;int&gt; 43, 62, 22, 122</span></span>
-<span><span class="co">#&gt; $ reason_id            &lt;int&gt; 4, 4, 4, 4</span></span>
+<span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 1, 2, 3</span></span>
+<span><span class="co">#&gt; $ number_records       &lt;int&gt; 64, 22, 86</span></span>
+<span><span class="co">#&gt; $ number_subjects      &lt;int&gt; 62, 22, 83</span></span>
+<span><span class="co">#&gt; $ reason_id            &lt;int&gt; 5, 5, 4</span></span>
 <span><span class="co">#&gt; $ reason               &lt;chr&gt; "Age requirement: 40 to 65", "Age requirement: 40…</span></span>
-<span><span class="co">#&gt; $ excluded_records     &lt;int&gt; 65, 88, 40, 193</span></span>
-<span><span class="co">#&gt; $ excluded_subjects    &lt;int&gt; 61, 81, 38, 165</span></span>
+<span><span class="co">#&gt; $ excluded_records     &lt;int&gt; 88, 40, 128</span></span>
+<span><span class="co">#&gt; $ excluded_subjects    &lt;int&gt; 81, 38, 113</span></span>
 <span></span>
 <span><span class="fu"><a href="https://darwin-eu-dev.github.io/omopgenerics/reference/attrition.html" class="external-link">attrition</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">reason</span> <span class="op">==</span> <span class="st">"Sex requirement: Female"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Rows: 4</span></span>
+<span><span class="co">#&gt; Rows: 3</span></span>
 <span><span class="co">#&gt; Columns: 7</span></span>
-<span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 1, 2, 3, 4</span></span>
-<span><span class="co">#&gt; $ number_records       &lt;int&gt; 19, 37, 12, 68</span></span>
-<span><span class="co">#&gt; $ number_subjects      &lt;int&gt; 19, 36, 12, 65</span></span>
-<span><span class="co">#&gt; $ reason_id            &lt;int&gt; 5, 5, 5, 5</span></span>
+<span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 1, 2, 3</span></span>
+<span><span class="co">#&gt; $ number_records       &lt;int&gt; 37, 12, 49</span></span>
+<span><span class="co">#&gt; $ number_subjects      &lt;int&gt; 36, 12, 48</span></span>
+<span><span class="co">#&gt; $ reason_id            &lt;int&gt; 6, 6, 5</span></span>
 <span><span class="co">#&gt; $ reason               &lt;chr&gt; "Sex requirement: Female", "Sex requirement: Fema…</span></span>
-<span><span class="co">#&gt; $ excluded_records     &lt;int&gt; 24, 27, 10, 61</span></span>
-<span><span class="co">#&gt; $ excluded_subjects    &lt;int&gt; 24, 26, 10, 57</span></span></code></pre></div>
+<span><span class="co">#&gt; $ excluded_records     &lt;int&gt; 27, 10, 37</span></span>
+<span><span class="co">#&gt; $ excluded_subjects    &lt;int&gt; 26, 10, 35</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="require-presence-in-another-cohort">Require presence in another cohort<a class="anchor" aria-label="anchor" href="#require-presence-in-another-cohort"></a>
 </h3>
 <p>We can also require that individuals are (or are not) in another cohort over some window. Here for example we require that study participants are in a GI bleed cohort any time prior up to their entry in the fractures cohort.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">gibleed</span> <span class="op">&lt;-</span> <span class="va">cdm</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="reference/conceptCohort.html">conceptCohort</a></span><span class="op">(</span>conceptSet <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"gibleed"</span> <span class="op">=</span> <span class="fl">192671L</span><span class="op">)</span>,</span>
 <span>  name <span class="op">=</span> <span class="st">"gibleed"</span><span class="op">)</span></span>
@@ -266,26 +287,26 @@
 <span>  <span class="fu"><a href="reference/requireCohortIntersect.html">requireCohortIntersect</a></span><span class="op">(</span>targetCohortTable <span class="op">=</span> <span class="st">"gibleed"</span>,</span>
 <span>                         intersections <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>                         window <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="cn">Inf</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://darwin-eu-dev.github.io/omopgenerics/reference/attrition.html" class="external-link">attrition</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">reason</span> <span class="op">==</span> <span class="st">"Not in cohort gibleed between -Inf &amp; 0 days relative to cohort_start_date"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Rows: 4</span></span>
+<span><span class="co">#&gt; Rows: 3</span></span>
 <span><span class="co">#&gt; Columns: 7</span></span>
-<span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 1, 2, 3, 4</span></span>
-<span><span class="co">#&gt; $ number_records       &lt;int&gt; 14, 30, 10, 54</span></span>
-<span><span class="co">#&gt; $ number_subjects      &lt;int&gt; 14, 30, 10, 52</span></span>
-<span><span class="co">#&gt; $ reason_id            &lt;int&gt; 8, 8, 8, 8</span></span>
+<span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 1, 2, 3</span></span>
+<span><span class="co">#&gt; $ number_records       &lt;int&gt; 30, 10, 40</span></span>
+<span><span class="co">#&gt; $ number_subjects      &lt;int&gt; 30, 10, 40</span></span>
+<span><span class="co">#&gt; $ reason_id            &lt;int&gt; 9, 9, 8</span></span>
 <span><span class="co">#&gt; $ reason               &lt;chr&gt; "Not in cohort gibleed between -Inf &amp; 0 days rela…</span></span>
-<span><span class="co">#&gt; $ excluded_records     &lt;int&gt; 5, 7, 2, 14</span></span>
-<span><span class="co">#&gt; $ excluded_subjects    &lt;int&gt; 5, 6, 2, 13</span></span></code></pre></div>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<span><span class="co">#&gt; $ excluded_records     &lt;int&gt; 7, 2, 9</span></span>
+<span><span class="co">#&gt; $ excluded_subjects    &lt;int&gt; 6, 2, 8</span></span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/cdmDisconnect.html" class="external-link">cdmDisconnect</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="more-information">More information<a class="anchor" aria-label="anchor" href="#more-information"></a>
 </h3>
-<p>CohortConstructor provides much more functionality for creating and manipulating cohorts. See the package website for more details.</p>
+<p>CohortConstructor provides much more functionality for creating and manipulating cohorts. See the package vignettes for more details.</p>
 </div>
 </div>
 </div>
