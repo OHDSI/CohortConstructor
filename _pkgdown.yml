@@ -1,6 +1,16 @@
 url: https://ohdsi.github.io/CohortConstructor/
 template:
   bootstrap: 5
+  bootswatch: flatly
+  light-switch: true
+  bslib:
+    bg: "#f2f4f3"
+    fg: "#000000"
+    primary: "#4a5759"
+
+navbar:
+  structure:
+    right: [search, github, lightswitch]
 
 reference:
 - subtitle: Build base cohorts

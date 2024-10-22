@@ -45,12 +45,12 @@ Let's start by creating a cohort of acetaminophen users. Individuals will have a
 
 ```{r}
 acetaminophen_codes <- getDrugIngredientCodes(cdm, 
-                                           name = "acetaminophen", 
-                                           nameStyle = "{concept_name}")
+                                              name = "acetaminophen", 
+                                              nameStyle = "{concept_name}")
 cdm$acetaminophen <- conceptCohort(cdm = cdm, 
-                                conceptSet = acetaminophen_codes, 
-                                exit = "event_end_date",
-                                name = "acetaminophen")
+                                   conceptSet = acetaminophen_codes, 
+                                   exit = "event_end_date",
+                                   name = "acetaminophen")
 ```
 
 At this point we have just created our base cohort without having applied any restrictions.
