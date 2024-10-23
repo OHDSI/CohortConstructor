@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Filter Cohorts • CohortConstructor</title>
+<title>Filtering cohorts • CohortConstructor</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
 <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
@@ -16,7 +16,7 @@
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Filter Cohorts">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Filtering cohorts">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -43,14 +43,14 @@
     <li><a class="dropdown-item" href="../articles/a01_building_base_cohorts.html">Building base cohorts</a></li>
     <li><a class="dropdown-item" href="../articles/a02_cohort_table_requirements.html">Applying cohort table requirements</a></li>
     <li><a class="dropdown-item" href="../articles/a03_require_demographics.html">Applying demographic requirements to a cohort</a></li>
-    <li><a class="dropdown-item" href="../articles/a04_require_intersections.html">Requirements related to other cohorts, concept sets, or tables</a></li>
-    <li><a class="dropdown-item" href="../articles/a05_update_cohort_start_end.html">Update cohort start and end dates</a></li>
-    <li><a class="dropdown-item" href="../articles/a06_concatanate_cohorts.html">Concatenate Cohorts</a></li>
-    <li><a class="dropdown-item" href="../articles/a07_filter_cohorts.html">Filter Cohorts</a></li>
-    <li><a class="dropdown-item" href="../articles/a08_split_cohorts.html">a07_split_cohorts</a></li>
-    <li><a class="dropdown-item" href="../articles/a09_combine_cohorts.html">Combine Cohorts</a></li>
-    <li><a class="dropdown-item" href="../articles/a10_match_cohorts.html">Generate a matched age and sex cohort</a></li>
-    <li><a class="dropdown-item" href="../articles/a11_benchmark.html">CohortConstructor benchmark</a></li>
+    <li><a class="dropdown-item" href="../articles/a04_require_intersections.html">Applying requirements related to other cohorts, concept sets, or tables</a></li>
+    <li><a class="dropdown-item" href="../articles/a05_update_cohort_start_end.html">Updating cohort start and end dates</a></li>
+    <li><a class="dropdown-item" href="../articles/a06_concatanate_cohorts.html">Concatenating cohort records</a></li>
+    <li><a class="dropdown-item" href="../articles/a07_filter_cohorts.html">Filtering cohorts</a></li>
+    <li><a class="dropdown-item" href="../articles/a08_split_cohorts.html">Splitting cohorts</a></li>
+    <li><a class="dropdown-item" href="../articles/a09_combine_cohorts.html">Combining Cohorts</a></li>
+    <li><a class="dropdown-item" href="../articles/a10_match_cohorts.html">Generating a matched cohort</a></li>
+    <li><a class="dropdown-item" href="../articles/a11_benchmark.html">CohortConstructor benchmarking results</a></li>
   </ul>
 </li>
       </ul>
@@ -79,7 +79,7 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="../logo.png" class="logo" alt=""><h1>Filter Cohorts</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>Filtering cohorts</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/OHDSI/CohortConstructor/blob/main/vignettes/a07_filter_cohorts.Rmd" class="external-link"><code>vignettes/a07_filter_cohorts.Rmd</code></a></small>
@@ -117,19 +117,19 @@ individuals in each cohort.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">medications</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/sampleCohorts.html">sampleCohorts</a></span><span class="op">(</span>cohortId <span class="op">=</span> <span class="cn">NULL</span>, n <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Source:   table&lt;main.my_study_medications&gt; [?? x 4]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB v1.1.1 [unknown@Linux 6.5.0-1025-azure:R 4.4.1//tmp/Rtmp6gxaR0/file1d801d8e068e.duckdb]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB v1.1.1 [unknown@Linux 6.5.0-1025-azure:R 4.4.1//tmp/RtmpoFpOB8/file1ddc766f94a2.duckdb]</span></span></span>
 <span><span class="co">#&gt;    cohort_definition_id subject_id cohort_start_date cohort_end_date</span></span>
 <span><span class="co">#&gt;                   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>         </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>                    1       <span style="text-decoration: underline;">2</span>232 1979-03-18        1979-03-25     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>                    1       <span style="text-decoration: underline;">4</span>653 1965-07-22        1965-07-29     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>                    2       <span style="text-decoration: underline;">3</span>871 1999-10-18        1999-10-18     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>                    1       <span style="text-decoration: underline;">3</span>899 1991-10-29        1991-11-12     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>                    1       <span style="text-decoration: underline;">3</span>968 2003-06-13        2003-09-11     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>                    2       <span style="text-decoration: underline;">3</span>795 2010-05-25        2010-05-25     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>                    1       <span style="text-decoration: underline;">5</span>128 2009-07-26        2009-08-02     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>                    2       <span style="text-decoration: underline;">2</span>152 1963-05-17        1963-05-17     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>                    1        366 1996-08-24        1996-09-14     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>                    1       <span style="text-decoration: underline;">3</span>295 1956-04-07        1956-04-14     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>                    1        855 1968-12-22        1968-12-29     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>                    1       <span style="text-decoration: underline;">3</span>929 2004-10-09        2004-10-23     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>                    1       <span style="text-decoration: underline;">4</span>491 2001-05-29        2001-06-05     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>                    1       <span style="text-decoration: underline;">1</span>340 1986-09-09        1986-09-23     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>                    1       <span style="text-decoration: underline;">2</span>069 1963-06-22        1963-07-06     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>                    1       <span style="text-decoration: underline;">3</span>308 1977-12-18        1978-01-22     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>                    1       <span style="text-decoration: underline;">4</span>312 2019-05-16        2019-05-17     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>                    1       <span style="text-decoration: underline;">2</span>134 2000-08-14        2000-09-11     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>                    1       <span style="text-decoration: underline;">1</span>864 1971-04-08        1971-04-22     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>                    1       <span style="text-decoration: underline;">3</span>199 1989-05-08        1989-05-15     </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ more rows</span></span></span>
 <span></span>
 <span><span class="fu"><a href="https://darwin-eu-dev.github.io/omopgenerics/reference/cohortCount.html" class="external-link">cohortCount</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">medications</span><span class="op">)</span></span>
