@@ -1,5 +1,5 @@
 ---
-title: "a07_split_cohorts"
+title: "Splitting cohorts"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{a07_split_cohorts}

@@ -1,5 +1,5 @@
 ---
-title: "Combine Cohorts"
+title: "Combining Cohorts"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{a08_combine_cohorts}

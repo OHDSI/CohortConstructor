@@ -1,5 +1,5 @@
 ---
-title: "Generate a matched age and sex cohort"
+title: "Generating a matched cohort"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Generate a matched age and sex cohort}
