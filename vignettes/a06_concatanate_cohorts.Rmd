@@ -1,5 +1,5 @@
 ---
-title: "Concatenate Cohorts"
+title: "Concatenating cohort records"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{a05_concatanate_cohorts}
