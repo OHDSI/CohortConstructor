@@ -119,8 +119,8 @@ trimToDateRange <- function(cohort,
         startDate = startDate,
         endDate = endDate,
         minDate = dateRange[1]
-      ) %>%
-      dplyr::compute(name = name, temporary = FALSE) %>%
+      ) |>
+      dplyr::compute(name = name, temporary = FALSE) |>
       omopgenerics::recordCohortAttrition(reason = paste0(startDate, " >= ", dateRange[1]),
                                           cohortId = cohortId)
   }
@@ -133,8 +133,8 @@ trimToDateRange <- function(cohort,
         startDate = startDate,
         endDate = endDate,
         maxDate = dateRange[2]
-      ) %>%
-      dplyr::compute(name = name, temporary = FALSE) %>%
+      ) |>
+      dplyr::compute(name = name, temporary = FALSE) |>
       omopgenerics::recordCohortAttrition(reason = paste0(endDate, " <= ", dateRange[2]),
                                           cohortId = cohortId)
   }
@@ -151,7 +151,7 @@ trimStartDate <- function(cohort,
                           endDate,
                           minDate,
                           requirementIds) {
-  cohort <- cohort %>%
+  cohort <- cohort |>
     dplyr::mutate(
       !!startDate := dplyr::if_else(
         .data[[startDate]] <= !!minDate &
@@ -159,7 +159,7 @@ trimStartDate <- function(cohort,
         as.Date(minDate),
         .data[[startDate]]
       )
-    ) %>%
+    ) |>
     dplyr::filter(.data[[startDate]] <= .data[[endDate]] |
                     (!.data$cohort_definition_id %in% .env$requirementIds))
   return(cohort)
@@ -170,13 +170,13 @@ trimEndDate <- function(cohort,
                         endDate,
                         maxDate,
                         requirementIds) {
-  cohort <- cohort %>%
+  cohort <- cohort |>
     dplyr::mutate(!!endDate := dplyr::if_else(
       .data[[endDate]] >= !!maxDate &
         (.data$cohort_definition_id %in% .env$requirementIds),
       as.Date(maxDate),
       .data[[endDate]]
-    )) %>%
+    )) |>
     dplyr::filter(.data[[startDate]] <= .data[[endDate]] |
                     (!.data$cohort_definition_id %in% requirementIds))
   return(cohort)

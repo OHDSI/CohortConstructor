@@ -27,16 +27,16 @@ test_that("exit at first date", {
       name = "cohort1"
     )
   expect_true(all(
-    cdm$cohort1 %>% dplyr::pull("cohort_start_date") %>% sort() ==
+    cdm$cohort1 |> dplyr::pull("cohort_start_date") |> sort() ==
       c("1989-12-09", "2000-01-01", "2000-06-03", "2000-12-09", "2015-01-15")
   ))
   expect_true(all(
-    cdm$cohort1 %>% dplyr::pull("cohort_end_date") %>% sort() ==
+    cdm$cohort1 |> dplyr::pull("cohort_end_date") |> sort() ==
       c("1990-12-09", "2001-01-01", "2001-08-01", "2002-12-09", "2015-01-15")
   ))
   # activate test when arrange works for duckdb
   # expect_true(all(
-  #   cdm$cohort1 %>% dplyr::pull("exit_reason") %>% sort() ==
+  #   cdm$cohort1 |> dplyr::pull("exit_reason") |> sort() ==
   #     c('cohort_end_date', 'other_date_1', 'other_date_1',
   #       'other_date_2; cohort_end_date; other_date_1', 'other_date_2; other_date_1')
   # ))
@@ -50,11 +50,11 @@ test_that("exit at first date", {
       returnReason = FALSE
     )
   expect_true(all(
-    cdm$cohort %>% dplyr::pull("cohort_start_date") %>% sort() ==
+    cdm$cohort |> dplyr::pull("cohort_start_date") |> sort() ==
       c("1989-12-09", "2000-01-01", "2000-06-03", "2000-12-09", "2015-01-15")
   ))
   expect_true(all(
-    cdm$cohort %>% dplyr::pull("cohort_end_date") %>% sort() ==
+    cdm$cohort |> dplyr::pull("cohort_end_date") |> sort() ==
       c("1990-12-09", "2001-01-01", "2001-08-01", "2002-12-09", "2015-01-15")
   ))
   expect_true(all(colnames(cdm$cohort) ==
@@ -93,11 +93,11 @@ test_that("exit at last date", {
       name = "cohort1"
     )
   expect_true(all(
-    cdm$cohort1 %>% dplyr::pull("cohort_start_date") %>% sort() ==
+    cdm$cohort1 |> dplyr::pull("cohort_start_date") |> sort() ==
       c("1989-12-09", "2000-01-01", "2000-06-03", "2000-12-09", "2015-01-15")
   ))
   expect_true(all(
-    cdm$cohort1 %>% dplyr::pull("cohort_end_date") %>% sort() ==
+    cdm$cohort1 |> dplyr::pull("cohort_end_date") |> sort() ==
       c("1990-12-09", "2001-01-12", "2001-09-02", "2002-12-09", "2015-02-15")
   ))
   expect_true(all(colnames(cdm$cohort1) ==
@@ -120,16 +120,16 @@ test_that("exit at last date", {
       returnReason = TRUE
     )
   expect_true(all(
-    cdm$cohort %>% dplyr::pull("cohort_start_date") %>% sort() ==
+    cdm$cohort |> dplyr::pull("cohort_start_date") |> sort() ==
       c("1989-12-09", "2000-01-01", "2000-06-03", "2000-12-09", "2015-01-15")
   ))
   expect_true(all(
-    cdm$cohort %>% dplyr::pull("cohort_end_date") %>% sort() ==
+    cdm$cohort |> dplyr::pull("cohort_end_date") |> sort() ==
       c("2000-11-09", "2001-01-01", "2001-09-02", "2002-12-10", "2015-04-15")
   ))
   expect_true(all(colnames(cdm$cohort) ==
                     c("cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date", "exit_reason")))
-  expect_true(all(cdm$cohort %>% dplyr::pull("exit_reason") %in% c("other_date_1", "other_date_2")))
+  expect_true(all(cdm$cohort |> dplyr::pull("exit_reason") %in% c("other_date_1", "other_date_2")))
 
   PatientProfiles::mockDisconnect(cdm)
 })

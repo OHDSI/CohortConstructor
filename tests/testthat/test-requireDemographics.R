@@ -9,7 +9,7 @@ test_that("test it works and expected errors", {
     dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
   cdm <- cdm_local |> copyCdm()
 
-  cdm$cohort1 <- cdm$cohort %>%
+  cdm$cohort1 <- cdm$cohort |>
     requireDemographics(
       ageRange = c(0, 35),
       indexDate = "cohort_start_date",
@@ -37,10 +37,10 @@ test_that("test it works and expected errors", {
         'Future observation requirement: 40 days')
   ))
 
-  cdm$cohort <- cdm$cohort %>%
-    requireAge(ageRange = list(c(0, 35))) %>%
-    requireSex(sex = "Both") %>%
-    requirePriorObservation(minPriorObservation = 10) %>%
+  cdm$cohort <- cdm$cohort |>
+    requireAge(ageRange = list(c(0, 35))) |>
+    requireSex(sex = "Both") |>
+    requirePriorObservation(minPriorObservation = 10) |>
     requireFutureObservation(minFutureObservation = 40)
 
   expect_true(inherits(cdm$cohort, "cohort_table"))
@@ -129,9 +129,9 @@ test_that("restrictions applied to single cohort", {
   cdm_local$person <- cdm_local$person |>
     dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
   cdm <- cdm_local |> copyCdm()
-  cdm$cohort1 <- cdm$cohort %>%
+  cdm$cohort1 <- cdm$cohort |>
     requireDemographics(ageRange = list(c(0, 5)), name = "cohort1")
-  expect_true(all(c("2001-03-30", "2003-06-15") == cdm$cohort1 %>% dplyr::pull("cohort_start_date")))
+  expect_true(all(c("2001-03-30", "2003-06-15") == cdm$cohort1 |> dplyr::pull("cohort_start_date")))
   expect_true(all(
     c("Initial qualifying events", "Age requirement: 0 to 5", "Sex requirement: Both",
       "Prior observation requirement: 0 days", "Future observation requirement: 0 days") ==
@@ -145,7 +145,7 @@ test_that("restrictions applied to single cohort", {
   expect_true(settings(cdm$cohort1)$min_prior_observation == 0)
   expect_true(settings(cdm$cohort1)$min_future_observation == 0)
 
-  cdm$cohort2 <- cdm$cohort %>%
+  cdm$cohort2 <- cdm$cohort |>
     requireDemographics(sex = "Male", name = "cohort2")
   expect_identical(dplyr::collect(cdm$cohort)$cohort_start_date, dplyr::collect(cdm$cohort2)$cohort_start_date)
   expect_true(all(
@@ -209,7 +209,7 @@ test_that("external columns kept after requireDemographics", {
     omock::mockPerson(n = 1,seed = 1) |>
     omock::mockObservationPeriod(seed = 1) |>
     omock::mockCohort(recordPerson = 3,seed = 1)
-  cdm_local$cohort <- cdm_local$cohort %>%
+  cdm_local$cohort <- cdm_local$cohort |>
     dplyr::mutate(
       col_extra1 = as.numeric(subject_id) + 1,
       col_extra2 = as.numeric(subject_id) + 2,
@@ -220,7 +220,7 @@ test_that("external columns kept after requireDemographics", {
     dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
   cdm <- cdm_local |> copyCdm()
 
-  cdm$cohort <- cdm$cohort %>%
+  cdm$cohort <- cdm$cohort |>
     requireDemographics(indexDate = "new_index_date", ageRange = list(c(0,5)))
 
   expect_true(all(c("col_extra1", "col_extra2", "new_index_date") %in% colnames(cdm$cohort)))

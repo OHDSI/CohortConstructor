@@ -52,6 +52,9 @@ library(CohortCharacteristics)
 con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomia_dir())
 cdm <- cdm_from_con(con, cdm_schema = "main", 
                     write_schema = c(prefix = "my_study_", schema = "main"))
+#> Note: method with signature 'DBIConnection#Id' chosen for function 'dbExistsTable',
+#>  target signature 'duckdb_connection#Id'.
+#>  "duckdb_connection#ANY" would also be valid
 cdm
 #> 
 #> ── # OMOP CDM reference (duckdb) of Synthea synthetic health database ──────────
@@ -76,7 +79,6 @@ synthetic data with a subset of the full vocabularies).
 
 ``` r
 library(CodelistGenerator)
-#> Warning: package 'CodelistGenerator' was built under R version 4.4.1
 
 hip_fx_codes <- getCandidateCodes(cdm, "hip fracture")
 #> Limiting to domains of interest
@@ -105,10 +107,10 @@ fx_codes
 #> - hip_fracture (1 codes)
 ```
 
-Now we can quickly create a our cohorts. For this we only need to
-provide the codes we have defined and we will get a cohort back, where
-we start by setting cohort exit as the same day as event start (the date
-of the fracture).
+Now we can quickly create our cohorts. For this we only need to provide
+the codes we have defined and we will get a cohort back, where we start
+by setting cohort exit as the same day as event start (the date of the
+fracture).
 
 ``` r
 cdm$fractures <- cdm |> 
@@ -132,20 +134,20 @@ restrictions, have the following associated settings, counts, and
 attrition.
 
 ``` r
-settings(cdm$fractures) %>% glimpse()
+settings(cdm$fractures) |> glimpse()
 #> Rows: 2
 #> Columns: 4
 #> $ cohort_definition_id <int> 1, 2
 #> $ cohort_name          <chr> "forearm_fracture", "hip_fracture"
 #> $ cdm_version          <chr> "5.3", "5.3"
 #> $ vocabulary_version   <chr> "v5.0 18-JAN-19", "v5.0 18-JAN-19"
-cohort_count(cdm$fractures) %>% glimpse()
+cohort_count(cdm$fractures) |> glimpse()
 #> Rows: 2
 #> Columns: 3
 #> $ cohort_definition_id <int> 1, 2
 #> $ number_records       <int> 569, 138
 #> $ number_subjects      <int> 510, 132
-attrition(cdm$fractures) %>% glimpse()
+attrition(cdm$fractures) |> glimpse()
 #> Rows: 4
 #> Columns: 7
 #> $ cohort_definition_id <int> 1, 1, 2, 2
@@ -195,7 +197,7 @@ require that individuals’ cohort start date fall within a certain date
 range.
 
 ``` r
-cdm$fractures <- cdm$fractures %>% 
+cdm$fractures <- cdm$fractures |> 
   requireInDateRange(dateRange = as.Date(c("2000-01-01", "2020-01-01")))
 ```
 
@@ -203,14 +205,14 @@ Now that we’ve applied this date restriction, we can see that our cohort
 attributes have been updated
 
 ``` r
-cohort_count(cdm$fractures) %>% glimpse()
+cohort_count(cdm$fractures) |> glimpse()
 #> Rows: 3
 #> Columns: 3
 #> $ cohort_definition_id <int> 1, 2, 3
 #> $ number_records       <int> 152, 62, 214
 #> $ number_subjects      <int> 143, 60, 196
-attrition(cdm$fractures) %>% 
-  filter(reason == "cohort_start_date between 2000-01-01 & 2020-01-01") %>% 
+attrition(cdm$fractures) |> 
+  filter(reason == "cohort_start_date between 2000-01-01 & 2020-01-01") |> 
   glimpse()
 #> Rows: 0
 #> Columns: 7
@@ -229,7 +231,7 @@ We can also add restrictions on patient characteristics such as age (on
 cohort start date by default) and sex.
 
 ``` r
-cdm$fractures <- cdm$fractures %>% 
+cdm$fractures <- cdm$fractures |> 
   requireDemographics(ageRange = list(c(40, 65)),
                       sex = "Female")
 ```
@@ -238,8 +240,8 @@ Again we can see how many individuals we’ve lost after applying these
 criteria.
 
 ``` r
-attrition(cdm$fractures) %>% 
-  filter(reason == "Age requirement: 40 to 65") %>% 
+attrition(cdm$fractures) |> 
+  filter(reason == "Age requirement: 40 to 65") |> 
   glimpse()
 #> Rows: 3
 #> Columns: 7
@@ -251,8 +253,8 @@ attrition(cdm$fractures) %>%
 #> $ excluded_records     <int> 88, 40, 128
 #> $ excluded_subjects    <int> 81, 38, 113
 
-attrition(cdm$fractures) %>% 
-  filter(reason == "Sex requirement: Female") %>% 
+attrition(cdm$fractures) |> 
+  filter(reason == "Sex requirement: Female") |> 
   glimpse()
 #> Rows: 3
 #> Columns: 7
@@ -277,15 +279,15 @@ cdm$gibleed <- cdm |>
   conceptCohort(conceptSet = list("gibleed" = 192671L),
   name = "gibleed")
 
-cdm$fractures <- cdm$fractures %>% 
+cdm$fractures <- cdm$fractures |> 
   requireCohortIntersect(targetCohortTable = "gibleed",
                          intersections = 0,
                          window = c(-Inf, 0))
 ```
 
 ``` r
-attrition(cdm$fractures) %>% 
-  filter(reason == "Not in cohort gibleed between -Inf & 0 days relative to cohort_start_date") %>% 
+attrition(cdm$fractures) |> 
+  filter(reason == "Not in cohort gibleed between -Inf & 0 days relative to cohort_start_date") |> 
   glimpse()
 #> Rows: 3
 #> Columns: 7

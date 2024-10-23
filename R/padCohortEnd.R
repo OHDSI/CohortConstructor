@@ -28,9 +28,9 @@
 #'   padCohortEnd(days = 10)
 #' }
 padCohortEnd <- function(cohort,
-                           days,
-                           cohortId = NULL,
-                           name = tableName(cohort)) {
+                         days,
+                         cohortId = NULL,
+                         name = tableName(cohort)) {
   # validate input
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cohort <- omopgenerics::validateCohortArgument(cohort)
@@ -52,39 +52,32 @@ padCohortEnd <- function(cohort,
       PatientProfiles::addFutureObservationQuery(
         futureObservationType = "date",
         futureObservationName = futureObsCol
-        )
+      )
   }
 
   if(length(cohortId) < length(ids)) {
     # if only a subset of ids are provided then only update these
-    cohort <- cohort %>%
+    cohort <- cohort |>
       dplyr::mutate(
         !!newEndCol :=
           dplyr::if_else(
             .data$cohort_definition_id %in% .env$cohortId,
-            as.Date(
-              !!CDMConnector::dateadd(
-                "cohort_end_date",
-                number = days,
-                interval = "day"
-              )
-            ),
+            as.Date(clock::add_days(x = .data$cohort_end_date, n = days)),
             .data$cohort_end_date
           )
       )
   } else {
     # if all ids are provided then simpler query - update all
-    cohort <- cohort %>%
+    cohort <- cohort |>
       dplyr::mutate(
-        !!newEndCol := as.Date(
-          !!CDMConnector::dateadd(
-            "cohort_end_date",
-            number = days,
-            interval = "day")))
+        !!newEndCol := as.Date(clock::add_days(x = .data$cohort_end_date, n = days))
+      )
   }
   if (days > 0) {
-    cohort <- cohort %>%
-      dplyr::mutate(!!diffCol := !!CDMConnector::datediff(newEndCol, futureObsCol)) |>
+    cohort <- cohort |>
+      dplyr::mutate(
+        !!diffCol := clock::date_count_between(.data[[newEndCol]], .data[[futureObsCol]], "day")
+        ) |>
       dplyr::mutate(cohort_end_date = dplyr::if_else(!!rlang::ensym(diffCol) >= 0,
                                                      !!rlang::ensym(newEndCol),
                                                      !!rlang::ensym(futureObsCol)))
@@ -94,7 +87,7 @@ padCohortEnd <- function(cohort,
   }
 
   # drop anyone with end before start
-  cohort <- cohort %>%
+  cohort <- cohort |>
     dplyr::filter(.data$cohort_start_date <= .data$cohort_end_date) |>
     dplyr::select(!dplyr::any_of(c(futureObsCol, diffCol, newEndCol)))
 

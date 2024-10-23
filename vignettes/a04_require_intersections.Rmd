@@ -67,7 +67,7 @@ cdm$gi_bleed <- conceptCohort(cdm = cdm,
 We could require that individuals in our medication cohorts are seen (or not seen) in another cohort. To do this we can use the `requireCohortIntersect()` function, requiring that individuals have one or more intersections with the GI bleed cohort.
 
 ```{r}
-cdm$medications_gi_bleed <- cdm$medications  %>%
+cdm$medications_gi_bleed <- cdm$medications  |>
   requireCohortIntersect(intersections = c(1,Inf),
                          targetCohortTable = "gi_bleed", 
                          targetCohortId = 1,
@@ -84,7 +84,7 @@ The flow chart above illustrates the changes to cohort 1 (users of acetaminophen
 Instead of requiring that individuals intersect with the GI bleed cohort, we could instead require that they don't intersect with it. In this case we can again use the `requireCohortIntersect()` function, but this time set the intersections argument to 0 to require individuals' absence in this other cohort rather than their presence in it.
 
 ```{r}
-cdm$medications_no_gi_bleed <- cdm$medications %>%
+cdm$medications_no_gi_bleed <- cdm$medications |>
   requireCohortIntersect(intersections = 0,
                          targetCohortTable = "gi_bleed", 
                          targetCohortId = 1,
@@ -115,7 +115,7 @@ cdm$gi_bleed <- conceptCohort(cdm = cdm,
 ```
 
 ```{r}
-cdm$medications_gi_bleed <- cdm$medications  %>%
+cdm$medications_gi_bleed <- cdm$medications  |>
   requireConceptIntersect(conceptSet = list("gi_bleed" = 192671), 
                          indexDate = "cohort_start_date", 
                          window = c(-Inf, 0), 
@@ -130,7 +130,7 @@ The flow chart above illustrates the changes to cohort 1  when restricted to onl
 Instead of requiring that individuals have events of GI bleeding, we could instead require that they don't have any events of it. In this case we can again use the `requireConceptIntersect()` function, but this time set the intersections argument to 0 to require individuals without past events of GI bleeding. 
 
 ```{r}
-cdm$medications_no_gi_bleed <- cdm$medications  %>%
+cdm$medications_no_gi_bleed <- cdm$medications  |>
   requireConceptIntersect(intersections = 0,
                          conceptSet = list("gi_bleed" = 192671), 
                          indexDate = "cohort_start_date", 
@@ -159,7 +159,7 @@ cdm$gi_bleed <- conceptCohort(cdm = cdm,
 ```
 
 ```{r}
-cdm$medications_gi_bleed <- cdm$medications  %>%
+cdm$medications_gi_bleed <- cdm$medications  |>
   requireTableIntersect(tableName = "gi_bleed",
                          indexDate = "cohort_start_date", 
                          window = c(-Inf, 0), 
@@ -174,7 +174,7 @@ The flow chart above illustrates the changes to cohort 1 when restricted to only
 Instead of requiring that individuals intersect with the GI bleed clinical table, we could instead require that they don't intersect with it. In this case we can again use the `requireCohortIntersect()` function, but this time set the intersections argument to 0 to require individuals' absence in the GI bleed clinical table.
 
 ```{r}
-cdm$medications_no_gi_bleed <- cdm$medications  %>%
+cdm$medications_no_gi_bleed <- cdm$medications  |>
   requireTableIntersect(tableName = "gi_bleed",
                          indexDate = "cohort_start_date", 
                          window = c(-Inf, 0), 
@@ -203,7 +203,7 @@ cdm$gi_bleed <- conceptCohort(cdm = cdm,
 ```
 
 ```{r}
-cdm$medications_deaths <- cdm$medications  %>%
+cdm$medications_deaths <- cdm$medications  |>
   requireDeathFlag(window = c(0,Inf), 
                          name = "medications_deaths")
 
@@ -216,7 +216,7 @@ The flow chart above illustrates the changes to cohort 1 when restricted to only
 To exclude individuals who died we add the argument 'negate = TRUE' to the function `requireDeathFlag()`.
 
 ```{r}
-cdm$medications_no_deaths <- cdm$medications  %>%
+cdm$medications_no_deaths <- cdm$medications  |>
   requireDeathFlag(window = c(0,Inf), 
                    name = "medications_no_deaths",
                    negate = TRUE)
