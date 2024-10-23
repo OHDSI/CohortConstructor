@@ -41,56 +41,41 @@ cdm <- cdm_from_con(con, cdm_schema = "main",
                     write_schema = c(prefix = "my_study_", schema = "main"))
 ```
 
+## Concept based cohort creation
+
+A way of defining base cohorts is to identify clinical records with codes from some pre-specified list. Here for example we'll first find codes for diclofenac and acetaminophen. 
+
+```{r}
+drug_codes <- getDrugIngredientCodes(cdm, 
+                                     name = c("acetaminophen",
+                                              "amoxicillin", 
+                                              "diclofenac", 
+                                              "simvastatin",
+                                              "warfarin"))
+
+drug_codes
+```
+
+Now we have our codes of interest, we'll make cohorts for each of these where cohort exit is defined as the event start date (which for these will be their drug exposure end date).
+
+```{r}
+cdm$drugs <- conceptCohort(cdm, 
+                           conceptSet = drug_codes,
+                           exit = "event_end_date",
+                           name = "drugs")
+
+settings(cdm$drugs)
+cohortCount(cdm$drugs)
+attrition(cdm$drugs)
+```
+
 ## Demographic based cohort creation
 
-One base cohort we can create is based around patient demographics. Here for example we create a cohort where people enter on their 18th birthday and leave at age 65 or  
+One base cohort we can create is based around patient demographics. Here for example we create a cohort where people enter on their 18th birthday and leave at on the day before their 66th birthday. 
 
 ```{r}
 cdm$working_age_cohort <- demographicsCohort(cdm = cdm, 
                                              ageRange = c(18, 65), 
                                              name = "working_age_cohort")
-
-settings(cdm$working_age_cohort)
-cohortCount(cdm$working_age_cohort)
-attrition(cdm$working_age_cohort)
 ```
-
-
-```{r}
-cdm$working_age_cohort |> 
-  addAge(indexDate = "cohort_start_date") |> 
-  summarise(min_start_age = min(age), 
-            median_start_age = median(age), 
-            max_start_age = max(age))
-
-cdm$working_age_cohort |> 
-  addAge(indexDate = "cohort_end_date") |> 
-  summarise(min_start_age = min(age), 
-            median_start_age = median(age), 
-            max_start_age = max(age))
-```
-
-## Concept based cohort creation
-
-```{r}
-drug_codes <- getDrugIngredientCodes(cdm, 
-                                     name = c("diclofenac", 
-                                              "acetaminophen"))
-
-drug_codes
-```
-
-```{r}
-cdm$medications <- conceptCohort(cdm = cdm, 
-                                 conceptSet = drug_codes, 
-                                 name = "medications")
-
-settings(cdm$medications)
-cohortCount(cdm$medications)
-```
-
-## Concept based cohort creation for measurements
-
-TO DO
-
 
