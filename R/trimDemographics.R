@@ -60,9 +60,9 @@ trimDemographics <- function(cohort,
     omopgenerics::newCohortTable(.softValidation = TRUE)
 
   if (!is.null(ageRange) ||
-    !is.null(minPriorObservation) ||
-    !is.null(minFutureObservation) ||
-    !is.null(sex)) {
+      !is.null(minPriorObservation) ||
+      !is.null(minFutureObservation) ||
+      !is.null(sex)) {
     cli::cli_inform(c("Adding demographics information"))
     newCohort <- newCohort |>
       PatientProfiles::addDemographics(
@@ -128,7 +128,7 @@ trimDemographics <- function(cohort,
     cli::cli_inform(c("Trim sex"))
     newCohort <- newCohort |>
       dplyr::filter(.data$sex == .data$sex_req |
-        .data$sex_req == "Both") |>
+                      .data$sex_req == "Both") |>
       dplyr::compute(name = tmpNewCohort, temporary = FALSE)
     # attrition
     uniqueSex <- unique(newSet$sex)
@@ -154,8 +154,8 @@ trimDemographics <- function(cohort,
       ageRange[[j]][is.infinite(ageRange[[j]])] <- 999L
     }
 
-    newCohort <- newCohort %>%
-      dplyr::mutate(!!!datesAgeRange(ageRange)) %>%
+    newCohort <- newCohort |>
+      dplyr::mutate(!!!datesAgeRange(ageRange)) |>
       dplyr::mutate(
         !!!caseAge(ageRange),
         "cohort_start_date" = dplyr::if_else(
@@ -194,7 +194,7 @@ trimDemographics <- function(cohort,
   }
   if (!is.null(minPriorObservation)) {
     cli::cli_inform(c("Trim prior observation"))
-    newCohort <- newCohort %>%
+    newCohort <- newCohort |>
       dplyr::mutate("min_prior_observation" = as.integer(.data$min_prior_observation)) %>%
       dplyr::mutate(
         "new_cohort_start_date" = as.Date(
@@ -233,12 +233,10 @@ trimDemographics <- function(cohort,
   }
   if (!is.null(minFutureObservation)) {
     cli::cli_inform(c("Trim future observation"))
-    newCohort <- newCohort %>%
+    newCohort <- newCohort |>
       dplyr::filter(
-        !!CDMConnector::datediff(
-          start = "cohort_start_date",
-          end = "future_observation",
-          interval = "day"
+        clock::date_count_between(
+          .data$cohort_start_date, .data$future_observation, "day"
         ) >=
           .data$min_future_observation
       ) |>
@@ -308,15 +306,15 @@ trimDemographics <- function(cohort,
     dplyr::distinct() |>
     dplyr::rename("target_cohort_rand01" = "cohort_definition_id") |>
     dplyr::inner_join(newCohort |>
-      dplyr::select(dplyr::all_of(
-        c(
-          "cohort_definition_id",
-          "subject_id",
-          "cohort_start_date",
-          "cohort_end_date",
-          "target_cohort_rand01"
-        )
-      )), by = unique(c("target_cohort_rand01", "subject_id"))) |>
+                        dplyr::select(dplyr::all_of(
+                          c(
+                            "cohort_definition_id",
+                            "subject_id",
+                            "cohort_start_date",
+                            "cohort_end_date",
+                            "target_cohort_rand01"
+                          )
+                        )), by = unique(c("target_cohort_rand01", "subject_id"))) |>
     dplyr::select(!"target_cohort_rand01") |>
     dplyr::relocate(dplyr::all_of(omopgenerics::cohortColumns("cohort"))) |>
     dplyr::compute(name = name, temporary = FALSE) |>
@@ -342,8 +340,8 @@ datesAgeRange <- function(ageRange) {
     unlist() |>
     unique()
   values <- values[!is.infinite(values)]
-  values <- values[values != 0]
-  glue::glue("as.Date(local(CDMConnector::dateadd('date_0', {values}, interval = 'year')))") |>
+  values <- values[values != 0] |> as.integer()
+  glue::glue("as.Date(clock::add_years(.data$date_0, {values}))") |>
     rlang::parse_exprs() |>
     rlang::set_names(glue::glue("date_{values}"))
 }
@@ -384,9 +382,9 @@ prepareColEnd <- function(x, col) {
     col,
     " == ",
     as.character(num),
-    " ~ as.Date(local(CDMConnector::dateadd(date = 'date_",
+    " ~ as.Date(clock::add_days(x = .data$date_",
     as.character(num + 1),
-    "', number = -1, interval = 'day')))"
+    ", n = -1L))"
   )
   if (infFlag) {
     x <- c(

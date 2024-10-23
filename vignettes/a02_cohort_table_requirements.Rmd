@@ -66,7 +66,7 @@ plotCohortAttrition(summary_attrition)
 We can see that in our starting cohort individuals have multiple entries for each use of acetaminophen. However, we could keep only their earliest cohort entry by using `requireIsFirstEntry()` from CohortConstructor.
 
 ```{r}
-cdm$acetaminophen <- cdm$acetaminophen %>% 
+cdm$acetaminophen <- cdm$acetaminophen |> 
   requireIsFirstEntry()
 
 summary_attrition <- summariseCohortAttrition(cdm$acetaminophen)
@@ -88,7 +88,7 @@ cdm$acetaminophen <- conceptCohort(cdm = cdm,
 ```
 
 ```{r}
-cdm$acetaminophen <- cdm$acetaminophen %>% 
+cdm$acetaminophen <- cdm$acetaminophen |> 
   requireInDateRange(dateRange = as.Date(c("2010-01-01", "2015-01-01")))
 
 summary_attrition <- summariseCohortAttrition(cdm$acetaminophen)
@@ -102,14 +102,14 @@ Multiple restrictions can be applied to a cohort, however it is important to not
 ```{r}
 cdm$acetaminophen_1 <- conceptCohort(cdm = cdm, 
                                  conceptSet = acetaminophen_codes, 
-                                 name = "acetaminophen_1") %>% 
-  requireIsFirstEntry() %>%
+                                 name = "acetaminophen_1") |> 
+  requireIsFirstEntry() |>
   requireInDateRange(dateRange = as.Date(c("2010-01-01", "2016-01-01")))
 
 cdm$acetaminophen_2 <- conceptCohort(cdm = cdm, 
                                  conceptSet = acetaminophen_codes, 
-                                 name = "acetaminophen_2") %>%
-  requireInDateRange(dateRange = as.Date(c("2010-01-01", "2016-01-01"))) %>% 
+                                 name = "acetaminophen_2") |>
+  requireInDateRange(dateRange = as.Date(c("2010-01-01", "2016-01-01"))) |> 
   requireIsFirstEntry()
 ```
 
@@ -163,7 +163,7 @@ cohortCount(cdm$medications) |>
 If we apply a minimum cohort count of 500, we end up with far fewer cohorts that all have a sufficient number of study participants.
 
 ```{r}
-cdm$medications <- cdm$medications %>% 
+cdm$medications <- cdm$medications |> 
   requireMinCohortCount(minCohortCount = 500)
 
 cohortCount(cdm$medications) |> 

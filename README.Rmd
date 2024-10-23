@@ -93,9 +93,9 @@ cdm$fractures <- cdm$fractures |>
 We can see that our starting cohorts, before we add any additional restrictions, have the following associated settings, counts, and attrition.
 
 ```{r}
-settings(cdm$fractures) %>% glimpse()
-cohort_count(cdm$fractures) %>% glimpse()
-attrition(cdm$fractures) %>% glimpse()
+settings(cdm$fractures) |> glimpse()
+cohort_count(cdm$fractures) |> glimpse()
+attrition(cdm$fractures) |> glimpse()
 ```
 
 ### Create an overall fracture cohort
@@ -119,16 +119,16 @@ cohortCount(cdm$fractures)
 Once we have created our base fracture cohort, we can then start applying additional cohort requirements. For example, first we can require that individuals' cohort start date fall within a certain date range.
 
 ```{r}
-cdm$fractures <- cdm$fractures %>% 
+cdm$fractures <- cdm$fractures |> 
   requireInDateRange(dateRange = as.Date(c("2000-01-01", "2020-01-01")))
 ```
 
 Now that we've applied this date restriction, we can see that our cohort attributes have been updated
 
 ```{r}
-cohort_count(cdm$fractures) %>% glimpse()
-attrition(cdm$fractures) %>% 
-  filter(reason == "cohort_start_date between 2000-01-01 & 2020-01-01") %>% 
+cohort_count(cdm$fractures) |> glimpse()
+attrition(cdm$fractures) |> 
+  filter(reason == "cohort_start_date between 2000-01-01 & 2020-01-01") |> 
   glimpse()
 ```
 
@@ -137,7 +137,7 @@ attrition(cdm$fractures) %>%
 We can also add restrictions on patient characteristics such as age (on cohort start date by default) and sex.
 
 ```{r}
-cdm$fractures <- cdm$fractures %>% 
+cdm$fractures <- cdm$fractures |> 
   requireDemographics(ageRange = list(c(40, 65)),
                       sex = "Female")
 ```
@@ -145,12 +145,12 @@ cdm$fractures <- cdm$fractures %>%
 Again we can see how many individuals we've lost after applying these criteria.
 
 ```{r}
-attrition(cdm$fractures) %>% 
-  filter(reason == "Age requirement: 40 to 65") %>% 
+attrition(cdm$fractures) |> 
+  filter(reason == "Age requirement: 40 to 65") |> 
   glimpse()
 
-attrition(cdm$fractures) %>% 
-  filter(reason == "Sex requirement: Female") %>% 
+attrition(cdm$fractures) |> 
+  filter(reason == "Sex requirement: Female") |> 
   glimpse()
 ```
 
@@ -163,15 +163,15 @@ cdm$gibleed <- cdm |>
   conceptCohort(conceptSet = list("gibleed" = 192671L),
   name = "gibleed")
 
-cdm$fractures <- cdm$fractures %>% 
+cdm$fractures <- cdm$fractures |> 
   requireCohortIntersect(targetCohortTable = "gibleed",
                          intersections = 0,
                          window = c(-Inf, 0))
 ```
 
 ```{r}
-attrition(cdm$fractures) %>% 
-  filter(reason == "Not in cohort gibleed between -Inf & 0 days relative to cohort_start_date") %>% 
+attrition(cdm$fractures) |> 
+  filter(reason == "Not in cohort gibleed between -Inf & 0 days relative to cohort_start_date") |> 
   glimpse()
 ```
 

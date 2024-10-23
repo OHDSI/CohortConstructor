@@ -146,18 +146,18 @@ test_that("requiring absence in another cohort", {
                                                        window = c(-Inf, Inf),
                                                       intersections = 0,
                                                        name = "cohort3_exclusion")
-  in_both <- intersect(cdm$cohort3_inclusion %>%
-                         dplyr::pull("subject_id") %>%
+  in_both <- intersect(cdm$cohort3_inclusion |>
+                         dplyr::pull("subject_id") |>
                          unique(),
-                       cdm$cohort3_exclusion %>%
-                         dplyr::pull("subject_id") %>%
+                       cdm$cohort3_exclusion |>
+                         dplyr::pull("subject_id") |>
                          unique())
   expect_true(length(in_both) == 0)
-  in_both <- intersect(cdm$cohort3_inclusion %>%
-                         dplyr::pull("cohort_start_date") %>%
+  in_both <- intersect(cdm$cohort3_inclusion |>
+                         dplyr::pull("cohort_start_date") |>
                          sort(),
-                       cdm$cohort3_exclusion %>%
-                         dplyr::pull("cohort_start_date") %>%
+                       cdm$cohort3_exclusion |>
+                         dplyr::pull("cohort_start_date") |>
                          sort())
   expect_true(length(in_both) == 0)
   expect_true(all(omopgenerics::attrition(cdm$cohort3_exclusion)$reason ==

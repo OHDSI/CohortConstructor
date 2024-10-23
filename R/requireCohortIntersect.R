@@ -72,18 +72,18 @@ requireCohortIntersect <- function(cohort,
   }
 
   if (is.null(targetCohortId)) {
-    targetCohortId <- omopgenerics::settings(cdm[[targetCohortTable]]) %>%
+    targetCohortId <- omopgenerics::settings(cdm[[targetCohortTable]]) |>
       dplyr::pull("cohort_definition_id")
   }
 
-  target_name <- cdm[[targetCohortTable]] %>%
-    omopgenerics::settings() %>%
-    dplyr::filter(.data$cohort_definition_id == .env$targetCohortId) %>%
+  target_name <- cdm[[targetCohortTable]] |>
+    omopgenerics::settings() |>
+    dplyr::filter(.data$cohort_definition_id == .env$targetCohortId) |>
     dplyr::pull("cohort_name")
 
   subsetName <- omopgenerics::uniqueTableName()
-  subsetCohort <- cohort %>%
-    dplyr::select(dplyr::all_of(.env$cols)) %>%
+  subsetCohort <- cohort |>
+    dplyr::select(dplyr::all_of(.env$cols)) |>
     PatientProfiles::addCohortIntersectCount(
       targetCohortTable = targetCohortTable,
       targetCohortId = targetCohortId,
@@ -96,7 +96,7 @@ requireCohortIntersect <- function(cohort,
       name = name
     )
 
-  subsetCohort <- subsetCohort %>%
+  subsetCohort <- subsetCohort |>
     dplyr::mutate(lower_limit = .env$lower_limit,
                   upper_limit = .env$upper_limit) |>
     dplyr::filter((
@@ -104,8 +104,8 @@ requireCohortIntersect <- function(cohort,
         .data$intersect_cohort <= .data$upper_limit
     ) |
       (!.data$cohort_definition_id %in% .env$cohortId)
-    ) %>%
-    dplyr::select(cols) %>%
+    ) |>
+    dplyr::select(cols) |>
     dplyr::compute(name = subsetName, temporary = FALSE)
 
   # attrition reason
@@ -131,10 +131,10 @@ requireCohortIntersect <- function(cohort,
     reason <- glue::glue("{reason}, censoring at {censorDate}")
   }
 
-  x <- cohort %>%
-    dplyr::inner_join(subsetCohort, by = c(cols)) %>%
-    dplyr::compute(name = name, temporary = FALSE) %>%
-    omopgenerics::newCohortTable(.softValidation = TRUE) %>%
+  x <- cohort |>
+    dplyr::inner_join(subsetCohort, by = c(cols)) |>
+    dplyr::compute(name = name, temporary = FALSE) |>
+    omopgenerics::newCohortTable(.softValidation = TRUE) |>
     omopgenerics::recordCohortAttrition(reason = reason, cohortId = cohortId)
 
   omopgenerics::dropTable(cdm = cdm, name = subsetName)

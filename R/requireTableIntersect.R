@@ -68,8 +68,8 @@ requireTableIntersect <- function(cohort,
   }
 
   subsetName <- omopgenerics::uniqueTableName()
-  subsetCohort <- cohort %>%
-    dplyr::select(dplyr::all_of(.env$cols)) %>%
+  subsetCohort <- cohort |>
+    dplyr::select(dplyr::all_of(.env$cols)) |>
     PatientProfiles::addTableIntersectCount(
       tableName = tableName,
       indexDate = indexDate,
@@ -81,7 +81,7 @@ requireTableIntersect <- function(cohort,
       name = subsetName
     )
 
-  subsetCohort <- subsetCohort %>%
+  subsetCohort <- subsetCohort |>
     dplyr::mutate(lower_limit = .env$lower_limit,
                   upper_limit = .env$upper_limit) |>
     dplyr::filter((
@@ -89,8 +89,8 @@ requireTableIntersect <- function(cohort,
         .data$intersect_table <= .data$upper_limit
     ) |
       (!.data$cohort_definition_id %in% .env$cohortId)
-    ) %>%
-    dplyr::select(cols) %>%
+    ) |>
+    dplyr::select(cols) |>
     dplyr::compute(name = subsetName, temporary = FALSE)
 
   # attrition reason
@@ -116,10 +116,10 @@ requireTableIntersect <- function(cohort,
     reason <- glue::glue("{reason}, censoring at {censorDate}")
   }
 
-  x <- cohort %>%
-    dplyr::inner_join(subsetCohort, by = c(cols)) %>%
-    dplyr::compute(name = name, temporary = FALSE) %>%
-    omopgenerics::newCohortTable(.softValidation = TRUE) %>%
+  x <- cohort |>
+    dplyr::inner_join(subsetCohort, by = c(cols)) |>
+    dplyr::compute(name = name, temporary = FALSE) |>
+    omopgenerics::newCohortTable(.softValidation = TRUE) |>
     omopgenerics::recordCohortAttrition(reason = reason, cohortId = cohortId)
 
   omopgenerics::dropTable(cdm = cdm, name = subsetName)

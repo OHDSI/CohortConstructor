@@ -47,12 +47,12 @@ mergeData <- function(data, patterns) {
               mutate(across(.cols = -result_id, as.character))
           }
         }
-        x[[pat]] <- dataSubset %>% omopgenerics::bind()
+        x[[pat]] <- dataSubset |> omopgenerics::bind()
       } else {
         cli::cli_abort("Not all results with pattern {pat} have class summarised result.")
       }
     }  else {
-      x[[pat]] <- dataSubset %>% dplyr::bind_rows() %>% distinct()
+      x[[pat]] <- dataSubset |> dplyr::bind_rows() |> distinct()
     }
   }
   return(x)

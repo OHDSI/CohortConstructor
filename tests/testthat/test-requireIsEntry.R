@@ -38,8 +38,8 @@ test_that("requireIsFirstEntry, cohortIds & name arguments", {
   counts_new <- omopgenerics::cohortCount(cdm$new_cohort)
 
   expect_identical(counts |> dplyr::filter(cohort_definition_id %in% 2:3), counts_new |> dplyr::filter(cohort_definition_id %in% 2:3))
-  expect_false(counts |> dplyr::filter(cohort_definition_id == 1) %>% dplyr::pull(number_records) ==
-                 counts_new |> dplyr::filter(cohort_definition_id == 1) %>% dplyr::pull(number_records))
+  expect_false(counts |> dplyr::filter(cohort_definition_id == 1) |> dplyr::pull(number_records) ==
+                 counts_new |> dplyr::filter(cohort_definition_id == 1) |> dplyr::pull(number_records))
   expect_identical(counts_new |> dplyr::filter(cohort_definition_id == 1), dplyr::tibble(cohort_definition_id = 1L, number_records = 3L, number_subjects = 3L))
   expect_true(all(cdm$new_cohort |>  dplyr::pull(cohort_start_date) ==
                     c("2001-05-29", "1999-07-30", "2015-01-23", "2002-10-09", "2003-09-12",
@@ -88,8 +88,8 @@ test_that("requireIsLastEntry", {
   counts_new <- omopgenerics::cohortCount(cdm$new_cohort)
 
   expect_identical(counts |> dplyr::filter(cohort_definition_id %in% 2:3), counts_new |> dplyr::filter(cohort_definition_id %in% 2:3))
-  expect_false(counts |> dplyr::filter(cohort_definition_id == 1) %>% dplyr::pull(number_records) ==
-                 counts_new |> dplyr::filter(cohort_definition_id == 1) %>% dplyr::pull(number_records))
+  expect_false(counts |> dplyr::filter(cohort_definition_id == 1) |> dplyr::pull(number_records) ==
+                 counts_new |> dplyr::filter(cohort_definition_id == 1) |> dplyr::pull(number_records))
   expect_identical(counts_new |> dplyr::filter(cohort_definition_id == 1), dplyr::tibble(cohort_definition_id = 1L, number_records = 3L, number_subjects = 3L))
   expect_true(all(cdm$new_cohort |>  dplyr::pull(cohort_start_date) ==
                     c("2004-01-08", "1999-07-30", "2015-02-17", "2002-10-09", "2003-09-12",

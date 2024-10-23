@@ -38,34 +38,26 @@ padCohortStart <- function(cohort,
 
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
   if(length(cohortId) < length(ids)) {
-  # if only a subset of ids are provided then only update these
-  cohort <- cohort %>%
+    # if only a subset of ids are provided then only update these
+    cohort <- cohort |>
       dplyr::mutate(
         cohort_start_date =
           dplyr::if_else(
             .data$cohort_definition_id %in% .env$cohortId,
-            as.Date(
-              !!CDMConnector::dateadd(
-                "cohort_start_date",
-                number = days,
-                interval = "day"
-              )
-            ),
+            as.Date(clock::add_days(x = .data$cohort_start_date, n = days)),
             .data$cohort_start_date
           )
       )
   } else {
     # if all ids are provided then simpler query - update all
-    cohort <- cohort %>%
+    cohort <- cohort |>
       dplyr::mutate(
-        cohort_start_date = as.Date(
-              !!CDMConnector::dateadd(
-                "cohort_start_date",
-                number = days,
-                interval = "day")))
+        cohort_start_date = as.Date(clock::add_days(x = .data$cohort_start_date, n = days))
+      )
+
   }
-  cohort <- cohort %>%
-      dplyr::filter(.data$cohort_start_date <= .data$cohort_end_date)
+  cohort <- cohort |>
+    dplyr::filter(.data$cohort_start_date <= .data$cohort_end_date)
 
   if (days < 0) {
     # if days is less than zero then updating start could take the date
@@ -74,16 +66,16 @@ padCohortStart <- function(cohort,
     cohort <- cohort |>
       PatientProfiles::addPriorObservationQuery(
         priorObservationType = "date",
-        priorObservationName = priorObsCol) %>%
+        priorObservationName = priorObsCol) |>
       dplyr::filter(.data$cohort_start_date >= .data[[priorObsCol]]) |>
       dplyr::select(!priorObsCol)
   }
 
-    cdm[[name]] <- cohort |>
-      dplyr::compute(temporary = FALSE, name = name) |>
-      omopgenerics::recordCohortAttrition(
-        reason = "Pad cohort start date by {days} day{?s}")
+  cdm[[name]] <- cohort |>
+    dplyr::compute(temporary = FALSE, name = name) |>
+    omopgenerics::recordCohortAttrition(
+      reason = "Pad cohort start date by {days} day{?s}")
 
-    return(cdm[[name]])
+  return(cdm[[name]])
 
 }

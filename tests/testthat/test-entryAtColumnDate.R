@@ -28,15 +28,15 @@ test_that("entry at first date", {
       name = "cohort1"
     )
   expect_true(all(
-    cdm$cohort1 %>% dplyr::pull("cohort_start_date") %>% sort() ==
+    cdm$cohort1 |> dplyr::pull("cohort_start_date") |> sort() ==
       c("1989-12-09", "2000-01-01", "2000-06-03", "2000-12-09", "2015-01-15")
   ))
   expect_true(all(
-    cdm$cohort1 %>% dplyr::pull("cohort_end_date") %>% sort() ==
+    cdm$cohort1 |> dplyr::pull("cohort_end_date") |> sort() ==
       c("1990-12-09", "2001-01-12", "2001-09-01", "2002-12-09", "2015-02-15")
   ))
-  expect_true(all(grepl("cohort_start_date", cdm$cohort1 %>% dplyr::pull("entry_reason"))))
-  expect_true(sum(grepl("other_date_1", cdm$cohort1 %>% dplyr::pull("entry_reason"))) == 1)
+  expect_true(all(grepl("cohort_start_date", cdm$cohort1 |> dplyr::pull("entry_reason"))))
+  expect_true(sum(grepl("other_date_1", cdm$cohort1 |> dplyr::pull("entry_reason"))) == 1)
   expect_true(all(colnames(cdm$cohort1) ==
                     c("cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date", "entry_reason")))
 
@@ -47,11 +47,11 @@ test_that("entry at first date", {
       returnReason = FALSE
     )
   expect_true(all(
-    cdm$cohort %>% dplyr::pull("cohort_start_date") %>% sort() ==
+    cdm$cohort |> dplyr::pull("cohort_start_date") |> sort() ==
       c("1990-11-09", "2001-01-01", "2001-08-01", "2002-12-09", "2015-01-15")
   ))
   expect_true(all(
-    cdm$cohort %>% dplyr::pull("cohort_end_date") %>% sort() ==
+    cdm$cohort |> dplyr::pull("cohort_end_date") |> sort() ==
       c("1990-12-09", "2001-01-12", "2001-09-01", "2002-12-09", "2015-02-15")
   ))
   expect_true(all(colnames(cdm$cohort) ==
@@ -92,17 +92,17 @@ test_that("entry at last date", {
       name = "cohort1"
     )
   expect_true(all(
-    cdm$cohort1 %>% dplyr::pull("cohort_start_date") %>% sort() ==
+    cdm$cohort1 |> dplyr::pull("cohort_start_date") |> sort() ==
       c("1989-12-09", "2000-12-09", "2001-04-15", "2001-10-01", "2015-01-15")
   ))
   expect_true(all(
-    cdm$cohort1 %>% dplyr::pull("cohort_end_date") %>% sort() ==
+    cdm$cohort1 |> dplyr::pull("cohort_end_date") |> sort() ==
       c("1990-12-09", "2001-04-15", "2001-10-01", "2002-12-09", "2015-02-15")
   ))
   expect_true(all(colnames(cdm$cohort1) ==
                     c("cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date", "entry_reason")))
   expect_true(all(
-    cdm$cohort1 %>% dplyr::pull("entry_reason") %>% sort() ==
+    cdm$cohort1 |> dplyr::pull("entry_reason") |> sort() ==
       c("cohort_end_date", "cohort_end_date", "cohort_start_date", "cohort_start_date", "cohort_start_date")
   ))
 
@@ -115,11 +115,11 @@ test_that("entry at last date", {
       name = "cohort1"
     ))
   expect_true(all(
-    cdm$cohort1 %>% dplyr::pull("cohort_start_date") %>% sort() ==
+    cdm$cohort1 |> dplyr::pull("cohort_start_date") |> sort() ==
       c("1990-12-09", "2000-01-01", "2000-06-03", "2002-12-09", "2015-02-15")
   ))
   expect_true(all(
-    cdm$cohort1 %>% dplyr::pull("cohort_end_date") %>% sort() ==
+    cdm$cohort1 |> dplyr::pull("cohort_end_date") |> sort() ==
       c("1990-12-09", "2001-04-15", "2001-10-01", "2002-12-09", "2015-02-15")
   ))
 
@@ -130,11 +130,11 @@ test_that("entry at last date", {
       returnReason = FALSE
     )
   expect_true(all(
-    cdm$cohort %>% dplyr::pull("cohort_start_date") %>% sort() ==
+    cdm$cohort |> dplyr::pull("cohort_start_date") |> sort() ==
       c("1990-11-09", "2001-01-01", "2001-09-02", "2002-12-09", "2015-02-15")
   ))
   expect_true(all(
-    cdm$cohort %>% dplyr::pull("cohort_end_date") %>% sort() ==
+    cdm$cohort |> dplyr::pull("cohort_end_date") |> sort() ==
       c("1990-12-09", "2001-04-15", "2001-10-01", "2002-12-09", "2015-02-15")
   ))
   expect_true(all(colnames(cdm$cohort) ==

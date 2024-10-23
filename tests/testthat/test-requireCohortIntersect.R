@@ -14,15 +14,15 @@ test_that("requiring presence in another cohort", {
                                              name = "cohort3")
   expect_identical(colnames(cdm$cohort3), colnames(cdm$cohort1))
 
-  expect_true(all(cdm$cohort3  %>%
-                    dplyr::distinct(subject_id) %>%
+  expect_true(all(cdm$cohort3  |>
+                    dplyr::distinct(subject_id) |>
                     dplyr::pull() %in%
-                    intersect(cdm$cohort1 %>%
-                                dplyr::distinct(subject_id) %>%
+                    intersect(cdm$cohort1 |>
+                                dplyr::distinct(subject_id) |>
                                 dplyr::pull(),
-                              cdm$cohort2 %>%
-                                dplyr::filter(cohort_definition_id == 1) %>%
-                                dplyr::distinct(subject_id) %>%
+                              cdm$cohort2 |>
+                                dplyr::filter(cohort_definition_id == 1) |>
+                                dplyr::distinct(subject_id) |>
                                 dplyr::pull())))
   expect_true(all(omopgenerics::attrition(cdm$cohort3)$reason ==
                     c("Initial qualifying events",
@@ -35,15 +35,15 @@ test_that("requiring presence in another cohort", {
                                              targetCohortId = 2,
                                              window = list(c(-Inf, Inf)),
                                              name = "cohort4")
-  expect_true(all(cdm$cohort4 %>%
-                    dplyr::distinct(subject_id) %>%
+  expect_true(all(cdm$cohort4 |>
+                    dplyr::distinct(subject_id) |>
                     dplyr::pull() %in%
-                    intersect(cdm$cohort1 %>%
-                                dplyr::distinct(subject_id) %>%
+                    intersect(cdm$cohort1 |>
+                                dplyr::distinct(subject_id) |>
                                 dplyr::pull(),
-                              cdm$cohort2 %>%
-                                dplyr::filter(cohort_definition_id == 2) %>%
-                                dplyr::distinct(subject_id) %>%
+                              cdm$cohort2 |>
+                                dplyr::filter(cohort_definition_id == 2) |>
+                                dplyr::distinct(subject_id) |>
                                 dplyr::pull())))
   expect_true(all(omopgenerics::attrition(cdm$cohort4)$reason ==
                     c("Initial qualifying events",
@@ -159,11 +159,11 @@ test_that("requiring absence in another cohort", {
                                                        targetCohortId = 1,
                                                        window = c(-Inf, Inf),
                                                        name = "cohort3_exclusion")
-  in_both <- intersect(cdm$cohort3_inclusion %>%
-                         dplyr::pull("subject_id") %>%
+  in_both <- intersect(cdm$cohort3_inclusion |>
+                         dplyr::pull("subject_id") |>
                          unique(),
-                       cdm$cohort3_exclusion %>%
-                         dplyr::pull("subject_id") %>%
+                       cdm$cohort3_exclusion |>
+                         dplyr::pull("subject_id") |>
                          unique())
   expect_true(length(in_both) == 0)
   expect_true(all(omopgenerics::attrition(cdm$cohort3_exclusion)$reason ==

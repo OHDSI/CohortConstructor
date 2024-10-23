@@ -194,9 +194,9 @@ getNewCohort <- function(cohort, cohortId, control) {
     name = temp_name,
     table = dplyr::tibble("cohort_definition_id" = cohortId)
   )
-  controls <- cdm[[temp_name]] %>%
+  controls <- cdm[[temp_name]] |>
     dplyr::cross_join(
-      cdm[["person"]] %>%
+      cdm[["person"]] |>
         dplyr::select("subject_id" = "person_id") |>
         dplyr::inner_join(
           cdm[["observation_period"]] |>
@@ -212,7 +212,7 @@ getNewCohort <- function(cohort, cohortId, control) {
             dplyr::ungroup(),
           by = "subject_id"
         )
-    ) %>%
+    ) |>
     dplyr::compute(name = control, temporary = FALSE)
   cdm <- omopgenerics::dropTable(cdm, temp_name)
 
@@ -268,8 +268,8 @@ addMatchCols <- function(x, matchCols) {
     dplyr::compute(name = omopgenerics::tableName(x), temporary = FALSE)
 }
 excludeIndividualsWithNoMatch <- function(cohort, groups, matchCols) {
-  cohort %>%
-    dplyr::inner_join(groups, by = c("cohort_definition_id", matchCols)) %>%
+  cohort |>
+    dplyr::inner_join(groups, by = c("cohort_definition_id", matchCols)) |>
     dplyr::select(!dplyr::all_of(matchCols)) |>
     dplyr::compute(name = tableName(cohort), temporary = FALSE) |>
     omopgenerics::recordCohortAttrition("Exclude individuals that do not have any match")
@@ -302,20 +302,20 @@ excludeNoMatchedIndividuals <- function(cdm,
                    temporary = FALSE)
 
   # Exclude individuals that do not have any match
-  cdm[[target]] <- cdm[[target]] %>%
+  cdm[[target]] <- cdm[[target]] |>
     excludeIndividualsWithNoMatch(groups, matchCols)
-  cdm[[control]] <- cdm[[control]] %>%
+  cdm[[control]] <- cdm[[control]] |>
     excludeIndividualsWithNoMatch(groups, matchCols)
 
   return(cdm)
 }
 
 addRandPairId <- function(x) {
-  x %>%
-    dplyr::mutate("id" = stats::runif(n = dplyr::n())) %>%
-    dplyr::arrange(.data$id) %>%
-    dplyr::mutate("pair_id" = dplyr::row_number(), .by = "group_id") %>%
-    dplyr::select(-"id") %>%
+  x |>
+    dplyr::mutate("id" = stats::runif(n = dplyr::n())) |>
+    dplyr::arrange(.data$id) |>
+    dplyr::mutate("pair_id" = dplyr::row_number(), .by = "group_id") |>
+    dplyr::select(-"id") |>
     dplyr::compute(name = omopgenerics::tableName(x), temporary = FALSE)
 }
 addClusterId <- function(x, u) {
@@ -333,23 +333,23 @@ clusterId <- function(x) {
 }
 infiniteMatching <- function(cdm, target, control) {
   # Create pair id to perform a random match
-  cdm[[target]] <- cdm[[target]] %>% addRandPairId()
-  cdm[[control]] <- cdm[[control]] %>% addRandPairId()
+  cdm[[target]] <- cdm[[target]] |> addRandPairId()
+  cdm[[control]] <- cdm[[control]] |> addRandPairId()
 
-  cdm[[control]] <- cdm[[control]] %>%
+  cdm[[control]] <- cdm[[control]] |>
     dplyr::inner_join(
       # Calculate the maximum number of cases per group
-      cdm[[target]] %>%
-        dplyr::group_by(.data$group_id) %>%
+      cdm[[target]] |>
+        dplyr::group_by(.data$group_id) |>
         dplyr::summarise(
           "max_id" = max(.data$pair_id, na.rm = TRUE),
           .groups = "drop"
         ),
       by = c("group_id")
-    ) %>%
+    ) |>
     # Calculate the maximum ratio per group
-    dplyr::mutate("pair_id" = ((.data$pair_id - 1) %% .data$max_id) + 1) %>%
-    dplyr::select(-"max_id") %>%
+    dplyr::mutate("pair_id" = ((.data$pair_id - 1) %% .data$max_id) + 1) |>
+    dplyr::select(-"max_id") |>
     dplyr::compute(name = control, temporary = FALSE)
 
   clusterId <- clusterId(cdm[[target]])
@@ -357,13 +357,13 @@ infiniteMatching <- function(cdm, target, control) {
   cdm[[target]] <- cdm[[target]] |> addClusterId(clusterId)
 
   # assign cohort_start_date and cohort end date to controls
-  cdm[[control]] <- cdm[[control]] %>%
+  cdm[[control]] <- cdm[[control]] |>
     dplyr::inner_join(
       # Cohort start date and end date of cases
-      cdm[[target]] %>%
+      cdm[[target]] |>
         dplyr::select("cluster_id", "index_date" = "cohort_start_date"),
       by = c("cluster_id")
-    ) %>%
+    ) |>
     dplyr::compute(name = control, temporary = FALSE)
 
   return(cdm)
@@ -401,15 +401,15 @@ observationTarget <- function(cdm, target, control) {
 
 checkRatio <- function(x, ratio) {
   if (!is.infinite(ratio)) {
-    x <- x %>%
-      dplyr::mutate("id" = stats::runif(n = dplyr::n())) %>%
-      dplyr::group_by(.data$cluster_id) %>%
-      dplyr::arrange(.data$id) %>%
-      dplyr::filter(dplyr::row_number() <= .env$ratio) %>%
-      dplyr::ungroup() %>%
+    x <- x |>
+      dplyr::mutate("id" = stats::runif(n = dplyr::n())) |>
+      dplyr::group_by(.data$cluster_id) |>
+      dplyr::arrange(.data$id) |>
+      dplyr::filter(dplyr::row_number() <= .env$ratio) |>
+      dplyr::ungroup() |>
       dplyr::arrange() |>
       dplyr::select(-"id") |>
-      dplyr::compute(name = tableName(x), temporary = FALSE) %>%
+      dplyr::compute(name = tableName(x), temporary = FALSE) |>
       omopgenerics::recordCohortAttrition("Exclude individuals to fulfil the ratio")
   }
   return(x)
