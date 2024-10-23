@@ -14,6 +14,7 @@ Create and manipulate study cohorts in data mapped to the Observational Medical 
 Useful links:
 \itemize{
   \item \url{https://ohdsi.github.io/CohortConstructor/}
+  \item \url{https://github.com/OHDSI/CohortConstructor}
 }
 
 }

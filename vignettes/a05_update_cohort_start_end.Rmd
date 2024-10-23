@@ -1,5 +1,5 @@
 ---
-title: "Update cohort start and end dates"
+title: "Updating cohort start and end dates"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{a04_update_cohort_start_end}

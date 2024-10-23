@@ -1,5 +1,5 @@
 ---
-title: "Requirements related to other cohorts, concept sets, or tables"
+title: "Applying requirements related to other cohorts, concept sets, or tables"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{a04_require_intersections}

@@ -1,5 +1,5 @@
 ---
-title: "Filter Cohorts"
+title: "Filtering cohorts"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{a07_filter_cohorts}
