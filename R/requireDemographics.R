@@ -284,7 +284,7 @@ demographicsFilter <- function(cohort,
         "cohort_end_date",
         indexDate
       )
-    )) %>%
+    )) |>
     PatientProfiles::addDemographics(
       indexDate = indexDate,
       age  = reqAge,

@@ -69,7 +69,7 @@ cdm$gi_bleed <- conceptCohort(cdm = cdm,
 We could require that individuals in our medication cohorts are seen (or not seen) in another cohort. To do this we can use the `requireCohortIntersect()` function. Here, for example, we require that individuals have one or more intersections with the GI bleed cohort.
 
 ```{r}
-cdm$warfarin_gi_bleed <- cdm$warfarin  %>%
+cdm$warfarin_gi_bleed <- cdm$warfarin  |>
   requireCohortIntersect(intersections = c(1,Inf),
                          targetCohortTable = "gi_bleed", 
                          targetCohortId = 1,
@@ -86,7 +86,7 @@ The flow chart above illustrates the changes to the cohort of users of acetamino
 Instead of requiring that individuals have a record in the GI bleed cohort, we could instead require that they don't. In this case we can again use the `requireCohortIntersect()` function, but this time we set the intersections argument to 0 so as to require individuals' absence in this other cohort.
 
 ```{r}
-cdm$warfarin_no_gi_bleed <- cdm$warfarin %>%
+cdm$warfarin_no_gi_bleed <- cdm$warfarin |>
   requireCohortIntersect(intersections = 0,
                          targetCohortTable = "gi_bleed", 
                          targetCohortId = 1,
@@ -103,7 +103,7 @@ plotCohortAttrition(summary_attrition)
 We could require that individuals in our medication cohorts have been seen (or not seen) to have events related to a concept list. To do this we can use the `requireConceptIntersect()` function, allowing us to filter our cohort based on whether they have or have not had events of GI bleeding before they entered the cohort.
 
 ```{r}
-cdm$warfarin_gi_bleed <- cdm$warfarin  %>%
+cdm$warfarin_gi_bleed <- cdm$warfarin  |>
   requireConceptIntersect(conceptSet = list("gi_bleed" = 192671), 
                          indexDate = "cohort_start_date", 
                          window = c(-Inf, 0), 
@@ -118,7 +118,7 @@ The flow chart above illustrates the changes to cohort 1  when restricted to onl
 Instead of requiring that individuals have events of GI bleeding, we could instead require that they don't have any events of it. In this case we can again use the `requireConceptIntersect()` function, but this time set the intersections argument to 0 to require individuals without past events of GI bleeding. 
 
 ```{r}
-cdm$warfarin_no_gi_bleed <- cdm$warfarin  %>%
+cdm$warfarin_no_gi_bleed <- cdm$warfarin  |>
   requireConceptIntersect(intersections = 0,
                          conceptSet = list("gi_bleed" = 192671), 
                          indexDate = "cohort_start_date", 
@@ -134,7 +134,7 @@ plotCohortAttrition(summary_attrition)
 We can also impose requirements around individuals presence (or absence) in clinical tables in the OMOP CDM using the `requireTableIntersect()` function. Here for example we reuire that individuals in our warfarin cohort have at least one prior record in the visit occurrence table. 
 
 ```{r}
-cdm$warfarin_visit <- cdm$warfarin  %>%
+cdm$warfarin_visit <- cdm$warfarin  |>
   requireTableIntersect(tableName = "visit_occurrence",
                          indexDate = "cohort_start_date", 
                          window = c(-Inf, -1), 

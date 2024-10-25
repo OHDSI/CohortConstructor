@@ -24,6 +24,7 @@ test_that("intersect example - two cohorts", {
                                   "2020-01-10"))
     ))
   cdm <- cdm_local |> copyCdm()
+
   cdm$my_cohort <- cdm$my_cohort |>
     omopgenerics::newCohortTable()
 
@@ -461,15 +462,15 @@ test_that("codelist", {
   # intersect concept generated cohort
   cdm$cohort2 <- intersectCohorts(cdm$cohort1, name = "cohort2")
   expect_true(all(
-    cdm$cohort2 %>% dplyr::pull("cohort_start_date") %>% sort() ==
+    cdm$cohort2 |> dplyr::pull("cohort_start_date") |> sort() ==
       c("2012-01-21", "2014-02-09")
   ))
   expect_true(all(
-    cdm$cohort2 %>% dplyr::pull("cohort_end_date") %>% sort() ==
+    cdm$cohort2 |> dplyr::pull("cohort_end_date") |> sort() ==
       c("2012-03-11", "2014-03-31")
   ))
   expect_true(all(
-    cdm$cohort2 %>% dplyr::pull("subject_id") %>% sort() == c(1, 1)
+    cdm$cohort2 |> dplyr::pull("subject_id") |> sort() == c(1, 1)
   ))
   codes <- attr(cdm$cohort2, "cohort_codelist")
   expect_true(all(codes |> dplyr::pull("codelist_name") |> sort() == c(rep("c1", 2), "c2")))
@@ -481,17 +482,17 @@ test_that("codelist", {
   cdm$cohort3 <- intersectCohorts(cdm$cohort1, returnNonOverlappingCohorts = TRUE, name = "cohort3")
   expect_identical(collectCohort(cdm$cohort3, 1), collectCohort(cdm$cohort2, 1))
   expect_true(all(
-    cdm$cohort3 %>% dplyr::pull("cohort_start_date") %>% sort() ==
+    cdm$cohort3 |> dplyr::pull("cohort_start_date") |> sort() ==
       c('2009-12-22', '2010-01-01', '2010-01-11', '2010-05-31', '2012-01-21',
         '2012-03-12', '2012-09-27', '2014-02-09', '2014-04-01', '2014-12-06')
   ))
   expect_true(all(
-    cdm$cohort3 %>% dplyr::pull("cohort_end_date") %>% sort() ==
+    cdm$cohort3 |> dplyr::pull("cohort_end_date") |> sort() ==
       c('2010-05-04', '2011-08-24', '2012-01-20', '2012-03-11', '2014-02-08',
         '2014-02-09', '2014-03-31', '2014-05-20', '2014-12-10', '2015-06-24')
   ))
   expect_true(all(
-    cdm$cohort3 %>% dplyr::pull("subject_id") %>% sort() == c(1, 1, 1, 1, 1, 1, 2, 3, 3, 3)
+    cdm$cohort3 |> dplyr::pull("subject_id") |> sort() == c(1, 1, 1, 1, 1, 1, 2, 3, 3, 3)
   ))
   codes <- attr(cdm$cohort3, "cohort_codelist")
   expect_true(all(codes |> dplyr::pull("codelist_name") |> sort() == c(rep("c1", 4), rep("c2", 2))))
@@ -502,15 +503,15 @@ test_that("codelist", {
   # only comb
   cdm$cohort4 <- intersectCohorts(cdm$cohort1, keepOriginalCohorts = FALSE, name = "cohort4")
   expect_true(all(
-    cdm$cohort4 %>% dplyr::pull("cohort_start_date") %>% sort() ==
+    cdm$cohort4 |> dplyr::pull("cohort_start_date") |> sort() ==
       c("2012-01-21", "2014-02-09")
   ))
   expect_true(all(
-    cdm$cohort4 %>% dplyr::pull("cohort_end_date") %>% sort() ==
+    cdm$cohort4 |> dplyr::pull("cohort_end_date") |> sort() ==
       c("2012-03-11", "2014-03-31")
   ))
   expect_true(all(
-    cdm$cohort4 %>% dplyr::pull("subject_id") %>% sort() == c(1, 1)
+    cdm$cohort4 |> dplyr::pull("subject_id") |> sort() == c(1, 1)
   ))
   codes <- attr(cdm$cohort4, "cohort_codelist")
   expect_true(all(codes |> dplyr::pull("codelist_name") |> sort() == c(rep("c1", 2), "c2")))

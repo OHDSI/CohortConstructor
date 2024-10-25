@@ -288,7 +288,7 @@ unerafiedConceptCohort <- function(cdm,
     }
   }
 
-  cohorts <- cohorts %>%
+  cohorts <- cohorts |>
     purrr::discard(is.null)
 
   if (length(cohorts) == 0) {
