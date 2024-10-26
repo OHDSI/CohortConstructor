@@ -423,43 +423,6 @@ reportConceptsFromUnsopportedDomains <- function(cdm,
   }
 }
 
-addIndex <- function(cdm, name, cols) {
-  tblSource <- attr(cdm[[name]], "tbl_source")
-  if(is.null(tblSource)){
-    return(invisible(NULL))
-  }
-  dbType <- attr(tblSource, "source_type")
-  if(is.null(dbType)){
-    return(invisible(NULL))
-  }
-
-  if (dbType == "postgresql") {
-    cli::cli_inform("Adding indexes to table")
-    con <- attr(cdm, "dbcon")
-    schema <- attr(cdm, "write_schema")
-    if(length(schema) > 1){
-      prefix <- attr(cdm, "write_schema")["prefix"]
-      schema <- attr(cdm, "write_schema")["schema"]
-    } else {
-      prefix <- NULL
-    }
-
-    cols <- paste0(cols, collapse = ",")
-
-    query <- paste0(
-      "CREATE INDEX ON ",
-      paste0(schema, ".", prefix, name),
-      " (",
-      cols,
-      ");"
-    )
-    suppressMessages(DBI::dbExecute(con, query))
-  }
-
-  return(invisible(NULL))
-
-}
-
 getDomainCohort <- function(cdm,
                             table,
                             concept,

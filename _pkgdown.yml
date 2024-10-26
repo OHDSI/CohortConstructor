@@ -55,3 +55,6 @@ reference:
 - subtitle: Results from benchmarking
 - contents:
   - matches("benchmarkData")
+- subtitle: Utility functions
+- contents:
+  - matches("addCohortTableIndex")
