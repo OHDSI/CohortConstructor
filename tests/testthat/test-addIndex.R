@@ -15,6 +15,10 @@ test_that("local tibble and duckdb test - will do nothing for these", {
   expect_no_error(cdm$cohort |>
     addCohortTableIndex())
 
+  # expected error
+  expect_error(cdm$person |>
+    addCohortTableIndex())
+
 })
 
 test_that("postgres test - adds indexes", {

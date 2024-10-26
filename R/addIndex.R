@@ -12,6 +12,8 @@
 #' @examples
 addCohortTableIndex <-  function(cohort) {
 
+  cohort <- omopgenerics::validateCohortArgument(cohort)
+
   cdm <- omopgenerics::cdmReference(cohort)
   name <- omopgenerics::tableName(cohort)
   addIndex(cdm = cdm, name = name,
