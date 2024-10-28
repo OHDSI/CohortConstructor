@@ -36,6 +36,15 @@ yearCohorts <- function(cohort,
     cohort <- cohort |>
       dplyr::compute(name = name, temporary = FALSE) |>
       omopgenerics::newCohortTable(.softValidation = TRUE)
+
+    useIndexes <- getOption("CohortConstructor.use_indexes")
+    if (!isFALSE(useIndexes)) {
+      addIndex(
+        cohort = cohort,
+        cols = c("subject_id", "cohort_start_date")
+      )
+    }
+
     return(cohort)
   }
 
@@ -173,6 +182,14 @@ yearCohorts <- function(cohort,
     )
 
   omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with(tablePrefix))
+
+  useIndexes <- getOption("CohortConstructor.use_indexes")
+  if (!isFALSE(useIndexes)) {
+    addIndex(
+      cohort = cohort,
+      cols = c("subject_id", "cohort_start_date")
+    )
+  }
 
   return(cohort)
 }

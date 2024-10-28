@@ -74,10 +74,8 @@ padCohortEnd <- function(cohort,
       )
   }
   if (days > 0) {
-    cohort <- cohort |>
-      dplyr::mutate(
-        !!diffCol := clock::date_count_between(.data[[newEndCol]], .data[[futureObsCol]], "day")
-        ) |>
+    cohort <- cohort %>%
+      dplyr::mutate(!!diffCol := !!CDMConnector::datediff(newEndCol, futureObsCol)) |>
       dplyr::mutate(cohort_end_date = dplyr::if_else(!!rlang::ensym(diffCol) >= 0,
                                                      !!rlang::ensym(newEndCol),
                                                      !!rlang::ensym(futureObsCol)))
@@ -103,6 +101,13 @@ padCohortEnd <- function(cohort,
     omopgenerics::recordCohortAttrition(
       reason = "Pad cohort start date by {days} day{?s}")
 
-  return(cdm[[name]])
+  useIndexes <- getOption("CohortConstructor.use_indexes")
+  if (!isFALSE(useIndexes)) {
+    addIndex(
+      cohort = cdm[[name]],
+      cols = c("subject_id", "cohort_start_date")
+    )
+  }
 
+  return(cdm[[name]])
 }

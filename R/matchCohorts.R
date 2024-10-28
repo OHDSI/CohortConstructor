@@ -180,6 +180,14 @@ matchCohorts <- function(cohort,
   # drop tmp tables
   omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with(tablePrefix))
 
+  useIndexes <- getOption("CohortConstructor.use_indexes")
+  if (!isFALSE(useIndexes)) {
+    addIndex(
+      cohort = cdm[[name]],
+      cols = c("subject_id", "cohort_start_date")
+    )
+  }
+
   # Return
   cli::cli_inform(c("v" = "Done"))
   return(cdm[[name]])

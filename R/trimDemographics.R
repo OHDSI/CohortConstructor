@@ -327,6 +327,14 @@ trimDemographics <- function(cohort,
 
   omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with(tablePrefix))
 
+  useIndexes <- getOption("CohortConstructor.use_indexes")
+  if (!isFALSE(useIndexes)) {
+    addIndex(
+      cohort = newCohort,
+      cols = c("subject_id", "cohort_start_date")
+    )
+  }
+
   cli::cli_inform(c("v" = "Cohort trimmed"))
   return(newCohort)
 }

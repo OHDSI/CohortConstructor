@@ -14,17 +14,18 @@ addCohortTableIndex <-  function(cohort) {
 
   cohort <- omopgenerics::validateCohortArgument(cohort)
 
-  cdm <- omopgenerics::cdmReference(cohort)
-  name <- omopgenerics::tableName(cohort)
-  addIndex(cdm = cdm, name = name,
+  addIndex(cohort,
            cols = c("subject_id", "cohort_start_date"))
 
   cohort
 }
 
 
-addIndex <- function(cdm, name, cols) {
-  tblSource <- attr(cdm[[name]], "tbl_source")
+addIndex <- function(cohort, cols) {
+  cdm <- omopgenerics::cdmReference(cohort)
+  name <- omopgenerics::tableName(cohort)
+
+  tblSource <- attr(cohort, "tbl_source")
   if(is.null(tblSource)){
     return(invisible(NULL))
   }
