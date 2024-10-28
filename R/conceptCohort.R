@@ -116,9 +116,8 @@ conceptCohort <- function(cdm,
       cli::cli_abort("There are no individuals in the `subsetCohort` and `subsetCohortId` provided.")
     }
     if (!isFALSE(useIndexes)) {
-      cdm[[subsetName]] <- subsetIndividuals
       addIndex(
-        cdm = cdm[[subsetName]],
+        cdm = subsetIndividuals,
         cols = "subject_id"
       )
     }

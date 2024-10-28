@@ -104,8 +104,7 @@ padCohortEnd <- function(cohort,
   useIndexes <- getOption("CohortConstructor.use_indexes")
   if (!isFALSE(useIndexes)) {
     addIndex(
-      cdm = cdm,
-      name = name,
+      cohort = cdm[[name]],
       cols = c("subject_id", "cohort_start_date")
     )
   }
