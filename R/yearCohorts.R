@@ -43,7 +43,6 @@ yearCohorts <- function(cohort,
         cohort = cohort,
         cols = c("subject_id", "cohort_start_date")
       )
-      cli::cli_inform("To skip adding indexes use `options(CohortConstructor.use_indexes = FALSE)`.")
     }
 
     return(cohort)
