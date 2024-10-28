@@ -117,7 +117,7 @@ conceptCohort <- function(cdm,
     }
     if (!isFALSE(useIndexes)) {
       addIndex(
-        cdm = subsetIndividuals,
+        cohort = subsetIndividuals,
         cols = "subject_id"
       )
     }
