@@ -213,6 +213,14 @@ exitAtColumnDate <- function(cohort,
 
   cdm <- omopgenerics::dropTable(cdm, name = dplyr::starts_with(tmpPrefix))
 
+  useIndexes <- getOption("CohortConstructor.use_indexes")
+  if (!isFALSE(useIndexes)) {
+    addIndex(
+      cohort = newCohort,
+      cols = c("subject_id", "cohort_start_date")
+    )
+  }
+
   return(newCohort)
 }
 

@@ -76,6 +76,14 @@ padCohortStart <- function(cohort,
     omopgenerics::recordCohortAttrition(
       reason = "Pad cohort start date by {days} day{?s}")
 
-  return(cdm[[name]])
+  useIndexes <- getOption("CohortConstructor.use_indexes")
+  if (!isFALSE(useIndexes)) {
+    addIndex(
+      cdm = cdm,
+      name = name,
+      cols = c("subject_id", "cohort_start_date")
+    )
+  }
 
+  return(cdm[[name]])
 }

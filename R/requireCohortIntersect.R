@@ -139,5 +139,13 @@ requireCohortIntersect <- function(cohort,
 
   omopgenerics::dropTable(cdm = cdm, name = subsetName)
 
+  useIndexes <- getOption("CohortConstructor.use_indexes")
+  if (!isFALSE(useIndexes)) {
+    addIndex(
+      cohort = x,
+      cols = c("subject_id", "cohort_start_date")
+    )
+  }
+
   return(x)
 }

@@ -110,6 +110,14 @@ exitAtObservationEnd <- function(cohort,
 
   omopgenerics::dropTable(cdm = cdm, name = tmpTable)
 
+  useIndexes <- getOption("CohortConstructor.use_indexes")
+  if (!isFALSE(useIndexes)) {
+    addIndex(
+      cohort = newCohort,
+      cols = c("subject_id", "cohort_start_date")
+    )
+  }
+
   return(newCohort)
 }
 
@@ -181,5 +189,14 @@ exitAtDeath <- function(cohort,
     omopgenerics::newCohortTable(.softValidation = TRUE) |>
     omopgenerics::recordCohortAttrition(reason = "Exit at death", cohortId = cohortId)
 
+  useIndexes <- getOption("CohortConstructor.use_indexes")
+  if (!isFALSE(useIndexes)) {
+    addIndex(
+      cohort = newCohort,
+      cols = c("subject_id", "cohort_start_date")
+    )
+  }
+
   return(newCohort)
 }
+

@@ -43,15 +43,21 @@ requireIsEntry <- function(cohort,
   }
 
   if (minEntry == 1 && maxEntry == Inf) {
-    return(
-      cohort |>
-        dplyr::compute(name = name, temporary = FALSE) |>
-        omopgenerics::newCohortTable(.softValidation = TRUE) |>
-        omopgenerics::recordCohortAttrition(
-          "Restricted to entries between {minEntry} and {maxEntry}",
-          cohortId = cohortId
-        )
-    )
+    cohort <- cohort |>
+      dplyr::compute(name = name, temporary = FALSE) |>
+      omopgenerics::newCohortTable(.softValidation = TRUE) |>
+      omopgenerics::recordCohortAttrition(
+        "Restricted to entries between {minEntry} and {maxEntry}",
+        cohortId = cohortId
+      )
+    useIndexes <- getOption("CohortConstructor.use_indexes")
+    if (!isFALSE(useIndexes)) {
+      addIndex(
+        cohort = cohort,
+        cols = c("subject_id", "cohort_start_date")
+      )
+    }
+    return(cohort)
   }
 
   cohort <- cohort |>
@@ -75,7 +81,13 @@ requireIsEntry <- function(cohort,
     omopgenerics::recordCohortAttrition("Restricted to entries between {minEntry} and {maxEntry}",
                                         cohortId = cohortId)
 
-
+  useIndexes <- getOption("CohortConstructor.use_indexes")
+  if (!isFALSE(useIndexes)) {
+    addIndex(
+      cohort = cohort,
+      cols = c("subject_id", "cohort_start_date")
+    )
+  }
 
   return(cohort)
 }
@@ -123,6 +135,14 @@ requireIsFirstEntry <- function(cohort,
     omopgenerics::newCohortTable(.softValidation = TRUE) |>
     omopgenerics::recordCohortAttrition("Restricted to first entry", cohortId = cohortId)
 
+  useIndexes <- getOption("CohortConstructor.use_indexes")
+  if (!isFALSE(useIndexes)) {
+    addIndex(
+      cohort = cohort,
+      cols = c("subject_id", "cohort_start_date")
+    )
+  }
+
   return(cohort)
 }
 
@@ -167,6 +187,14 @@ requireIsLastEntry <- function(cohort,
     dplyr::compute(name = name, temporary = FALSE) |>
     omopgenerics::newCohortTable(.softValidation = TRUE) |>
     omopgenerics::recordCohortAttrition("Restricted to last entry", cohortId = cohortId)
+
+  useIndexes <- getOption("CohortConstructor.use_indexes")
+  if (!isFALSE(useIndexes)) {
+    addIndex(
+      cohort = cohort,
+      cols = c("subject_id", "cohort_start_date")
+    )
+  }
 
   return(cohort)
 }

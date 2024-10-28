@@ -65,3 +65,4 @@ countDuckdbPermanentTables <- function(con){
     dplyr::tally() |>
     dplyr::pull("n")
 }
+testIndexes <- TRUE

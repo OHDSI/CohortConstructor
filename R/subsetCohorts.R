@@ -44,5 +44,13 @@ subsetCohorts <- function(cohort,
       .softValidation = TRUE
     )
 
+  useIndexes <- getOption("CohortConstructor.use_indexes")
+  if (!isFALSE(useIndexes)) {
+    addIndex(
+      cohort = cdm[[name]],
+      cols = c("subject_id", "cohort_start_date")
+    )
+  }
+
   return(cdm[[name]])
 }

@@ -61,6 +61,14 @@ requireInDateRange <- function(cohort,
     dplyr::compute(name = name, temporary = FALSE) |>
     omopgenerics::newCohortTable(.softValidation = TRUE)
 
+  useIndexes <- getOption("CohortConstructor.use_indexes")
+  if (!isFALSE(useIndexes)) {
+    addIndex(
+      cohort = cohort,
+      cols = c("subject_id", "cohort_start_date")
+    )
+  }
+
   return(cohort)
 }
 
@@ -142,6 +150,14 @@ trimToDateRange <- function(cohort,
   cohort <- cohort |>
     dplyr::compute(name = name, temporary = FALSE) |>
     omopgenerics::newCohortTable(.softValidation = TRUE)
+
+  useIndexes <- getOption("CohortConstructor.use_indexes")
+  if (!isFALSE(useIndexes)) {
+    addIndex(
+      cohort = cohort,
+      cols = c("subject_id", "cohort_start_date")
+    )
+  }
 
   return(cohort)
 }

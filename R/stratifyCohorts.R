@@ -154,6 +154,14 @@ stratifyCohorts <- function(cohort,
 
   omopgenerics::dropTable(cdm = cdm, name = nm)
 
+  useIndexes <- getOption("CohortConstructor.use_indexes")
+  if (!isFALSE(useIndexes)) {
+    addIndex(
+      cohort = newCohort,
+      cols = c("subject_id", "cohort_start_date")
+    )
+  }
+
   return(newCohort)
 }
 

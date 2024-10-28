@@ -93,8 +93,7 @@ conceptCohort <- function(cdm,
 
   if (!isFALSE(useIndexes)) {
     addIndex(
-      cdm = cdm,
-      name = tableCohortCodelist,
+      cohort = cdm[[tableCohortCodelist]],
       cols = "concept_id"
     )
   }
@@ -119,8 +118,7 @@ conceptCohort <- function(cdm,
     if (!isFALSE(useIndexes)) {
       cdm[[subsetName]] <- subsetIndividuals
       addIndex(
-        cdm = cdm,
-        name = subsetName,
+        cdm = cdm[[subsetName]],
         cols = "subject_id"
       )
     }
@@ -185,8 +183,7 @@ conceptCohort <- function(cdm,
 
   if (!isFALSE(useIndexes)) {
     addIndex(
-      cdm = cdm,
-      name = name,
+      cohort = cdm[[name]],
       cols = c("subject_id", "cohort_start_date")
     )
   }
@@ -200,6 +197,13 @@ conceptCohort <- function(cdm,
     omopgenerics::recordCohortAttrition(reason = "Collapse overlapping records")
 
   cdm[[name]] <- omopgenerics::newCohortTable(table = cdm[[name]])
+
+  if (!isFALSE(useIndexes)) {
+    addIndex(
+      cohort = cdm[[name]],
+      cols = c("subject_id", "cohort_start_date")
+    )
+  }
 
   cli::cli_inform(c("v" = "Cohort {.strong {name}} created."))
 
