@@ -163,3 +163,12 @@ NULL
 #' @keywords internal
 NULL
 
+#' Helper for consistent documentation of `padObservation`.
+#'
+#' @param padObservation Whether to pad observations if they are outside
+#' observation_period (TRUE) or drop the records if they are outside
+#' observation_period (FALSE)
+#'
+#' @name padObservationDoc
+#' @keywords internal
+NULL

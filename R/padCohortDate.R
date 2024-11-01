@@ -1,5 +1,4 @@
 
-
 #' Set cohort start or cohort end
 #'
 #' @inheritParams cohortDoc
@@ -7,6 +6,7 @@
 #' @inheritParams nameDoc
 #' @inheritParams collapseDoc
 #' @inheritParams daysDoc
+#' @inheritParams padObservationDoc
 #' @param cohortDate 'cohort_start_date' or 'cohort_end_date'.
 #' @param indexDate Variable in cohort that contains the index date to add.
 #'
@@ -28,6 +28,7 @@ padCohortDate <- function(cohort,
                           cohortDate = "cohort_start_date",
                           indexDate = "cohort_start_date",
                           collapse = TRUE,
+                          padObservation = TRUE,
                           cohortId = NULL,
                           name = tableName(cohort)) {
   cohort |>
@@ -36,6 +37,7 @@ padCohortDate <- function(cohort,
       indexDate = indexDate,
       days = days,
       collapse = collapse,
+      padObservation = padObservation,
       cohortId = cohortId,
       name = name
     )
@@ -59,6 +61,7 @@ padCohortDate <- function(cohort,
 #' @inheritParams nameDoc
 #' @inheritParams collapseDoc
 #' @inheritParams daysDoc
+#' @inheritParams padObservationDoc
 #'
 #' @return Cohort table
 #' @export
@@ -74,6 +77,7 @@ padCohortDate <- function(cohort,
 padCohortEnd <- function(cohort,
                          days,
                          collapse = TRUE,
+                         padObservation = TRUE,
                          cohortId = NULL,
                          name = tableName(cohort)) {
   cohort |>
@@ -82,6 +86,7 @@ padCohortEnd <- function(cohort,
       indexDate = "cohort_end_date",
       days = days,
       collapse = collapse,
+      padObservation = padObservation,
       cohortId = cohortId,
       name = name
     )
@@ -102,6 +107,7 @@ padCohortEnd <- function(cohort,
 #' @inheritParams nameDoc
 #' @inheritParams collapseDoc
 #' @inheritParams daysDoc
+#' @inheritParams padObservationDoc
 #'
 #' @return Cohort table
 #' @export
@@ -117,6 +123,7 @@ padCohortEnd <- function(cohort,
 padCohortStart <- function(cohort,
                            days,
                            collapse = TRUE,
+                           padObservation = TRUE,
                            cohortId = NULL,
                            name = tableName(cohort)) {
   cohort |>
@@ -125,6 +132,7 @@ padCohortStart <- function(cohort,
       indexDate = "cohort_start_date",
       days = days,
       collapse = collapse,
+      padObservation = padObservation,
       cohortId = cohortId,
       name = name
     )
@@ -135,6 +143,7 @@ padCohortStart <- function(cohort,
                            indexDate,
                            days,
                            collapse,
+                           padObservation,
                            cohortId,
                            name,
                            call = parent.frame()) {
@@ -148,7 +157,7 @@ padCohortStart <- function(cohort,
   validateColumn(indexDate, cohort, call = call)
   omopgenerics::assertLogical(collapse, length = 1)
   cohortId <- validateCohortId(cohortId, set = settings(cohort), call = call)
-  omopgenerics::assertCharacter(name, length = 1)
+  name <- omopgenerics::validateNameArgument(name, validation = "warning")
   msg <- "`days` be an integerish or point to an integerish column of cohort"
   reason <- paste0("pad `", cohortDate, "` ")
   if (is.numeric(days)) {
@@ -187,36 +196,9 @@ padCohortStart <- function(cohort,
     ) |>
     dplyr::compute(name = intermediate, temporary = FALSE)
 
-  # in observation and in the same observation period
-  idcol <- omopgenerics::uniqueId(exclude = colnames(cohort))
-  if (cohortDate == "cohort_start_date") {
-    subCohort <- subCohort |>
-      PatientProfiles::addPriorObservationQuery(
-        indexDate = "cohort_end_date",
-        priorObservationName = idcol,
-        priorObservationType = "date"
-      ) |>
-      dplyr::mutate("cohort_start_date" = dplyr::if_else(
-        .data$cohort_start_date < .data[[idcol]],
-        .data[[idcol]],
-        .data$cohort_start_date
-      ))
-  } else {
-    subCohort <- subCohort |>
-      PatientProfiles::addFutureObservationQuery(
-        indexDate = "cohort_start_date",
-        futureObservationName = idcol,
-        futureObservationType = "date"
-      ) |>
-      dplyr::mutate("cohort_end_date" = dplyr::if_else(
-        .data$cohort_end_date > .data[[idcol]],
-        .data[[idcol]],
-        .data$cohort_end_date
-      ))
-  }
+  # solve observation
   subCohort <- subCohort |>
-    dplyr::select(!dplyr::all_of(idcol)) |>
-    dplyr::compute(name = intermediate, temporary = FALSE)
+    solveObservation(padObservation, intermediate, cohortDate)
 
   # solve overlap
   subCohort <- subCohort |>
@@ -283,4 +265,47 @@ solveOverlap <- function(x, collapse, intermediate) {
     omopgenerics::dropTable(cdm = cdm, name = uniqueName)
   }
   return(x)
+}
+solveObservation <- function(x, padObservation, intermediate, cohortDate) {
+  idcol <- omopgenerics::uniqueId(exclude = colnames(x))
+  if (cohortDate == "cohort_start_date") {
+    x <- x |>
+      PatientProfiles::addPriorObservationQuery(
+        indexDate = "cohort_end_date",
+        priorObservationName = idcol,
+        priorObservationType = "date"
+      )
+    if (padObservation) {
+      x <- x |>
+        dplyr::mutate("cohort_start_date" = dplyr::if_else(
+          .data$cohort_start_date < .data[[idcol]],
+          .data[[idcol]],
+          .data$cohort_start_date
+        ))
+    } else {
+      x <- x |>
+        dplyr::filter(.data$cohort_start_date >= .data[[idcol]])
+    }
+  } else {
+    x <- x |>
+      PatientProfiles::addFutureObservationQuery(
+        indexDate = "cohort_start_date",
+        futureObservationName = idcol,
+        futureObservationType = "date"
+      )
+    if (padObservation) {
+      x <- x |>
+        dplyr::mutate("cohort_end_date" = dplyr::if_else(
+          .data$cohort_end_date > .data[[idcol]],
+          .data[[idcol]],
+          .data$cohort_end_date
+        ))
+    } else {
+      x <- x |>
+        dplyr::filter(.data$cohort_end_date <= .data[[idcol]])
+    }
+  }
+  x |>
+    dplyr::select(!dplyr::all_of(idcol)) |>
+    dplyr::compute(name = intermediate, temporary = FALSE)
 }

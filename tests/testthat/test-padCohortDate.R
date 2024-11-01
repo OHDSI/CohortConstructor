@@ -162,7 +162,7 @@ test_that("test indexes - postgres", {
 })
 
 test_that("adding days to cohort start", {
-  cdm <-  omock::mockCdmFromTables(tables = list(
+  cdm <- omock::mockCdmFromTables(tables = list(
     cohort =
       data.frame(
         cohort_definition_id = 1L,
@@ -200,12 +200,20 @@ test_that("adding days to cohort start", {
   cdm$cohort_3 <- padCohortStart(
     cdm$cohort,
     days = -90,
-    name = "cohort_3"
+    name = "cohort_3",
+    padObservation = FALSE
   )
-  expect_identical(nrow(cdm$cohort_3 |>
-                          dplyr::collect()), nrow(dplyr::tibble()))
-  expect_true(cohortCount(cdm$cohort_3) |>
-                dplyr::pull("number_subjects") == 0)
+  expect_true(nrow(dplyr::collect(cdm$cohort_3)) == 0)
+  cdm$cohort_3 <- padCohortStart(
+    cdm$cohort,
+    days = -90,
+    name = "cohort_3",
+    padObservation = TRUE
+  )
+  expect_true(nrow(dplyr::collect(cdm$cohort_3)) == 1)
+  expect_identical(
+    cdm$cohort_3 |> dplyr::pull("cohort_start_date"), as.Date("2020-01-01")
+  )
 
   # drop if cohort start would be after cohort end
   cdm$cohort_4 <- padCohortStart(cdm$cohort,
@@ -224,10 +232,8 @@ test_that("adding days to cohort start", {
     table = data.frame(
       observation_period_id = c(1L, 2L),
       person_id = c(1L, 2L),
-      observation_period_start_date =
-        as.Date("2020-01-01"),
-      observation_period_end_date =
-        as.Date("2020-03-01"),
+      observation_period_start_date = as.Date("2020-01-01"),
+      observation_period_end_date = as.Date("2020-03-01"),
       period_type_concept_id = 1L
     )
   )

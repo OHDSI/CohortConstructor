@@ -10,6 +10,7 @@ padCohortDate(
   cohortDate = "cohort_start_date",
   indexDate = "cohort_start_date",
   collapse = TRUE,
+  padObservation = TRUE,
   cohortId = NULL,
   name = tableName(cohort)
 )
@@ -26,6 +27,10 @@ must be numeric) to add.}
 
 \item{collapse}{Whether to collapse the overlapping records (TRUE) or drop
 the records that have an ongoing prior record.}
+
+\item{padObservation}{Whether to pad observations if they are outside
+observation_period (TRUE) or drop the records if they are outside
+observation_period (FALSE)}
 
 \item{cohortId}{Vector identifying which cohorts to modify
 (cohort_definition_id or cohort_name). If NULL, all cohorts will be
