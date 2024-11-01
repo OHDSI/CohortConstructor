@@ -169,7 +169,7 @@ test_that("test indexes - postgres", {
                                                       cohort_end_date = as.Date("2009-01-03"),
                                                       other_date = as.Date("2009-01-01")))
   cdm$my_cohort <- omopgenerics::newCohortTable(cdm$my_cohort)
-  cdm$my_cohort <- entryAtFirstDate(cdm$my_cohort, dateColumns = c("cohort_end_date", "other_date"), returnReason = FALSE)
+  cdm$my_cohort <- entryAtFirstDate(cdm$my_cohort, dateColumns = c("cohort_end_date", "other_date"), returnReason = TRUE)
 
   expect_true(
     DBI::dbGetQuery(db, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==

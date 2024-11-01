@@ -125,6 +125,13 @@ exitAtColumnDate <- function(cohort,
     reason <- "entry_reason"
   }
 
+  if (reason %in% colnames(cohort) & returnReason) {
+    cli::cli_inform("Column {reason} will be overwritten.")
+    cohort <- cohort |> dplyr::select(!dplyr::all_of(reason))
+  } else if (reason %in% colnames(cohort) & !returnReason) {
+    reason <- "date_column_name_1234"
+  }
+
   # check NA
   checkNA <- cohort |>
     dplyr::filter(dplyr::if_all(
