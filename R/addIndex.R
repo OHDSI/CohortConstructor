@@ -9,7 +9,6 @@
 #' @return The cohort table
 #' @export
 #'
-#' @examples
 addCohortTableIndex <-  function(cohort) {
 
   cohort <- omopgenerics::validateCohortArgument(cohort)
