@@ -58,7 +58,7 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">yearCohorts</span><span class="op">(</span><span class="va">cohort</span>, <span class="va">years</span>, cohortId <span class="op">=</span> <span class="cn">NULL</span>, name <span class="op">=</span> <span class="fu"><a href="https://darwin-eu-dev.github.io/omopgenerics/reference/tableName.html" class="external-link">tableName</a></span><span class="op">(</span><span class="va">cohort</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">yearCohorts</span><span class="op">(</span><span class="va">cohort</span>, <span class="va">years</span>, cohortId <span class="op">=</span> <span class="cn">NULL</span>, name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/omopgenerics/man/tableName.html" class="external-link">tableName</a></span><span class="op">(</span><span class="va">cohort</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -96,7 +96,7 @@ removed from the cohort set.</p></dd>
 <span class="r-in"><span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="mockCohortConstructor.html">mockCohortConstructor</a></span><span class="op">(</span>nPerson <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">cdm</span><span class="op">$</span><span class="va">cohort1</span> <span class="op">&lt;-</span> <span class="va">cdm</span><span class="op">$</span><span class="va">cohort1</span> <span class="op">|&gt;</span> <span class="fu">yearCohorts</span><span class="op">(</span>years <span class="op">=</span> <span class="fl">2000</span><span class="op">:</span><span class="fl">2002</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://darwin-eu-dev.github.io/omopgenerics/reference/settings.html" class="external-link">settings</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">cohort1</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/pkg/omopgenerics/man/settings.html" class="external-link">settings</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">cohort1</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 3 × 5</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   cohort_definition_id cohort_name   target_cohort_definition_id  year</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                               <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>

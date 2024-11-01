@@ -70,7 +70,7 @@ that overlap combined and kept. Cohort entries are when an individual was in
 <span>  gap <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  cohortName <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  keepOriginalCohorts <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  name <span class="op">=</span> <span class="fu"><a href="https://darwin-eu-dev.github.io/omopgenerics/reference/tableName.html" class="external-link">tableName</a></span><span class="op">(</span><span class="va">cohort</span><span class="op">)</span></span>
+<span>  name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/omopgenerics/man/tableName.html" class="external-link">tableName</a></span><span class="op">(</span><span class="va">cohort</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -122,7 +122,7 @@ together with the new ones. If FALSE only the new cohort will be returned.</p></
 <span class="r-in"><span><span class="va">cdm</span><span class="op">$</span><span class="va">cohort2</span> <span class="op">&lt;-</span> <span class="va">cdm</span><span class="op">$</span><span class="va">cohort2</span> <span class="op">|&gt;</span> <span class="fu">unionCohorts</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>`union_cohorts()` was deprecated in CDMConnector 1.1.0.</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Please use `cohort_union()` instead.</span>
-<span class="r-in"><span><span class="fu"><a href="https://darwin-eu-dev.github.io/omopgenerics/reference/settings.html" class="external-link">settings</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">cohort2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/pkg/omopgenerics/man/settings.html" class="external-link">settings</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">cohort2</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in UseMethod("settings"):</span> no applicable method for 'settings' applied to an object of class "c('cdm_table', 'GeneratedCohortSet', 'tbl_duckdb_connection', 'tbl_dbi', 'tbl_sql', 'tbl_lazy', 'tbl')"</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>

@@ -61,7 +61,7 @@ from cohorts that are specified.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">subsetCohorts</span><span class="op">(</span><span class="va">cohort</span>, <span class="va">cohortId</span>, name <span class="op">=</span> <span class="fu"><a href="https://darwin-eu-dev.github.io/omopgenerics/reference/tableName.html" class="external-link">tableName</a></span><span class="op">(</span><span class="va">cohort</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">subsetCohorts</span><span class="op">(</span><span class="va">cohort</span>, <span class="va">cohortId</span>, name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/omopgenerics/man/tableName.html" class="external-link">tableName</a></span><span class="op">(</span><span class="va">cohort</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -96,7 +96,7 @@ removed from the cohort set.</p></dd>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">cdm</span><span class="op">$</span><span class="va">cohort1</span> <span class="op">|&gt;</span> <span class="fu">subsetCohorts</span><span class="op">(</span>cohortId <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Source:   table&lt;main.cohort1&gt; [?? x 4]</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: DuckDB v1.1.1 [unknown@Linux 6.5.0-1025-azure:R 4.4.1/:memory:]</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: DuckDB v1.1.2 [unknown@Linux 6.5.0-1025-azure:R 4.4.2/:memory:]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    cohort_definition_id subject_id cohort_start_date cohort_end_date</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>         </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>                    1          4 1998-12-14        2002-02-14     </span>

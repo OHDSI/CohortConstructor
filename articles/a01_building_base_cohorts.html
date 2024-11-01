@@ -134,7 +134,7 @@ these will be their drug exposure end date).</p>
 <span>                           exit <span class="op">=</span> <span class="st">"event_end_date"</span>,</span>
 <span>                           name <span class="op">=</span> <span class="st">"drugs"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://darwin-eu-dev.github.io/omopgenerics/reference/settings.html" class="external-link">settings</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">drugs</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/omopgenerics/man/settings.html" class="external-link">settings</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">drugs</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 4</span></span></span>
 <span><span class="co">#&gt;   cohort_definition_id cohort_name       cdm_version vocabulary_version</span></span>
 <span><span class="co">#&gt;                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             </span></span>
@@ -143,7 +143,7 @@ these will be their drug exposure end date).</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>                    3 3355_diclofenac   5.3         v5.0 18-JAN-19    </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>                    4 36567_simvastatin 5.3         v5.0 18-JAN-19    </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>                    5 723_amoxicillin   5.3         v5.0 18-JAN-19</span></span>
-<span><span class="fu"><a href="https://darwin-eu-dev.github.io/omopgenerics/reference/cohortCount.html" class="external-link">cohortCount</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">drugs</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/omopgenerics/man/cohortCount.html" class="external-link">cohortCount</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">drugs</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 3</span></span></span>
 <span><span class="co">#&gt;   cohort_definition_id number_records number_subjects</span></span>
 <span><span class="co">#&gt;                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
@@ -152,7 +152,7 @@ these will be their drug exposure end date).</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>                    3            830             830</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>                    4            182             182</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>                    5           <span style="text-decoration: underline;">4</span>307            <span style="text-decoration: underline;">2</span>130</span></span>
-<span><span class="fu"><a href="https://darwin-eu-dev.github.io/omopgenerics/reference/attrition.html" class="external-link">attrition</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">drugs</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/omopgenerics/man/attrition.html" class="external-link">attrition</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">drugs</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 20 × 7</span></span></span>
 <span><span class="co">#&gt;    cohort_definition_id number_records number_subjects reason_id reason         </span></span>
 <span><span class="co">#&gt;                   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          </span></span>
