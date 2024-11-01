@@ -341,8 +341,8 @@ test_that("test indexes - postgres", {
   CDMConnector::cdm_disconnect(cdm = cdm)
 })
 
-test_taht("test ", {
-  cdm <-  omock::mockCdmFromTables(tables = list(
+test_that("test padCohortDate", {
+  cdm <- omock::mockCdmFromTables(tables = list(
     cohort = dplyr::tibble(
       cohort_definition_id = 1L,
       subject_id = c(1L, 2L),
@@ -351,8 +351,8 @@ test_taht("test ", {
       days = c(5, 8)
     )
   ))
-  cdm <- cdm |>
-    copyCdm()
+
+  cdm <- copyCdm(cdm)
 
   expect_no_error(
     cdm$my_cohort <- cdm$cohort |>
@@ -363,6 +363,19 @@ test_taht("test ", {
         collapse = TRUE,
         name = "my_cohort"
       )
+  )
+
+  expect_identical(
+    cdm$my_cohort |>
+      dplyr::filter(subject_id == 1) |>
+      dplyr::pull("cohort_end_date"),
+    as.Date("2020-01-08")
+  )
+  expect_identical(
+    cdm$my_cohort |>
+      dplyr::filter(subject_id == 2) |>
+      dplyr::pull("cohort_end_date"),
+    as.Date("2020-01-11")
   )
 
 })
