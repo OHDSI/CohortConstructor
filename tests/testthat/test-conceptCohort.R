@@ -554,7 +554,8 @@ test_that("table not present in the cdm", {
 })
 
 test_that("cohort exit as event start date", {
-  cdm <- omock::mockCdmReference() |>
+  skip_on_cran()
+   cdm <- omock::mockCdmReference() |>
     omock::mockCdmFromTables(tables = list("cohort" = dplyr::tibble(
       "cohort_definition_id" = 1L,
       "subject_id" = c(1L, 2L, 3L),
@@ -625,7 +626,8 @@ test_that("cohort exit as event start date", {
 })
 
 test_that("use source field concepts", {
-  cdm <- omock::mockCdmReference() |>
+  skip_on_cran()
+   cdm <- omock::mockCdmReference() |>
     omock::mockCdmFromTables(tables = list("cohort" = dplyr::tibble(
       "cohort_definition_id" = 1L,
       "subject_id" = c(1L, 2L, 3L),

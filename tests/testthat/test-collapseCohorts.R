@@ -192,6 +192,7 @@ test_that("out of observation", {
 })
 
 test_that("infitine", {
+  skip_on_cran()
 
   cdm <- omock::mockCdmFromTables()
   cdm$person <- dplyr::tibble(
@@ -249,6 +250,7 @@ test_that("infitine", {
 
 test_that("multiple observation periods", {
 # collapse should respect observation end dates
+  skip_on_cran()
 
   cdm <- omock::mockCdmReference() |>
     omock::mockCdmFromTables(tables = list("cohort" = dplyr::tibble(

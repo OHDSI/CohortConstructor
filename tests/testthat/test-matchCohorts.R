@@ -77,6 +77,8 @@ test_that("matchCohorts runs without errors", {
 })
 
 test_that("matchCohorts, no duplicated people within a cohort", {
+  skip_on_cran()
+
   cdm <- mockCohortConstructor(nPerson = 1000)
   cdm$cohort1 <- cdm$cohort1 |>
     dplyr::group_by(subject_id) |>
@@ -120,6 +122,7 @@ test_that("matchCohorts, no duplicated people within a cohort", {
 })
 
 test_that("check that we obtain expected result when ratio is 1", {
+  skip_on_cran()
 
   cdm <- mockCohortConstructor(nPerson = 1000)
 
@@ -179,6 +182,7 @@ test_that("check that we obtain expected result when ratio is 1", {
 })
 
 test_that("test exactMatchingCohort with a ratio bigger than 1", {
+  skip_on_cran()
 
   cdm <- omock::emptyCdmReference(cdmName = "mock")
   cdm$person <- cdm$person |>
@@ -278,6 +282,8 @@ test_that("test exactMatchingCohort with a ratio bigger than 1", {
 })
 
 test_that("keepOriginalCohorts works" , {
+  skip_on_cran()
+
   cdm <- mockCohortConstructor()
   cohort <- cdm$cohort2 |> matchCohorts(cohortId = 1, keepOriginalCohorts = TRUE, name = "new_cohort")
   expect_identical(settings(cohort), dplyr::tibble(

@@ -72,6 +72,8 @@ test_that("unionCohorts works", {
 })
 
 test_that("gap and name works", {
+  skip_on_cran()
+
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4, seed = 1) |>
     omock::mockObservationPeriod(seed = 1) |>
@@ -277,6 +279,8 @@ test_that("test codelist", {
 })
 
 test_that("keep original cohorts", {
+  skip_on_cran()
+
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4, seed = 1) |>
     omock::mockObservationPeriod(seed = 1) |>
@@ -299,6 +303,8 @@ test_that("keep original cohorts", {
 })
 
 test_that("multiple observation periods", {
+  skip_on_cran()
+
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4, seed = 1)
   cdm_local$observation_period <- dplyr::tibble(

@@ -1,4 +1,6 @@
 test_that("mearurementCohorts works", {
+  skip_on_cran()
+
   cdm <- mockCohortConstructor(con = NULL, seed = 1)
   cdm$concept <- cdm$concept |>
     dplyr::union_all(

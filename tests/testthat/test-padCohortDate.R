@@ -1,4 +1,5 @@
 test_that("simple example", {
+  skip_on_cran()
 
   cdm <-  omock::mockCdmFromTables(tables = list(
     cohort =
@@ -53,6 +54,7 @@ test_that("simple example", {
 })
 
 test_that("overlapping entries", {
+  skip_on_cran()
 
   cdm <-  omock::mockCdmFromTables(tables = list(
     cohort =
@@ -162,6 +164,8 @@ test_that("test indexes - postgres", {
 })
 
 test_that("adding days to cohort start", {
+  skip_on_cran()
+
   cdm <- omock::mockCdmFromTables(tables = list(
     cohort =
       data.frame(
@@ -348,6 +352,8 @@ test_that("test indexes - postgres", {
 })
 
 test_that("test padCohortDate", {
+  skip_on_cran()
+
   cdm <- omock::mockCdmFromTables(tables = list(
     cohort = dplyr::tibble(
       cohort_definition_id = 1L,

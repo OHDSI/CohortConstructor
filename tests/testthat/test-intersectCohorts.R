@@ -46,6 +46,8 @@ test_that("intersect example - two cohorts", {
 })
 
 test_that("intersect example - three cohorts", {
+  skip_on_cran()
+
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 2)
   cdm_local <- omopgenerics::insertTable(
@@ -95,6 +97,8 @@ test_that("intersect example - three cohorts", {
 })
 
 test_that("intersect example - nobody with intersection", {
+  skip_on_cran()
+
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 2)
   cdm_local <- omopgenerics::insertTable(
@@ -140,6 +144,8 @@ test_that("intersect example - nobody with intersection", {
 })
 
 test_that("intersect with gap", {
+  skip_on_cran()
+
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 1)
   cdm_local <- omopgenerics::insertTable(
@@ -195,6 +201,8 @@ test_that("intersect with gap", {
 })
 
 test_that("keepOriginalCohorts", {
+  skip_on_cran()
+
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 2)
   cdm_local <- omopgenerics::insertTable(
@@ -274,6 +282,8 @@ test_that("keepOriginalCohorts", {
 })
 
 test_that("returnNonOverlappingCohorts - two cohorts", {
+  skip_on_cran()
+
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 2)
   cdm_local <- omopgenerics::insertTable(
@@ -323,6 +333,8 @@ test_that("returnNonOverlappingCohorts - two cohorts", {
 })
 
 test_that("returnNonOverlappingCohorts - three cohorts", {
+  skip_on_cran()
+
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 2)
   cdm_local <- omopgenerics::insertTable(
@@ -532,6 +544,8 @@ test_that("codelist", {
 })
 
 test_that("records combined for gap must be in the same observation period", {
+  skip_on_cran()
+
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 2)
   cdm_local <- omopgenerics::insertTable(
@@ -586,6 +600,8 @@ test_that("records combined for gap must be in the same observation period", {
 })
 
 test_that("multiple observation periods", {
+  skip_on_cran()
+
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4, seed = 1)
   cdm_local$observation_period <- dplyr::tibble(
