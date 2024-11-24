@@ -439,7 +439,7 @@ test_that("codelist kept with >1 requirement", {
   cdm$cohort1 <- conceptCohort(cdm = cdm, conceptSet = list(a = 1, b = 2), name = "cohort1")
 
   cdm$cohort2 <- cdm$cohort1 |> requireDemographics(name = "cohort2", minPriorObservation = c(0,3), cohortId = 1)
-  expect_identical(attr(cdm$cohort2, "cohort_codelist") |> dplyr::collect() |> dplyr::arrange(.data$cohort_definition_id), dplyr::tibble(
+  expect_equal(attr(cdm$cohort2, "cohort_codelist") |> dplyr::collect() |> dplyr::arrange(.data$cohort_definition_id), dplyr::tibble(
       cohort_definition_id = as.integer(1:3),
       codelist_name = c("a", "b", "a"),
       concept_id = as.integer(c(1, 2, 1)),

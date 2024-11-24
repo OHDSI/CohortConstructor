@@ -1,6 +1,6 @@
 Package: CohortConstructor
 Title: Build and Manipulate Study Cohorts Using a Common Data Model
-Version: 0.3.2
+Version: 0.3.2.900
 Authors@R: c(
     person("Edward", "Burn", , "edward.burn@ndorms.ox.ac.uk", 
     role = c("aut", "cre"), comment = c(ORCID = "0000-0002-9286-1128")),
@@ -35,7 +35,7 @@ Imports:
     dplyr,
     glue,
     magrittr,
-    omopgenerics (>= 0.2.1),
+    omopgenerics (>= 0.4.0),
     PatientProfiles (>= 1.2.0),
     purrr,
     rlang,
