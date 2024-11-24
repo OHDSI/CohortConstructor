@@ -30,6 +30,7 @@ library(tidyr)
 library(gt)
 library(scales)
 library(CohortConstructor)
+library(gt)
 
 niceOverlapLabels <- function(labels) {
   new_labels <- gsub("_", " ", gsub(" and.*|cc_", "", labels))
@@ -213,7 +214,7 @@ The table below depicts the total time it took to create the nine cohorts when u
 ```{r}
 header_prefix <- "[header]Time by tool (minutes)\n[header_level]"
 benchmarkData$time_domain |>
-  gtTable(colsToMergeRows = "all_columns") |>
+  formatTable() |> 
   tab_style(style = list(cell_fill(color = "#e1e1e1"), cell_text(weight = "bold")), 
             locations = cells_column_labels()) |>
   tab_style(style = list(cell_text(weight = "bold")), 
@@ -226,7 +227,7 @@ Cohorts are often stratified in studies. With Atlas cohort definitions, each str
 
 ```{r}
 benchmarkData$time_strata |>
-  gtTable(colsToMergeRows = "all_columns") |>
+  formatTable() |>
   tab_style(style = list(cell_fill(color = "#e1e1e1"), cell_text(weight = "bold")), 
             locations = cells_column_labels()) |>
   tab_style(style = list(cell_text(weight = "bold")), 

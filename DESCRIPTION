@@ -35,7 +35,7 @@ Imports:
     dplyr,
     glue,
     magrittr,
-    omopgenerics (>= 0.2.1),
+    omopgenerics (>= 0.4.0),
     PatientProfiles (>= 1.2.0),
     purrr,
     rlang,
