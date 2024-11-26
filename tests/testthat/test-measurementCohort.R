@@ -240,6 +240,91 @@ test_that("mearurementCohorts works", {
   PatientProfiles::mockDisconnect(cdm)
 })
 
+test_that("mearurementCohorts - valueAsNumber without unit concept", {
+  skip_on_cran()
+
+cdm <- mockCohortConstructor(con = NULL, seed = 1)
+
+cdm <- omopgenerics::insertTable(cdm, "person",
+            dplyr::tibble(person_id = c(1, 2, 3),
+                          gender_concept_id = NA_integer_,
+                          year_of_birth = 1990L,
+                          race_concept_id = NA_integer_,
+                          ethnicity_concept_id = NA_integer_ ))
+cdm <- omopgenerics::insertTable(cdm, "observation_period",
+                                 dplyr::tibble(observation_period_id = c(1, 2, 3),
+                                               person_id =  c(1, 2, 3),
+                                               observation_period_start_date = as.Date("2000-01-01"),
+                                               observation_period_end_date  = as.Date("2020-01-01"),
+                                               period_type_concept_id  = NA_integer_ ))
+
+cdm <- omopgenerics::insertTable(cdm, "concept",
+                                         dplyr::tibble(
+                                           concept_id = c(4326744,  8876),
+                                           concept_name = c("Blood pressure", "my_unit"),
+                                           domain_id = c("Measurement", "Unit"),
+                                           vocabulary_id = c("SNOMED", "UCUM"),
+                                           standard_concept = "S",
+                                           concept_class_id = c("Observable Entity"),
+                                           concept_code = NA,
+                                           valid_start_date = NA,
+                                           valid_end_date = NA,
+                                           invalid_reason = NA))
+
+cdm <- omopgenerics::insertTable(cdm, "measurement",
+                                 dplyr::tibble(
+                                   measurement_id = 1:3L,
+                                   person_id = as.integer(c(1, 2, 3)),
+                                   measurement_concept_id = c(4326744),
+                                   measurement_date = as.Date(c("2000-07-01", "2000-12-11", "2002-09-08")),
+                                   measurement_type_concept_id = NA_integer_,
+                                   value_as_number = c(100, 105, 110),
+                                   value_as_concept_id = c(0, 0, 0) ,
+                                   unit_concept_id = c(8876, 8876, 0)
+                                 ))
+
+
+cohort_1 <- measurementCohort(
+  cdm = cdm,
+  name = "cohort",
+  conceptSet = list("normal_blood_pressure" = c(4326744)),
+  valueAsNumber = list("8876" = c(70L, 120L))
+)
+expect_true(all(sort(cohort_1 |>
+  dplyr::pull("subject_id")) == c(1, 2)))
+
+
+# removing unit_concept_id 8876 - should mean any value between 70 and 120 would be included
+# and we should now get person 3 included
+cohort_2 <- measurementCohort(
+  cdm = cdm,
+  name = "cohort",
+  conceptSet = list("normal_blood_pressure" = c(4326744L)),
+  valueAsNumber = list(c(70L, 120L))
+)
+expect_true(all(sort(cohort_2 |>
+                       dplyr::pull("subject_id")) == c(1, 2, 3)))
+
+# don't allow some with unit concept id and others without
+expect_error(measurementCohort(
+  cdm = cdm,
+  name = "cohort",
+  conceptSet = list("normal_blood_pressure" = c(4326744L)),
+  valueAsNumber = list("8876" = c(70L, 120L),
+                       c(70L, 120L))))
+
+# don't allow some with unit concept id and others without
+expect_error(measurementCohort(
+  cdm = cdm,
+  name = "cohort",
+  conceptSet = list("normal_blood_pressure" = c(4326744L)),
+  valueAsNumber = list(c(70L, 120L),
+                       c(100L, 150L))))
+
+PatientProfiles::mockDisconnect(cdm)
+
+})
+
 test_that("expected errors", {
   testthat::skip_on_cran()
   cdm <- mockCohortConstructor(con = NULL, seed = 1)
