@@ -1,4 +1,5 @@
 test_that("sampleCohort subsetting one cohort", {
+  skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4, seed = 1) |>
     omock::mockObservationPeriod(seed = 1) |>
@@ -28,6 +29,7 @@ test_that("sampleCohort subsetting one cohort", {
 })
 
 test_that("sampleCohort subsetting multiple cohorts", {
+  skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 10,seed = 1) |>
     omock::mockObservationPeriod(seed = 1) |>
@@ -57,6 +59,7 @@ test_that("sampleCohort subsetting multiple cohorts", {
 })
 
 test_that("sampleCohort subsetting all cohorts", {
+  skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4,seed = 1) |>
     omock::mockObservationPeriod(seed = 1) |>
@@ -76,7 +79,8 @@ test_that("sampleCohort subsetting all cohorts", {
 })
 
 test_that("expected errors", {
-  cdm_local <- omock::mockCdmReference() |>
+  skip_on_cran()
+   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
     omock::mockCohort(name = c("cohort1"), numberCohorts = 3, seed = 2)
@@ -97,9 +101,8 @@ test_that("expected errors", {
   PatientProfiles::mockDisconnect(cdm)
 })
 
-
 test_that("original cohort attributes unchanged", {
-
+  skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(nPerson = 20) |>
     omock::mockObservationPeriod()

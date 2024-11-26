@@ -1,4 +1,5 @@
 test_that("simple stratification", {
+  skip_on_cran()
   cdm <- omopgenerics::cdmFromTables(
     tables = list(
       "person" = dplyr::tibble(

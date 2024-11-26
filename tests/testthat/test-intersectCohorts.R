@@ -1,4 +1,5 @@
 test_that("intersect example - two cohorts", {
+  skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 2)
   cdm_local <- omopgenerics::insertTable(

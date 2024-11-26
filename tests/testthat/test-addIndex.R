@@ -1,6 +1,6 @@
 
 test_that("local tibble and duckdb test - will do nothing for these", {
-
+  skip_on_cran()
   cdm <- omock::mockCdmReference() |>
     omock::mockCdmFromTables(tables = list("cohort" = dplyr::tibble(
       "cohort_definition_id" = 1,

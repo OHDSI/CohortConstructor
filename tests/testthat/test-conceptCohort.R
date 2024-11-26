@@ -1,4 +1,5 @@
 test_that("expected errors and messages", {
+  skip_on_cran()
   cdm <- omock::mockCdmReference() |>
     omock::mockPerson() |>
     omock::mockObservationPeriod()

@@ -1,4 +1,5 @@
 test_that("matchCohorts runs without errors", {
+  skip_on_cran()
   cdm <- mockCohortConstructor(nPerson = 1000)
 
   cdm$cohort1 <- cdm$cohort1 |>
