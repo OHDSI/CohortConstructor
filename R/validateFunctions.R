@@ -182,11 +182,21 @@ validateStrata <- function(strata, cohort) {
 }
 
 validateValueAsNumber <- function(valueAsNumber) {
-  omopgenerics::assertList(valueAsNumber,
-    named = TRUE,
-    class = c("integer", "numeric"),
-    null = TRUE
+
+   omopgenerics::assertList(valueAsNumber,
+                           class = c("integer", "numeric"),
+                           null = TRUE
   )
+
+  # if any is named all must be
+  if(is.null(names(valueAsNumber)) || any(nchar(names(valueAsNumber)) == 0)){
+    omopgenerics::assertList(valueAsNumber,
+                             length = 1,
+                             null = TRUE,
+                             msg = "If any valueAsNumber has no unit specified, only one range should be specified"
+    )
+  }
+
   for (i in seq_along(valueAsNumber)) {
     if (length(valueAsNumber[[i]]) != 2) {
       cli::cli_abort("Each numeric vector in `valueAsNumber` list must be of length 2.")
