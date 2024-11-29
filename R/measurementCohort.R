@@ -19,12 +19,13 @@
 #' @inheritParams nameDoc
 #' @param valueAsConcept A vector of cohort IDs used to filter measurements.
 #' Only measurements with these values in the `value_as_concept_id` column of
-#' the measurement table will be included. If NULL all entries independently of
+#' the measurement table will be included. If NULL all entries independent of
 #' their value as concept will be considered.
 #' @param valueAsNumber A named list indicating the range of values and the unit
 #' they correspond to, as follows:
-#' list("unit_concept_id" = c(rangeValue1, rangeValue2)). If NULL, all entries
-#' independently of their value as number will be included.
+#' list("unit_concept_id" = c(rangeValue1, rangeValue2)). If no name is supplied
+#' in the list, no requirement on unit concept id will be applied. If NULL, all
+#' entries independent of their value as number will be included.
 #'
 #' @export
 #'
@@ -149,7 +150,6 @@ measurementCohort <- function(cdm,
     cohort <- cohort |>
       dplyr::filter(!!!filterExpr) |>
       dplyr::compute(name = name, temporary = FALSE)
-
     if (cohort |> dplyr::tally() |> dplyr::pull("n") == 0) {
       cli::cli_warn(
         "There are no subjects with the specified value_as_concept_id or value_as_number."
@@ -235,11 +235,18 @@ getFilterExpression <- function(valueAsConcept, valueAsNumber) {
   expFilter <- character()
   if (!is.null(valueAsNumber)) {
     for (ii in seq_along(valueAsNumber)) {
-      expFilter[ii] <- glue::glue(
-        "(.data$unit_concept_id %in% {names(valueAsNumber)[ii]} &
+      if(!is.null(names(valueAsNumber)[ii])){
+        expFilter[ii] <- glue::glue(
+          "(.data$unit_concept_id %in% {names(valueAsNumber)[ii]} &
       .data$value_as_number >= {valueAsNumber[[ii]][1]} &
       .data$value_as_number <= {valueAsNumber[[ii]][2]})"
-      )
+        )
+      } else {
+        expFilter[ii] <- glue::glue(
+          "(.data$value_as_number >= {valueAsNumber[[ii]][1]} &
+          .data$value_as_number <= {valueAsNumber[[ii]][2]})"
+        )
+      }
     }
   } else {
     ii <- 0
