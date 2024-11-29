@@ -349,3 +349,38 @@ test_that("test indexes - postgres", {
   omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
   CDMConnector::cdm_disconnect(cdm = cdm)
 })
+
+test_that("test same record in different cohorts", {
+
+  cdm <- omock::mockCdmFromTables()
+  cdm$person <- dplyr::tibble(
+    "person_id" = c(1L, 2L, 3L),
+    "gender_concept_id" = 1L,
+    "year_of_birth" = 1990L,
+    "race_concept_id" = 1L,
+    "ethnicity_concept_id" = 1L
+  )
+  cdm$observation_period <-  dplyr::tibble(
+    "observation_period_id" = c(1L, 2L, 3L),
+    "person_id" = c(1L, 2L, 3L),
+    "observation_period_start_date" = as.Date("2000-01-01"),
+    "observation_period_end_date" = as.Date("2024-01-01"),
+    "period_type_concept_id" = 1L
+  )
+  cdm$cohort <- dplyr::tibble(
+    "cohort_definition_id" = c(1L, 1L, 1L, 2L, 2L),
+    "subject_id" = c(1L, 2L, 3L, 3L, 1L),
+    "cohort_start_date" = as.Date(c("2020-01-01", "2020-01-01",
+                                    "2020-01-01", "2020-01-01", "2020-01-01")),
+    "cohort_end_date" = as.Date(c("2022-01-01", "2022-01-01",
+                                  "2022-01-01", "2022-01-01", "2020-01-05"))
+  )
+
+  cdm <- cdm |> copyCdm()
+  cdm$cohort <- omopgenerics::newCohortTable(cdm$cohort)
+  cdm$cohort_collapsed <- cdm$cohort |> collapseCohorts(gap = 10, name = "cohort_collapsed")
+
+  expect_true(cdm$cohort_collapsed |> dplyr::filter(subject_id == 3) |> dplyr::collect() |> nrow() == 2)
+  expect_true(cdm$cohort_collapsed |> dplyr::filter(subject_id == 1) |> dplyr::collect() |> nrow() == 2)
+
+})
