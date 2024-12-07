@@ -483,9 +483,13 @@ getDomainCohort <- function(cdm,
 
 extendOverlap  <- function(cohort,
                            name){
+
+  workingTblNames <- paste0(omopgenerics::uniqueTableName(), "_", c(1:4))
+
   cohort <- cohort %>%
     dplyr::mutate(record_id = dplyr::row_number()) |>
-    dplyr::compute()
+    dplyr::compute(temporary = FALSE,
+                   name = workingTblNames[1])
 
   # keep overlapping records
   cohort_overlap <- cohort %>%
@@ -501,14 +505,16 @@ extendOverlap  <- function(cohort,
                   "cohort_start_date", "cohort_end_date",
                   "record_id") |>
     dplyr::distinct() |>
-    dplyr::compute()
+    dplyr::compute(temporary = FALSE,
+                   name = workingTblNames[2])
 
   cohort_no_overlap <- cohort |>
     dplyr::anti_join(cohort_overlap |>
                        dplyr::select("record_id"),
                      by = "record_id") |>
-    dplyr::select(!"record_id") |>
-    dplyr::compute()
+    dplyr::select(!"record_id")  |>
+    dplyr::compute(temporary = FALSE,
+                   name = workingTblNames[3])
 
   cohort_overlap <- cohort_overlap %>%
      dplyr::mutate(days = !!CDMConnector::datediff("cohort_start_date",
@@ -524,12 +530,16 @@ extendOverlap  <- function(cohort,
         number = "days",
         interval = "day"
       ))) |>
-    dplyr::select(!"days") |>
-    dplyr::compute()
+    dplyr::select(!"days")  |>
+    dplyr::compute(temporary = FALSE,
+                   name = workingTblNames[4])
 
   cohort_updated <- dplyr::union_all(cohort_overlap,
                                      cohort_no_overlap) |>
     dplyr::compute(name = name, temporary = FALSE)
+
+  CDMConnector::dropTable(cdm = cdm,
+                          name = workingTblNames)
 
   cohort_updated
 
