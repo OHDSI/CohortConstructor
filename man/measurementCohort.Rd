@@ -22,13 +22,14 @@ or a conceptSetExpression.}
 
 \item{valueAsConcept}{A vector of cohort IDs used to filter measurements.
 Only measurements with these values in the \code{value_as_concept_id} column of
-the measurement table will be included. If NULL all entries independently of
+the measurement table will be included. If NULL all entries independent of
 their value as concept will be considered.}
 
 \item{valueAsNumber}{A named list indicating the range of values and the unit
 they correspond to, as follows:
-list("unit_concept_id" = c(rangeValue1, rangeValue2)). If NULL, all entries
-independently of their value as number will be included.}
+list("unit_concept_id" = c(rangeValue1, rangeValue2)). If no name is supplied
+in the list, no requirement on unit concept id will be applied. If NULL, all
+entries independent of their value as number will be included.}
 }
 \value{
 A cohort table

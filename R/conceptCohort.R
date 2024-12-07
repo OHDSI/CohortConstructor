@@ -18,17 +18,23 @@
 #' condition_start_date and condition_end_date for records coming
 #' from the condition_occurrence tables). So that the resulting table
 #' satisfies the requirements of an OMOP CDM cohort table:
-#' * Overlapping records are collapsed into a single cohort entry.
-#' * If a record starts outside of an observation period it will be
-#'  silently ignored.
-#' * If a record ends outside of an observation period it will be
-#'  trimmed so as to end at the preceding observation period end date.
+#' * Cohort entries will not overlap. Overlapping records will be
+#' combined based on the overlap argument.
+#' * Cohort entries will not go out of observation. If a record starts
+#' outside of an observation period it will be silently ignored. If a
+#' record ends outside of an observation period it will be trimmed so
+#' as to end at the preceding observation period end date.
 #'
 #' @inheritParams cdmDoc
 #' @inheritParams conceptSetDoc
 #' @inheritParams nameDoc
 #' @param exit How the cohort end date is defined. Can be either
 #' "event_end_date" or "event_start_date".
+#' @param overlap How to deal with overlapping records. In all
+#' cases cohort start will be set as the earliest start date. If
+#' "merge", cohort end will be the latest end date. If "extend",
+#' cohort end date will be set by adding together the total days
+#' from each of the overlapping records.
 #' @param useSourceFields If TRUE, the source concept_id fields will also be
 #' used when identifying relevant clinical records. If FALSE, only the standard
 #' concept_id fields will be used.
@@ -57,6 +63,7 @@ conceptCohort <- function(cdm,
                           conceptSet,
                           name,
                           exit = "event_end_date",
+                          overlap = "merge",
                           useSourceFields = FALSE,
                           subsetCohort = NULL,
                           subsetCohortId = NULL) {
@@ -65,6 +72,7 @@ conceptCohort <- function(cdm,
   cdm <- omopgenerics::validateCdmArgument(cdm)
   conceptSet <- omopgenerics::validateConceptSetArgument(conceptSet, cdm)
   omopgenerics::assertChoice(exit, c("event_start_date", "event_end_date"))
+  omopgenerics::assertChoice(overlap, c("merge", "extend"), length = 1)
   omopgenerics::assertLogical(useSourceFields, length = 1)
 
   useIndexes <- getOption("CohortConstructor.use_indexes")
@@ -190,10 +198,20 @@ conceptCohort <- function(cdm,
   cli::cli_inform(c("i" = "Applying cohort requirements."))
   cdm[[name]] <- fulfillCohortReqs(cdm = cdm, name = name)
 
-  cli::cli_inform(c("i" = "Collapsing records."))
+  if(overlap == "merge"){
+  cli::cli_inform(c("i" = "Merging overlapping records."))
   cdm[[name]] <- cdm[[name]] |>
     joinOverlap(name = name, gap = 0)  |>
-    omopgenerics::recordCohortAttrition(reason = "Collapse overlapping records")
+    omopgenerics::recordCohortAttrition(reason = "Merge overlapping records")
+  }
+
+  if(overlap == "extend"){
+    cli::cli_inform(c("i" = "Merging overlapping records."))
+    cdm[[name]] <- cdm[[name]] |>
+      extendOverlap(name = name)  |>
+      omopgenerics::recordCohortAttrition(reason = "Add overlapping records")
+  }
+
 
   cdm[[name]] <- omopgenerics::newCohortTable(table = cdm[[name]])
 
@@ -461,4 +479,58 @@ getDomainCohort <- function(cdm,
       by = "concept_id"
     ) |>
     dplyr::compute(temporary = FALSE, name = name)
+}
+
+extendOverlap  <- function(cohort,
+                           name){
+  cohort <- cohort %>%
+    dplyr::mutate(record_id = dplyr::row_number()) |>
+    dplyr::compute()
+
+  # keep overlapping records
+  cohort_overlap <- cohort %>%
+    dplyr::inner_join(cohort,
+                      by = c("cohort_definition_id", "subject_id"),
+                      suffix = c("", "_overlap")) |>
+    dplyr::filter(
+      record_id != record_id_overlap,
+      cohort_start_date <= cohort_end_date_overlap &
+      cohort_end_date >= cohort_start_date_overlap
+    )  |>
+    dplyr::select("cohort_definition_id", "subject_id",
+                  "cohort_start_date", "cohort_end_date",
+                  "record_id") |>
+    dplyr::distinct() |>
+    dplyr::compute()
+
+  cohort_no_overlap <- cohort |>
+    dplyr::anti_join(cohort_overlap |>
+                       dplyr::select("record_id"),
+                     by = "record_id") |>
+    dplyr::select(!"record_id") |>
+    dplyr::compute()
+
+  cohort_overlap <- cohort_overlap %>%
+     dplyr::mutate(days = !!CDMConnector::datediff("cohort_start_date",
+                                          "cohort_end_date")) |>
+     dplyr::group_by(dplyr::pick("cohort_definition_id",
+                                 "subject_id")) |>
+     dplyr::summarise(cohort_start_date = min(.data$cohort_start_date, na.rm = TRUE),
+                      days  = as.integer(sum(.data$days)))  %>%
+    dplyr:: ungroup() %>%
+    dplyr::mutate(cohort_end_date = as.Date(
+      !!CDMConnector::dateadd(
+        date = "cohort_start_date",
+        number = "days",
+        interval = "day"
+      ))) |>
+    dplyr::select(!"days") |>
+    dplyr::compute()
+
+  cohort_updated <- dplyr::union_all(cohort_overlap,
+                                     cohort_no_overlap) |>
+    dplyr::compute(name = name, temporary = FALSE)
+
+  cohort_updated
+
 }
