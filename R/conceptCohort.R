@@ -486,6 +486,8 @@ extendOverlap  <- function(cohort,
 
   workingTblNames <- paste0(omopgenerics::uniqueTableName(), "_", c(1:4))
 
+  cdm <- omopgenerics::cdmReference(cohort)
+
   cohort <- cohort %>%
     dplyr::mutate(record_id = dplyr::row_number()) |>
     dplyr::compute(temporary = FALSE,
