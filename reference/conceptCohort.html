@@ -16,11 +16,12 @@ Cohort duration is based on record start and end (e.g.
 condition_start_date and condition_end_date for records coming
 from the condition_occurrence tables). So that the resulting table
 satisfies the requirements of an OMOP CDM cohort table:
-Overlapping records are collapsed into a single cohort entry.
-If a record starts outside of an observation period it will be
-silently ignored.
-If a record ends outside of an observation period it will be
-trimmed so as to end at the preceding observation period end date.
+Cohort entries will not overlap. Overlapping records will be
+combined based on the overlap argument.
+Cohort entries will not go out of observation. If a record starts
+outside of an observation period it will be silently ignored. If a
+record ends outside of an observation period it will be trimmed so
+as to end at the preceding observation period end date.
 
 "><meta property="og:description" content="conceptCohort() creates a cohort table from patient records
 from the clinical tables in the OMOP CDM.
@@ -39,11 +40,12 @@ Cohort duration is based on record start and end (e.g.
 condition_start_date and condition_end_date for records coming
 from the condition_occurrence tables). So that the resulting table
 satisfies the requirements of an OMOP CDM cohort table:
-Overlapping records are collapsed into a single cohort entry.
-If a record starts outside of an observation period it will be
-silently ignored.
-If a record ends outside of an observation period it will be
-trimmed so as to end at the preceding observation period end date.
+Cohort entries will not overlap. Overlapping records will be
+combined based on the overlap argument.
+Cohort entries will not go out of observation. If a record starts
+outside of an observation period it will be silently ignored. If a
+record ends outside of an observation period it will be trimmed so
+as to end at the preceding observation period end date.
 
 "><meta property="og:image" content="https://ohdsi.github.io/CohortConstructor/logo.png"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -112,11 +114,12 @@ cohorts:</p><ul><li><p>condition_occurrence</p></li>
 </ul><p>Cohort duration is based on record start and end (e.g.
 condition_start_date and condition_end_date for records coming
 from the condition_occurrence tables). So that the resulting table
-satisfies the requirements of an OMOP CDM cohort table:</p><ul><li><p>Overlapping records are collapsed into a single cohort entry.</p></li>
-<li><p>If a record starts outside of an observation period it will be
-silently ignored.</p></li>
-<li><p>If a record ends outside of an observation period it will be
-trimmed so as to end at the preceding observation period end date.</p></li>
+satisfies the requirements of an OMOP CDM cohort table:</p><ul><li><p>Cohort entries will not overlap. Overlapping records will be
+combined based on the overlap argument.</p></li>
+<li><p>Cohort entries will not go out of observation. If a record starts
+outside of an observation period it will be silently ignored. If a
+record ends outside of an observation period it will be trimmed so
+as to end at the preceding observation period end date.</p></li>
 </ul></div>
 
     <div class="section level2">
@@ -126,6 +129,7 @@ trimmed so as to end at the preceding observation period end date.</p></li>
 <span>  <span class="va">conceptSet</span>,</span>
 <span>  <span class="va">name</span>,</span>
 <span>  exit <span class="op">=</span> <span class="st">"event_end_date"</span>,</span>
+<span>  overlap <span class="op">=</span> <span class="st">"merge"</span>,</span>
 <span>  useSourceFields <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  subsetCohort <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  subsetCohortId <span class="op">=</span> <span class="cn">NULL</span></span>
@@ -152,6 +156,14 @@ or a conceptSetExpression.</p></dd>
 <dt id="arg-exit">exit<a class="anchor" aria-label="anchor" href="#arg-exit"></a></dt>
 <dd><p>How the cohort end date is defined. Can be either
 "event_end_date" or "event_start_date".</p></dd>
+
+
+<dt id="arg-overlap">overlap<a class="anchor" aria-label="anchor" href="#arg-overlap"></a></dt>
+<dd><p>How to deal with overlapping records. In all
+cases cohort start will be set as the earliest start date. If
+"merge", cohort end will be the latest end date. If "extend",
+cohort end date will be set by adding together the total days
+from each of the overlapping records.</p></dd>
 
 
 <dt id="arg-usesourcefields">useSourceFields<a class="anchor" aria-label="anchor" href="#arg-usesourcefields"></a></dt>
