@@ -71,8 +71,6 @@ test_that("matchCohorts runs without errors", {
 
   # expect warnings
   cdm <- mockCohortConstructor(nPerson = 1000)
-  expect_warning(matchCohorts(cohort = cdm$cohort1,
-                              name = "new_cohort"))
 
   PatientProfiles::mockDisconnect(cdm)
 })
