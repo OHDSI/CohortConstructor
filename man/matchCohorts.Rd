@@ -38,6 +38,15 @@ A cohort table.
 \description{
 \code{matchCohorts()} generate a new cohort matched to individuals in an
 existing cohort. Individuals can be matched based on year of birth and sex.
+Matching is done at the record level, so if individuals have multiple
+cohort entries they can be matched to different individuals for each of their
+records.
+
+Two new cohorts will be created when matching. The first is those
+cohort entries which were matched ("_sampled" is added to the original
+cohort name for this cohort). The other is the matches found from the
+database population ("_matched" is added to the original cohort name
+for this cohort).
 }
 \examples{
 \donttest{

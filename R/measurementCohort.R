@@ -119,7 +119,7 @@ measurementCohort <- function(cdm,
 
   if (ud > 0) {
     cli::cli_inform(
-      c("x" = "{.strong {ud}} concept{?s} excluded because don't correspond to the `Measurement` domain.")
+      c("x" = "{.strong {ud}} concept{?s} excluded because they don't correspond to the `Measurement` domain.")
     )
   }
 
