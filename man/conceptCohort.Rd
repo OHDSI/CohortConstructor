@@ -9,6 +9,7 @@ conceptCohort(
   conceptSet,
   name,
   exit = "event_end_date",
+  overlap = "merge",
   useSourceFields = FALSE,
   subsetCohort = NULL,
   subsetCohortId = NULL
@@ -24,6 +25,12 @@ or a conceptSetExpression.}
 
 \item{exit}{How the cohort end date is defined. Can be either
 "event_end_date" or "event_start_date".}
+
+\item{overlap}{How to deal with overlapping records. In all
+cases cohort start will be set as the earliest start date. If
+"merge", cohort end will be the latest end date. If "extend",
+cohort end date will be set by adding together the total days
+from each of the overlapping records.}
 
 \item{useSourceFields}{If TRUE, the source concept_id fields will also be
 used when identifying relevant clinical records. If FALSE, only the standard
@@ -61,11 +68,12 @@ condition_start_date and condition_end_date for records coming
 from the condition_occurrence tables). So that the resulting table
 satisfies the requirements of an OMOP CDM cohort table:
 \itemize{
-\item Overlapping records are collapsed into a single cohort entry.
-\item If a record starts outside of an observation period it will be
-silently ignored.
-\item If a record ends outside of an observation period it will be
-trimmed so as to end at the preceding observation period end date.
+\item Cohort entries will not overlap. Overlapping records will be
+combined based on the overlap argument.
+\item Cohort entries will not go out of observation. If a record starts
+outside of an observation period it will be silently ignored. If a
+record ends outside of an observation period it will be trimmed so
+as to end at the preceding observation period end date.
 }
 }
 \examples{
