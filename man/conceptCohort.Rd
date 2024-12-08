@@ -9,6 +9,7 @@ conceptCohort(
   conceptSet,
   name,
   exit = "event_end_date",
+  overlap = "merge",
   useSourceFields = FALSE,
   subsetCohort = NULL,
   subsetCohortId = NULL
@@ -25,6 +26,12 @@ or a conceptSetExpression.}
 \item{exit}{How the cohort end date is defined. Can be either
 "event_end_date" or "event_start_date".}
 
+\item{overlap}{How to deal with overlapping records. In all
+cases cohort start will be set as the earliest start date. If
+"merge", cohort end will be the latest end date. If "extend",
+cohort end date will be set by adding together the total days
+from each of the overlapping records.}
+
 \item{useSourceFields}{If TRUE, the source concept_id fields will also be
 used when identifying relevant clinical records. If FALSE, only the standard
 concept_id fields will be used.}
@@ -36,12 +43,6 @@ generated cohort.}
 \item{subsetCohortId}{Optional. Specifies cohort IDs from the \code{subsetCohort}
 table to include. If none are provided, all cohorts from the \code{subsetCohort}
 are included.}
-
-\item{overlap}{How to deal with overlapping records. In all
-cases cohort start will be set as the earliest start date. If
-"merge", cohort end will be the latest end date. If "extend",
-cohort end date will be set by adding together the total days
-from each of the overlapping records.}
 }
 \value{
 A cohort table
