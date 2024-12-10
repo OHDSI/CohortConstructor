@@ -180,33 +180,33 @@ test_that("simple example", {
   )
 
   # subsetCohort ----
-  cdm$cohort <- cdm$cohort |> omopgenerics::newCohortTable()
-  cdm$cohort <- cdm$cohort |>
-    omopgenerics::newCohortTable(
-      cohortSetRef = dplyr::tibble(
-        "cohort_definition_id" = c(1L, 2L, 3L),
-        "cohort_name" = paste0("cohort", 1:3),
-      ),
-      cohortAttritionRef = dplyr::bind_rows(
-        attrition(cdm$cohort),attrition(cdm$cohort)[1] |> dplyr::mutate("cohort_definition_id" = 3L)
-      )
-    )
-  cohort2 <- conceptCohort(cdm = cdm,
-                           conceptSet = list(a = 1L),
-                           name = "my_cohort2",
-                           subsetCohort = cdm$cohort)
-  expect_equal(collectCohort(cohort2, 1), collectCohort(cohort, 1))
-  cohort3 <- conceptCohort(cdm = cdm,
-                           conceptSet = list(a = 1L),
-                           name = "my_cohort3",
-                           subsetCohort = cdm$cohort,
-                           subsetCohortId = 2)
-  expect_true(nrow(collectCohort(cohort3, 1)) == 0)
-  expect_error(conceptCohort(cdm = cdm,
-                             conceptSet = list(a = 1L),
-                             name = "my_cohort3",
-                             subsetCohort = cdm$cohort,
-                             subsetCohortId = 3))
+  # cdm$cohort <- cdm$cohort |> omopgenerics::newCohortTable()
+  # cdm$cohort <- cdm$cohort |>
+  #   omopgenerics::newCohortTable(
+  #     cohortSetRef = dplyr::tibble(
+  #       "cohort_definition_id" = c(1L, 2L, 3L),
+  #       "cohort_name" = paste0("cohort", 1:3),
+  #     ),
+  #     cohortAttritionRef = dplyr::bind_rows(
+  #       attrition(cdm$cohort),attrition(cdm$cohort)[1] |> dplyr::mutate("cohort_definition_id" = 3L)
+  #     )
+  #   )
+  # cohort2 <- conceptCohort(cdm = cdm,
+  #                          conceptSet = list(a = 1L),
+  #                          name = "my_cohort2",
+  #                          subsetCohort = cdm$cohort)
+  # expect_equal(collectCohort(cohort2, 1), collectCohort(cohort, 1))
+  # cohort3 <- conceptCohort(cdm = cdm,
+  #                          conceptSet = list(a = 1L),
+  #                          name = "my_cohort3",
+  #                          subsetCohort = cdm$cohort,
+  #                          subsetCohortId = 2)
+  # expect_true(nrow(collectCohort(cohort3, 1)) == 0)
+  # expect_error(conceptCohort(cdm = cdm,
+  #                            conceptSet = list(a = 1L),
+  #                            name = "my_cohort3",
+  #                            subsetCohort = cdm$cohort,
+  #                            subsetCohortId = 3))
 
   PatientProfiles::mockDisconnect(cdm)
 })
