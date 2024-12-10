@@ -206,12 +206,15 @@ conceptCohort <- function(cdm,
   }
 
   if(overlap == "extend"){
-    cli::cli_inform(c("i" = "Merging overlapping records."))
+    cli::cli_inform(c("i" = "Adding overlapping records."))
     cdm[[name]] <- cdm[[name]] |>
       extendOverlap(name = name)  |>
       omopgenerics::recordCohortAttrition(reason = "Add overlapping records")
-  }
 
+   # adding days might mean we no longer satisfy cohort requirements
+    cli::cli_inform(c("i" = "Re-appplying cohort requirements."))
+    cdm[[name]] <- fulfillCohortReqs(cdm = cdm, name = name)
+  }
 
   cdm[[name]] <- omopgenerics::newCohortTable(table = cdm[[name]])
 
