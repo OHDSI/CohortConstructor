@@ -898,6 +898,44 @@ test_that("overlap option", {
                                                 overlap = "another"))
 
 
+
+  # When extending, overlapping with the following record
+  cdm <- omopgenerics::insertTable(
+    cdm = cdm, name = "drug_exposure", table = dplyr::tibble(
+      "drug_exposure_id" = c(1L, 2L, 3L),
+      "person_id" = c(1L, 1L, 1L),
+      "drug_concept_id" = c(1L, 1L, 1L),
+      "drug_exposure_start_date" = as.Date(c("2020-01-01", "2020-01-05",  "2020-01-13")),
+      "drug_exposure_end_date" = as.Date(c("2020-01-08", "2020-01-11",  "2020-01-15")),
+      "drug_type_concept_id" = 1L
+    ))
+  expect_no_error(cdm$cohort_6 <- conceptCohort(cdm = cdm,
+                                conceptSet = list(a = 1L),
+                                name = "cohort_6",
+                                exit = "event_end_date",
+                                overlap = "extend"))
+
+
+
+  # Check if "extend" exceeds observation_period_end_date
+  cdm <- omopgenerics::insertTable(
+    cdm = cdm, name = "drug_exposure", table = dplyr::tibble(
+      "drug_exposure_id" = c(1L, 2L),
+      "person_id" = c(1L, 1L),
+      "drug_concept_id" = c(1L, 1L),
+      "drug_exposure_start_date" = as.Date(c("2020-01-15", "2020-01-20")),
+      "drug_exposure_end_date" = as.Date(c("2020-01-28", "2020-01-28")),
+      "drug_type_concept_id" = 1L
+    ))
+
+  expect_no_error(cdm$cohort_7 <- conceptCohort(cdm = cdm,
+                                conceptSet = list(a = 1L),
+                                name = "cohort_7",
+                                exit = "event_end_date",
+                                overlap = "extend"))
+
+
+
   PatientProfiles::mockDisconnect(cdm)
 })
 
