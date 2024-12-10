@@ -74,6 +74,11 @@ conceptCohort <- function(cdm,
   omopgenerics::assertChoice(exit, c("event_start_date", "event_end_date"))
   omopgenerics::assertChoice(overlap, c("merge", "extend"), length = 1)
   omopgenerics::assertLogical(useSourceFields, length = 1)
+  omopgenerics::assertCharacter(subsetCohort, length = 1, null = TRUE)
+  if (!is.null(subsetCohort)) {
+    subsetCohort <- omopgenerics::validateCohortArgument(cdm[[subsetCohort]])
+    subsetCohortId <- omopgenerics::validateCohortIdArgument({{subsetCohortId}}, subsetCohort)
+  }
 
   useIndexes <- getOption("CohortConstructor.use_indexes")
 
@@ -108,19 +113,13 @@ conceptCohort <- function(cdm,
 
   # subsetCohort
   if (!is.null(subsetCohort)) {
-    subsetCohort <- omopgenerics::validateCohortArgument(subsetCohort)
-    subsetCohortId <- omopgenerics::validateCohortIdArgument(subsetCohortId, cohort = subsetCohort)
     subsetName <- omopgenerics::uniqueTableName(prefix = tmpPref)
-    if (!all(settings(subsetCohort)$cohort_definition_id %in% subsetCohortId)) {
-      subsetCohort <- subsetCohort |>
-        dplyr::filter(.data$cohort_definition_id %in% .env$subsetCohortId) |>
-        dplyr::compute(name = subsetName, temporary = FALSE)
-    }
     subsetIndividuals <- subsetCohort |>
+      dplyr::filter(.data$cohort_definition_id %in% .env$subsetCohortId) |>
       dplyr::distinct(.data$subject_id) |>
       dplyr::compute(name = subsetName, temporary = FALSE)
-    if (subsetIndividuals |> dplyr::tally() |> dplyr::pull("n") == 0) {
-      omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with(tmpPref))
+    if (omopgenerics::isTableEmpty(subsetIndividuals)) {
+      omopgenerics::dropTable(cdm = cdm, name = subsetName)
       cli::cli_abort("There are no individuals in the `subsetCohort` and `subsetCohortId` provided.")
     }
     if (!isFALSE(useIndexes)) {
