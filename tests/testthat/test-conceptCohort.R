@@ -929,4 +929,83 @@ test_that("test indexes - postgres", {
   CDMConnector::cdm_disconnect(cdm = cdm)
 })
 
+test_that("test subsetCohort arguments", {
+  cdm <- omock::mockCdmFromTables(
+    tables = list(
+      condition_occurrence = dplyr::tibble(
+        condition_occurrence_id = 1:3L,
+        person_id = c(1L, 2L, 3L),
+        condition_concept_id = 194152L,
+        condition_start_date = as.Date("2020-01-01"),
+        condition_end_date = as.Date("2020-01-01"),
+        condition_type_concept_id = 0L
+      ),
+      cohort = dplyr::tibble(
+        subject_id = c(1L, 2L),
+        cohort_definition_id = c(1L, 2L),
+        cohort_start_date = as.Date("2010-01-01"),
+        cohort_end_date = as.Date("2010-01-01")
+      )
+    )
+  )
 
+  cdm <- CDMConnector::copyCdmTo(con = duckdb::dbConnect(duckdb::duckdb()), cdm = cdm, schema = "main")
+
+  expect_no_error(
+    x <- conceptCohort(
+      cdm = cdm,
+      conceptSet = list(test = 194152L),
+      name = "test"
+    )
+  )
+  expect_true(all(c(1L, 2L, 3L) %in% dplyr::pull(x, "subject_id")))
+
+  expect_no_error(
+    x <- conceptCohort(
+      cdm = cdm,
+      conceptSet = list(test = 194152L),
+      name = "test",
+      subsetCohort = "cohort"
+    )
+  )
+  expect_true(all(c(1L, 2L) %in% dplyr::pull(x, "subject_id")))
+  expect_true(all(!c(3L) %in% dplyr::pull(x, "subject_id")))
+
+  expect_no_error(
+    x <- conceptCohort(
+      cdm = cdm,
+      conceptSet = list(test = 194152L),
+      name = "test",
+      subsetCohort = "cohort",
+      subsetCohortId = 1L
+    )
+  )
+  expect_true(all(c(1L) %in% dplyr::pull(x, "subject_id")))
+  expect_true(all(!c(2L, 3L) %in% dplyr::pull(x, "subject_id")))
+
+  expect_no_error(
+    x <- conceptCohort(
+      cdm = cdm,
+      conceptSet = list(test = 194152L),
+      name = "test",
+      subsetCohort = "cohort",
+      subsetCohortId = "cohort_1"
+    )
+  )
+  expect_true(all(c(1L) %in% dplyr::pull(x, "subject_id")))
+  expect_true(all(!c(2L, 3L) %in% dplyr::pull(x, "subject_id")))
+
+  expect_no_error(
+    x <- conceptCohort(
+      cdm = cdm,
+      conceptSet = list(test = 194152L),
+      name = "test",
+      subsetCohort = "cohort",
+      subsetCohortId = dplyr::starts_with("cohort")
+    )
+  )
+  expect_true(all(c(1L, 2L) %in% dplyr::pull(x, "subject_id")))
+  expect_true(all(!c(3L) %in% dplyr::pull(x, "subject_id")))
+
+  CDMConnector::cdmDisconnect(cdm = cdm)
+})
