@@ -915,9 +915,10 @@ test_that("overlap option", {
                                 exit = "event_end_date",
                                 overlap = "extend"))
 
+  expect_true((cdm$cohort_6 |> dplyr::pull("cohort_start_date")) == as.Date("2020-01-01"))
+  expect_true((cdm$cohort_6 |> dplyr::pull("cohort_end_date")) == as.Date("2020-01-16"))
 
-
-  # Check if "extend" exceeds observation_period_end_date
+  # Check if "extend" exceeds observation_period_end_date (when only one observation period)
   cdm <- omopgenerics::insertTable(
     cdm = cdm, name = "drug_exposure", table = dplyr::tibble(
       "drug_exposure_id" = c(1L, 2L),
@@ -933,8 +934,25 @@ test_that("overlap option", {
                                 name = "cohort_7",
                                 exit = "event_end_date",
                                 overlap = "extend"))
+  expect_true((cdm$cohort_7 |> dplyr::pull("cohort_start_date")) == as.Date("2020-01-15"))
+  expect_true((cdm$cohort_7 |> dplyr::pull("cohort_end_date")) == as.Date("2020-01-30"))
 
+  # Check if "extend" exceeds observation_period_end_date (when more than one observation period)
+  cdm <- omopgenerics::insertTable(
+    cdm = cdm, name = "observation_period", table = dplyr::tibble(
+      "observation_period_id" = c(1L, 1L, 2L),
+      "person_id" = c(1L, 1L, 2L),
+      "observation_period_start_date" = as.Date(c("2020-01-01","2020-03-01","2020-01-01")),
+      "observation_period_end_date" = as.Date(c("2020-01-30","2020-03-30","2020-01-30")),
+      "period_type_concept_id" = c(NA_integer_,NA_integer_,NA_integer_)
+    ))
 
+  expect_no_error(cdm$cohort_8 <- conceptCohort(cdm = cdm,
+                                                conceptSet = list(a = 1L),
+                                                name = "cohort_8",
+                                                exit = "event_end_date",
+                                                overlap = "extend"))
+  expect_true((cdm$cohort_8 |> dplyr::pull("cohort_end_date")) == as.Date("2020-01-30"))
 
   PatientProfiles::mockDisconnect(cdm)
 })
