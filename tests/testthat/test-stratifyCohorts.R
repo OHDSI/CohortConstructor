@@ -15,7 +15,7 @@ test_that("simple stratification", {
         "observation_period_id" = 1:4,
         "person_id" = 1:4,
         "observation_period_start_date" = as.Date("2000-01-01"),
-        "observation_period_end_date" = as.Date("2030-01-01"),
+        "observation_period_end_date" = as.Date("2024-01-01"),
         "period_type_concept_id" = 0L
       )
     ),
