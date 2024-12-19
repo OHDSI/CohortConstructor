@@ -436,7 +436,7 @@ test_that("codelist kept with >1 requirement", {
 
   cdm <- cdm_local |> copyCdm()
 
-  cdm$cohort1 <- conceptCohort(cdm = cdm, conceptSet = list(a = 1, b = 2), name = "cohort1")
+  cdm$cohort1 <- conceptCohort(cdm = cdm, conceptSet = list(a = 1L, b = 2L), name = "cohort1")
 
   cdm$cohort2 <- cdm$cohort1 |> requireDemographics(name = "cohort2", minPriorObservation = c(0,3), cohortId = 1)
   expect_equal(attr(cdm$cohort2, "cohort_codelist") |> dplyr::collect() |> dplyr::arrange(.data$cohort_definition_id), dplyr::tibble(

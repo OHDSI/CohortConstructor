@@ -198,10 +198,10 @@ conceptCohort <- function(cdm,
   cdm[[name]] <- fulfillCohortReqs(cdm = cdm, name = name)
 
   if(overlap == "merge"){
-  cli::cli_inform(c("i" = "Merging overlapping records."))
-  cdm[[name]] <- cdm[[name]] |>
-    joinOverlap(name = name, gap = 0)  |>
-    omopgenerics::recordCohortAttrition(reason = "Merge overlapping records")
+    cli::cli_inform(c("i" = "Merging overlapping records."))
+    cdm[[name]] <- cdm[[name]] |>
+      joinOverlap(name = name, gap = 0)  |>
+      omopgenerics::recordCohortAttrition(reason = "Merge overlapping records")
   }
 
   if(overlap == "extend"){
@@ -210,7 +210,7 @@ conceptCohort <- function(cdm,
       extendOverlap(name = name)  |>
       omopgenerics::recordCohortAttrition(reason = "Add overlapping records")
 
-   # adding days might mean we no longer satisfy cohort requirements
+    # adding days might mean we no longer satisfy cohort requirements
     cli::cli_inform(c("i" = "Re-appplying cohort requirements."))
     cdm[[name]] <- fulfillCohortReqs(cdm = cdm, name = name)
   }
@@ -492,86 +492,82 @@ extendOverlap  <- function(cohort,
   # Because once we add to a record this may cause a new overlap
   # will do a while loop until all overlaps are resolved
   while(hasOverlap(cohort)){
-  cli::cli_inform("Recursively adding overlapping records")
-  workingTblNames <- paste0(omopgenerics::uniqueTableName(), "_", c(1:4))
-  cohort <- cohort %>%
+    cli::cli_inform("Recursively adding overlapping records")
+    workingTblNames <- paste0(omopgenerics::uniqueTableName(), "_", c(1:4))
+    cohort <- cohort %>%
       dplyr::mutate(record_id = dplyr::row_number()) |>
       dplyr::compute(temporary = FALSE,
                      name = workingTblNames[1])
 
-  # keep overlapping records
-  cohort_overlap <- cohort %>%
-    dplyr::inner_join(cohort,
-                      by = c("cohort_definition_id", "subject_id"),
-                      suffix = c("", "_overlap")) |>
-    dplyr::filter(
-      record_id != record_id_overlap,
-      cohort_start_date <= cohort_end_date_overlap &
-      cohort_end_date >= cohort_start_date_overlap
-    )  |>
-    dplyr::select("cohort_definition_id", "subject_id",
-                  "cohort_start_date", "cohort_end_date",
-                  "record_id") |>
-    dplyr::distinct() |>
-    dplyr::compute(temporary = FALSE,
-                   name = workingTblNames[2])
+    # keep overlapping records
+    cohort_overlap <- cohort %>%
+      dplyr::inner_join(cohort,
+                        by = c("cohort_definition_id", "subject_id"),
+                        suffix = c("", "_overlap")) |>
+      dplyr::filter(
+        record_id != record_id_overlap,
+        cohort_start_date <= cohort_end_date_overlap &
+          cohort_end_date >= cohort_start_date_overlap
+      )  |>
+      dplyr::select("cohort_definition_id", "subject_id",
+                    "cohort_start_date", "cohort_end_date",
+                    "record_id") |>
+      dplyr::distinct() |>
+      dplyr::compute(temporary = FALSE,
+                     name = workingTblNames[2])
 
-  cohort_no_overlap <- cohort |>
-    dplyr::anti_join(cohort_overlap |>
-                       dplyr::select("record_id"),
-                     by = "record_id") |>
-    dplyr::select(!"record_id")  |>
-    dplyr::compute(temporary = FALSE,
-                   name = workingTblNames[3])
+    cohort_no_overlap <- cohort |>
+      dplyr::anti_join(cohort_overlap |>
+                         dplyr::select("record_id"),
+                       by = "record_id") |>
+      dplyr::select(!"record_id")  |>
+      dplyr::compute(temporary = FALSE,
+                     name = workingTblNames[3])
 
-  cohort_overlap <- cohort_overlap %>%
-     dplyr::mutate(days = !!CDMConnector::datediff("cohort_start_date",
-                                          "cohort_end_date")) |>
-     dplyr::group_by(dplyr::pick("cohort_definition_id",
-                                 "subject_id")) |>
-     dplyr::summarise(cohort_start_date = min(.data$cohort_start_date, na.rm = TRUE),
-                      days  = as.integer(sum(.data$days)))  %>%
-    dplyr:: ungroup() %>%
-    dplyr::mutate(cohort_end_date = as.Date(
-      !!CDMConnector::dateadd(
-        date = "cohort_start_date",
-        number = "days",
-        interval = "day"
-      ))) |>
-    dplyr::select(!"days")  |>
-    dplyr::compute(temporary = FALSE,
-                   name = workingTblNames[4])
+    cohort_overlap <- cohort_overlap %>%
+      dplyr::mutate(days = !!CDMConnector::datediff("cohort_start_date",
+                                                    "cohort_end_date")) |>
+      dplyr::group_by(dplyr::pick("cohort_definition_id",
+                                  "subject_id")) |>
+      dplyr::summarise(cohort_start_date = min(.data$cohort_start_date, na.rm = TRUE),
+                       days  = as.integer(sum(.data$days, na.rm = TRUE)))  %>%
+      dplyr:: ungroup() %>%
+      dplyr::mutate(cohort_end_date = as.Date(
+        !!CDMConnector::dateadd(
+          date = "cohort_start_date",
+          number = "days",
+          interval = "day"
+        ))) |>
+      dplyr::select(!"days")  |>
+      dplyr::compute(temporary = FALSE,
+                     name = workingTblNames[4])
 
-  cohort <- dplyr::union_all(cohort_overlap,
-                                     cohort_no_overlap) |>
-    dplyr::compute(name = name, temporary = FALSE)
+    cohort <- dplyr::union_all(cohort_overlap, cohort_no_overlap) |>
+      dplyr::compute(name = name, temporary = FALSE)
 
-  CDMConnector::dropTable(cdm = cdm,
-                          name = workingTblNames)
-
+    CDMConnector::dropTable(cdm = cdm, name = workingTblNames)
   }
 
   cohort
-
 }
 
 hasOverlap <- function(cohort){
-    overlaps <- cohort |>
-      dplyr::group_by(.data$cohort_definition_id, .data$subject_id) |>
-      dplyr::arrange(.data$cohort_start_date) |>
-      dplyr::mutate(
-        "next_cohort_start_date" = dplyr::lead(.data$cohort_start_date)
-      ) |>
-      dplyr::filter(.data$cohort_end_date >= .data$next_cohort_start_date) |>
-      dplyr::ungroup() |>
-      dplyr::tally() |>
-      dplyr::collect()
+  overlaps <- cohort |>
+    dplyr::group_by(.data$cohort_definition_id, .data$subject_id) |>
+    dplyr::arrange(.data$cohort_start_date) |>
+    dplyr::mutate(
+      "next_cohort_start_date" = dplyr::lead(.data$cohort_start_date)
+    ) |>
+    dplyr::filter(.data$cohort_end_date >= .data$next_cohort_start_date) |>
+    dplyr::ungroup() |>
+    dplyr::tally() |>
+    dplyr::collect()
 
-    if (overlaps$n > 0) {
-      cli::cli_inform(" - {overlaps$n} overlapping record{?s} found")
+  if (overlaps$n > 0) {
+    cli::cli_inform(" - {overlaps$n} overlapping record{?s} found")
     return(TRUE)
-      } else {
+  } else {
     return(FALSE)
-      }
-
   }
+
+}

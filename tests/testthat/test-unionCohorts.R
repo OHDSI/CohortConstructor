@@ -61,7 +61,7 @@ test_that("unionCohorts works", {
   expect_identical(collectCohort(cdm$cohort3, 2), collectCohort(cdm$cohort4, 2))
 
   # union 2 empty cohorts
-  cdm$cohort5 <- conceptCohort(cdm = cdm, conceptSet = list("a"= 1, "b" = 2), name = "cohort5")
+  cdm$cohort5 <- conceptCohort(cdm = cdm, conceptSet = list("a"= 1L, "b" = 2L), name = "cohort5")
   cdm$cohort6 <- cdm$cohort5 |> unionCohorts(name = "cohort6")
   expect_true(nrow(attrition(cdm$cohort6)) == 1)
   expect_true(attrition(cdm$cohort6)$number_records == 0)
@@ -235,7 +235,7 @@ test_that("test codelist", {
 
   cdm <- cdm_local |> copyCdm()
 
-  cdm$cohort1 <- conceptCohort(cdm, conceptSet = list(c1 = c(1,3), c2 = c(2)), name = "cohort1")
+  cdm$cohort1 <- conceptCohort(cdm, conceptSet = list(c1 = c(1L,3L), c2 = c(2L)), name = "cohort1")
 
   # Union concept generated cohort
   cdm$cohort2 <- unionCohorts(cdm$cohort1, name = "cohort2")

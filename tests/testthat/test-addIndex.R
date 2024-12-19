@@ -1,4 +1,3 @@
-
 test_that("local tibble and duckdb test - will do nothing for these", {
   skip_on_cran()
   cdm <- omock::mockCdmReference() |>
@@ -6,7 +5,7 @@ test_that("local tibble and duckdb test - will do nothing for these", {
       "cohort_definition_id" = 1,
       "subject_id" = c(1, 2, 3),
       "cohort_start_date" = as.Date("2020-01-01"),
-      "cohort_end_date" = as.Date("2029-12-31")
+      "cohort_end_date" = as.Date("2024-01-01")
     )))
   expect_no_error(cdm$cohort <- cdm$cohort |>
     addCohortTableIndex())

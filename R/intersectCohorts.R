@@ -342,10 +342,10 @@ joinOverlap <- function(cohort,
   cdm <- omopgenerics::cdmReference(cohort)
 
   start <- cohort |>
-    dplyr::select(by, "date" := !!startDate) |>
+    dplyr::select(dplyr::all_of(by), "date" := !!startDate) |>
     dplyr::mutate("date_id" = -1)
   end <- cohort |>
-    dplyr::select(by, "date" := !!endDate) |>
+    dplyr::select(dplyr::all_of(by), "date" := !!endDate) |>
     dplyr::mutate("date_id" = 1)
   if (gap > 0) {
     end <- end |>
@@ -357,7 +357,7 @@ joinOverlap <- function(cohort,
     dplyr::compute(temporary = FALSE, name = workingTbl)
 
   x <- x |>
-    dplyr::group_by(dplyr::pick(by)) |>
+    dplyr::group_by(dplyr::pick(dplyr::all_of(by))) |>
     dplyr::arrange(.data$date, .data$date_id) |>
     dplyr::mutate(
       "cum_id" = cumsum(.data$date_id),
@@ -410,7 +410,7 @@ joinAll <- function(cohort,
   }
 
   x <- cohort |>
-    dplyr::group_by(dplyr::across(by)) |>
+    dplyr::group_by(dplyr::across(dplyr::all_of(by))) |>
     dplyr::summarise(
       cohort_start_date =
         min(.data$cohort_start_date, na.rm = TRUE),

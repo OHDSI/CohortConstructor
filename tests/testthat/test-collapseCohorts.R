@@ -5,7 +5,7 @@ test_that("simple example", {
       "cohort_definition_id" = 1L,
       "subject_id" = c(1L, 2L, 3L),
       "cohort_start_date" = as.Date("2020-01-01"),
-      "cohort_end_date" = as.Date("2029-12-31")
+      "cohort_end_date" = as.Date("2024-01-01")
     )))
   cdm <- omopgenerics::insertTable(
     cdm = cdm, name = "concept", table = dplyr::tibble(
@@ -70,7 +70,7 @@ test_that("simple example", {
   expect_no_error(newCohort <- cohort |> collapseCohorts(gap = 1, name = "my_cohort"))
   expect_identical(settings(newCohort), settings(cohort))
   expect_identical(cohortCount(newCohort), dplyr::tibble(
-    "cohort_definition_id" = 1L, "number_records" = 4L, "number_subjects" = 2L
+    "cohort_definition_id" = 1L, "number_records" = 2L, "number_subjects" = 2L
   ))
   # expect_identical(
   #   attrition(newCohort),
@@ -112,7 +112,7 @@ test_that("out of observation", {
       "cohort_definition_id" = 1L,
       "subject_id" = c(1L, 2L, 3L),
       "cohort_start_date" = as.Date("2020-01-01"),
-      "cohort_end_date" = as.Date("2029-12-31")
+      "cohort_end_date" = as.Date("2024-01-01")
     )))
   cdm <- omopgenerics::insertTable(
     cdm = cdm, name = "concept", table = dplyr::tibble(
@@ -169,7 +169,7 @@ test_that("out of observation", {
   expect_no_error(newCohort <- cohort |> collapseCohorts(gap = 1, name = "my_cohort"))
   expect_identical(settings(newCohort), settings(cohort))
   expect_identical(cohortCount(newCohort), dplyr::tibble(
-    "cohort_definition_id" = 1L, "number_records" = 4L, "number_subjects" = 2L
+    "cohort_definition_id" = 1L, "number_records" = 2L, "number_subjects" = 2L
   ))
   # expect_identical(
   #   attrition(newCohort),
