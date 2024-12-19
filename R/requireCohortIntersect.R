@@ -11,7 +11,7 @@
 #' @inheritParams windowDoc
 #' @inheritParams nameDoc
 #'
-#' @return Cohort table with only those isatisfying the criteria kept
+#' @return Cohort table with only those entries satisfying the criteria
 #'
 #' @export
 #'

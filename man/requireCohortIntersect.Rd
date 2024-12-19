@@ -54,7 +54,7 @@ column date of the cohort.}
 \item{name}{Name of the new cohort table created in the cdm object.}
 }
 \value{
-Cohort table with only those isatisfying the criteria kept
+Cohort table with only those entries satisfying the criteria
 }
 \description{
 \code{requireCohortIntersect()} filters a cohort table based on a requirement

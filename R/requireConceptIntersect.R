@@ -11,6 +11,8 @@
 #' @inheritParams windowDoc
 #' @inheritParams nameDoc
 #' @inheritParams conceptSetDoc
+#' @param inObservation If TRUE only records inside an observation period will
+#' be considered.
 #'
 #' @return Cohort table with only those  with the events in the concept list
 #' kept (or those without the event if negate = TRUE)
@@ -35,6 +37,7 @@ requireConceptIntersect <- function(cohort,
                                     indexDate = "cohort_start_date",
                                     targetStartDate = "event_start_date",
                                     targetEndDate = "event_end_date",
+                                    inObservation = TRUE,
                                     censorDate = NULL,
                                     name = tableName(cohort)) {
   # checks
@@ -82,6 +85,7 @@ requireConceptIntersect <- function(cohort,
         targetEndDate = targetEndDate,
         window = window,
         censorDate = censorDate,
+        inObservation = inObservation,
         nameStyle = "intersect_concept",
         name = subsetName
       )
