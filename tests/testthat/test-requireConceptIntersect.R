@@ -96,7 +96,7 @@ test_that("require flag in concept", {
   # only support one concept at the moment
  expect_error(
    requireConceptIntersect(cohort = cdm$cohort1,
-                               conceptSet = list(a = 1, b = 2),
+                               conceptSet = list(a = 1L, b = 2L),
                                window = c(-Inf, Inf))
  )
  expect_error(
