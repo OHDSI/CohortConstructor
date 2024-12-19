@@ -33,10 +33,10 @@ exitAtObservationEnd <- function(cohort,
                                  limitToCurrentPeriod = TRUE,
                                  name = tableName(cohort)) {
   # checks
-  cohort <- validateCohortTable(cohort, dropExtraColumns = TRUE)
+  cohort <- omopgenerics::validateCohortArgument(cohort, dropExtraColumns = TRUE)
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
-  cohortId <- validateCohortId(cohortId, settings(cohort))
+  cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort)
 
   tmpTable <- omopgenerics::uniqueTableName()
   if (all(cohortId %in% settings(cohort)$cohort_definition_id)) {
@@ -153,9 +153,9 @@ exitAtDeath <- function(cohort,
                         name = tableName(cohort)) {
   # checks
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
-  cohort <- validateCohortTable(cohort, dropExtraColumns = TRUE)
+  cohort <- omopgenerics::validateCohortArgument(cohort, dropExtraColumns = TRUE)
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
-  cohortId <- validateCohortId(cohortId, settings(cohort))
+  cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort)
   omopgenerics::assertLogical(requireDeath, length = 1)
 
   # create new cohort

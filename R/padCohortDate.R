@@ -156,7 +156,7 @@ padCohortStart <- function(cohort,
   omopgenerics::assertCharacter(indexDate, length = 1, call = call)
   validateColumn(indexDate, cohort, call = call)
   omopgenerics::assertLogical(collapse, length = 1)
-  cohortId <- validateCohortId(cohortId, set = settings(cohort), call = call)
+  cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort)
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   msg <- "`days` be an integerish or point to an integerish column of cohort"
   reason <- paste0("pad `", cohortDate, "` ")

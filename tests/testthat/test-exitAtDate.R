@@ -157,8 +157,8 @@ test_that("exit at death date", {
   expect_true(all(attrition(cdm$cohort)$reason ==
                     c("Initial qualifying events", "No death recorded", "Exit at death", "Initial qualifying events")))
 
-  # additional columns warning
-  expect_message(cdm$cohort <- cdm$cohort |> dplyr::mutate(extra_col = 1) |> exitAtDeath())
+  # columns warning
+  cdm$cohort <- cdm$cohort |> dplyr::mutate(extra_col = 1) |> exitAtDeath()
   expect_true(all(colnames(cdm$cohort) == c("cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date")))
 
   # expected errors

@@ -18,10 +18,10 @@ collapseCohorts <- function(cohort,
                             gap = 0,
                             name = tableName(cohort)) {
   # input validation
-  cohort <- validateCohortTable(cohort, dropExtraColumns = TRUE)
+  cohort <- omopgenerics::validateCohortArgument(cohort, dropExtraColumns = TRUE)
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
-  cohortId <- validateCohortId(cohortId, settings(cohort))
+  cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort)
   omopgenerics::assertNumeric(gap, integerish = TRUE, min = 0, length = 1)
   ids <- settings(cohort)$cohort_definition_id
 

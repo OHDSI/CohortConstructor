@@ -41,7 +41,7 @@ requireDeathFlag <- function(cohort,
   cohort <- omopgenerics::validateCohortArgument(cohort)
   validateCohortColumn(indexDate, cohort, class = "Date")
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
-  cohortId <- validateCohortId(cohortId, settings(cohort))
+  cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort)
   window <- omopgenerics::validateWindowArgument(window)
   omopgenerics::assertLogical(negate, length = 1)
 

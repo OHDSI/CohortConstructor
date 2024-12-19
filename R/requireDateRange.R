@@ -35,7 +35,7 @@ requireInDateRange <- function(cohort,
   cohort <- omopgenerics::validateCohortArgument(cohort)
   validateCohortColumn(indexDate, cohort, class = "Date")
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
-  cohortId <- validateCohortId(cohortId, settings(cohort))
+  cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort)
   dateRange <- validateDateRange(dateRange)
 
   # requirement
@@ -116,7 +116,7 @@ trimToDateRange <- function(cohort,
   validateCohortColumn(startDate, cohort, class = "Date")
   validateCohortColumn(endDate, cohort, class = "Date")
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
-  cohortId <- validateCohortId(cohortId, settings(cohort))
+  cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort)
   dateRange <- validateDateRange(dateRange)
 
   # trim start

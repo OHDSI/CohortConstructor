@@ -43,7 +43,7 @@ requireConceptIntersect <- function(cohort,
   validateCohortColumn(indexDate, cohort, class = "Date")
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   window <- omopgenerics::validateWindowArgument(window)
-  cohortId <- validateCohortId(cohortId, settings(cohort))
+  cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort)
   intersections <- validateIntersections(intersections)
   conceptSet <- omopgenerics::validateConceptSetArgument(conceptSet, cdm)
 

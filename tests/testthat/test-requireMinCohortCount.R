@@ -35,7 +35,7 @@ test_that("testing requireMinCohortCount", {
     name = "cohort1_b"
   )
   expect_gt(nrow(cdm$cohort1_b |>
-                     dplyr::collect()), 0)
+                   dplyr::collect()), 0)
   expect_true(all(cohortCount(cdm$cohort1_b) |>
                     dplyr::filter(cohort_definition_id == 1) |>
                     dplyr::pull("number_records") == 0))
@@ -51,13 +51,19 @@ test_that("testing requireMinCohortCount", {
                     dplyr::pull("number_subjects") > 0))
 
   # restrict specific cohort
-  expect_warning(
-    cdm$cohort1_c <- requireMinCohortCount(
+  expect_error(
+    requireMinCohortCount(
       cdm$cohort1,
       minCohortCount = 5,
       cohortId = c("cohort_1", "cohort_6"),
       name = "cohort1_c"
     ))
+  cdm$cohort1_c <- requireMinCohortCount(
+    cdm$cohort1,
+    minCohortCount = 5,
+    cohortId = "cohort_1",
+    name = "cohort1_c"
+  )
   expect_true(cdm$cohort1_c |> dplyr::tally() |> dplyr::pull() == 4)
 
 

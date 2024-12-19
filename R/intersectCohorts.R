@@ -42,7 +42,7 @@ intersectCohorts <- function(cohort,
   cohort <- omopgenerics::validateCohortArgument(cohort)
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
-  cohortId <- validateCohortId(cohortId, settings(cohort))
+  cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort)
   omopgenerics::assertNumeric(gap, integerish = TRUE, min = 0, length = 1)
   omopgenerics::assertLogical(returnNonOverlappingCohorts, length = 1)
   omopgenerics::assertLogical(keepOriginalCohorts, length = 1)

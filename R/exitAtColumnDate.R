@@ -104,7 +104,7 @@ exitAtColumnDate <- function(cohort,
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   cohort <- omopgenerics::validateCohortArgument(cohort)
-  cohortId <- validateCohortId(cohortId, settings(cohort))
+  cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort)
   validateCohortColumn(dateColumns, cohort, "Date")
   omopgenerics::assertLogical(returnReason, length = 1)
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
