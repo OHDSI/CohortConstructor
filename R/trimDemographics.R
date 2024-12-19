@@ -320,7 +320,7 @@ trimDemographics <- function(cohort,
       cohortSetRef = newSet,
       cohortAttritionRef = attrition(newCohort),
       cohortCodelistRef = newCod,
-      .softValidation = TRUE
+      .softValidation = FALSE
     )
 
   omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with(tablePrefix))

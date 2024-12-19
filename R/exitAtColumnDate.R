@@ -216,7 +216,7 @@ exitAtColumnDate <- function(cohort,
   newCohort <- newCohort |>
     dplyr::relocate(dplyr::all_of(omopgenerics::cohortColumns("cohort"))) |>
     dplyr::compute(name = name, temporary = FALSE) |>
-    omopgenerics::newCohortTable(.softValidation = TRUE)
+    omopgenerics::newCohortTable(.softValidation = FALSE)
 
   cdm <- omopgenerics::dropTable(cdm, name = dplyr::starts_with(tmpPrefix))
 

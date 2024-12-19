@@ -73,7 +73,7 @@ collapseCohorts <- function(cohort,
       dplyr::compute(name = name, temporary = FALSE)
   }
   newCohort <- newCohort |>
-    omopgenerics::newCohortTable(.softValidation = TRUE) |>
+    omopgenerics::newCohortTable(.softValidation = FALSE) |>
     omopgenerics::recordCohortAttrition(
       reason = "Collapse cohort with a gap of {gap} days.",
       cohortId = cohortId)

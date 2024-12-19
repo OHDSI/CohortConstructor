@@ -164,7 +164,7 @@ matchCohorts <- function(cohort,
           "match_status" = "target"
         )
       ,
-      .softValidation = TRUE
+      .softValidation = FALSE
     )
 
   # Bind both cohorts

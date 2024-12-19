@@ -178,7 +178,7 @@ yearCohorts <- function(cohort,
       cohortSetRef = newSet,
       cohortAttritionRef = newAttrition |> dplyr::bind_rows(),
       cohortCodelistRef = newCodelist,
-      .softValidation = TRUE
+      .softValidation = FALSE
     )
 
   omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with(tablePrefix))
