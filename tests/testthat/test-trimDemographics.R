@@ -16,10 +16,10 @@ test_that("simple duckdb checks", {
         "observation_period_id" = as.integer(1:4),
         "person_id" = as.integer(c(1, 2, 2, 3)),
         "observation_period_start_date" = as.Date(c(
-          "1993-04-19", "2010-03-12", "2031-08-23", "2020-10-06"
+          "1993-04-19", "2010-03-12", "2017-08-23", "2020-10-06"
         )),
         "observation_period_end_date" = as.Date(c(
-          "2033-10-11", "2017-01-01", "2045-03-12", "2100-12-31"
+          "2023-10-11", "2017-01-01", "2023-03-12", "2024-01-01"
         )),
         "period_type_concept_id" = 0L
       )
@@ -30,10 +30,10 @@ test_that("simple duckdb checks", {
         "cohort_definition_id" = as.integer(c(1, 1, 1, 2)),
         "subject_id" = as.integer(c(1, 2, 3, 1)),
         "cohort_start_date" = as.Date(c(
-          "2032-01-19", "2039-11-12", "2036-03-16", "2003-12-15"
+          "2012-01-19", "2010-11-12", "2021-03-16", "2003-12-15"
         )),
         "cohort_end_date" = as.Date(c(
-          "2033-10-11", "2045-01-12", "2074-05-18", "2010-05-25"
+          "2023-10-11", "2015-01-12", "2024-01-01", "2010-05-25"
         ))
       )
     )
@@ -68,18 +68,14 @@ test_that("simple duckdb checks", {
   expect_identical(
     x,
     dplyr::tibble(
-      "subject_id" = as.integer(c(1, 2, 3)),
-      "cohort_start_date" = as.Date(c(
-        "2033-04-19", "2040-01-15", "2045-08-20"
-      )),
-      "cohort_end_date" = as.Date(c(
-        "2033-10-11", "2045-01-12", "2065-08-19"
-      ))
+      "subject_id" = as.integer(c()),
+      "cohort_start_date" = as.Date(c()),
+      "cohort_end_date" = as.Date(c())
     )
   )
   id <- settings(cdm$cohort2) |>
     dplyr::filter(
-      sex == "Both" & age_range == "40_59" &
+      sex == "Both" & age_range == "0_19" &
         min_prior_observation == 0 &
         min_future_observation == 365 &
         grepl("cohort_1", cohort_name)
@@ -89,9 +85,9 @@ test_that("simple duckdb checks", {
   expect_identical(
     x,
     dplyr::tibble(
-      "subject_id" = c(2L, 3L),
-      "cohort_start_date" = as.Date(c("2040-01-15", "2045-08-20")),
-      "cohort_end_date" = as.Date(c("2045-01-12", "2065-08-19"))
+      "subject_id" = c(1L, 2L, 3L),
+      "cohort_start_date" = as.Date(c("2012-01-19", "2010-11-12", "2021-03-16")),
+      "cohort_end_date" = as.Date(c("2013-04-18", "2015-01-12", "2024-01-01"))
     )
   )
 
@@ -156,9 +152,9 @@ test_that("simple duckdb checks", {
   expect_identical(
     x,
     dplyr::tibble(
-      "subject_id" = as.integer(c(1, 2, 3)),
-      "cohort_start_date" = as.Date(c("1993-04-19", "2010-03-12", "2020-10-06")),
-      "cohort_end_date" = as.Date(c("2013-04-18", "2017-01-01", "2025-08-19"))
+      "subject_id" = as.integer(c(1, 2, 2, 3)),
+      "cohort_start_date" = as.Date(c("1993-04-19", "2010-03-12", "2017-08-23", "2020-10-06")),
+      "cohort_end_date" = as.Date(c("2013-04-18", "2017-01-01", "2020-01-14", "2024-01-01"))
     )
   )
   id <- settings(cdm$obs1) |>
@@ -172,9 +168,9 @@ test_that("simple duckdb checks", {
   expect_identical(
     x,
     dplyr::tibble(
-      "subject_id" = c(1L, 2L, 3L),
-      "cohort_start_date" = as.Date(c("1994-04-19", "2011-03-12", "2021-10-06")),
-      "cohort_end_date" = as.Date(c("2013-04-18", "2017-01-01", "2025-08-19"))
+      "subject_id" = c(1L, 2L, 2L, 3L),
+      "cohort_start_date" = as.Date(c("1994-04-19", "2011-03-12", "2018-08-23", "2021-10-06")),
+      "cohort_end_date" = as.Date(c("2013-04-18", "2017-01-01", "2020-01-14", "2024-01-01"))
     )
   )
 
@@ -291,9 +287,9 @@ test_that("simple duckdb checks", {
   expect_identical(
     x,
     dplyr::tibble(
-      "subject_id" = c(1L, 2L, 3L),
-      "cohort_start_date" = as.Date(c("1993-04-19", "2010-03-12", "2020-10-06")),
-      "cohort_end_date" = as.Date(c("2013-04-18", "2017-01-01", "2025-08-19"))
+      "subject_id" = c(1L, 2L, 2L, 3L),
+      "cohort_start_date" = as.Date(c("1993-04-19", "2010-03-12", "2017-08-23", "2020-10-06")),
+      "cohort_end_date" = as.Date(c("2013-04-18", "2017-01-01", "2020-01-14", "2024-01-01"))
     )
   )
   id <- settings(cdm$obs_new) |>
