@@ -1,41 +1,3 @@
-# validateCohortTable <- function(cohort, dropExtraColumns = FALSE) {
-#   if (!inherits(cohort, "cohort_table") ||
-#     !all(
-#       c(
-#         "cohort_definition_id",
-#         "subject_id",
-#         "cohort_start_date",
-#         "cohort_end_date"
-#       ) %in%
-#         colnames(cohort)
-#     )) {
-#     cli::cli_abort("cohort must be a `cohort_table`")
-#   }
-#   if (dropExtraColumns) {
-#     extraColumns <- colnames(cohort)
-#     extraColumns <- extraColumns[!extraColumns %in% c(
-#       "cohort_definition_id",
-#       "subject_id",
-#       "cohort_start_date",
-#       "cohort_end_date"
-#     )]
-#     if (length(extraColumns) > 0) {
-#       cli::cli_inform(
-#         c("!" = "extra columns will be dropped from cohort table:
-#         {paste0(extraColumns, collapse = ', ')}.")
-#       )
-#       cohort <- cohort |>
-#         dplyr::select(
-#           "cohort_definition_id",
-#           "subject_id",
-#           "cohort_start_date",
-#           "cohort_end_date"
-#         )
-#     }
-#   }
-#   return(invisible(cohort))
-# }
-
 validateCohortColumn <- function(columns, cohort, class = NULL) {
   for (column in columns) {
     omopgenerics::assertCharacter(column)
@@ -53,48 +15,6 @@ validateCohortColumn <- function(columns, cohort, class = NULL) {
   }
   return(invisible(columns))
 }
-
-# validateCohortId <- function(cohortId, set, call = parent.frame()) {
-#   # NULL
-#   if (is.null(cohortId)) {
-#     cohortId <- set$cohort_definition_id
-#
-#   # Character
-#   } else if (is.character(cohortId)) {
-#     cohortIdIn <- cohortId
-#     cohortId <- set |> dplyr::filter(.data$cohort_name %in% .env$cohortId) |> dplyr::pull("cohort_definition_id")
-#     indNot <- !cohortIdIn %in% set$cohort_name
-#     if (sum(indNot) > 0) {
-#       if (sum(indNot) == length(cohortIdIn)) {
-#         cli::cli_abort("No valid cohortId supplied.", call = call)
-#       } else {
-#         cli::cli_warn(
-#           "{paste0(cohortIdIn[indNot], collapse = ', ')} {?is/are} not in the cohort table and won't be used.", call = call
-#         )
-#       }
-#     }
-#
-#   # Numeric
-#   } else if (is.numeric(cohortId)) {
-#     omopgenerics::assertNumeric(cohortId, null = TRUE, integerish = TRUE)
-#     indNot <- !cohortId %in% set$cohort_definition_id
-#     if (sum(indNot) > 0) {
-#       if (sum(indNot) == length(cohortId)) {
-#         cli::cli_abort("No valid cohort ids supplied.", call = call)
-#       } else {
-#         cli::cli_warn(
-#           "{paste0(cohortId[indNot], collapse = ', ')} {?is/are} not in the cohort table and won't be used.", call = call
-#         )
-#         cohortId <- cohortId[!indNot]
-#       }
-#     }
-#
-#   # Anything else
-#   } else {
-#     cli::cli_abort("{.strong cohortId} must be 1) a numeric vector indicating which `cohort_deifnition_id`, 2) a character vector indicating which `cohort_name`, or 3) NULL to use all cohorts in the table.", call = call)
-#   }
-#   return(cohortId)
-# }
 
 validateDateRange <- function(dateRange) {
   if (!inherits(dateRange, "Date") && !all(is.na(dateRange))) {
