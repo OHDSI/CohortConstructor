@@ -36,9 +36,9 @@ from each of the overlapping records.}
 used when identifying relevant clinical records. If FALSE, only the standard
 concept_id fields will be used.}
 
-\item{subsetCohort}{A cohort table containing individuals for whom cohorts
-will be generated. Only individuals in this table will appear in the
-generated cohort.}
+\item{subsetCohort}{A character refering to a cohort table containing
+individuals for whom cohorts will be generated. Only individuals in this
+table will appear in the generated cohort.}
 
 \item{subsetCohortId}{Optional. Specifies cohort IDs from the \code{subsetCohort}
 table to include. If none are provided, all cohorts from the \code{subsetCohort}
