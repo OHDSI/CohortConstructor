@@ -32,6 +32,12 @@ yearCohorts <- function(cohort,
   cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
   omopgenerics::assertNumeric(years, integerish = TRUE)
 
+  if (length(cohortId) == 0) {
+    cli::cli_inform("Returning empty cohort as `cohortId` is not valid.")
+    cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name)
+    return(cdm[[name]])
+  }
+
   if (length(years) == 0) {
     cohort <- cohort |>
       dplyr::compute(name = name, temporary = FALSE) |>

@@ -235,7 +235,7 @@ test_that("different intersection count requirements", {
   # no intersections - people not in cohort2
   expect_identical(sort(cdm$cohort1 |>
                           requireConceptIntersect(intersections = c(0, 0),
-                                                  conceptSet = list("a" = 1),
+                                                  conceptSet = list("a" = 1L),
                                                   window = c(-Inf, Inf),
                                                   name = "cohort1_test") |>
                           dplyr::pull("subject_id")), as.integer(c(4,5,6,7,8,9,10)))
@@ -243,14 +243,14 @@ test_that("different intersection count requirements", {
   # only one intersection
   expect_identical(sort(cdm$cohort1 |>
                           requireConceptIntersect(intersections = c(1, 1),
-                                                  conceptSet = list("a" = 1),
+                                                  conceptSet = list("a" = 1L),
                                                   window = c(-Inf, Inf),
                                                   name = "cohort1_test") |>
                           dplyr::pull("subject_id")), c(1L))
 
   expect_identical(sort(cdm$cohort1 |>
                           requireConceptIntersect(intersections = c(1),
-                                                  conceptSet = list("a" = 1),
+                                                  conceptSet = list("a" = 1L),
                                                   window = c(-Inf, Inf),
                                                   name = "cohort1_test") |>
                           dplyr::pull("subject_id")), c(1L))
@@ -258,38 +258,33 @@ test_that("different intersection count requirements", {
   # 2 intersections
   expect_identical(sort(cdm$cohort1 |>
                           requireConceptIntersect(intersections = c(2, 2),
-                                                  conceptSet = list("a" = 1),
+                                                  conceptSet = list("a" = 1L),
                                                   window = c(-Inf, Inf),
                                                   name = "cohort1_test") |>
                           dplyr::pull("subject_id")), c(2L))
 
   expect_identical(sort(cdm$cohort1 |>
                           requireConceptIntersect(intersections = c(2),
-                                                  conceptSet = list("a" = 1),
+                                                  conceptSet = list("a" = 1L),
                                                   window = c(-Inf, Inf),
                                                   name = "cohort1_test") |>
                           dplyr::pull("subject_id")), c(2L))
 
-
-
   # 2 or more intersections
   expect_identical(sort(cdm$cohort1 |>
                           requireConceptIntersect(intersections = c(2, Inf),
-                                                  conceptSet = list("a" = 1),
+                                                  conceptSet = list("a" = 1L),
                                                   window = c(-Inf, Inf),
                                                   name = "cohort1_test") |>
                           dplyr::pull("subject_id")), c(2L, 3L))
 
   # 2 or 3 intersections
   expect_identical(sort(cdm$cohort1 |>
-                          requireConceptIntersect(intersections = c(2, 3),
+                          requireConceptIntersect(intersections = c(2L, 3L),
                                                   conceptSet = list("a" = 1),
                                                   window = c(-Inf, Inf),
                                                   name = "cohort1_test") |>
                           dplyr::pull("subject_id")), c(2L, 3L))
-
-
-
 
   # expected errors
   expect_error(requireConceptIntersect(cohort = cdm$cohort1,
@@ -310,7 +305,6 @@ test_that("different intersection count requirements", {
                                        window = c(-Inf, Inf)))
 
   PatientProfiles::mockDisconnect(cdm)
-
 })
 
 test_that("test indexes - postgres", {

@@ -47,6 +47,12 @@ stratifyCohorts <- function(cohort,
   strata <- validateStrata(strata, cohort)
   omopgenerics::assertLogical(removeStrata, length = 1)
 
+  if (length(cohortId) == 0) {
+    cli::cli_inform("Returning empty cohort as `cohortId` is not valid.")
+    cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name)
+    return(cdm[[name]])
+  }
+
   if (length(strata) == 0 ||
     sum(cohortCount(cohort)$number_records) == 0) {
     return(subsetCohorts(

@@ -45,6 +45,13 @@ requireDeathFlag <- function(cohort,
   window <- omopgenerics::validateWindowArgument(window)
   omopgenerics::assertLogical(negate, length = 1)
 
+  if (length(cohortId) == 0) {
+    cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
+    # return entry cohort as cohortId is used to modify not subset
+    cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE)
+    return(cdm[[name]])
+  }
+
   cols <- unique(
     c(
       "cohort_definition_id",
