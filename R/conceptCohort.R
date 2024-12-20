@@ -38,9 +38,9 @@
 #' @param useSourceFields If TRUE, the source concept_id fields will also be
 #' used when identifying relevant clinical records. If FALSE, only the standard
 #' concept_id fields will be used.
-#' @param subsetCohort  A cohort table containing individuals for whom cohorts
-#' will be generated. Only individuals in this table will appear in the
-#' generated cohort.
+#' @param subsetCohort  A character refering to a cohort table containing
+#' individuals for whom cohorts will be generated. Only individuals in this
+#' table will appear in the generated cohort.
 #' @param subsetCohortId Optional. Specifies cohort IDs from the `subsetCohort`
 #' table to include. If none are provided, all cohorts from the `subsetCohort`
 #' are included.
@@ -77,7 +77,7 @@ conceptCohort <- function(cdm,
   omopgenerics::assertCharacter(subsetCohort, length = 1, null = TRUE)
   if (!is.null(subsetCohort)) {
     subsetCohort <- omopgenerics::validateCohortArgument(cdm[[subsetCohort]])
-    subsetCohortId <- omopgenerics::validateCohortIdArgument({{subsetCohortId}}, subsetCohort)
+    subsetCohortId <- omopgenerics::validateCohortIdArgument({{subsetCohortId}}, subsetCohort, validation = "warning")
   }
 
   useIndexes <- getOption("CohortConstructor.use_indexes")
@@ -120,7 +120,19 @@ conceptCohort <- function(cdm,
       dplyr::compute(name = subsetName, temporary = FALSE)
     if (omopgenerics::isTableEmpty(subsetIndividuals)) {
       omopgenerics::dropTable(cdm = cdm, name = subsetName)
-      cli::cli_abort("There are no individuals in the `subsetCohort` and `subsetCohortId` provided.")
+      cli::cli_warn("There are no individuals in the `subsetCohort` and `subsetCohortId` provided. Returning empty cohort.")
+      cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name)
+      cdm[[name]] <- cdm[[name]] |>
+        omopgenerics::newCohortTable(
+          cohortSetRef = cohortSet,
+          cohortAttritionRef = dplyr::tibble(
+            "cohort_definition_id" = cohortSet$cohort_definition_id,
+            "number_records" = 0L, "number_subjects" = 0L,
+            "reason_id" = 1L, "reason" = "Qualifying initial events",
+            "excluded_records" = NA_integer_, "excluded_subjects" = NA_integer_
+          )
+        )
+      return(cdm[[name]])
     }
     if (!isFALSE(useIndexes)) {
       addIndex(
