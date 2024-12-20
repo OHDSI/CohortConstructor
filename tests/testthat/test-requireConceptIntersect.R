@@ -38,6 +38,17 @@ test_that("require flag in concept", {
   expect_true(all(cdm$cohort3 |> dplyr::pull("cohort_start_date") |> sort() ==
                     c("2001-03-24", "2001-11-28", "2002-01-30", "2002-06-13", "2003-05-17", "2004-03-11")))
 
+  cdm$in_obs <- requireConceptIntersect(cohort = cdm$cohort1,
+                                        conceptSet = list(a = 1L),
+                                        intersections = 2,
+                                        window = c(0, Inf),
+                                        inObservation = FALSE,
+                                        name = "in_obs")
+  expect_identical(
+    collectCohort(cdm$in_obs, 1),
+    dplyr::tibble(subject_id = 2L, cohort_start_date = as.Date("1999-05-03"), cohort_end_date = as.Date("2001-06-15"))
+  )
+
   expect_true(all(omopgenerics::attrition(cdm$cohort3)$reason ==
                     c("Initial qualifying events",
                       "Concept a between -Inf & Inf days relative to cohort_start_date between 1 and Inf",
@@ -45,10 +56,10 @@ test_that("require flag in concept", {
                       "Concept a between -Inf & Inf days relative to cohort_start_date between 1 and Inf")))
   # cohort Id
   cdm$cohort4 <-  requireConceptIntersect(cohort = cdm$cohort1,
-                                              cohortId = 1,
-                                              conceptSet = list(a = 1L),
-                                              window = c(-Inf, Inf),
-                                              name = "cohort4")
+                                          cohortId = 1,
+                                          conceptSet = list(a = 1L),
+                                          window = c(-Inf, Inf),
+                                          name = "cohort4")
   expect_true(all(cdm$cohort4 |> dplyr::pull("subject_id") ==
                     c(rep(1, 6))))
   expect_true(all(cdm$cohort4 |> dplyr::pull("cohort_start_date") |> sort() ==
@@ -83,8 +94,8 @@ test_that("require flag in concept", {
   # empty concept
   expect_message(
     cdm$cohort1 <-  requireConceptIntersect(cohort = cdm$cohort1,
-                                                conceptSet = list(),
-                                                window = list(c(-Inf, Inf)))
+                                            conceptSet = list(),
+                                            window = list(c(-Inf, Inf)))
   )
   expect_true(all(omopgenerics::attrition(cdm$cohort1)$reason ==
                     c("Initial qualifying events",
@@ -139,14 +150,14 @@ test_that("requiring absence in another cohort", {
   cdm <- cdm_local |> copyCdm()
 
   cdm$cohort3_inclusion <-  requireConceptIntersect(cohort = cdm$cohort1,
-                                                       conceptSet = list(a = 1L),
-                                                       window = c(-Inf, Inf),
-                                                       name = "cohort3_inclusion")
+                                                    conceptSet = list(a = 1L),
+                                                    window = c(-Inf, Inf),
+                                                    name = "cohort3_inclusion")
   cdm$cohort3_exclusion <-  requireConceptIntersect(cohort = cdm$cohort1,
-                                                       conceptSet = list(a = 1L),
-                                                       window = c(-Inf, Inf),
-                                                      intersections = 0,
-                                                       name = "cohort3_exclusion")
+                                                    conceptSet = list(a = 1L),
+                                                    window = c(-Inf, Inf),
+                                                    intersections = 0,
+                                                    name = "cohort3_exclusion")
   in_both <- intersect(cdm$cohort3_inclusion |>
                          dplyr::pull("subject_id") |>
                          unique(),
@@ -223,79 +234,80 @@ test_that("different intersection count requirements", {
 
   # no intersections - people not in cohort2
   expect_identical(sort(cdm$cohort1 |>
-                      requireConceptIntersect(intersections = c(0, 0),
-                                              conceptSet = list("a" = 1L),
-                                             window = c(-Inf, Inf),
-                                             name = "cohort1_test") |>
-                      dplyr::pull("subject_id")), as.integer(c(4,5,6,7,8,9,10)))
-
+                          requireConceptIntersect(intersections = c(0, 0),
+                                                  conceptSet = list("a" = 1),
+                                                  window = c(-Inf, Inf),
+                                                  name = "cohort1_test") |>
+                          dplyr::pull("subject_id")), as.integer(c(4,5,6,7,8,9,10)))
 
   # only one intersection
   expect_identical(sort(cdm$cohort1 |>
-                      requireConceptIntersect(intersections = c(1, 1),
-                                             conceptSet = list(a = 1L),
-                                             window = c(-Inf, Inf),
-                                             name = "cohort1_test") |>
-                      dplyr::pull("subject_id")), c(1L))
+                          requireConceptIntersect(intersections = c(1, 1),
+                                                  conceptSet = list("a" = 1),
+                                                  window = c(-Inf, Inf),
+                                                  name = "cohort1_test") |>
+                          dplyr::pull("subject_id")), c(1L))
 
   expect_identical(sort(cdm$cohort1 |>
-                      requireConceptIntersect(intersections = c(1),
-                                              conceptSet = list(a = 1L),
-                                             window = c(-Inf, Inf),
-                                             name = "cohort1_test") |>
-                      dplyr::pull("subject_id")), c(1L))
+                          requireConceptIntersect(intersections = c(1),
+                                                  conceptSet = list("a" = 1),
+                                                  window = c(-Inf, Inf),
+                                                  name = "cohort1_test") |>
+                          dplyr::pull("subject_id")), c(1L))
 
   # 2 intersections
   expect_identical(sort(cdm$cohort1 |>
-                      requireConceptIntersect(intersections = c(2, 2),
-                                              conceptSet = list(a = 1L),
-                                             window = c(-Inf, Inf),
-                                             name = "cohort1_test") |>
-                      dplyr::pull("subject_id")), c(2L))
+                          requireConceptIntersect(intersections = c(2, 2),
+                                                  conceptSet = list("a" = 1),
+                                                  window = c(-Inf, Inf),
+                                                  name = "cohort1_test") |>
+                          dplyr::pull("subject_id")), c(2L))
 
   expect_identical(sort(cdm$cohort1 |>
-                      requireConceptIntersect(intersections = c(2),
-                                              conceptSet = list(a = 1L),
-                                             window = c(-Inf, Inf),
-                                             name = "cohort1_test") |>
-                      dplyr::pull("subject_id")), c(2L))
+                          requireConceptIntersect(intersections = c(2),
+                                                  conceptSet = list("a" = 1),
+                                                  window = c(-Inf, Inf),
+                                                  name = "cohort1_test") |>
+                          dplyr::pull("subject_id")), c(2L))
+
 
 
   # 2 or more intersections
   expect_identical(sort(cdm$cohort1 |>
-                      requireConceptIntersect(intersections = c(2, Inf),
-                                              conceptSet = list(a = 1L),
-                                             window = c(-Inf, Inf),
-                                             name = "cohort1_test") |>
-                      dplyr::pull("subject_id")), c(2L, 3L))
+                          requireConceptIntersect(intersections = c(2, Inf),
+                                                  conceptSet = list("a" = 1),
+                                                  window = c(-Inf, Inf),
+                                                  name = "cohort1_test") |>
+                          dplyr::pull("subject_id")), c(2L, 3L))
 
   # 2 or 3 intersections
   expect_identical(sort(cdm$cohort1 |>
-                      requireConceptIntersect(intersections = c(2, 3),
-                                              conceptSet = list(a = 1L),
-                                             window = c(-Inf, Inf),
-                                             name = "cohort1_test") |>
-                      dplyr::pull("subject_id")), c(2L, 3L))
+                          requireConceptIntersect(intersections = c(2, 3),
+                                                  conceptSet = list("a" = 1),
+                                                  window = c(-Inf, Inf),
+                                                  name = "cohort1_test") |>
+                          dplyr::pull("subject_id")), c(2L, 3L))
+
 
 
 
   # expected errors
   expect_error(requireConceptIntersect(cohort = cdm$cohort1,
-                                      intersections = c(-10, 10),
-                                      conceptSet = list(a = 1L),
-                                      window = c(-Inf, Inf)))
+                                       intersections = c(-10, 10),
+                                       conceptSet = list("a" = 1),
+                                       window = c(-Inf, Inf)))
   expect_error(requireConceptIntersect(cohort = cdm$cohort1,
-                                      intersections = c(11, 10),
-                                      conceptSet = list(a = 1L),
-                                      window = c(-Inf, Inf)))
+                                       intersections = c(11, 10),
+                                       conceptSet = list("a" = 1),
+                                       window = c(-Inf, Inf)))
   expect_error(requireConceptIntersect(cohort = cdm$cohort1,
-                                      intersections = c(Inf, Inf),
-                                      conceptSet = list(a = 1L),
-                                      window = c(-Inf, Inf)))
+                                       intersections = c(Inf, Inf),
+                                       conceptSet = list("a" = 1),
+                                       window = c(-Inf, Inf)))
   expect_error(requireConceptIntersect(cohort = cdm$cohort1,
-                                      intersections = c(1, 2, 3),
-                                      conceptSet = list(a = 1L),
-                                      window = c(-Inf, Inf)))
+                                       intersections = c(1, 2, 3),
+                                       conceptSet = list("a" = 1),
+                                       window = c(-Inf, Inf)))
 
   PatientProfiles::mockDisconnect(cdm)
 

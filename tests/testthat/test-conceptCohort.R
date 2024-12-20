@@ -101,8 +101,8 @@ test_that("simple example", {
     cdm = cdm, name = "cohort", table = dplyr::tibble(
       "cohort_definition_id" = c(1, 1, 2) |> as.integer(),
       "subject_id" = c(1, 2, 3) |> as.integer(),
-      "cohort_start_date" = c(0, 300, 1500) |> as.Date(origin = "2020-01-01"),
-      "cohort_end_date" = c(400, 800, 1600) |> as.Date(origin = "2020-01-01")
+      "cohort_start_date" = c(0, 300, 1400) |> as.Date(origin = "2020-01-01"),
+      "cohort_end_date" = c(400, 800, 1420) |> as.Date(origin = "2020-01-01")
     )
   )
 
@@ -180,33 +180,34 @@ test_that("simple example", {
   )
 
   # subsetCohort ----
-  # cdm$cohort <- cdm$cohort |> omopgenerics::newCohortTable()
-  # cdm$cohort <- cdm$cohort |>
-  #   omopgenerics::newCohortTable(
-  #     cohortSetRef = dplyr::tibble(
-  #       "cohort_definition_id" = c(1L, 2L, 3L),
-  #       "cohort_name" = paste0("cohort", 1:3),
-  #     ),
-  #     cohortAttritionRef = dplyr::bind_rows(
-  #       attrition(cdm$cohort),attrition(cdm$cohort)[1] |> dplyr::mutate("cohort_definition_id" = 3L)
-  #     )
-  #   )
-  # cohort2 <- conceptCohort(cdm = cdm,
-  #                          conceptSet = list(a = 1L),
-  #                          name = "my_cohort2",
-  #                          subsetCohort = cdm$cohort)
-  # expect_equal(collectCohort(cohort2, 1), collectCohort(cohort, 1))
-  # cohort3 <- conceptCohort(cdm = cdm,
-  #                          conceptSet = list(a = 1L),
-  #                          name = "my_cohort3",
-  #                          subsetCohort = cdm$cohort,
-  #                          subsetCohortId = 2)
-  # expect_true(nrow(collectCohort(cohort3, 1)) == 0)
-  # expect_error(conceptCohort(cdm = cdm,
-  #                            conceptSet = list(a = 1L),
-  #                            name = "my_cohort3",
-  #                            subsetCohort = cdm$cohort,
-  #                            subsetCohortId = 3))
+  cdm$cohort <- cdm$cohort |> omopgenerics::newCohortTable()
+  cdm$cohort <- cdm$cohort |>
+    omopgenerics::newCohortTable(
+      cohortSetRef = dplyr::tibble(
+        "cohort_definition_id" = c(1L, 2L, 3L),
+        "cohort_name" = paste0("cohort", 1:3),
+      ),
+      cohortAttritionRef = dplyr::bind_rows(
+        attrition(cdm$cohort),attrition(cdm$cohort)[1] |> dplyr::mutate("cohort_definition_id" = 3L)
+      )
+    )
+  cohort2 <- conceptCohort(cdm = cdm,
+                           conceptSet = list(a = 1L),
+                           name = "my_cohort2",
+                           subsetCohort = "cohort")
+  expect_equal(collectCohort(cohort2, 1), collectCohort(cohort, 1))
+  cohort3 <- conceptCohort(cdm = cdm,
+                           conceptSet = list(a = 1L),
+                           name = "my_cohort3",
+                           subsetCohort = "cohort",
+                           subsetCohortId = 2)
+  expect_true(nrow(collectCohort(cohort3, 1)) == 0)
+  expect_warning(c <- conceptCohort(cdm = cdm,
+                                    conceptSet = list(a = 1L),
+                                    name = "my_cohort3",
+                                    subsetCohort = "cohort",
+                                    subsetCohortId = 3))
+  expect_true(dplyr::pull(dplyr::tally(c)) == 0)
 
   PatientProfiles::mockDisconnect(cdm)
 })
@@ -482,7 +483,7 @@ test_that("table not present in the cdm", {
 
 test_that("cohort exit as event start date", {
   skip_on_cran()
-   cdm <- omock::mockCdmReference() |>
+  cdm <- omock::mockCdmReference() |>
     omock::mockCdmFromTables(tables = list("cohort" = dplyr::tibble(
       "cohort_definition_id" = 1L,
       "subject_id" = c(1L, 2L, 3L),
@@ -554,7 +555,7 @@ test_that("cohort exit as event start date", {
 
 test_that("use source field concepts", {
   skip_on_cran()
-   cdm <- omock::mockCdmReference() |>
+  cdm <- omock::mockCdmReference() |>
     omock::mockCdmFromTables(tables = list("cohort" = dplyr::tibble(
       "cohort_definition_id" = 1L,
       "subject_id" = c(1L, 2L, 3L),
@@ -728,11 +729,11 @@ test_that("overlap option", {
   expect_true(nrow(cdm$cohort_1 |>
                      dplyr::collect()) == 4)
   expect_true(all(sort(cdm$cohort_1 |>
-                dplyr::pull("cohort_start_date")) ==
-                as.Date(c("2020-01-01",
-                          "2020-01-01",
-                          "2020-01-02",
-                          "2020-01-20"))))
+                         dplyr::pull("cohort_start_date")) ==
+                    as.Date(c("2020-01-01",
+                              "2020-01-01",
+                              "2020-01-02",
+                              "2020-01-20"))))
   expect_true(all(sort(cdm$cohort_1 |>
                          dplyr::pull("cohort_end_date")) ==
                     as.Date(c("2020-01-03",
@@ -760,7 +761,7 @@ test_that("overlap option", {
                               "2020-01-21"))))
 
 
-# only overlapping records
+  # only overlapping records
   cdm <- omopgenerics::insertTable(
     cdm = cdm, name = "drug_exposure", table = dplyr::tibble(
       "drug_exposure_id" = c(1L, 2L),
@@ -788,7 +789,7 @@ test_that("overlap option", {
                          dplyr::pull("cohort_end_date")) ==
                     as.Date(c("2020-01-10"))))
 
-# no overlapping records
+  # no overlapping records
   cdm <- omopgenerics::insertTable(
     cdm = cdm, name = "drug_exposure", table = dplyr::tibble(
       "drug_exposure_id" = c(1L, 2L),
@@ -816,12 +817,12 @@ test_that("overlap option", {
                          dplyr::pull("cohort_end_date")) ==
                     as.Date(c("2020-01-03", "2020-01-10"))))
 
-# wrong input
+  # wrong input
   expect_error(cdm$cohort_5 <- conceptCohort(cdm = cdm,
-                                                conceptSet = list(a = 1L),
-                                                name = "cohort_5",
-                                                exit = "event_end_date",
-                                                overlap = "another"))
+                                             conceptSet = list(a = 1L),
+                                             name = "cohort_5",
+                                             exit = "event_end_date",
+                                             overlap = "another"))
 
 
 
@@ -836,10 +837,10 @@ test_that("overlap option", {
       "drug_type_concept_id" = 1L
     ))
   expect_no_error(cdm$cohort_6 <- conceptCohort(cdm = cdm,
-                                conceptSet = list(a = 1L),
-                                name = "cohort_6",
-                                exit = "event_end_date",
-                                overlap = "extend"))
+                                                conceptSet = list(a = 1L),
+                                                name = "cohort_6",
+                                                exit = "event_end_date",
+                                                overlap = "extend"))
 
   expect_true((cdm$cohort_6 |> dplyr::pull("cohort_start_date")) == as.Date("2020-01-01"))
   expect_true((cdm$cohort_6 |> dplyr::pull("cohort_end_date")) == as.Date("2020-01-16"))
@@ -856,10 +857,10 @@ test_that("overlap option", {
     ))
 
   expect_no_error(cdm$cohort_7 <- conceptCohort(cdm = cdm,
-                                conceptSet = list(a = 1L),
-                                name = "cohort_7",
-                                exit = "event_end_date",
-                                overlap = "extend"))
+                                                conceptSet = list(a = 1L),
+                                                name = "cohort_7",
+                                                exit = "event_end_date",
+                                                overlap = "extend"))
   expect_true((cdm$cohort_7 |> dplyr::pull("cohort_start_date")) == as.Date("2020-01-15"))
   expect_true((cdm$cohort_7 |> dplyr::pull("cohort_end_date")) == as.Date("2020-01-30"))
 
