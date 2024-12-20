@@ -52,11 +52,16 @@ matchCohorts <- function(cohort,
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cohort <- omopgenerics::validateCohortArgument(cohort)
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
-  cohortId <- validateCohortId(cohortId, settings(cohort))
+  cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
   omopgenerics::assertNumeric(ratio, min = 0, length = 1)
   omopgenerics::assertLogical(matchSex, length = 1)
   omopgenerics::assertLogical(matchYearOfBirth, length = 1)
 
+  if (length(cohortId) == 0) {
+    cli::cli_inform("Returning empty cohort as `cohortId` is not valid.")
+    cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name)
+    return(cdm[[name]])
+  }
 
   # table prefix
   tablePrefix <- omopgenerics::tmpPrefix()

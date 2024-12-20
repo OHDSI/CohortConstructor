@@ -37,7 +37,7 @@ unionCohorts <- function(cohort,
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cohort <- omopgenerics::validateCohortArgument(cohort)
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
-  cohortId <- validateCohortId(cohortId, settings(cohort))
+  cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
   omopgenerics::assertNumeric(gap, integerish = TRUE, min = 0, length = 1)
   omopgenerics::assertCharacter(cohortName, length = 1, null = TRUE)
   omopgenerics::assertLogical(keepOriginalCohorts, length = 1)

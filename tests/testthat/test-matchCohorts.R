@@ -62,7 +62,7 @@ test_that("matchCohorts runs without errors", {
 
   # empty set
   cdm <- omopgenerics::emptyCohortTable(cdm, name = "cohort")
-  expect_no_error(empty_cohort <- matchCohorts(cohort = cdm$cohort, name = "empty_cohort"))
+  expect_warning(empty_cohort <- matchCohorts(cohort = cdm$cohort, name = "empty_cohort"))
   expect_identical(cdm$cohort |> dplyr::collect(), empty_cohort |> dplyr::collect())
 
   # expect errors

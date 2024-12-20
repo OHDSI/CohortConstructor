@@ -35,8 +35,15 @@ requireInDateRange <- function(cohort,
   cohort <- omopgenerics::validateCohortArgument(cohort)
   validateCohortColumn(indexDate, cohort, class = "Date")
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
-  cohortId <- validateCohortId(cohortId, settings(cohort))
+  cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
   dateRange <- validateDateRange(dateRange)
+
+  if (length(cohortId) == 0) {
+    cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
+    # return entry cohort as cohortId is used to modify not subset
+    cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE)
+    return(cdm[[name]])
+  }
 
   # requirement
   if (!is.na(dateRange[1])) {
@@ -78,15 +85,13 @@ requireInDateRange <- function(cohort,
 #' `trimToDateRange()` resets the cohort start and end date based on the
 #' specified date range.
 #'
-#' @param cohort A cohort table in a cdm reference.
-#' @param dateRange A window of time during which the index date must have
-#' been observed.
-#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
-#' used; otherwise, only the specified cohorts will be modified, and the
-#' rest will remain unchanged.
+#' @inheritParams cohortDoc
+#' @inheritParams cohortIdModifyDoc
+#' @inheritParams nameDoc
+#' @param dateRange A window of time during which the start and end date must
+#'  have been observed.
 #' @param startDate Variable with earliest date.
 #' @param endDate Variable with latest date.
-#' @param name Name of the new cohort with the restriction.
 #'
 #' @return The cohort table with record timings updated to only be within the
 #' date range. Any records with all time outside of the range will have
@@ -116,8 +121,15 @@ trimToDateRange <- function(cohort,
   validateCohortColumn(startDate, cohort, class = "Date")
   validateCohortColumn(endDate, cohort, class = "Date")
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
-  cohortId <- validateCohortId(cohortId, settings(cohort))
+  cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
   dateRange <- validateDateRange(dateRange)
+
+  if (length(cohortId) == 0) {
+    cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
+    # return entry cohort as cohortId is used to modify not subset
+    cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE)
+    return(cdm[[name]])
+  }
 
   # trim start
   if (!is.na(dateRange[1])) {

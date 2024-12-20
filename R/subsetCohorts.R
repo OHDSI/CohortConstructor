@@ -27,7 +27,13 @@ subsetCohorts <- function(cohort,
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cohort <- omopgenerics::validateCohortArgument(cohort)
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
-  cohortId <- validateCohortId(cohortId, settings(cohort))
+  cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
+
+  if (length(cohortId) == 0) {
+    cli::cli_inform("Returning empty cohort as `cohortId` is not valid.")
+    cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name)
+    return(cdm[[name]])
+  }
 
   cdm[[name]] <- cohort |>
     dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>

@@ -5,6 +5,7 @@
 #' specified demographic criteria is satisfied.
 #'
 #' @inheritParams requireDemographics
+#' @inheritParams cohortIdSubsetDoc
 #'
 #' @return The cohort table with only records for individuals satisfying the
 #' demographic requirements
@@ -30,7 +31,7 @@ trimDemographics <- function(cohort,
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cohort <- omopgenerics::validateCohortArgument(cohort)
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
-  cohortId <- validateCohortId(cohortId, settings(cohort))
+  cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
   ageRange <- validateDemographicRequirements(
     ageRange = ageRange,
     sex = sex,
@@ -38,6 +39,12 @@ trimDemographics <- function(cohort,
     minFutureObservation = minFutureObservation,
     null = TRUE
   )
+
+  if (length(cohortId) == 0) {
+    cli::cli_inform("Returning empty cohort as `cohortId` is not valid.")
+    cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name)
+    return(cdm[[name]])
+  }
 
   ids <- settings(cohort)$cohort_definition_id
 

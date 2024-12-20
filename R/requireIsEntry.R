@@ -27,7 +27,14 @@ requireIsEntry <- function(cohort,
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cohort <- omopgenerics::validateCohortArgument(cohort)
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
-  cohortId <- validateCohortId(cohortId, settings(cohort))
+  cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
+
+  if (length(cohortId) == 0) {
+    cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
+    # return entry cohort as cohortId is used to modify not subset
+    cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE)
+    return(cdm[[name]])
+  }
 
   omopgenerics::assertNumeric(entryRange, integerish = TRUE, min = 0)
   if (length(entryRange) < 1 || length(entryRange) > 2) {
@@ -103,7 +110,6 @@ requireIsEntry <- function(cohort,
 #' @inheritParams cohortDoc
 #' @inheritParams cohortIdModifyDoc
 #' @inheritParams nameDoc
-#' @param name Name of the new cohort with the restriction.
 #'
 #' @return A cohort table in a cdm reference.
 #' @export
@@ -122,7 +128,14 @@ requireIsFirstEntry <- function(cohort,
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cohort <- omopgenerics::validateCohortArgument(cohort)
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
-  cohortId <- validateCohortId(cohortId, settings(cohort))
+  cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
+
+  if (length(cohortId) == 0) {
+    cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
+    # return entry cohort as cohortId is used to modify not subset
+    cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE)
+    return(cdm[[name]])
+  }
 
   cohort <- cohort |>
     dplyr::group_by(.data$subject_id, .data$cohort_definition_id) |>
@@ -152,11 +165,9 @@ requireIsFirstEntry <- function(cohort,
 #' `requireIsLastEntry()` filters cohort records, keeping only the last
 #' cohort entry per person.
 #'
-#' @param cohort A cohort table in a cdm reference.
-#' @param cohortId IDs of the cohorts to modify. If NULL, all cohorts will be
-#' used; otherwise, only the specified cohorts will be modified, and the
-#' rest will remain unchanged.
-#' @param name Name of the new cohort with the restriction.
+#' @inheritParams cohortDoc
+#' @inheritParams cohortIdModifyDoc
+#' @inheritParams nameDoc
 #'
 #' @return A cohort table in a cdm reference.
 #' @export
@@ -175,7 +186,14 @@ requireIsLastEntry <- function(cohort,
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cohort <- omopgenerics::validateCohortArgument(cohort)
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
-  cohortId <- validateCohortId(cohortId, settings(cohort))
+  cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
+
+  if (length(cohortId) == 0) {
+    cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
+    # return entry cohort as cohortId is used to modify not subset
+    cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE)
+    return(cdm[[name]])
+  }
 
   cohort <- cohort |>
     dplyr::group_by(.data$subject_id, .data$cohort_definition_id) |>
