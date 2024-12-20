@@ -105,7 +105,7 @@ exitAtObservationEnd <- function(cohort,
 
   newCohort <- newCohort |>
     dplyr::compute(name = name, temporary = FALSE) |>
-    omopgenerics::newCohortTable(.softValidation = TRUE) |>
+    omopgenerics::newCohortTable(.softValidation = FALSE) |>
     omopgenerics::recordCohortAttrition(reason = reason, cohortId = cohortId)
 
   omopgenerics::dropTable(cdm = cdm, name = tmpTable)
@@ -186,7 +186,7 @@ exitAtDeath <- function(cohort,
     # no overlapping periods
     joinOverlap(name = name) |>
     dplyr::compute(name = name, temporary = FALSE) |>
-    omopgenerics::newCohortTable(.softValidation = TRUE) |>
+    omopgenerics::newCohortTable(.softValidation = FALSE) |>
     omopgenerics::recordCohortAttrition(reason = "Exit at death", cohortId = cohortId)
 
   useIndexes <- getOption("CohortConstructor.use_indexes")

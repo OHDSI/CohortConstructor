@@ -287,7 +287,7 @@ cdm <- omopgenerics::insertTable(cdm, "measurement",
 cohort_1 <- measurementCohort(
   cdm = cdm,
   name = "cohort",
-  conceptSet = list("normal_blood_pressure" = c(4326744)),
+  conceptSet = list("normal_blood_pressure" = c(4326744L)),
   valueAsNumber = list("8876" = c(70L, 120L))
 )
 expect_true(all(sort(cohort_1 |>

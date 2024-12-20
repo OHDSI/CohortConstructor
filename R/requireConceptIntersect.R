@@ -95,7 +95,7 @@ requireConceptIntersect <- function(cohort,
       ) |
         (!.data$cohort_definition_id %in% .env$cohortId)
       ) |>
-      dplyr::select(cols) |>
+      dplyr::select(dplyr::all_of(cols)) |>
       dplyr::compute(name = subsetName, temporary = FALSE)
 
     # attrition reason

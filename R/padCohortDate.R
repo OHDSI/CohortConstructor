@@ -213,6 +213,7 @@ padCohortStart <- function(cohort,
     ) |>
     dplyr::union_all(subCohort) |>
     dplyr::compute(name = name, temporary = FALSE) |>
+    omopgenerics::newCohortTable(.softValidation = FALSE) |>
     omopgenerics::recordCohortAttrition(cohortId = cohortId, reason = reason)
 
   # drop temp table

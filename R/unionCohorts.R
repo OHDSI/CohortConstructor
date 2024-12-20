@@ -80,7 +80,7 @@ unionCohorts <- function(cohort,
       cohortSetRef = cohSet,
       cohortAttritionRef = NULL,
       cohortCodelistRef = cohCodelist,
-      .softValidation = TRUE
+      .softValidation = FALSE
     )
 
   if (isFALSE(keepOriginalCohorts)) {
