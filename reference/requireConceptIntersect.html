@@ -73,6 +73,7 @@ list in some time window around an index date.</p>
 <span>  indexDate <span class="op">=</span> <span class="st">"cohort_start_date"</span>,</span>
 <span>  targetStartDate <span class="op">=</span> <span class="st">"event_start_date"</span>,</span>
 <span>  targetEndDate <span class="op">=</span> <span class="st">"event_end_date"</span>,</span>
+<span>  inObservation <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  censorDate <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  name <span class="op">=</span> <span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/tableName.html" class="external-link">tableName</a></span><span class="op">(</span><span class="va">cohort</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -123,6 +124,11 @@ compute the intersection.</p></dd>
 incidence of target event in the window will be considered as intersection,
 otherwise prevalence of that event will be used as intersection (overlap
 between cohort and event).</p></dd>
+
+
+<dt id="arg-inobservation">inObservation<a class="anchor" aria-label="anchor" href="#arg-inobservation"></a></dt>
+<dd><p>If TRUE only records inside an observation period will
+be considered.</p></dd>
 
 
 <dt id="arg-censordate">censorDate<a class="anchor" aria-label="anchor" href="#arg-censordate"></a></dt>
