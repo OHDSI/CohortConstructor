@@ -149,7 +149,7 @@ trimToDateRange <- function(cohort,
 
   cohort <- cohort |>
     dplyr::compute(name = name, temporary = FALSE) |>
-    omopgenerics::newCohortTable(.softValidation = TRUE)
+    omopgenerics::newCohortTable(.softValidation = FALSE)
 
   useIndexes <- getOption("CohortConstructor.use_indexes")
   if (!isFALSE(useIndexes)) {

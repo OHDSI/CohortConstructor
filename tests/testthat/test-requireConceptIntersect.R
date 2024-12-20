@@ -30,9 +30,9 @@ test_that("require flag in concept", {
 
   start_cols <- colnames(cdm$cohort1)
   cdm$cohort3 <-  requireConceptIntersect(cohort = cdm$cohort1,
-                                          conceptSet = list(a = 1L),
-                                          window = c(-Inf, Inf),
-                                          name = "cohort3")
+                                              conceptSet = list(a = 1L),
+                                              window = c(-Inf, Inf),
+                                              name = "cohort3")
   expect_identical(colnames(cdm$cohort3), colnames(cdm$cohort1))
   expect_true(all(cdm$cohort3 |> dplyr::pull("subject_id") == 1L))
   expect_true(all(cdm$cohort3 |> dplyr::pull("cohort_start_date") |> sort() ==
@@ -70,10 +70,10 @@ test_that("require flag in concept", {
                       "Initial qualifying events")))
   # censor date
   cdm$cohort5 <- requireConceptIntersect(cohort = cdm$cohort1,
-                                         conceptSet = list(a = 1L),
-                                         window = c(-Inf, Inf),
-                                         censorDate = "cohort_end_date",
-                                         name = "cohort5")
+                                             conceptSet = list(a = 1L),
+                                             window = c(-Inf, Inf),
+                                             censorDate = "cohort_end_date",
+                                             name = "cohort5")
   expect_true(cdm$cohort5 |> dplyr::pull("subject_id") |> length() == 0)
   expect_true(all(omopgenerics::attrition(cdm$cohort5)$reason ==
                     c("Initial qualifying events",
@@ -83,8 +83,8 @@ test_that("require flag in concept", {
 
   # name
   cdm$cohort1 <-  requireConceptIntersect(cohort = cdm$cohort1,
-                                          conceptSet = list(a = 1L),
-                                          window = c(-Inf, Inf))
+                                              conceptSet = list(a = 1L),
+                                              window = c(-Inf, Inf))
   expect_true(all(omopgenerics::attrition(cdm$cohort1)$reason ==
                     c("Initial qualifying events",
                       "Concept a between -Inf & Inf days relative to cohort_start_date between 1 and Inf",
@@ -105,16 +105,16 @@ test_that("require flag in concept", {
 
   # expected errors
   # only support one concept at the moment
-  expect_error(
-    requireConceptIntersect(cohort = cdm$cohort1,
-                            conceptSet = list(a = 1L, b = 2L),
-                            window = c(-Inf, Inf))
-  )
-  expect_error(
-    requireConceptIntersect(cohort = cdm$cohort1,
-                            conceptSet = NULL,
-                            window = c(-Inf, Inf))
-  )
+ expect_error(
+   requireConceptIntersect(cohort = cdm$cohort1,
+                               conceptSet = list(a = 1L, b = 2L),
+                               window = c(-Inf, Inf))
+ )
+ expect_error(
+   requireConceptIntersect(cohort = cdm$cohort1,
+                               conceptSet = NULL,
+                               window = c(-Inf, Inf))
+ )
 
   PatientProfiles::mockDisconnect(cdm)
 })
@@ -240,7 +240,6 @@ test_that("different intersection count requirements", {
                                                   name = "cohort1_test") |>
                           dplyr::pull("subject_id")), as.integer(c(4,5,6,7,8,9,10)))
 
-
   # only one intersection
   expect_identical(sort(cdm$cohort1 |>
                           requireConceptIntersect(intersections = c(1, 1),
@@ -272,6 +271,7 @@ test_that("different intersection count requirements", {
                           dplyr::pull("subject_id")), c(2L))
 
 
+
   # 2 or more intersections
   expect_identical(sort(cdm$cohort1 |>
                           requireConceptIntersect(intersections = c(2, Inf),
@@ -287,6 +287,7 @@ test_that("different intersection count requirements", {
                                                   window = c(-Inf, Inf),
                                                   name = "cohort1_test") |>
                           dplyr::pull("subject_id")), c(2L, 3L))
+
 
 
 
