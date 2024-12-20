@@ -42,7 +42,7 @@ requireCohortIntersect <- function(cohort,
   validateCohortColumn(indexDate, cohort, class = "Date")
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   window <- omopgenerics::validateWindowArgument(window)
-  cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort)
+  cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
   intersections <- validateIntersections(intersections)
 
   lower_limit <- as.integer(intersections[[1]])

@@ -244,7 +244,7 @@ demographicsFilter <- function(cohort,
   cohort <- omopgenerics::validateCohortArgument(cohort)
   validateCohortColumn(indexDate, cohort, class = "Date")
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
-  cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort)
+  cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
   ageRange <- validateDemographicRequirements(ageRange, sex, minPriorObservation, minFutureObservation)
 
   ids <- omopgenerics::settings(cohort)$cohort_definition_id

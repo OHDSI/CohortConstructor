@@ -51,27 +51,22 @@ test_that("testing requireMinCohortCount", {
                     dplyr::pull("number_subjects") > 0))
 
   # restrict specific cohort
-  expect_error(
-    requireMinCohortCount(
+  expect_warning(
+    cdm$cohort1_c <- requireMinCohortCount(
       cdm$cohort1,
       minCohortCount = 5,
       cohortId = c("cohort_1", "cohort_6"),
       name = "cohort1_c"
     ))
-  cdm$cohort1_c <- requireMinCohortCount(
-    cdm$cohort1,
-    minCohortCount = 5,
-    cohortId = "cohort_1",
-    name = "cohort1_c"
-  )
   expect_true(cdm$cohort1_c |> dplyr::tally() |> dplyr::pull() == 4)
 
 
   # nobody to drop
-  cdm$cohort1_c <- requireMinCohortCount(cdm$cohort1,
-                                         minCohortCount = 0,
-                                         name = "cohort1_c"
-  )
+  expect_warning(
+    cdm$cohort1_c <- requireMinCohortCount(cdm$cohort1,
+                                           minCohortCount = 0,
+                                           name = "cohort1_c"
+    ))
   expect_identical(settings(cdm$cohort1_c), startSettings)
   expect_identical(
     attrition(cdm$cohort1_c) |>
@@ -105,15 +100,6 @@ test_that("testing requireMinCohortCount", {
                                                     name = "cohort2"
   ))
   expect_error(cdm$cohort2 <- requireMinCohortCount(cdm$cohort1,
-                                                    cohortId = "1",
-                                                    name = "cohort2"
-  ))
-  expect_error(cdm$cohort2 <- requireMinCohortCount(cdm$cohort1,
-                                                    cohortId = 2,
-                                                    name = "cohort3"
-  ))
-  expect_error(cdm$cohort2 <- requireMinCohortCount(cdm$cohort1,
-                                                    cohortId = 10,
                                                     name = "cohort2"
   ))
 

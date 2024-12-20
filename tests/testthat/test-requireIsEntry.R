@@ -67,9 +67,9 @@ test_that("errors", {
 
   expect_error(cdm$cohort |> requireIsFirstEntry(name = 1))
   expect_error(cdm$cohort1 <- cdm$cohort |> requireIsFirstEntry(name = "cohort2"))
-  expect_error(cdm$cohort |> requireIsFirstEntry(cohortId = Inf))
+  expect_warning(cdm$cohort |> requireIsFirstEntry(cohortId = Inf))
   expect_error(cdm$cohort |> dplyr::collect() |> requireIsFirstEntry())
-  expect_error(cdm$cohort |> requireIsFirstEntry(cohortId = c(1, 5)))
+  expect_warning(cdm$cohort |> requireIsFirstEntry(cohortId = c(1, 5)))
 })
 
 test_that("requireIsLastEntry", {
@@ -110,9 +110,9 @@ test_that("requireIsLastEntry", {
   # errors
   expect_error(cdm$cohort |> requireIsLastEntry(name = 1))
   expect_error(cdm$cohort1 <- cdm$cohort |> requireIsLastEntry(name = "cohort2"))
-  expect_error(cdm$cohort |> requireIsLastEntry(cohortId = Inf))
+  expect_warning(cdm$cohort |> requireIsLastEntry(cohortId = Inf))
   expect_error(cdm$cohort |> dplyr::collect() |> requireIsLastEntry())
-  expect_error(cdm$cohort |> requireIsLastEntry(cohortId = c(1, 5)))
+  expect_warning(cdm$cohort |> requireIsLastEntry(cohortId = c(1, 5)))
 })
 
 test_that("requireEntry", {
@@ -166,9 +166,9 @@ test_that("requireEntry", {
  expect_error(cdm$cohort1 |> requireIsEntry(entryRange = "a"))
  expect_error(cdm$cohort1 |> requireIsEntry(entryRange = c(1, 1), name = 1))
  expect_error(cdm$cohort1 <- cdm$cohort1 |> requireIsEntry(entryRange = c(1, 1), name = "cohort2"))
- expect_error(cdm$cohort1 |> requireIsEntry(entryRange = c(1, 1), cohortId = Inf))
+ expect_warning(cdm$cohort1 |> requireIsEntry(entryRange = c(1, 1), cohortId = Inf))
  expect_error(cdm$cohort1 |> dplyr::collect() |> requireIsEntry(entryRange = c(1, 1)))
- expect_error(cdm$cohort1 |> requireIsEntry(entryRange = c(1, 1), cohortId = c(1, 5)))
+ expect_warning(cdm$cohort1 |> requireIsEntry(entryRange = c(1, 1), cohortId = c(1, 5)))
 
 
  # mock cohort

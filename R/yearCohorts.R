@@ -29,7 +29,7 @@ yearCohorts <- function(cohort,
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cohort <- omopgenerics::validateCohortArgument(cohort)
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
-  cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort)
+  cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
   omopgenerics::assertNumeric(years, integerish = TRUE)
 
   if (length(years) == 0) {

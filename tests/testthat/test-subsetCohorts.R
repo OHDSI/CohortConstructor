@@ -100,9 +100,9 @@ test_that("Expected behaviour", {
 
   # Subset 1 cohort
   expect_error(cdm$cohort2 <- subsetCohorts("cohort1", 1, name = "cohort2"))
-  expect_error(cdm$cohort2 <- subsetCohorts(cdm$cohort1, "1", name = "cohort2"))
+  expect_warning(cdm$cohort2 <- subsetCohorts(cdm$cohort1, "1", name = "cohort2"))
   expect_error(cdm$cohort2 <- subsetCohorts(cdm$cohort1, 2, name = "cohort3"))
-  expect_error(cdm$cohort2 <- subsetCohorts(cdm$cohort1, 10, name = "cohort2"))
+  expect_warning(cdm$cohort2 <- subsetCohorts(cdm$cohort1, 10, name = "cohort2"))
   expect_no_error(cohort <- subsetCohorts(cdm$cohort1, NULL))
   expect_identical(cohort, cdm$cohort1)
 

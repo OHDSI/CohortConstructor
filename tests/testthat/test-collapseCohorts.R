@@ -24,8 +24,8 @@ test_that("simple example", {
       "drug_exposure_id" = as.integer(1:11),
       "person_id" = as.integer(c(1, 1, 1, 1, 2, 2, 3, 1, 1, 1, 1)),
       "drug_concept_id" = as.integer(c(1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1)),
-      "drug_exposure_start_date" = c(0, 300, 1500, 750, 10, 800, 150, 1800, 1801, 1802, 1803),
-      "drug_exposure_end_date" = c(400, 800, 1600, 1550, 2000, 1000, 600, 1800, 1801, 1802, 1803),
+      "drug_exposure_start_date" = c(0, 300, 1300, 750, 10, 800, 150, 1800, 1801, 1802, 1803),
+      "drug_exposure_end_date" = c(400, 800, 1330, 1550, 2000, 1000, 600, 1800, 1801, 1802, 1803),
       "drug_type_concept_id" = 1L
     ) |>
       dplyr::mutate(
@@ -49,56 +49,56 @@ test_that("simple example", {
                     collapseCohorts(gap = 0, name = "new_cohort", cohortId = "a"))
   expect_identical(settings(sameCohort2), settings(cohort))
   expect_identical(cohortCount(sameCohort2), cohortCount(cohort))
-  # expect_identical(
-  #   attrition(sameCohort),
-  #   attrition(cohort) |>
-  #     dplyr::union_all(dplyr::tibble(
-  #       "cohort_definition_id" = 1L,
-  #       "number_records" = 7L,
-  #       "number_subjects" = 2L,
-  #       "reason_id" = 2L,
-  #       "reason" = "Collapse cohort with a gap of 0 days.",
-  #       "excluded_records" = 0L,
-  #       "excluded_subjects" = 0L
-  #     ))
-  # )
+  expect_identical(
+    attrition(sameCohort),
+    attrition(cohort) |>
+      dplyr::union_all(dplyr::tibble(
+        "cohort_definition_id" = 1L,
+        "number_records" = 3L,
+        "number_subjects" = 2L,
+        "reason_id" = 5L,
+        "reason" = "Collapse cohort with a gap of 0 days.",
+        "excluded_records" = 0L,
+        "excluded_subjects" = 0L
+      ))
+  )
   expect_true(tableName(sameCohort) == "new_cohort")
   expect_identical(
     omopgenerics::tableSource(sameCohort), omopgenerics::tableSource(cohort)
   )
 
-  expect_no_error(newCohort <- cohort |> collapseCohorts(gap = 1, name = "my_cohort"))
+  expect_no_error(newCohort <- cohort |> collapseCohorts(gap = 500, name = "my_cohort"))
   expect_identical(settings(newCohort), settings(cohort))
   expect_identical(cohortCount(newCohort), dplyr::tibble(
     "cohort_definition_id" = 1L, "number_records" = 2L, "number_subjects" = 2L
   ))
-  # expect_identical(
-  #   attrition(newCohort),
-  #   attrition(cohort) |>
-  #     dplyr::union_all(dplyr::tibble(
-  #       "cohort_definition_id" = 1L,
-  #       "number_records" = 4L,
-  #       "number_subjects" = 2L,
-  #       "reason_id" = 2L,
-  #       "reason" = "Collapse cohort with a gap of 1 days.",
-  #       "excluded_records" = 3L,
-  #       "excluded_subjects" = 0L
-  #     ))
-  # )
+  expect_identical(
+    attrition(newCohort),
+    attrition(cohort) |>
+      dplyr::union_all(dplyr::tibble(
+        "cohort_definition_id" = 1L,
+        "number_records" = 2L,
+        "number_subjects" = 2L,
+        "reason_id" = 5L,
+        "reason" = "Collapse cohort with a gap of 500 days.",
+        "excluded_records" = 1L,
+        "excluded_subjects" = 0L
+      ))
+  )
   expect_true(tableName(newCohort) == "my_cohort")
   expect_identical(
     omopgenerics::tableSource(newCohort), omopgenerics::tableSource(cohort)
   )
 
   # expected behaviour
-  expect_error(cdm$cohort |> collapseCohorts(cohortId = c("a", "n")))
+  expect_warning(cdm$cohort |> collapseCohorts(cohortId = c("a", "n")))
   cdm$cohort <- cdm$cohort |> dplyr::mutate(extra_column_1 = 1,
                                             extra_column_2 = 2)
-  expect_error(cdm$cohort |> collapseCohorts(gap = NA))
-  expect_error(cdm$cohort |> collapseCohorts(gap = NULL))
-  expect_error(cdm$cohort |> collapseCohorts(gap = -1))
-  expect_error(cdm$cohort |> collapseCohorts(gap = -Inf))
-  expect_error(cdm$cohort |> collapseCohorts(gap = "not a number"))
+  expect_warning(expect_error(cdm$cohort |> collapseCohorts(gap = NA)))
+  expect_warning(expect_error(cdm$cohort |> collapseCohorts(gap = NULL)))
+  expect_warning(expect_error(cdm$cohort |> collapseCohorts(gap = -1)))
+  expect_warning(expect_error(cdm$cohort |> collapseCohorts(gap = -Inf)))
+  expect_warning(expect_error(cdm$cohort |> collapseCohorts(gap = "not a number")))
 
 
   PatientProfiles::mockDisconnect(cdm)

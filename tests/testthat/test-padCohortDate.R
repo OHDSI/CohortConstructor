@@ -112,7 +112,6 @@ test_that("overlapping entries", {
   expect_true(nrow(cdm$cohort_2 |>
                      dplyr::collect()) == 4)
 
-
   expect_identical(cdm$cohort_2 |>
     dplyr::filter(subject_id == 2) |>
     dplyr::filter(cohort_definition_id == 2) |>
@@ -294,13 +293,13 @@ test_that("adding days to cohort start", {
     cohortId = 1,
     name = "my_cohort_1"
   ))
-  expect_error(padCohortStart(
+  expect_warning(padCohortStart(
     cdm$my_cohort,
     days = 2,
     cohortId = "a",
     name = "my_cohort_1"
   ))
-  expect_error(padCohortStart(
+  expect_warning(padCohortStart(
     cdm$my_cohort,
     days = 2,
     cohortId = 99,

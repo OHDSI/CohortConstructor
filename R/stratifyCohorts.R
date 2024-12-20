@@ -43,7 +43,7 @@ stratifyCohorts <- function(cohort,
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cohort <- omopgenerics::validateCohortArgument(cohort)
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
-  cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort)
+  cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
   strata <- validateStrata(strata, cohort)
   omopgenerics::assertLogical(removeStrata, length = 1)
 

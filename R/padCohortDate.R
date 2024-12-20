@@ -156,8 +156,16 @@ padCohortStart <- function(cohort,
   omopgenerics::assertCharacter(indexDate, length = 1, call = call)
   validateColumn(indexDate, cohort, call = call)
   omopgenerics::assertLogical(collapse, length = 1)
-  cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort)
+  cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
+
+  if (length(cohortId) == 0) {
+    cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
+    # return entry cohort as cohortId is used to modify not subset
+    cohort <- cohort |> dplyr::compute(name = name, temporary = FALSE)
+    return(cohort)
+  }
+
   msg <- "`days` be an integerish or point to an integerish column of cohort"
   reason <- paste0("pad `", cohortDate, "` ")
   if (is.numeric(days)) {

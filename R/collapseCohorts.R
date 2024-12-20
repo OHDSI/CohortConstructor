@@ -21,9 +21,16 @@ collapseCohorts <- function(cohort,
   cohort <- omopgenerics::validateCohortArgument(cohort, dropExtraColumns = TRUE)
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
-  cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort)
+  cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
   omopgenerics::assertNumeric(gap, integerish = TRUE, min = 0, length = 1)
   ids <- settings(cohort)$cohort_definition_id
+
+  if (length(cohortId) == 0) {
+    cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
+    # return entry cohort as cohortId is used to modify not subset
+    cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE)
+    return(cdm[[name]])
+  }
 
   # temp tables
   tablePrefix <- omopgenerics::tmpPrefix()
