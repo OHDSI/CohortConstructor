@@ -80,12 +80,13 @@ specified date range.</p>
 
 
 <dt id="arg-daterange">dateRange<a class="anchor" aria-label="anchor" href="#arg-daterange"></a></dt>
-<dd><p>A window of time during which the index date must have
-been observed.</p></dd>
+<dd><p>A window of time during which the start and end date must
+have been observed.</p></dd>
 
 
 <dt id="arg-cohortid">cohortId<a class="anchor" aria-label="anchor" href="#arg-cohortid"></a></dt>
-<dd><p>IDs of the cohorts to modify. If NULL, all cohorts will be
+<dd><p>Vector identifying which cohorts to modify
+(cohort_definition_id or cohort_name). If NULL, all cohorts will be
 used; otherwise, only the specified cohorts will be modified, and the
 rest will remain unchanged.</p></dd>
 
@@ -99,7 +100,7 @@ rest will remain unchanged.</p></dd>
 
 
 <dt id="arg-name">name<a class="anchor" aria-label="anchor" href="#arg-name"></a></dt>
-<dd><p>Name of the new cohort with the restriction.</p></dd>
+<dd><p>Name of the new cohort table created in the cdm object.</p></dd>
 
 </dl></div>
     <div class="section level2">
