@@ -107,13 +107,13 @@ test_that("entry at last date", {
   ))
 
   # test character cohort id working
-  expect_warning(cdm$cohort1 <- cdm$cohort |>
+  cdm$cohort1 <- cdm$cohort |>
     entryAtLastDate(
       dateColumns = c("cohort_end_date", "other_date_1", "other_date_2"),
       returnReason = TRUE,
-      cohortId = c("cohort_2", "cohort_3"),
+      cohortId = c("cohort_2"),
       name = "cohort1"
-    ))
+    )
   expect_true(all(
     cdm$cohort1 |> dplyr::pull("cohort_start_date") |> sort() ==
       c("1990-12-09", "2000-01-01", "2000-06-03", "2002-12-09", "2015-02-15")
