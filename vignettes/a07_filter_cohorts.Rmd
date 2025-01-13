@@ -40,9 +40,9 @@ if (!dir.exists(Sys.getenv("EUNOMIA_DATA_FOLDER"))){ dir.create(Sys.getenv("EUNO
 For this example we'll use the Eunomia synthetic data from the CDMConnector package.
 
 ```{r}
-con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomia_dir())
-cdm <- cdm_from_con(con, cdm_schema = "main", 
-                    write_schema = c(prefix = "my_study_", schema = "main"))
+con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomiaDir())
+cdm <- CDMConnector::cdmFromCon(con, cdmSchema = "main", 
+                    writeSchema = "main", writePrefix = "my_study_")
 ```
 
 Let's start by creating two drug cohorts, one for users of diclofenac and another for users of acetaminophen.
@@ -66,7 +66,7 @@ When cohortId = NULL all cohorts in the table are used. Note that this function 
 It is also possible to only sample one cohort within cohort table, however the remaining cohorts will still remain.
 
 ```{r include = FALSE, warning = FALSE}
-con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomia_dir())
+con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomiaDir())
 cdm <- cdm_from_con(con, cdm_schema = "main", 
                     write_schema = c(prefix = "my_study_", schema = "main"))
 cdm$medications <- conceptCohort(cdm = cdm, 
@@ -86,7 +86,7 @@ The chosen cohort (users of diclofenac) has been reduced to 100 individuals, as 
 If you want to filter the cohort table to only include individuals and records from a specified cohort, you can use the function `subsetCohorts`. 
 
 ```{r include = FALSE, warning = FALSE}
-con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomia_dir())
+con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomiaDir())
 cdm <- cdm_from_con(con, cdm_schema = "main", 
                     write_schema = c(prefix = "my_study_", schema = "main"))
 cdm$medications <- conceptCohort(cdm = cdm, 

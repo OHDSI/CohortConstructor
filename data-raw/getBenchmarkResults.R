@@ -213,6 +213,15 @@ benchmarkData$comparison <- benchmarkDataPre$comparison |>
   filter(grepl("atlas_", cohort_name_comparator) & grepl("cc_", cohort_name_reference)) |>
   filter(gsub("atlas_", "", cohort_name_comparator) == gsub("cc_", "", cohort_name_reference)) |>
   uniteGroup(cols = c("cohort_name_reference", "cohort_name_comparator")) |>
+  mutate(
+    variable_name = case_when(
+      .data$variable_name == "overlap" ~ "In both cohorts",
+      .data$variable_name == "reference" ~ "Only in reference cohort",
+      .data$variable_name == "comparator" ~ "Only in comparator cohort",
+      .default = .data$variable_name
+    ),
+    variable_level = "Subjects"
+  ) |>
   newSummarisedResult()
 
 ### sql indexes

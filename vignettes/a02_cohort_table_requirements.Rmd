@@ -36,9 +36,9 @@ if (!dir.exists(Sys.getenv("EUNOMIA_DATA_FOLDER"))){ dir.create(Sys.getenv("EUNO
 ```
 
 ```{r}
-con <- DBI::dbConnect(duckdb::duckdb(), dbdir = CDMConnector::eunomia_dir())
-cdm <- CDMConnector::cdm_from_con(con, cdm_schema = "main", 
-                    write_schema = c(prefix = "my_study_", schema = "main"))
+con <- DBI::dbConnect(duckdb::duckdb(), dbdir = CDMConnector::eunomiaDir())
+cdm <- CDMConnector::cdmFromCon(con, cdmSchema = "main", 
+                    writeSchema = "main", writePrefix = "my_study_")
 ```
 
 Let's start by creating a cohort of acetaminophen users. Individuals will have a cohort entry for each drug exposure record they have for acetaminophen with cohort exit based on their drug record end date. Note when creating the cohort, any overlapping records will be concatenated. 

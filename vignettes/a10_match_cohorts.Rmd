@@ -27,10 +27,10 @@ library(dplyr)
 cdm <- mockCohortConstructor(nPerson = 1000)
 ```
 
-As we will use `cohort1` to explore `generateMatchedCohortSet()`, let us first use `cohort_attrition()` from CDMConnector package to explore this cohort:
+As we will use `cohort1` to explore `generateMatchedCohortSet()`, let us first use `settings()` from omopgenerics package to explore this cohort:
 
 ```{r, eval = FALSE}
-CDMConnector::cohort_set(cdm$cohort1)
+omopgenerics::settings(cdm$cohort1)
 ```
 
 # Use generateMatchedCohortSet() to create an age-sex matched cohort
@@ -42,17 +42,17 @@ cdm$matched_cohort1 <- matchCohorts(
   cohortId = 1,
   name = "matched_cohort1")
 
-CDMConnector::cohort_set(cdm$matched_cohort1)
+omopgenerics::settings(cdm$matched_cohort1)
 ```
 Notice that in the generated tibble, there are two cohorts: `cohort_definition_id = 1` (original cohort), and `cohort_definition_id = 4` (matched cohort). *target_cohort_name* column indicates which is the original cohort. *match_sex* and *match_year_of_birth* adopt boolean values (`TRUE`/`FALSE`) indicating if we have matched for sex and age, or not. *match_status* indicate if it is the original cohort (`target`) or if it is the matched cohort (`matched`). *target_cohort_id* indicates which is the cohort_id of the original cohort.
 
-Check the exclusion criteria applied to generate the new cohorts by using `cohort_attrition()` from CDMConnector package:
+Check the exclusion criteria applied to generate the new cohorts by using `attrition()` from omopgenerics package:
 ```{r, eval = FALSE}
 # Original cohort
-CDMConnector::cohort_attrition(cdm$matched_cohort1) |> filter(cohort_definition_id == 1)
+omopgenerics::attrition(cdm$matched_cohort1) |> filter(cohort_definition_id == 1)
 
 # Matched cohort
-CDMConnector::cohort_attrition(cdm$matched_cohort1) |> filter(cohort_definition_id == 4)
+omopgenerics::attrition(cdm$matched_cohort1) |> filter(cohort_definition_id == 4)
 ```
 Briefly, from the original cohort, we exclude first those individuals that do not have a match, and then individuals that their matching pair is not in observation during the assigned *cohort_start_date*. From the matched cohort, we start from the whole database and we first exclude individuals that are in the original cohort. Afterwards, we exclude individuals that do not have a match, then individuals that are not in observation during the assigned *cohort_start_date*, and finally we remove as many individuals as required to fulfill the ratio.
 
@@ -70,7 +70,7 @@ Notice that if `matchSex = FALSE` and `matchYear = FALSE`, we will obtain an unm
 The default matching ratio is 1:1 (`ratio = 1`). Use `cohort_counts()` from CDMConnector to check if the matching has been done as desired.
 
 ```{r, eval = FALSE}
-CDMConnector::cohort_count(cdm$matched_cohort1)
+omopgenerics::cohortCount(cdm$matched_cohort1)
 ```
 
 You can modify the `ratio` parameter to tailor your matched cohort. `ratio` can adopt values from 1 to Inf.
@@ -82,7 +82,7 @@ cdm$matched_cohort2 <- matchCohorts(
   name = "matched_cohort2",
   ratio = Inf)
 
-CDMConnector::cohort_count(cdm$matched_cohort2)
+omopgenerics::cohortCount(cdm$matched_cohort2)
 ```
 
 ## Generate matched cohorts simultaneously across multiple cohorts
@@ -95,9 +95,9 @@ cdm$matched_cohort3 <- matchCohorts(
   name = "matched_cohort3",
   ratio = 2)
 
-CDMConnector::cohort_set(cdm$matched_cohort3) |> arrange(cohort_definition_id)
+omopgenerics::settings(cdm$matched_cohort3) |> arrange(cohort_definition_id)
 
-CDMConnector::cohort_count(cdm$matched_cohort3) |> arrange(cohort_definition_id)
+omopgenerics::cohortCount(cdm$matched_cohort3) |> arrange(cohort_definition_id)
 ```
 
 Notice that each cohort has their own (and independent of other cohorts) matched cohort. 
