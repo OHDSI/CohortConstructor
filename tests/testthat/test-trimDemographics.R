@@ -347,15 +347,15 @@ test_that("cohort Id, name, additional columns", {
   x1 <- collectCohort(cdm$cohort3, 1)
   x3 <- collectCohort(cdm$cohort3, 3)
   expect_identical(x1, dplyr::tibble(
-      subject_id = c(1, 1, 2, 3) |> as.integer(),
-      cohort_start_date = as.Date(c("2001-04-03", "2002-05-07", "1999-07-26", "2015-02-19")),
-      cohort_end_date = as.Date(c("2002-05-06", "2005-11-07", "2002-09-17", "2015-06-27"))
-    ))
+    subject_id = c(1, 1, 2, 3) |> as.integer(),
+    cohort_start_date = as.Date(c("2001-04-03", "2002-05-07", "1999-07-26", "2015-02-19")),
+    cohort_end_date = as.Date(c("2002-05-06", "2005-11-07", "2002-09-17", "2015-06-27"))
+  ))
   expect_identical(x3, dplyr::tibble(
-      subject_id = c(1, 1, 2) |> as.integer(),
-      cohort_start_date = as.Date(c("2001-07-08", "2002-05-07", "2000-05-09")),
-      cohort_end_date = as.Date(c("2002-05-06", "2005-11-07", "2002-09-17"))
-    ))
+    subject_id = c(1, 1, 2) |> as.integer(),
+    cohort_start_date = as.Date(c("2001-07-08", "2002-05-07", "2000-05-09")),
+    cohort_end_date = as.Date(c("2002-05-06", "2005-11-07", "2002-09-17"))
+  ))
   expect_true(all(
     attrition(cdm$cohort3)$reason ==
       c('Initial qualifying events', 'Sex requirement: Male',
@@ -364,11 +364,11 @@ test_that("cohort Id, name, additional columns", {
         'Prior observation requirement: 400 days')
   ))
   expect_identical(settings(cdm$cohort3), dplyr::tibble(
-      cohort_definition_id = as.integer(1:3),
-      cohort_name = c("cohort_1_1", "cohort_2", "cohort_1_2"),
-      sex = c("Male", "Both", "Male"),
-      min_prior_observation = c(0, 0, 400)
-    ))
+    cohort_definition_id = as.integer(1:3),
+    cohort_name = c("cohort_1_1", "cohort_2", "cohort_1_2"),
+    sex = c("Male", "Both", "Male"),
+    min_prior_observation = c(0, 0, 400)
+  ))
 
   expect_no_error(
     cohort <- trimDemographics(cohort = cdm$cohort2,
@@ -394,18 +394,20 @@ test_that("test indexes - postgres", {
                        password = Sys.getenv("CDM5_POSTGRESQL_PASSWORD"))
   cdm <- CDMConnector::cdmFromCon(
     con = db,
-    cdm_schema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA"),
-    write_schema = c(schema =  Sys.getenv("CDM5_POSTGRESQL_SCRATCH_SCHEMA"),
-                     prefix = "cc_"),
-    achilles_schema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA")
+    cdmSchema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA"),
+    writeSchema = Sys.getenv("CDM5_POSTGRESQL_SCRATCH_SCHEMA"),
+    writePrefix = "cc_",
+    achillesSchema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA")
   )
 
-  cdm <- omopgenerics::insertTable(cdm = cdm,
-                                   name = "my_cohort",
-                                   table = data.frame(cohort_definition_id = 1L,
-                                                      subject_id = 1L,
-                                                      cohort_start_date = as.Date("2009-01-01"),
-                                                      cohort_end_date = as.Date("2009-01-02")))
+  cdm <- omopgenerics::insertTable(
+    cdm = cdm,
+    name = "my_cohort",
+    table = data.frame(cohort_definition_id = 1L,
+                       subject_id = 1L,
+                       cohort_start_date = as.Date("2009-01-01"),
+                       cohort_end_date = as.Date("2009-01-02"))
+  )
   cdm$my_cohort <- omopgenerics::newCohortTable(cdm$my_cohort)
   cdm$my_cohort <- trimDemographics(cdm$my_cohort, ageRange = list(c(0, 50)))
 

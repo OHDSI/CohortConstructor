@@ -322,7 +322,7 @@ trimDemographics <- function(cohort,
                         )), by = unique(c("target_cohort_rand01", "subject_id"))) |>
     dplyr::select(!"target_cohort_rand01") |>
     dplyr::relocate(dplyr::all_of(omopgenerics::cohortColumns("cohort"))) |>
-    dplyr::compute(name = name, temporary = FALSE) |>
+    dplyr::compute(name = name, temporary = FALSE, overwrite = TRUE) |>
     omopgenerics::newCohortTable(
       cohortSetRef = newSet,
       cohortAttritionRef = attrition(newCohort),

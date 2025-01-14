@@ -51,8 +51,7 @@ A cohort table
 \code{conceptCohort()} creates a cohort table from patient records
 from the clinical tables in the OMOP CDM.
 
-The following tables are currently supported for creating concept
-cohorts:
+The following tables are currently supported for creating concept#' cohorts:
 \itemize{
 \item condition_occurrence
 \item device_exposure
