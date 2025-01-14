@@ -207,6 +207,7 @@ test_that("Example: mixture of parameters", {
 
   expect_true(all(cdm$cohort3 |> dplyr::pull("sex")== "Male"))
 
+  omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
   PatientProfiles::mockDisconnect(cdm)
 })
 
@@ -220,12 +221,12 @@ test_that("test indexes - postgres", {
                        host = Sys.getenv("CDM5_POSTGRESQL_HOST"),
                        user = Sys.getenv("CDM5_POSTGRESQL_USER"),
                        password = Sys.getenv("CDM5_POSTGRESQL_PASSWORD"))
-  cdm <- CDMConnector::cdm_from_con(
+  cdm <- CDMConnector::cdmFromCon(
     con = db,
-    cdm_schema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA"),
-    write_schema = c(schema =  Sys.getenv("CDM5_POSTGRESQL_SCRATCH_SCHEMA"),
-                     prefix = "cc_"),
-    achilles_schema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA")
+    cdmSchema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA"),
+    writeSchema = Sys.getenv("CDM5_POSTGRESQL_SCRATCH_SCHEMA"),
+    writePrefix = "cc_",
+    achillesSchema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA")
   )
 
   cdm$my_cohort <- demographicsCohort(cdm, name = "my_cohort", ageRange = list(c(0, 50)))
@@ -236,5 +237,5 @@ test_that("test indexes - postgres", {
   )
 
   omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
-  CDMConnector::cdm_disconnect(cdm = cdm)
+  CDMConnector::cdmDisconnect(cdm = cdm)
 })

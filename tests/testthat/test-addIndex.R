@@ -29,12 +29,12 @@ test_that("postgres test - adds indexes", {
                        host = Sys.getenv("CDM5_POSTGRESQL_HOST"),
                        user = Sys.getenv("CDM5_POSTGRESQL_USER"),
                        password = Sys.getenv("CDM5_POSTGRESQL_PASSWORD"))
-  cdm <- CDMConnector::cdm_from_con(
+  cdm <- CDMConnector::cdmFromCon(
     con = db,
-    cdm_schema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA"),
-    write_schema = c(schema =  Sys.getenv("CDM5_POSTGRESQL_SCRATCH_SCHEMA"),
-                     prefix = "cc_"),
-    achilles_schema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA")
+    cdmSchema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA"),
+    writeSchema = Sys.getenv("CDM5_POSTGRESQL_SCRATCH_SCHEMA"),
+    writePrefix = "cc_",
+    achillesSchema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA")
   )
 
   cdm <- omopgenerics::insertTable(cdm = cdm,
@@ -56,14 +56,13 @@ test_that("postgres test - adds indexes", {
 
   # no error if we add another index - it will just be skipped
   cdm$my_cohort <- cdm$my_cohort |> addCohortTableIndex()
-  indexes_end_2 <- DBI::dbGetQuery(db,
-                            paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';"))
+  indexes_end_2 <- DBI::dbGetQuery(db, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';"))
   expect_true(nrow(indexes_end_2) == 1)
 
   # should still all work as before
   cdm$my_cohort <- omopgenerics::newCohortTable(cdm$my_cohort)
 
   omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
-  CDMConnector::cdm_disconnect(cdm = cdm)
+  CDMConnector::cdmDisconnect(cdm = cdm)
 
 })

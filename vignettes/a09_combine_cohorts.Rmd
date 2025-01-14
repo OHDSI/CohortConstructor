@@ -40,7 +40,7 @@ if (!dir.exists(Sys.getenv("EUNOMIA_DATA_FOLDER"))){ dir.create(Sys.getenv("EUNO
 For this example we'll use the Eunomia synthetic data from the CDMConnector package.
 
 ```{r}
-con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomia_dir())
+con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomiaDir())
 cdm <- cdm_from_con(con, cdm_schema = "main", 
                     write_schema = c(prefix = "my_study_", schema = "main"))
 ```
@@ -68,9 +68,9 @@ cohortCount(cdm$medintersect)
 There are 6 individuals who had overlapping records in the diclofenac and acetaminophen cohorts.
 
 ```{r, include=FALSE, warning=FALSE}
-con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomia_dir())
-cdm <- cdm_from_con(con, cdm_schema = "main", 
-                    write_schema = c(prefix = "my_study_", schema = "main"))
+con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomiaDir())
+cdm <- CDMConnector::cdmFromCon(con, cdmSchema = "main", 
+                    writeSchema = "main", writePrefix = "my_study_")
 cdm$medications <- conceptCohort(cdm = cdm, 
                                  conceptSet = list("diclofenac" = 1124300,
                                                    "acetaminophen" = 1127433), 
@@ -103,7 +103,7 @@ cohortCount(cdm$medunion)
 We have now created a new cohort which includes individuals in either the diclofenac cohort or the acetaminophen cohort. 
 
 ```{r, include=FALSE, warning=FALSE}
-con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomia_dir())
+con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomiaDir())
 cdm <- cdm_from_con(con, cdm_schema = "main", 
                     write_schema = c(prefix = "my_study_", schema = "main"))
 cdm$medications <- conceptCohort(cdm = cdm, 
@@ -126,7 +126,7 @@ cohortCount(cdm$medunion)
 You can also choose the number of days between two subsequent cohort entries to be merged using the `gap` argument.
 
 ```{r, include=FALSE, warning=FALSE}
-con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomia_dir())
+con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomiaDir())
 cdm <- cdm_from_con(con, cdm_schema = "main", 
                     write_schema = c(prefix = "my_study_", schema = "main"))
 cdm$medications <- conceptCohort(cdm = cdm, 

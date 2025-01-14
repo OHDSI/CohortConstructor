@@ -41,9 +41,9 @@ if (!dir.exists(Sys.getenv("EUNOMIA_DATA_FOLDER"))){ dir.create(Sys.getenv("EUNO
 In this vignette we'll show how requirements related to patient demographics can be applied to a cohort. Again we'll use the Eunomia synthetic data.
 
 ```{r}
-con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomia_dir())
-cdm <- cdm_from_con(con, cdm_schema = "main", 
-                    write_schema = c(prefix = "my_study_", schema = "main"))
+con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomiaDir())
+cdm <- CDMConnector::cdmFromCon(con, cdmSchema = "main", 
+                    writeSchema = "main", writePrefix = "my_study_")
 ```
 
 Let's start by creating a cohort of people with a fracture. We'll first look for codes that might represent a fracture and the build a cohort using these codes, setting cohort exit to 180 days after the fracture.

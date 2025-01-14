@@ -224,12 +224,12 @@ test_that("test indexes - postgres", {
                        host = Sys.getenv("CDM5_POSTGRESQL_HOST"),
                        user = Sys.getenv("CDM5_POSTGRESQL_USER"),
                        password = Sys.getenv("CDM5_POSTGRESQL_PASSWORD"))
-  cdm <- CDMConnector::cdm_from_con(
+  cdm <- CDMConnector::cdmFromCon(
     con = db,
-    cdm_schema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA"),
-    write_schema = c(schema =  Sys.getenv("CDM5_POSTGRESQL_SCRATCH_SCHEMA"),
+    cdmSchema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA"),
+    writeSchema = c(schema =  Sys.getenv("CDM5_POSTGRESQL_SCRATCH_SCHEMA"),
                      prefix = "cc_"),
-    achilles_schema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA")
+    achillesSchema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA")
   )
 
   cdm <- omopgenerics::insertTable(cdm = cdm,
@@ -265,5 +265,5 @@ test_that("test indexes - postgres", {
   )
 
   omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
-  CDMConnector::cdm_disconnect(cdm = cdm)
+  CDMConnector::cdmDisconnect(cdm = cdm)
 })
