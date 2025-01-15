@@ -100,7 +100,7 @@ requireCohortIntersect <- function(cohort,
       window = window,
       censorDate = censorDate,
       nameStyle = "intersect_cohort",
-      name = name
+      name = subsetName
     )
 
   subsetCohort <- subsetCohort |>
@@ -138,6 +138,7 @@ requireCohortIntersect <- function(cohort,
     reason <- glue::glue("{reason}, censoring at {censorDate}")
   }
 
+  # add additional columns
   x <- cohort |>
     dplyr::inner_join(subsetCohort, by = c(cols)) |>
     dplyr::compute(name = name, temporary = FALSE) |>
