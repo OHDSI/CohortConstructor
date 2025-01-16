@@ -67,7 +67,7 @@ It is also possible to only sample one cohort within cohort table, however the r
 
 ```{r include = FALSE, warning = FALSE}
 con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomiaDir())
-cdm <- cdm_from_con(con, cdm_schema = "main", 
+cdm <- cdmFromCon(con, cdm_schema = "main", 
                     write_schema = c(prefix = "my_study_", schema = "main"))
 cdm$medications <- conceptCohort(cdm = cdm, 
                                  conceptSet = list("diclofenac" = 1124300,
@@ -87,7 +87,7 @@ If you want to filter the cohort table to only include individuals and records f
 
 ```{r include = FALSE, warning = FALSE}
 con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomiaDir())
-cdm <- cdm_from_con(con, cdm_schema = "main", 
+cdm <- cdmFromCon(con, cdm_schema = "main", 
                     write_schema = c(prefix = "my_study_", schema = "main"))
 cdm$medications <- conceptCohort(cdm = cdm, 
                                  conceptSet = list("diclofenac" = 1124300,

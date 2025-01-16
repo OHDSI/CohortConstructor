@@ -50,7 +50,7 @@ library(CohortCharacteristics)
 
 ``` r
 con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomiaDir())
-cdm <- cdm_from_con(con, cdm_schema = "main", 
+cdm <- cdmFromCon(con, cdm_schema = "main", 
                     write_schema = c(prefix = "my_study_", schema = "main"))
 #> Note: method with signature 'DBIConnection#Id' chosen for function 'dbExistsTable',
 #>  target signature 'duckdb_connection#Id'.

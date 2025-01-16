@@ -41,7 +41,7 @@ For this example we'll use the Eunomia synthetic data from the CDMConnector pack
 
 ```{r}
 con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomiaDir())
-cdm <- cdm_from_con(con, cdm_schema = "main", 
+cdm <- cdmFromCon(con, cdm_schema = "main", 
                     write_schema = c(prefix = "my_study_", schema = "main"))
 ```
 
@@ -104,7 +104,7 @@ We have now created a new cohort which includes individuals in either the diclof
 
 ```{r, include=FALSE, warning=FALSE}
 con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomiaDir())
-cdm <- cdm_from_con(con, cdm_schema = "main", 
+cdm <- cdmFromCon(con, cdm_schema = "main", 
                     write_schema = c(prefix = "my_study_", schema = "main"))
 cdm$medications <- conceptCohort(cdm = cdm, 
                                  conceptSet = list("diclofenac" = 1124300,
@@ -127,7 +127,7 @@ You can also choose the number of days between two subsequent cohort entries to 
 
 ```{r, include=FALSE, warning=FALSE}
 con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomiaDir())
-cdm <- cdm_from_con(con, cdm_schema = "main", 
+cdm <- cdmFromCon(con, cdm_schema = "main", 
                     write_schema = c(prefix = "my_study_", schema = "main"))
 cdm$medications <- conceptCohort(cdm = cdm, 
                                  conceptSet = list("diclofenac" = 1124300,
