@@ -517,9 +517,9 @@ extendOverlap  <- function(cohort,
                         by = c("cohort_definition_id", "subject_id"),
                         suffix = c("", "_overlap")) |>
       dplyr::filter(
-        record_id != record_id_overlap,
-        cohort_start_date <= cohort_end_date_overlap &
-          cohort_end_date >= cohort_start_date_overlap
+        .data$record_id != .data$record_id_overlap,
+        .data$cohort_start_date <= .data$cohort_end_date_overlap &
+        .data$cohort_end_date >= .data$cohort_start_date_overlap
       )  |>
       dplyr::select("cohort_definition_id", "subject_id",
                     "cohort_start_date", "cohort_end_date",
