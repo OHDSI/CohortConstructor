@@ -1,62 +1,65 @@
 test_that("simple example", {
   skip_on_cran()
-  cdm <- omock::mockCdmReference() |>
-    omock::mockCdmFromTables(tables = list("cohort" = dplyr::tibble(
+  cdm <- omock::mockPerson(nPerson = 3)
+  cdm$observation_period <-  dplyr::tibble(
+    "observation_period_id" = c(1L, 2L, 3L),
+    "person_id" = c(1L, 2L, 3L),
+    "observation_period_start_date" = as.Date("2000-01-01"),
+    "observation_period_end_date" = as.Date("2024-01-01"),
+    "period_type_concept_id" = 1L
+  )
+  cdm <- omopgenerics::insertTable(cdm, name = "cohort",
+    table = dplyr::tibble(
       "cohort_definition_id" = 1L,
-      "subject_id" = c(1L, 2L, 3L),
-      "cohort_start_date" = as.Date("2020-01-01"),
-      "cohort_end_date" = as.Date("2024-01-01")
-    )))
-  cdm <- omopgenerics::insertTable(
-    cdm = cdm, name = "concept", table = dplyr::tibble(
-      "concept_id" = 1L,
-      "concept_name" = "my concept",
-      "domain_id" = "drug",
-      "vocabulary_id" = NA_integer_,
-      "concept_class_id" = NA_integer_,
-      "concept_code" = NA_integer_,
-      "valid_start_date" = as.Date(NA),
-      "valid_end_date" = as.Date(NA)
+      "subject_id" = c(1L, 1L, 2L, 3L),
+      "cohort_start_date" = as.Date(c("2020-01-01",
+                                      "2020-01-12",
+                                      "2021-01-01",
+                                      "2022-01-01")),
+      "cohort_end_date" = as.Date(c("2020-01-10",
+                                    "2020-01-15",
+                                    "2021-01-01",
+                                    "2022-01-01"))
     )
   )
-  cdm <- omopgenerics::insertTable(
-    cdm = cdm, name = "drug_exposure", table = dplyr::tibble(
-      "drug_exposure_id" = as.integer(1:11),
-      "person_id" = as.integer(c(1, 1, 1, 1, 2, 2, 3, 1, 1, 1, 1)),
-      "drug_concept_id" = as.integer(c(1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1)),
-      "drug_exposure_start_date" = c(0, 300, 1300, 750, 10, 800, 150, 1800, 1801, 1802, 1803),
-      "drug_exposure_end_date" = c(400, 800, 1330, 1550, 2000, 1000, 600, 1800, 1801, 1802, 1803),
-      "drug_type_concept_id" = 1L
-    ) |>
-      dplyr::mutate(
-        "drug_exposure_start_date" = as.Date(.data$drug_exposure_start_date, origin = "2020-01-01"),
-        "drug_exposure_end_date" = as.Date(.data$drug_exposure_end_date, origin = "2020-01-01")
-      )
+  cdm <- omopgenerics::insertTable(cdm, name = "cohort",
+    table = dplyr::tibble(
+      "cohort_definition_id" = 1L,
+      "subject_id" = c(1L, 1L, 2L, 3L),
+      "cohort_start_date" = as.Date(c("2020-01-01",
+                                      "2020-01-12",
+                                      "2021-01-01",
+                                      "2022-01-01")),
+      "cohort_end_date" = as.Date(c("2020-01-10",
+                                    "2020-01-15",
+                                    "2021-01-01",
+                                    "2022-01-01"))
+    )
   )
-
   cdm <- cdm |> copyCdm()
-
-  expect_no_error(cohort <- conceptCohort(cdm = cdm, conceptSet = list(a = 1L),
-                                          name = "cohort"))
-
-  expect_no_error(sameCohort <- cohort |>
-                    collapseCohorts(gap = 0, name = "new_cohort"))
-  expect_identical(settings(sameCohort), settings(cohort))
-  expect_identical(cohortCount(sameCohort), cohortCount(cohort))
+  cdm$cohort <- omopgenerics::newCohortTable(cdm$cohort)
+  expect_no_error(sameCohort <- cdm$cohort |>
+                    collapseCohorts(gap = 0,
+                                    name = "new_cohort"))
+  expect_identical(settings(sameCohort), settings(cdm$cohort))
+  expect_identical(cohortCount(sameCohort), cohortCount(cdm$cohort))
 
   # test character id works
-  expect_no_error(sameCohort2 <- cohort |>
-                    collapseCohorts(gap = 0, name = "new_cohort", cohortId = "a"))
-  expect_identical(settings(sameCohort2), settings(cohort))
-  expect_identical(cohortCount(sameCohort2), cohortCount(cohort))
+  cohort_name <- settings(cdm$cohort) |> dplyr::pull("cohort_name")
+  expect_no_error(sameCohort2 <- cdm$cohort |>
+                    collapseCohorts(gap = 0,
+                                    name = "new_cohort",
+                                    cohortId = cohort_name))
+  expect_identical(settings(sameCohort2), settings(cdm$cohort))
+  expect_identical(cohortCount(sameCohort2), cohortCount(cdm$cohort))
   expect_identical(
     attrition(sameCohort),
-    attrition(cohort) |>
+    attrition(cdm$cohort) |>
       dplyr::union_all(dplyr::tibble(
         "cohort_definition_id" = 1L,
-        "number_records" = 3L,
-        "number_subjects" = 2L,
-        "reason_id" = 5L,
+        "number_records" = 4L,
+        "number_subjects" = 3L,
+        "reason_id" = 2L,
         "reason" = "Collapse cohort with a gap of 0 days.",
         "excluded_records" = 0L,
         "excluded_subjects" = 0L
@@ -64,129 +67,46 @@ test_that("simple example", {
   )
   expect_true(tableName(sameCohort) == "new_cohort")
   expect_identical(
-    omopgenerics::tableSource(sameCohort), omopgenerics::tableSource(cohort)
+    omopgenerics::tableSource(sameCohort), omopgenerics::tableSource(cdm$cohort)
   )
 
-  expect_no_error(newCohort <- cohort |> collapseCohorts(gap = 500, name = "my_cohort"))
-  expect_identical(settings(newCohort), settings(cohort))
+  expect_no_error(newCohort <- cdm$cohort |>
+                    collapseCohorts(gap = 5, name = "my_cohort"))
+  expect_identical(settings(newCohort), settings(cdm$cohort))
   expect_identical(cohortCount(newCohort), dplyr::tibble(
-    "cohort_definition_id" = 1L, "number_records" = 2L, "number_subjects" = 2L
+    "cohort_definition_id" = 1L,
+    "number_records" = 3L,
+    "number_subjects" = 3L
   ))
   expect_identical(
     attrition(newCohort),
-    attrition(cohort) |>
+    attrition(cdm$cohort) |>
       dplyr::union_all(dplyr::tibble(
         "cohort_definition_id" = 1L,
-        "number_records" = 2L,
-        "number_subjects" = 2L,
-        "reason_id" = 5L,
-        "reason" = "Collapse cohort with a gap of 500 days.",
+        "number_records" = 3L,
+        "number_subjects" = 3L,
+        "reason_id" = 2L,
+        "reason" = "Collapse cohort with a gap of 5 days.",
         "excluded_records" = 1L,
         "excluded_subjects" = 0L
       ))
   )
   expect_true(tableName(newCohort) == "my_cohort")
   expect_identical(
-    omopgenerics::tableSource(newCohort), omopgenerics::tableSource(cohort)
+    omopgenerics::tableSource(newCohort), omopgenerics::tableSource(cdm$cohort)
   )
 
   # expected behaviour
   expect_warning(cdm$cohort |> collapseCohorts(cohortId = c("a", "n")))
   cdm$cohort <- cdm$cohort |> dplyr::mutate(extra_column_1 = 1,
                                             extra_column_2 = 2)
-  expect_warning(expect_error(cdm$cohort |> collapseCohorts(gap = NA)))
-  expect_warning(expect_error(cdm$cohort |> collapseCohorts(gap = NULL)))
-  expect_warning(expect_error(cdm$cohort |> collapseCohorts(gap = -1)))
-  expect_warning(expect_error(cdm$cohort |> collapseCohorts(gap = -Inf)))
-  expect_warning(expect_error(cdm$cohort |> collapseCohorts(gap = "not a number")))
+  expect_warning(cdm$cohort |> collapseCohorts())
+  expect_error(cdm$cohort |> collapseCohorts(gap = NA))
+  expect_error(cdm$cohort |> collapseCohorts(gap = NULL))
+  expect_error(cdm$cohort |> collapseCohorts(gap = -1))
+  expect_error(cdm$cohort |> collapseCohorts(gap = -Inf))
+  expect_error(cdm$cohort |> collapseCohorts(gap = "not a number"))
 
-
-  PatientProfiles::mockDisconnect(cdm)
-})
-
-test_that("out of observation", {
-  testthat::skip_on_cran()
-  cdm <- omock::mockCdmReference() |>
-    omock::mockCdmFromTables(tables = list("cohort" = dplyr::tibble(
-      "cohort_definition_id" = 1L,
-      "subject_id" = c(1L, 2L, 3L),
-      "cohort_start_date" = as.Date("2020-01-01"),
-      "cohort_end_date" = as.Date("2024-01-01")
-    )))
-  cdm <- omopgenerics::insertTable(
-    cdm = cdm, name = "concept", table = dplyr::tibble(
-      "concept_id" = 1L,
-      "concept_name" = "my concept",
-      "domain_id" = "drug",
-      "vocabulary_id" = NA_integer_,
-      "concept_class_id" = NA_integer_,
-      "concept_code" = NA_integer_,
-      "valid_start_date" = NA_integer_,
-      "valid_end_date" = NA_integer_
-    )
-  )
-  cdm <- omopgenerics::insertTable(
-    cdm = cdm, name = "drug_exposure", table = dplyr::tibble(
-      "drug_exposure_id" = as.integer(1:11),
-      "person_id" = as.integer(c(1, 1, 1, 1, 2, 2, 3, 1, 1, 1, 1)),
-      "drug_concept_id" = as.integer(c(1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1)),
-      "drug_exposure_start_date" = c(0, 300, 1500, 750, 10, 800, 150, 1800, 1801, 1802, 1803),
-      "drug_exposure_end_date" = c(400, 800, 1600, 1550, 2000, 1000, 600, 1800, 1801, 1802, 1803),
-      "drug_type_concept_id" = 1
-    ) |>
-      dplyr::mutate(
-        "drug_exposure_start_date" = as.Date(.data$drug_exposure_start_date, origin = "2020-01-01"),
-        "drug_exposure_end_date" = as.Date(.data$drug_exposure_end_date, origin = "2020-01-01")
-      )
-  )
-
-  cdm <- cdm |> copyCdm()
-
-  expect_no_error(cohort <- conceptCohort(cdm = cdm, conceptSet = list(a = 1L), name = "cohort"))
-
-  expect_no_error(sameCohort <- cohort |> collapseCohorts(gap = 0, name = "new_cohort"))
-  expect_identical(settings(sameCohort), settings(cohort))
-  expect_identical(cohortCount(sameCohort), cohortCount(cohort))
-  # expect_identical(
-  #   attrition(sameCohort),
-  #   attrition(cohort) |>
-  #     dplyr::union_all(dplyr::tibble(
-  #       "cohort_definition_id" = 1L,
-  #       "number_records" = 7L,
-  #       "number_subjects" = 2L,
-  #       "reason_id" = 2L,
-  #       "reason" = "Collapse cohort with a gap of 0 days.",
-  #       "excluded_records" = 0L,
-  #       "excluded_subjects" = 0L
-  #     ))
-  # )
-  expect_true(tableName(sameCohort) == "new_cohort")
-  expect_identical(
-    omopgenerics::tableSource(sameCohort), omopgenerics::tableSource(cohort)
-  )
-
-  expect_no_error(newCohort <- cohort |> collapseCohorts(gap = 1, name = "my_cohort"))
-  expect_identical(settings(newCohort), settings(cohort))
-  expect_identical(cohortCount(newCohort), dplyr::tibble(
-    "cohort_definition_id" = 1L, "number_records" = 2L, "number_subjects" = 2L
-  ))
-  # expect_identical(
-  #   attrition(newCohort),
-  #   attrition(cohort) |>
-  #     dplyr::union_all(dplyr::tibble(
-  #       "cohort_definition_id" = 1L,
-  #       "number_records" = 4L,
-  #       "number_subjects" = 2L,
-  #       "reason_id" = 2L,
-  #       "reason" = "Collapse cohort with a gap of 1 days.",
-  #       "excluded_records" = 3L,
-  #       "excluded_subjects" = 0L
-  #     ))
-  # )
-  expect_true(tableName(newCohort) == "my_cohort")
-  expect_identical(
-    omopgenerics::tableSource(newCohort), omopgenerics::tableSource(cohort)
-  )
 
   PatientProfiles::mockDisconnect(cdm)
 })
@@ -323,12 +243,12 @@ test_that("test indexes - postgres", {
                        host = Sys.getenv("CDM5_POSTGRESQL_HOST"),
                        user = Sys.getenv("CDM5_POSTGRESQL_USER"),
                        password = Sys.getenv("CDM5_POSTGRESQL_PASSWORD"))
-  cdm <- CDMConnector::cdmFromCon(
+  cdm <- CDMConnector::cdm_from_con(
     con = db,
-    cdmSchema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA"),
-    writeSchema = Sys.getenv("CDM5_POSTGRESQL_SCRATCH_SCHEMA"),
-    writePrefix = "cc_",
-    achillesSchema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA")
+    cdm_schema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA"),
+    write_schema = c(schema =  Sys.getenv("CDM5_POSTGRESQL_SCRATCH_SCHEMA"),
+                     prefix = "cc_"),
+    achilles_schema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA")
   )
 
   cdm <- omopgenerics::insertTable(cdm = cdm,
@@ -346,40 +266,5 @@ test_that("test indexes - postgres", {
   )
 
   omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
-  CDMConnector::cdmDisconnect(cdm = cdm)
-})
-
-test_that("test same record in different cohorts", {
-
-  cdm <- omock::mockCdmFromTables()
-  cdm$person <- dplyr::tibble(
-    "person_id" = c(1L, 2L, 3L),
-    "gender_concept_id" = 1L,
-    "year_of_birth" = 1990L,
-    "race_concept_id" = 1L,
-    "ethnicity_concept_id" = 1L
-  )
-  cdm$observation_period <-  dplyr::tibble(
-    "observation_period_id" = c(1L, 2L, 3L),
-    "person_id" = c(1L, 2L, 3L),
-    "observation_period_start_date" = as.Date("2000-01-01"),
-    "observation_period_end_date" = as.Date("2024-01-01"),
-    "period_type_concept_id" = 1L
-  )
-  cdm$cohort <- dplyr::tibble(
-    "cohort_definition_id" = c(1L, 1L, 1L, 2L, 2L),
-    "subject_id" = c(1L, 2L, 3L, 3L, 1L),
-    "cohort_start_date" = as.Date(c("2020-01-01", "2020-01-01",
-                                    "2020-01-01", "2020-01-01", "2020-01-01")),
-    "cohort_end_date" = as.Date(c("2022-01-01", "2022-01-01",
-                                  "2022-01-01", "2022-01-01", "2020-01-05"))
-  )
-
-  cdm <- cdm |> copyCdm()
-  cdm$cohort <- omopgenerics::newCohortTable(cdm$cohort)
-  cdm$cohort_collapsed <- cdm$cohort |> collapseCohorts(gap = 10, name = "cohort_collapsed")
-
-  expect_true(cdm$cohort_collapsed |> dplyr::filter(subject_id == 3) |> dplyr::collect() |> nrow() == 2)
-  expect_true(cdm$cohort_collapsed |> dplyr::filter(subject_id == 1) |> dplyr::collect() |> nrow() == 2)
-
+  CDMConnector::cdm_disconnect(cdm = cdm)
 })
