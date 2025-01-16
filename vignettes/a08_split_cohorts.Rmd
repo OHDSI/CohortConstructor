@@ -63,8 +63,8 @@ We can also split cohorts for specified years using the function `yearCohorts()`
 
 ```{r, include=FALSE, warning=FALSE}
 con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomiaDir())
-cdm <- cdmFromCon(con, cdm_schema = "main", 
-                    write_schema = c(prefix = "my_study_", schema = "main"))
+cdm <- cdmFromCon(con, cdmSchema = "main", 
+                    writeSchema = c(prefix = "my_study_", schema = "main"))
 
 cdm$medications <- conceptCohort(cdm = cdm, 
                                  conceptSet = list("diclofenac" = 1124300,
