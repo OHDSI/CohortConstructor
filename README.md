@@ -50,14 +50,19 @@ library(CohortCharacteristics)
 
 ``` r
 con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomiaDir())
-cdm <- cdm_from_con(con, cdm_schema = "main", 
-                    write_schema = c(prefix = "my_study_", schema = "main"))
+cdm <- cdmFromCon(con, cdmSchema = "main", 
+                    writeSchema = c(prefix = "my_study_", schema = "main"))
+#> Support for 'prefix' in writeSchema is deprecated and will be removed in a future release. Please use the `writePrefix` argument in `cdmFromCon()` instead.
 #> Note: method with signature 'DBIConnection#Id' chosen for function 'dbExistsTable',
 #>  target signature 'duckdb_connection#Id'.
 #>  "duckdb_connection#ANY" would also be valid
+#> 
+#> ! cdm name not specified and could not be inferred from the cdm source table
+#> 
+#> This message is displayed once per session.
 cdm
 #> 
-#> ── # OMOP CDM reference (duckdb) of Synthea synthetic health database ──────────
+#> ── # OMOP CDM reference (duckdb) of An OMOP CDM database ───────────────────────
 #> • omop tables: person, observation_period, visit_occurrence, visit_detail,
 #> condition_occurrence, drug_exposure, procedure_occurrence, device_exposure,
 #> measurement, observation, death, note, note_nlp, specimen, fact_relationship,
@@ -79,6 +84,7 @@ synthetic data with a subset of the full vocabularies).
 
 ``` r
 library(CodelistGenerator)
+#> Warning: package 'CodelistGenerator' was built under R version 4.4.2
 
 hip_fx_codes <- getCandidateCodes(cdm, "hip fracture")
 #> Limiting to domains of interest
@@ -87,7 +93,7 @@ hip_fx_codes <- getCandidateCodes(cdm, "hip fracture")
 #> Search completed. Finishing up.
 #> ✔ 1 candidate concept identified
 #> 
-#> Time taken: 0 minutes and 0 seconds
+#> Time taken: 0 minutes and 1 seconds
 forearm_fx_codes <- getCandidateCodes(cdm, "forearm fracture")
 #> Limiting to domains of interest
 #> Getting concepts to include
@@ -95,7 +101,7 @@ forearm_fx_codes <- getCandidateCodes(cdm, "forearm fracture")
 #> Search completed. Finishing up.
 #> ✔ 1 candidate concept identified
 #> 
-#> Time taken: 0 minutes and 0 seconds
+#> Time taken: 0 minutes and 1 seconds
 
 fx_codes <- newCodelist(list("hip_fracture" = hip_fx_codes$concept_id,
                              "forearm_fracture"= forearm_fx_codes$concept_id))
@@ -142,21 +148,26 @@ settings(cdm$fractures) |> glimpse()
 #> $ cdm_version          <chr> "5.3", "5.3"
 #> $ vocabulary_version   <chr> "v5.0 18-JAN-19", "v5.0 18-JAN-19"
 cohort_count(cdm$fractures) |> glimpse()
+#> Warning: `cohort_count()` was deprecated in CDMConnector 1.7.0.
+#> ℹ Please use `cohortCount()` instead.
+#> This warning is displayed once every 8 hours.
+#> Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+#> generated.
 #> Rows: 2
 #> Columns: 3
 #> $ cohort_definition_id <int> 1, 2
 #> $ number_records       <int> 569, 138
 #> $ number_subjects      <int> 510, 132
 attrition(cdm$fractures) |> glimpse()
-#> Rows: 4
+#> Rows: 10
 #> Columns: 7
-#> $ cohort_definition_id <int> 1, 1, 2, 2
-#> $ number_records       <int> 569, 569, 138, 138
-#> $ number_subjects      <int> 510, 510, 132, 132
-#> $ reason_id            <int> 1, 2, 1, 2
-#> $ reason               <chr> "Initial qualifying events", "Pad cohort start da…
-#> $ excluded_records     <int> 0, 0, 0, 0
-#> $ excluded_subjects    <int> 0, 0, 0, 0
+#> $ cohort_definition_id <int> 1, 1, 1, 1, 1, 2, 2, 2, 2, 2
+#> $ number_records       <int> 569, 569, 569, 569, 569, 138, 138, 138, 138, 138
+#> $ number_subjects      <int> 510, 510, 510, 510, 510, 132, 132, 132, 132, 132
+#> $ reason_id            <int> 1, 2, 3, 4, 5, 1, 2, 3, 4, 5
+#> $ reason               <chr> "Initial qualifying events", "Record start <= rec…
+#> $ excluded_records     <int> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+#> $ excluded_subjects    <int> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 ```
 
 ### Create an overall fracture cohort
@@ -248,7 +259,7 @@ attrition(cdm$fractures) |>
 #> $ cohort_definition_id <int> 1, 2, 3
 #> $ number_records       <int> 64, 22, 86
 #> $ number_subjects      <int> 62, 22, 83
-#> $ reason_id            <int> 5, 5, 4
+#> $ reason_id            <int> 8, 8, 4
 #> $ reason               <chr> "Age requirement: 40 to 65", "Age requirement: 40…
 #> $ excluded_records     <int> 88, 40, 128
 #> $ excluded_subjects    <int> 81, 38, 113
@@ -261,7 +272,7 @@ attrition(cdm$fractures) |>
 #> $ cohort_definition_id <int> 1, 2, 3
 #> $ number_records       <int> 37, 12, 49
 #> $ number_subjects      <int> 36, 12, 48
-#> $ reason_id            <int> 6, 6, 5
+#> $ reason_id            <int> 9, 9, 5
 #> $ reason               <chr> "Sex requirement: Female", "Sex requirement: Fema…
 #> $ excluded_records     <int> 27, 10, 37
 #> $ excluded_subjects    <int> 26, 10, 35
@@ -294,7 +305,7 @@ attrition(cdm$fractures) |>
 #> $ cohort_definition_id <int> 1, 2, 3
 #> $ number_records       <int> 30, 10, 40
 #> $ number_subjects      <int> 30, 10, 40
-#> $ reason_id            <int> 9, 9, 8
+#> $ reason_id            <int> 12, 12, 8
 #> $ reason               <chr> "Not in cohort gibleed between -Inf & 0 days rela…
 #> $ excluded_records     <int> 7, 2, 9
 #> $ excluded_subjects    <int> 6, 2, 8
