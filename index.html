@@ -29,7 +29,7 @@
 
     <a class="navbar-brand me-2" href="index.html">CohortConstructor</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -110,14 +110,19 @@
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://darwin-eu.github.io/CohortCharacteristics/" class="external-link">CohortCharacteristics</a></span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">duckdb</span><span class="fu">::</span><span class="fu"><a href="https://r.duckdb.org/reference/duckdb.html" class="external-link">duckdb</a></span><span class="op">(</span><span class="op">)</span>, dbdir <span class="op">=</span> <span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/eunomiaDir.html" class="external-link">eunomiaDir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/cdmFromCon.html" class="external-link">cdm_from_con</a></span><span class="op">(</span><span class="va">con</span>, cdm_schema <span class="op">=</span> <span class="st">"main"</span>, </span>
-<span>                    write_schema <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>prefix <span class="op">=</span> <span class="st">"my_study_"</span>, schema <span class="op">=</span> <span class="st">"main"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/cdmFromCon.html" class="external-link">cdmFromCon</a></span><span class="op">(</span><span class="va">con</span>, cdmSchema <span class="op">=</span> <span class="st">"main"</span>, </span>
+<span>                    writeSchema <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>prefix <span class="op">=</span> <span class="st">"my_study_"</span>, schema <span class="op">=</span> <span class="st">"main"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Support for 'prefix' in writeSchema is deprecated and will be removed in a future release. Please use the `writePrefix` argument in `cdmFromCon()` instead.</span></span>
 <span><span class="co">#&gt; Note: method with signature 'DBIConnection#Id' chosen for function 'dbExistsTable',</span></span>
 <span><span class="co">#&gt;  target signature 'duckdb_connection#Id'.</span></span>
 <span><span class="co">#&gt;  "duckdb_connection#ANY" would also be valid</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ! cdm name not specified and could not be inferred from the cdm source table</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; This message is displayed once per session.</span></span>
 <span><span class="va">cdm</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── # OMOP CDM reference (duckdb) of Synthea synthetic health database ──────────</span></span>
+<span><span class="co">#&gt; ── # OMOP CDM reference (duckdb) of An OMOP CDM database ───────────────────────</span></span>
 <span><span class="co">#&gt; • omop tables: person, observation_period, visit_occurrence, visit_detail,</span></span>
 <span><span class="co">#&gt; condition_occurrence, drug_exposure, procedure_occurrence, device_exposure,</span></span>
 <span><span class="co">#&gt; measurement, observation, death, note, note_nlp, specimen, fact_relationship,</span></span>
@@ -134,6 +139,7 @@
 <p>We will first need to identify codes that could be used to represent fractures of interest. To find these we’ll use the CodelistGenerator package (note, we will just find a few codes because we are using synthetic data with a subset of the full vocabularies).</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://darwin-eu.github.io/CodelistGenerator/" class="external-link">CodelistGenerator</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: package 'CodelistGenerator' was built under R version 4.4.2</span></span>
 <span></span>
 <span><span class="va">hip_fx_codes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/CodelistGenerator/reference/getCandidateCodes.html" class="external-link">getCandidateCodes</a></span><span class="op">(</span><span class="va">cdm</span>, <span class="st">"hip fracture"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Limiting to domains of interest</span></span>
@@ -142,7 +148,7 @@
 <span><span class="co">#&gt; Search completed. Finishing up.</span></span>
 <span><span class="co">#&gt; ✔ 1 candidate concept identified</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Time taken: 0 minutes and 0 seconds</span></span>
+<span><span class="co">#&gt; Time taken: 0 minutes and 1 seconds</span></span>
 <span><span class="va">forearm_fx_codes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/CodelistGenerator/reference/getCandidateCodes.html" class="external-link">getCandidateCodes</a></span><span class="op">(</span><span class="va">cdm</span>, <span class="st">"forearm fracture"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Limiting to domains of interest</span></span>
 <span><span class="co">#&gt; Getting concepts to include</span></span>
@@ -150,7 +156,7 @@
 <span><span class="co">#&gt; Search completed. Finishing up.</span></span>
 <span><span class="co">#&gt; ✔ 1 candidate concept identified</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Time taken: 0 minutes and 0 seconds</span></span>
+<span><span class="co">#&gt; Time taken: 0 minutes and 1 seconds</span></span>
 <span></span>
 <span><span class="va">fx_codes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/newCodelist.html" class="external-link">newCodelist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"hip_fracture"</span> <span class="op">=</span> <span class="va">hip_fx_codes</span><span class="op">$</span><span class="va">concept_id</span>,</span>
 <span>                             <span class="st">"forearm_fracture"</span><span class="op">=</span> <span class="va">forearm_fx_codes</span><span class="op">$</span><span class="va">concept_id</span><span class="op">)</span><span class="op">)</span></span>
@@ -180,21 +186,26 @@
 <span><span class="co">#&gt; $ cdm_version          &lt;chr&gt; "5.3", "5.3"</span></span>
 <span><span class="co">#&gt; $ vocabulary_version   &lt;chr&gt; "v5.0 18-JAN-19", "v5.0 18-JAN-19"</span></span>
 <span><span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/cohort_count.html" class="external-link">cohort_count</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: `cohort_count()` was deprecated in CDMConnector 1.7.0.</span></span>
+<span><span class="co">#&gt; ℹ Please use `cohortCount()` instead.</span></span>
+<span><span class="co">#&gt; This warning is displayed once every 8 hours.</span></span>
+<span><span class="co">#&gt; Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span>
+<span><span class="co">#&gt; generated.</span></span>
 <span><span class="co">#&gt; Rows: 2</span></span>
 <span><span class="co">#&gt; Columns: 3</span></span>
 <span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 1, 2</span></span>
 <span><span class="co">#&gt; $ number_records       &lt;int&gt; 569, 138</span></span>
 <span><span class="co">#&gt; $ number_subjects      &lt;int&gt; 510, 132</span></span>
 <span><span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/attrition.html" class="external-link">attrition</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Rows: 4</span></span>
+<span><span class="co">#&gt; Rows: 10</span></span>
 <span><span class="co">#&gt; Columns: 7</span></span>
-<span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 1, 1, 2, 2</span></span>
-<span><span class="co">#&gt; $ number_records       &lt;int&gt; 569, 569, 138, 138</span></span>
-<span><span class="co">#&gt; $ number_subjects      &lt;int&gt; 510, 510, 132, 132</span></span>
-<span><span class="co">#&gt; $ reason_id            &lt;int&gt; 1, 2, 1, 2</span></span>
-<span><span class="co">#&gt; $ reason               &lt;chr&gt; "Initial qualifying events", "Pad cohort start da…</span></span>
-<span><span class="co">#&gt; $ excluded_records     &lt;int&gt; 0, 0, 0, 0</span></span>
-<span><span class="co">#&gt; $ excluded_subjects    &lt;int&gt; 0, 0, 0, 0</span></span></code></pre></div>
+<span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 1, 1, 1, 1, 1, 2, 2, 2, 2, 2</span></span>
+<span><span class="co">#&gt; $ number_records       &lt;int&gt; 569, 569, 569, 569, 569, 138, 138, 138, 138, 138</span></span>
+<span><span class="co">#&gt; $ number_subjects      &lt;int&gt; 510, 510, 510, 510, 510, 132, 132, 132, 132, 132</span></span>
+<span><span class="co">#&gt; $ reason_id            &lt;int&gt; 1, 2, 3, 4, 5, 1, 2, 3, 4, 5</span></span>
+<span><span class="co">#&gt; $ reason               &lt;chr&gt; "Initial qualifying events", "Record start &lt;= rec…</span></span>
+<span><span class="co">#&gt; $ excluded_records     &lt;int&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0</span></span>
+<span><span class="co">#&gt; $ excluded_subjects    &lt;int&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="create-an-overall-fracture-cohort">Create an overall fracture cohort<a class="anchor" aria-label="anchor" href="#create-an-overall-fracture-cohort"></a>
@@ -267,7 +278,7 @@
 <span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 1, 2, 3</span></span>
 <span><span class="co">#&gt; $ number_records       &lt;int&gt; 64, 22, 86</span></span>
 <span><span class="co">#&gt; $ number_subjects      &lt;int&gt; 62, 22, 83</span></span>
-<span><span class="co">#&gt; $ reason_id            &lt;int&gt; 5, 5, 4</span></span>
+<span><span class="co">#&gt; $ reason_id            &lt;int&gt; 8, 8, 4</span></span>
 <span><span class="co">#&gt; $ reason               &lt;chr&gt; "Age requirement: 40 to 65", "Age requirement: 40…</span></span>
 <span><span class="co">#&gt; $ excluded_records     &lt;int&gt; 88, 40, 128</span></span>
 <span><span class="co">#&gt; $ excluded_subjects    &lt;int&gt; 81, 38, 113</span></span>
@@ -280,7 +291,7 @@
 <span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 1, 2, 3</span></span>
 <span><span class="co">#&gt; $ number_records       &lt;int&gt; 37, 12, 49</span></span>
 <span><span class="co">#&gt; $ number_subjects      &lt;int&gt; 36, 12, 48</span></span>
-<span><span class="co">#&gt; $ reason_id            &lt;int&gt; 6, 6, 5</span></span>
+<span><span class="co">#&gt; $ reason_id            &lt;int&gt; 9, 9, 5</span></span>
 <span><span class="co">#&gt; $ reason               &lt;chr&gt; "Sex requirement: Female", "Sex requirement: Fema…</span></span>
 <span><span class="co">#&gt; $ excluded_records     &lt;int&gt; 27, 10, 37</span></span>
 <span><span class="co">#&gt; $ excluded_subjects    &lt;int&gt; 26, 10, 35</span></span></code></pre></div>
@@ -307,7 +318,7 @@
 <span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 1, 2, 3</span></span>
 <span><span class="co">#&gt; $ number_records       &lt;int&gt; 30, 10, 40</span></span>
 <span><span class="co">#&gt; $ number_subjects      &lt;int&gt; 30, 10, 40</span></span>
-<span><span class="co">#&gt; $ reason_id            &lt;int&gt; 9, 9, 8</span></span>
+<span><span class="co">#&gt; $ reason_id            &lt;int&gt; 12, 12, 8</span></span>
 <span><span class="co">#&gt; $ reason               &lt;chr&gt; "Not in cohort gibleed between -Inf &amp; 0 days rela…</span></span>
 <span><span class="co">#&gt; $ excluded_records     &lt;int&gt; 7, 2, 9</span></span>
 <span><span class="co">#&gt; $ excluded_subjects    &lt;int&gt; 6, 2, 8</span></span></code></pre></div>
