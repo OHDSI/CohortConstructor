@@ -440,7 +440,7 @@ test_that("table not present in the cdm", {
   # expect_true(all(cdm$conceptcohort |> dplyr::pull(cohort_start_date) |> sort() ==
   #                   c("2020-01-01", "2020-01-01", "2020-01-01", "2020-01-11", "2020-01-11", "2020-01-11")))
 
-  PatientProfiles::mockDisconnect(cdm)
+  # PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("cohort exit as event start date", {
