@@ -138,11 +138,21 @@ requireCohortIntersect <- function(cohort,
     reason <- glue::glue("{reason}, censoring at {censorDate}")
   }
 
+  # codelist
+  targetCodelist <- attr(cdm[[targetCohortTable]], "cohort_codelist") |>
+    dplyr::filter(.data$cohort_definition_id %in% .env$targetCohortId) |>
+    dplyr::collect()
+  newCodelist <- getIntersectionCodelist(
+    cohort, cohortId, targetCodelist
+  )
+
   # add additional columns
   x <- cohort |>
     dplyr::inner_join(subsetCohort, by = c(cols)) |>
     dplyr::compute(name = name, temporary = FALSE) |>
-    omopgenerics::newCohortTable(.softValidation = TRUE) |>
+    omopgenerics::newCohortTable(
+      .softValidation = TRUE, cohortCodelistRef = newCodelist
+    ) |>
     omopgenerics::recordCohortAttrition(reason = reason, cohortId = cohortId)
 
   omopgenerics::dropTable(cdm = cdm, name = subsetName)
