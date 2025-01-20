@@ -132,10 +132,18 @@ requireConceptIntersect <- function(cohort,
       reason <- glue::glue("{reason}, censoring at {censorDate}")
     }
 
+    #codelist
+    newCodelist <- getIntersectionCodelist(
+      cohort, cohortId, conceptSetToCohortCodelist(conceptSet)
+    )
+
+    # cohort
     cohort <- cohort |>
       dplyr::inner_join(subsetCohort, by = c(cols)) |>
       dplyr::compute(name = name, temporary = FALSE) |>
-      omopgenerics::newCohortTable(.softValidation = TRUE) |>
+      omopgenerics::newCohortTable(
+        .softValidation = TRUE, cohortCodelistRef = newCodelist
+      ) |>
       omopgenerics::recordCohortAttrition(reason = reason, cohortId = cohortId)
 
     omopgenerics::dropTable(cdm = cdm, name = subsetName)
@@ -150,4 +158,20 @@ requireConceptIntersect <- function(cohort,
   }
 
   return(cohort)
+}
+
+getIntersectionCodelist <- function(cohort, cohortId, codelist) {
+  criteria <- "inclusion criteria"
+  intersectCodelist <- lapply(
+    as.list(cohortId),
+    function(x, tab = codelist) {
+      tab |> dplyr::mutate(cohort_definition_id = .env$x)
+    }) |>
+    dplyr::bind_rows() |>
+    dplyr::mutate(type = .env$criteria)
+  newCodelist <- attr(cohort, "cohort_codelist") |>
+    dplyr::collect() |>
+    dplyr::union(intersectCodelist) |>
+    dplyr::arrange(.data$cohort_definition_id)
+  return(newCodelist)
 }
