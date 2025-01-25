@@ -115,10 +115,13 @@ test_that("requiring presence in another cohort", {
                       "Not in cohort cohort_1 between 0 & Inf days relative to cohort_start_date, censoring at cohort_end_date")))
 
   # expected errors
-  # only support one target id at the moment
+  # only support one target id
   expect_error(requireCohortIntersect(cohort = cdm$cohort1,
                                       targetCohortTable = "cohort2",
                                       targetCohortId = c(1,2),
+                                      window = c(-Inf, Inf)))
+  expect_error(requireCohortIntersect(cohort = cdm$cohort1,
+                                      targetCohortTable = "cohort2",
                                       window = c(-Inf, Inf)))
   expect_error(requireCohortIntersect(cohort = cdm$cohort1,
                                       targetCohortTable = "cohort22", # does not exist
@@ -136,6 +139,8 @@ test_that("requiring presence in another cohort", {
                                       targetCohortTable = c("not_a_cohort", "lala"),
                                       targetCohortId = 1,
                                       window = c(-Inf, Inf)))
+
+
   PatientProfiles::mockDisconnect(cdm)
 
 })
