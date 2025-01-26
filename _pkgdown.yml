@@ -40,6 +40,9 @@ reference:
 - subtitle: Filter cohorts
 - contents:
   - matches("subsetCohorts|sampleCohorts")
+- subtitle: Copy cohorts
+- contents:
+  - matches("copyCohorts")
 - subtitle: Split cohorts
 - contents:
   - matches("yearCohorts|stratifyCohorts")
