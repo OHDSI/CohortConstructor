@@ -14,7 +14,7 @@ articles:
   a09_combine_cohorts: a09_combine_cohorts.html
   a10_match_cohorts: a10_match_cohorts.html
   a11_benchmark: a11_benchmark.html
-last_built: 2025-01-20T21:46Z
+last_built: 2025-01-26T09:36Z
 urls:
   reference: https://ohdsi.github.io/CohortConstructor/reference
   article: https://ohdsi.github.io/CohortConstructor/articles
