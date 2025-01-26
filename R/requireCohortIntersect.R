@@ -41,9 +41,18 @@ requireCohortIntersect <- function(cohort,
   cohort <- omopgenerics::validateCohortArgument(cohort)
   validateCohortColumn(indexDate, cohort, class = "Date")
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
+  omopgenerics::validateCohortArgument(cdm[[targetCohortTable]])
   window <- omopgenerics::validateWindowArgument(window)
-  cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
+  cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}},
+                                                     cohort,
+                                                     validation = "warning")
+  if(!is.null(targetCohortId)){
+  targetCohortId <- omopgenerics::validateCohortIdArgument({{targetCohortId}},
+                                                           cdm[[targetCohortTable]],
+                                                           validation = "error")
+  }
   intersections <- validateIntersections(intersections)
+
 
   if (length(cohortId) == 0) {
     cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
@@ -51,7 +60,12 @@ requireCohortIntersect <- function(cohort,
     cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE)
     return(cdm[[name]])
   }
-
+  # targetCohortId must be singular
+  if (length(targetCohortId) > 1) {
+    cli::cli_abort(c("requireCohortIntersect can only be use with one rarget cohort at a time.",
+                     "i" = "Cohort IDs {targetCohortId} found in targetCohortTable {targetCohortTable}",
+                     "i" = "Use targetCohortId argument to specify just one cohort for intersection"))
+  }
   lower_limit <- as.integer(intersections[[1]])
   upper_limit <- intersections[[2]]
   upper_limit[is.infinite(upper_limit)] <- 999999L
