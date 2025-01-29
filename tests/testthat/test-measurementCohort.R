@@ -52,6 +52,10 @@ test_that("mearurementCohorts works", {
     valueAsNumber = list("8876" = c(70L, 120L))
   )
 
+  expect_true(
+    all(colnames(attr(cdm$cohort, "cohort_codelist")) == c("cohort_definition_id", "codelist_name", "concept_id", "type"))
+  )
+
   if(isDuckdb){
     endTempTables <- countDuckdbTempTables(
       con = attr(omopgenerics::cdmSource(cdm),
@@ -236,6 +240,18 @@ test_that("mearurementCohorts works", {
   expect_true(cdm$cohort10 |> attrition() |> nrow() == 0)
   expect_true(cdm$cohort10 |> settings() |> nrow() == 0)
   expect_identical(colnames(settings(cdm$cohort10)) |> sort(), c("cdm_version", "cohort_definition_id", "cohort_name", "vocabulary_version"))
+
+  # test no concept unit specified ----
+  cdm$cohort11 <- measurementCohort(
+    cdm = cdm,
+    name = "cohort11",
+    conceptSet = list("blood_pressure_measurement" = c(4326744L, 4298393L, 45770407L)),
+    valueAsNumber = list(c(0, 100))
+  )
+  expect_identical(
+    collectCohort(cdm$cohort11, 1),
+    dplyr::tibble(subject_id = 1L, cohort_start_date = as.Date("2000-07-01"), cohort_end_date = as.Date("2000-07-01"))
+  )
 
   PatientProfiles::mockDisconnect(cdm)
 })
