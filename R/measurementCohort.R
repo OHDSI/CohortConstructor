@@ -157,10 +157,12 @@ measurementCohort <- function(cdm,
     }
   }
 
+  cohortCodelist <- cohortCodelist |> dplyr::collect() |> dplyr::select(-"domain_id")
+
   cohort <- cohort |>
     omopgenerics::newCohortTable(
       cohortSetRef = cohortSet,
-      cohortCodelistRef = cohortCodelist |> dplyr::collect(),
+      cohortCodelistRef = cohortCodelist,
       .softValidation = TRUE
     )
 
@@ -175,7 +177,7 @@ measurementCohort <- function(cdm,
       omopgenerics::newCohortTable(
         cohortSetRef = cohortSet,
         cohortAttritionRef = attrition(cohort),
-        cohortCodelistRef = cohortCodelist |> dplyr::collect()
+        cohortCodelistRef = cohortCodelist
       )
     return(cdm[[name]])
   }
@@ -213,8 +215,7 @@ measurementCohort <- function(cdm,
 
   cli::cli_inform(c("i" = "Creating cohort attributes."))
 
-  cohort <- cohort |>
-    omopgenerics::newCohortTable(.softValidation = TRUE)
+  cohort <- cohort |> omopgenerics::newCohortTable()
 
   cli::cli_inform(c("v" = "Cohort {.strong {name}} created."))
 
