@@ -52,6 +52,10 @@ test_that("mearurementCohorts works", {
     valueAsNumber = list("8876" = c(70L, 120L))
   )
 
+  expect_true(
+    all(colnames(attr(cdm$cohort, "cohort_codelist")) == c("cohort_definition_id", "codelist_name", "concept_id", "type"))
+  )
+
   if(isDuckdb){
     endTempTables <- countDuckdbTempTables(
       con = attr(omopgenerics::cdmSource(cdm),
