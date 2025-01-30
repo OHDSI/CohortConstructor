@@ -334,8 +334,13 @@ joinOverlap <- function(cohort,
                         startDate = "cohort_start_date",
                         endDate = "cohort_end_date",
                         by = c("cohort_definition_id", "subject_id")) {
+
   if (cohort |> dplyr::tally() |> dplyr::pull("n") == 0) {
-    return(cohort)
+    return(
+      cohort |>
+        dplyr::select(dplyr::all_of(c(by, startDate, endDate))) |>
+        dplyr::compute(name = name, temporary = FALSE)
+    )
   }
 
   gap <- as.integer(gap)

@@ -1,3 +1,18 @@
+#' Run benchmark of CohortConstructor package
+#'
+#' @description
+#' Run benchmark of CohortConstructor cohort instantiation time compared to CIRCE from JSON. More information in the \href{benchmarking vignette}{https://ohdsi.github.io/CohortConstructor/articles/a11_benchmark.html}.
+#'
+#' @inheritParams cdmDoc
+#'
+#' @export
+#'
+#' @examples
+#' \donttest{
+#' library(CohortConstructor)
+#' cdm <- mockCohortConstructor()
+#' results <- benchmarkCohortConstructor(cdm)
+#' }
 benchmarkCohortConstructor <- function(cdm) {
   # check inputs
   cdm <- omopgenerics::validateCdmArgument(cdm)
@@ -7,12 +22,12 @@ benchmarkCohortConstructor <- function(cdm) {
     dplyr::filter(.data$cohort_name != "first_depression")
 
   # Instantiate or read Atlas ----
-  cli::cli_inform(c("*" = "Instantiating JSONs"))
+  cli::cli_inform(c("*" = "{.strong Instantiating JSON cohort defintions with CDMConnector}"))
   for (json in jsons$cohort_name_snakecase) {
     tictoc::tic(msg = paste0("atlas_", json))
     cdm <- CDMConnector::generateCohortSet(
       cdm = cdm,
-      cohortSet = jsons |> dplyr::filter(.data$cohort_name_snakecase == .env$json),
+      cohortSet = jsons |> dplyr::filter(.data$cohort_name_snakecase == .env$json) |> dplyr::mutate("cohort_name" = paste0("atlas_", .data$cohort_name)),
       name = paste0("atlas_", json),
       computeAttrition = TRUE,
       overwrite = TRUE
@@ -48,85 +63,101 @@ benchmarkCohortConstructor <- function(cdm) {
     "mncs_transurethral_prostatectomy", "mncs_ureteric_kidney_bladder_surgery"
   )
   codes_cdm <- CodelistGenerator::codesFromCohort(here::here("extras", "JSONCohorts"), cdm)
-  codes <- as.list(rep(100001L, length(concept_sets))) # mock concept as pleace-holder
+  codes <- as.list(rep(100001L, length(concept_sets))) # mock concept as place-holder
   names(codes) <- concept_sets
   for (nm in names(codes_cdm)) {
     codes[nm] <- codes_cdm[nm]
   }
 
   # CohortConstructor by definition ----
-  tictoc::tic(msg = paste0("cc1_asthma_no_copd"))
+  cli::cli_inform(c("*" = "{.strong Instantiating with CohortConstructor by cohort definition}"))
+  tictoc::tic(msg = paste0("cc_asthma_no_copd"))
   cdm <- getAsthma(cdm, codes)
   tictoc::toc(log = TRUE)
-  tictoc::tic(msg = paste0("cc1_beta_blockers_hypertension"))
+  tictoc::tic(msg = paste0("cc_beta_blockers_hypertension"))
   cdm <- getBetaBlockers(cdm, codes)
   tictoc::toc(log = TRUE)
-  tictoc::tic(msg = paste0("cc1_covid"))
+  tictoc::tic(msg = paste0("cc_covid"))
   cdm <- getCovid(cdm, codes)
   tictoc::toc(log = TRUE)
-  tictoc::tic(msg = paste0("cc1_covid_female"))
+  tictoc::tic(msg = paste0("cc_covid_female"))
   cdm <- getCovidStrata(
-    cdm, codes, sex = "Female", ageRange = NULL, name = "cc1_covid_female"
+    cdm, codes, sex = "Female", ageRange = list(c(0, 150)), name = "cc1_covid_female"
   )
   tictoc::toc(log = TRUE)
-  tictoc::tic(msg = paste0("cc1_covid_female_0_to_50"))
+  tictoc::tic(msg = paste0("cc_covid_female_0_to_50"))
   cdm <- getCovidStrata(
     cdm, codes, sex = "Female", ageRange = list(c(0, 50)), name = "cc1_covid_female_0_to_50"
   )
   tictoc::toc(log = TRUE)
-  tictoc::tic(msg = paste0("cc1_covid_female_51_to_150"))
+  tictoc::tic(msg = paste0("cc_covid_female_51_to_150"))
   cdm <- getCovidStrata(
     cdm, codes, sex = "Female", ageRange = list(c(51, 150)), name = "cc1_covid_female_51_to_150"
   )
   tictoc::toc(log = TRUE)
-  tictoc::tic(msg = paste0("cc1_covid_male"))
+  tictoc::tic(msg = paste0("cc_covid_male"))
   cdm <- getCovidStrata(
-    cdm, codes, sex = "Male", ageRange = NULL, name = "cc1_covid_male"
+    cdm, codes, sex = "Male", ageRange = list(c(0, 150)), name = "cc1_covid_male"
   )
   tictoc::toc(log = TRUE)
-  tictoc::tic(msg = paste0("cc1_covid_male_0_to_50"))
+  tictoc::tic(msg = paste0("cc_covid_male_0_to_50"))
   cdm <- getCovidStrata(
     cdm, codes, sex = "Male", ageRange = list(c(0, 50)), name = "cc1_covid_male_0_to_50"
   )
   tictoc::toc(log = TRUE)
-  tictoc::tic(msg = paste0("cc1_covid_male_51_to_150"))
+  tictoc::tic(msg = paste0("cc_covid_male_51_to_150"))
   cdm <- getCovidStrata(
     cdm, codes, sex = "Male", ageRange = list(c(51, 150)), name = "cc1_covid_male_51_to_150"
   )
   tictoc::toc(log = TRUE)
-  tictoc::tic(msg = paste0("cc1_endometriosis_procedure"))
+  tictoc::tic(msg = paste0("cc_endometriosis_procedure"))
   cdm <- getEndometriosisProcedure(cdm, codes)
   tictoc::toc(log = TRUE)
-  tictoc::tic(msg = paste0("cc1_hospitalisation"))
+  tictoc::tic(msg = paste0("cc_hospitalisation"))
   cdm <- getHospitalisation(cdm, codes)
   tictoc::toc(log = TRUE)
-  tictoc::tic(msg = paste0("cc1_major_non_cardiac_surgery"))
+  tictoc::tic(msg = paste0("cc_major_non_cardiac_surgery"))
   cdm <- getMajorNonCardiacSurgery(cdm, codes)
   tictoc::toc(log = TRUE)
-  tictoc::tic(msg = paste0("cc1_neutropenia_leukopenia"))
+  tictoc::tic(msg = paste0("cc_neutropenia_leukopenia"))
   cdm <- getNeutropeniaLeukopenia(cdm, codes)
   tictoc::toc(log = TRUE)
-  tictoc::tic(msg = paste0("cc1_new_fluoroquinolone"))
+  tictoc::tic(msg = paste0("cc_new_fluoroquinolone"))
   cdm <- getNewFluoroquinolone(cdm, codes)
   tictoc::toc(log = TRUE)
-  tictoc::tic(msg = paste0("cc1_transverse_myelitis"))
+  tictoc::tic(msg = paste0("cc_transverse_myelitis"))
   cdm <- getTransverseMyelitis(cdm, codes)
   tictoc::toc(log = TRUE)
 
   # CohortConstructor by concept ----
+  cli::cli_inform(c("*" = "{.strong Instantiating with CohortConstructor by domain}"))
   tictoc::tic(msg = paste0("cc_set_no_strata"))
   cdm <- getCohortConstructorSet(cdm, codes)
   tictoc::toc(log = TRUE)
   tictoc::tic(msg = paste0("cc_set_strata"))
-  cdm <- getCohortConstructorSet(cdm, codes)
+  cdm <- getCohortConstructorSetStrata(cdm)
   tictoc::toc(log = TRUE)
 
-  # Evaluate cohorts ----
+  # Evaluate cohorts and CDM ----
+  cli::cli_inform(c("*" = "{.strong Evaluating cohort similarities}"))
+  cdm <- bindCohorts(cdm, cohortNames = jsons$cohort_name)
+  resultsOverlap <- CohortCharacteristics::summariseCohortOverlap(cdm$benchmark)
+  resultsTiming <- CohortCharacteristics::summariseCohortTiming(cdm$benchmark)
+  resultsCohortCount <- summary(cdm$benchmark)
+  resultsOmopCount <- getOmopCounts(cdm)
 
-  # Use SQL indexes ----
+  # Without SQL indexes ----
+  cli::cli_inform(c("*" = "{.strong Instantiating with CohortConstructor without using indexes}"))
+  runWithoutIndex(cdm, codes)
 
   # Format time results ----
-  results <- tic.log(format = FALSE) |> purrr::map_df(~as_tibble(.x))
+  resultsTime <- getTimes(tictoc::tic.log(format = FALSE))
+
+  # Bind and return results ---
+  cli::cli_inform(c("*" = "{.strong Benchmarking finished}"))
+  return(omopgenerics::bind(list(
+    resultsOverlap, resultsTiming, resultsCohortCount, resultsOmopCount, resultsTime
+  )))
 }
 
 # functions ----
@@ -136,27 +167,26 @@ getId <- function(cohort, cohort_names) {
     dplyr::pull("cohort_definition_id")
 }
 
-getCohortConstructorSet <- function(cdm, codes) {
+getAsthma <- function(cdm, codes, name = NULL) {
+  if (is.null(name)) {
+    cdm$cc1_asthma_no_copd <- conceptCohort(
+      cdm = cdm,
+      conceptSet = codes[c("asthma", "asthma_therapy")],
+      name = "cc1_asthma_no_copd",
+      exit = "event_end_date",
+      overlap = "merge",
+      useSourceFields = FALSE,
+      subsetCohort = NULL,
+      subsetCohortId = NULL
+    )
+    name <- "cc1_asthma_no_copd"
+  }
 
-}
-
-getAsthma <- function(cdm, codes) {
-  cdm$cc1_asthma_no_copd <- conceptCohort(
-    cdm = cdm,
-    conceptSet = codes[c("asthma", "asthma_therapy")],
-    name = "cc1_asthma_no_copd",
-    exit = "event_end_date",
-    overlap = "merge",
-    useSourceFields = FALSE,
-    subsetCohort = NULL,
-    subsetCohortId = NULL
-  )
-
-  cdm$cc1_asthma_no_copd <- cdm$cc1_asthma_no_copd |>
+  cdm[[name]] <- cdm[[name]] |>
     # age to asthma therapy
     requireAge(
       ageRange = list(c(0, 54)),
-      cohortId = getId(cdm$cc1_asthma_no_copd, "asthma_therapy"),
+      cohortId = getId(cdm[[name]], "asthma_therapy"),
       indexDate = "cohort_start_date"
     ) |>
     # previous asthma therapy concepts
@@ -164,7 +194,7 @@ getAsthma <- function(cdm, codes) {
       conceptSet = codes["asthma_therapy"],
       window = list(c(-365, -180)),
       intersections = c(1, Inf),
-      cohortId = getId(cdm$cc1_asthma_no_copd, "asthma_therapy"),
+      cohortId = getId(cdm[[name]], "asthma_therapy"),
       indexDate = "cohort_start_date",
       targetStartDate = "event_start_date",
       targetEndDate = NULL,
@@ -175,7 +205,7 @@ getAsthma <- function(cdm, codes) {
     unionCohorts(
       cohortId = NULL,
       gap = 0,
-      cohortName = "cc1_asthma_no_copd",
+      cohortName = name,
       keepOriginalCohorts = FALSE
     ) |>
     # get first entry
@@ -207,12 +237,16 @@ getAsthma <- function(cdm, codes) {
   return(cdm)
 }
 
-getBetaBlockers <- function(cdm, codes) {
-  cdm$cc1_beta_blockers_hypertension <- conceptCohort(
-    cdm = cdm,
-    conceptSet = codes["beta_blockers"],
-    name = "cc1_beta_blockers_hypertension"
-  ) |>
+getBetaBlockers <- function(cdm, codes, name = NULL) {
+  if (is.null(name)) {
+    cdm$cc1_beta_blockers_hypertension <- conceptCohort(
+      cdm = cdm,
+      conceptSet = codes["beta_blockers"],
+      name = "cc1_beta_blockers_hypertension"
+    )
+    name <- "cc1_beta_blockers_hypertension"
+  }
+  cdm[[name]] <- cdm[[name]] |>
     collapseCohorts(gap = 90) |>
     requireIsFirstEntry() |>
     requirePriorObservation(minPriorObservation = 365) |>
@@ -224,22 +258,23 @@ getBetaBlockers <- function(cdm, codes) {
       indexDate = "cohort_start_date",
       targetStartDate = "event_start_date",
       targetEndDate = NULL
-    )
-  cdm$cc1_beta_blockers_hypertension <- cdm$cc1_beta_blockers_hypertension |>
+    ) |>
     omopgenerics::newCohortTable(
-      cohortSetRef = settings(cdm$cc1_beta_blockers_hypertension) |>
-        dplyr::mutate("cohort_name" = "cc1_beta_blockers_hypertension"),
+      cohortSetRef = settings(cdm[[name]] ) |>
+        dplyr::mutate("cohort_name" = name),
       .softValidation = TRUE
     )
   return(cdm)
 }
 
-getCovid <- function(cdm, codes, name = "cc1_covid") {
-  cdm[[name]] <- conceptCohort(
-    cdm = cdm,
-    conceptSet = codes[c("covid_19")],
-    name = name
-  )
+getCovid <- function(cdm, codes, name = "cc1_covid", base = FALSE) {
+  if (!base) {
+    cdm[[name]] <- conceptCohort(
+      cdm = cdm,
+      conceptSet = codes[c("covid_19")],
+      name = name
+    )
+  }
   cdm$temp_cc1_covid_test_positive <- measurementCohort(
     cdm = cdm,
     conceptSet = codes["sars_cov_2_test"],
@@ -277,12 +312,16 @@ getCovidStrata <- function(cdm, codes, sex, ageRange, name) {
   return(cdm)
 }
 
-getEndometriosisProcedure <- function(cdm, codes) {
-  cdm$cc1_endometriosis_procedure <- conceptCohort(
-    cdm = cdm,
-    conceptSet = codes["endometriosis_related_laproscopic_procedures"],
-    name = "cc1_endometriosis_procedure"
-  ) |>
+getEndometriosisProcedure <- function(cdm, codes, name = NULL) {
+  if (is.null(name)) {
+    cdm$cc1_endometriosis_procedure <- conceptCohort(
+      cdm = cdm,
+      conceptSet = codes["endometriosis_related_laproscopic_procedures"],
+      name = "cc1_endometriosis_procedure"
+    )
+    name <- "cc1_endometriosis_procedure"
+  }
+  cdm[[name]] <- cdm[[name]] |>
     requireConceptIntersect(
       conceptSet = codes["endometriosis"],
       window = list(c(-30, 30)),
@@ -307,27 +346,27 @@ getEndometriosisProcedure <- function(cdm, codes) {
       ageRange = list(c(15, 49)),
       sex = "Female"
     ) |>
-    exitAtObservationEnd()
-  cdm$cc1_endometriosis_procedure <- cdm$cc1_endometriosis_procedure |>
+    exitAtObservationEnd() |>
     omopgenerics::newCohortTable(
-      cohortSetRef = settings(cdm$cc1_endometriosis_procedure) |>
-        dplyr::mutate("cohort_name" = "cc1_endometriosis_procedure"),
+      cohortSetRef = settings(cdm[[name]]) |> dplyr::mutate("cohort_name" = name),
       .softValidation = TRUE
     )
   return(cdm)
 }
 
-getHospitalisation <- function(cdm, codes) {
-  cdm$cc1_hospitalisation <- conceptCohort(
-    cdm = cdm,
-    conceptSet = codes["inpatient_visit"],
-    name = "cc1_hospitalisation"
-  ) |>
-    padCohortEnd(days = 1)
-  cdm$cc1_hospitalisation <- cdm$cc1_hospitalisation |>
+getHospitalisation <- function(cdm, codes, name = NULL) {
+  if (is.null(name)) {
+    cdm$cc1_hospitalisation <- conceptCohort(
+      cdm = cdm,
+      conceptSet = codes["inpatient_visit"],
+      name = "cc1_hospitalisation"
+    )
+    name <- "cc1_hospitalisation"
+  }
+  cdm[[name]] <- cdm[[name]] |>
+    padCohortEnd(days = 1) |>
     omopgenerics::newCohortTable(
-      cohortSetRef = settings(cdm$cc1_hospitalisation) |>
-        dplyr::mutate("cohort_name" = "cc1_hospitalisation"),
+      cohortSetRef = settings(cdm[[name]]) |> dplyr::mutate("cohort_name" = name),
       .softValidation = TRUE
     )
   return(cdm)
@@ -346,13 +385,16 @@ getMajorNonCardiacSurgery <- function(cdm, codes) {
   return(cdm)
 }
 
-getNeutropeniaLeukopenia <- function(cdm, codes) {
+getNeutropeniaLeukopenia <- function(cdm, codes, name = NULL) {
   # entry
-  cdm$cc1_neutropenia_leukopenia <- conceptCohort(
-    cdm = cdm,
-    conceptSet = codes["neutropenia_agranulocytosis_or_unspecified_leukopenia"],
-    name = "cc1_neutropenia_leukopenia"
-  )
+  if (is.null(name)) {
+    cdm$cc1_neutropenia_leukopenia <- conceptCohort(
+      cdm = cdm,
+      conceptSet = codes["neutropenia_agranulocytosis_or_unspecified_leukopenia"],
+      name = "cc1_neutropenia_leukopenia"
+    )
+    name <- "cc1_neutropenia_leukopenia"
+  }
   cdm$temp_cc1_neutrophil_absolute_count <- measurementCohort(
     cdm = cdm,
     conceptSet = codes["neutrophil_absolute_count"],
@@ -374,12 +416,12 @@ getNeutropeniaLeukopenia <- function(cdm, codes) {
     )
   )
   cdm <- omopgenerics::bind(
-    cdm$cc1_neutropenia_leukopenia,
+    cdm[[name]],
     cdm$temp_cc1_neutrophil_absolute_count,
-    name = "cc1_neutropenia_leukopenia"
+    name = name
   )
-  cdm$cc1_neutropenia_leukopenia <- cdm$cc1_neutropenia_leukopenia |>
-    CohortConstructor::unionCohorts(cohortName = "cc1_neutropenia_leukopenia") |>
+  cdm[[name]] <- cdm[[name]] |>
+    CohortConstructor::unionCohorts(cohortName = name) |>
     # exclusion
     requireConceptIntersect(
       conceptSet = codes["congenital_or_genetic_neutropenia_leukopenia_or_agranulocytosis"],
@@ -404,44 +446,49 @@ getNeutropeniaLeukopenia <- function(cdm, codes) {
       targetCohortTable = "temp_cc1_normal_neutrophil",
       window = list(c(0,Inf)),
       nameStyle = "normal_count_date",
-      name = "cc1_neutropenia_leukopenia"
+      name = name
     ) |>
     exitAtFirstDate(dateColumns = c("cohort_end_date", "normal_count_date"), returnReason = FALSE)
   return(cdm)
 }
 
-getNewFluoroquinolone <- function(cdm, codes) {
-  cdm$cc1_new_fluoroquinolone <- conceptCohort(
-    cdm = cdm,
-    conceptSet = codes["fluoroquinolone_systemic"],
-    name = "cc1_new_fluoroquinolone"
-  ) |>
+getNewFluoroquinolone <- function(cdm, codes, name = NULL) {
+  if (is.null(name)) {
+    cdm$cc1_new_fluoroquinolone <- conceptCohort(
+      cdm = cdm,
+      conceptSet = codes["fluoroquinolone_systemic"],
+      name = "cc1_new_fluoroquinolone"
+    )
+    name <- "cc1_new_fluoroquinolone"
+  }
+  cdm[[name]] <- cdm[[name]] |>
     collapseCohorts(gap = 30) |>
     requireIsFirstEntry() |>
-    requirePriorObservation(minPriorObservation = 365)
-  cdm$cc1_new_fluoroquinolone <- cdm$cc1_new_fluoroquinolone |>
+    requirePriorObservation(minPriorObservation = 365) |>
     omopgenerics::newCohortTable(
-      cohortSetRef = omopgenerics::settings(cdm$cc1_new_fluoroquinolone) |>
-        dplyr::mutate("cohort_name" = "cc1_new_fluoroquinolone"),
+      cohortSetRef = omopgenerics::settings(cdm[[name]]) |> dplyr::mutate("cohort_name" = name),
       .softValidation = TRUE
     )
   return(cdm)
 }
 
-getTransverseMyelitis <- function(cdm, codes) {
-  cdm$cc1_transverse_myelitis <- conceptCohort(
-    cdm = cdm,
-    conceptSet = codes[c("transverse_myelitis", "symptoms_for_transverse_myelitis")],
-    exit = "event_start_date",
-    name = "cc1_transverse_myelitis"
-  )
-  cdm$cc1_transverse_myelitis <- cdm$cc1_transverse_myelitis |>
+getTransverseMyelitis <- function(cdm, codes, name = NULL) {
+  if (is.null(name)) {
+    cdm$cc1_transverse_myelitis <- conceptCohort(
+      cdm = cdm,
+      conceptSet = codes[c("transverse_myelitis", "symptoms_for_transverse_myelitis")],
+      exit = "event_start_date",
+      name = "cc1_transverse_myelitis"
+    )
+    name <- "cc1_transverse_myelitis"
+  }
+  cdm[[name]] <- cdm[[name]] |>
     requireCohortIntersect(
-      targetCohortTable = "cc1_transverse_myelitis",
+      targetCohortTable = name,
       window = list(c(0, 30)),
       intersections = c(1, Inf),
-      cohortId = getId(cdm$cc1_transverse_myelitis, "symptoms_for_transverse_myelitis"),
-      targetCohortId = getId(cdm$cc1_transverse_myelitis, "transverse_myelitis"),
+      cohortId = getId(cdm[[name]], "symptoms_for_transverse_myelitis"),
+      targetCohortId = getId(cdm[[name]], "transverse_myelitis"),
       indexDate = "cohort_start_date",
       targetStartDate = "cohort_start_date",
       targetEndDate = NULL
@@ -456,19 +503,18 @@ getTransverseMyelitis <- function(cdm, codes) {
       targetEndDate = NULL,
       inObservation = FALSE,
     )
-  cdm$cc1_transverse_myelitis <- cdm$cc1_transverse_myelitis |>
-    # THIS SHOULD INCLUDE EVENTS OUTSIDE OBSERVATION - NOT POSSIBLE ATM (29/01/2025)
+  cdm[[name]] <- cdm[[name]] |>
     requireCohortIntersect(
-      targetCohortTable = "cc1_transverse_myelitis",
+      targetCohortTable = name,
       window = list(c(-365, -1)),
       intersections = 0,
       cohortId = NULL,
-      targetCohortId = getId(cdm$cc1_transverse_myelitis, "symptoms_for_transverse_myelitis"),
+      targetCohortId = getId(cdm[[name]], "symptoms_for_transverse_myelitis"),
       indexDate = "cohort_start_date",
       targetStartDate = "cohort_start_date",
       targetEndDate = NULL
     ) |>
-    CohortConstructor::unionCohorts(cohortName = "cc1_transverse_myelitis") |>
+    CohortConstructor::unionCohorts(cohortName = name) |>
     padCohortEnd(days = 1)
   return(cdm)
 }
@@ -485,59 +531,209 @@ getCohortConstructorSet <- function(cdm, codes) {
       "fluoroquinolone_systemic"
     )]
   )
-  base_start <- codes[c("transverse_myelitis", "symptoms_for_transverse_myelitis")]
   cdm$base_end <- conceptCohort(cdm = cdm, conceptSet = base_end, name = "base_end")
-  cdm$base_start <- conceptCohort(cdm = cdm, conceptSet = base_start, name = "base_start")
-
-  # measurement cohorts
-  cdm$temp_cc1_covid_test_positive <- measurementCohort(
-    cdm = cdm,
-    conceptSet = codes["sars_cov_2_test"],
-    name = "temp_cc1_covid_test_positive",
-    valueAsConcept = c(4126681, 45877985, 9191, 45884084, 4181412, 45879438)
-  )
-  cdm$temp_cc1_covid_test_negative <- measurementCohort(
-    cdm = cdm,
-    conceptSet = codes["sars_cov_2_test"],
-    name = "temp_cc1_covid_test_negative",
-    valueAsConcept = c(9189, 9190, 9191, 4132135, 3661867, 45878583, 45880296, 45884086)
-  )
-  cdm$temp_cc1_neutrophil_absolute_count <- measurementCohort(
-    cdm = cdm,
-    conceptSet = codes["neutrophil_absolute_count"],
-    name = "temp_cc1_neutrophil_absolute_count",
-    valueAsNumber = list(
-      "9444" = c(0.01, 1.499), "8848" = c(0.01, 1.499), "8816" = c(0.01, 1.499),
-      "8961" = c(0.01, 1.499), "44777588" = c(0.01, 1.499),
-      "8784" = c(10, 1499), "8647" = c(10, 1499)
-    )
-  )
-  cdm$temp_cc1_normal_neutrophil <- measurementCohort(
-    cdm = cdm,
-    conceptSet = codes["neutrophil_absolute_count"],
-    name = "temp_cc1_normal_neutrophil",
-    valueAsNumber = list(
-      "9444" = c(4, 8.25), "8848" = c(4, 8.25), "8816" = c(4, 8.25),
-      "8961" = c(4, 8.25), "44777588" = c(4, 8.25),
-      "8784" = c(4000, 8250), "8647" = c(4000, 8250)
-    )
-  )
 
   # cc_asthma_no_copd
+  cdm$cc_asthma_no_copd <- subsetCohorts(
+    cohort = cdm$base_end,
+    cohortId = getId(cdm$base_end, c("asthma", "asthma_therapy")),
+    name = "cc_asthma_no_copd"
+  )
+  cdm <- getAsthma(cdm, codes, name = "cc_asthma_no_copd")
 
   # cc_beta_blockers_hypertension
+  cdm$cc_beta_blockers_hypertension <- subsetCohorts(
+    cohort = cdm$base_end,
+    cohortId = getId(cdm$base_end, "beta_blockers"),
+    name = "cc_beta_blockers_hypertension"
+  )
+  cdm <- getBetaBlockers(cdm, codes, name = "cc_beta_blockers_hypertension")
 
   # cc_covid
+  cdm$cc_covid <- subsetCohorts(
+    cohort = cdm$base_end,
+    cohortId = getId(cdm$base_end, "covid_19"),
+    name = "cc_covid"
+  )
+  cdm <- getCovid(cdm, codes, name = "cc_covid", base = TRUE)
 
   # cc_endometriosis_procedure
+  cdm$cc_endometriosis_procedure <- subsetCohorts(
+    cohort = cdm$base_end,
+    cohortId = getId(cdm$base_end, "endometriosis_related_laproscopic_procedures"),
+    name = "cc_endometriosis_procedure"
+  )
+  cdm <- getEndometriosisProcedure(cdm, codes, name = "cc_endometriosis_procedure")
 
   # cc_hospitalisation
+  cdm$cc_hospitalisation <- subsetCohorts(
+    cohort = cdm$base_end,
+    cohortId = getId(cdm$base_end, "inpatient_visit"),
+    name = "cc_hospitalisation"
+  )
+  cdm <- getHospitalisation(cdm, codes, name = "cc_hospitalisation")
 
   # cc_major_non_cardiac_surgery
+  cdm$cc_major_non_cardiac_surgery <- subsetCohorts(
+    cohort = cdm$base_end,
+    cohortId = getId(cdm$base_end, "cc_major_non_cardiac_surgery"),
+    name = "cc_major_non_cardiac_surgery"
+  ) |>
+    exitAtObservationEnd() |>
+    requireAge(ageRange = list(c(18, 150)))
 
   # cc_neutropenia_leukopenia
+  cdm$cc_neutropenia_leukopenia <- subsetCohorts(
+    cohort = cdm$base_end,
+    cohortId = getId(cdm$base_end, "neutropenia_agranulocytosis_or_unspecified_leukopenia"),
+    name = "cc_neutropenia_leukopenia"
+  )
+  cdm <- getNeutropeniaLeukopenia(cdm, codes, name = "cc_neutropenia_leukopenia")
 
   # cc_new_fluoroquinolone
+  cdm$cc_new_fluoroquinolone <- subsetCohorts(
+    cohort = cdm$base_end,
+    cohortId = getId(cdm$base_end, "fluoroquinolone_systemic"),
+    name = "cc_new_fluoroquinolone"
+  )
+  cdm <- getNewFluoroquinolone(cdm, codes, name = "cc_new_fluoroquinolone")
 
   # cc_transverse_myelitis
+  cdm$cc_transverse_myelitis <- conceptCohort(
+    cdm = cdm,
+    conceptSet = codes[c("transverse_myelitis", "symptoms_for_transverse_myelitis")],
+    name = "cc_transverse_myelitis"
+  )
+  cdm <- getTransverseMyelitis(cdm, codes, name = "cc_transverse_myelitis")
+  return(cdm)
+}
+
+getCohortConstructorSetStrata <- function(cdm) {
+  cdm$cc_covid_strata <- cdm$cc_covid |>
+    PatientProfiles::addDemographics(
+      ageGroup = list(c(0,50), c(51, 150)),
+      priorObservation = FALSE,
+      futureObservation = FALSE,
+      name = "cc_covid_strata"
+    ) |>
+    dplyr::select(!"age") |>
+    stratifyCohorts(strata = list("sex", c("sex", "age_group")))
+  if (cdm$cc_covid_strata |> dplyr::tally() |> dplyr::pull("n") == 0) {
+    cdm$cc_covid_strata <- cdm$cc_covid_strata |>
+      omopgenerics::newCohortTable(
+        cohortSetRef = dplyr::tibble(
+          cohort_definition_id = 1:6,
+          cohort_name = c(
+            "cc_covid_female", "cc_covid_male", "cc_covid_female_0_to_50",
+            "cc_covid_female_51_to_150", "cc_covid_male_0_to_50", "cc_covid_male_51_to_150"
+          )
+        ),
+        cohortAttritionRef = NULL
+      )
+  }
+  return(cdm)
+}
+
+bindCohorts <- function(cdm, cohortNames) {
+  cohortNames <- names(cdm)[grepl(paste0(cohortNames, collapse = "|"), names(cdm))]
+  cohortNames <- cohortNames[!grepl("temp", cohortNames)]
+  cdm <- eval(parse(
+    text = paste0("omopgenerics::bind(", paste0("cdm$", cohortNames, collapse = ", "), ", name = 'benchmark')")
+  ))
+}
+
+getOmopCounts <- function(cdm) {
+  tabNames <- c(
+    "person", "drug_exposure", "condition_occurrence", "procedure_occurrence",
+    "visit_occurrence", "observation_period", "measurement", "observation",
+    "death"
+  )
+  tableCounts <- NULL
+  for (tab in tabNames) {
+    tableCounts <- tableCounts |>
+      dplyr::union_all(
+        dplyr::tibble(
+          table_name = tab,
+          estimate_value = cdm[[tab]] |> dplyr::tally() |> dplyr::pull("n") |> as.character()
+        )
+      )
+  }
+  tableCounts <- tableCounts |>
+    dplyr::mutate(
+      result_id = 1L,
+      cdm_name = omopgenerics::cdmName(cdm),
+      variable_name = "number_records",
+      variable_level = NA_character_,
+      estimate_name = "count",
+      estimate_type = "numeric"
+    ) |>
+    omopgenerics::uniteGroup("table_name") |>
+    omopgenerics::uniteStrata() |>
+    omopgenerics::uniteAdditional() |>
+    omopgenerics::newSummarisedResult(
+      settings = dplyr::tibble(
+        result_id = 1L,
+        result_type = "omop_counts",
+        package_name = "CohortConstructor",
+        package_version = as.character(utils::packageVersion("CohortConstructor"))
+      )
+    )
+  return(tableCounts)
+}
+
+getTimes <- function(log) {
+  return(
+    log |>
+      purrr::map_df(~dplyr::as_tibble(.x)) |>
+      dplyr::distinct() |>
+      dplyr::mutate(
+        estimate_value = as.character((as.numeric(.data$toc) - as.numeric(.data$tic))/60),
+        tool = dplyr::if_else(grepl("cc", .data$msg), "CohortConstructor", "CIRCE"),
+        variable_name = stringr::str_to_sentence(gsub("_", " ", gsub("cc_|cc1_|atlas_", "", .data$msg)))
+      ) |>
+      dplyr::select(-dplyr::all_of(c("tic", "toc", "msg", "callback_msg"))) |>
+      dplyr::mutate(
+        variable_name = dplyr::case_when(
+          grepl("Asthma", .data$variable_name) ~ "Asthma without COPD",
+          "Covid" == .data$variable_name ~ "COVID-19",
+          grepl("male", .data$variable_name) ~ gsub("male ", "male, ", gsub("Covid", "COVID-19:", .data$variable_name)),
+          grepl("eutropenia", .data$variable_name) ~ "Acquired neutropenia or unspecified leukopenia",
+          grepl("Hosp", .data$variable_name) ~ "Inpatient hospitalisation",
+          grepl("First", .data$variable_name) ~ "First major depression",
+          grepl("fluoro", .data$variable_name) ~ "New fluoroquinolone users",
+          grepl("Beta", .data$variable_name) ~ "New users of beta blockers nested in essential hypertension",
+          "Set no strata" == .data$variable_name ~ "Cohort set - Overall",
+          "Set strata" == .data$variable_name ~ "Cohort set - COVID-19 strata",
+          .default = .data$variable_name
+        )
+      ) |>
+      dplyr::arrange(`variable_name`) |>
+      dplyr::mutate(
+        variable_level = dplyr::if_else(
+          grepl("Cohort set", .data$variable_name), gsub("Cohort set - ", "", .data$variable_name), NA
+        ),
+        variable_name = dplyr::if_else(
+          grepl("Cohort set", .data$variable_name), "Cohort set", .data$variable_name
+        ),
+        cdm_name = omopgenerics::cdmName(cdm),
+        result_id = 1L,
+        estimate_name = "time",
+        estimate_type = "numeric"
+      ) |>
+      omopgenerics::uniteGroup("tool") |>
+      omopgenerics::uniteStrata() |>
+      omopgenerics::uniteAdditional() |>
+      omopgenerics::newSummarisedResult(
+        settings = dplyr::tibble(
+          result_id = 1L,
+          result_type = "instanciation_time",
+          package_name = "CohortConstructor",
+          package_version = as.character(utils::packageVersion("CohortConstructor"))
+        )
+      )
+  )
+}
+
+runWithoutIndex <- function(cdm, codes) {
+
 }
