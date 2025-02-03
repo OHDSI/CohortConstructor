@@ -5,12 +5,15 @@
 #'
 #' @inheritParams cohortDoc
 #' @inheritParams nameDoc
-#' @inheritParams cohortIdModifyDoc
+#' @inheritParams cohortIdSubsetDoc
 #'
 #' @return A new cohort table containing cohorts from the original cohort table.
 #' @export
 #'
 #' @examples
+#' library(CohortConstructor)
+#' cdm <- mockCohortConstructor()
+#' cdm$cohort3 <- copyCohorts(cdm$cohort1, name = "cohort3")
 copyCohorts <- function(cohort, name, cohortId = NULL) {
   omopgenerics::validateCohortArgument(cohort)
   cdm <- omopgenerics::cdmReference(cohort)

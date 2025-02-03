@@ -2,11 +2,13 @@
 
 export(addCohortTableIndex)
 export(attrition)
+export(benchmarkCohortConstructor)
 export(bind)
 export(cohortCodelist)
 export(cohortCount)
 export(collapseCohorts)
 export(conceptCohort)
+export(copyCohorts)
 export(demographicsCohort)
 export(endDateColumn)
 export(entryAtFirstDate)
