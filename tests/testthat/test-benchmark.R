@@ -66,21 +66,22 @@ test_that("benchmark works", {
     resDomain |>
       omopgenerics::filterSettings(result_type == "summarise_cohort_overlap") |>
       dplyr::pull("group_level") |>
-      unique(),
+      unique() |>
+      sort(),
     c(
-      'cc_asthma_no_copd &&& atlas_asthma_no_copd',
-      'cc_beta_blockers_hypertension &&& atlas_beta_blockers_hypertension',
-      'cc_covid &&& atlas_covid', 'cc_endometriosis_procedure &&& atlas_endometriosis_procedure',
-      'cc_hospitalisation &&& atlas_hospitalisation',
-      'cc_major_non_cardiac_surgery &&& atlas_major_non_cardiac_surgery',
-      'cc_neutropenia_leukopenia &&& atlas_neutropenia_leukopenia',
-      'cc_new_fluoroquinolone &&& atlas_new_fluoroquinolone',
-      'cc_transverse_myelitis &&& atlas_transverse_myelitis',
-      'cc_covid_female &&& atlas_covid_female', 'cc_covid_male &&& atlas_covid_male',
-      'cc_covid_female_0_to_50 &&& atlas_covid_female_0_to_50',
-      'cc_covid_female_51_to_150 &&& atlas_covid_female_51_to_150',
-      'cc_covid_male_0_to_50 &&& atlas_covid_male_0_to_50',
-      'cc_covid_male_51_to_150 &&& atlas_covid_male_51_to_150'
+      'atlas_asthma_no_copd &&& cc_asthma_no_copd',
+      'atlas_beta_blockers_hypertension &&& cc_beta_blockers_hypertension',
+      'atlas_covid &&& cc_covid', 'atlas_covid_female &&& cc_covid_female',
+      'atlas_covid_female_0_to_50 &&& cc_covid_female_0_to_50',
+      'atlas_covid_female_51_to_150 &&& cc_covid_female_51_to_150',
+      'atlas_covid_male &&& cc_covid_male', 'atlas_covid_male_0_to_50 &&& cc_covid_male_0_to_50',
+      'atlas_covid_male_51_to_150 &&& cc_covid_male_51_to_150',
+      'atlas_endometriosis_procedure &&& cc_endometriosis_procedure',
+      'atlas_hospitalisation &&& cc_hospitalisation',
+      'atlas_major_non_cardiac_surgery &&& cc_major_non_cardiac_surgery',
+      'atlas_neutropenia_leukopenia &&& cc_neutropenia_leukopenia',
+      'atlas_new_fluoroquinolone &&& cc_new_fluoroquinolone',
+      'atlas_transverse_myelitis &&& cc_transverse_myelitis'
     )
   )
   expect_true(
