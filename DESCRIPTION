@@ -39,6 +39,7 @@ Imports:
     PatientProfiles (>= 1.2.3),
     purrr,
     rlang,
+    tictoc,
     tidyr,
     utils
 Suggests: 
