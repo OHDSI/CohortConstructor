@@ -3,8 +3,7 @@
 #' @description
 #' Run benchmark of CohortConstructor cohort instantiation time compared to
 #' CIRCE from JSON. More information in the
-#' \href{https://ohdsi.github.io/CohortConstructor/articles/a11_benchmark.html}
-#' {benchmarking vignette}.
+#' \href{https://ohdsi.github.io/CohortConstructor/articles/a11_benchmark.html}{benchmarking vignette}.
 #'
 #' @inheritParams cdmDoc
 #' @param runCIRCE Whether to run cohorts from JSON definitions generated with
@@ -759,7 +758,7 @@ getTimes <- function(log, cdm) {
           .default = .data$variable_name
         )
       ) |>
-      dplyr::arrange(`variable_name`) |>
+      dplyr::arrange(.data$variable_name) |>
       dplyr::mutate(
         variable_level = dplyr::if_else(
           grepl("Cohort set", .data$variable_name), gsub("Cohort set - ", "", .data$variable_name), NA
