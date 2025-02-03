@@ -30,6 +30,12 @@ benchmarkCohortConstructor <- function(cdm,
                                        runCohortConstructorDefinition = TRUE,
                                        runCohortConstructorDomain = TRUE,
                                        dropCohorts = TRUE) {
+  # Package checks
+  rlang::check_installed("tictoc")
+  rlang::check_installed("CirceR")
+  rlang::check_installed("SqlRender")
+  rlang::check_installed("CohortCharacteristics")
+
   # check inputs
   cdm <- omopgenerics::validateCdmArgument(cdm)
   omopgenerics::assertLogical(runCIRCE)

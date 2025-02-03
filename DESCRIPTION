@@ -29,7 +29,6 @@ RoxygenNote: 7.3.2
 Imports: 
     CDMConnector (>= 1.7.0),
     checkmate,
-    CirceR,
     cli,
     clock,
     dbplyr (>= 2.5.0),
@@ -40,8 +39,6 @@ Imports:
     PatientProfiles (>= 1.2.3),
     purrr,
     rlang,
-    SqlRender,
-    tictoc,
     tidyr,
     utils
 Suggests: 
@@ -66,7 +63,10 @@ Suggests:
     gt,
     scales,
     here,
-    ggpubr
+    ggpubr,
+    SqlRender,
+    CirceR,
+    tictoc
 Config/testthat/edition: 3
 Config/testthat/parallel: true
 VignetteBuilder: knitr
