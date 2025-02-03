@@ -182,7 +182,7 @@ benchmarkCohortConstructor <- function(cdm,
   # runWithoutIndex(cdm, codes)
 
   # Format time results ----
-  resultsTime <- getTimes(tictoc::tic.log(format = FALSE))
+  resultsTime <- getTimes(tictoc::tic.log(format = FALSE), cdm)
 
   # Drop tables ----
   cli::cli_inform(c(""))
@@ -733,7 +733,7 @@ getOmopCounts <- function(cdm) {
   return(tableCounts)
 }
 
-getTimes <- function(log) {
+getTimes <- function(log, cdm) {
   return(
     log |>
       purrr::map_df(~dplyr::as_tibble(.x)) |>
