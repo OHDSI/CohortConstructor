@@ -1,4 +1,9 @@
 test_that("benchmark works", {
+  if (Sys.getenv("EUNOMIA_DATA_FOLDER") == ""){
+    Sys.setenv("EUNOMIA_DATA_FOLDER" = file.path(tempdir(), "eunomia"))}
+  if (!dir.exists(Sys.getenv("EUNOMIA_DATA_FOLDER"))){ dir.create(Sys.getenv("EUNOMIA_DATA_FOLDER"))
+    CDMConnector::downloadEunomiaData()
+  }
   con <- DBI::dbConnect(duckdb::duckdb(), CDMConnector::eunomiaDir("synpuf-1k", "5.3"))
   cdm <- CDMConnector::cdmFromCon(con = con, cdmSchema   = "main", writeSchema = "main")
   res <- benchmarkCohortConstructor(cdm)
