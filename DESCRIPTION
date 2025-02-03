@@ -29,6 +29,7 @@ RoxygenNote: 7.3.2
 Imports: 
     CDMConnector (>= 1.7.0),
     checkmate,
+    CirceR,
     cli,
     clock,
     dbplyr (>= 2.5.0),
