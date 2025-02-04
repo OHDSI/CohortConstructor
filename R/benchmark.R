@@ -17,12 +17,6 @@
 #'
 #' @export
 #'
-#' @examples
-#' \donttest{
-#' library(CohortConstructor)
-#' cdm <- mockCohortConstructor()
-#' results <- benchmarkCohortConstructor(cdm)
-#' }
 benchmarkCohortConstructor <- function(cdm,
                                        runCIRCE = TRUE,
                                        runCohortConstructorDefinition = TRUE,
