@@ -18,6 +18,7 @@
 <url><loc>https://ohdsi.github.io/CohortConstructor/index.html</loc></url>
 <url><loc>https://ohdsi.github.io/CohortConstructor/reference/CohortConstructor-package.html</loc></url>
 <url><loc>https://ohdsi.github.io/CohortConstructor/reference/addCohortTableIndex.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/reference/benchmarkCohortConstructor.html</loc></url>
 <url><loc>https://ohdsi.github.io/CohortConstructor/reference/benchmarkData.html</loc></url>
 <url><loc>https://ohdsi.github.io/CohortConstructor/reference/cdmDoc.html</loc></url>
 <url><loc>https://ohdsi.github.io/CohortConstructor/reference/cohortDoc.html</loc></url>
@@ -28,6 +29,7 @@
 <url><loc>https://ohdsi.github.io/CohortConstructor/reference/columnDateDoc.html</loc></url>
 <url><loc>https://ohdsi.github.io/CohortConstructor/reference/conceptCohort.html</loc></url>
 <url><loc>https://ohdsi.github.io/CohortConstructor/reference/conceptSetDoc.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/reference/copyCohorts.html</loc></url>
 <url><loc>https://ohdsi.github.io/CohortConstructor/reference/daysDoc.html</loc></url>
 <url><loc>https://ohdsi.github.io/CohortConstructor/reference/demographicsCohort.html</loc></url>
 <url><loc>https://ohdsi.github.io/CohortConstructor/reference/entryAtFirstDate.html</loc></url>
