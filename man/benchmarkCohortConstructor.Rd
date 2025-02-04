@@ -32,10 +32,3 @@ cohort all together, as a set).}
 Run benchmark of CohortConstructor cohort instantiation time compared to
 CIRCE from JSON. More information in the benchmarking vignette.
 }
-\examples{
-\donttest{
-library(CohortConstructor)
-cdm <- mockCohortConstructor()
-results <- benchmarkCohortConstructor(cdm)
-}
-}
