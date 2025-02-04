@@ -63,7 +63,10 @@ Suggests:
     gt,
     scales,
     here,
-    ggpubr
+    ggpubr,
+    SqlRender,
+    CirceR,
+    tictoc
 Config/testthat/edition: 3
 Config/testthat/parallel: true
 VignetteBuilder: knitr

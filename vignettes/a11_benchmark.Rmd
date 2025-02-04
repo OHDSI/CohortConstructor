@@ -276,7 +276,6 @@ benchmarkData$sql_indexes |>
     axis.title.y = element_text(size = 14)   
   ) +
   facet_wrap(vars(cdm_name), scales = "free_x")
-
 ```
 
 

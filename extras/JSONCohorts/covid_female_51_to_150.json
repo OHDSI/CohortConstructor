@@ -1,0 +1,325 @@
+{
+  "ConceptSets": [
+    {
+      "id": 4,
+      "name": "covid_19",
+      "expression": {
+        "items": [
+          {
+            "concept": {
+              "CONCEPT_CLASS_ID": "Clinical Finding",
+              "CONCEPT_CODE": "840539006",
+              "CONCEPT_ID": 37311061,
+              "CONCEPT_NAME": "COVID-19",
+              "DOMAIN_ID": "Condition",
+              "INVALID_REASON": "V",
+              "INVALID_REASON_CAPTION": "Valid",
+              "STANDARD_CONCEPT": "S",
+              "STANDARD_CONCEPT_CAPTION": "Standard",
+              "VOCABULARY_ID": "SNOMED"
+            },
+            "includeDescendants": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 5,
+      "name": "sars_cov_2_test",
+      "expression": {
+        "items": [
+          {
+            "concept": {
+              "CONCEPT_CLASS_ID": "Lab Test",
+              "CONCEPT_CODE": "OMOP4873969",
+              "CONCEPT_ID": 756055,
+              "CONCEPT_NAME": "Measurement of Severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2)",
+              "DOMAIN_ID": "Measurement",
+              "INVALID_REASON": "V",
+              "INVALID_REASON_CAPTION": "Valid",
+              "STANDARD_CONCEPT": "S",
+              "STANDARD_CONCEPT_CAPTION": "Standard",
+              "VOCABULARY_ID": "OMOP Extension"
+            },
+            "includeDescendants": true
+          },
+          {
+            "concept": {
+              "CONCEPT_CLASS_ID": "Procedure",
+              "CONCEPT_CODE": "1240461000000109",
+              "CONCEPT_ID": 37310258,
+              "CONCEPT_NAME": "Measurement of Severe acute respiratory syndrome coronavirus 2 antibody",
+              "DOMAIN_ID": "Measurement",
+              "INVALID_REASON": "V",
+              "INVALID_REASON_CAPTION": "Valid",
+              "STANDARD_CONCEPT": "S",
+              "STANDARD_CONCEPT_CAPTION": "Standard",
+              "VOCABULARY_ID": "SNOMED"
+            },
+            "isExcluded": true,
+            "includeDescendants": true
+          },
+          {
+            "concept": {
+              "CONCEPT_CLASS_ID": "HCPCS",
+              "CONCEPT_CODE": "U0003",
+              "CONCEPT_ID": 704059,
+              "CONCEPT_NAME": "Infectious agent detection by nucleic acid (DNA or RNA); severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2) (Coronavirus disease [COVID-19]), amplified probe technique, making use of high throughput technologies as described by CMS-2020-01-R",
+              "DOMAIN_ID": "Measurement",
+              "INVALID_REASON": "V",
+              "INVALID_REASON_CAPTION": "Valid",
+              "STANDARD_CONCEPT": "S",
+              "STANDARD_CONCEPT_CAPTION": "Standard",
+              "VOCABULARY_ID": "HCPCS"
+            },
+            "includeDescendants": true
+          },
+          {
+            "concept": {
+              "CONCEPT_CLASS_ID": "HCPCS",
+              "CONCEPT_CODE": "U0004",
+              "CONCEPT_ID": 704058,
+              "CONCEPT_NAME": "2019-nCoV Coronavirus, SARS-CoV-2/2019-nCoV (COVID-19), any technique, multiple types or subtypes (includes all targets), non-CDC, making use of high throughput technologies as described by CMS-2020-01-R",
+              "DOMAIN_ID": "Measurement",
+              "INVALID_REASON": "V",
+              "INVALID_REASON_CAPTION": "Valid",
+              "STANDARD_CONCEPT": "S",
+              "STANDARD_CONCEPT_CAPTION": "Standard",
+              "VOCABULARY_ID": "HCPCS"
+            },
+            "includeDescendants": true
+          }
+        ]
+      }
+    }
+  ],
+  "PrimaryCriteria": {
+    "CriteriaList": [
+      {
+        "Measurement": {
+          "CodesetId": 5,
+          "OccurrenceStartDate": {
+            "Value": "2019-12-01",
+            "Op": "gt"
+          },
+          "ValueAsConcept": [
+            {
+              "CONCEPT_CODE": "260373001",
+              "CONCEPT_ID": 4126681,
+              "CONCEPT_NAME": "Detected",
+              "DOMAIN_ID": "Meas Value",
+              "INVALID_REASON_CAPTION": "Unknown",
+              "STANDARD_CONCEPT_CAPTION": "Unknown",
+              "VOCABULARY_ID": "SNOMED"
+            },
+            {
+              "CONCEPT_CODE": "LA11882-0",
+              "CONCEPT_ID": 45877985,
+              "CONCEPT_NAME": "Detected",
+              "DOMAIN_ID": "Meas Value",
+              "INVALID_REASON_CAPTION": "Unknown",
+              "STANDARD_CONCEPT_CAPTION": "Unknown",
+              "VOCABULARY_ID": "LOINC"
+            },
+            {
+              "CONCEPT_CODE": "10828004",
+              "CONCEPT_ID": 9191,
+              "CONCEPT_NAME": "Positive",
+              "DOMAIN_ID": "Meas Value",
+              "INVALID_REASON_CAPTION": "Unknown",
+              "STANDARD_CONCEPT_CAPTION": "Unknown",
+              "VOCABULARY_ID": "SNOMED"
+            },
+            {
+              "CONCEPT_CODE": "LA6576-8",
+              "CONCEPT_ID": 45884084,
+              "CONCEPT_NAME": "Positive",
+              "DOMAIN_ID": "Meas Value",
+              "INVALID_REASON_CAPTION": "Unknown",
+              "STANDARD_CONCEPT_CAPTION": "Unknown",
+              "VOCABULARY_ID": "LOINC"
+            },
+            {
+              "CONCEPT_CODE": "52101004",
+              "CONCEPT_ID": 4181412,
+              "CONCEPT_NAME": "Present",
+              "DOMAIN_ID": "Meas Value",
+              "INVALID_REASON_CAPTION": "Unknown",
+              "STANDARD_CONCEPT_CAPTION": "Unknown",
+              "VOCABULARY_ID": "SNOMED"
+            },
+            {
+              "CONCEPT_CODE": "LA9633-4",
+              "CONCEPT_ID": 45879438,
+              "CONCEPT_NAME": "Present",
+              "DOMAIN_ID": "Meas Value",
+              "INVALID_REASON_CAPTION": "Unknown",
+              "STANDARD_CONCEPT_CAPTION": "Unknown",
+              "VOCABULARY_ID": "LOINC"
+            }
+          ],
+          "Age": {
+            "Value": 50,
+            "Op": "gt"
+          },
+          "Gender": [
+            {
+              "CONCEPT_CODE": "F",
+              "CONCEPT_ID": 8532,
+              "CONCEPT_NAME": "FEMALE",
+              "DOMAIN_ID": "Gender",
+              "INVALID_REASON_CAPTION": "Unknown",
+              "STANDARD_CONCEPT_CAPTION": "Unknown",
+              "VOCABULARY_ID": "Gender"
+            }
+          ]
+        }
+      },
+      {
+        "ConditionOccurrence": {
+          "CorrelatedCriteria": {
+            "Type": "ANY",
+            "CriteriaList": [
+              {
+                "Criteria": {
+                  "Measurement": {
+                    "CodesetId": 5,
+                    "ValueAsConcept": [
+                      {
+                        "CONCEPT_CODE": "260385009",
+                        "CONCEPT_ID": 9189,
+                        "CONCEPT_NAME": "Negative",
+                        "DOMAIN_ID": "Meas Value",
+                        "INVALID_REASON_CAPTION": "Unknown",
+                        "STANDARD_CONCEPT_CAPTION": "Unknown",
+                        "VOCABULARY_ID": "SNOMED"
+                      },
+                      {
+                        "CONCEPT_CODE": "260415000",
+                        "CONCEPT_ID": 9190,
+                        "CONCEPT_NAME": "Not detected",
+                        "DOMAIN_ID": "Meas Value",
+                        "INVALID_REASON_CAPTION": "Unknown",
+                        "STANDARD_CONCEPT_CAPTION": "Unknown",
+                        "VOCABULARY_ID": "SNOMED"
+                      },
+                      {
+                        "CONCEPT_CODE": "895231008",
+                        "CONCEPT_ID": 3661867,
+                        "CONCEPT_NAME": "Not detected in pooled specimen",
+                        "DOMAIN_ID": "Meas Value",
+                        "INVALID_REASON_CAPTION": "Unknown",
+                        "STANDARD_CONCEPT_CAPTION": "Unknown",
+                        "VOCABULARY_ID": "SNOMED"
+                      },
+                      {
+                        "CONCEPT_CODE": "2667000",
+                        "CONCEPT_ID": 4132135,
+                        "CONCEPT_NAME": "Absent",
+                        "DOMAIN_ID": "Meas Value",
+                        "INVALID_REASON_CAPTION": "Unknown",
+                        "STANDARD_CONCEPT_CAPTION": "Unknown",
+                        "VOCABULARY_ID": "SNOMED"
+                      },
+                      {
+                        "CONCEPT_CODE": "LA6577-6",
+                        "CONCEPT_ID": 45878583,
+                        "CONCEPT_NAME": "Negative",
+                        "DOMAIN_ID": "Meas Value",
+                        "INVALID_REASON_CAPTION": "Unknown",
+                        "STANDARD_CONCEPT_CAPTION": "Unknown",
+                        "VOCABULARY_ID": "LOINC"
+                      },
+                      {
+                        "CONCEPT_CODE": "LA11883-8",
+                        "CONCEPT_ID": 45880296,
+                        "CONCEPT_NAME": "Not detected",
+                        "DOMAIN_ID": "Meas Value",
+                        "INVALID_REASON_CAPTION": "Unknown",
+                        "STANDARD_CONCEPT_CAPTION": "Unknown",
+                        "VOCABULARY_ID": "LOINC"
+                      },
+                      {
+                        "CONCEPT_CODE": "LA9634-2",
+                        "CONCEPT_ID": 45884086,
+                        "CONCEPT_NAME": "Absent",
+                        "DOMAIN_ID": "Meas Value",
+                        "INVALID_REASON_CAPTION": "Unknown",
+                        "STANDARD_CONCEPT_CAPTION": "Unknown",
+                        "VOCABULARY_ID": "LOINC"
+                      }
+                    ]
+                  }
+                },
+                "StartWindow": {
+                  "Start": {
+                    "Days": 3,
+                    "Coeff": -1
+                  },
+                  "End": {
+                    "Days": 3,
+                    "Coeff": 1
+                  },
+                  "UseEventEnd": false
+                },
+                "Occurrence": {
+                  "Type": 0,
+                  "Count": 0
+                }
+              }
+            ],
+            "DemographicCriteriaList": [],
+            "Groups": []
+          },
+          "CodesetId": 4,
+          "OccurrenceStartDate": {
+            "Value": "2019-12-01",
+            "Op": "gt"
+          },
+          "Age": {
+            "Value": 50,
+            "Op": "gt"
+          },
+          "Gender": [
+            {
+              "CONCEPT_CODE": "F",
+              "CONCEPT_ID": 8532,
+              "CONCEPT_NAME": "FEMALE",
+              "DOMAIN_ID": "Gender",
+              "INVALID_REASON_CAPTION": "Unknown",
+              "STANDARD_CONCEPT_CAPTION": "Unknown",
+              "VOCABULARY_ID": "Gender"
+            }
+          ]
+        }
+      }
+    ],
+    "ObservationWindow": {
+      "PriorDays": 0,
+      "PostDays": 0
+    },
+    "PrimaryCriteriaLimit": {
+      "Type": "All"
+    }
+  },
+  "QualifiedLimit": {
+    "Type": "First"
+  },
+  "ExpressionLimit": {
+    "Type": "All"
+  },
+  "InclusionRules": [],
+  "EndStrategy": {
+    "DateOffset": {
+      "DateField": "EndDate",
+      "Offset": 0
+    }
+  },
+  "CensoringCriteria": [],
+  "CollapseSettings": {
+    "CollapseType": "ERA",
+    "EraPad": 0
+  },
+  "CensorWindow": {},
+  "cdmVersionRange": ">=5.0.0"
+}

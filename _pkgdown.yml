@@ -55,9 +55,9 @@ reference:
 - subtitle: Mock data
 - contents:
   - matches("mockCohortConstructor")
-- subtitle: Results from benchmarking
+- subtitle: Package benchmark
 - contents:
-  - matches("benchmarkData")
+  - matches("benchmarkData|benchmarkCohortConstructor")
 - subtitle: Utility functions
 - contents:
   - matches("addCohortTableIndex")

@@ -25,7 +25,7 @@ Only measurements with these values in the \code{value_as_concept_id} column of
 the measurement table will be included. If NULL all entries independent of
 their value as concept will be considered.}
 
-\item{valueAsNumber}{A named list indicating the range of values and the unit
+\item{valueAsNumber}{A list indicating the range of values and the unit
 they correspond to, as follows:
 list("unit_concept_id" = c(rangeValue1, rangeValue2)). If no name is supplied
 in the list, no requirement on unit concept id will be applied. If NULL, all

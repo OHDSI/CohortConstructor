@@ -55,11 +55,17 @@ stratifyCohorts <- function(cohort,
 
   if (length(strata) == 0 ||
     sum(cohortCount(cohort)$number_records) == 0) {
-    return(subsetCohorts(
-      cohort = cohort,
-      cohortId = cohortId,
-      name = name
-    ))
+    if (removeStrata) {
+      cohort <- cohort |>
+        dplyr::select(!dplyr::any_of(unique(unlist(strata))))
+    }
+    return(
+      subsetCohorts(
+        cohort = cohort,
+        cohortId = cohortId,
+        name = name
+      )
+    )
   }
 
   strataCols <- unique(unlist(strata))
