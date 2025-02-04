@@ -2,8 +2,7 @@
 #'
 #' @description
 #' Run benchmark of CohortConstructor cohort instantiation time compared to
-#' CIRCE from JSON. More information in the
-#' \href{https://ohdsi.github.io/CohortConstructor/articles/a11_benchmark.html}{benchmarking vignette}.
+#' CIRCE from JSON. More information in the benchmarking vignette.
 #'
 #' @inheritParams cdmDoc
 #' @param runCIRCE Whether to run cohorts from JSON definitions generated with

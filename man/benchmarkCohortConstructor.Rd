@@ -30,9 +30,7 @@ cohort all together, as a set).}
 }
 \description{
 Run benchmark of CohortConstructor cohort instantiation time compared to
-CIRCE from JSON. More information in the
-\href{https://ohdsi.github.io/CohortConstructor/articles/a11_benchmark.html}
-{benchmarking vignette}.
+CIRCE from JSON. More information in the benchmarking vignette.
 }
 \examples{
 \donttest{
