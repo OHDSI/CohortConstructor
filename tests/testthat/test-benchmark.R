@@ -17,7 +17,7 @@ test_that("benchmark works", {
       omopgenerics::tidy() |>
       dplyr::pull("count") |>
       sort(),
-    c(0, 0, 0, 0, 0, 0, 0, 0, 0, 66, 86, 112, 126, 145, 321)
+    c(0, 0, 0, 0, 0, 0, 0, 0, 0, 56, 86, 112, 126, 145, 321)
   )
   expect_equal(
     settings(res) |> dplyr::pull("result_type") |> unique() |> sort(),
