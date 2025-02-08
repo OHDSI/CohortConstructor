@@ -43,14 +43,12 @@ requireCohortIntersect <- function(cohort,
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   omopgenerics::validateCohortArgument(cdm[[targetCohortTable]])
   window <- omopgenerics::validateWindowArgument(window)
-  cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}},
-                                                     cohort,
-                                                     validation = "warning")
-  if(!is.null(targetCohortId)){
-  targetCohortId <- omopgenerics::validateCohortIdArgument({{targetCohortId}},
-                                                           cdm[[targetCohortTable]],
-                                                           validation = "error")
-  }
+  cohortId <- omopgenerics::validateCohortIdArgument(
+    {{cohortId}}, cohort, validation = "warning"
+  )
+  targetCohortId <- omopgenerics::validateCohortIdArgument(
+    {{targetCohortId}}, cdm[[targetCohortTable]], validation = "error"
+  )
   intersections <- validateIntersections(intersections)
 
 

@@ -142,7 +142,6 @@ test_that("requiring presence in another cohort", {
 
 
   PatientProfiles::mockDisconnect(cdm)
-
 })
 
 test_that("requiring absence in another cohort", {
