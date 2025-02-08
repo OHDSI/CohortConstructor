@@ -95,7 +95,7 @@ niceNum <- function(x, dec = 0) {
 
 # get data ----
 resultPatterns <- c("time", "comparison", "details", "omop", "index_counts", "sql_indexes")
-benchmarkDataPre <- readData(here::here("data-raw", "data")) |>
+benchmarkDataPre <- readData(here::here("data-raw", "benchmarkResults")) |>
   mergeData(resultPatterns) |>
   updateCDMname(old = "AurumCDM_202403", new = "CPRD Aurum") |>
   updateResultType(old = "cohort_overlap", new = "summarise_cohort_overlap")
