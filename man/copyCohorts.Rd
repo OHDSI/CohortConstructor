@@ -4,18 +4,18 @@
 \alias{copyCohorts}
 \title{Copy a cohort table}
 \usage{
-copyCohorts(cohort, n, cohortId = NULL, name = tableName(cohort))
+copyCohorts(cohort, name, n = 1, cohortId = NULL)
 }
 \arguments{
 \item{cohort}{A cohort table in a cdm reference.}
+
+\item{name}{Name of the new cohort table created in the cdm object.}
 
 \item{n}{Number of times to duplicate the selected cohorts.}
 
 \item{cohortId}{Vector identifying which cohorts to include
 (cohort_definition_id or cohort_name). Cohorts not included will be
 removed from the cohort set.}
-
-\item{name}{Name of the new cohort table created in the cdm object.}
 }
 \value{
 A new cohort table containing cohorts from the original cohort table.
