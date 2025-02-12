@@ -36,10 +36,7 @@ benchmarkCohortConstructor <- function(cdm,
   omopgenerics::assertLogical(dropCohorts)
   tictoc::tic.clearlog()
 
-  # Read JSONs of cohorts to create ----
-  jsons <- CDMConnector::readCohortSet(here::here("extras", "JSONCohorts")) |>
-    dplyr::filter(.data$cohort_name != "first_depression")
-
+  # prefix for cohorts created - to drop later
   pref <- paste0("bench", paste0(sample.int(9,3), collapse = ""))
 
   # Instantiate or read Atlas ----
@@ -56,11 +53,6 @@ benchmarkCohortConstructor <- function(cdm,
       )
       tictoc::toc(log = TRUE)
     }
-  }
-
-  # Get codelist ----
-  if (runCohortConstructorDefinition | runCohortConstructorDomain) {
-    codes <- getCodes(cdm)
   }
 
   # CohortConstructor by definition ----
@@ -776,42 +768,6 @@ getTimes <- function(log, cdm) {
         )
       )
   )
-}
-
-getCodes <- function(cdm) {
-  concept_sets <- c(
-    "inpatient_visit", "beta_blockers", "symptoms_for_transverse_myelitis",
-    "asthma_therapy", "fluoroquinolone_systemic",
-    "congenital_or_genetic_neutropenia_leukopenia_or_agranulocytosis",
-    "endometriosis", "chronic_obstructive_lung_disease", "essential_hypertension",
-    "asthma", "neutropenia_agranulocytosis_or_unspecified_leukopenia",
-    "dementia", "schizophrenia_not_including_paraphenia", "psychotic_disorder",
-    "bipolar_disorder", "major_depressive_disorder", "transverse_myelitis",
-    "schizoaffective_disorder", "endometriosis_related_laproscopic_procedures",
-    "long_acting_muscarinic_antagonists_lamas", "neutrophilia", "covid_19",
-    "sars_cov_2_test", "neutrophil_absolute_count",
-    "mncs_abdominal_aortic_aneurysm_repair", "mncs_above_knee_amputation",
-    "mncs_adrenalectomy", "mncs_appendectomy", "mncs_below_knee_amputation",
-    "mncs_breast_reconstruction", "mncs_celiac_artery_revascularization",
-    "mncs_cerebrovascular_surgery", "mncs_cholecystectomy",
-    "mncs_complex_visceral_resection_liver", "mncs_complex_visceral_resection_oesophagus",
-    "mncs_complex_visceral_resection_pancreas_biliary", "mncs_craniotomy",
-    "mncs_head_neck_resection", "mncs_hysterectomy_opherectomy",
-    "mncs_iliac_femoral_bypass", "mncs_internal_fixation_femur", "mncs_knee_arthroplasty",
-    "mncs_lobectomy", "mncs_lymph_node_dissection", "mncs_major_hip_pelvic_surgery",
-    "mncs_mytoreductive_surgery", "mncs_peripheral_vascular_lower_limb_arterial_bypass",
-    "mncs_pneumonectomy", "mncs_radical_hysterectomy", "mncs_radical_prostatectomy",
-    "mncs_renal_artery_revascularization", "mncs_sb_colon_rectal", "mncs_splenectomy",
-    "mncs_stomach_surgery", "mncs_thoracic_resection", "mncs_thoracic_vascular_surgery",
-    "mncs_transurethral_prostatectomy", "mncs_ureteric_kidney_bladder_surgery"
-  )
-  codes_cdm <- CodelistGenerator::codesFromCohort(here::here("extras", "JSONCohorts"), cdm)
-  codes <- as.list(rep(100001L, length(concept_sets))) # mock concept as place-holder
-  names(codes) <- concept_sets
-  for (nm in names(codes_cdm)) {
-    codes[nm] <- codes_cdm[nm]
-  }
-  return(codes)
 }
 
 runWithoutIndex <- function(cdm, codes) {

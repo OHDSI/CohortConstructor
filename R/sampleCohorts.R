@@ -36,6 +36,31 @@ sampleCohorts <- function(cohort,
     cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
     # return entry cohort as cohortId is used to modify not subset
     cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE)
+    useIndexes <- getOption("CohortConstructor.use_indexes")
+    if (!isFALSE(useIndexes)) {
+      addIndex(
+        cohort = cdm[[name]],
+        cols = c("subject_id", "cohort_start_date")
+      )
+    }
+    return(cdm[[name]])
+  }
+
+  if (all(cohort |>
+          dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>
+          dplyr::group_by(.data$cohort_definition_id) |>
+          dplyr::tally() |>
+          dplyr::pull() <= n)) {
+    cli::cli_inform("Returning entry cohort as the size of the cohorts to be sampled is equal or smaller than `n`.")
+    # return entry cohort as cohortId is used to modify not subset
+    cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE)
+    useIndexes <- getOption("CohortConstructor.use_indexes")
+    if (!isFALSE(useIndexes)) {
+      addIndex(
+        cohort = cdm[[name]],
+        cols = c("subject_id", "cohort_start_date")
+      )
+    }
     return(cdm[[name]])
   }
 
@@ -60,14 +85,6 @@ sampleCohorts <- function(cohort,
       reason = paste0("Sample ", n, " individuals"),
       cohortId = cohortId
     )
-
-  useIndexes <- getOption("CohortConstructor.use_indexes")
-  if (!isFALSE(useIndexes)) {
-    addIndex(
-      cohort = cdm[[name]],
-      cols = c("subject_id", "cohort_start_date")
-    )
-  }
 
   return(cdm[[name]])
 }
