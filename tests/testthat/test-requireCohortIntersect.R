@@ -142,7 +142,6 @@ test_that("requiring presence in another cohort", {
 
 
   PatientProfiles::mockDisconnect(cdm)
-
 })
 
 test_that("requiring absence in another cohort", {
@@ -177,6 +176,16 @@ test_that("requiring absence in another cohort", {
                       "Not in cohort cohort_1 between -Inf & Inf days relative to cohort_start_date",
                       "Initial qualifying events",
                       "Not in cohort cohort_1 between -Inf & Inf days relative to cohort_start_date")))
+
+  # empty target cohort
+  expect_message(
+    cdm$cohort1_equal <-  requireCohortIntersect(cohort = cdm$cohort1,
+                                                 targetCohortTable = "cohort3_exclusion",
+                                                 targetCohortId = 1,
+                                                 window = c(-Inf, Inf),
+                                                 name = "cohort1_equal")
+  )
+  expect_equal(collectCohort(cdm$cohort1_equal, 1), collectCohort(cdm$cohort1, 1))
 
   PatientProfiles::mockDisconnect(cdm)
 })

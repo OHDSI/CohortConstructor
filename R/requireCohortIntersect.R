@@ -43,14 +43,12 @@ requireCohortIntersect <- function(cohort,
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   omopgenerics::validateCohortArgument(cdm[[targetCohortTable]])
   window <- omopgenerics::validateWindowArgument(window)
-  cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}},
-                                                     cohort,
-                                                     validation = "warning")
-  if(!is.null(targetCohortId)){
-  targetCohortId <- omopgenerics::validateCohortIdArgument({{targetCohortId}},
-                                                           cdm[[targetCohortTable]],
-                                                           validation = "error")
-  }
+  cohortId <- omopgenerics::validateCohortIdArgument(
+    {{cohortId}}, cohort, validation = "warning"
+  )
+  targetCohortId <- omopgenerics::validateCohortIdArgument(
+    {{targetCohortId}}, cdm[[targetCohortTable]], validation = "error"
+  )
   intersections <- validateIntersections(intersections)
 
 
@@ -60,6 +58,17 @@ requireCohortIntersect <- function(cohort,
     cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE)
     return(cdm[[name]])
   }
+
+  if (cdm[[targetCohortTable]] |>
+      dplyr::filter(.data$cohort_definition_id %in% .env$targetCohortId) |>
+      dplyr::tally() |>
+      dplyr::pull() == 0) {
+    cli::cli_inform("Returning entry cohort as the target cohort to intersect is empty.")
+    # return entry cohort as cohortId is used to modify not subset
+    cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE)
+    return(cdm[[name]])
+  }
+
   # targetCohortId must be singular
   if (length(targetCohortId) > 1) {
     cli::cli_abort(c("requireCohortIntersect can only be use with one rarget cohort at a time.",
