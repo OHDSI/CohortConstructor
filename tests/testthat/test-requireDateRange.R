@@ -127,7 +127,7 @@ test_that("trim cohort dates", {
   expect_identical(sort(cdm$cohort3 |>
                       dplyr::pull("subject_id")), as.integer(c(1, 1, 1, 2, 2, 3)))
   expect_identical(omopgenerics::attrition(cdm$cohort3)$reason[
-    omopgenerics::attrition(cdm$cohort3)$cohort_definition_id == 1], c("Initial qualifying events", "cohort_start_date >= 2001-01-01", "cohort_end_date <= 2005-01-01"))
+    omopgenerics::attrition(cdm$cohort3)$cohort_definition_id == 1], c("Initial qualifying events", "cohort_start_date trimmed >= 2001-01-01", "cohort_end_date trimmed <= 2005-01-01"))
   expect_identical(omopgenerics::attrition(cdm$cohort3)$reason[
     omopgenerics::attrition(cdm$cohort3)$cohort_definition_id == 2], "Initial qualifying events")
 
@@ -137,14 +137,14 @@ test_that("trim cohort dates", {
                     cohortId = 1,
                     name = "cohort4")
   expect_identical(sort(cdm$cohort4 |> dplyr::pull("cohort_end_date")), as.Date(c("2000-05-27", "2001-09-08", "2002-03-26", "2004-12-11", "2005-01-01", "2007-09-06", "2015-08-12")))
-  expect_identical(omopgenerics::attrition(cdm$cohort4)$reason, c("Initial qualifying events", "cohort_end_date <= 2005-01-01", "Initial qualifying events"))
+  expect_identical(omopgenerics::attrition(cdm$cohort4)$reason, c("Initial qualifying events", "cohort_end_date trimmed <= 2005-01-01", "Initial qualifying events"))
 
   cdm$cohort5 <- cdm$cohort2 |>
     trimToDateRange(dateRange = as.Date(c("2005-01-01", NA)),
                     cohortId = 1,
                     name = "cohort5")
   expect_identical(sort(cdm$cohort5 |> dplyr::pull("cohort_start_date")), as.Date(c("1999-07-11", "2000-06-17", "2004-12-12", "2005-01-01", "2015-01-25", "2015-02-02")))
-  expect_identical(omopgenerics::attrition(cdm$cohort5)$reason, c("Initial qualifying events", "cohort_start_date >= 2005-01-01", "Initial qualifying events"))
+  expect_identical(omopgenerics::attrition(cdm$cohort5)$reason, c("Initial qualifying events", "cohort_start_date trimmed >= 2005-01-01", "Initial qualifying events"))
 
   cdm$cohort6 <- cdm$cohort2 |>
     trimToDateRange(dateRange = as.Date(c(NA, NA)),
