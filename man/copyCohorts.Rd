@@ -4,16 +4,18 @@
 \alias{copyCohorts}
 \title{Copy a cohort table}
 \usage{
-copyCohorts(cohort, name, cohortId = NULL)
+copyCohorts(cohort, n, cohortId = NULL, name = tableName(cohort))
 }
 \arguments{
 \item{cohort}{A cohort table in a cdm reference.}
 
-\item{name}{Name of the new cohort table created in the cdm object.}
+\item{n}{Number of times to duplicate the selected cohorts.}
 
 \item{cohortId}{Vector identifying which cohorts to include
 (cohort_definition_id or cohort_name). Cohorts not included will be
 removed from the cohort set.}
+
+\item{name}{Name of the new cohort table created in the cdm object.}
 }
 \value{
 A new cohort table containing cohorts from the original cohort table.
@@ -24,5 +26,6 @@ A new cohort table containing cohorts from the original cohort table.
 \examples{
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
-cdm$cohort3 <- copyCohorts(cdm$cohort1, name = "cohort3")
+cdm$cohort3 <- copyCohorts(cdm$cohort1, n = 2, cohortId = 1, name = "cohort3")
+
 }

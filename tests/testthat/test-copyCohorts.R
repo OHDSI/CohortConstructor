@@ -11,7 +11,8 @@ test_that("simple example", {
   start_attrition <- omopgenerics::attrition(cdm$original_cohort)
 
   cdm$copy_cohort <- copyCohorts(cdm$original_cohort,
-                                name = "copy_cohort")
+                                 n = 1,
+                                 name = "copy_cohort")
   expect_identical(omopgenerics::settings(cdm$copy_cohort),
                    start_settings)
   expect_identical(omopgenerics::attrition(cdm$copy_cohort),
@@ -30,21 +31,21 @@ test_that("simple example", {
                    start_settings)
 
   # warning if the new cohort table already exists
- expect_warning(cdm$copy_cohort <- copyCohorts(cdm$original_cohort,
-                                name = "copy_cohort"))
+  expect_warning(cdm$copy_cohort <- copyCohorts(cdm$original_cohort,
+                                                n = 1,
+                                                name = "copy_cohort"))
 
- # expected errors
- expect_error(cdm$copy_cohort <- copyCohorts(cdm$original_cohort,
-                                            name = "another_name"))
- expect_error(cdm$copy_cohort <- copyCohorts("a",
-                                            name = "copy_cohort"))
- # not allowed to copy cohort to the same location
- expect_error(cdm$original_cohort <- copyCohorts(cdm$original_cohort,
-                                                name = "original_cohort"))
+  # expected errors
+  expect_error(cdm$copy_cohort <- copyCohorts(cdm$original_cohort,
+                                              n = 1,
+                                              name = "another_name"))
+  expect_error(cdm$copy_cohort <- copyCohorts("a",
+                                              n = 1,
+                                              name = "copy_cohort"))
 
- PatientProfiles::mockDisconnect(cdm)
+  PatientProfiles::mockDisconnect(cdm)
 
-  })
+})
 
 test_that("copy only specific cohort IDs", {
   skip_on_cran()
@@ -61,11 +62,13 @@ test_that("copy only specific cohort IDs", {
 
   # keep just one cohort
   cdm$copy_cohort_a <- copyCohorts(cdm$original_cohort,
-                                cohortId = 1,
-                                name = "copy_cohort_a")
+                                   cohortId = 1,
+                                   n = 1,
+                                   name = "copy_cohort_a")
   cdm$copy_cohort_b <- copyCohorts(cdm$original_cohort,
-                                cohortId = "cohort_1",
-                                name = "copy_cohort_b")
+                                   n = 1,
+                                   cohortId = "cohort_1",
+                                   name = "copy_cohort_b")
   expect_identical(
     omopgenerics::settings(cdm$original_cohort) |>
       dplyr::filter(cohort_definition_id == 1),
@@ -77,21 +80,58 @@ test_that("copy only specific cohort IDs", {
 
   # keep both cohorts
   cdm$copy_cohort_c <- copyCohorts(cdm$original_cohort,
-                                cohortId = c(1, 2),
-                                name = "copy_cohort_c")
+                                   n = 1,
+                                   cohortId = c(1, 2),
+                                   name = "copy_cohort_c")
   cdm$copy_cohort_d <- copyCohorts(cdm$original_cohort,
-                                cohortId = c("cohort_1", "cohort_2"),
-                                name = "copy_cohort_d")
+                                   n = 1,
+                                   cohortId = c("cohort_1", "cohort_2"),
+                                   name = "copy_cohort_d")
 
   # cohort not present
   expect_error(cdm$copy_cohort <- copyCohorts(cdm$original_cohort,
-                                cohortId = c(3),
-                                name = "copy_cohort"))
+                                              n = 1,
+                                              cohortId = c(3),
+                                              name = "copy_cohort"))
   expect_error(cdm$copy_cohort <- copyCohorts(cdm$original_cohort,
-                                             cohortId = "not_a_cohort",
-                                             name = "copy_cohort"))
+                                              n = 1,
+                                              cohortId = "not_a_cohort",
+                                              name = "copy_cohort"))
 
   PatientProfiles::mockDisconnect(cdm)
 
+})
+
+test_that("multiple copies", {
+  cdm_local <- omock::mockCdmReference() |>
+    omock::mockPerson(n = 4, seed = 1) |>
+    omock::mockObservationPeriod(seed = 1) |>
+    omock::mockCohort(name = c("original_cohort"),
+                      numberCohorts = 3, seed = 1)
+  cdm <- cdm_local |> copyCdm()
+
+  cdm$copy_cohort <- copyCohorts(
+    cdm$original_cohort, n = 4, cohortId = 1, name = "copy_cohort"
+  )
+  expect_equal(collectCohort(cdm$copy_cohort, 1), collectCohort(cdm$copy_cohort, 2))
+  expect_equal(collectCohort(cdm$copy_cohort, 1), collectCohort(cdm$copy_cohort, 3))
+  expect_equal(collectCohort(cdm$copy_cohort, 1), collectCohort(cdm$copy_cohort, 4))
+
+  cdm$copy_cohort2 <- copyCohorts(
+    cdm$original_cohort, n = 3, cohortId = c(1, 3), name = "copy_cohort2"
+  )
+  expect_equal(collectCohort(cdm$copy_cohort2, 1), collectCohort(cdm$copy_cohort2, 4))
+  expect_equal(collectCohort(cdm$copy_cohort2, 1), collectCohort(cdm$copy_cohort2, 6))
+  expect_equal(collectCohort(cdm$copy_cohort2, 3), collectCohort(cdm$copy_cohort2, 5))
+  expect_equal(collectCohort(cdm$copy_cohort2, 3), collectCohort(cdm$copy_cohort2, 7))
+  expect_equal(
+    settings(cdm$copy_cohort2),
+    dplyr::tibble(
+      cohort_definition_id = c(1, 3, 4:7),
+      cohort_name = c("cohort_1", "cohort_3", "cohort_1_1", "cohort_3_1", "cohort_1_2", "cohort_3_2"),
+      original_cohort_id = c(NA, NA, 1, 3, 1, 3),
+      original_cohort_name = c(NA, NA, "cohort_1", "cohort_3", "cohort_1", "cohort_3")
+    )
+  )
 })
 
