@@ -93,15 +93,17 @@ test_that("require flag in concept", {
 
   # empty concept
   expect_message(
-    cdm$cohort1 <-  requireConceptIntersect(cohort = cdm$cohort1,
+    cdm$cohort1_equal <-  requireConceptIntersect(cohort = cdm$cohort1,
                                             conceptSet = list(),
-                                            window = list(c(-Inf, Inf)))
+                                            window = list(c(-Inf, Inf)),
+                                            name = "cohort1_equal")
   )
-  expect_true(all(omopgenerics::attrition(cdm$cohort1)$reason ==
+  expect_true(all(omopgenerics::attrition(cdm$cohort1_equal)$reason ==
                     c("Initial qualifying events",
                       "Concept a between -Inf & Inf days relative to cohort_start_date between 1 and Inf",
                       "Initial qualifying events",
                       "Concept a between -Inf & Inf days relative to cohort_start_date between 1 and Inf")))
+  expect_equal(collectCohort(cdm$cohort1_equal,1), collectCohort(cdm$cohort1, 1))
 
   # expected errors
   # only support one concept at the moment
