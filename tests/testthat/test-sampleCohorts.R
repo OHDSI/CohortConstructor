@@ -20,10 +20,10 @@ test_that("sampleCohort subsetting one cohort", {
 
   # Subset it again should yield the same cohort
   test_cohort1 <- sampleCohorts(cdm$cohort1, n = 2, cohortId = 1)
-  expect_true(all.equal(test_cohort1, cdm$cohort1))
-  expect_true(attrition(test_cohort1) |>
-                dplyr::filter(reason == "Sample 2 individuals" & reason_id == 3) |>
-                dplyr::pull("excluded_subjects") == 0)
+  expect_equal(collectCohort(test_cohort1, 1), collectCohort(cdm$cohort1, 1))
+  expect_equal(
+    attrition(test_cohort1) |> dplyr::pull("reason"), attrition(cdm$cohort1) |> dplyr::pull("reason")
+  )
 
   cdm$cohort3 <- sampleCohorts(cdm$cohort1, n = 100000, cohortId = 1, name = "cohort3")
   expect_equal(collectCohort(cdm$cohort1, 1), collectCohort(cdm$cohort3, 1))
@@ -44,9 +44,9 @@ test_that("sampleCohort subsetting multiple cohorts", {
 
   cdm$cohort1a <- sampleCohorts(cdm$cohort1, n = 4, name = "cohort1a")
   expect_true(all(attrition(cdm$cohort1a) |>
-                dplyr::filter(reason == "Sample 4 individuals") |>
-                dplyr::arrange(cohort_definition_id) |>
-                dplyr::pull("number_subjects") == c(4,4,4)))
+                    dplyr::filter(reason == "Sample 4 individuals") |>
+                    dplyr::arrange(cohort_definition_id) |>
+                    dplyr::pull("number_subjects") == c(4,4,4)))
 
   # Subset it again but only cohorts 1 and 3
   cdm$cohort1b <- sampleCohorts(cdm$cohort1, cohortId = c(1,3), n = 4, name = "cohort1b")
@@ -55,8 +55,8 @@ test_that("sampleCohort subsetting multiple cohorts", {
                     dplyr::arrange(cohort_definition_id) |>
                     dplyr::pull("number_subjects") == c(4,4)))
   expect_true(omopgenerics::cohortCount(cdm$cohort1b) |>
-    dplyr::filter(cohort_definition_id == 2) |>
-    dplyr::pull("number_records") == 10)
+                dplyr::filter(cohort_definition_id == 2) |>
+                dplyr::pull("number_records") == 10)
 
   PatientProfiles::mockDisconnect(cdm)
 })
@@ -74,16 +74,16 @@ test_that("sampleCohort subsetting all cohorts", {
 
   test1 <- sampleCohorts(cdm$cohort1, n = 2)
   test2 <- sampleCohorts(cdm$cohort1, cohortId = c(1,2,3), n = 2)
-  expect_true(all.equal(test1, test2))
+  expect_true(all.equal(attrition(test1), attrition(test2)))
   test3 <- sampleCohorts(cdm$cohort1, cohortId = paste0("cohort_", c(1,2,3)), n = 2)
-  expect_true(all.equal(test1, test3))
+  expect_true(all.equal(attrition(test1), attrition(test3)))
 
   PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("expected errors", {
   skip_on_cran()
-   cdm_local <- omock::mockCdmReference() |>
+  cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
     omock::mockCohort(name = c("cohort1"), numberCohorts = 3, seed = 2)

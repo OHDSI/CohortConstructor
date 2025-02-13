@@ -48,6 +48,7 @@ sampleCohorts <- function(cohort,
 
   if (all(cohort |>
           dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>
+          dplyr::distinct(.data$cohort_definition_id, .data$subject_id) |>
           dplyr::group_by(.data$cohort_definition_id) |>
           dplyr::tally() |>
           dplyr::pull() <= n)) {
