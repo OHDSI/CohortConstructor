@@ -75,7 +75,8 @@ unionCohorts <- function(cohort,
   if (!is.null(cohCodelist)) {
     cohCodelist <- cohCodelist |> dplyr::mutate("cohort_definition_id" = 1L)
   }
-  unionedCohort <- unionedCohort |>
+  cdm[[name]] <- unionedCohort |>
+    dplyr::compute(name = name, temporary = FALSE) |>
     omopgenerics::newCohortTable(
       cohortSetRef = cohSet,
       cohortAttritionRef = NULL,
@@ -83,11 +84,8 @@ unionCohorts <- function(cohort,
       .softValidation = FALSE
     )
 
-  if (isFALSE(keepOriginalCohorts)) {
-    cdm[[name]] <- unionedCohort |>
-      dplyr::compute(name = name, temporary = FALSE)
-  } else {
-    cdm <- bind(cohort, unionedCohort, name = name)
+  if (isTRUE(keepOriginalCohorts)) {
+    cdm <- bind(cohort, cdm[[name]], name = name)
   }
 
   CDMConnector::dropTable(cdm, name = tmpTable)
