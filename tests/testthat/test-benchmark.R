@@ -1,4 +1,5 @@
 test_that("benchmark works", {
+  skip_on_cran()
   if (Sys.getenv("EUNOMIA_DATA_FOLDER") == ""){
     Sys.setenv("EUNOMIA_DATA_FOLDER" = file.path(tempdir(), "eunomia"))}
   if (!dir.exists(Sys.getenv("EUNOMIA_DATA_FOLDER"))){ dir.create(Sys.getenv("EUNOMIA_DATA_FOLDER"))

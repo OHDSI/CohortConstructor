@@ -1,4 +1,5 @@
 test_that("test restrict to first entry works", {
+  skip_on_cran()
   cdm <- omock::mockCdmReference() |>
     omock::mockPerson(n = 3, seed = 1) |>
     omock::mockObservationPeriod(seed = 1) |>
