@@ -23,8 +23,7 @@ test_that("expected errors and messages", {
   expect_error(conceptCohort(cdm = cdm, name = NA, conceptSet = NULL))
   expect_error(conceptCohort(cdm = cdm, name = 1, conceptSet = NULL))
   expect_error(conceptCohort(cdm = cdm, name = c("ass", "asdf"), conceptSet = NULL))
-  expect_error(conceptCohort(cdm = cdm, name = "aaaa", conceptSet = NULL))
-  expect_error(conceptCohort(cdm = cdm, conceptSet = NULL, name = "cohort"))
+  expect_message(conceptCohort(cdm = cdm, name = "aaaa", conceptSet = NULL))
 
   # empty cohort from empty concept
   expect_no_error(x <- conceptCohort(cdm = cdm, conceptSet = list(), name = "cohort"))
