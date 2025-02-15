@@ -75,7 +75,8 @@ matchCohorts <- function(cohort,
   if (cohort |> settings() |> nrow() == 0) {
     cdm[[name]] <- cohort |>
       dplyr::relocate(dplyr::all_of(omopgenerics::cohortColumns("cohort"))) |>
-      dplyr::compute(name = name, temporary = FALSE) |>
+      dplyr::compute(name = name, temporary = FALSE,
+                     logPrefix = "CohortConstructor_matchCohorts_relocate_") |>
       omopgenerics::newCohortTable(.softValidation = TRUE)
     return(cdm[[name]])
   }
@@ -222,7 +223,8 @@ getNewCohort <- function(cohort, cohortId, control) {
           by = "subject_id"
         )
     ) |>
-    dplyr::compute(name = control, temporary = FALSE)
+    dplyr::compute(name = control, temporary = FALSE,
+                   logPrefix = "CohortConstructor_matchCohorts_control_")
   cdm <- omopgenerics::dropTable(cdm, temp_name)
 
   controls <- controls |>
@@ -251,7 +253,8 @@ getNewCohort <- function(cohort, cohortId, control) {
 excludeCases <- function(cdm, target, control) {
   cdm[[control]] |>
     dplyr::anti_join(cdm[[target]], by = c("subject_id", "cohort_definition_id")) |>
-    dplyr::compute(name = control, temporary = FALSE) |>
+    dplyr::compute(name = control, temporary = FALSE,
+                   logPrefix = "CohortConstructor_excludeCases_") |>
     omopgenerics::recordCohortAttrition("Exclude cases from controls")
 }
 
@@ -274,13 +277,15 @@ addMatchCols <- function(x, matchCols) {
         dplyr::select("subject_id" = "person_id", dplyr::all_of(matchCols)),
       by = c("subject_id")
     ) |>
-    dplyr::compute(name = omopgenerics::tableName(x), temporary = FALSE)
+    dplyr::compute(name = omopgenerics::tableName(x), temporary = FALSE,
+                   logPrefix = "CohortConstructor_addMatchCols_")
 }
 excludeIndividualsWithNoMatch <- function(cohort, groups, matchCols) {
   cohort |>
     dplyr::inner_join(groups, by = c("cohort_definition_id", matchCols)) |>
     dplyr::select(!dplyr::all_of(matchCols)) |>
-    dplyr::compute(name = tableName(cohort), temporary = FALSE) |>
+    dplyr::compute(name = tableName(cohort), temporary = FALSE,
+                   logPrefix = "CohortConstructor_excludeIndividualsWithNoMatch_") |>
     omopgenerics::recordCohortAttrition("Exclude individuals that do not have any match")
 }
 excludeNoMatchedIndividuals <- function(cdm,
@@ -308,7 +313,8 @@ excludeNoMatchedIndividuals <- function(cdm,
     dplyr::mutate("group_id" = dplyr::row_number()) |>
     dplyr::arrange() |>
     dplyr::compute(name = omopgenerics::uniqueTableName(tablePrefix),
-                   temporary = FALSE)
+                   temporary = FALSE,
+                   logPrefix = "CohortConstructor_excludeNoMatchedIndividuals_")
 
   # Exclude individuals that do not have any match
   cdm[[target]] <- cdm[[target]] |>
@@ -325,13 +331,15 @@ addRandPairId <- function(x) {
     dplyr::arrange(.data$id) |>
     dplyr::mutate("pair_id" = dplyr::row_number(), .by = "group_id") |>
     dplyr::select(-"id") |>
-    dplyr::compute(name = omopgenerics::tableName(x), temporary = FALSE)
+    dplyr::compute(name = omopgenerics::tableName(x), temporary = FALSE,
+                   logPrefix = "CohortConstructor_addRandPairId_")
 }
 addClusterId <- function(x, u) {
   x |>
     dplyr::inner_join(u, by = c("pair_id", "group_id")) |>
     dplyr::select(-"pair_id", -"group_id") |>
-    dplyr::compute(name = omopgenerics::tableName(x), temporary = FALSE)
+    dplyr::compute(name = omopgenerics::tableName(x), temporary = FALSE,
+                   logPrefix = "CohortConstructor_addClusterId_")
 }
 clusterId <- function(x) {
   x |>
@@ -359,7 +367,8 @@ infiniteMatching <- function(cdm, target, control) {
     # Calculate the maximum ratio per group
     dplyr::mutate("pair_id" = ((.data$pair_id - 1) %% .data$max_id) + 1) |>
     dplyr::select(-"max_id") |>
-    dplyr::compute(name = control, temporary = FALSE)
+    dplyr::compute(name = control, temporary = FALSE,
+                   logPrefix = "CohortConstructor_infiniteMatching_1_")
 
   clusterId <- clusterId(cdm[[target]])
   cdm[[control]] <- cdm[[control]] |> addClusterId(clusterId)
@@ -373,7 +382,8 @@ infiniteMatching <- function(cdm, target, control) {
         dplyr::select("cluster_id", "index_date" = "cohort_start_date"),
       by = c("cluster_id")
     ) |>
-    dplyr::compute(name = control, temporary = FALSE)
+    dplyr::compute(name = control, temporary = FALSE,
+                   logPrefix = "CohortConstructor_infiniteMatching_2_")
 
   return(cdm)
 }
@@ -398,13 +408,15 @@ observationControl <- function(x) {
     ) |>
     dplyr::select(-"observation_period_start_date") |>
     dplyr::relocate(dplyr::all_of(omopgenerics::cohortColumns("cohort"))) |>
-    dplyr::compute(name = tableName(x), temporary = FALSE) |>
+    dplyr::compute(name = tableName(x), temporary = FALSE,
+                   logPrefix = "CohortConstructor_observationControl_") |>
     omopgenerics::recordCohortAttrition(reason = "Exclude individuals not in observation")
 }
 observationTarget <- function(cdm, target, control) {
   cdm[[target]] |>
     dplyr::inner_join(cdm[[control]] |> dplyr::select("cluster_id") |> dplyr::distinct(), by = "cluster_id") |>
-    dplyr::compute(name = target, temporary = FALSE) |>
+    dplyr::compute(name = target, temporary = FALSE,
+                   logPrefix = "CohortConstructor_observationTarget_") |>
     omopgenerics::recordCohortAttrition(reason = "No possible pairs in observation")
 }
 
@@ -418,7 +430,8 @@ checkRatio <- function(x, ratio) {
       dplyr::ungroup() |>
       dplyr::arrange() |>
       dplyr::select(-"id") |>
-      dplyr::compute(name = tableName(x), temporary = FALSE) |>
+      dplyr::compute(name = tableName(x), temporary = FALSE,
+                     logPrefix = "CohortConstructor_checkRatio_") |>
       omopgenerics::recordCohortAttrition("Exclude individuals to fulfil the ratio")
   }
   return(x)

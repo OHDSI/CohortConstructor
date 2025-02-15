@@ -37,7 +37,8 @@ subsetCohorts <- function(cohort,
 
   cdm[[name]] <- cohort |>
     dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>
-    dplyr::compute(name = name, temporary = FALSE)
+    dplyr::compute(name = name, temporary = FALSE,
+                   logPrefix = "CohortConstructor_subsetCohorts_filter_")
 
   cdm[[name]] <- cdm[[name]] |>
     omopgenerics::newCohortTable(

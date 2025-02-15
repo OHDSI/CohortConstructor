@@ -70,13 +70,15 @@ unionCohorts <- function(cohort,
     dplyr::select(!"observation_period_id") |>
     dplyr::mutate(cohort_definition_id = 1L) |>
     dplyr::relocate(dplyr::all_of(omopgenerics::cohortColumns("cohort"))) |>
-    dplyr::compute(name = tmpTable, temporary = FALSE)
+    dplyr::compute(name = tmpTable, temporary = FALSE,
+                   logPrefix = "CohortConstructor_unionCohorts_tmpTable_")
   cohCodelist <- attr(cohort, "cohort_codelist")
   if (!is.null(cohCodelist)) {
     cohCodelist <- cohCodelist |> dplyr::mutate("cohort_definition_id" = 1L)
   }
   cdm[[name]] <- unionedCohort |>
-    dplyr::compute(name = name, temporary = FALSE) |>
+    dplyr::compute(name = name, temporary = FALSE,
+                   logPrefix = "CohortConstructor_unionCohorts_newCohort_") |>
     omopgenerics::newCohortTable(
       cohortSetRef = cohSet,
       cohortAttritionRef = NULL,

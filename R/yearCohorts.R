@@ -40,7 +40,8 @@ yearCohorts <- function(cohort,
 
   if (length(years) == 0) {
     cohort <- cohort |>
-      dplyr::compute(name = name, temporary = FALSE) |>
+      dplyr::compute(name = name, temporary = FALSE,
+                     logPrefix = "CohortConstructor_yearCohorts_entry_") |>
       omopgenerics::newCohortTable(.softValidation = TRUE)
 
     useIndexes <- getOption("CohortConstructor.use_indexes")
@@ -179,7 +180,8 @@ yearCohorts <- function(cohort,
   # new cohort
   cohort <- cohort |>
     dplyr::relocate(dplyr::all_of(omopgenerics::cohortColumns("cohort"))) |>
-    dplyr::compute(name = name, temporary = FALSE) |>
+    dplyr::compute(name = name, temporary = FALSE,
+                   logPrefix = "CohortConstructor_yearCohorts_newCohort_") |>
     omopgenerics::newCohortTable(
       cohortSetRef = newSet,
       cohortAttritionRef = newAttrition |> dplyr::bind_rows(),

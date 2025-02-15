@@ -38,7 +38,8 @@ requireMinCohortCount <- function(cohort,
   if (length(cohortId) == 0) {
     cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
     # return entry cohort as cohortId is used to modify not subset
-    cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE)
+    cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE,
+                                            logPrefix = "CohortConstructor_requireMinCohortCount_entry_")
     return(cdm[[name]])
   }
 
@@ -54,7 +55,8 @@ requireMinCohortCount <- function(cohort,
   }
 
   cdm[[name]] <- cohort |>
-    dplyr::compute(temporary = FALSE, name = name) |>
+    dplyr::compute(temporary = FALSE, name = name,
+                   logPrefix = "CohortConstructor_requireMinCohortCount_fewer_") |>
     omopgenerics::recordCohortAttrition(
       reason = "Fewer than minimum cohort count of {minCohortCount}",
       cohortId = cohortsToDrop

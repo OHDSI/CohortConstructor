@@ -53,14 +53,16 @@ requireConceptIntersect <- function(cohort,
   if (length(cohortId) == 0) {
     cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
     # return entry cohort as cohortId is used to modify not subset
-    cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE)
+    cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE,
+                                            logPrefix = "CohortConstructor_requireConceptIntersect_entry_1_")
     return(cdm[[name]])
   }
 
   if (length(conceptSet) == 0) {
     cli::cli_inform("Returning entry cohort as `conceptSet` is empty.")
     # return entry cohort as cohortId is used to modify not subset
-    cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE)
+    cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE,
+                                            logPrefix = "CohortConstructor_requireConceptIntersect_entry_2_")
     return(cdm[[name]])
   }
 
@@ -114,7 +116,8 @@ requireConceptIntersect <- function(cohort,
         (!.data$cohort_definition_id %in% .env$cohortId)
       ) |>
       dplyr::select(dplyr::all_of(cols)) |>
-      dplyr::compute(name = subsetName, temporary = FALSE)
+      dplyr::compute(name = subsetName, temporary = FALSE,
+                     logPrefix = "CohortConstructor_requireConceptIntersect_subset_")
 
     # attrition reason
     if (all(intersections == 0)) {
@@ -147,7 +150,8 @@ requireConceptIntersect <- function(cohort,
     # cohort
     cohort <- cohort |>
       dplyr::inner_join(subsetCohort, by = c(cols)) |>
-      dplyr::compute(name = name, temporary = FALSE) |>
+      dplyr::compute(name = name, temporary = FALSE,
+                     logPrefix = "CohortConstructor_requireConceptIntersect_join_") |>
       omopgenerics::newCohortTable(
         .softValidation = TRUE, cohortCodelistRef = newCodelist
       ) |>

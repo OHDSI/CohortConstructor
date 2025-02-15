@@ -117,7 +117,8 @@ conceptCohort <- function(cdm,
     subsetIndividuals <- subsetCohort |>
       dplyr::filter(.data$cohort_definition_id %in% .env$subsetCohortId) |>
       dplyr::distinct(.data$subject_id) |>
-      dplyr::compute(name = subsetName, temporary = FALSE)
+      dplyr::compute(name = subsetName, temporary = FALSE,
+                     logPrefix = "CohortConstructor_conceptCohort_subsetCohort_")
     if (omopgenerics::isTableEmpty(subsetIndividuals)) {
       omopgenerics::dropTable(cdm = cdm, name = subsetName)
       cli::cli_warn("There are no individuals in the `subsetCohort` and `subsetCohortId` provided. Returning empty cohort.")
@@ -307,7 +308,8 @@ unerafiedConceptCohort <- function(cdm,
               tableCohortCodelist, domain, nameK, subsetIndividuals, TRUE
             )
           ) |>
-          dplyr::compute(name = nameK, temporary = FALSE)
+          dplyr::compute(name = nameK, temporary = FALSE,
+                         logPrefix = "CohortConstructor_conceptCohort_domainCohort_")
       }
 
       if (tempCohort |>
@@ -341,7 +343,8 @@ unerafiedConceptCohort <- function(cdm,
       "cohort_end_date"
     ) |>
     dplyr::mutate(cohort_end_date = dplyr::coalesce(.data$cohort_end_date, .data$cohort_start_date)) |>
-    dplyr::compute(name = name, temporary = FALSE)
+    dplyr::compute(name = name, temporary = FALSE,
+                   logPrefix = "CohortConstructor_conceptCohort_reduce_")
 
   omopgenerics::dropTable(cdm, name = dplyr::starts_with(workingTblNames))
 
@@ -356,7 +359,8 @@ fulfillCohortReqs <- function(cdm, name) {
       !is.na(.data$cohort_start_date),
       .data$cohort_start_date <= .data$cohort_end_date
     ) |>
-    dplyr::compute(temporary = FALSE, name = name) |>
+    dplyr::compute(temporary = FALSE, name = name,
+                   logPrefix = "CohortConstructor_fulfillCohortReqs_filter_") |>
     omopgenerics::recordCohortAttrition(reason = "Record start <= record end") |>
     dplyr::left_join(
       cdm$observation_period |>
@@ -384,7 +388,8 @@ fulfillCohortReqs <- function(cdm, name) {
       "cohort_start_date",
       "cohort_end_date"
     ) |>
-    dplyr::compute(temporary = FALSE, name = name) |>
+    dplyr::compute(temporary = FALSE, name = name,
+                   logPrefix = "CohortConstructor_fulfillCohortReqs_inObservation_") |>
     omopgenerics::recordCohortAttrition(reason = "Record in observation")
 }
 
@@ -437,7 +442,8 @@ uploadCohortCodelistToCdm <- function(cdm, cohortCodelist, tableCohortCodelist) 
     dplyr::compute(
       name = tableCohortCodelist,
       temporary = FALSE,
-      overwrite = TRUE
+      overwrite = TRUE,
+      logPrefix = "CohortConstructor_uploadCohortCodelist_"
     )
 
   cdm
@@ -483,7 +489,8 @@ getDomainCohort <- function(cdm,
   if (!is.null(subsetIndividuals)) {
     tempCohort <- tempCohort |>
       dplyr::inner_join(subsetIndividuals,  by = "subject_id") |>
-      dplyr::compute(temporary = FALSE, name = name)
+      dplyr::compute(temporary = FALSE, name = name,
+                     logPrefix = "CohortConstructor_subsetIndividuals_")
   }
   tempCohort <- tempCohort  |>
     dplyr::inner_join(
@@ -492,7 +499,8 @@ getDomainCohort <- function(cdm,
         dplyr::select("concept_id", "cohort_definition_id"),
       by = "concept_id"
     ) |>
-    dplyr::compute(temporary = FALSE, name = name)
+    dplyr::compute(temporary = FALSE, name = name,
+                   logPrefix = "CohortConstructor_tempCohort_")
 }
 
 extendOverlap  <- function(cohort,
@@ -509,7 +517,8 @@ extendOverlap  <- function(cohort,
     cohort <- cohort %>%
       dplyr::mutate(record_id = dplyr::row_number()) |>
       dplyr::compute(temporary = FALSE,
-                     name = workingTblNames[1])
+                     name = workingTblNames[1],
+                     logPrefix = "CohortConstructor_extendOverlap_hasOverlap_")
 
     # keep overlapping records
     cohort_overlap <- cohort %>%
@@ -526,7 +535,8 @@ extendOverlap  <- function(cohort,
                     "record_id") |>
       dplyr::distinct() |>
       dplyr::compute(temporary = FALSE,
-                     name = workingTblNames[2])
+                     name = workingTblNames[2],
+                     logPrefix = "CohortConstructor_extendOverlap_keepOverlap_")
 
     cohort_no_overlap <- cohort |>
       dplyr::anti_join(cohort_overlap |>
@@ -534,7 +544,8 @@ extendOverlap  <- function(cohort,
                        by = "record_id") |>
       dplyr::select(!"record_id")  |>
       dplyr::compute(temporary = FALSE,
-                     name = workingTblNames[3])
+                     name = workingTblNames[3],
+                     logPrefix = "CohortConstructor_extendOverlap_noOverlap_")
 
     cohort_overlap <- cohort_overlap %>%
       dplyr::mutate(days = !!CDMConnector::datediff("cohort_start_date",
@@ -552,7 +563,8 @@ extendOverlap  <- function(cohort,
         ))) |>
       dplyr::select(!"days")  |>
       dplyr::compute(temporary = FALSE,
-                     name = workingTblNames[4])
+                     name = workingTblNames[4],
+                     logPrefix = "CohortConstructor_extendOverlap_update_")
 
     cohort <- dplyr::union_all(cohort_overlap, cohort_no_overlap) |>
       dplyr::compute(name = name, temporary = FALSE)
