@@ -162,7 +162,8 @@ padCohortStart <- function(cohort,
   if (length(cohortId) == 0) {
     cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
     # return entry cohort as cohortId is used to modify not subset
-    cohort <- cohort |> dplyr::compute(name = name, temporary = FALSE)
+    cohort <- cohort |> dplyr::compute(name = name, temporary = FALSE,
+                                       logPrefix = "CohortConstructor_.padCohortDate_empty_")
     return(cohort)
   }
 
@@ -202,7 +203,8 @@ padCohortStart <- function(cohort,
       .data$cohort_start_date <= .data$cohort_end_date &
         !is.na(.data[[cohortDate]])
     ) |>
-    dplyr::compute(name = intermediate, temporary = FALSE)
+    dplyr::compute(name = intermediate, temporary = FALSE,
+                   logPrefix = "CohortConstructor_.padCohortDate_intermediate_")
 
   # solve observation
   subCohort <- subCohort |>
@@ -220,7 +222,8 @@ padCohortStart <- function(cohort,
       "cohort_end_date"
     ) |>
     dplyr::union_all(subCohort) |>
-    dplyr::compute(name = name, temporary = FALSE) |>
+    dplyr::compute(name = name, temporary = FALSE,
+                   logPrefix = "CohortConstructor_.padCohortDate_recreate_") |>
     omopgenerics::newCohortTable(.softValidation = FALSE) |>
     omopgenerics::recordCohortAttrition(cohortId = cohortId, reason = reason)
 
@@ -253,7 +256,8 @@ solveOverlap <- function(x, collapse, intermediate) {
       dplyr::arrange(.data$cohort_start_date) |>
       dplyr::mutate(id = dplyr::row_number()) |>
       dplyr::ungroup() |>
-      dplyr::compute(name = uniqueName, temporary = FALSE)
+      dplyr::compute(name = uniqueName, temporary = FALSE,
+                     logPrefix = "CohortConstructor_solveOverlap_xId_")
     x <- xId |>
       dplyr::left_join(
         xId |>
@@ -269,7 +273,8 @@ solveOverlap <- function(x, collapse, intermediate) {
           .data$prior_end_date < .data$cohort_start_date
       ) |>
       dplyr::select(!"prior_end_date") |>
-      dplyr::compute(name = intermediate, temporary = FALSE)
+      dplyr::compute(name = intermediate, temporary = FALSE,
+                     logPrefix = "CohortConstructor_solveOverlap_final_")
     cdm <- omopgenerics::cdmReference(x)
     omopgenerics::dropTable(cdm = cdm, name = uniqueName)
   }
@@ -316,5 +321,6 @@ solveObservation <- function(x, padObservation, intermediate, cohortDate) {
   }
   x |>
     dplyr::select(!dplyr::all_of(idcol)) |>
-    dplyr::compute(name = intermediate, temporary = FALSE)
+    dplyr::compute(name = intermediate, temporary = FALSE,
+                   logPrefix = "CohortConstructor_solveObservation_")
 }

@@ -41,7 +41,8 @@ requireInDateRange <- function(cohort,
   if (length(cohortId) == 0) {
     cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
     # return entry cohort as cohortId is used to modify not subset
-    cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE)
+    cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE,
+                                            logPrefix = "CohortConstructor_requireInDateRange_entry_")
     return(cdm[[name]])
   }
 
@@ -50,7 +51,8 @@ requireInDateRange <- function(cohort,
     cohort <- cohort |>
       dplyr::filter(.data[[indexDate]] >= !!dateRange[1] |
                       (!.data$cohort_definition_id %in% cohortId)) |>
-      dplyr::compute(name = name, temporary = FALSE) |>
+      dplyr::compute(name = name, temporary = FALSE,
+                     logPrefix = "CohortConstructor_requireInDateRange_dateRange1_") |>
       omopgenerics::recordCohortAttrition(reason = "{indexDate} after {dateRange[1]}",
                                           cohortId = cohortId)
   }
@@ -59,13 +61,15 @@ requireInDateRange <- function(cohort,
     cohort <- cohort |>
       dplyr::filter(.data[[indexDate]] <= !!dateRange[2] |
                       (!.data$cohort_definition_id %in% cohortId)) |>
-      dplyr::compute(name = name, temporary = FALSE) |>
+      dplyr::compute(name = name, temporary = FALSE,
+                     logPrefix = "CohortConstructor_requireInDateRange_dateRange2_") |>
       omopgenerics::recordCohortAttrition(reason = "{indexDate} before {dateRange[2]}",
                                           cohortId = cohortId)
   }
 
   cohort <- cohort |>
-    dplyr::compute(name = name, temporary = FALSE) |>
+    dplyr::compute(name = name, temporary = FALSE,
+                   logPrefix = "CohortConstructor_requireInDateRange_newCohort_") |>
     omopgenerics::newCohortTable(.softValidation = TRUE)
 
   useIndexes <- getOption("CohortConstructor.use_indexes")
@@ -127,7 +131,8 @@ trimToDateRange <- function(cohort,
   if (length(cohortId) == 0) {
     cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
     # return entry cohort as cohortId is used to modify not subset
-    cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE)
+    cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE,
+                                            logPrefix = "CohortConstructor_trimToDateRange_entry_")
     return(cdm[[name]])
   }
 
@@ -140,7 +145,8 @@ trimToDateRange <- function(cohort,
         endDate = endDate,
         minDate = dateRange[1]
       ) |>
-      dplyr::compute(name = name, temporary = FALSE) |>
+      dplyr::compute(name = name, temporary = FALSE,
+                     logPrefix = "CohortConstructor_trimToDateRange_start_") |>
       omopgenerics::recordCohortAttrition(reason = "{startDate} trimmed >= {dateRange[1]}",
                                           cohortId = cohortId)
   }
@@ -154,13 +160,15 @@ trimToDateRange <- function(cohort,
         endDate = endDate,
         maxDate = dateRange[2]
       ) |>
-      dplyr::compute(name = name, temporary = FALSE) |>
+      dplyr::compute(name = name, temporary = FALSE,
+                     logPrefix = "CohortConstructor_trimToDateRange_end_") |>
       omopgenerics::recordCohortAttrition(reason = "{endDate} trimmed <= {dateRange[2]}",
                                           cohortId = cohortId)
   }
 
   cohort <- cohort |>
-    dplyr::compute(name = name, temporary = FALSE) |>
+    dplyr::compute(name = name, temporary = FALSE,
+                   logPrefix = "CohortConstructor_trimToDateRange_newCohort_") |>
     omopgenerics::newCohortTable(.softValidation = FALSE)
 
   useIndexes <- getOption("CohortConstructor.use_indexes")

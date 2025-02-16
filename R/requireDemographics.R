@@ -251,7 +251,8 @@ demographicsFilter <- function(cohort,
   if (length(cohortId) == 0) {
     cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
     # return entry cohort as cohortId is used to modify not subset
-    cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE)
+    cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE,
+                                            logPrefix = "CohortConstructor_demographicsFilter_entry_")
     return(cdm[[name]])
   }
 
@@ -331,7 +332,8 @@ demographicsFilter <- function(cohort,
 
   workingTable <- workingTable |>
     dplyr::select(dplyr::all_of(orderVars)) |>
-    dplyr::compute(name = workingName, temporary = FALSE) |>
+    dplyr::compute(name = workingName, temporary = FALSE,
+                                            logPrefix = "CohortConstructor_demographicsFilter_select_") |>
     omopgenerics::newCohortTable(
       cohortSetRef = newSet,
       cohortAttritionRef = newAtt,
@@ -346,7 +348,8 @@ demographicsFilter <- function(cohort,
     workingTable <- workingTable |>
       dplyr::filter(.data$age >= .data$min_age &
                       .data$age <= .data$max_age) |>
-      dplyr::compute(name = workingName, temporary = FALSE)
+      dplyr::compute(name = workingName, temporary = FALSE,
+                     logPrefix = "CohortConstructor_demographicsFilter_reqAge_")
     # attrition
     uniqueRanges <- unique(newSet$age_range)
     for (ii in seq_along(uniqueRanges)) {
@@ -370,7 +373,8 @@ demographicsFilter <- function(cohort,
     workingTable <- workingTable |>
       dplyr::filter(.data$sex == .data$sex_req |
                       .data$sex_req == "Both") |>
-      dplyr::compute(name = workingName, temporary = FALSE)
+      dplyr::compute(name = workingName, temporary = FALSE,
+                     logPrefix = "CohortConstructor_demographicsFilter_reqSex_")
     # attrition
     uniqueSex <- unique(newSet$sex)
     for (ii in seq_along(uniqueSex)) {
@@ -390,7 +394,8 @@ demographicsFilter <- function(cohort,
   if (reqPriorObservation) {
     workingTable <- workingTable |>
       dplyr::filter(.data$prior_observation >= .data$min_prior_observation) |>
-      dplyr::compute(name = workingName, temporary = FALSE)
+      dplyr::compute(name = workingName, temporary = FALSE,
+                     logPrefix = "CohortConstructor_demographicsFilter_reqPriorObservation_")
     # attrition
     uniquePrior <- unique(newSet$min_prior_observation)
     for (ii in seq_along(uniquePrior)) {
@@ -414,7 +419,8 @@ demographicsFilter <- function(cohort,
   if (reqFutureObservation) {
     workingTable <- workingTable |>
       dplyr::filter(.data$future_observation >= .data$min_future_observation) |>
-      dplyr::compute(name = workingName, temporary = FALSE)
+      dplyr::compute(name = workingName, temporary = FALSE,
+                     logPrefix = "CohortConstructor_demographicsFilter_reqFutureObservation_")
     # attrition
     uniqueFuture <- unique(newSet$min_future_observation)
     for (ii in seq_along(uniqueFuture)) {
@@ -486,7 +492,8 @@ demographicsFilter <- function(cohort,
                         )) |>
     dplyr::select(!"target_cohort_rand01") |>
     dplyr::relocate(dplyr::all_of(omopgenerics::cohortColumns("cohort"))) |>
-    dplyr::compute(name = name, temporary = FALSE) |>
+    dplyr::compute(name = name, temporary = FALSE,
+                   logPrefix = "CohortConstructor_demographicsFilter_relocate_") |>
     omopgenerics::newCohortTable(
       cohortSetRef = newSet,
       cohortAttritionRef = attrition(workingTable),

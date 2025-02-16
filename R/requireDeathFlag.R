@@ -48,7 +48,8 @@ requireDeathFlag <- function(cohort,
   if (length(cohortId) == 0) {
     cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
     # return entry cohort as cohortId is used to modify not subset
-    cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE)
+    cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE,
+                                            logPrefix = "CohortConstructor_requireDeathFlag_entry_")
     return(cdm[[name]])
   }
 
@@ -81,7 +82,8 @@ requireDeathFlag <- function(cohort,
       dplyr::filter(.data$death == 1 |
                       (!.data$cohort_definition_id %in% cohortId)) |>
       dplyr::select(!"death") |>
-      dplyr::compute(name = subsetName, temporary = FALSE)
+      dplyr::compute(name = subsetName, temporary = FALSE,
+                     logPrefix = "CohortConstructor_requireDeathFlag_negateFalse_")
     # attrition reason
     reason <- glue::glue("Death between {window_start} & ",
                          "{window_end} days relative to {indexDate}")
@@ -91,7 +93,8 @@ requireDeathFlag <- function(cohort,
       dplyr::filter(.data$death != 1 |
                       (!.data$cohort_definition_id %in% cohortId)) |>
       dplyr::select(!"death") |>
-      dplyr::compute(name = subsetName, temporary = FALSE)
+      dplyr::compute(name = subsetName, temporary = FALSE,
+                     logPrefix = "CohortConstructor_requireDeathFlag_negateTrue_")
     # attrition reason
     reason <- glue::glue("Alive between {window_start} & ",
                          "{window_end} days relative to {indexDate}")
@@ -103,7 +106,8 @@ requireDeathFlag <- function(cohort,
 
   x <- cohort |>
     dplyr::inner_join(subsetCohort, by = c(cols)) |>
-    dplyr::compute(name = name, temporary = FALSE) |>
+    dplyr::compute(name = name, temporary = FALSE,
+                   logPrefix = "CohortConstructor_requireDeathFlag_join_") |>
     omopgenerics::newCohortTable(.softValidation = TRUE) |>
     omopgenerics::recordCohortAttrition(reason = reason, cohortId = cohortId)
 

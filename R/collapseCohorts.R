@@ -37,16 +37,19 @@ collapseCohorts <- function(cohort,
   tmpNewCohort <- paste0(omopgenerics::uniqueTableName(tablePrefix), "_1")
   if (all(ids %in% cohortId)) {
     newCohort <- cohort |>
-      dplyr::compute(name = tmpNewCohort, temporary = FALSE) |>
+      dplyr::compute(name = tmpNewCohort, temporary = FALSE,
+                     logPrefix = "CohortConstructor_collapseCohorts_newCohort1_") |>
       omopgenerics::newCohortTable(.softValidation = TRUE)
   } else {
     tmpUnchanged <- paste0(omopgenerics::uniqueTableName(tablePrefix), "_2")
     unchangedCohort <- cohort |>
       dplyr::filter(!.data$cohort_definition_id %in% .env$cohortId) |>
-      dplyr::compute(name = tmpUnchanged, temporary = FALSE)
+      dplyr::compute(name = tmpUnchanged, temporary = FALSE,
+                     logPrefix = "CohortConstructor_collapseCohorts_unchangedCohort_")
     newCohort <- cohort |>
       dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>
-      dplyr::compute(name = tmpNewCohort, temporary = FALSE)
+      dplyr::compute(name = tmpNewCohort, temporary = FALSE,
+                     logPrefix = "CohortConstructor_collapseCohorts_newCohort2_")
   }
   if (gap == Inf) {
     newCohort <- newCohort |>
@@ -74,10 +77,12 @@ collapseCohorts <- function(cohort,
   if (!all(ids %in% cohortId)) {
     newCohort <- unchangedCohort |>
       dplyr::union_all(newCohort)|>
-      dplyr::compute(name = name, temporary = FALSE)
+      dplyr::compute(name = name, temporary = FALSE,
+                     logPrefix = "CohortConstructor_collapseCohorts_union_")
   } else {
     newCohort <- newCohort |>
-      dplyr::compute(name = name, temporary = FALSE)
+      dplyr::compute(name = name, temporary = FALSE,
+                     logPrefix = "CohortConstructor_collapseCohorts_all_id_")
   }
   newCohort <- newCohort |>
     omopgenerics::newCohortTable(.softValidation = FALSE) |>

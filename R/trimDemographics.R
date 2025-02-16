@@ -63,7 +63,8 @@ trimDemographics <- function(cohort,
       "cohort_start_date",
       "cohort_end_date"
     ) |>
-    dplyr::compute(name = tmpNewCohort, temporary = FALSE) |>
+    dplyr::compute(name = tmpNewCohort, temporary = FALSE,
+                   logPrefix = "CohortConstructor_trimDemographics_trimmed_") |>
     omopgenerics::newCohortTable(.softValidation = TRUE)
 
   if (!is.null(ageRange) ||
@@ -121,7 +122,8 @@ trimDemographics <- function(cohort,
       relationship = "many-to-many"
     ) |>
     dplyr::relocate(dplyr::all_of(omopgenerics::cohortColumns("cohort"))) |>
-    dplyr::compute(name = tmpNewCohort, temporary = FALSE)
+    dplyr::compute(name = tmpNewCohort, temporary = FALSE,
+                   logPrefix = "CohortConstructor_trimDemographics_initial_")
 
   newCohort <- newCohort |>
     omopgenerics::newCohortTable(
@@ -136,7 +138,8 @@ trimDemographics <- function(cohort,
     newCohort <- newCohort |>
       dplyr::filter(.data$sex == .data$sex_req |
                       .data$sex_req == "Both") |>
-      dplyr::compute(name = tmpNewCohort, temporary = FALSE)
+      dplyr::compute(name = tmpNewCohort, temporary = FALSE,
+                     logPrefix = "CohortConstructor_trimDemographics_sex_")
     # attrition
     uniqueSex <- unique(newSet$sex)
     for (ii in seq_along(uniqueSex)) {
@@ -180,7 +183,8 @@ trimDemographics <- function(cohort,
         )
       ) |>
       dplyr::filter(.data$cohort_start_date <= .data$cohort_end_date) |>
-      dplyr::compute(name = tmpNewCohort, temporary = FALSE)
+      dplyr::compute(name = tmpNewCohort, temporary = FALSE,
+                     logPrefix = "CohortConstructor_trimDemographics_dates_")
     # attrition
     uniqueRanges <- unique(newSet$age_range)
     for (ii in seq_along(uniqueRanges)) {
@@ -218,7 +222,8 @@ trimDemographics <- function(cohort,
         )
       ) |>
       dplyr::filter(.data$cohort_start_date <= .data$cohort_end_date) |>
-      dplyr::compute(name = tmpNewCohort, temporary = FALSE)
+      dplyr::compute(name = tmpNewCohort, temporary = FALSE,
+                     logPrefix = "CohortConstructor_trimDemographics_priorObs_")
     # attrition
     uniquePrior <- unique(newSet$min_prior_observation)
     for (ii in seq_along(uniquePrior)) {
@@ -245,7 +250,8 @@ trimDemographics <- function(cohort,
         !!CDMConnector::datediff("cohort_start_date", "future_observation") >=
           .data$min_future_observation
       ) |>
-      dplyr::compute(name = tmpNewCohort, temporary = FALSE)
+      dplyr::compute(name = tmpNewCohort, temporary = FALSE,
+                     logPrefix = "CohortConstructor_trimDemographics_futureObs_")
     # attrition
     uniqueFuture <- unique(newSet$min_future_observation)
     for (ii in seq_along(uniqueFuture)) {
@@ -322,7 +328,8 @@ trimDemographics <- function(cohort,
                         )), by = unique(c("target_cohort_rand01", "subject_id"))) |>
     dplyr::select(!"target_cohort_rand01") |>
     dplyr::relocate(dplyr::all_of(omopgenerics::cohortColumns("cohort"))) |>
-    dplyr::compute(name = name, temporary = FALSE, overwrite = TRUE) |>
+    dplyr::compute(name = name, temporary = FALSE, overwrite = TRUE,
+                   logPrefix = "CohortConstructor_trimDemographics_original_") |>
     omopgenerics::newCohortTable(
       cohortSetRef = newSet,
       cohortAttritionRef = attrition(newCohort),

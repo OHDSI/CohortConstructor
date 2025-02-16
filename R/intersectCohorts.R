@@ -128,7 +128,8 @@ intersectCohorts <- function(cohort,
     dplyr::inner_join(cdm[[setName]], by = cohortNames) |>
     dplyr::select("cohort_definition_id", "subject_id",
                   "cohort_start_date", "cohort_end_date") |>
-    dplyr::compute(name = tblName, temporary = FALSE)
+    dplyr::compute(name = tblName, temporary = FALSE,
+                   logPrefix = "CohortConstructor_intersectCohorts_out_")
   if (cohortOut |> dplyr::tally() |> dplyr::pull("n") > 0) {
     cohortOut <- cohortOut |>
       PatientProfiles::addObservationPeriodId(name = tblName) |>
@@ -203,7 +204,8 @@ intersectCohorts <- function(cohort,
     cdm <- bind(originalCohorts, cohortOut, name = name)
   } else {
     cohortOut <- cohortOut |>
-      dplyr::compute(name = name, temporary = FALSE)
+      dplyr::compute(name = name, temporary = FALSE,
+                     logPrefix = "CohortConstructor_intersectCohorts_keepOriginalCohorts_")
     cdm[[name]] <- omopgenerics::newCohortTable(
       table = cohortOut,
       cohortSetRef = cohSet,
@@ -276,7 +278,8 @@ splitOverlap <- function(x,
         dplyr::mutate(!!is := as.Date(clock::add_days(.data[[is]], 1L)))
     ) |>
     dplyr::distinct() |>
-    dplyr::compute(temporary = FALSE, name = tmpTable_1)
+    dplyr::compute(temporary = FALSE, name = tmpTable_1,
+                   logPrefix = "CohortConstructor_intersectCohorts_tmpTable_1_")
 
   tmpTable_2 <- paste0(tmp, "_2")
   x_a <-  x_a |>
@@ -285,7 +288,8 @@ splitOverlap <- function(x,
     dplyr::mutate(!!id := dplyr::row_number()) |>
     dbplyr::window_order() |>
     dplyr::ungroup() |>
-    dplyr::compute(temporary = FALSE, name = tmpTable_2)
+    dplyr::compute(temporary = FALSE, name = tmpTable_2,
+                   logPrefix = "CohortConstructor_intersectCohorts_tmpTable_2_")
 
   tmpTable_3 <- paste0(tmp, "_3")
   x_b <- x |>
@@ -301,7 +305,8 @@ splitOverlap <- function(x,
     dplyr::mutate(!!id := dplyr::row_number() - 1) |>
     dbplyr::window_order() |>
     dplyr::ungroup() |>
-    dplyr::compute(temporary = FALSE, name = tmpTable_3)
+    dplyr::compute(temporary = FALSE, name = tmpTable_3,
+                   logPrefix = "CohortConstructor_intersectCohorts_tmpTable_3_")
 
   x <-  x_a |>
     dplyr::inner_join(
@@ -311,7 +316,8 @@ splitOverlap <- function(x,
     dplyr::select(dplyr::all_of(by),
                   !!start := dplyr::all_of(is),
                   !!end := dplyr::all_of(ie)) |>
-    dplyr::compute(temporary = FALSE, name = name)
+    dplyr::compute(temporary = FALSE, name = name,
+                   logPrefix = "CohortConstructor_intersectCohorts_inner_join_")
 }
 
 #' Join overlapping periods in single periods using gap.
@@ -339,7 +345,8 @@ joinOverlap <- function(cohort,
     return(
       cohort |>
         dplyr::select(dplyr::all_of(c(by, startDate, endDate))) |>
-        dplyr::compute(name = name, temporary = FALSE)
+        dplyr::compute(name = name, temporary = FALSE,
+                       logPrefix = "CohortConstructor_joinOverlap_input_")
     )
   }
 
@@ -359,7 +366,8 @@ joinOverlap <- function(cohort,
   workingTbl <- omopgenerics::uniqueTableName()
   x <- start |>
     dplyr::union_all(end) |>
-    dplyr::compute(temporary = FALSE, name = workingTbl)
+    dplyr::compute(temporary = FALSE, name = workingTbl,
+                   logPrefix = "CohortConstructor_joinOverlap_workingTbl_")
 
   x <- x |>
     dplyr::group_by(dplyr::pick(dplyr::all_of(by))) |>
@@ -375,10 +383,12 @@ joinOverlap <- function(cohort,
     dplyr::ungroup() |>
     dplyr::arrange() |>
     dplyr::select(dplyr::all_of(c(by, "era_id", "name", "date"))) |>
-    dplyr::compute(temporary = FALSE, name = name) |>
+    dplyr::compute(temporary = FALSE, name = name,
+                   logPrefix = "CohortConstructor_joinOverlap_ids_") |>
     tidyr::pivot_wider(names_from = "name", values_from = "date") |>
     dplyr::select(-"era_id") |>
-    dplyr::compute(temporary = FALSE, name = name)
+    dplyr::compute(temporary = FALSE, name = name,
+                   logPrefix = "CohortConstructor_joinOverlap_pivot_wider_")
   if (gap > 0) {
     x <- x |>
       dplyr::mutate(!!endDate := as.Date(clock::add_days(x = .data[[endDate]], n = -gap)))
@@ -387,7 +397,8 @@ joinOverlap <- function(cohort,
   x <- x |>
     dplyr::relocate(dplyr::all_of(c(by, startDate, endDate))) |>
     dplyr::distinct() |>
-    dplyr::compute(temporary = FALSE, name = name)
+    dplyr::compute(temporary = FALSE, name = name,
+                   logPrefix = "CohortConstructor_joinOverlap_relocate_")
 
   omopgenerics::dropTable(cdm = cdm, name = workingTbl)
 

@@ -55,7 +55,8 @@ requireCohortIntersect <- function(cohort,
   if (length(cohortId) == 0) {
     cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
     # return entry cohort as cohortId is used to modify not subset
-    cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE)
+    cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE,
+                                            logPrefix = "CohortConstructor_requireCohortIntersect_entry_1_")
     return(cdm[[name]])
   }
 
@@ -65,7 +66,8 @@ requireCohortIntersect <- function(cohort,
       dplyr::pull() == 0) {
     cli::cli_inform("Returning entry cohort as the target cohort to intersect is empty.")
     # return entry cohort as cohortId is used to modify not subset
-    cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE)
+    cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE,
+                                            logPrefix = "CohortConstructor_requireCohortIntersect_entry_2_")
     return(cdm[[name]])
   }
 
@@ -136,7 +138,8 @@ requireCohortIntersect <- function(cohort,
       (!.data$cohort_definition_id %in% .env$cohortId)
     ) |>
     dplyr::select(dplyr::all_of(cols)) |>
-    dplyr::compute(name = subsetName, temporary = FALSE)
+    dplyr::compute(name = subsetName, temporary = FALSE,
+                   logPrefix = "CohortConstructor_requireCohortIntersect_subset_")
 
   # attrition reason
   if (all(intersections == 0)) {
@@ -172,7 +175,8 @@ requireCohortIntersect <- function(cohort,
   # add additional columns
   x <- cohort |>
     dplyr::inner_join(subsetCohort, by = c(cols)) |>
-    dplyr::compute(name = name, temporary = FALSE) |>
+    dplyr::compute(name = name, temporary = FALSE,
+                   logPrefix = "CohortConstructor_requireCohortIntersect_additional_") |>
     omopgenerics::newCohortTable(
       .softValidation = TRUE, cohortCodelistRef = newCodelist
     ) |>

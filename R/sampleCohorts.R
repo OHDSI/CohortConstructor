@@ -35,7 +35,8 @@ sampleCohorts <- function(cohort,
   if (length(cohortId) == 0) {
     cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
     # return entry cohort as cohortId is used to modify not subset
-    cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE)
+    cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE,
+                                            logPrefix = "CohortConstructor_sampleCohorts_entry_")
     useIndexes <- getOption("CohortConstructor.use_indexes")
     if (!isFALSE(useIndexes)) {
       addIndex(
@@ -54,7 +55,8 @@ sampleCohorts <- function(cohort,
           dplyr::pull() <= n)) {
     cli::cli_inform("Returning entry cohort as the size of the cohorts to be sampled is equal or smaller than `n`.")
     # return entry cohort as cohortId is used to modify not subset
-    cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE)
+    cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE,
+                                            logPrefix = "CohortConstructor_sampleCohorts_return_")
     useIndexes <- getOption("CohortConstructor.use_indexes")
     if (!isFALSE(useIndexes)) {
       addIndex(
@@ -79,7 +81,8 @@ sampleCohorts <- function(cohort,
     dplyr::ungroup() |>
     dplyr::relocate(dplyr::all_of(omopgenerics::cohortColumns("cohort")))  |>
     dplyr::compute(name = name,
-                   temporary = FALSE)
+                   temporary = FALSE,
+                   logPrefix = "CohortConstructor_sampleCohorts_sample_")
 
   cdm[[name]] <- cdm[[name]] |>
     omopgenerics::recordCohortAttrition(

@@ -12,10 +12,11 @@
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' library(CohortConstructor)
 #' cdm <- mockCohortConstructor()
 #' cdm$cohort3 <- copyCohorts(cdm$cohort1, n = 2, cohortId = 1, name = "cohort3")
-#'
+#'}
 copyCohorts <- function(cohort, name, n = 1, cohortId = NULL) {
   omopgenerics::validateCohortArgument(cohort)
   cdm <- omopgenerics::cdmReference(cohort)
@@ -28,7 +29,8 @@ copyCohorts <- function(cohort, name, n = 1, cohortId = NULL) {
   if (length(unique(cohorts_to_keep)) ==
       length(settings(cohort) |>  dplyr::pull("cohort_definition_id"))) {
     newCohort <- cohort |>
-      dplyr::compute(name = name, temporary = FALSE, overwrite = TRUE)
+      dplyr::compute(name = name, temporary = FALSE, overwrite = TRUE,
+                     logPrefix = "CohortConstructor_copyCohors_subset_")
   } else {
     newCohort <- cohort |>
       CohortConstructor::subsetCohorts(cohortId = cohorts_to_keep, name = name)
@@ -41,7 +43,8 @@ copyCohorts <- function(cohort, name, n = 1, cohortId = NULL) {
     codes <- copyFromSet(attr(newCohort, "cohort_codelist") |> dplyr::collect(), set)
     newCohort <- copyFromSet(newCohort, set)
     newCohort <- newCohort |>
-      dplyr::compute(name = name, temporary = FALSE) |>
+      dplyr::compute(name = name, temporary = FALSE,
+                     logPrefix = "CohortConstructor_copyCohors_duplicate_") |>
       omopgenerics::newCohortTable(
         cohortSetRef = set,
         cohortAttritionRef = att,

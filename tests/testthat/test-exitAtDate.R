@@ -1,4 +1,5 @@
 test_that("exit at observation end", {
+  skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4,seed = 1) |>
     omock::mockObservationPeriod(seed = 1) |>

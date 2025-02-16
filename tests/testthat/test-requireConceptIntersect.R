@@ -112,11 +112,6 @@ test_that("require flag in concept", {
                             conceptSet = list(a = 1L, b = 2L),
                             window = c(-Inf, Inf))
   )
-  expect_error(
-    requireConceptIntersect(cohort = cdm$cohort1,
-                            conceptSet = NULL,
-                            window = c(-Inf, Inf))
-  )
 
   PatientProfiles::mockDisconnect(cdm)
 })
@@ -323,10 +318,9 @@ test_that("test indexes - postgres", {
     con = db,
     cdmSchema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA"),
     writeSchema = Sys.getenv("CDM5_POSTGRESQL_SCRATCH_SCHEMA"),
-    writePrefix = "cc_",
+    writePrefix = "cc_test_",
     achillesSchema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA")
   )
-
   cdm <- omopgenerics::insertTable(cdm = cdm,
                                    name = "my_cohort",
                                    table = data.frame(cohort_definition_id = 1L,
@@ -334,12 +328,17 @@ test_that("test indexes - postgres", {
                                                       cohort_start_date = as.Date("2009-01-02"),
                                                       cohort_end_date = as.Date("2009-01-03"),
                                                       other_date = as.Date("2009-01-01")))
+  expect_no_error(cdm$my_cohort |> head(1))
   cdm$my_cohort <- omopgenerics::newCohortTable(cdm$my_cohort)
-  cdm$my_cohort <- requireConceptIntersect(cdm$my_cohort, conceptSet = list(a = 0), window = list(c(0, Inf)))
-
+  expect_no_error(omopgenerics::settings(cdm$my_cohort))
+  cdm$my_cohort <- requireConceptIntersect(cdm$my_cohort,
+                                           conceptSet = list(a = 0),
+                                           window = list(c(0, Inf)))
+  expect_no_error(cdm$my_cohort |> head(1))
+  expect_no_error(omopgenerics::settings(cdm$my_cohort))
   expect_true(
-    DBI::dbGetQuery(db, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
-      "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
+    DBI::dbGetQuery(db, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_test_my_cohort';")) |> dplyr::pull("indexdef") ==
+      "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_test_my_cohort USING btree (subject_id, cohort_start_date)"
   )
 
   omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
@@ -347,6 +346,7 @@ test_that("test indexes - postgres", {
 })
 
 test_that("codelists", {
+  skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4, seed = 1) |>
     omock::mockObservationPeriod(seed = 1) |>

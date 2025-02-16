@@ -24,8 +24,9 @@ A new cohort table containing cohorts from the original cohort table.
 \code{copyCohorts()} copies an existing cohort table to a new location.
 }
 \examples{
+\donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
 cdm$cohort3 <- copyCohorts(cdm$cohort1, n = 2, cohortId = 1, name = "cohort3")
-
+}
 }

@@ -112,7 +112,8 @@ exitAtColumnDate <- function(cohort,
   if (length(cohortId) == 0) {
     cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
     # return entry cohort as cohortId is used to modify not subset
-    cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE)
+    cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE,
+                                            logPrefix = "CohortConstructor_exitAtColumnDate_entryCohort_")
     return(cdm[[name]])
   }
 
@@ -160,7 +161,8 @@ exitAtColumnDate <- function(cohort,
         "cohort_start_date_0123456789" = .data$cohort_start_date,
         "cohort_end_date_0123456789" = .data$cohort_end_date
       ) |>
-      dplyr::compute(name = tmpName, temporary = FALSE)
+      dplyr::compute(name = tmpName, temporary = FALSE,
+                     logPrefix = "CohortConstructor_newDate_1_")
   } else {
     newCohort <- cohort |>
       dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>
@@ -168,7 +170,8 @@ exitAtColumnDate <- function(cohort,
         "cohort_start_date_0123456789" = .data$cohort_start_date,
         "cohort_end_date_0123456789" = .data$cohort_end_date
       ) |>
-      dplyr::compute(name = tmpName, temporary = FALSE)
+      dplyr::compute(name = tmpName, temporary = FALSE,
+                     logPrefix = "CohortConstructor_exitAtColumnDate_newDate_2_")
   }
 
   newCohort <- newCohort |>
@@ -198,7 +201,8 @@ exitAtColumnDate <- function(cohort,
       )
     ) |>
     dplyr::distinct() |>
-    dplyr::compute(name = tmpName, temporary = FALSE)
+    dplyr::compute(name = tmpName, temporary = FALSE,
+                   logPrefix = "CohortConstructor_exitAtColumnDate_newDate_1_")
 
   # checks with informative errors
   validateNewCohort(newCohort, cdm, tmpPrefix)
@@ -213,7 +217,8 @@ exitAtColumnDate <- function(cohort,
           dplyr::select(!dplyr::all_of(dateColumns)) |>
           dplyr::mutate(!!reason := !!newDate)
       ) |>
-      dplyr::compute(name = tmpName, temporary = FALSE)
+      dplyr::compute(name = tmpName, temporary = FALSE,
+                     logPrefix = "CohortConstructor_exitAtColumnDate_union_")
   }
 
   if (!returnReason) {
@@ -222,7 +227,8 @@ exitAtColumnDate <- function(cohort,
 
   newCohort <- newCohort |>
     dplyr::relocate(dplyr::all_of(omopgenerics::cohortColumns("cohort"))) |>
-    dplyr::compute(name = name, temporary = FALSE) |>
+    dplyr::compute(name = name, temporary = FALSE,
+                   logPrefix = "CohortConstructor_exitAtColumnDate_relocate_") |>
     omopgenerics::newCohortTable(.softValidation = FALSE)
 
   cdm <- omopgenerics::dropTable(cdm, name = dplyr::starts_with(tmpPrefix))

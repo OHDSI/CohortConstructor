@@ -44,6 +44,7 @@ cdm$medications <- conceptCohort(cdm = cdm,
                                                    "acetaminophen" = 1127433), 
                                  name = "medications")
 cohortCount(cdm$medications)
+settings(cdm$medications)
 ```
 
 We can stratify cohorts based on specified columns using the function `stratifyCohorts()`. In this example, let's stratify the medications cohort by age and sex.
@@ -52,30 +53,9 @@ We can stratify cohorts based on specified columns using the function `stratifyC
 cdm$stratified <- cdm$medications |>
   addAge(ageGroup = list("Child" = c(0,17), "18 to 65" = c(18,64), "65 and Over" = c(65, Inf))) |>
   addSex(name = "stratified") |>
-  stratifyCohorts(strata = list("sex", "age_group", c("sex", "age_group")), name = "stratified")
+  stratifyCohorts(strata = list("sex", "age_group"), name = "stratified")
 
+cohortCount(cdm$stratified)
 settings(cdm$stratified)
 ```
 
-The age and sex columns are added using functions from the package `PatientProfiles`. The 'stratified' table includes 22 cohorts, representing various combinations of sex and age groups.
-
-We can also split cohorts for specified years using the function `yearCohorts()`.
-
-```{r, include=FALSE, warning=FALSE}
-con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomiaDir())
-cdm <- cdmFromCon(con, cdmSchema = "main", 
-                    writeSchema = c(prefix = "my_study_", schema = "main"))
-
-cdm$medications <- conceptCohort(cdm = cdm, 
-                                 conceptSet = list("diclofenac" = 1124300,
-                                                   "acetaminophen" = 1127433), 
-                                 name = "medications")
-```
-
-```{r}
-cdm$years <- cdm$medications |>
-  yearCohorts(years = 2005:2010, name = "years")
-
-settings(cdm$years)
-```
-The 'years' table includes 12 cohorts, with each cohort representing a specific drug and year.

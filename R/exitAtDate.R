@@ -41,18 +41,22 @@ exitAtObservationEnd <- function(cohort,
   if (length(cohortId) == 0) {
     cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
     # return entry cohort as cohortId is used to modify not subset
-    cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE)
+    cdm[[name]] <- cohort |>
+      dplyr::compute(name = name, temporary = FALSE,
+                    logPrefix = "CohortConstructor_exitAtObservationEnd_entry_")
     return(cdm[[name]])
   }
 
   tmpTable <- omopgenerics::uniqueTableName()
   if (all(cohortId %in% settings(cohort)$cohort_definition_id)) {
     newCohort <- cohort |>
-      dplyr::compute(name = tmpTable, temporary = FALSE)
+      dplyr::compute(name = tmpTable, temporary = FALSE,
+                     logPrefix = "CohortConstructor_exitAtObservationEnd_copy_")
   } else {
     newCohort <- cohort |>
       dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>
-      dplyr::compute(name = tmpTable, temporary = FALSE)
+      dplyr::compute(name = tmpTable, temporary = FALSE,
+                     logPrefix = "CohortConstructor_exitAtObservationEnd_filter_")
   }
 
   newCohort <- newCohort |>
@@ -67,14 +71,16 @@ exitAtObservationEnd <- function(cohort,
     ) |>
     # filter to current or future observation periods
     dplyr::filter(.data$observation_period_end_date >= .data$cohort_end_date) |>
-    dplyr::compute(name = tmpTable, temporary = FALSE)
+    dplyr::compute(name = tmpTable, temporary = FALSE,
+                   logPrefix = "CohortConstructor_exitAtObservationEnd_filterFuture_")
 
   if (limitToCurrentPeriod) {
     reason <- "Exit at observation period end date, limited to current observation period"
     newCohort <- newCohort |>
       # filter to current observation period
       dplyr::filter(.data$observation_period_start_date <= .data$cohort_start_date) |>
-      dplyr::compute(name = tmpTable, temporary = FALSE)
+      dplyr::compute(name = tmpTable, temporary = FALSE,
+                     logPrefix = "CohortConstructor_exitAtObservationEnd_limitToCurrentPeriod_")
 
   } else {
     reason <- "Exit at observation period end date"
@@ -88,7 +94,8 @@ exitAtObservationEnd <- function(cohort,
           .data$cohort_start_date
         )
       ) |>
-      dplyr::compute(name = tmpTable, temporary = FALSE)
+      dplyr::compute(name = tmpTable, temporary = FALSE,
+                     logPrefix = "CohortConstructor_exitAtObservationEnd_exit_")
   }
 
   newCohort <- newCohort |>
@@ -107,7 +114,8 @@ exitAtObservationEnd <- function(cohort,
       dplyr::union_all(
         cohort |> dplyr::filter(!.data$cohort_definition_d %in% .env$cohortId)
       ) |>
-      dplyr::compute(name = tmpTable, temporary = FALSE)
+      dplyr::compute(name = tmpTable, temporary = FALSE,
+                     logPrefix = "CohortConstructor_exitAtObservationEnd_union_")
   }
 
   newCohort <- newCohort |>
@@ -168,7 +176,9 @@ exitAtDeath <- function(cohort,
   if (length(cohortId) == 0) {
     cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
     # return entry cohort as cohortId is used to modify not subset
-    cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE)
+    cdm[[name]] <- cohort |>
+      dplyr::compute(name = name, temporary = FALSE,
+                    logPrefix = "CohortConstructor_exitAtDeath_entry_")
     return(cdm[[name]])
   }
 
@@ -189,7 +199,8 @@ exitAtDeath <- function(cohort,
     newCohort <- newCohort |>
       dplyr::filter(!is.na(.data$date_of_death) |
                       !.data$cohort_definition_id %in% .env$cohortId) |>
-      dplyr::compute(name = name, temporary = FALSE) |>
+      dplyr::compute(name = name, temporary = FALSE,
+                     logPrefix = "CohortConstructor_exitAtDeath_requireDeath_") |>
       omopgenerics::recordCohortAttrition(reason = "No death recorded", cohortId = cohortId)
   } else {
     newCohort <- newCohort |>
@@ -201,7 +212,8 @@ exitAtDeath <- function(cohort,
     joinOverlap(name = name) |>
     dplyr::compute(name = name, temporary = FALSE) |>
     omopgenerics::newCohortTable(.softValidation = FALSE) |>
-    omopgenerics::recordCohortAttrition(reason = "Exit at death", cohortId = cohortId)
+    omopgenerics::recordCohortAttrition(reason = "Exit at death",
+                                        cohortId = cohortId)
 
   useIndexes <- getOption("CohortConstructor.use_indexes")
   if (!isFALSE(useIndexes)) {
