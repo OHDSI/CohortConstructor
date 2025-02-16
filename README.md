@@ -93,7 +93,7 @@ hip_fx_codes <- getCandidateCodes(cdm, "hip fracture")
 #> Search completed. Finishing up.
 #> ✔ 1 candidate concept identified
 #> 
-#> Time taken: 0 minutes and 1 seconds
+#> Time taken: 0 minutes and 0 seconds
 forearm_fx_codes <- getCandidateCodes(cdm, "forearm fracture")
 #> Limiting to domains of interest
 #> Getting concepts to include
@@ -101,7 +101,7 @@ forearm_fx_codes <- getCandidateCodes(cdm, "forearm fracture")
 #> Search completed. Finishing up.
 #> ✔ 1 candidate concept identified
 #> 
-#> Time taken: 0 minutes and 1 seconds
+#> Time taken: 0 minutes and 0 seconds
 
 fx_codes <- newCodelist(list("hip_fracture" = hip_fx_codes$concept_id,
                              "forearm_fracture"= forearm_fx_codes$concept_id))

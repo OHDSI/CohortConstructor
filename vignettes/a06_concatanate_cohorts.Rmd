@@ -45,12 +45,11 @@ cdm <- CDMConnector::cdmFromCon(con, cdmSchema = "main",
                     writeSchema = "main", writePrefix = "my_study_")
 ```
 
-Let's start by creating two drug cohorts, one for users of diclofenac and another for users of acetaminophen.
+Let's start by creating a cohort of users of acetaminophen
 
 ```{r}
 cdm$medications <- conceptCohort(cdm = cdm, 
-                                 conceptSet = list("diclofenac" = 1124300,
-                                                   "acetaminophen" = 1127433), 
+                                 conceptSet = list("acetaminophen" = 1127433), 
                                  name = "medications")
 cohortCount(cdm$medications)
 ```
@@ -59,8 +58,8 @@ We can merge cohort records using the `collapseCohorts()` function in the Cohort
 Let's first define a new cohort where records within 1095 days (~ 3 years) of each other will be merged.
 
 ```{r}
-cdm$medications_collapsed <- collapseCohorts(
-  cohort = cdm$medications,
+cdm$medications_collapsed <- cdm$medications |> 
+  collapseCohorts(
   gap = 1095,
   name = "medications_collapsed"
 )
@@ -80,14 +79,6 @@ Now let's look at how the cohorts have been changed.
 
 ```{r}
 summary_attrition <- summariseCohortAttrition(cdm$medications_collapsed)
-plotCohortAttrition(summary_attrition, cohortId = 1)
+tableCohortAttrition(summary_attrition)
 ```
 
-The flow chart above illustrates the changes to cohort 1 (users of acetaminophen) when entries within 3 years of each other are merged. We see that collapsing the cohort has led to 1,390 fewer records.
-
-```{r}
-summary_attrition <- summariseCohortAttrition(cdm$medications_collapsed)
-plotCohortAttrition(summary_attrition, cohortId = 2)
-```
-
-The flow chart above illustrates the changes to cohort 2 (users of diclofenac) when entries within 3 years of each other are merged. Since this cohort only has one record per individual the function collapseCohorts() had no impact on the final number of records.
