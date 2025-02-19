@@ -52,6 +52,11 @@ reference:
 - subtitle: Match cohorts
 - contents:
   - matches("matchCohorts")
+- subtitle: Create cohorts using json cohort definitions from ATLAS
+- contents:
+  - jsonCohort
+  - codeFromJson
+  - codelistFromJson
 - subtitle: Mock data
 - contents:
   - matches("mockCohortConstructor")

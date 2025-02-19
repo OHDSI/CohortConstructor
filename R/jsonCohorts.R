@@ -11,6 +11,8 @@
 jsonCohort <- function(cdm,
                        jsonPath,
                        name) {
+  rlang::check_installed("jsonlite")
+  rlang::check_installed("styler")
   # initial checks
   omopgenerics::assertCharacter(jsonPath, length = 1)
   cdm <- omopgenerics::validateCdmArgument(cdm = cdm)
@@ -47,8 +49,8 @@ jsonCohort <- function(cdm,
 #' @return A `codelist` object.
 #' @export
 #'
-codelistsFromJson <- function(jsonPath,
-                              cdm) {
+codelistFromJson <- function(jsonPath,
+                             cdm) {
 
 }
 
