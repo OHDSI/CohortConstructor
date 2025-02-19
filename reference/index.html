@@ -92,16 +92,16 @@
 
       <dl><dt>
 
+          <code><a href="requireMinCohortCount.html">requireMinCohortCount()</a></code>
+
+        </dt>
+        <dd>Filter cohorts to keep only records for those with a minimum amount of subjects</dd>
+      </dl><dl><dt>
+
           <code><a href="requireInDateRange.html">requireInDateRange()</a></code>
 
         </dt>
         <dd>Require that an index date is within a date range</dd>
-      </dl><dl><dt>
-
-          <code><a href="requireIsEntry.html">requireIsEntry()</a></code>
-
-        </dt>
-        <dd>Restrict cohort to specific entry</dd>
       </dl><dl><dt>
 
           <code><a href="requireIsFirstEntry.html">requireIsFirstEntry()</a></code>
@@ -116,10 +116,10 @@
         <dd>Restrict cohort to last entry per person</dd>
       </dl><dl><dt>
 
-          <code><a href="requireMinCohortCount.html">requireMinCohortCount()</a></code>
+          <code><a href="requireIsEntry.html">requireIsEntry()</a></code>
 
         </dt>
-        <dd>Filter cohorts to keep only records for those with a minimum amount of subjects</dd>
+        <dd>Restrict cohort to specific entry</dd>
       </dl></div><div class="section level2">
 
       <h3 id="impose-singular-demographic-requirements-on-existing-cohorts">Impose singular demographic requirements on existing cohorts<a class="anchor" aria-label="anchor" href="#impose-singular-demographic-requirements-on-existing-cohorts"></a></h3>
@@ -139,10 +139,10 @@
         <dd>Restrict cohort on age</dd>
       </dl><dl><dt>
 
-          <code><a href="requireFutureObservation.html">requireFutureObservation()</a></code>
+          <code><a href="requireSex.html">requireSex()</a></code>
 
         </dt>
-        <dd>Restrict cohort on future observation</dd>
+        <dd>Restrict cohort on sex</dd>
       </dl><dl><dt>
 
           <code><a href="requirePriorObservation.html">requirePriorObservation()</a></code>
@@ -151,10 +151,10 @@
         <dd>Restrict cohort on prior observation</dd>
       </dl><dl><dt>
 
-          <code><a href="requireSex.html">requireSex()</a></code>
+          <code><a href="requireFutureObservation.html">requireFutureObservation()</a></code>
 
         </dt>
-        <dd>Restrict cohort on sex</dd>
+        <dd>Restrict cohort on future observation</dd>
       </dl></div><div class="section level2">
 
       <h3 id="impose-multiple-demographic-requirements-on-existing-cohorts">Impose multiple demographic requirements on existing cohorts<a class="anchor" aria-label="anchor" href="#impose-multiple-demographic-requirements-on-existing-cohorts"></a></h3>
@@ -325,16 +325,16 @@
 
       <dl><dt>
 
-          <code><a href="sampleCohorts.html">sampleCohorts()</a></code>
-
-        </dt>
-        <dd>Sample a cohort table for a given number of individuals.</dd>
-      </dl><dl><dt>
-
           <code><a href="subsetCohorts.html">subsetCohorts()</a></code>
 
         </dt>
         <dd>Generate a cohort table keeping a subset of cohorts.</dd>
+      </dl><dl><dt>
+
+          <code><a href="sampleCohorts.html">sampleCohorts()</a></code>
+
+        </dt>
+        <dd>Sample a cohort table for a given number of individuals.</dd>
       </dl></div><div class="section level2">
 
       <h3 id="copy-cohorts">Copy cohorts<a class="anchor" aria-label="anchor" href="#copy-cohorts"></a></h3>
@@ -365,16 +365,16 @@
 
       <dl><dt>
 
-          <code><a href="stratifyCohorts.html">stratifyCohorts()</a></code>
-
-        </dt>
-        <dd>Create a new cohort table from stratifying an existing one</dd>
-      </dl><dl><dt>
-
           <code><a href="yearCohorts.html">yearCohorts()</a></code>
 
         </dt>
         <dd>Generate a new cohort table restricting cohort entries to certain years</dd>
+      </dl><dl><dt>
+
+          <code><a href="stratifyCohorts.html">stratifyCohorts()</a></code>
+
+        </dt>
+        <dd>Create a new cohort table from stratifying an existing one</dd>
       </dl></div><div class="section level2">
 
       <h3 id="combine-cohorts">Combine cohorts<a class="anchor" aria-label="anchor" href="#combine-cohorts"></a></h3>
@@ -467,6 +467,12 @@
 
 
       <dl><dt>
+
+          <code><a href="renameCohort.html">renameCohort()</a></code>
+
+        </dt>
+        <dd>Utility function to change the name of a cohort.</dd>
+      </dl><dl><dt>
 
           <code><a href="addCohortTableIndex.html">addCohortTableIndex()</a></code>
 
