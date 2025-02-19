@@ -1,4 +1,4 @@
-test_that("test changeCohortName", {
+test_that("test renameCohort", {
   cdm <- omock::mockPerson(nPerson = 10) |>
     omock::mockObservationPeriod() |>
     omock::mockCohort(
@@ -9,7 +9,7 @@ test_that("test changeCohortName", {
   # one cohort
   expect_no_error(
     cdm$cohort <- cdm$cohort |>
-      changeCohortName(cohortId = 1, newCohortName = "my_cohort")
+      renameCohort(cohortId = 1, newCohortName = "my_cohort")
   )
   expect_identical(
     omopgenerics::settings(cdm$cohort),
@@ -22,7 +22,7 @@ test_that("test changeCohortName", {
   # multiple cohorts
   expect_no_error(
     cdm$cohort <- cdm$cohort |>
-      changeCohortName(
+      renameCohort(
         cohortId = c(1, 2),
         newCohortName = c("covid", "tb")
       )
@@ -38,7 +38,7 @@ test_that("test changeCohortName", {
   # multiple cohorts not sorted
   expect_no_error(
     cdm$cohort <- cdm$cohort |>
-      changeCohortName(
+      renameCohort(
         cohortId = c(3, 2),
         newCohortName = c("xx", "st")
       )
@@ -54,13 +54,13 @@ test_that("test changeCohortName", {
   # expect error if present name
   expect_error(
     cdm$cohort <- cdm$cohort |>
-      changeCohortName(cohortId = 1, newCohortName = "xx")
+      renameCohort(cohortId = 1, newCohortName = "xx")
   )
 
   # expect error if different lengths
   expect_error(
     cdm$cohort <- cdm$cohort |>
-      changeCohortName(cohortId = 1, newCohortName = c("name1", "name2"))
+      renameCohort(cohortId = 1, newCohortName = c("name1", "name2"))
   )
 
   CDMConnector::cdmDisconnect(cdm = cdm)

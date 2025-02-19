@@ -75,5 +75,5 @@ reference:
   - benchmarkData
 - subtitle: Utility functions
 - contents:
-  - changeCohortName
+  - renameCohort
   - addCohortTableIndex

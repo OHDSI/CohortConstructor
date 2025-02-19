@@ -18,11 +18,11 @@
 #' settings(cdm$cohort1)
 #'
 #' cdm$cohort1 <- cdm$cohort1 |>
-#'   changeCohortName(cohortId = 1, newCohortName = "new_name")
+#'   renameCohort(cohortId = 1, newCohortName = "new_name")
 #'
 #' settings(cdm$cohort1)
 #' }
-changeCohortName <- function(cohort,
+renameCohort <- function(cohort,
                              cohortId,
                              newCohortName) {
   # check input
