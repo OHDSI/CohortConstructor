@@ -15,43 +15,57 @@ navbar:
 reference:
 - subtitle: Build base cohorts
 - contents:
-  - matches("conceptCohort|demographicsCohort|measurementCohort")
+  - conceptCohort
+  - demographicsCohort
+  - measurementCohort
 - subtitle: Apply cohort table related requirements
 - contents:
-  - matches("requireMinCohortCount|requireInDateRange|requireIsFirstEntry|requireIsLastEntry|requireIsEntry")
+  - requireMinCohortCount
+  - requireInDateRange
+  - requireIsFirstEntry
+  - requireIsLastEntry
+  - requireIsEntry
 - subtitle: Impose singular demographic requirements on existing cohorts
 - contents:
-  - matches("requireAge|requireSex|requirePriorObservation|requireFutureObservation")
+  - requireAge
+  - requireSex
+  - requirePriorObservation
+  - requireFutureObservation
 - subtitle: Impose multiple demographic requirements on existing cohorts
 - contents:
-  - matches("requireDemographics")
+  - requireDemographics
 - subtitle: Impose requirements of presence or absence in other cohorts, concept sets, or table
 - contents:
-  - matches("requireCohortIntersect|requireConceptIntersect|requireTableIntersect")
+  - requireCohortIntersect
+  - requireConceptIntersect
+  - requireTableIntersect
 - subtitle: Impose presence or absence of a death record within a time window
 - contents:
-  - matches("requireDeathFlag")
+  - requireDeathFlag
 - subtitle: Update cohort start and end dates
 - contents:
   - matches("^trim|exit|entry|padCohortDate|padCohortStart|padCohortEnd")
 - subtitle: Concatanate cohort entries
 - contents:
-  - matches("collapseCohorts")
+  - collapseCohorts
 - subtitle: Filter cohorts
 - contents:
-  - matches("subsetCohorts|sampleCohorts")
+  - subsetCohorts
+  - sampleCohorts
 - subtitle: Copy cohorts
 - contents:
-  - matches("copyCohorts")
+  - copyCohorts
 - subtitle: Split cohorts
 - contents:
-  - matches("yearCohorts|stratifyCohorts")
+  - yearCohorts
+  - stratifyCohorts
 - subtitle: Combine cohorts
 - contents:
-  - matches("intersectCohorts|unionCohorts")
+  - intersectCohorts
+  - unionCohorts
 - subtitle: Match cohorts
 - contents:
-  - matches("matchCohorts")
+  - matchCohorts
 - subtitle: Create cohorts using json cohort definitions from ATLAS
 - contents:
   - jsonCohort
@@ -59,10 +73,12 @@ reference:
   - codelistFromJson
 - subtitle: Mock data
 - contents:
-  - matches("mockCohortConstructor")
+  - mockCohortConstructor
 - subtitle: Package benchmark
 - contents:
-  - matches("benchmarkData|benchmarkCohortConstructor")
+  - benchmarkCohortConstructor
+  - benchmarkData
 - subtitle: Utility functions
 - contents:
-  - matches("addCohortTableIndex")
+  - renameCohort
+  - addCohortTableIndex
