@@ -32,6 +32,7 @@ satisfy the specified sex criteria."><meta property="og:image" content="https://
     <li><a class="dropdown-item" href="../articles/a09_combine_cohorts.html">Combining Cohorts</a></li>
     <li><a class="dropdown-item" href="../articles/a10_match_cohorts.html">Generating a matched cohort</a></li>
     <li><a class="dropdown-item" href="../articles/a11_benchmark.html">CohortConstructor benchmarking results</a></li>
+    <li><a class="dropdown-item" href="../articles/a12_behind_the_scenes.html">Behind the scenes</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -101,7 +102,7 @@ sex requirement</p>
 <span class="r-in"><span><span class="va">cdm</span><span class="op">$</span><span class="va">cohort1</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu">requireSex</span><span class="op">(</span>sex <span class="op">=</span> <span class="st">"Female"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Source:   table&lt;main.cohort1&gt; [?? x 4]</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: DuckDB v1.1.3 [unknown@Linux 6.8.0-1021-azure:R 4.4.2/:memory:]</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: DuckDB v1.2.0 [unknown@Linux 6.8.0-1021-azure:R 4.4.2/:memory:]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   cohort_definition_id subject_id cohort_start_date cohort_end_date</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>         </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>                    1          2 1964-09-18        1965-08-30     </span>
