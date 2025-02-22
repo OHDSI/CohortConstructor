@@ -57,6 +57,16 @@ test_that("requireIsFirstEntry, cohortIds & name arguments", {
         "Initial qualifying events", "Initial qualifying events")
   ))
 
+  cdm$new_cohort_2 <- CohortConstructor::requireIsEntry(
+    entryRange = 1,
+    cohort = cdm$cohort,
+    cohortId = 1,
+    name = "new_cohort_2")
+
+  expect_identical(
+  nrow(cdm$new_cohort |> dplyr::collect()),
+  nrow(cdm$new_cohort_2 |> dplyr::collect()))
+
 })
 
 test_that("errors", {
@@ -228,8 +238,8 @@ test_that("test indexes - postgres", {
   cdm <- CDMConnector::cdmFromCon(
     con = db,
     cdmSchema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA"),
-    writeSchema = c(schema =  Sys.getenv("CDM5_POSTGRESQL_SCRATCH_SCHEMA"),
-                     prefix = "cc_"),
+    writeSchema = Sys.getenv("CDM5_POSTGRESQL_SCRATCH_SCHEMA"),
+    writePrefix = "cc_",
     achillesSchema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA")
   )
 
