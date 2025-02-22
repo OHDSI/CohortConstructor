@@ -14,6 +14,14 @@ knitr::opts_chunk$set(
   message = FALSE,
   comment = "#>"
 )
+
+library(CDMConnector)
+if (Sys.getenv("EUNOMIA_DATA_FOLDER") == ""){
+Sys.setenv("EUNOMIA_DATA_FOLDER" = file.path(tempdir(), "eunomia"))}
+if (!dir.exists(Sys.getenv("EUNOMIA_DATA_FOLDER"))){ dir.create(Sys.getenv("EUNOMIA_DATA_FOLDER"))
+downloadEunomiaData()  
+}
+
 ```
 
 In previous vignettes we have seen numerous R functions that can help us to add a cohort of interest to a cdm reference. When our cdm reference is to tables in a database, as is often the code, our R code will have been translated to SQL that is run against tables in the databases (for more details on how this is all implemented see <https://oxford-pharmacoepi.github.io/Tidy-R-programming-with-OMOP/>).
