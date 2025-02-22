@@ -147,7 +147,8 @@ test_that("restrictions applied to single cohort", {
 
   cdm$cohort2 <- cdm$cohort |>
     requireDemographics(sex = "Male", name = "cohort2")
-  expect_identical(dplyr::collect(cdm$cohort)$cohort_start_date, dplyr::collect(cdm$cohort2)$cohort_start_date)
+  expect_identical(dplyr::collect(cdm$cohort)$cohort_start_date |> sort(),
+                   dplyr::collect(cdm$cohort2)$cohort_start_date |> sort())
   expect_true(all(
     c("Initial qualifying events", "Age requirement: 0 to 150", "Sex requirement: Male",
       "Prior observation requirement: 0 days", "Future observation requirement: 0 days") ==
