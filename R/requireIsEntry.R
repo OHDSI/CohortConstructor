@@ -32,8 +32,10 @@ requireIsEntry <- function(cohort,
   if (length(cohortId) == 0) {
     cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
     # return entry cohort as cohortId is used to modify not subset
-    cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE,
-                                            logPrefix = "CohortConstructor_requireIsEntry_entry_")
+    cdm[[name]] <- cohort |>
+      dplyr::compute(name = name,
+                     temporary = FALSE,
+                     logPrefix = "CohortConstructor_requireIsEntry_entry_")
     return(cdm[[name]])
   }
 
@@ -74,12 +76,23 @@ requireIsEntry <- function(cohort,
     dplyr::group_by(.data$subject_id, .data$cohort_definition_id) |>
     dplyr::mutate(entry = dplyr::row_number())
 
+  if(isFALSE(needsIdFilter(cohort = cohort, cohortId = cohortId))){
   if (maxEntry == Inf) {
     cohort <- cohort  |>
       dplyr::filter(.data$entry >= {{minEntry}})
   } else {
     cohort <- cohort |>
       dplyr::filter(.data$entry >= {{minEntry}}, .data$entry <= {{maxEntry}})
+  }} else {
+    if (maxEntry == Inf) {
+      cohort <- cohort  |>
+        dplyr::filter(.data$entry >= {{minEntry}} |
+                      (!.data$cohort_definition_id %in% .env$cohortId))
+    } else {
+      cohort <- cohort |>
+        dplyr::filter(.data$entry >= {{minEntry}}, .data$entry <= {{maxEntry}} |
+                     (!.data$cohort_definition_id %in% .env$cohortId))
+    }
   }
 
   cohort <- cohort |>
@@ -141,17 +154,28 @@ requireIsFirstEntry <- function(cohort,
     return(cdm[[name]])
   }
 
+ if(isFALSE(needsIdFilter(cohort = cohort, cohortId = cohortId))){
+   cohort <- cohort |>
+     dplyr::group_by(.data$subject_id, .data$cohort_definition_id) |>
+     dplyr::filter(
+       .data$cohort_start_date == min(.data$cohort_start_date, na.rm = TRUE)
+     )
+ } else {
+   cohort <- cohort |>
+     dplyr::group_by(.data$subject_id, .data$cohort_definition_id) |>
+     dplyr::filter(
+       .data$cohort_start_date == min(.data$cohort_start_date, na.rm = TRUE) |
+         (!.data$cohort_definition_id %in% .env$cohortId)
+     )
+ }
+
   cohort <- cohort |>
-    dplyr::group_by(.data$subject_id, .data$cohort_definition_id) |>
-    dplyr::filter(
-      .data$cohort_start_date == min(.data$cohort_start_date, na.rm = TRUE) |
-        (!.data$cohort_definition_id %in% .env$cohortId)
-    ) |>
     dplyr::ungroup() |>
     dplyr::compute(name = name, temporary = FALSE,
                    logPrefix = "CohortConstructor_requireIsFirstEntry_min_") |>
     omopgenerics::newCohortTable(.softValidation = TRUE) |>
-    omopgenerics::recordCohortAttrition("Restricted to first entry", cohortId = cohortId)
+    omopgenerics::recordCohortAttrition("Restricted to first entry",
+                                        cohortId = cohortId)
 
   useIndexes <- getOption("CohortConstructor.use_indexes")
   if (!isFALSE(useIndexes)) {
@@ -201,12 +225,22 @@ requireIsLastEntry <- function(cohort,
     return(cdm[[name]])
   }
 
+  if(isFALSE(needsIdFilter(cohort = cohort, cohortId = cohortId))){
   cohort <- cohort |>
     dplyr::group_by(.data$subject_id, .data$cohort_definition_id) |>
     dplyr::filter(
-      .data$cohort_start_date == max(.data$cohort_start_date, na.rm = TRUE) |
-        (!.data$cohort_definition_id %in% .env$cohortId)
-    ) |>
+      .data$cohort_start_date == max(.data$cohort_start_date, na.rm = TRUE)
+    )
+  } else {
+    cohort <- cohort |>
+      dplyr::group_by(.data$subject_id, .data$cohort_definition_id) |>
+      dplyr::filter(
+        .data$cohort_start_date == max(.data$cohort_start_date, na.rm = TRUE) |
+          (!.data$cohort_definition_id %in% .env$cohortId)
+      )
+    }
+
+  cohort <- cohort |>
     dplyr::ungroup() |>
     dplyr::compute(name = name, temporary = FALSE,
                    logPrefix = "CohortConstructor_requireIsLastEntry_max_") |>

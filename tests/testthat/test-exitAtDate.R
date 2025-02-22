@@ -14,13 +14,13 @@ test_that("exit at observation end", {
   expect_true(all(cdm$cohort1 |> dplyr::pull(subject_id) |> sort() ==  c(1, 1, 2, 3)))
 
   # test cohort id and name
-  cdm$cohort <- cdm$cohort |> exitAtObservationEnd(cohortId = 1)
-  expect_true(all(cdm$cohort |> dplyr::pull(cohort_start_date) |> sort() ==
+  cdm$cohort2 <- cdm$cohort |> exitAtObservationEnd(cohortId = 1, name = "cohort2")
+  expect_true(all(cdm$cohort2 |> dplyr::pull(cohort_start_date) |> sort() ==
                     c("1999-05-03", "2001-03-24", "2001-11-28", "2002-01-30", "2002-06-13", "2003-05-17", "2015-02-25")))
-  expect_true(all(cdm$cohort |> dplyr::pull(cohort_end_date) |> sort() ==
+  expect_true(all(cdm$cohort2 |> dplyr::pull(cohort_end_date) |> sort() ==
                     c("2001-11-27", "2002-01-29", "2002-06-12", "2003-06-15", "2005-01-15", "2013-06-29", "2015-10-11")))
-  expect_true(all(cdm$cohort |> dplyr::pull(subject_id) |> sort() ==  c(1, 1, 1, 1, 1, 2, 3)))
-  expect_true(all(attrition(cdm$cohort)$reason == c("Initial qualifying events", "Exit at observation period end date, limited to current observation period", "Initial qualifying events")))
+  expect_true(all(cdm$cohort2 |> dplyr::pull(subject_id) |> sort() ==  c(1, 1, 1, 1, 1, 2, 3)))
+  expect_true(all(attrition(cdm$cohort2)$reason == c("Initial qualifying events", "Exit at observation period end date, limited to current observation period", "Initial qualifying events")))
 
   # additional columns warning
   expect_warning(cdm$cohort <- cdm$cohort |> dplyr::mutate(extra_col = 1) |> exitAtObservationEnd())

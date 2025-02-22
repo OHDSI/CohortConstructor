@@ -48,7 +48,7 @@ exitAtObservationEnd <- function(cohort,
   }
 
   tmpTable <- omopgenerics::uniqueTableName()
-  if (all(cohortId %in% settings(cohort)$cohort_definition_id)) {
+  if(isFALSE(needsIdFilter(cohort = cohort, cohortId = cohortId))){
     newCohort <- cohort |>
       dplyr::compute(name = tmpTable, temporary = FALSE,
                      logPrefix = "CohortConstructor_exitAtObservationEnd_copy_")
@@ -109,10 +109,10 @@ exitAtObservationEnd <- function(cohort,
     # no overlapping periods
     joinOverlap(name = tmpTable)
 
-  if (!all(cohortId %in% settings(cohort)$cohort_definition_id)) {
-    newCohort <- newCohort |>
+if(isTRUE(needsIdFilter(cohort = cohort, cohortId = cohortId))){
+   newCohort <- newCohort |>
       dplyr::union_all(
-        cohort |> dplyr::filter(!.data$cohort_definition_d %in% .env$cohortId)
+        cohort |> dplyr::filter(!.data$cohort_definition_id %in% .env$cohortId)
       ) |>
       dplyr::compute(name = tmpTable, temporary = FALSE,
                      logPrefix = "CohortConstructor_exitAtObservationEnd_union_")

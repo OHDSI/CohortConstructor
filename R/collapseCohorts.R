@@ -35,7 +35,7 @@ collapseCohorts <- function(cohort,
   # temp tables
   tablePrefix <- omopgenerics::tmpPrefix()
   tmpNewCohort <- paste0(omopgenerics::uniqueTableName(tablePrefix), "_1")
-  if (all(ids %in% cohortId)) {
+  if (isFALSE(needsIdFilter(cohort = cohort, cohortId = cohortId))){
     newCohort <- cohort |>
       dplyr::compute(name = tmpNewCohort, temporary = FALSE,
                      logPrefix = "CohortConstructor_collapseCohorts_newCohort1_") |>
