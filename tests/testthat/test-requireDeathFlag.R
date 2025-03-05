@@ -71,6 +71,7 @@ test_that("requiring death", {
                       "Initial qualifying events",
                       "Death between 0 & Inf days relative to cohort_start_date")))
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
 
@@ -116,6 +117,7 @@ test_that("not death", {
                     c("Initial qualifying events", "Alive between 0 & Inf days relative to cohort_start_date",
                       "Initial qualifying events")))
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
 
@@ -151,6 +153,7 @@ test_that("test indexes - postgres", {
       "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
   )
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
   CDMConnector::cdmDisconnect(cdm = cdm)
 })

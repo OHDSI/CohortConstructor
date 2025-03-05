@@ -72,6 +72,7 @@ test_that("matchCohorts runs without errors", {
   # expect warnings
   cdm <- mockCohortConstructor(nPerson = 1000)
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
 
@@ -117,6 +118,7 @@ test_that("matchCohorts, no duplicated people within a cohort", {
 
   expect_true(anyDuplicated(p1) == 0L)
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
 
@@ -177,6 +179,7 @@ test_that("check that we obtain expected result when ratio is 1", {
                              is.na(person_id.y)
                            ))))
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
 
@@ -277,6 +280,7 @@ test_that("test exactMatchingCohort with a ratio bigger than 1", {
     dplyr::pull() %in% as.Date(c("2017-10-30","2003-01-04","2014-12-15","2010-09-09"))
   expect_true(unique(outc) == TRUE)
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
 
@@ -306,6 +310,8 @@ test_that("keepOriginalCohorts works" , {
       match_year_of_birth = c(NA, NA, rep(TRUE, 4)),
       match_status = c(NA, NA, "target", "target", "control", "control")
     ))
+
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
 
@@ -342,6 +348,7 @@ test_that("test indexes - postgres", {
       "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
   )
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
   CDMConnector::cdmDisconnect(cdm = cdm)
 })

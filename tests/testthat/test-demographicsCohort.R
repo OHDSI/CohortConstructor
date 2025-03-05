@@ -35,6 +35,7 @@ test_that("input validation", {
       demographicsCohort(name = "cohort3", minPriorObservation = "15")
   )
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
 
@@ -71,6 +72,7 @@ test_that("Example: sex", {
   expect_true(all(cdm$cohort3 |> dplyr::pull("check1")== TRUE))
   expect_true(all(cdm$cohort3 |> dplyr::pull("check2")== TRUE))
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
 
@@ -101,6 +103,7 @@ test_that("Example: ageRange", {
   expect_true(all(cdm$cohort3 |> dplyr::pull("check1")== TRUE))
   expect_true(all(cdm$cohort3 |> dplyr::pull("check2")== TRUE))
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
 
@@ -137,6 +140,7 @@ test_that("Example: priorObs", {
 
   expect_true(all(loc_cohort3 |> dplyr::pull("check3")== TRUE))
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
 
@@ -207,6 +211,7 @@ test_that("Example: mixture of parameters", {
 
   expect_true(all(cdm$cohort3 |> dplyr::pull("sex")== "Male"))
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
   PatientProfiles::mockDisconnect(cdm)
 })
@@ -236,6 +241,7 @@ test_that("test indexes - postgres", {
       "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
   )
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
   CDMConnector::cdmDisconnect(cdm = cdm)
 })

@@ -103,6 +103,7 @@ test_that("testing requireMinCohortCount", {
                                                     name = "cohort2"
   ))
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
 
@@ -138,6 +139,7 @@ test_that("test indexes - postgres", {
       "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
   )
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
   CDMConnector::cdmDisconnect(cdm = cdm)
 })

@@ -42,6 +42,9 @@ unionCohorts <- function(cohort,
   omopgenerics::assertCharacter(cohortName, length = 1, null = TRUE)
   omopgenerics::assertLogical(keepOriginalCohorts, length = 1)
 
+  if (is.infinite(gap)) {
+    gap <- 999999999
+  }
   if (length(cohortId) < 2) {
     cli::cli_abort("Settings of cohort table must contain at least two cohorts.")
   }
@@ -90,7 +93,7 @@ unionCohorts <- function(cohort,
     cdm <- bind(cohort, cdm[[name]], name = name)
   }
 
-  CDMConnector::dropTable(cdm, name = tmpTable)
+  CDMConnector::dropTable(cdm, name = dplyr::starts_with(tmpTable))
 
   useIndexes <- getOption("CohortConstructor.use_indexes")
   if (!isFALSE(useIndexes)) {

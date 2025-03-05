@@ -94,6 +94,7 @@ test_that("requireDateRange", {
       requireInDateRange(dateRange = as.Date(c("2011-01-01", "2010-01-01")))
   )
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
 
@@ -152,6 +153,7 @@ test_that("trim cohort dates", {
                     name = "cohort6")
   expect_identical(cdm$cohort6 |> dplyr::collect(), cdm$cohort2 |> dplyr::collect())
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
 
@@ -193,6 +195,8 @@ test_that("test indexes - postgres", {
       "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
   )
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
   CDMConnector::cdmDisconnect(cdm = cdm)
 })
+

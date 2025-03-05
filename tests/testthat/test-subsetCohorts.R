@@ -40,6 +40,7 @@ test_that("subsetCohort works", {
   ))
   expect_identical(attrition(cohort) |> dplyr::filter(.data$cohort_definition_id %in% 3:5), attrition(cdm$cohort1))
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
 
@@ -87,6 +88,7 @@ test_that("codelist works", {
   cdm$cohort1 <- subsetCohorts(cdm$cohort1, 2)
   expect_identical(attr(cdm$cohort1, "cohort_codelist") |> dplyr::collect(), attr(cohort, "cohort_codelist") |> dplyr::filter(cohort_definition_id == 2) |> dplyr::collect())
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
 
@@ -106,6 +108,7 @@ test_that("Expected behaviour", {
   expect_no_error(cohort <- subsetCohorts(cdm$cohort1, NULL))
   expect_identical(cohort, cdm$cohort1)
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
 
@@ -141,6 +144,7 @@ test_that("test indexes - postgres", {
       "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
   )
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
   CDMConnector::cdmDisconnect(cdm = cdm)
 })

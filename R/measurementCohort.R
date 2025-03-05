@@ -184,6 +184,7 @@ measurementCohort <- function(cdm,
         cohortAttritionRef = cohortAttrition,
         cohortCodelistRef = cohortCodelist
       )
+    omopgenerics::dropTable(cdm = cdm, name = tmpCodelist)
     return(cdm[[name]])
   }
 
