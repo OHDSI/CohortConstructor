@@ -1,7 +1,8 @@
 #' Copy a cohort table
 #'
 #' @description
-#' `copyCohorts()` copies an existing cohort table to a new location.
+#' `copyCohorts()` copies an existing cohort table to a new location and
+#' multiplies the cohorts in the table.
 #'
 #' @inheritParams cohortDoc
 #' @inheritParams nameDoc

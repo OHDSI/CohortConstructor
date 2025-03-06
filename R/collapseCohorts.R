@@ -74,7 +74,7 @@ collapseCohorts <- function(cohort,
       ) |>
       dplyr::select(!"observation_period_id")
   }
-  if (!all(ids %in% cohortId)) {
+  if (isTRUE(needsIdFilter(cohort = cohort, cohortId = cohortId))) {
     newCohort <- unchangedCohort |>
       dplyr::union_all(newCohort)|>
       dplyr::compute(name = name, temporary = FALSE,

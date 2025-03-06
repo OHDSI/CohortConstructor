@@ -2,9 +2,8 @@
 #' Utility function to change the name of a cohort.
 #'
 #' @inheritParams cohortDoc
-#' @param cohortId Vector identifying which cohorts to include
-#' (cohort_definition_id or cohort_name).
-#' @param newCohortName Character vector with same
+#' @inheritParams cohortIdModifyDoc
+#' @param newCohortName Character vector with the new cohort names.
 #'
 #' @return A cohort_table object.
 #' @export
@@ -23,8 +22,8 @@
 #' settings(cdm$cohort1)
 #' }
 renameCohort <- function(cohort,
-                             cohortId,
-                             newCohortName) {
+                         cohortId,
+                         newCohortName) {
   # check input
   cohort <- omopgenerics::validateCohortArgument(cohort = cohort)
   cohortId <- omopgenerics::validateCohortIdArgument(

@@ -113,8 +113,28 @@ requireCohortIntersect <- function(cohort,
     dplyr::filter(.data$cohort_definition_id == .env$targetCohortId) |>
     dplyr::pull("cohort_name")
 
-  subsetName <- omopgenerics::uniqueTableName()
-  subsetCohort <- cohort |>
+  tablePrefix <- omopgenerics::tmpPrefix()
+  tmpNewCohort <- omopgenerics::uniqueTableName(tablePrefix)
+  if (isFALSE(needsIdFilter(cohort = cohort, cohortId = cohortId))){
+    newCohort <- cohort |>
+      dplyr::compute(
+        name = tmpNewCohort, temporary = FALSE,
+        logPrefix = "CohortConstructor_requireCohortIntersect_newCohort1_"
+      ) |>
+      omopgenerics::newCohortTable(.softValidation = TRUE)
+  } else {
+    tmpUnchanged <- paste0(omopgenerics::uniqueTableName(tablePrefix), "_2")
+    unchangedCohort <- cohort |>
+      dplyr::filter(!.data$cohort_definition_id %in% .env$cohortId) |>
+      dplyr::compute(name = tmpUnchanged, temporary = FALSE,
+                     logPrefix = "CohortConstructor_requireCohortIntersect_unchangedCohort_")
+    newCohort <- cohort |>
+      dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>
+      dplyr::compute(name = tmpNewCohort, temporary = FALSE,
+                     logPrefix = "CohortConstructor_requireCohortIntersect_newCohort2_")
+  }
+
+  newCohort <- newCohort |>
     dplyr::select(dplyr::all_of(.env$cols)) |>
     PatientProfiles::addCohortIntersectCount(
       targetCohortTable = targetCohortTable,
@@ -125,20 +145,16 @@ requireCohortIntersect <- function(cohort,
       window = window,
       censorDate = censorDate,
       nameStyle = "intersect_cohort",
-      name = subsetName
+      name = tmpNewCohort
     )
 
-  subsetCohort <- subsetCohort |>
-    dplyr::mutate(lower_limit = .env$lower_limit,
-                  upper_limit = .env$upper_limit) |>
-    dplyr::filter((
-      .data$intersect_cohort >= .data$lower_limit &
-        .data$intersect_cohort <= .data$upper_limit
-    ) |
-      (!.data$cohort_definition_id %in% .env$cohortId)
+  newCohort <- newCohort |>
+    dplyr::filter(
+      .data$intersect_cohort >= .env$lower_limit &
+        .data$intersect_cohort <= .env$upper_limit
     ) |>
     dplyr::select(dplyr::all_of(cols)) |>
-    dplyr::compute(name = subsetName, temporary = FALSE,
+    dplyr::compute(name = tmpNewCohort, temporary = FALSE,
                    logPrefix = "CohortConstructor_requireCohortIntersect_subset_")
 
   # attrition reason
@@ -168,13 +184,17 @@ requireCohortIntersect <- function(cohort,
   targetCodelist <- attr(cdm[[targetCohortTable]], "cohort_codelist") |>
     dplyr::filter(.data$cohort_definition_id %in% .env$targetCohortId) |>
     dplyr::collect()
-  newCodelist <- getIntersectionCodelist(
-    cohort, cohortId, targetCodelist
-  )
+  newCodelist <- getIntersectionCodelist(cohort, cohortId, targetCodelist)
+
+  # add non modified
+  if (!isFALSE(needsIdFilter(cohort = cohort, cohortId = cohortId))) {
+    newCohort <- newCohort |>
+      dplyr::union_all(unchangedCohort)
+  }
 
   # add additional columns
   x <- cohort |>
-    dplyr::inner_join(subsetCohort, by = c(cols)) |>
+    dplyr::inner_join(newCohort, by = c(cols)) |>
     dplyr::compute(name = name, temporary = FALSE,
                    logPrefix = "CohortConstructor_requireCohortIntersect_additional_") |>
     omopgenerics::newCohortTable(
@@ -182,7 +202,7 @@ requireCohortIntersect <- function(cohort,
     ) |>
     omopgenerics::recordCohortAttrition(reason = reason, cohortId = cohortId)
 
-  omopgenerics::dropTable(cdm = cdm, name = subsetName)
+  omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with(tablePrefix))
 
   useIndexes <- getOption("CohortConstructor.use_indexes")
   if (!isFALSE(useIndexes)) {

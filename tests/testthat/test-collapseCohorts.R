@@ -9,32 +9,32 @@ test_that("simple example", {
     "period_type_concept_id" = 1L
   )
   cdm <- omopgenerics::insertTable(cdm, name = "cohort",
-    table = dplyr::tibble(
-      "cohort_definition_id" = 1L,
-      "subject_id" = c(1L, 1L, 2L, 3L),
-      "cohort_start_date" = as.Date(c("2020-01-01",
-                                      "2020-01-12",
-                                      "2021-01-01",
-                                      "2022-01-01")),
-      "cohort_end_date" = as.Date(c("2020-01-10",
-                                    "2020-01-15",
-                                    "2021-01-01",
-                                    "2022-01-01"))
-    )
+                                   table = dplyr::tibble(
+                                     "cohort_definition_id" = 1L,
+                                     "subject_id" = c(1L, 1L, 2L, 3L),
+                                     "cohort_start_date" = as.Date(c("2020-01-01",
+                                                                     "2020-01-12",
+                                                                     "2021-01-01",
+                                                                     "2022-01-01")),
+                                     "cohort_end_date" = as.Date(c("2020-01-10",
+                                                                   "2020-01-15",
+                                                                   "2021-01-01",
+                                                                   "2022-01-01"))
+                                   )
   )
   cdm <- omopgenerics::insertTable(cdm, name = "cohort",
-    table = dplyr::tibble(
-      "cohort_definition_id" = 1L,
-      "subject_id" = c(1L, 1L, 2L, 3L),
-      "cohort_start_date" = as.Date(c("2020-01-01",
-                                      "2020-01-12",
-                                      "2021-01-01",
-                                      "2022-01-01")),
-      "cohort_end_date" = as.Date(c("2020-01-10",
-                                    "2020-01-15",
-                                    "2021-01-01",
-                                    "2022-01-01"))
-    )
+                                   table = dplyr::tibble(
+                                     "cohort_definition_id" = 1L,
+                                     "subject_id" = c(1L, 1L, 2L, 3L),
+                                     "cohort_start_date" = as.Date(c("2020-01-01",
+                                                                     "2020-01-12",
+                                                                     "2021-01-01",
+                                                                     "2022-01-01")),
+                                     "cohort_end_date" = as.Date(c("2020-01-10",
+                                                                   "2020-01-15",
+                                                                   "2021-01-01",
+                                                                   "2022-01-01"))
+                                   )
   )
   cdm <- cdm |> copyCdm()
   cdm$cohort <- omopgenerics::newCohortTable(cdm$cohort)
@@ -43,6 +43,23 @@ test_that("simple example", {
                                     name = "new_cohort"))
   expect_identical(settings(sameCohort), settings(cdm$cohort))
   expect_identical(cohortCount(sameCohort), cohortCount(cdm$cohort))
+
+  # test cohort Id works
+  cdm$cohort1 <- cdm$cohort |>
+    dplyr::compute(name = "cohort1", temporary = FALSE) |>
+    omopgenerics::newCohortTable(settings(cdm$cohort) |> dplyr::mutate(cohort_name = "cohort2"))
+  cdm <- omopgenerics::bind(cdm$cohort, cdm$cohort1, name = "cohort1")
+  cdm$cohort2 <- cdm$cohort1 |>
+    collapseCohorts(gap = 100000, name = "cohort2", cohortId = 2)
+  expect_equal(
+    collectCohort(cdm$cohort2, 2),
+    dplyr::tibble(
+      subject_id = 1:3L,
+      cohort_start_date = as.Date(c("2020-01-01", "2021-01-01", "2022-01-01")),
+      cohort_end_date = as.Date(c("2020-01-15", "2021-01-01", "2022-01-01"))
+    )
+  )
+  expect_equal(collectCohort(cdm$cohort2, 1), collectCohort(cdm$cohort1, 1))
 
   # test character id works
   cohort_name <- settings(cdm$cohort) |> dplyr::pull("cohort_name")
@@ -133,9 +150,9 @@ test_that("infitine", {
     "cohort_definition_id" = c(1L, 1L, 1L, 2L),
     "subject_id" = c(1L, 2L, 3L, 3L),
     "cohort_start_date" = as.Date(c("2020-01-01", "2020-01-01",
-                                  "2020-01-01", "2021-01-01")),
+                                    "2020-01-01", "2021-01-01")),
     "cohort_end_date" = as.Date(c("2022-01-01", "2022-01-01",
-                                "2022-01-01", "2023-01-01"))
+                                  "2022-01-01", "2023-01-01"))
   )
 
   cdm <- cdm |> copyCdm()
@@ -143,14 +160,14 @@ test_that("infitine", {
   # for each person and each cohort id we should go from
   # first cohort start to last cohort entry
   cdm$cohort_collapsed <- cdm$cohort |>
-                  collapseCohorts(gap = Inf,
-                                  name = "cohort_collapsed")
+    collapseCohorts(gap = Inf,
+                    name = "cohort_collapsed")
   expect_true(nrow(cdm$cohort_collapsed |>
-    dplyr::collect()) == 4)
+                     dplyr::collect()) == 4)
   expect_true(all(cdm$cohort_collapsed |>
-                     dplyr::filter(cohort_definition_id == 1) |>
-                     dplyr::pull("cohort_start_date") ==
-                as.Date("2020-01-01")))
+                    dplyr::filter(cohort_definition_id == 1) |>
+                    dplyr::pull("cohort_start_date") ==
+                    as.Date("2020-01-01")))
   expect_true(all(cdm$cohort_collapsed |>
                     dplyr::filter(cohort_definition_id == 2) |>
                     dplyr::pull("cohort_start_date") ==
@@ -169,7 +186,7 @@ test_that("infitine", {
 })
 
 test_that("multiple observation periods", {
-# collapse should respect observation end dates
+  # collapse should respect observation end dates
   skip_on_cran()
 
   cdm <- omock::mockCdmReference() |>
@@ -212,14 +229,14 @@ test_that("multiple observation periods", {
   cdm <- cdm |> copyCdm()
 
   expect_no_error(cdm$cohort_1 <- conceptCohort(cdm = cdm,
-                                          conceptSet = list(a = 1L),
-                                          name = "cohort_1"))
+                                                conceptSet = list(a = 1L),
+                                                name = "cohort_1"))
 
   # should not have been combined as they are in different observation periods
   expect_no_error(cdm$cohort_1  <- cdm$cohort_1  |>
                     collapseCohorts(gap = 500, name = "cohort_1"))
   expect_true(nrow(cdm$cohort_1 |>
-         dplyr::collect()) == 2)
+                     dplyr::collect()) == 2)
 
   expect_no_error(cdm$cohort_1 <- conceptCohort(cdm = cdm,
                                                 conceptSet = list(a = 1L),

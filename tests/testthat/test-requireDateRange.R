@@ -123,7 +123,7 @@ test_that("trim cohort dates", {
     trimToDateRange(dateRange = as.Date(c("2001-01-01", "2005-01-01")),
                     cohortId = "cohort_1",
                     name = "cohort3")
-  expect_true(omopgenerics::cohortCount(cdm$cohort3)$number_records[1] == 2)
+  expect_true(omopgenerics::cohortCount(cdm$cohort3)$number_records[omopgenerics::cohortCount(cdm$cohort3)$cohort_definition_id == 1] == 2)
   expect_identical(sort(cdm$cohort3 |>
                       dplyr::pull("subject_id")), as.integer(c(1, 1, 1, 2, 2, 3)))
   expect_identical(omopgenerics::attrition(cdm$cohort3)$reason[

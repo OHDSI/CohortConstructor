@@ -41,26 +41,35 @@ requireInDateRange <- function(cohort,
   if (length(cohortId) == 0) {
     cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
     # return entry cohort as cohortId is used to modify not subset
-    cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE,
-                                            logPrefix = "CohortConstructor_requireInDateRange_entry_")
+    cdm[[name]] <- cohort |>
+      dplyr::compute(
+        name = name, temporary = FALSE,
+        logPrefix = "CohortConstructor_requireInDateRange_entry_"
+      )
     return(cdm[[name]])
   }
+
+  filterDR1 <- ".data[[indexDate]] >= as.Date('{dateRange[1]}')"
+  filterDR2 <- ".data[[indexDate]] <= as.Date('{dateRange[2]}')"
+  if (isTRUE(needsIdFilter(cohort = cohort, cohortId = cohortId))) {
+    filterDR1 <- paste0(filterDR1, " | (!.data$cohort_definition_id %in% cohortId)")
+    filterDR2 <- paste0(filterDR2, " | (!.data$cohort_definition_id %in% cohortId)")
+  }
+  filterDR1 <- rlang::parse_exprs(glue::glue(filterDR1))
+  filterDR2 <- rlang::parse_exprs(glue::glue(filterDR2))
 
   # requirement
   if (!is.na(dateRange[1])) {
     cohort <- cohort |>
-      dplyr::filter(.data[[indexDate]] >= !!dateRange[1] |
-                      (!.data$cohort_definition_id %in% cohortId)) |>
+      dplyr::filter(!!!filterDR1) |>
       dplyr::compute(name = name, temporary = FALSE,
                      logPrefix = "CohortConstructor_requireInDateRange_dateRange1_") |>
       omopgenerics::recordCohortAttrition(reason = "{indexDate} after {dateRange[1]}",
                                           cohortId = cohortId)
   }
-
   if (!is.na(dateRange[2])) {
     cohort <- cohort |>
-      dplyr::filter(.data[[indexDate]] <= !!dateRange[2] |
-                      (!.data$cohort_definition_id %in% cohortId)) |>
+      dplyr::filter(!!!filterDR2) |>
       dplyr::compute(name = name, temporary = FALSE,
                      logPrefix = "CohortConstructor_requireInDateRange_dateRange2_") |>
       omopgenerics::recordCohortAttrition(reason = "{indexDate} before {dateRange[2]}",
@@ -136,68 +145,92 @@ trimToDateRange <- function(cohort,
     return(cdm[[name]])
   }
 
+  # temp tables
+  tablePrefix <- omopgenerics::tmpPrefix()
+  tmpNewCohort <- omopgenerics::uniqueTableName(tablePrefix)
+  if (isFALSE(needsIdFilter(cohort = cohort, cohortId = cohortId))){
+    newCohort <- cohort |>
+      dplyr::compute(name = tmpNewCohort, temporary = FALSE,
+                     logPrefix = "CohortConstructor_requireDateRange_newCohort1_") |>
+      omopgenerics::newCohortTable(.softValidation = TRUE)
+  } else {
+    tmpUnchanged <- omopgenerics::uniqueTableName(tablePrefix)
+    ids <- settings(cohort)$cohort_definition_id
+    idskeep <- ids[!ids %in% cohortId]
+    unchangedCohort <- subsetCohorts(cohort, idskeep, name = tmpUnchanged)
+    newCohort <- subsetCohorts(cohort, cohortId, name = tmpNewCohort)
+  }
+
   # trim start
   if (!is.na(dateRange[1])) {
-    cohort <- cohort |>
+    newCohort <- newCohort |>
       trimStartDate(
-        requirementIds = cohortId,
         startDate = startDate,
         endDate = endDate,
         minDate = dateRange[1]
       ) |>
-      dplyr::compute(name = name, temporary = FALSE,
-                     logPrefix = "CohortConstructor_trimToDateRange_start_") |>
-      omopgenerics::recordCohortAttrition(reason = "{startDate} trimmed >= {dateRange[1]}",
-                                          cohortId = cohortId)
+      dplyr::compute(
+        name = tmpNewCohort, temporary = FALSE,
+        logPrefix = "CohortConstructor_trimToDateRange_start_"
+      ) |>
+      omopgenerics::recordCohortAttrition(
+        reason = "{startDate} trimmed >= {dateRange[1]}"
+      )
   }
 
   # trim end
   if (!is.na(dateRange[2])) {
-    cohort <- cohort |>
+    newCohort <- newCohort |>
       trimEndDate(
-        requirementIds = cohortId,
         startDate = startDate,
         endDate = endDate,
         maxDate = dateRange[2]
       ) |>
-      dplyr::compute(name = name, temporary = FALSE,
-                     logPrefix = "CohortConstructor_trimToDateRange_end_") |>
-      omopgenerics::recordCohortAttrition(reason = "{endDate} trimmed <= {dateRange[2]}",
-                                          cohortId = cohortId)
+      dplyr::compute(
+        name = tmpNewCohort, temporary = FALSE,
+        logPrefix = "CohortConstructor_trimToDateRange_end_"
+      ) |>
+      omopgenerics::recordCohortAttrition(
+        reason = "{endDate} trimmed <= {dateRange[2]}"
+      )
   }
 
-  cohort <- cohort |>
+  if (isTRUE(needsIdFilter(cohort = cohort, cohortId = cohortId))) {
+    cdm <- omopgenerics::bind(newCohort, unchangedCohort, name = name)
+    newCohort <- cdm[[name]]
+  }
+
+  newCohort <- newCohort |>
     dplyr::compute(name = name, temporary = FALSE,
                    logPrefix = "CohortConstructor_trimToDateRange_newCohort_") |>
     omopgenerics::newCohortTable(.softValidation = FALSE)
 
+  omopgenerics::dropSourceTable(cdm = cdm, dplyr::starts_with(tablePrefix))
+
   useIndexes <- getOption("CohortConstructor.use_indexes")
   if (!isFALSE(useIndexes)) {
     addIndex(
-      cohort = cohort,
+      cohort = newCohort,
       cols = c("subject_id", "cohort_start_date")
     )
   }
 
-  return(cohort)
+  return(newCohort)
 }
 
 trimStartDate <- function(cohort,
                           startDate,
                           endDate,
-                          minDate,
-                          requirementIds) {
+                          minDate) {
   cohort <- cohort |>
     dplyr::mutate(
       !!startDate := dplyr::if_else(
-        .data[[startDate]] <= !!minDate &
-          .data$cohort_definition_id %in% .env$requirementIds,
+        .data[[startDate]] <= !!minDate,
         as.Date(minDate),
         .data[[startDate]]
       )
     ) |>
-    dplyr::filter(.data[[startDate]] <= .data[[endDate]] |
-                    (!.data$cohort_definition_id %in% .env$requirementIds))
+    dplyr::filter(.data[[startDate]] <= .data[[endDate]])
   return(cohort)
 }
 
@@ -208,12 +241,10 @@ trimEndDate <- function(cohort,
                         requirementIds) {
   cohort <- cohort |>
     dplyr::mutate(!!endDate := dplyr::if_else(
-      .data[[endDate]] >= !!maxDate &
-        (.data$cohort_definition_id %in% .env$requirementIds),
+      .data[[endDate]] >= !!maxDate,
       as.Date(maxDate),
       .data[[endDate]]
     )) |>
-    dplyr::filter(.data[[startDate]] <= .data[[endDate]] |
-                    (!.data$cohort_definition_id %in% requirementIds))
+    dplyr::filter(.data[[startDate]] <= .data[[endDate]])
   return(cohort)
 }

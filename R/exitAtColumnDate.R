@@ -155,7 +155,7 @@ exitAtColumnDate <- function(cohort,
   tmpPrefix <- omopgenerics::tmpPrefix()
   tmpName <- omopgenerics::uniqueTableName(prefix = tmpPrefix)
 
-  if (all(ids %in% cohortId)) {
+  if (isFALSE(needsIdFilter(cohort = cohort, cohortId = cohortId))) {
     newCohort <- cohort |>
       dplyr::mutate(
         "cohort_start_date_0123456789" = .data$cohort_start_date,
@@ -207,7 +207,7 @@ exitAtColumnDate <- function(cohort,
   # checks with informative errors
   validateNewCohort(newCohort, cdm, tmpPrefix)
 
-  if (!all(ids %in% cohortId)) {
+  if (isTRUE(needsIdFilter(cohort = cohort, cohortId = cohortId))) {
     dateColumns <- dateColumns[!dateColumns %in% c("cohort_end_date", "cohort_start_date")]
     newCohort <- newCohort |>
       # join non modified cohorts
