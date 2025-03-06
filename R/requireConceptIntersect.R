@@ -11,8 +11,6 @@
 #' @inheritParams windowDoc
 #' @inheritParams nameDoc
 #' @inheritParams conceptSetDoc
-#' @param inObservation If TRUE only records inside an observation period will
-#' be considered.
 #'
 #' @return Cohort table with only those  with the events in the concept list
 #' kept (or those without the event if negate = TRUE)

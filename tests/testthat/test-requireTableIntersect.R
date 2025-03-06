@@ -5,89 +5,107 @@ test_that("requiring presence in another table", {
     omock::mockObservationPeriod(seed = 1) |>
     omock::mockCohort(name = c("cohort1"), numberCohorts = 2,seed = 1)
   cdm_local$table <- dplyr::tibble(
-    person_id = c(1, 3, 2),
-    date_start = as.Date(c("2002-01-01", "2015-10-01", "2000-01-01")),
-    date_end = as.Date(c("2002-01-01", "2015-10-01", "2000-01-01"))
+    person_id = c(1, 3, 2, 2),
+    date_start = as.Date(c("2002-01-01", "2015-10-01", "2000-01-01", "1999-01-01")),
+    date_end = as.Date(c("2002-01-01", "2015-10-01", "2000-01-01", "1999-01-01"))
   )
   cdm <- cdm_local |> copyCdm()
 
   start_cols <- colnames(cdm$cohort1)
   cdm$cohort2 <-  requireTableIntersect(cohort = cdm$cohort1,
-                                            tableName = "table",
-                                            targetStartDate = "date_start",
-                                            targetEndDate = "date_end",
-                                            window = list(c(-Inf, Inf)),
-                                            name = "cohort2")
+                                        tableName = "table",
+                                        targetStartDate = "date_start",
+                                        targetEndDate = "date_end",
+                                        window = list(c(-Inf, Inf)),
+                                        name = "cohort2")
   expect_identical(colnames(cdm$cohort2), colnames(cdm$cohort1))
 
 
   expect_identical(cdm$cohort2 |> dplyr::pull("subject_id") |> sort(), cdm$cohort1 |> dplyr::pull("subject_id") |> sort())
   expect_identical(omopgenerics::attrition(cdm$cohort2)$reason, c("Initial qualifying events",
-                 "In table table between -Inf & Inf days relative to cohort_start_date between 1 and Inf",
-                 "Initial qualifying events",
-                 "In table table between -Inf & Inf days relative to cohort_start_date between 1 and Inf"))
+                                                                  "In table table between -Inf & Inf days relative to cohort_start_date between 1 and Inf",
+                                                                  "Initial qualifying events",
+                                                                  "In table table between -Inf & Inf days relative to cohort_start_date between 1 and Inf"))
 
   cdm$cohort3 <-  requireTableIntersect(cohort = cdm$cohort1,
-                                            tableName = "table",
-                                            targetStartDate = "date_start",
-                                            targetEndDate = "date_end",
-                                            window = c(0, Inf),
-                                            name = "cohort3")
+                                        tableName = "table",
+                                        targetStartDate = "date_start",
+                                        targetEndDate = "date_end",
+                                        window = c(0, Inf),
+                                        name = "cohort3")
   expect_true(all(cdm$cohort3 |> dplyr::pull("subject_id") == c(2,3,1,1)))
   expect_true(all(cdm$cohort3 |> dplyr::pull("cohort_start_date") ==
                     c("1999-05-03", "2015-02-25", "2001-03-24", "2001-11-28")))
   expect_identical(omopgenerics::attrition(cdm$cohort3)$reason, c("Initial qualifying events",
-                 "In table table between 0 & Inf days relative to cohort_start_date between 1 and Inf",
-                 "Initial qualifying events",
-                 "In table table between 0 & Inf days relative to cohort_start_date between 1 and Inf"))
+                                                                  "In table table between 0 & Inf days relative to cohort_start_date between 1 and Inf",
+                                                                  "Initial qualifying events",
+                                                                  "In table table between 0 & Inf days relative to cohort_start_date between 1 and Inf"))
 
   # censor date
   cdm$cohort4 <-  requireTableIntersect(cohort = cdm$cohort1,
-                                            tableName = "table",
-                                            targetStartDate = "date_start",
-                                            targetEndDate = "date_end",
-                                            window = c(-Inf, 0),
-                                            censorDate = "cohort_end_date",
-                                            name = "cohort4")
+                                        tableName = "table",
+                                        targetStartDate = "date_start",
+                                        targetEndDate = "date_end",
+                                        window = c(-Inf, 0),
+                                        censorDate = "cohort_end_date",
+                                        name = "cohort4")
   expect_true(all(cdm$cohort4 |> dplyr::pull("subject_id") == c(1,1,1,1)))
   expect_true(all(cdm$cohort4 |> dplyr::pull("cohort_start_date") == c("2003-05-17", "2004-03-11", "2002-01-30", "2002-06-13")))
   expect_identical(omopgenerics::attrition(cdm$cohort4)$reason, c("Initial qualifying events",
-                 "In table table between -Inf & 0 days relative to cohort_start_date between 1 and Inf, censoring at cohort_end_date",
-                 "Initial qualifying events",
-                 "In table table between -Inf & 0 days relative to cohort_start_date between 1 and Inf, censoring at cohort_end_date"))
+                                                                  "In table table between -Inf & 0 days relative to cohort_start_date between 1 and Inf, censoring at cohort_end_date",
+                                                                  "Initial qualifying events",
+                                                                  "In table table between -Inf & 0 days relative to cohort_start_date between 1 and Inf, censoring at cohort_end_date"))
 
   # cohort Id
   cdm$cohort5 <-  requireTableIntersect(cohort = cdm$cohort1,
-                                            cohortId = 1,
-                                            tableName = "table",
-                                            targetStartDate = "date_start",
-                                            targetEndDate = "date_end",
-                                            window = c(-Inf, 0),
-                                            censorDate = "cohort_end_date",
-                                            name = "cohort5")
+                                        cohortId = 1,
+                                        tableName = "table",
+                                        targetStartDate = "date_start",
+                                        targetEndDate = "date_end",
+                                        window = c(-Inf, 0),
+                                        censorDate = "cohort_end_date",
+                                        name = "cohort5")
   expect_true(all(cdm$cohort5 |> dplyr::pull("subject_id") == c(1, 1, 1, 1, 1,1)))
   expect_true(all(cdm$cohort5 |> dplyr::pull("cohort_start_date") |> sort() ==
                     c("2001-03-24", "2001-11-28", "2002-01-30", "2002-06-13", "2003-05-17", "2004-03-11")))
   expect_identical(omopgenerics::attrition(cdm$cohort5)$reason, c("Initial qualifying events",
-                 "In table table between -Inf & 0 days relative to cohort_start_date between 1 and Inf, censoring at cohort_end_date",
-                 "Initial qualifying events"))
+                                                                  "In table table between -Inf & 0 days relative to cohort_start_date between 1 and Inf, censoring at cohort_end_date",
+                                                                  "Initial qualifying events"))
+
+  # out of observation
+  cdm$cohort6 <-  requireTableIntersect(cohort = cdm$cohort1,
+                                        cohortId = 1,
+                                        tableName = "table",
+                                        targetStartDate = "date_start",
+                                        targetEndDate = "date_end",
+                                        window = c(-Inf, -1),
+                                        inObservation = FALSE,
+                                        censorDate = "cohort_end_date",
+                                        name = "cohort6")
+  expect_equal(
+    cdm$cohort6 |>
+      dplyr::filter(subject_id == 2) |>
+      dplyr::pull("cohort_start_date"),
+    as.Date("1999-05-03")
+  )
+
 
   # expected errors
   # currently just 1 table suported´
   expect_error(
     requireTableIntersect(cohort = cdm$cohort1,
-                              tableName = c("table", "observation_period"),
-                              window = c(-Inf, Inf))
+                          tableName = c("table", "observation_period"),
+                          window = c(-Inf, Inf))
   )
   expect_error(
     requireTableIntersect(cohort = cdm$cohort1,
-                              tableName = cdm$table,
-                              window = c(-Inf, Inf))
+                          tableName = cdm$table,
+                          window = c(-Inf, Inf))
   )
   expect_error(
     requireTableIntersect(cohort = cdm$cohort1,
-                              tableName = "not_a_table",
-                              window = c(-Inf, Inf))
+                          tableName = "not_a_table",
+                          window = c(-Inf, Inf))
   )
 
   PatientProfiles::mockDisconnect(cdm)
@@ -108,66 +126,66 @@ test_that("requiring absence in another table", {
 
   cdm$cohort2 <-  requireTableIntersect(cohort = cdm$cohort1,
                                         intersections = 0,
-                                            tableName = "table",
-                                            targetStartDate = "date_start",
-                                            targetEndDate = "date_end",
-                                            window = c(-Inf, Inf),
-                                            name = "cohort2")
+                                        tableName = "table",
+                                        targetStartDate = "date_start",
+                                        targetEndDate = "date_end",
+                                        window = c(-Inf, Inf),
+                                        name = "cohort2")
 
   expect_true(cdm$cohort2 |> dplyr::pull("subject_id") |> length() == 1)
   expect_identical(omopgenerics::attrition(cdm$cohort2)$reason, c("Initial qualifying events",
-                 "Not in table table between -Inf & Inf days relative to cohort_start_date",
-                 "Initial qualifying events",
-                 "Not in table table between -Inf & Inf days relative to cohort_start_date"))
+                                                                  "Not in table table between -Inf & Inf days relative to cohort_start_date",
+                                                                  "Initial qualifying events",
+                                                                  "Not in table table between -Inf & Inf days relative to cohort_start_date"))
 
   cdm$cohort3 <-  requireTableIntersect(cohort = cdm$cohort1,
                                         intersections = 0,
-                                            tableName = "table",
-                                            targetStartDate = "date_start",
-                                            targetEndDate = "date_end",
-                                            window = c(0, Inf),
-                                            name = "cohort3")
+                                        tableName = "table",
+                                        targetStartDate = "date_start",
+                                        targetEndDate = "date_end",
+                                        window = c(0, Inf),
+                                        name = "cohort3")
   expect_true(all(cdm$cohort3 |> dplyr::pull("subject_id") == c(1,1,2,1,1)))
   expect_true(all(cdm$cohort3 |> dplyr::pull("cohort_start_date") |> sort() ==
                     c("1999-05-03", "2002-01-30", "2002-06-13", "2003-05-17", "2004-03-11")))
   expect_identical(omopgenerics::attrition(cdm$cohort3)$reason, c("Initial qualifying events",
-                 "Not in table table between 0 & Inf days relative to cohort_start_date",
-                 "Initial qualifying events",
-                 "Not in table table between 0 & Inf days relative to cohort_start_date"))
+                                                                  "Not in table table between 0 & Inf days relative to cohort_start_date",
+                                                                  "Initial qualifying events",
+                                                                  "Not in table table between 0 & Inf days relative to cohort_start_date"))
 
   # censor date
   cdm$cohort4 <-  requireTableIntersect(cohort = cdm$cohort1,
                                         intersections = 0,
-                                            tableName = "table",
-                                            targetStartDate = "date_start",
-                                            targetEndDate = "date_end",
-                                            window = c(-Inf, 0),
-                                            censorDate = "cohort_end_date",
-                                            name = "cohort4")
+                                        tableName = "table",
+                                        targetStartDate = "date_start",
+                                        targetEndDate = "date_end",
+                                        window = c(-Inf, 0),
+                                        censorDate = "cohort_end_date",
+                                        name = "cohort4")
   expect_true(all(cdm$cohort4 |> dplyr::pull("subject_id") == c(2,3,1,1)))
   expect_true(all((cdm$cohort4 |> dplyr::pull("cohort_start_date") ==
-                 c("1999-05-03", "2015-02-25", "2001-03-24", "2001-11-28"))))
+                     c("1999-05-03", "2015-02-25", "2001-03-24", "2001-11-28"))))
   expect_identical(omopgenerics::attrition(cdm$cohort4)$reason, c("Initial qualifying events",
-                 "Not in table table between -Inf & 0 days relative to cohort_start_date, censoring at cohort_end_date",
-                 "Initial qualifying events",
-                 "Not in table table between -Inf & 0 days relative to cohort_start_date, censoring at cohort_end_date"))
+                                                                  "Not in table table between -Inf & 0 days relative to cohort_start_date, censoring at cohort_end_date",
+                                                                  "Initial qualifying events",
+                                                                  "Not in table table between -Inf & 0 days relative to cohort_start_date, censoring at cohort_end_date"))
 
   # cohort Id and name
   cdm$cohort1 <-  requireTableIntersect(cohort = cdm$cohort1,
                                         intersections = 0,
-                                            cohortId = "cohort_1",
-                                            tableName = "table",
-                                            targetStartDate = "date_start",
-                                            targetEndDate = "date_end",
-                                            window = c(0, Inf),
-                                            censorDate = NULL)
+                                        cohortId = "cohort_1",
+                                        tableName = "table",
+                                        targetStartDate = "date_start",
+                                        targetEndDate = "date_end",
+                                        window = c(0, Inf),
+                                        censorDate = NULL)
   expect_true(all(cdm$cohort1 |> dplyr::pull("subject_id") |> sort() == c(1, 1, 1, 1, 1, 1, 2)))
   expect_true(all((cdm$cohort1 |> dplyr::pull("cohort_start_date") |> sort() ==
                      c("1999-05-03", "2001-03-24", "2001-11-28", "2002-01-30", "2002-06-13",
                        "2003-05-17", "2004-03-11"))))
   expect_identical(omopgenerics::attrition(cdm$cohort1)$reason, c("Initial qualifying events",
-                 "Not in table table between 0 & Inf days relative to cohort_start_date",
-                 "Initial qualifying events"))
+                                                                  "Not in table table between 0 & Inf days relative to cohort_start_date",
+                                                                  "Initial qualifying events"))
 
   PatientProfiles::mockDisconnect(cdm)
 })
@@ -210,79 +228,79 @@ test_that("different intersection count requirements", {
 
   # no intersections - people not in cohort2
   expect_identical(sort(cdm$cohort1 |>
-                      requireTableIntersect(intersections = c(0, 0),
-                                            tableName = "drug_exposure",
-                                              window = c(-Inf, Inf),
-                                              name = "cohort1_test") |>
-                      dplyr::pull("subject_id")), as.integer(c(4,5,6,7,8,9,10)))
+                          requireTableIntersect(intersections = c(0, 0),
+                                                tableName = "drug_exposure",
+                                                window = c(-Inf, Inf),
+                                                name = "cohort1_test") |>
+                          dplyr::pull("subject_id")), as.integer(c(4,5,6,7,8,9,10)))
 
 
   # only one intersection
   expect_identical(sort(cdm$cohort1 |>
-                      requireTableIntersect(intersections = c(1, 1),
-                                              tableName = "drug_exposure",
-                                              window = c(-Inf, Inf),
-                                              name = "cohort1_test") |>
-                      dplyr::pull("subject_id")), c(1L))
+                          requireTableIntersect(intersections = c(1, 1),
+                                                tableName = "drug_exposure",
+                                                window = c(-Inf, Inf),
+                                                name = "cohort1_test") |>
+                          dplyr::pull("subject_id")), c(1L))
 
   expect_identical(sort(cdm$cohort1 |>
-                      requireTableIntersect(intersections = c(1),
-                                              tableName = "drug_exposure",
-                                              window = c(-Inf, Inf),
-                                              name = "cohort1_test") |>
-                      dplyr::pull("subject_id")), c(1L))
+                          requireTableIntersect(intersections = c(1),
+                                                tableName = "drug_exposure",
+                                                window = c(-Inf, Inf),
+                                                name = "cohort1_test") |>
+                          dplyr::pull("subject_id")), c(1L))
 
   # 2 intersections
   expect_identical(sort(cdm$cohort1 |>
-                      requireTableIntersect(intersections = c(2, 2),
-                                              tableName = "drug_exposure",
-                                              window = c(-Inf, Inf),
-                                              name = "cohort1_test") |>
-                      dplyr::pull("subject_id")), c(2L))
+                          requireTableIntersect(intersections = c(2, 2),
+                                                tableName = "drug_exposure",
+                                                window = c(-Inf, Inf),
+                                                name = "cohort1_test") |>
+                          dplyr::pull("subject_id")), c(2L))
 
   expect_identical(sort(cdm$cohort1 |>
-                      requireTableIntersect(intersections = c(2),
-                                              tableName = "drug_exposure",
-                                              window = c(-Inf, Inf),
-                                              name = "cohort1_test") |>
-                      dplyr::pull("subject_id")), c(2L))
+                          requireTableIntersect(intersections = c(2),
+                                                tableName = "drug_exposure",
+                                                window = c(-Inf, Inf),
+                                                name = "cohort1_test") |>
+                          dplyr::pull("subject_id")), c(2L))
 
 
   # 2 or more intersections
   expect_identical(sort(cdm$cohort1 |>
-                      requireTableIntersect(intersections = c(2, Inf),
-                                              tableName = "drug_exposure",
-                                              window = c(-Inf, Inf),
-                                              name = "cohort1_test") |>
-                      dplyr::pull("subject_id")), c(2L, 3L))
+                          requireTableIntersect(intersections = c(2, Inf),
+                                                tableName = "drug_exposure",
+                                                window = c(-Inf, Inf),
+                                                name = "cohort1_test") |>
+                          dplyr::pull("subject_id")), c(2L, 3L))
 
   # 2 or 3 intersections
   expect_identical(sort(cdm$cohort1 |>
-                      requireTableIntersect(intersections = c(2, 3),
-                                              tableName = "drug_exposure",
-                                              window = c(-Inf, Inf),
-                                              name = "cohort1_test") |>
-                      dplyr::pull("subject_id")), c(2L, 3L))
+                          requireTableIntersect(intersections = c(2, 3),
+                                                tableName = "drug_exposure",
+                                                window = c(-Inf, Inf),
+                                                name = "cohort1_test") |>
+                          dplyr::pull("subject_id")), c(2L, 3L))
 
 
 
   # expected errors
   expect_error(requireTableIntersect(cohort = cdm$cohort1,
-                                       intersections = c(-10, 10),
-                                       tableName = "drug_exposure",
-                                       window = c(-Inf, Inf)))
+                                     intersections = c(-10, 10),
+                                     tableName = "drug_exposure",
+                                     window = c(-Inf, Inf)))
   expect_error(requireTableIntersect(cohort = cdm$cohort1,
-                                       intersections = c(11, 10),
-                                       tableName = "drug_exposure",
-                                       window = c(-Inf, Inf)))
+                                     intersections = c(11, 10),
+                                     tableName = "drug_exposure",
+                                     window = c(-Inf, Inf)))
   expect_error(requireTableIntersect(cohort = cdm$cohort1,
-                                       intersections = c(Inf, Inf),
-                                       tableName = "drug_exposure",
-                                       window = c(-Inf, Inf)))
+                                     intersections = c(Inf, Inf),
+                                     tableName = "drug_exposure",
+                                     window = c(-Inf, Inf)))
   expect_error(requireTableIntersect(cohort = cdm$cohort1,
-                                       intersections = c(1, 2, 3),
-                                       tableName = "drug_exposure",
-                                       window = c(-Inf, Inf)))
+                                     intersections = c(1, 2, 3),
+                                     tableName = "drug_exposure",
+                                     window = c(-Inf, Inf)))
 
   PatientProfiles::mockDisconnect(cdm)
 

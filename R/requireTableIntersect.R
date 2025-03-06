@@ -33,6 +33,7 @@ requireTableIntersect <- function(cohort,
                                   indexDate = "cohort_start_date",
                                   targetStartDate = startDateColumn(tableName),
                                   targetEndDate = endDateColumn(tableName),
+                                  inObservation = TRUE,
                                   censorDate = NULL,
                                   name = tableName(cohort)) {
   # checks
@@ -85,6 +86,7 @@ requireTableIntersect <- function(cohort,
       targetEndDate = targetEndDate,
       window = window,
       censorDate = censorDate,
+      inObservation = inObservation,
       nameStyle = "intersect_table",
       name = subsetName
     )

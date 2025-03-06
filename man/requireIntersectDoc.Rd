@@ -28,6 +28,9 @@ intersect.}
 \item{targetCohortId}{Vector of cohort definition ids to include.}
 
 \item{tableName}{Name of the table to check for intersect.}
+
+\item{inObservation}{If TRUE only records inside an observation period will
+be considered.}
 }
 \description{
 Helper for consistent documentation of arguments in \code{requireIntersect}
