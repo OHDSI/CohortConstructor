@@ -68,7 +68,7 @@ test_that("unionCohorts works", {
 
   cdm$cohort5 <- cdm$cohort5 |> unionCohorts(name = "cohort5")
 
-
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
 
@@ -146,6 +146,7 @@ test_that("gap and name works", {
                     )))
   expect_true(settings(cdm$cohort)$cohort_name == "test")
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
 
@@ -199,6 +200,7 @@ test_that("Expected behaviour", {
                            name = "cohort1")
   )
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
 
@@ -276,6 +278,7 @@ test_that("test codelist", {
   expect_true(all(codes |> dplyr::pull("type") |> sort() == rep("index event", 3)))
   expect_true(all(codes |> dplyr::pull("cohort_definition_id") |> sort() == c(1, 1, 1)))
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
 
@@ -300,6 +303,7 @@ test_that("keep original cohorts", {
                               keepOriginalCohorts = TRUE)
   expect_true(nrow(settings(cdm$cohort3)) == nrow(start_settings) + 1)
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
 
@@ -339,6 +343,7 @@ test_that("multiple observation periods", {
       "cohort_end_date" = as.Date(c("2000-12-20", "2001-04-01", "2004-01-01", "2001-12-30", "2003-01-01"))
     ))
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
 
@@ -374,6 +379,7 @@ test_that("test indexes - postgres", {
       "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
   )
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
   CDMConnector::cdmDisconnect(cdm = cdm)
 })

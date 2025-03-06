@@ -170,6 +170,7 @@ test_that("simple example", {
     dplyr::as_tibble() |>
     dplyr::arrange(subject_id, cohort_start_date)
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
 
@@ -393,6 +394,7 @@ test_that("out of observation", {
   expect_true(cdm$cohort4 |> dplyr::pull("subject_id") |> sort() == 4)
   expect_true(cdm$cohort4 |> dplyr::pull("cohort_start_date") == "1999-01-01")
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
 
@@ -869,6 +871,7 @@ test_that("test indexes - postgres", {
       "CREATE INDEX cc_cohort_subject_id_cohort_start_date_idx ON public.cc_cohort USING btree (subject_id, cohort_start_date)"
   )
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
   CDMConnector::cdmDisconnect(cdm = cdm)
 })
@@ -951,5 +954,6 @@ test_that("test subsetCohort arguments", {
   expect_true(all(c(1L, 2L) %in% dplyr::pull(x, "subject_id")))
   expect_true(all(!c(3L) %in% dplyr::pull(x, "subject_id")))
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   CDMConnector::cdmDisconnect(cdm = cdm)
 })

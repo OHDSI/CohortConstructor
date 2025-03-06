@@ -18,7 +18,6 @@ test_that("test restrict to first entry works", {
 
   expect_true(all(cdm$cohort2 |> CohortConstructor::requireIsFirstEntry() |>
                     dplyr::pull(subject_id) == c(1:3, 1:3)))
-
 })
 
 test_that("requireIsFirstEntry, cohortIds & name arguments", {
@@ -66,7 +65,6 @@ test_that("requireIsFirstEntry, cohortIds & name arguments", {
   expect_identical(
   nrow(cdm$new_cohort |> dplyr::collect()),
   nrow(cdm$new_cohort_2 |> dplyr::collect()))
-
 })
 
 test_that("errors", {
@@ -223,6 +221,9 @@ test_that("requireEntry", {
    dplyr::pull("cohort_start_date")),
    as.Date(c("2010-06-01","2010-07-01")),
    ignore_attr = TRUE)
+
+ expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
+ PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("test indexes - postgres", {
@@ -275,6 +276,7 @@ test_that("test indexes - postgres", {
       "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
   )
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
   CDMConnector::cdmDisconnect(cdm = cdm)
 })

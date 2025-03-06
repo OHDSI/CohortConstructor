@@ -43,6 +43,7 @@ test_that("simple example", {
                                               n = 1,
                                               name = "copy_cohort"))
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 
 })
@@ -98,8 +99,8 @@ test_that("copy only specific cohort IDs", {
                                               cohortId = "not_a_cohort",
                                               name = "copy_cohort"))
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
-
 })
 
 test_that("multiple copies", {
@@ -133,5 +134,7 @@ test_that("multiple copies", {
       original_cohort_name = c(NA, NA, "cohort_1", "cohort_3", "cohort_1", "cohort_3")
     )
   )
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
+  PatientProfiles::mockDisconnect(cdm)
 })
 

@@ -112,6 +112,7 @@ test_that("yearCohorts - change name", {
                              name = "cohort1")
   expect_identical(cdm$cohort1 |> dplyr::collect(), cdm$cohort |> dplyr::collect())
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
 
@@ -183,6 +184,7 @@ test_that("yearCohorts - keep name", {
   )))
   expect_true(all(cohortCount(cdm$cohort)$number_records == c(1, 0, 0, 0)))
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
 
@@ -218,6 +220,7 @@ test_that("test indexes - postgres", {
       "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
   )
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
   CDMConnector::cdmDisconnect(cdm = cdm)
 })

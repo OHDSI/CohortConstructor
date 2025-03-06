@@ -28,6 +28,7 @@ test_that("sampleCohort subsetting one cohort", {
   cdm$cohort3 <- sampleCohorts(cdm$cohort1, n = 100000, cohortId = 1, name = "cohort3")
   expect_equal(collectCohort(cdm$cohort1, 1), collectCohort(cdm$cohort3, 1))
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
 
@@ -58,6 +59,7 @@ test_that("sampleCohort subsetting multiple cohorts", {
                 dplyr::filter(cohort_definition_id == 2) |>
                 dplyr::pull("number_records") == 10)
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
 
@@ -78,6 +80,7 @@ test_that("sampleCohort subsetting all cohorts", {
   test3 <- sampleCohorts(cdm$cohort1, cohortId = paste0("cohort_", c(1,2,3)), n = 2)
   expect_true(all.equal(attrition(test1), attrition(test3)))
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
 
@@ -100,6 +103,7 @@ test_that("expected errors", {
   expect_error(sampleCohorts(cdm$cohort1))
   expect_error(sampleCohorts(cdm$cohort1, n = c(1,2)))
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
 
@@ -122,6 +126,8 @@ test_that("original cohort attributes unchanged", {
 
   expect_identical(cohort_before, cohort_after)
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
+  PatientProfiles::mockDisconnect(cdm)
 })
 
 test_that("test indexes - postgres", {
@@ -156,6 +162,7 @@ test_that("test indexes - postgres", {
       "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
   )
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
   CDMConnector::cdmDisconnect(cdm = cdm)
 })

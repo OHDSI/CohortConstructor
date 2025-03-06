@@ -63,5 +63,6 @@ test_that("test renameCohort", {
       renameCohort(cohortId = 1, newCohortName = c("name1", "name2"))
   )
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   CDMConnector::cdmDisconnect(cdm = cdm)
 })

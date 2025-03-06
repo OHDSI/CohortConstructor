@@ -116,6 +116,7 @@ test_that("test it works and expected errors", {
     minFutureObservation = "a"
   ))
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
 
@@ -162,6 +163,7 @@ test_that("restrictions applied to single cohort", {
   expect_true(settings(cdm$cohort2)$min_prior_observation == 0)
   expect_true(settings(cdm$cohort2)$min_future_observation == 0)
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
 
@@ -201,6 +203,7 @@ test_that("ignore existing cohort extra variables", {
                     omopgenerics::attrition(cdm$new_cohort)$reason))
   expect_true(all(colnames(settings(cdm$cohort)) == c("cohort_definition_id", "cohort_name", "min_prior_observation")))
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
 
@@ -226,6 +229,7 @@ test_that("external columns kept after requireDemographics", {
 
   expect_true(all(c("col_extra1", "col_extra2", "new_index_date") %in% colnames(cdm$cohort)))
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
 
@@ -250,6 +254,7 @@ test_that("cohortIds", {
   expect_true(all(cdm$new_cohort |> dplyr::pull("cohort_definition_id") == c(2,2,2)))
   expect_true(all(cdm$new_cohort |> dplyr::pull("subject_id") == c(1,1,1)))
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
 
@@ -337,6 +342,7 @@ test_that("test more than one restriction", {
         'cohort_3_3', 'cohort_3_4')
   ))
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 
   # one empty output cohort
@@ -401,6 +407,7 @@ test_that("test more than one restriction", {
         'Sex requirement: Male', 'Sex requirement: Male')
   ))
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
 
@@ -447,6 +454,7 @@ test_that("codelist kept with >1 requirement", {
       type = c("index event", "index event", "index event")
     ))
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
 
@@ -476,6 +484,8 @@ test_that("settings with extra columns", {
     ))
   expect_true(all(colnames(attrition(cdm$cohort)) ==
                     c("cohort_definition_id", "number_records", "number_subjects", "reason_id", "reason", "excluded_records", "excluded_subjects" )))
+
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
 
@@ -503,6 +513,8 @@ test_that("requireInteractions", {
       min_prior_observation = c(rep(0, 3), rep(1, 3), rep(0, 3)),
       min_future_observation = rep(0, 9)
     ))
+
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
 
@@ -560,6 +572,8 @@ test_that("test indexes - postgres", {
       "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
   )
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
   CDMConnector::cdmDisconnect(cdm = cdm)
 })
+
