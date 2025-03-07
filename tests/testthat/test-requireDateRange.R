@@ -46,6 +46,13 @@ test_that("requireDateRange", {
   expect_true(all(cohortCount(cdm$cohort4)$number_subjects == c(1,3)))
   expect_true(all(cdm$cohort4 |> dplyr::pull("cohort_start_date") |> sort() ==
                     c("1999-07-11", "2000-01-11", "2000-05-28", "2000-06-17", "2004-12-12", "2015-02-02")))
+  expect_no_error(
+    # 1 cohort id + same name
+    cdm$cohort4 <- cdm$cohort4 |>
+      requireInDateRange(dateRange = as.Date(c("2000-01-01", "2001-01-01")),
+                         cohortId = 1,
+                         name = "cohort4")
+  )
   # NA
   expect_no_error(
     cdm$cohort5 <- cdm$cohort2 |>

@@ -196,8 +196,8 @@ trimToDateRange <- function(cohort,
   }
 
   if (isTRUE(needsIdFilter(cohort = cohort, cohortId = cohortId))) {
-    cdm <- omopgenerics::bind(newCohort, unchangedCohort, name = name)
-    newCohort <- cdm[[name]]
+    cdm <- omopgenerics::bind(newCohort, unchangedCohort, name = tmpNewCohort)
+    newCohort <- cdm[[tmpNewCohort]]
   }
 
   newCohort <- newCohort |>

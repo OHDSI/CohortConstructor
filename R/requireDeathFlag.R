@@ -66,34 +66,48 @@ requireDeathFlag <- function(cohort,
   window_start <- window[[1]][1]
   window_end <- window[[1]][2]
 
-  subsetName <- omopgenerics::uniqueTableName()
-  subsetCohort <- cohort |>
+  # temp tables
+  tablePrefix <- omopgenerics::tmpPrefix()
+  tmpNewCohort <- omopgenerics::uniqueTableName(tablePrefix)
+  if (isFALSE(needsIdFilter(cohort = cohort, cohortId = cohortId))){
+    newCohort <- cohort |>
+      dplyr::compute(name = tmpNewCohort, temporary = FALSE,
+                     logPrefix = "CohortConstructor_requireDateRange_newCohort1_") |>
+      omopgenerics::newCohortTable(.softValidation = TRUE)
+  } else {
+    tmpUnchanged <- omopgenerics::uniqueTableName(tablePrefix)
+    ids <- settings(cohort)$cohort_definition_id
+    idskeep <- ids[!ids %in% cohortId]
+    unchangedCohort <- subsetCohorts(cohort, idskeep, name = tmpUnchanged)  |>
+      dplyr::select(dplyr::all_of(.env$cols))
+    newCohort <- subsetCohorts(cohort, cohortId, name = tmpNewCohort)
+  }
+
+  newCohort <- newCohort |>
     dplyr::select(dplyr::all_of(.env$cols)) |>
     PatientProfiles::addDeathFlag(
       indexDate = indexDate,
       censorDate = censorDate,
       window = window,
       deathFlagName = "death",
-      name = subsetName
+      name = tmpNewCohort
     )
 
   if (isFALSE(negate)) {
-    subsetCohort <- subsetCohort |>
-      dplyr::filter(.data$death == 1 |
-                      (!.data$cohort_definition_id %in% cohortId)) |>
+    newCohort <- newCohort |>
+      dplyr::filter(.data$death == 1) |>
       dplyr::select(!"death") |>
-      dplyr::compute(name = subsetName, temporary = FALSE,
+      dplyr::compute(name = tmpNewCohort, temporary = FALSE,
                      logPrefix = "CohortConstructor_requireDeathFlag_negateFalse_")
     # attrition reason
     reason <- glue::glue("Death between {window_start} & ",
                          "{window_end} days relative to {indexDate}")
   } else {
     # ie require absence instead of presence
-    subsetCohort <- subsetCohort |>
-      dplyr::filter(.data$death != 1 |
-                      (!.data$cohort_definition_id %in% cohortId)) |>
+    newCohort <- newCohort |>
+      dplyr::filter(.data$death != 1) |>
       dplyr::select(!"death") |>
-      dplyr::compute(name = subsetName, temporary = FALSE,
+      dplyr::compute(name = tmpNewCohort, temporary = FALSE,
                      logPrefix = "CohortConstructor_requireDeathFlag_negateTrue_")
     # attrition reason
     reason <- glue::glue("Alive between {window_start} & ",
@@ -104,14 +118,19 @@ requireDeathFlag <- function(cohort,
     reason <- glue::glue("{reason}, censoring at {censorDate}")
   }
 
+  if (isTRUE(needsIdFilter(cohort = cohort, cohortId = cohortId))) {
+    cdm <- omopgenerics::bind(newCohort, unchangedCohort, name = tmpNewCohort)
+    newCohort <- cdm[[tmpNewCohort]]
+  }
+
   x <- cohort |>
-    dplyr::inner_join(subsetCohort, by = c(cols)) |>
+    dplyr::inner_join(newCohort, by = c(cols)) |>
     dplyr::compute(name = name, temporary = FALSE,
                    logPrefix = "CohortConstructor_requireDeathFlag_join_") |>
     omopgenerics::newCohortTable(.softValidation = TRUE) |>
     omopgenerics::recordCohortAttrition(reason = reason, cohortId = cohortId)
 
-  omopgenerics::dropTable(cdm = cdm, name = subsetName)
+  omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with(tablePrefix))
 
   useIndexes <- getOption("CohortConstructor.use_indexes")
   if (!isFALSE(useIndexes)) {
