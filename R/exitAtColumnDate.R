@@ -152,27 +152,17 @@ exitAtColumnDate <- function(cohort,
     cli::cli_abort("All cohort records must have at least one non-empty date in the `dateColumns`")
   }
 
-  tmpPrefix <- omopgenerics::tmpPrefix()
-  tmpName <- omopgenerics::uniqueTableName(prefix = tmpPrefix)
 
-  if (all(ids %in% cohortId)) {
-    newCohort <- cohort |>
-      dplyr::mutate(
-        "cohort_start_date_0123456789" = .data$cohort_start_date,
-        "cohort_end_date_0123456789" = .data$cohort_end_date
-      ) |>
-      dplyr::compute(name = tmpName, temporary = FALSE,
-                     logPrefix = "CohortConstructor_newDate_1_")
-  } else {
-    newCohort <- cohort |>
-      dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>
-      dplyr::mutate(
-        "cohort_start_date_0123456789" = .data$cohort_start_date,
-        "cohort_end_date_0123456789" = .data$cohort_end_date
-      ) |>
-      dplyr::compute(name = tmpName, temporary = FALSE,
-                     logPrefix = "CohortConstructor_exitAtColumnDate_newDate_2_")
-  }
+  # temp tables
+  tablePrefix <- omopgenerics::tmpPrefix()
+  tmpNewCohort <- omopgenerics::uniqueTableName(tablePrefix)
+  tmpUnchanged <- omopgenerics::uniqueTableName(tablePrefix)
+  cdm <- filterCohortInternal(cdm, cohort, cohortId, tmpNewCohort, tmpUnchanged)
+  newCohort <- cdm[[tmpNewCohort]] |>
+    dplyr::mutate(
+      "cohort_start_date_0123456789" = .data$cohort_start_date,
+      "cohort_end_date_0123456789" = .data$cohort_end_date
+    )
 
   newCohort <- newCohort |>
     tidyr::pivot_longer(
@@ -201,23 +191,22 @@ exitAtColumnDate <- function(cohort,
       )
     ) |>
     dplyr::distinct() |>
-    dplyr::compute(name = tmpName, temporary = FALSE,
+    dplyr::compute(name = tmpNewCohort, temporary = FALSE,
                    logPrefix = "CohortConstructor_exitAtColumnDate_newDate_1_")
 
   # checks with informative errors
-  validateNewCohort(newCohort, cdm, tmpPrefix)
+  cdm <- validateNewCohort(newCohort, cdm, tablePrefix)
 
-  if (!all(ids %in% cohortId)) {
+  if (isTRUE(needsIdFilter(cohort, cohortId))) {
     dateColumns <- dateColumns[!dateColumns %in% c("cohort_end_date", "cohort_start_date")]
     newCohort <- newCohort |>
       # join non modified cohorts
       dplyr::union_all(
-        cohort |>
-          dplyr::filter(!.data$cohort_definition_id %in% .env$cohortId) |>
+        cdm[[tmpUnchanged]] |>
           dplyr::select(!dplyr::all_of(dateColumns)) |>
           dplyr::mutate(!!reason := !!newDate)
       ) |>
-      dplyr::compute(name = tmpName, temporary = FALSE,
+      dplyr::compute(name = tmpNewCohort, temporary = FALSE,
                      logPrefix = "CohortConstructor_exitAtColumnDate_union_")
   }
 
@@ -227,11 +216,13 @@ exitAtColumnDate <- function(cohort,
 
   newCohort <- newCohort |>
     dplyr::relocate(dplyr::all_of(omopgenerics::cohortColumns("cohort"))) |>
-    dplyr::compute(name = name, temporary = FALSE,
-                   logPrefix = "CohortConstructor_exitAtColumnDate_relocate_") |>
+    dplyr::compute(
+      name = name, temporary = FALSE,
+      logPrefix = "CohortConstructor_exitAtColumnDate_relocate_"
+    ) |>
     omopgenerics::newCohortTable(.softValidation = FALSE)
 
-  cdm <- omopgenerics::dropTable(cdm, name = dplyr::starts_with(tmpPrefix))
+  cdm <- omopgenerics::dropSourceTable(cdm, name = dplyr::starts_with(tablePrefix))
 
   useIndexes <- getOption("CohortConstructor.use_indexes")
   if (!isFALSE(useIndexes)) {
@@ -251,7 +242,7 @@ validateNewCohort <- function(newCohort, cdm, tmpName) {
     dplyr::tally() |>
     dplyr::pull("n")
   if (checkStart > 0) {
-    cdm <- omopgenerics::dropTable(cdm, name = dplyr::starts_with(tmpName))
+    cdm <- omopgenerics::dropSourceTable(cdm, name = dplyr::starts_with(tmpName))
     cli::cli_abort(
       "There are new cohort end dates smaller than the start date.
     Please provide valid dates in `dateColumns`"
@@ -268,7 +259,7 @@ validateNewCohort <- function(newCohort, cdm, tmpName) {
     dplyr::tally() |>
     dplyr::pull("n")
   if (checkObservation > 0) {
-    cdm <- omopgenerics::dropTable(cdm, name = dplyr::starts_with(tmpName))
+    cdm <- omopgenerics::dropSourceTable(cdm, name = dplyr::starts_with(tmpName))
     cli::cli_abort(
       "There are new cohort end dates outside of the observation period.
     Please provide dates in observation in `dateColumns`"
@@ -284,10 +275,12 @@ validateNewCohort <- function(newCohort, cdm, tmpName) {
     dplyr::tally() |>
     dplyr::pull("n")
   if (checkOverlap > 0) {
-    cdm <- omopgenerics::dropTable(cdm, name = dplyr::starts_with(tmpName))
+    cdm <- omopgenerics::dropSourceTable(cdm, name = dplyr::starts_with(tmpName))
     cli::cli_abort(
       "There are new cohort end dates which resulted in overlapping records.
                    Please check the dates provided in `dateColumns`."
     )
   }
+
+  return(cdm)
 }

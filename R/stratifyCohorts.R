@@ -165,7 +165,7 @@ stratifyCohorts <- function(cohort,
       .softValidation = TRUE
     )
 
-  omopgenerics::dropTable(cdm = cdm, name = nm)
+  omopgenerics::dropSourceTable(cdm = cdm, name = nm)
 
   useIndexes <- getOption("CohortConstructor.use_indexes")
   if (!isFALSE(useIndexes)) {

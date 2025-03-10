@@ -666,6 +666,8 @@ test_that("test indexes - postgres", {
     achillesSchema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA")
   )
 
+  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::contains("og_"))
+
   cdm <- omopgenerics::insertTable(cdm = cdm,
                                    name = "my_cohort",
                                    table = data.frame(cohort_definition_id = 1:2L,
@@ -682,6 +684,6 @@ test_that("test indexes - postgres", {
   )
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
+  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
   CDMConnector::cdmDisconnect(cdm = cdm)
 })

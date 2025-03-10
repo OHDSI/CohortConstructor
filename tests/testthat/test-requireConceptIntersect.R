@@ -341,11 +341,11 @@ test_that("test indexes - postgres", {
   expect_no_error(omopgenerics::settings(cdm$my_cohort))
   expect_true(
     DBI::dbGetQuery(db, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_test_my_cohort';")) |> dplyr::pull("indexdef") ==
-      "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_test_my_cohort USING btree (subject_id, cohort_start_date)"
+      "CREATE INDEX cc_test_my_cohort_subject_id_cohort_start_date_idx ON public.cc_test_my_cohort USING btree (subject_id, cohort_start_date)"
   )
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
+  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
   CDMConnector::cdmDisconnect(cdm = cdm)
 })
 

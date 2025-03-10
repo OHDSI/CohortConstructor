@@ -76,8 +76,14 @@ requireTableIntersect <- function(cohort,
     cli::cli_abort("Currently just one table supported.")
   }
 
-  subsetName <- omopgenerics::uniqueTableName()
-  subsetCohort <- cohort |>
+  # temp tables
+  tablePrefix <- omopgenerics::tmpPrefix()
+  tmpNewCohort <- omopgenerics::uniqueTableName(tablePrefix)
+  tmpUnchanged <- omopgenerics::uniqueTableName(tablePrefix)
+  cdm <- filterCohortInternal(cdm, cohort, cohortId, tmpNewCohort, tmpUnchanged)
+  newCohort <- cdm[[tmpNewCohort]]
+
+  newCohort <- newCohort |>
     dplyr::select(dplyr::all_of(.env$cols)) |>
     PatientProfiles::addTableIntersectCount(
       tableName = tableName,
@@ -88,21 +94,17 @@ requireTableIntersect <- function(cohort,
       censorDate = censorDate,
       inObservation = inObservation,
       nameStyle = "intersect_table",
-      name = subsetName
-    )
-
-  subsetCohort <- subsetCohort |>
-    dplyr::mutate(lower_limit = .env$lower_limit,
-                  upper_limit = .env$upper_limit) |>
-    dplyr::filter((
-      .data$intersect_table >= .data$lower_limit &
-        .data$intersect_table <= .data$upper_limit
-    ) |
-      (!.data$cohort_definition_id %in% .env$cohortId)
+      name = tmpNewCohort
+    ) |>
+    dplyr::filter(
+      .data$intersect_table >= .env$lower_limit &
+        .data$intersect_table <= .env$upper_limit
     ) |>
     dplyr::select(dplyr::all_of(cols)) |>
-    dplyr::compute(name = subsetName, temporary = FALSE,
-                   logPrefix = "CohortConstructor_requireTableIntersect_subset_")
+    dplyr::compute(
+      name = tmpNewCohort, temporary = FALSE,
+      logPrefix = "CohortConstructor_requireTableIntersect_subset_"
+    )
 
   # attrition reason
   if (all(intersections == 0)) {
@@ -127,22 +129,46 @@ requireTableIntersect <- function(cohort,
     reason <- glue::glue("{reason}, censoring at {censorDate}")
   }
 
-  x <- cohort |>
-    dplyr::inner_join(subsetCohort, by = c(cols)) |>
-    dplyr::compute(name = name, temporary = FALSE,
-                   logPrefix = "CohortConstructor_requireTableIntersect_join_") |>
+  if (isTRUE(needsIdFilter(cohort, cohortId))) {
+    newCohort <- newCohort |>
+      # join non modified cohorts
+      dplyr::union_all(
+        cdm[[tmpUnchanged]] |>
+          dplyr::select(dplyr::all_of(colnames(newCohort)))
+      ) |>
+      dplyr::compute(
+        name = tmpNewCohort, temporary = FALSE,
+        logPrefix = "CohortConstructor_requireTableIntersect_union_"
+      )
+  }
+
+  # add additional columns
+  if (any(!colnames(cohort) %in% colnames(newCohort))) {
+    newCohort <- newCohort |>
+      dplyr::inner_join(cohort, by = c(cols)) |>
+      dplyr::compute(
+        name = tmpNewCohort, temporary = FALSE,
+        logPrefix = "CohortConstructor_requireTableIntersect_additional_"
+      )
+  }
+
+  newCohort <- newCohort |>
+    dplyr::compute(
+      name = name, temporary = FALSE,
+      logPrefix = "CohortConstructor_requireTableIntersect_name_"
+    ) |>
     omopgenerics::newCohortTable(.softValidation = TRUE) |>
     omopgenerics::recordCohortAttrition(reason = reason, cohortId = cohortId)
 
-  omopgenerics::dropTable(cdm = cdm, name = subsetName)
+  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(tablePrefix))
 
   useIndexes <- getOption("CohortConstructor.use_indexes")
   if (!isFALSE(useIndexes)) {
     addIndex(
-      cohort = x,
+      cohort = newCohort,
       cols = c("subject_id", "cohort_start_date")
     )
   }
 
-  return(x)
+  return(newCohort)
 }

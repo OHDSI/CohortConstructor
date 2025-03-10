@@ -67,8 +67,8 @@ library(CohortConstructor)
 cdm <- mockCohortConstructor()
 cdm$cohort1 |>
   requireCohortIntersect(targetCohortTable = "cohort2",
-                             targetCohortId = 1,
-                             indexDate = "cohort_start_date",
-                             window = c(-Inf, 0))
+                         targetCohortId = 1,
+                         indexDate = "cohort_start_date",
+                         window = c(-Inf, 0))
 }
 }

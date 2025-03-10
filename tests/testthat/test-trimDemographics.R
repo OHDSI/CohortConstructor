@@ -419,6 +419,6 @@ test_that("test indexes - postgres", {
   )
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
+  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
   CDMConnector::cdmDisconnect(cdm = cdm)
 })
