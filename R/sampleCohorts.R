@@ -67,28 +67,55 @@ sampleCohorts <- function(cohort,
     return(cdm[[name]])
   }
 
-  cdm[[name]] <- cohort |>
-    dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>
+  # temp tables
+  tablePrefix <- omopgenerics::tmpPrefix()
+  tmpNewCohort <- omopgenerics::uniqueTableName(tablePrefix)
+  tmpUnchanged <- omopgenerics::uniqueTableName(tablePrefix)
+  cdm <- filterCohortInternal(cdm, cohort, cohortId, tmpNewCohort, tmpUnchanged)
+  newCohort <- cdm[[tmpNewCohort]]
+
+  newCohort<- newCohort |>
     dplyr::group_by(.data$cohort_definition_id) |>
     dplyr::select("subject_id", "cohort_definition_id") |>
     dplyr::distinct() |>
     dplyr::slice_sample(n = n) |>
-    dplyr::left_join(cohort, by = c("subject_id", "cohort_definition_id")) |>
-    dplyr::union_all(cohort |>
-      dplyr::filter(!(
-        .data$cohort_definition_id %in% .env$cohortId
-      ))) |>
     dplyr::ungroup() |>
+    dplyr::left_join(cohort, by = c("subject_id", "cohort_definition_id")) |>
     dplyr::relocate(dplyr::all_of(omopgenerics::cohortColumns("cohort")))  |>
-    dplyr::compute(name = name,
-                   temporary = FALSE,
-                   logPrefix = "CohortConstructor_sampleCohorts_sample_")
+    dplyr::compute(
+      name = tmpNewCohort, temporary = FALSE,
+      logPrefix = "CohortConstructor_sampleCohorts_sample_"
+    )
 
-  cdm[[name]] <- cdm[[name]] |>
+  if (isTRUE(needsIdFilter(cohort, cohortId))) {
+    newCohort <- newCohort |>
+      # join non modified cohorts
+      dplyr::union_all(cdm[[tmpUnchanged]]) |>
+      dplyr::compute(
+        name = tmpNewCohort, temporary = FALSE,
+        logPrefix = "CohortConstructor_sampleCohorts_union_"
+      )
+  }
+
+  newCohort <- newCohort |>
+    dplyr::compute(
+      name = name, temporary = FALSE,
+      logPrefix = "CohortConstructor_sampleCohorts_name_"
+    ) |>
     omopgenerics::recordCohortAttrition(
       reason = paste0("Sample ", n, " individuals"),
       cohortId = cohortId
     )
 
-  return(cdm[[name]])
+  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(tablePrefix))
+
+  useIndexes <- getOption("CohortConstructor.use_indexes")
+  if (!isFALSE(useIndexes)) {
+    addIndex(
+      cohort = newCohort,
+      cols = c("subject_id", "cohort_start_date")
+    )
+  }
+
+  return(newCohort)
 }

@@ -184,7 +184,7 @@ measurementCohort <- function(cdm,
         cohortAttritionRef = cohortAttrition,
         cohortCodelistRef = cohortCodelist
       )
-    omopgenerics::dropTable(cdm = cdm, name = tmpCodelist)
+    omopgenerics::dropSourceTable(cdm = cdm, name = tmpCodelist)
     return(cdm[[name]])
   }
 
@@ -228,7 +228,7 @@ measurementCohort <- function(cdm,
 
   cli::cli_inform(c("v" = "Cohort {.strong {name}} created."))
 
-  omopgenerics::dropTable(cdm = cdm, name = tmpCodelist)
+  omopgenerics::dropSourceTable(cdm = cdm, name = tmpCodelist)
 
   useIndexes <- getOption("CohortConstructor.use_indexes")
   if (!isFALSE(useIndexes)) {
@@ -283,7 +283,7 @@ addDomains <- function(cohortCodelist, cdm, name) {
     dplyr::compute(name = name, temporary = FALSE,
                    logPrefix = "CohortConstructor_addDomains_")
 
-  omopgenerics::dropTable(cdm = cdm, name = tmpName)
+  omopgenerics::dropSourceTable(cdm = cdm, name = tmpName)
 
   return(cohortCodelist)
 }

@@ -166,6 +166,21 @@ test_that("infitine", {
                     dplyr::pull("cohort_end_date") ==
                     as.Date("2023-01-01")))
 
+  # test Id
+  cdm$cohort_collapsed2 <- cdm$cohort |>
+    dplyr::mutate("extra_col" = 1) |>
+    collapseCohorts(gap = Inf,
+                    name = "cohort_collapsed2",
+                    cohortId = 2)
+  expect_equal(collectCohort(cdm$cohort, 1), collectCohort(cdm$cohort_collapsed2, 1))
+  expect_true(
+    cdm$cohort_collapsed2 |>
+      attrition() |>
+      dplyr::filter(reason == "Collapse cohort with a gap of Inf days.") |>
+      dplyr::pull("cohort_definition_id") == 2
+  )
+
+
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
@@ -255,6 +270,8 @@ test_that("test indexes - postgres", {
     achillesSchema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA")
   )
 
+  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::contains("og_"))
+
   cdm <- omopgenerics::insertTable(cdm = cdm,
                                    name = "my_cohort",
                                    table = data.frame(cohort_definition_id = 1L,
@@ -270,6 +287,6 @@ test_that("test indexes - postgres", {
   )
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
+  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
   CDMConnector::cdmDisconnect(cdm = cdm)
 })

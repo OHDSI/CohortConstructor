@@ -180,7 +180,7 @@ matchCohorts <- function(cohort,
   cdm <- do.call(omopgenerics::bind, c(cohorts, "name" = name))
 
   # drop tmp tables
-  omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with(tablePrefix))
+  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(tablePrefix))
 
   useIndexes <- getOption("CohortConstructor.use_indexes")
   if (!isFALSE(useIndexes)) {
@@ -225,7 +225,7 @@ getNewCohort <- function(cohort, cohortId, control) {
     ) |>
     dplyr::compute(name = control, temporary = FALSE,
                    logPrefix = "CohortConstructor_matchCohorts_control_")
-  cdm <- omopgenerics::dropTable(cdm, temp_name)
+  cdm <- omopgenerics::dropSourceTable(cdm, temp_name)
 
   controls <- controls |>
     dplyr::relocate(dplyr::all_of(omopgenerics::cohortColumns("cohort"))) |>

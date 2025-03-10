@@ -5,7 +5,7 @@
 #' specified demographic criteria is satisfied.
 #'
 #' @inheritParams requireDemographics
-#' @inheritParams cohortIdSubsetDoc
+#' @inheritParams cohortIdModifyDoc
 #'
 #' @return The cohort table with only records for individuals satisfying the
 #' demographic requirements
@@ -337,7 +337,7 @@ trimDemographics <- function(cohort,
       .softValidation = FALSE
     )
 
-  omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with(tablePrefix))
+  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(tablePrefix))
 
   useIndexes <- getOption("CohortConstructor.use_indexes")
   if (!isFALSE(useIndexes)) {

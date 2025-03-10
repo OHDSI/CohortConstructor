@@ -62,7 +62,7 @@ test_that("postgres test - adds indexes", {
   # should still all work as before
   cdm$my_cohort <- omopgenerics::newCohortTable(cdm$my_cohort)
 
-  omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
+  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
   CDMConnector::cdmDisconnect(cdm = cdm)
 
 })

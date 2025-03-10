@@ -502,8 +502,8 @@ demographicsFilter <- function(cohort,
     )
 
   # drop working tables and their attributes
-  omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with(workingName))
-  omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with(tempSetName))
+  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(workingName))
+  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(tempSetName))
 
   useIndexes <- getOption("CohortConstructor.use_indexes")
   if (!isFALSE(useIndexes)) {

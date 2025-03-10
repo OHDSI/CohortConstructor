@@ -9,8 +9,10 @@ renameCohort(cohort, cohortId, newCohortName)
 \arguments{
 \item{cohort}{A cohort table in a cdm reference.}
 
-\item{cohortId}{Vector identifying which cohorts to include
-(cohort_definition_id or cohort_name).}
+\item{cohortId}{Vector identifying which cohorts to modify
+(cohort_definition_id or cohort_name). If NULL, all cohorts will be
+used; otherwise, only the specified cohorts will be modified, and the
+rest will remain unchanged.}
 
 \item{newCohortName}{Character vector with same}
 }
