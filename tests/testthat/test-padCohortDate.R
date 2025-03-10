@@ -124,6 +124,13 @@ test_that("overlapping entries", {
         dplyr::filter(cohort_definition_id == 1)  |>
     dplyr::pull("cohort_end_date")))
 
+  # extra columns
+ expect_no_error(
+   cdm$cohort_3 <- cdm$cohort |>
+    dplyr::mutate(extra_col = 1) |>
+    padCohortEnd(days = 10, name = "cohort_3", cohortId = 2)
+ )
+
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
@@ -146,6 +153,8 @@ test_that("test indexes - postgres", {
     achillesSchema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA")
   )
 
+  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::contains("og_"))
+
   cdm <- omopgenerics::insertTable(cdm = cdm,
                                    name = "my_cohort",
                                    table = data.frame(cohort_definition_id = 1L,
@@ -162,7 +171,7 @@ test_that("test indexes - postgres", {
   )
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
+  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
   CDMConnector::cdmDisconnect(cdm = cdm)
 })
 
@@ -354,7 +363,7 @@ test_that("test indexes - postgres", {
   )
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
+  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
   CDMConnector::cdmDisconnect(cdm = cdm)
 })
 

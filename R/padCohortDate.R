@@ -158,6 +158,7 @@ padCohortStart <- function(cohort,
   omopgenerics::assertLogical(collapse, length = 1)
   cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
+  cdm <- omopgenerics::cdmReference(cohort)
 
   if (length(cohortId) == 0) {
     cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
@@ -185,9 +186,12 @@ padCohortStart <- function(cohort,
     cli::cli_abort(message = msg, call = call)
   }
 
-  intermediate <- omopgenerics::uniqueTableName()
-  subCohort <- cohort |>
-    dplyr::filter(.data$cohort_definition_id %in% .env$cohortId)
+  # temp tables
+  tablePrefix <- omopgenerics::tmpPrefix()
+  tmpNewCohort <- omopgenerics::uniqueTableName(tablePrefix)
+  tmpUnchanged <- omopgenerics::uniqueTableName(tablePrefix)
+  cdm <- filterCohortInternal(cdm, cohort, cohortId, tmpNewCohort, tmpUnchanged)
+  newCohort <- cdm[[tmpNewCohort]]
 
   # pad days
   q <- q |>
@@ -195,43 +199,54 @@ padCohortStart <- function(cohort,
     as.character() |>
     rlang::parse_exprs() |>
     rlang::set_names(cohortDate)
-  subCohort <- subCohort |>
-    dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) %>%
+  newCohort <- newCohort %>%
     dplyr::mutate(!!!q) |>
     # drop start > end
     dplyr::filter(
       .data$cohort_start_date <= .data$cohort_end_date &
         !is.na(.data[[cohortDate]])
     ) |>
-    dplyr::compute(name = intermediate, temporary = FALSE,
+    dplyr::compute(name = tmpNewCohort, temporary = FALSE,
                    logPrefix = "CohortConstructor_.padCohortDate_intermediate_")
 
   # solve observation
-  subCohort <- subCohort |>
-    solveObservation(padObservation, intermediate, cohortDate)
+  newCohort <- newCohort |>
+    solveObservation(padObservation, tmpNewCohort, cohortDate)
 
   # solve overlap
-  subCohort <- subCohort |>
-    solveOverlap(collapse, intermediate)
+  newCohort <- newCohort |>
+    solveOverlap(collapse, tmpNewCohort)
 
   # recreate the cohort
-  cohort <- cohort |>
-    dplyr::filter(!.data$cohort_definition_id %in% .env$cohortId) |>
-    dplyr::select(
-      "cohort_definition_id", "subject_id", "cohort_start_date",
-      "cohort_end_date"
-    ) |>
-    dplyr::union_all(subCohort) |>
+  if (isTRUE(needsIdFilter(cohort, cohortId))) {
+    newCohort <- newCohort |>
+      # join non modified cohorts
+      dplyr::union_all(
+        cdm[[tmpUnchanged]] |>
+          dplyr::select(dplyr::all_of(omopgenerics::cohortColumns("cohort")))
+      ) |>
+      dplyr::compute(name = tmpNewCohort, temporary = FALSE,
+                     logPrefix = "CohortConstructor_.padCohortDate_union_")
+  }
+
+  newCohort <- newCohort |>
     dplyr::compute(name = name, temporary = FALSE,
                    logPrefix = "CohortConstructor_.padCohortDate_recreate_") |>
     omopgenerics::newCohortTable(.softValidation = FALSE) |>
     omopgenerics::recordCohortAttrition(cohortId = cohortId, reason = reason)
 
   # drop temp table
-  cdm <- omopgenerics::cdmReference(cohort)
-  omopgenerics::dropTable(cdm = cdm, name = intermediate)
+  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(tablePrefix))
 
-  return(cohort)
+  useIndexes <- getOption("CohortConstructor.use_indexes")
+  if (!isFALSE(useIndexes)) {
+    addIndex(
+      cohort = newCohort,
+      cols = c("subject_id", "cohort_start_date")
+    )
+  }
+
+  return(newCohort)
 }
 
 validateColumn <- function(col, x, call) {
@@ -276,7 +291,7 @@ solveOverlap <- function(x, collapse, intermediate) {
       dplyr::compute(name = intermediate, temporary = FALSE,
                      logPrefix = "CohortConstructor_solveOverlap_final_")
     cdm <- omopgenerics::cdmReference(x)
-    omopgenerics::dropTable(cdm = cdm, name = uniqueName)
+    omopgenerics::dropSourceTable(cdm = cdm, name = uniqueName)
   }
   return(x)
 }

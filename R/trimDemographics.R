@@ -63,9 +63,7 @@ trimDemographics <- function(cohort,
       "cohort_start_date",
       "cohort_end_date"
     ) |>
-    dplyr::compute(name = tmpNewCohort, temporary = FALSE,
-                   logPrefix = "CohortConstructor_trimDemographics_trimmed_") |>
-    omopgenerics::newCohortTable(.softValidation = TRUE)
+    subsetCohorts(cohortId = cohortId, name = tmpNewCohort)
 
   if (!is.null(ageRange) ||
       !is.null(minPriorObservation) ||
@@ -337,7 +335,7 @@ trimDemographics <- function(cohort,
       .softValidation = FALSE
     )
 
-  omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with(tablePrefix))
+  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(tablePrefix))
 
   useIndexes <- getOption("CohortConstructor.use_indexes")
   if (!isFALSE(useIndexes)) {

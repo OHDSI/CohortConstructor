@@ -171,10 +171,10 @@ benchmarkCohortConstructor <- function(cdm,
   # Drop tables ----
   cli::cli_inform(c(""))
   cli::cli_inform(c("*" = "{.strong Dropping intrmediate benchmark intermediate tables.}"))
-  omopgenerics::dropTable(cdm, name = dplyr::starts_with(pref))
+  omopgenerics::dropSourceTable(cdm, name = dplyr::starts_with(pref))
   if (dropCohorts) {
     cli::cli_inform(c("*" = "{.strong Dropping benchmark cohort}"))
-    omopgenerics::dropTable(cdm, name = dplyr::starts_with("benchmark"))
+    omopgenerics::dropSourceTable(cdm, name = dplyr::starts_with("benchmark"))
   }
 
   # Bind and return results ---

@@ -120,7 +120,7 @@ conceptCohort <- function(cdm,
       dplyr::compute(name = subsetName, temporary = FALSE,
                      logPrefix = "CohortConstructor_conceptCohort_subsetCohort_")
     if (omopgenerics::isTableEmpty(subsetIndividuals)) {
-      omopgenerics::dropTable(cdm = cdm, name = subsetName)
+      omopgenerics::dropSourceTable(cdm = cdm, name = subsetName)
       cli::cli_warn("There are no individuals in the `subsetCohort` and `subsetCohortId` provided. Returning empty cohort.")
       cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name)
       cdm[[name]] <- cdm[[name]] |>
@@ -166,7 +166,7 @@ conceptCohort <- function(cdm,
     subsetIndividuals = subsetIndividuals
   )
 
-  omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with(tmpPref))
+  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(tmpPref))
   cdm[[tableCohortCodelist]] <- NULL
 
   if (cdm[[name]] |>
@@ -329,7 +329,7 @@ unerafiedConceptCohort <- function(cdm,
     purrr::discard(is.null)
 
   if (length(cohorts) == 0) {
-    omopgenerics::dropTable(cdm, name = dplyr::starts_with(workingTblNames))
+    omopgenerics::dropSourceTable(cdm, name = dplyr::starts_with(workingTblNames))
     cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name)
     return(cdm[[name]])
   }
@@ -346,7 +346,7 @@ unerafiedConceptCohort <- function(cdm,
     dplyr::compute(name = name, temporary = FALSE,
                    logPrefix = "CohortConstructor_conceptCohort_reduce_")
 
-  omopgenerics::dropTable(cdm, name = dplyr::starts_with(workingTblNames))
+  omopgenerics::dropSourceTable(cdm, name = dplyr::starts_with(workingTblNames))
 
   return(cohort)
 }

@@ -88,85 +88,115 @@ requireConceptIntersect <- function(cohort,
 
   if (length(conceptSet) == 0) {
     cli::cli_inform(c("i" = "Empty codelist provided, returning input cohort"))
-  } else {
-    subsetName <- omopgenerics::uniqueTableName()
-    subsetCohort <- cohort |>
-      dplyr::select(dplyr::all_of(.env$cols)) |>
-      PatientProfiles::addConceptIntersectCount(
-        conceptSet = conceptSet,
-        indexDate = indexDate,
-        targetStartDate = targetStartDate,
-        targetEndDate = targetEndDate,
-        window = window,
-        censorDate = censorDate,
-        inObservation = inObservation,
-        nameStyle = "intersect_concept",
-        name = subsetName
-      )
+    return(
+      cohort |>
+        dplyr::compute(
+          name = name, temporary = FALSE,
+          logPrefix = "CohortConstructor_requireConceptIntersect_emptyConcept_"
+        )
+    )
+  }
 
-    subsetCohort <- subsetCohort |>
-      dplyr::mutate(lower_limit = .env$lower_limit,
-                    upper_limit = .env$upper_limit) |>
-      dplyr::filter((
-        .data$intersect_concept >= .data$lower_limit &
-          .data$intersect_concept <= .data$upper_limit
-      ) |
-        (!.data$cohort_definition_id %in% .env$cohortId)
-      ) |>
-      dplyr::select(dplyr::all_of(cols)) |>
-      dplyr::compute(name = subsetName, temporary = FALSE,
-                     logPrefix = "CohortConstructor_requireConceptIntersect_subset_")
+  # temp tables
+  tablePrefix <- omopgenerics::tmpPrefix()
+  tmpNewCohort <- omopgenerics::uniqueTableName(tablePrefix)
+  tmpUnchanged <- omopgenerics::uniqueTableName(tablePrefix)
+  cdm <- filterCohortInternal(cdm, cohort, cohortId, tmpNewCohort, tmpUnchanged)
+  newCohort <- cdm[[tmpNewCohort]]
 
-    # attrition reason
-    if (all(intersections == 0)) {
-      reason <- glue::glue(
-        "Not in concept {names(conceptSet)} between {window_start} & ",
-        "{window_end} days relative to {indexDate}"
-      )
-    } else if (intersections[[1]] != intersections[[2]]) {
-      reason <- glue::glue(
-        "Concept {names(conceptSet)} between {window_start} & ",
-        "{window_end} days relative to {indexDate} between ",
-        "{intersections[[1]]} and {intersections[[2]]}"
-      )
-    } else {
-      reason <- glue::glue(
-        "Concept {names(conceptSet)} between {window_start} & ",
-        "{window_end} days relative to {indexDate} ",
-        "{intersections[[1]]} times"
-      )
-    }
-    if (!is.null(censorDate)) {
-      reason <- glue::glue("{reason}, censoring at {censorDate}")
-    }
-
-    #codelist
-    newCodelist <- getIntersectionCodelist(
-      cohort, cohortId, conceptSetToCohortCodelist(conceptSet)
+  newCohort <- newCohort |>
+    dplyr::select(dplyr::all_of(.env$cols)) |>
+    PatientProfiles::addConceptIntersectCount(
+      conceptSet = conceptSet,
+      indexDate = indexDate,
+      targetStartDate = targetStartDate,
+      targetEndDate = targetEndDate,
+      window = window,
+      censorDate = censorDate,
+      inObservation = inObservation,
+      nameStyle = "intersect_concept",
+      name = tmpNewCohort
     )
 
-    # cohort
-    cohort <- cohort |>
-      dplyr::inner_join(subsetCohort, by = c(cols)) |>
-      dplyr::compute(name = name, temporary = FALSE,
-                     logPrefix = "CohortConstructor_requireConceptIntersect_join_") |>
-      omopgenerics::newCohortTable(
-        .softValidation = TRUE, cohortCodelistRef = newCodelist
-      ) |>
-      omopgenerics::recordCohortAttrition(reason = reason, cohortId = cohortId)
+  newCohort <- newCohort |>
+    dplyr::filter(
+      .data$intersect_concept >= .env$lower_limit &
+        .data$intersect_concept <= .env$upper_limit
+    ) |>
+    dplyr::select(dplyr::all_of(cols)) |>
+    dplyr::compute(name = tmpNewCohort, temporary = FALSE,
+                   logPrefix = "CohortConstructor_requireConceptIntersect_subset_")
 
-    omopgenerics::dropTable(cdm = cdm, name = subsetName)
+  # attrition reason
+  if (all(intersections == 0)) {
+    reason <- glue::glue(
+      "Not in concept {names(conceptSet)} between {window_start} & ",
+      "{window_end} days relative to {indexDate}"
+    )
+  } else if (intersections[[1]] != intersections[[2]]) {
+    reason <- glue::glue(
+      "Concept {names(conceptSet)} between {window_start} & ",
+      "{window_end} days relative to {indexDate} between ",
+      "{intersections[[1]]} and {intersections[[2]]}"
+    )
+  } else {
+    reason <- glue::glue(
+      "Concept {names(conceptSet)} between {window_start} & ",
+      "{window_end} days relative to {indexDate} ",
+      "{intersections[[1]]} times"
+    )
   }
+  if (!is.null(censorDate)) {
+    reason <- glue::glue("{reason}, censoring at {censorDate}")
+  }
+
+  # codelist
+  newCodelist <- getIntersectionCodelist(
+    cohort, cohortId, conceptSetToCohortCodelist(conceptSet)
+  )
+
+  if (isTRUE(needsIdFilter(cohort, cohortId))) {
+    newCohort <- newCohort |>
+      # join non modified cohorts
+      dplyr::union_all(
+        cdm[[tmpUnchanged]] |>
+          dplyr::select(dplyr::all_of(colnames(newCohort)))
+      ) |>
+      dplyr::compute(name = tmpNewCohort, temporary = FALSE,
+                     logPrefix = "CohortConstructor_requireConceptIntersect_union_")
+  }
+
+  # add additional columns
+  if (any(!colnames(cohort) %in% colnames(newCohort))) {
+    newCohort <- newCohort |>
+      dplyr::inner_join(cohort, by = c(cols)) |>
+      dplyr::compute(name = tmpNewCohort, temporary = FALSE,
+                     logPrefix = "CohortConstructor_requireConceptIntersect_additional_")
+  }
+
+  # cohort
+  newCohort <- newCohort |>
+    dplyr::compute(
+      name = name, temporary = FALSE,
+      logPrefix = "CohortConstructor_requireConceptIntersect_join_"
+    ) |>
+    omopgenerics::newCohortTable(
+      .softValidation = TRUE, cohortCodelistRef = newCodelist
+    ) |>
+    omopgenerics::recordCohortAttrition(reason = reason, cohortId = cohortId)
+
+  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(tablePrefix))
+
 
   useIndexes <- getOption("CohortConstructor.use_indexes")
   if (!isFALSE(useIndexes)) {
     addIndex(
-      cohort = cohort,
+      cohort = newCohort,
       cols = c("subject_id", "cohort_start_date")
     )
   }
 
-  return(cohort)
+  return(newCohort)
 }
 
 getIntersectionCodelist <- function(cohort, cohortId, codelist) {
