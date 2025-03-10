@@ -89,6 +89,7 @@ test_that("requiring presence in another table", {
     as.Date("1999-05-03")
   )
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
 
   # expected errors
   # currently just 1 table suported´
@@ -108,7 +109,6 @@ test_that("requiring presence in another table", {
                           window = c(-Inf, Inf))
   )
 
-  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
 

@@ -5,7 +5,7 @@
 #' specified demographic criteria is satisfied.
 #'
 #' @inheritParams requireDemographics
-#' @inheritParams cohortIdSubsetDoc
+#' @inheritParams cohortIdModifyDoc
 #'
 #' @return The cohort table with only records for individuals satisfying the
 #' demographic requirements
@@ -63,7 +63,9 @@ trimDemographics <- function(cohort,
       "cohort_start_date",
       "cohort_end_date"
     ) |>
-    subsetCohorts(cohortId = cohortId, name = tmpNewCohort)
+    dplyr::compute(name = tmpNewCohort, temporary = FALSE,
+                   logPrefix = "CohortConstructor_trimDemographics_trimmed_") |>
+    omopgenerics::newCohortTable(.softValidation = TRUE)
 
   if (!is.null(ageRange) ||
       !is.null(minPriorObservation) ||
