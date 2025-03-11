@@ -6,9 +6,9 @@ validateCohortColumn <- function(columns, cohort, class = NULL) {
     }
     if (!is.null(class)) {
       if (!any(cohort |>
-        dplyr::pull(!!column) |>
-        class() |>
-        unique() %in% class)) {
+               dplyr::pull(!!column) |>
+               class() |>
+               unique() %in% class)) {
         cli::cli_abort("{column} must be a column of class {class} in the cohort table.")
       }
     }
@@ -35,13 +35,14 @@ validateDemographicRequirements <- function(ageRange,
                                             sex,
                                             minPriorObservation,
                                             minFutureObservation,
-                                            null = FALSE) {
+                                            null = FALSE,
+                                            length = 1) {
   # ageRange:
   if (!is.list(ageRange) &&
-    !is.null(ageRange)) {
+      !is.null(ageRange)) {
     ageRange <- list(ageRange)
   }
-  omopgenerics::assertList(ageRange, class = "numeric", null = null)
+  omopgenerics::assertList(ageRange, class = "numeric", null = null, length = length)
   if (!is.null(ageRange)) {
     for (i in seq_along(ageRange)) {
       if (length(ageRange[[i]]) != 2) {
@@ -57,9 +58,9 @@ validateDemographicRequirements <- function(ageRange,
   }
 
   # sex:
-  omopgenerics::assertCharacter(sex, null = null)
+  omopgenerics::assertCharacter(sex, null = null, length = length)
   if (!all(sex %in% c("Male", "Female", "Both")) && !is.null(sex)) {
-    cli::cli_abort("`sex` must be from: 'Male', 'Female', and 'Both'.")
+    cli::cli_abort("`sex` must be one of: 'Male', 'Female', and 'Both'.")
   }
 
   # minPriorObservation:
@@ -72,7 +73,8 @@ validateDemographicRequirements <- function(ageRange,
     minPriorObservation,
     integerish = TRUE,
     min = 0,
-    null = TRUE
+    null = TRUE,
+    length = length
   )
   # minFutureObservation:
   if (!is.null(minFutureObservation)) {
@@ -84,7 +86,8 @@ validateDemographicRequirements <- function(ageRange,
     minFutureObservation,
     integerish = TRUE,
     min = 0,
-    null = TRUE
+    null = TRUE,
+    length = length
   )
 
   return(ageRange)
@@ -103,7 +106,7 @@ validateStrata <- function(strata, cohort) {
 
 validateValueAsNumber <- function(valueAsNumber) {
 
-   omopgenerics::assertList(valueAsNumber,
+  omopgenerics::assertList(valueAsNumber,
                            class = c("integer", "numeric"),
                            null = TRUE
   )

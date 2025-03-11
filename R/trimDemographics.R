@@ -37,7 +37,8 @@ trimDemographics <- function(cohort,
     sex = sex,
     minPriorObservation = minPriorObservation,
     minFutureObservation = minFutureObservation,
-    null = TRUE
+    null = TRUE,
+    length = NULL
   )
 
   if (length(cohortId) == 0) {
@@ -337,7 +338,7 @@ trimDemographics <- function(cohort,
       .softValidation = FALSE
     )
 
-  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(tablePrefix))
+  omopgenerics::dropTable(cdm = cdm, name = dplyr::starts_with(tablePrefix))
 
   useIndexes <- getOption("CohortConstructor.use_indexes")
   if (!isFALSE(useIndexes)) {
