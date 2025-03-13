@@ -37,7 +37,8 @@ trimDemographics <- function(cohort,
     sex = sex,
     minPriorObservation = minPriorObservation,
     minFutureObservation = minFutureObservation,
-    null = TRUE
+    null = TRUE,
+    length = NULL
   )
 
   if (length(cohortId) == 0) {

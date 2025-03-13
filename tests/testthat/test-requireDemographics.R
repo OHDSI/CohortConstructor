@@ -51,10 +51,10 @@ test_that("test it works and expected errors", {
   expect_identical(settings(cdm$cohort), dplyr::tibble(
       cohort_definition_id = 1L,
       cohort_name = "cohort_1",
-      min_future_observation = 40,
-      min_prior_observation = 10,
+      age_range = "0_35",
       sex = "Both",
-      age_range = "0_35"
+      min_prior_observation = 10,
+      min_future_observation = 40
     ))
   expect_true(all(
     attrition(cdm$cohort)$reason ==
@@ -258,206 +258,6 @@ test_that("cohortIds", {
   PatientProfiles::mockDisconnect(cdm)
 })
 
-test_that("test more than one restriction", {
-  testthat::skip_on_cran()
-  cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 3,seed = 1) |>
-    omock::mockObservationPeriod(seed = 1) |>
-    omock::mockCohort(numberCohorts = 3,seed = 1)
-  # to remove in new omock
-  cdm_local$person <- cdm_local$person |>
-    dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
-  cdm <- cdm_local |> copyCdm()
-
-  # keep = false
-  cdm$cohort1 <- cdm$cohort |>
-    requireAge(ageRange = list(c(0,19), c(20, 40), c(0, 40)), name = "cohort1")
-  expect_true(all(
-    cdm$cohort1 |> dplyr::pull("cohort_definition_id") |> sort() ==
-      c(1, 1, 2, 2, 2, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7, 9, 9, 9)
-  ))
-  expect_true(all(
-    cdm$cohort1 |> dplyr::pull("cohort_start_date") |> sort() ==
-      c("1999-11-16", "1999-11-16", "1999-12-17", "1999-12-17", "1999-12-19",
-        "1999-12-19", "2000-05-15", "2000-05-15", "2000-06-23", "2000-06-23",
-        "2001-07-16", "2001-07-16", "2001-12-04", "2001-12-04", "2003-06-15",
-        "2003-06-15", "2004-09-11", "2004-09-11")
-  ))
-  expect_true(all(
-    cdm$cohort1 |> dplyr::pull("cohort_end_date") |> sort() ==
-      c("1999-12-18", "1999-12-18", "2000-05-14", "2000-05-14", "2001-02-23",
-        "2001-02-23", "2001-07-15", "2001-07-15", "2001-08-26", "2001-08-26",
-        "2001-12-03", "2001-12-03", "2004-09-10", "2004-09-10", "2005-07-25",
-        "2005-07-25", "2006-09-27", "2006-09-27")
-  ))
-  expect_true(all(
-    attrition(cdm$cohort1)$reason |> sort() ==
-      c('Age requirement: 0 to 19', 'Age requirement: 0 to 19', 'Age requirement: 0 to 19',
-        'Age requirement: 0 to 40', 'Age requirement: 0 to 40', 'Age requirement: 0 to 40',
-        'Age requirement: 20 to 40', 'Age requirement: 20 to 40', 'Age requirement: 20 to 40',
-        'Initial qualifying events', 'Initial qualifying events', 'Initial qualifying events',
-        'Initial qualifying events', 'Initial qualifying events', 'Initial qualifying events',
-        'Initial qualifying events', 'Initial qualifying events', 'Initial qualifying events')
-  ))
-  expect_true(all(
-    attrition(cdm$cohort1)$number_records |> sort() ==
-      c(0, 0, 1, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3)
-  ))
-  expect_true(all(settings(cdm$cohort1)$age_range |> unique() == c("0_19", "0_40", "20_40")))
-  expect_true(all(settings(cdm$cohort1)$cohort_name |> unique() ==
-                    c("cohort_1_1", "cohort_2_1", "cohort_3_1", "cohort_1_2", "cohort_2_2",
-                      "cohort_3_2", "cohort_1_3", "cohort_2_3", "cohort_3_3")))
-
-  # keep = true
-  cdm$cohort2 <- cdm$cohort |>
-    requireAge(ageRange = list(c(0,19), c(20, 40), c(0, 40), c(0, 150)), name = "cohort2")
-  expect_true(all(
-    cdm$cohort2 |> dplyr::pull("cohort_definition_id") |> sort() ==
-      c(1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 5, 5, 5, 7, 7, 7, 8, 8, 8, 9, 9, 9, 10, 12, 12, 12)
-  ))
-  expect_true(all(
-    cdm$cohort2 |> dplyr::pull("cohort_start_date") |> sort() ==
-      c("1999-11-16", "1999-11-16", "1999-11-16", "1999-12-17", "1999-12-17",
-        "1999-12-17", "1999-12-19", "1999-12-19", "1999-12-19", "2000-05-15",
-        "2000-05-15", "2000-05-15", "2000-06-23", "2000-06-23", "2000-06-23",
-        "2001-07-16", "2001-07-16", "2001-07-16", "2001-12-04", "2001-12-04",
-        "2001-12-04", "2003-06-15", "2003-06-15", "2003-06-15", "2004-09-11",
-        "2004-09-11", "2004-09-11")
-  ))
-  expect_true(all(
-    cdm$cohort2 |> dplyr::pull("cohort_end_date") |> sort() ==
-      c("1999-12-18", "1999-12-18", "1999-12-18", "2000-05-14", "2000-05-14",
-        "2000-05-14", "2001-02-23", "2001-02-23", "2001-02-23", "2001-07-15",
-        "2001-07-15", "2001-07-15", "2001-08-26", "2001-08-26", "2001-08-26",
-        "2001-12-03", "2001-12-03", "2001-12-03", "2004-09-10", "2004-09-10",
-        "2004-09-10", "2005-07-25", "2005-07-25", "2005-07-25", "2006-09-27",
-        "2006-09-27", "2006-09-27")
-  ))
-  expect_true(all(settings(cdm$cohort2)$age_range |> unique() == c("0_150", "0_19", "0_40", "20_40")))
-  expect_true(all(colnames(settings(cdm$cohort2)) %in% c("cohort_definition_id", "cohort_name", "age_range")))
-  expect_true(all(
-    settings(cdm$cohort2)$cohort_name |> sort() ==
-      c('cohort_1_1', 'cohort_1_2', 'cohort_1_3', 'cohort_1_4', 'cohort_2_1',
-        'cohort_2_2', 'cohort_2_3', 'cohort_2_4', 'cohort_3_1', 'cohort_3_2',
-        'cohort_3_3', 'cohort_3_4')
-  ))
-
-  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  PatientProfiles::mockDisconnect(cdm)
-
-  # one empty output cohort
-  cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 3,seed = 1) |>
-    omock::mockObservationPeriod(seed = 1) |>
-    omock::mockCohort(numberCohorts = 3, seed = 4)
-  # to remove in new omock
-  cdm_local$person <- cdm_local$person |>
-    dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
-  cdm <- cdm_local |> copyCdm()
-
-  # empty cohort return (no males in the cohort)
-  cdm$cohort1 <- cdm$cohort |>
-    requireSex(sex = c("Both", "Male"), name = "cohort1") |>
-    requirePriorObservation(minPriorObservation = 3, name = "cohort1")
-
-  expect_true(all(
-    cdm$cohort1 |> dplyr::pull("cohort_definition_id") |> sort() ==
-      cdm$cohort |> dplyr::pull("cohort_definition_id") |> sort()
-  ))
-  expect_true(all(
-    cdm$cohort1 |> dplyr::pull("cohort_start_date") |> sort() ==
-      cdm$cohort |> dplyr::pull("cohort_start_date") |> sort()
-  ))
-  expect_true(all(
-    cdm$cohort1 |> dplyr::pull("cohort_end_date") |> sort() ==
-      cdm$cohort |> dplyr::pull("cohort_end_date") |> sort()
-  ))
-  expect_true(all(
-    attrition(cdm$cohort1)$reason |> sort() ==
-      c('Initial qualifying events', 'Initial qualifying events', 'Initial qualifying events',
-        'Initial qualifying events', 'Initial qualifying events', 'Initial qualifying events',
-        'Prior observation requirement: 3 days', 'Prior observation requirement: 3 days',
-        'Prior observation requirement: 3 days', 'Prior observation requirement: 3 days',
-        'Prior observation requirement: 3 days', 'Prior observation requirement: 3 days',
-        'Sex requirement: Both', 'Sex requirement: Both', 'Sex requirement: Both',
-        'Sex requirement: Male', 'Sex requirement: Male', 'Sex requirement: Male')
-  ))
-  expect_true(all(
-    attrition(cdm$cohort1)$number_records |> sort() ==
-      c(rep(0, 6), rep(3, 12))
-  ))
-  expect_true(all(settings(cdm$cohort1)$min_prior_observation |> unique() == 3))
-  expect_true(all(colnames(settings(cdm$cohort1)) %in% c("cohort_definition_id", "cohort_name", "min_prior_observation", "sex")))
-  expect_true(all(
-    settings(cdm$cohort1)$cohort_name |> sort() ==
-      c("cohort_1_1", "cohort_1_2", "cohort_2_1", "cohort_2_2", "cohort_3_1", "cohort_3_2")
-  ))
-
-  cdm$cohort2 <- cdm$cohort |>
-    requireSex(sex = c("Both", "Male"), name = "cohort2", cohortId = c("cohort_1", "cohort_3")) |>
-    requirePriorObservation(minPriorObservation = c(3, 2), name = "cohort2", cohortId = 1)
-  expect_true(all(settings(cdm$cohort2) |> dplyr::arrange(.data$cohort_definition_id) |> dplyr::pull("cohort_name") ==
-                    c("cohort_1_1_1", "cohort_2", "cohort_3_1", "cohort_1_2", "cohort_3_2", "cohort_1_1_2")))
-  expect_true(all(
-    attrition(cdm$cohort2)$reason |> sort() ==
-      c('Initial qualifying events', 'Initial qualifying events', 'Initial qualifying events',
-        'Initial qualifying events', 'Initial qualifying events', 'Initial qualifying events',
-        'Prior observation requirement: 2 days', 'Prior observation requirement: 3 days',
-        'Sex requirement: Both', 'Sex requirement: Both', 'Sex requirement: Both',
-        'Sex requirement: Male', 'Sex requirement: Male')
-  ))
-
-  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  PatientProfiles::mockDisconnect(cdm)
-})
-
-test_that("codelist kept with >1 requirement", {
-  testthat::skip_on_cran()
-  cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4,seed = 1) |>
-    omock::mockObservationPeriod(seed = 1)
-  # to remove in new omock
-  cdm_local$person <- cdm_local$person |>
-    dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
-  cdm_local$concept <- dplyr::tibble(
-    "concept_id" = c(1, 2),
-    "concept_name" = c("my concept 1", "my concept 2"),
-    "domain_id" = "Drug",
-    "vocabulary_id" = NA,
-    "concept_class_id" = NA,
-    "concept_code" = NA,
-    "valid_start_date" = NA,
-    "valid_end_date" = NA
-  )
-  cdm_local$drug_exposure <- dplyr::tibble(
-    "drug_exposure_id" = 1:13,
-    "person_id" = c(1, 1, 1, 1, 2, 2, 3, 1, 1, 1, 1, 4, 4),
-    "drug_concept_id" = c(1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 2),
-    "drug_exposure_start_date" = c(0, 300, 1500, 750, 10, 800, 150, 1800, 1801, 1802, 1803, 430, 10),
-    "drug_exposure_end_date" = c(400, 800, 1600, 1550, 2000, 1000, 600, 1801, 1802, 1803, 1804, 400, 100),
-    "drug_type_concept_id" = 1
-  ) |>
-    dplyr::mutate(
-      "drug_exposure_start_date" = as.Date(.data$drug_exposure_start_date, origin = "2010-01-01"),
-      "drug_exposure_end_date" = as.Date(.data$drug_exposure_end_date, origin = "2010-01-01")
-    )
-
-  cdm <- cdm_local |> copyCdm()
-
-  cdm$cohort1 <- conceptCohort(cdm = cdm, conceptSet = list(a = 1L, b = 2L), name = "cohort1")
-
-  cdm$cohort2 <- cdm$cohort1 |> requireDemographics(name = "cohort2", minPriorObservation = c(0,3), cohortId = 1)
-  expect_equal(attr(cdm$cohort2, "cohort_codelist") |> dplyr::collect() |> dplyr::arrange(.data$cohort_definition_id), dplyr::tibble(
-      cohort_definition_id = as.integer(1:3),
-      codelist_name = c("a", "b", "a"),
-      concept_id = as.integer(c(1, 2, 1)),
-      type = c("index event", "index event", "index event")
-    ))
-
-  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  PatientProfiles::mockDisconnect(cdm)
-})
-
 test_that("settings with extra columns", {
   testthat::skip_on_cran()
   cdm_local <- omock::mockCdmReference() |>
@@ -474,45 +274,16 @@ test_that("settings with extra columns", {
       cohortSetRef = settings(cdm$cohort) |>
         dplyr::mutate(sex = "Both", extra1 = 1, extra2 = "hi")
       )
-  cdm$cohort <- cdm$cohort |> requireSex(sex = c("Both", "Female"))
+  cdm$cohort <- cdm$cohort |> requireSex(sex = c("Both"))
   expect_identical(cdm$cohort |> settings() |> dplyr::arrange(.data$cohort_definition_id), dplyr::tibble(
-      cohort_definition_id = as.integer(1:6),
-      cohort_name = c("cohort_1_1", "cohort_2_1", "cohort_3_1", "cohort_1_2", "cohort_2_2", "cohort_3_2"),
-      sex = c(rep("Both", 3), rep("Female", 3)),
+      cohort_definition_id = as.integer(1:3),
+      cohort_name = c("cohort_1", "cohort_2", "cohort_3"),
       extra1 = 1,
-      extra2 = "hi"
+      extra2 = "hi",
+      sex = c(rep("Both", 3))
     ))
   expect_true(all(colnames(attrition(cdm$cohort)) ==
                     c("cohort_definition_id", "number_records", "number_subjects", "reason_id", "reason", "excluded_records", "excluded_subjects" )))
-
-  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  PatientProfiles::mockDisconnect(cdm)
-})
-
-test_that("requireInteractions", {
-  testthat::skip_on_cran()
-  cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 3,seed = 1) |>
-    omock::mockObservationPeriod(seed = 1) |>
-    omock::mockCohort(numberCohorts = 3, seed = 4)
-  # to remove in new omock
-  cdm_local$person <- cdm_local$person |>
-    dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
-  cdm <- cdm_local |> copyCdm()
-
-  cdm$cohort1 <- cdm$cohort |>
-    requireDemographics(sex = c("Both", "Female"),
-                        minPriorObservation = c(0, 1),
-                        requirementInteractions = FALSE,
-                        name = "cohort1")
-  expect_identical(cdm$cohort1 |> settings() |> dplyr::arrange(.data$cohort_definition_id), dplyr::tibble(
-      cohort_definition_id = as.integer(1:9),
-      cohort_name = c("cohort_1_1", "cohort_2_1", "cohort_3_1", "cohort_1_2", "cohort_2_2", "cohort_3_2", "cohort_1_3", "cohort_2_3", "cohort_3_3"),
-      age_range = "0_150",
-      sex = c(rep("Both", 6), rep("Female", 3)),
-      min_prior_observation = c(rep(0, 3), rep(1, 3), rep(0, 3)),
-      min_future_observation = rep(0, 9)
-    ))
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
@@ -533,7 +304,7 @@ test_that("Inf age", {
   expect_no_error(cdm$cohort1 <- cdm$cohort |>
     requireDemographics(ageRange = c(0, Inf),
                         name = "cohort1"))
-  expect_no_error(cdm$cohort2 <-cdm$cohort |>
+  expect_error(cdm$cohort2 <-cdm$cohort |>
                     requireDemographics(ageRange = list(c(0, 17),
                                                         c(18,Inf)),
                                         name = "cohort2"))
