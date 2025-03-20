@@ -43,6 +43,10 @@ mockCohortConstructor <- function(nPerson = 10,
                                   con = DBI::dbConnect(duckdb::duckdb()),
                                   writeSchema = "main",
                                   seed = 123) {
+
+  rlang::check_installed("omock")
+  rlang::check_installed("duckdb")
+
   if (is.null(tables)) {
     cdm <- omock::mockCdmReference() |>
       omock::mockVocabularyTables(concept = conceptTable) |>
