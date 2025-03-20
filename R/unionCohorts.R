@@ -61,6 +61,12 @@ unionCohorts <- function(cohort,
     gap = gap
   )
 
+  if (keepOriginalCohorts) {
+    if (any(cohortName %in% omopgenerics::settings(cohort)$cohort_name)) {
+      cli::cli_abort("Change `cohortName` as there is already a cohort named `{cohortName}` in the cohort.")
+    }
+  }
+
   # union cohort
   # save to a separate table so can append to original cohorts at the end
   tmpTable  <- omopgenerics::uniqueTableName()
@@ -79,8 +85,8 @@ unionCohorts <- function(cohort,
   if (!is.null(cohCodelist)) {
     cohCodelist <- cohCodelist |> dplyr::mutate("cohort_definition_id" = 1L)
   }
-  cdm[[name]] <- unionedCohort |>
-    dplyr::compute(name = name, temporary = FALSE,
+  unionedCohort <- unionedCohort |>
+    dplyr::compute(name = tmpTable, temporary = FALSE,
                    logPrefix = "CohortConstructor_unionCohorts_newCohort_") |>
     omopgenerics::newCohortTable(
       cohortSetRef = cohSet,
@@ -90,7 +96,17 @@ unionCohorts <- function(cohort,
     )
 
   if (isTRUE(keepOriginalCohorts)) {
-    cdm <- bind(cohort, cdm[[name]], name = name)
+    cdm <- bind(cohort, unionedCohort, name = name)
+  } else {
+    cdm[[name]] <- unionedCohort |>
+      dplyr::compute(name = name, temporary = FALSE,
+                     logPrefix = "CohortConstructor_unionCohorts_name_") |>
+      omopgenerics::newCohortTable(
+        cohortSetRef = cohSet,
+        cohortAttritionRef = NULL,
+        cohortCodelistRef = cohCodelist,
+        .softValidation = FALSE
+      )
   }
 
   CDMConnector::dropTable(cdm, name = dplyr::starts_with(tmpTable))

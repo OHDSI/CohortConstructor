@@ -68,6 +68,11 @@ test_that("unionCohorts works", {
 
   cdm$cohort5 <- cdm$cohort5 |> unionCohorts(name = "cohort5")
 
+  # TEST same name and keep cohorts
+  cdm$cohort1 <- cdm$cohort1 |>
+    CohortConstructor::unionCohorts(name = "cohort1", keepOriginalCohorts = TRUE)
+  expect_true(all(settings(cdm$cohort1)$cohort_name %in% c("cohort_1", "cohort_2", "cohort_3", "cohort_4", "cohort_1_cohort_2_cohort_3_cohort_4")))
+
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
