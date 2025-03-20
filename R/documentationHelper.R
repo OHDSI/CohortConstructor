@@ -76,6 +76,8 @@ NULL
 #' table to consider.
 #' @param returnReason If TRUE it will return a column indicating which of the
 #' `dateColumns` was used.
+#' @param keepDateColumns If TRUE the returned cohort will keep columns in
+#' `dateColumns`.
 #'
 #' @name columnDateDoc
 #' @keywords internal

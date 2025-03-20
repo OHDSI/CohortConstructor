@@ -43,6 +43,44 @@ test_that("exit at first date", {
   expect_true(all(colnames(cdm$cohort1) ==
                     c("cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date", "exit_reason")))
 
+  # test keep dates
+  cdm$cohort2 <- cdm$cohort |>
+    exitAtFirstDate(
+      dateColumns = c("cohort_end_date", "other_date_1", "other_date_2"),
+      returnReason = TRUE,
+      name = "cohort2",
+      keepDateColumns = TRUE
+    )
+  expect_equal(colnames(cdm$cohort1), cdm$cohort2 |> dplyr::select(-c("other_date_1", "other_date_2")) |> colnames())
+  expect_true(all(c("other_date_1", "other_date_2", "exit_reason") %in% colnames(cdm$cohort2)))
+  expect_equal(collectCohort(cdm$cohort2, 1), collectCohort(cdm$cohort1, 1))
+
+  cdm$cohort3 <- cdm$cohort |>
+    exitAtFirstDate(
+      dateColumns = c("cohort_end_date", "other_date_1", "other_date_2"),
+      returnReason = FALSE,
+      name = "cohort3",
+      keepDateColumns = TRUE
+    )
+  expect_equal(colnames(cdm$cohort1 |> dplyr::select(!"exit_reason")), cdm$cohort3 |> dplyr::select(-c("other_date_1", "other_date_2")) |> colnames())
+  expect_true(all(c("other_date_1", "other_date_2") %in% colnames(cdm$cohort3)))
+  expect_equal(collectCohort(cdm$cohort3, 1), collectCohort(cdm$cohort1, 1))
+
+  # same name
+  cdm$cohort_new <- cdm$cohort |>
+    dplyr::select("cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date", "other_date_1", "other_date_2") |>
+    dplyr::compute(name = "cohort_new", temporary = FALSE) |>
+    omopgenerics::newCohortTable()
+
+  cdm$cohort_new <- cdm$cohort_new |>
+    exitAtFirstDate(
+      dateColumns = c("cohort_end_date", "other_date_1", "other_date_2"),
+      returnReason = TRUE,
+      keepDateColumns = TRUE
+    )
+  expect_true(all(c("other_date_1", "other_date_2", "exit_reason") %in% colnames(cdm$cohort_new)))
+  expect_equal(collectCohort(cdm$cohort1, 1), collectCohort(cdm$cohort_new, 1))
+
   # works with == name and cohort ID
   cdm$cohort <- cdm$cohort |>
     exitAtFirstDate(
@@ -113,6 +151,44 @@ test_that("exit at last date", {
       name = "cohort11"
     )
   expect_identical(collectCohort(cdm$cohort1, 1), collectCohort(cdm$cohort11, 1))
+
+  # test keep dates
+  cdm$cohort2 <- cdm$cohort |>
+    exitAtLastDate(
+      dateColumns = c("cohort_end_date", "other_date_1", "other_date_2"),
+      returnReason = TRUE,
+      name = "cohort2",
+      keepDateColumns = TRUE
+    )
+  expect_equal(colnames(cdm$cohort1), cdm$cohort2 |> dplyr::select(-c("other_date_1", "other_date_2", "exit_reason")) |> colnames())
+  expect_true(all(c("other_date_1", "other_date_2", "exit_reason") %in% colnames(cdm$cohort2)))
+  expect_equal(collectCohort(cdm$cohort2, 1), collectCohort(cdm$cohort1, 1))
+
+  cdm$cohort3 <- cdm$cohort |>
+    exitAtLastDate(
+      dateColumns = c("cohort_end_date", "other_date_1", "other_date_2"),
+      returnReason = FALSE,
+      name = "cohort3",
+      keepDateColumns = TRUE
+    )
+  expect_equal(colnames(cdm$cohort1), cdm$cohort3 |> dplyr::select(-c("other_date_1", "other_date_2")) |> colnames())
+  expect_true(all(c("other_date_1", "other_date_2") %in% colnames(cdm$cohort3)))
+  expect_equal(collectCohort(cdm$cohort3, 1), collectCohort(cdm$cohort1, 1))
+
+  # same name
+  cdm$cohort_new <- cdm$cohort |>
+    dplyr::select("cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date", "other_date_1", "other_date_2") |>
+    dplyr::compute(name = "cohort_new", temporary = FALSE) |>
+    omopgenerics::newCohortTable()
+
+  cdm$cohort_new <- cdm$cohort_new |>
+    exitAtLastDate(
+      dateColumns = c("cohort_end_date", "other_date_1", "other_date_2"),
+      returnReason = TRUE,
+      keepDateColumns = TRUE
+    )
+  expect_true(all(c("other_date_1", "other_date_2", "exit_reason") %in% colnames(cdm$cohort_new)))
+  expect_equal(collectCohort(cdm$cohort1, 1), collectCohort(cdm$cohort_new, 1))
 
   # test not cohort end as columns working
   cdm$cohort <- cdm$cohort |>

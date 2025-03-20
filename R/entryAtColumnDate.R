@@ -33,6 +33,7 @@ entryAtFirstDate <- function(cohort,
                              dateColumns,
                              cohortId = NULL,
                              returnReason = TRUE,
+                             keepDateColumns = FALSE,
                              name = tableName(cohort)) {
   exitAtColumnDate(
     cohort = cohort,
@@ -41,7 +42,8 @@ entryAtFirstDate <- function(cohort,
     returnReason = returnReason,
     name = name,
     order = "first",
-    exit = FALSE
+    exit = FALSE,
+    keepDateColumns = keepDateColumns
   )
 }
 
@@ -81,6 +83,7 @@ entryAtLastDate <- function(cohort,
                             dateColumns,
                             cohortId = NULL,
                             returnReason = TRUE,
+                            keepDateColumns = FALSE,
                             name = tableName(cohort)) {
   exitAtColumnDate(
     cohort = cohort,
@@ -89,6 +92,7 @@ entryAtLastDate <- function(cohort,
     returnReason = returnReason,
     name = name,
     order = "last",
-    exit = FALSE
+    exit = FALSE,
+    keepDateColumns = keepDateColumns
   )
 }

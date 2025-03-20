@@ -9,6 +9,9 @@ table to consider.}
 
 \item{returnReason}{If TRUE it will return a column indicating which of the
 \code{dateColumns} was used.}
+
+\item{keepDateColumns}{If TRUE the returned cohort will keep columns in
+\code{dateColumns}.}
 }
 \description{
 Helper for consistent documentation of \code{dateColumns} and \code{returnReason}.
