@@ -12,7 +12,8 @@ conceptCohort(
   overlap = "merge",
   useSourceFields = FALSE,
   subsetCohort = NULL,
-  subsetCohortId = NULL
+  subsetCohortId = NULL,
+  table = NULL
 )
 }
 \arguments{
@@ -43,6 +44,10 @@ table will appear in the generated cohort.}
 \item{subsetCohortId}{Optional. Specifies cohort IDs from the \code{subsetCohort}
 table to include. If none are provided, all cohorts from the \code{subsetCohort}
 are included.}
+
+\item{table}{Name of OMOP tables to search for records of the concepts
+provided. If NULL, each concept will be search at the assigned domain in
+the concept table.}
 }
 \value{
 A cohort table
