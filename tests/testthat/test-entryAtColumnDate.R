@@ -25,6 +25,7 @@ test_that("entry at first date", {
     entryAtFirstDate(
       dateColumns = c("cohort_start_date", "cohort_end_date", "other_date_1", "other_date_2"),
       returnReason = TRUE,
+      keepDateColumns = FALSE,
       name = "cohort1"
     )
   expect_true(all(
@@ -82,6 +83,7 @@ test_that("entry at first date", {
   cdm$cohort <- cdm$cohort |>
     entryAtFirstDate(
       dateColumns = c("cohort_end_date", "other_date_1", "other_date_2"),
+      keepDateColumns = FALSE,
       returnReason = FALSE
     )
   expect_true(all(
@@ -127,6 +129,7 @@ test_that("entry at last date", {
       dateColumns = c("cohort_end_date", "other_date_1", "other_date_2"),
       returnReason = TRUE,
       cohortId = 1,
+      keepDateColumns = FALSE,
       name = "cohort1"
     )
   expect_true(all(
@@ -189,6 +192,7 @@ test_that("entry at last date", {
       dateColumns = c("cohort_end_date", "other_date_1", "other_date_2"),
       returnReason = TRUE,
       cohortId = c("cohort_2"),
+      keepDateColumns = FALSE,
       name = "cohort1"
     )
   expect_true(all(
@@ -204,6 +208,7 @@ test_that("entry at last date", {
   cdm$cohort <- cdm$cohort |>
     entryAtLastDate(
       dateColumns = c("other_date_1", "other_date_2"),
+      keepDateColumns = FALSE,
       returnReason = FALSE
     )
   expect_true(all(

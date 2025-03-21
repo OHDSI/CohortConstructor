@@ -24,6 +24,7 @@ test_that("exit at first date", {
     exitAtFirstDate(
       dateColumns = c("cohort_end_date", "other_date_1", "other_date_2"),
       returnReason = TRUE,
+      keepDateColumns = FALSE,
       name = "cohort1"
     )
   expect_true(all(
@@ -85,6 +86,7 @@ test_that("exit at first date", {
   cdm$cohort <- cdm$cohort |>
     exitAtFirstDate(
       dateColumns = c("cohort_end_date", "other_date_1", "other_date_2"),
+      keepDateColumns = FALSE,
       returnReason = FALSE
     )
   expect_true(all(
@@ -129,6 +131,7 @@ test_that("exit at last date", {
       dateColumns = c("cohort_end_date", "other_date_1", "other_date_2"),
       returnReason = FALSE,
       cohortId = 1,
+      keepDateColumns = FALSE,
       name = "cohort1"
     )
   expect_true(all(
@@ -148,6 +151,7 @@ test_that("exit at last date", {
       dateColumns = c("cohort_end_date", "other_date_1", "other_date_2"),
       returnReason = FALSE,
       cohortId = c("cohort_1"),
+      keepDateColumns = FALSE,
       name = "cohort11"
     )
   expect_identical(collectCohort(cdm$cohort1, 1), collectCohort(cdm$cohort11, 1))
@@ -194,6 +198,7 @@ test_that("exit at last date", {
   cdm$cohort <- cdm$cohort |>
     exitAtLastDate(
       dateColumns = c("other_date_1", "other_date_2"),
+      keepDateColumns = FALSE,
       returnReason = TRUE
     )
   expect_true(all(

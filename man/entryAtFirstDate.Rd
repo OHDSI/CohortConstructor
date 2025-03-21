@@ -9,7 +9,7 @@ entryAtFirstDate(
   dateColumns,
   cohortId = NULL,
   returnReason = TRUE,
-  keepDateColumns = FALSE,
+  keepDateColumns = TRUE,
   name = tableName(cohort)
 )
 }

@@ -33,7 +33,7 @@ exitAtFirstDate <- function(cohort,
                             dateColumns,
                             cohortId = NULL,
                             returnReason = TRUE,
-                            keepDateColumns = FALSE,
+                            keepDateColumns = TRUE,
                             name = tableName(cohort)) {
   exitAtColumnDate(
     cohort = cohort,
@@ -83,7 +83,7 @@ exitAtLastDate <- function(cohort,
                            dateColumns,
                            cohortId = NULL,
                            returnReason = TRUE,
-                           keepDateColumns = FALSE,
+                           keepDateColumns = TRUE,
                            name = tableName(cohort)) {
   exitAtColumnDate(
     cohort = cohort,
