@@ -1048,7 +1048,7 @@ test_that("table argument", {
   )
 
 
-  expect_warning(cdm$cohort <- conceptCohort(cdm,
+  expect_error(cdm$cohort <- conceptCohort(cdm,
                                              conceptSet = list("cohort" = 1:2L),
                                              name = "cohort",
                                              exit = "event_end_date",

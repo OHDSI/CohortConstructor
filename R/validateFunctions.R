@@ -165,12 +165,7 @@ validateTable <- function(table) {
   if (length(table) != 0) {
     notId <- !table %in% domainsData$table
     if (any(notId)) {
-      cli::cli_warn("{.strong {table[notId]}} table{?s} do not correspond to any of the supported OMOP tables and will be ignored. Supported tables are: {domainsData$table}")
-    }
-    table <- table[!notId]
-
-    if (length(table) == 0) {
-      cli::cli_abort("Provide a valid input for `table`. Support OMOP tables are: {domainsData$table}.")
+      cli::cli_abort("{.strong {table[notId]}} table{?s} do not correspond to any of the supported OMOP tables and will be ignored. Supported tables are: {domainsData$table}")
     }
   }
 

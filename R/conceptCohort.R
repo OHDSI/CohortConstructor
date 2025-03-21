@@ -432,14 +432,14 @@ conceptSetToCohortCodelist <- function(conceptSet) {
 
 # upload codes to cdm and add domain
 uploadCohortCodelistToCdm <- function(cdm, cohortCodelist, tableCohortCodelist, table) {
-  cdm <- omopgenerics::insertTable(
-    cdm = cdm,
-    name = tableCohortCodelist,
-    table = cohortCodelist |>
-      dplyr::select("cohort_definition_id", "concept_id")
-  )
-
   if (is.null(table)) {
+    cdm <- omopgenerics::insertTable(
+      cdm = cdm,
+      name = tableCohortCodelist,
+      table = cohortCodelist |>
+        dplyr::select("cohort_definition_id", "concept_id")
+    )
+
     cdm[[tableCohortCodelist]] <- cdm[[tableCohortCodelist]] |>
       dplyr::left_join(cdm[["concept"]] |>
                          dplyr::select("concept_id", "domain_id"), by = "concept_id") |>
@@ -451,24 +451,25 @@ uploadCohortCodelistToCdm <- function(cdm, cohortCodelist, tableCohortCodelist, 
         name = tableCohortCodelist,
         temporary = FALSE,
         overwrite = TRUE,
-        logPrefix = "CohortConstructor_uploadCohortCodelist_tableNull"
+        logPrefix = "CohortConstructor_uploadCohortCodelist"
       )
   } else {
     domains <- domainsData |>
       dplyr::filter(.data$table %in% .env$table) |>
       dplyr::select(domain_id)
-    cdm[[tableCohortCodelist]] <- cdm[[tableCohortCodelist]] |>
-      dplyr::cross_join(domains, copy = TRUE) |>
+    cohortCodelist <- cohortCodelist |>
+      dplyr::select("cohort_definition_id", "concept_id") |>
+      dplyr::cross_join(domains) |>
       dplyr::mutate(
         "concept_id" = as.integer(.data$concept_id),
         "domain_id" = tolower(.data$domain_id)
-      ) |>
-      dplyr::compute(
-        name = tableCohortCodelist,
-        temporary = FALSE,
-        overwrite = TRUE,
-        logPrefix = "CohortConstructor_uploadCohortCodelist_table"
       )
+
+    cdm <- omopgenerics::insertTable(
+      cdm = cdm,
+      name = tableCohortCodelist,
+      table = cohortCodelist
+    )
   }
 
   cdm
