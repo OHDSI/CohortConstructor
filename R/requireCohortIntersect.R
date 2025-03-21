@@ -82,16 +82,6 @@ requireCohortIntersect <- function(cohort,
   upper_limit[is.infinite(upper_limit)] <- 999999L
   upper_limit <- as.integer(upper_limit)
 
-  cols <- unique(
-    c(
-      "cohort_definition_id",
-      "subject_id",
-      "cohort_start_date",
-      "cohort_end_date",
-      indexDate
-    )
-  )
-
   window_start <- window[[1]][1]
   window_end <- window[[1]][2]
 
@@ -121,8 +111,8 @@ requireCohortIntersect <- function(cohort,
   newCohort <- cdm[[tmpNewCohort]]
 
   # requirement
+  intersectCol <- uniqueColumnName(newCohort)
   newCohort <- newCohort |>
-    dplyr::select(dplyr::all_of(.env$cols)) |>
     PatientProfiles::addCohortIntersectCount(
       targetCohortTable = targetCohortTable,
       targetCohortId = targetCohortId,
@@ -131,16 +121,16 @@ requireCohortIntersect <- function(cohort,
       targetEndDate = targetEndDate,
       window = window,
       censorDate = censorDate,
-      nameStyle = "intersect_cohort",
+      nameStyle = intersectCol,
       name = tmpNewCohort
     )
 
   newCohort <- newCohort |>
     dplyr::filter(
-      .data$intersect_cohort >= .env$lower_limit &
-        .data$intersect_cohort <= .env$upper_limit
+      .data[[intersectCol]] >= .env$lower_limit &
+        .data[[intersectCol]] <= .env$upper_limit
     ) |>
-    dplyr::select(dplyr::all_of(cols)) |>
+    dplyr::select(!dplyr::all_of(intersectCol)) |>
     dplyr::compute(name = tmpNewCohort, temporary = FALSE,
                    logPrefix = "CohortConstructor_requireCohortIntersect_subset_")
 
@@ -184,14 +174,6 @@ requireCohortIntersect <- function(cohort,
       ) |>
       dplyr::compute(name = tmpNewCohort, temporary = FALSE,
                      logPrefix = "CohortConstructor_requireCohortIntersect_union_")
-  }
-
-  # add additional columns
-  if (any(!colnames(cohort) %in% colnames(newCohort))) {
-    newCohort <- newCohort |>
-      dplyr::inner_join(cohort, by = c(cols)) |>
-      dplyr::compute(name = tmpNewCohort, temporary = FALSE,
-                     logPrefix = "CohortConstructor_requireCohortIntersect_additional_")
   }
 
   newCohort <- newCohort |>
