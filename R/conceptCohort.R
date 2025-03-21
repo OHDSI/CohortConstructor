@@ -44,6 +44,9 @@
 #' @param subsetCohortId Optional. Specifies cohort IDs from the `subsetCohort`
 #' table to include. If none are provided, all cohorts from the `subsetCohort`
 #' are included.
+#' @param table Name of OMOP tables to search for records of the concepts
+#' provided. If NULL, each concept will be search at the assigned domain in
+#' the concept table.
 #'
 #' @export
 #'
@@ -66,7 +69,9 @@ conceptCohort <- function(cdm,
                           overlap = "merge",
                           useSourceFields = FALSE,
                           subsetCohort = NULL,
-                          subsetCohortId = NULL) {
+                          subsetCohortId = NULL,
+                          table = NULL) {
+
   # initial input validation
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cdm <- omopgenerics::validateCdmArgument(cdm)
@@ -79,6 +84,7 @@ conceptCohort <- function(cdm,
     subsetCohort <- omopgenerics::validateCohortArgument(cdm[[subsetCohort]])
     subsetCohortId <- omopgenerics::validateCohortIdArgument({{subsetCohortId}}, subsetCohort, validation = "warning")
   }
+  table <- validateTable(table)
 
   useIndexes <- getOption("CohortConstructor.use_indexes")
 
@@ -101,7 +107,8 @@ conceptCohort <- function(cdm,
   cdm <- uploadCohortCodelistToCdm(
     cdm = cdm,
     cohortCodelist = cohortCodelist,
-    tableCohortCodelist = tableCohortCodelist
+    tableCohortCodelist = tableCohortCodelist,
+    table = table
   )
 
   if (!isFALSE(useIndexes)) {
@@ -424,7 +431,7 @@ conceptSetToCohortCodelist <- function(conceptSet) {
 }
 
 # upload codes to cdm and add domain
-uploadCohortCodelistToCdm <- function(cdm, cohortCodelist, tableCohortCodelist) {
+uploadCohortCodelistToCdm <- function(cdm, cohortCodelist, tableCohortCodelist, table) {
   cdm <- omopgenerics::insertTable(
     cdm = cdm,
     name = tableCohortCodelist,
@@ -432,19 +439,37 @@ uploadCohortCodelistToCdm <- function(cdm, cohortCodelist, tableCohortCodelist) 
       dplyr::select("cohort_definition_id", "concept_id")
   )
 
-  cdm[[tableCohortCodelist]] <- cdm[[tableCohortCodelist]] |>
-    dplyr::left_join(cdm[["concept"]] |>
-                       dplyr::select("concept_id", "domain_id"), by = "concept_id") |>
-    dplyr::mutate(
-      "concept_id" = as.integer(.data$concept_id),
-      "domain_id" = tolower(.data$domain_id)
-    ) |>
-    dplyr::compute(
-      name = tableCohortCodelist,
-      temporary = FALSE,
-      overwrite = TRUE,
-      logPrefix = "CohortConstructor_uploadCohortCodelist_"
-    )
+  if (is.null(table)) {
+    cdm[[tableCohortCodelist]] <- cdm[[tableCohortCodelist]] |>
+      dplyr::left_join(cdm[["concept"]] |>
+                         dplyr::select("concept_id", "domain_id"), by = "concept_id") |>
+      dplyr::mutate(
+        "concept_id" = as.integer(.data$concept_id),
+        "domain_id" = tolower(.data$domain_id)
+      ) |>
+      dplyr::compute(
+        name = tableCohortCodelist,
+        temporary = FALSE,
+        overwrite = TRUE,
+        logPrefix = "CohortConstructor_uploadCohortCodelist_tableNull"
+      )
+  } else {
+    domains <- domainsData |>
+      dplyr::filter(.data$table %in% .env$table) |>
+      dplyr::select(domain_id)
+    cdm[[tableCohortCodelist]] <- cdm[[tableCohortCodelist]] |>
+      dplyr::cross_join(domains, copy = TRUE) |>
+      dplyr::mutate(
+        "concept_id" = as.integer(.data$concept_id),
+        "domain_id" = tolower(.data$domain_id)
+      ) |>
+      dplyr::compute(
+        name = tableCohortCodelist,
+        temporary = FALSE,
+        overwrite = TRUE,
+        logPrefix = "CohortConstructor_uploadCohortCodelist_table"
+      )
+  }
 
   cdm
 }
