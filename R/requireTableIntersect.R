@@ -59,16 +59,6 @@ requireTableIntersect <- function(cohort,
   upper_limit[is.infinite(upper_limit)] <- 999999L
   upper_limit <- as.integer(upper_limit)
 
-  cols <- unique(
-    c(
-      "cohort_definition_id",
-      "subject_id",
-      "cohort_start_date",
-      "cohort_end_date",
-      indexDate
-    )
-  )
-
   window_start <- window[[1]][1]
   window_end <- window[[1]][2]
 
@@ -83,8 +73,8 @@ requireTableIntersect <- function(cohort,
   cdm <- filterCohortInternal(cdm, cohort, cohortId, tmpNewCohort, tmpUnchanged)
   newCohort <- cdm[[tmpNewCohort]]
 
+  intersectCol <- uniqueColumnName(newCohort)
   newCohort <- newCohort |>
-    dplyr::select(dplyr::all_of(.env$cols)) |>
     PatientProfiles::addTableIntersectCount(
       tableName = tableName,
       indexDate = indexDate,
@@ -93,14 +83,14 @@ requireTableIntersect <- function(cohort,
       window = window,
       censorDate = censorDate,
       inObservation = inObservation,
-      nameStyle = "intersect_table",
+      nameStyle = intersectCol,
       name = tmpNewCohort
     ) |>
     dplyr::filter(
-      .data$intersect_table >= .env$lower_limit &
-        .data$intersect_table <= .env$upper_limit
+      .data[[intersectCol]] >= .env$lower_limit &
+        .data[[intersectCol]] <= .env$upper_limit
     ) |>
-    dplyr::select(dplyr::all_of(cols)) |>
+    dplyr::select(!dplyr::all_of(intersectCol)) |>
     dplyr::compute(
       name = tmpNewCohort, temporary = FALSE,
       logPrefix = "CohortConstructor_requireTableIntersect_subset_"
@@ -132,23 +122,10 @@ requireTableIntersect <- function(cohort,
   if (isTRUE(needsIdFilter(cohort, cohortId))) {
     newCohort <- newCohort |>
       # join non modified cohorts
-      dplyr::union_all(
-        cdm[[tmpUnchanged]] |>
-          dplyr::select(dplyr::all_of(colnames(newCohort)))
-      ) |>
+      dplyr::union_all(cdm[[tmpUnchanged]]) |>
       dplyr::compute(
         name = tmpNewCohort, temporary = FALSE,
         logPrefix = "CohortConstructor_requireTableIntersect_union_"
-      )
-  }
-
-  # add additional columns
-  if (any(!colnames(cohort) %in% colnames(newCohort))) {
-    newCohort <- newCohort |>
-      dplyr::inner_join(cohort, by = c(cols)) |>
-      dplyr::compute(
-        name = tmpNewCohort, temporary = FALSE,
-        logPrefix = "CohortConstructor_requireTableIntersect_additional_"
       )
   }
 

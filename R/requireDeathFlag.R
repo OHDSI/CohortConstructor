@@ -53,16 +53,6 @@ requireDeathFlag <- function(cohort,
     return(cdm[[name]])
   }
 
-  cols <- unique(
-    c(
-      "cohort_definition_id",
-      "subject_id",
-      "cohort_start_date",
-      "cohort_end_date",
-      indexDate
-    )
-  )
-
   window_start <- window[[1]][1]
   window_end <- window[[1]][2]
 
@@ -73,21 +63,20 @@ requireDeathFlag <- function(cohort,
   cdm <- filterCohortInternal(cdm, cohort, cohortId, tmpNewCohort, tmpUnchanged)
   newCohort <- cdm[[tmpNewCohort]]
 
+  intersectCol <- uniqueColumnName(newCohort)
   newCohort <- newCohort |>
-    dplyr::select(dplyr::all_of(.env$cols)) |>
     PatientProfiles::addDeathFlag(
       indexDate = indexDate,
       censorDate = censorDate,
       window = window,
-      deathFlagName = "death",
+      deathFlagName = intersectCol,
       name = tmpNewCohort
     )
 
   if (isFALSE(negate)) {
     newCohort <- newCohort |>
-      dplyr::filter(.data$death == 1 |
-                      (!.data$cohort_definition_id %in% cohortId)) |>
-      dplyr::select(!"death") |>
+      dplyr::filter(.data[[intersectCol]] == 1) |>
+      dplyr::select(!dplyr::all_of(intersectCol)) |>
       dplyr::compute(name = tmpNewCohort, temporary = FALSE,
                      logPrefix = "CohortConstructor_requireDeathFlag_negateFalse_")
     # attrition reason
@@ -96,9 +85,8 @@ requireDeathFlag <- function(cohort,
   } else {
     # ie require absence instead of presence
     newCohort <- newCohort |>
-      dplyr::filter(.data$death != 1 |
-                      (!.data$cohort_definition_id %in% cohortId)) |>
-      dplyr::select(!"death") |>
+      dplyr::filter(.data[[intersectCol]] != 1) |>
+      dplyr::select(!dplyr::all_of(intersectCol)) |>
       dplyr::compute(name = tmpNewCohort, temporary = FALSE,
                      logPrefix = "CohortConstructor_requireDeathFlag_negateTrue_")
     # attrition reason
@@ -113,23 +101,10 @@ requireDeathFlag <- function(cohort,
   if (isTRUE(needsIdFilter(cohort, cohortId))) {
     newCohort <- newCohort |>
       # join non modified cohorts
-      dplyr::union_all(
-        cdm[[tmpUnchanged]] |>
-          dplyr::select(dplyr::all_of(colnames(newCohort)))
-      ) |>
+      dplyr::union_all(cdm[[tmpUnchanged]]) |>
       dplyr::compute(
         name = tmpNewCohort, temporary = FALSE,
         logPrefix = "CohortConstructor_requireDeathFlag_union_"
-      )
-  }
-
-  # add additional columns
-  if (any(!colnames(cohort) %in% colnames(newCohort))) {
-    newCohort <- newCohort |>
-      dplyr::inner_join(cohort, by = c(cols)) |>
-      dplyr::compute(
-        name = tmpNewCohort, temporary = FALSE,
-        logPrefix = "CohortConstructor_requireDeathFlag_additional_"
       )
   }
 
