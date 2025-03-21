@@ -287,17 +287,19 @@ demographicsFilter <- function(cohort,
   # because the cohort table passed to the function might have extra columns
   # that would conflict with ones we'll add, we'll take the core table first
   # join later
-  cols <- c("cohort_definition_id", "subject_id", "cohort_start_date",
-            "cohort_end_date", indexDate) |> unique()
 
+  newCols <- uniqueColumnName(newCohort, n = 4)
   newCohort <- newCohort |>
-    dplyr::select(dplyr::all_of(cols)) |>
     PatientProfiles::addDemographics(
       indexDate = indexDate,
       age  = reqAge,
+      ageName = newCols[1],
       sex = reqSex,
+      sexName = newCols[2],
       priorObservation = reqPriorObservation,
+      priorObservationName = newCols[3],
       futureObservation = reqFutureObservation,
+      futureObservationName = newCols[4],
       name = tmpNewCohort
     )
 
@@ -310,7 +312,7 @@ demographicsFilter <- function(cohort,
     if (is.infinite(max_age)) max_age <- 200
     # filter
     newCohort <- newCohort |>
-      dplyr::filter(.data$age >= .env$min_age & .data$age <= .env$max_age) |>
+      dplyr::filter(.data[[newCols[1]]] >= .env$min_age & .data[[newCols[1]]] <= .env$max_age) |>
       dplyr::compute(
         name = tmpNewCohort, temporary = FALSE,
         logPrefix = "CohortConstructor_demographicsFilter_reqAge_"
@@ -323,7 +325,7 @@ demographicsFilter <- function(cohort,
   # sex
   if (reqSex) {
     newCohort <- newCohort |>
-      dplyr::filter(.data$sex == .env$sex) |>
+      dplyr::filter(.data[[newCols[2]]] == .env$sex) |>
       dplyr::compute(
         name = tmpNewCohort, temporary = FALSE,
         logPrefix = "CohortConstructor_demographicsFilter_reqSex_"
@@ -336,7 +338,7 @@ demographicsFilter <- function(cohort,
   # prior observation
   if (reqPriorObservation) {
     newCohort <- newCohort |>
-      dplyr::filter(.data$prior_observation >= .env$minPriorObservation) |>
+      dplyr::filter(.data[[newCols[3]]] >= .env$minPriorObservation) |>
       dplyr::compute(
         name = tmpNewCohort, temporary = FALSE,
         logPrefix = "CohortConstructor_demographicsFilter_reqPriorObservation_"
@@ -349,7 +351,7 @@ demographicsFilter <- function(cohort,
   # future observation
   if (reqFutureObservation) {
     newCohort <- newCohort |>
-      dplyr::filter(.data$future_observation >= .env$minFutureObservation) |>
+      dplyr::filter(.data[[newCols[4]]] >= .env$minFutureObservation) |>
       dplyr::compute(
         name = tmpNewCohort, temporary = FALSE,
         logPrefix = "CohortConstructor_demographicsFilter_reqFutureObservation_"
@@ -361,38 +363,16 @@ demographicsFilter <- function(cohort,
   }
 
   newCohort <- newCohort |>
-    dplyr::select(dplyr::all_of(cols)) |>
+    dplyr::select(!dplyr::any_of(newCols)) |>
     dplyr::compute(name = tmpNewCohort, temporary = FALSE,
                    logPrefix = "CohortConstructor_demographicsFilter_select_")
 
   if (isTRUE(needsIdFilter(cohort, cohortId))) {
     newCohort <- newCohort |>
       # join non modified cohorts
-      dplyr::union_all(
-        cdm[[tmpUnchanged]] |>
-          dplyr::select(dplyr::all_of(cols))
-      ) |>
+      dplyr::union_all(cdm[[tmpUnchanged]]) |>
       dplyr::compute(name = tmpNewCohort, temporary = FALSE,
                      logPrefix = "CohortConstructor_demographicsFilter_union_")
-  }
-
-  # add additional columns
-  if (any(!colnames(cohort) %in% colnames(newCohort))) {
-    if (dplyr::pull(dplyr::tally(dplyr::ungroup(newCohort))) == 0) {
-      additionalCols <- colnames(cohort)[!colnames(cohort) %in% colnames(newCohort)]
-      additionalCols <- rep(NA_character_, length(additionalCols)) |>
-        rlang::parse_exprs() |>
-        rlang::set_names(additionalCols)
-      newCohort <- newCohort |>
-        dplyr::mutate(!!!additionalCols)
-    } else {
-      newCohort <- newCohort |>
-        dplyr::inner_join(cohort, by = c(cols)) |>
-        dplyr::compute(
-          name = tmpNewCohort, temporary = FALSE,
-          logPrefix = "CohortConstructor_demographicsFilter_additional_"
-        )
-    }
   }
 
   newCohort <- newCohort |>
@@ -403,7 +383,6 @@ demographicsFilter <- function(cohort,
     )
 
   omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(tablePrefix))
-
 
   useIndexes <- getOption("CohortConstructor.use_indexes")
   if (!isFALSE(useIndexes)) {

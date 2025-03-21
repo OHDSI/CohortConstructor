@@ -69,16 +69,6 @@ requireConceptIntersect <- function(cohort,
   upper_limit[is.infinite(upper_limit)] <- 999999L
   upper_limit <- as.integer(upper_limit)
 
-  cols <- unique(
-    c(
-      "cohort_definition_id",
-      "subject_id",
-      "cohort_start_date",
-      "cohort_end_date",
-      indexDate
-    )
-  )
-
   window_start <- window[[1]][1]
   window_end <- window[[1]][2]
 
@@ -104,8 +94,8 @@ requireConceptIntersect <- function(cohort,
   cdm <- filterCohortInternal(cdm, cohort, cohortId, tmpNewCohort, tmpUnchanged)
   newCohort <- cdm[[tmpNewCohort]]
 
+  intersectCol <- uniqueColumnName(newCohort)
   newCohort <- newCohort |>
-    dplyr::select(dplyr::all_of(.env$cols)) |>
     PatientProfiles::addConceptIntersectCount(
       conceptSet = conceptSet,
       indexDate = indexDate,
@@ -114,16 +104,16 @@ requireConceptIntersect <- function(cohort,
       window = window,
       censorDate = censorDate,
       inObservation = inObservation,
-      nameStyle = "intersect_concept",
+      nameStyle = intersectCol,
       name = tmpNewCohort
     )
 
   newCohort <- newCohort |>
     dplyr::filter(
-      .data$intersect_concept >= .env$lower_limit &
-        .data$intersect_concept <= .env$upper_limit
+      .data[[intersectCol]] >= .env$lower_limit &
+        .data[[intersectCol]] <= .env$upper_limit
     ) |>
-    dplyr::select(dplyr::all_of(cols)) |>
+    dplyr::select(!dplyr::all_of(intersectCol)) |>
     dplyr::compute(name = tmpNewCohort, temporary = FALSE,
                    logPrefix = "CohortConstructor_requireConceptIntersect_subset_")
 
@@ -166,14 +156,6 @@ requireConceptIntersect <- function(cohort,
                      logPrefix = "CohortConstructor_requireConceptIntersect_union_")
   }
 
-  # add additional columns
-  if (any(!colnames(cohort) %in% colnames(newCohort))) {
-    newCohort <- newCohort |>
-      dplyr::inner_join(cohort, by = c(cols)) |>
-      dplyr::compute(name = tmpNewCohort, temporary = FALSE,
-                     logPrefix = "CohortConstructor_requireConceptIntersect_additional_")
-  }
-
   # cohort
   newCohort <- newCohort |>
     dplyr::compute(
@@ -186,7 +168,6 @@ requireConceptIntersect <- function(cohort,
     omopgenerics::recordCohortAttrition(reason = reason, cohortId = cohortId)
 
   omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(tablePrefix))
-
 
   useIndexes <- getOption("CohortConstructor.use_indexes")
   if (!isFALSE(useIndexes)) {

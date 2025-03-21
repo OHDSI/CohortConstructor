@@ -25,3 +25,14 @@ filterCohortInternal <- function(cdm, cohort, cohortId, tmpNewCohort, tmpUnchang
   }
   return(cdm)
 }
+
+uniqueColumnName <- function(table, n = 1) {
+  cols <- colnames(table)
+  newCols <- paste0("cohortconstructor_", 1:n)
+  ids <- newCols %in% cols
+  while (any(ids)) {
+    newCols <- paste0(newCols, round(runif(1, max = 10)))
+    ids <- newCols %in% cols
+  }
+  return(newCols)
+}
