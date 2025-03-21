@@ -9,6 +9,7 @@ entryAtFirstDate(
   dateColumns,
   cohortId = NULL,
   returnReason = TRUE,
+  keepDateColumns = TRUE,
   name = tableName(cohort)
 )
 }
@@ -25,6 +26,9 @@ rest will remain unchanged.}
 
 \item{returnReason}{If TRUE it will return a column indicating which of the
 \code{dateColumns} was used.}
+
+\item{keepDateColumns}{If TRUE the returned cohort will keep columns in
+\code{dateColumns}.}
 
 \item{name}{Name of the new cohort table created in the cdm object.}
 }

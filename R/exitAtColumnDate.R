@@ -33,6 +33,7 @@ exitAtFirstDate <- function(cohort,
                             dateColumns,
                             cohortId = NULL,
                             returnReason = TRUE,
+                            keepDateColumns = TRUE,
                             name = tableName(cohort)) {
   exitAtColumnDate(
     cohort = cohort,
@@ -41,7 +42,8 @@ exitAtFirstDate <- function(cohort,
     returnReason = returnReason,
     name = name,
     order = "first",
-    exit = TRUE
+    exit = TRUE,
+    keepDateColumns = keepDateColumns
   )
 }
 
@@ -81,6 +83,7 @@ exitAtLastDate <- function(cohort,
                            dateColumns,
                            cohortId = NULL,
                            returnReason = TRUE,
+                           keepDateColumns = TRUE,
                            name = tableName(cohort)) {
   exitAtColumnDate(
     cohort = cohort,
@@ -89,7 +92,8 @@ exitAtLastDate <- function(cohort,
     returnReason = returnReason,
     name = name,
     order = "last",
-    exit = TRUE
+    exit = TRUE,
+    keepDateColumns = keepDateColumns
   )
 }
 
@@ -99,7 +103,8 @@ exitAtColumnDate <- function(cohort,
                              returnReason,
                              order,
                              name,
-                             exit) {
+                             exit,
+                             keepDateColumns) {
   # checks
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
@@ -212,6 +217,21 @@ exitAtColumnDate <- function(cohort,
 
   if (!returnReason) {
     newCohort <- newCohort |> dplyr::select(!dplyr::all_of(reason))
+  }
+
+  if (keepDateColumns) {
+    newCohort <- newCohort |>
+      dplyr::inner_join(
+        cohort |>
+          dplyr::select(any_of(c(
+            "cohort_definition_id", "subject_id", keptDate, dateColumns
+          ))) |>
+          dplyr::select(!dplyr::any_of(newDate))
+      ) |>
+      dplyr::compute(
+        name = tmpNewCohort, temporary = FALSE,
+        logPrefix = "CohortConstructor_exitAtColumnDate_keepDates_"
+      )
   }
 
   newCohort <- newCohort |>
