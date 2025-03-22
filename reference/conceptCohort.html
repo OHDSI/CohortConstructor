@@ -133,7 +133,8 @@ as to end at the preceding observation period end date.</p></li>
 <span>  overlap <span class="op">=</span> <span class="st">"merge"</span>,</span>
 <span>  useSourceFields <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  subsetCohort <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  subsetCohortId <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  subsetCohortId <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  table <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -183,6 +184,12 @@ table will appear in the generated cohort.</p></dd>
 <dd><p>Optional. Specifies cohort IDs from the <code>subsetCohort</code>
 table to include. If none are provided, all cohorts from the <code>subsetCohort</code>
 are included.</p></dd>
+
+
+<dt id="arg-table">table<a class="anchor" aria-label="anchor" href="#arg-table"></a></dt>
+<dd><p>Name of OMOP tables to search for records of the concepts
+provided. If NULL, each concept will be search at the assigned domain in
+the concept table.</p></dd>
 
 </dl></div>
     <div class="section level2">
