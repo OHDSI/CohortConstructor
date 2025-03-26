@@ -363,19 +363,31 @@ unerafiedConceptCohort <- function(cdm,
   return(cohort)
 }
 
-fulfillCohortReqs <- function(cdm, name, inObservation) {
+fulfillCohortReqs <- function(cdm, name, inObservation, type = "start_end") {
   # 1) inObservation == TRUE and start is out of observation, drop cohort entry.
   #    inObservation == FALSE and start is out of observation move to observation start
   # 2) inObservation == TRUE and end is after observation end, set cohort end as observation end,
   #    inObservation == FALSE and end is after observation end set cohort end as observation start
+  if (type == "start_end") {
+    cdm[[name]] <- cdm[[name]] |>
+      dplyr::filter(
+        !is.na(.data$cohort_start_date),
+        .data$cohort_start_date <= .data$cohort_end_date
+      ) |>
+      dplyr::compute(temporary = FALSE, name = name,
+                     logPrefix = "CohortConstructor_fulfillCohortReqs_filterStartEnd_") |>
+      omopgenerics::recordCohortAttrition(reason = "Record start <= record end")
+  } else if (type == "start") {
+    cdm[[name]] <- cdm[[name]] |>
+      dplyr::filter(
+        !is.na(.data$cohort_start_date)
+      ) |>
+      dplyr::compute(temporary = FALSE, name = name,
+                     logPrefix = "CohortConstructor_fulfillCohortReqs_filterStart_") |>
+      omopgenerics::recordCohortAttrition(reason = "Not missing record date")
+  }
+
   cdm[[name]] <- cdm[[name]] |>
-    dplyr::filter(
-      !is.na(.data$cohort_start_date),
-      .data$cohort_start_date <= .data$cohort_end_date
-    ) |>
-    dplyr::compute(temporary = FALSE, name = name,
-                   logPrefix = "CohortConstructor_fulfillCohortReqs_filter_") |>
-    omopgenerics::recordCohortAttrition(reason = "Record start <= record end") |>
     dplyr::left_join(
       cdm$observation_period |>
         dplyr::select(

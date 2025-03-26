@@ -1071,7 +1071,7 @@ test_that("table argument", {
   CDMConnector::cdmDisconnect(cdm = cdm)
 })
 
-test_that("", {
+test_that("inObservation FALSE", {
   cdm <- omock::mockPerson(nPerson = 3)
   cdm <- omopgenerics::insertTable(
     cdm = cdm, name = "observation_period", table = dplyr::tibble(
