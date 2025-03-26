@@ -10,10 +10,11 @@ conceptCohort(
   name,
   exit = "event_end_date",
   overlap = "merge",
+  inObservation = TRUE,
+  table = NULL,
   useSourceFields = FALSE,
   subsetCohort = NULL,
-  subsetCohortId = NULL,
-  table = NULL
+  subsetCohortId = NULL
 )
 }
 \arguments{
@@ -33,6 +34,14 @@ cases cohort start will be set as the earliest start date. If
 cohort end date will be set by adding together the total days
 from each of the overlapping records.}
 
+\item{inObservation}{If TRUE, only records in observation will be used. If
+FALSE, records before the start of observation period will be considered,
+with startdate the start of observation.}
+
+\item{table}{Name of OMOP tables to search for records of the concepts
+provided. If NULL, each concept will be search at the assigned domain in
+the concept table.}
+
 \item{useSourceFields}{If TRUE, the source concept_id fields will also be
 used when identifying relevant clinical records. If FALSE, only the standard
 concept_id fields will be used.}
@@ -44,10 +53,6 @@ table will appear in the generated cohort.}
 \item{subsetCohortId}{Optional. Specifies cohort IDs from the \code{subsetCohort}
 table to include. If none are provided, all cohorts from the \code{subsetCohort}
 are included.}
-
-\item{table}{Name of OMOP tables to search for records of the concepts
-provided. If NULL, each concept will be search at the assigned domain in
-the concept table.}
 }
 \value{
 A cohort table

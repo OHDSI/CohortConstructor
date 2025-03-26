@@ -47,6 +47,9 @@
 #' @param table Name of OMOP tables to search for records of the concepts
 #' provided. If NULL, each concept will be search at the assigned domain in
 #' the concept table.
+#' @param inObservation If TRUE, only records in observation will be used. If
+#' FALSE, records before the start of observation period will be considered,
+#' with startdate the start of observation.
 #'
 #' @export
 #'
@@ -67,10 +70,11 @@ conceptCohort <- function(cdm,
                           name,
                           exit = "event_end_date",
                           overlap = "merge",
+                          inObservation = TRUE,
+                          table = NULL,
                           useSourceFields = FALSE,
                           subsetCohort = NULL,
-                          subsetCohortId = NULL,
-                          table = NULL) {
+                          subsetCohortId = NULL) {
 
   # initial input validation
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
@@ -79,6 +83,7 @@ conceptCohort <- function(cdm,
   omopgenerics::assertChoice(exit, c("event_start_date", "event_end_date"))
   omopgenerics::assertChoice(overlap, c("merge", "extend"), length = 1)
   omopgenerics::assertLogical(useSourceFields, length = 1)
+  omopgenerics::assertLogical(inObservation, length = 1)
   omopgenerics::assertCharacter(subsetCohort, length = 1, null = TRUE)
   if (!is.null(subsetCohort)) {
     subsetCohort <- omopgenerics::validateCohortArgument(cdm[[subsetCohort]])
@@ -215,7 +220,7 @@ conceptCohort <- function(cdm,
   }
 
   cli::cli_inform(c("i" = "Applying cohort requirements."))
-  cdm[[name]] <- fulfillCohortReqs(cdm = cdm, name = name)
+  cdm[[name]] <- fulfillCohortReqs(cdm = cdm, name = name, inObservation = inObservation)
 
   if(overlap == "merge"){
     cli::cli_inform(c("i" = "Merging overlapping records."))
@@ -232,7 +237,7 @@ conceptCohort <- function(cdm,
 
     # adding days might mean we no longer satisfy cohort requirements
     cli::cli_inform(c("i" = "Re-appplying cohort requirements."))
-    cdm[[name]] <- fulfillCohortReqs(cdm = cdm, name = name)
+    cdm[[name]] <- fulfillCohortReqs(cdm = cdm, name = name, inObservation = TRUE)
   }
 
   cdm[[name]] <- omopgenerics::newCohortTable(table = cdm[[name]])
@@ -358,10 +363,12 @@ unerafiedConceptCohort <- function(cdm,
   return(cohort)
 }
 
-fulfillCohortReqs <- function(cdm, name) {
-  # 1) if start is out of observation, drop cohort entry
-  # 2) if end is after observation end, set cohort end as observation end
-  cdm[[name]] |>
+fulfillCohortReqs <- function(cdm, name, inObservation) {
+  # 1) inObservation == TRUE and start is out of observation, drop cohort entry.
+  #    inObservation == FALSE and start is out of observation move to observation start
+  # 2) inObservation == TRUE and end is after observation end, set cohort end as observation end,
+  #    inObservation == FALSE and end is after observation end set cohort end as observation start
+  cdm[[name]] <- cdm[[name]] |>
     dplyr::filter(
       !is.na(.data$cohort_start_date),
       .data$cohort_start_date <= .data$cohort_end_date
@@ -373,11 +380,53 @@ fulfillCohortReqs <- function(cdm, name) {
       cdm$observation_period |>
         dplyr::select(
           "person_id",
+          "observation_period_id",
           "observation_period_start_date",
           "observation_period_end_date"
         ),
       by = c("subject_id" = "person_id")
     ) |>
+    dplyr::compute(temporary = FALSE, name = name,
+                   logPrefix = "CohortConstructor_fulfillCohortReqs_observationJoin_")
+
+  if (!inObservation) {
+    cdm[[name]] <- cdm[[name]] %>%
+      dplyr::mutate(
+        in_observation_start = .data$observation_period_start_date <= .data$cohort_start_date & .data$observation_period_end_date >= .data$cohort_start_date,
+        in_observation_end = .data$observation_period_start_date <= .data$cohort_end_date & .data$observation_period_end_date >= .data$cohort_end_date,
+        days_start_obs = !!CDMConnector::datediff("cohort_start_date", "observation_period_start_date"),
+        days_start_obs = dplyr::if_else(.data$days_start_obs < 0, NA, .data$days_start_obs)
+      ) |>
+      dplyr::group_by(.data$cohort_definition_id, .data$subject_id, .data$cohort_start_date, .data$cohort_end_date) |>
+      # which records to trim
+      dplyr::mutate(
+        trim_record =  all(!in_observation_start) & min(.data$days_start_obs) == .data$days_start_obs & !is.na(days_start_obs)
+      ) |>
+      dplyr::ungroup() |>
+      dplyr::mutate(
+        cohort_start_date = dplyr::if_else(
+          .data$trim_record == TRUE,
+          .data$observation_period_start_date,
+          .data$cohort_start_date
+        ),
+        cohort_end_date = dplyr::if_else(
+          .data$trim_record == TRUE & !.data$in_observation_end,
+          dplyr::if_else(
+            .data$cohort_end_date > .data$observation_period_end_date,
+            .data$observation_period_end_date,
+            .data$observation_period_start_date
+          ),
+          .data$cohort_end_date
+        )
+      ) |>
+      dplyr::select(!dplyr::any_of(c("in_observation_start", "in_observation_end", "days_start_obs", "trim_record"))) |>
+      dplyr::compute(
+        temporary = FALSE, name = name,
+        logPrefix = "CohortConstructor_fulfillCohortReqs_trimRecords_"
+      )
+  }
+
+  cdm[[name]] <- cdm[[name]] |>
     dplyr::filter(
       .data$cohort_start_date >= .data$observation_period_start_date,
       .data$cohort_start_date <= .data$observation_period_end_date
@@ -398,6 +447,7 @@ fulfillCohortReqs <- function(cdm, name) {
     dplyr::compute(temporary = FALSE, name = name,
                    logPrefix = "CohortConstructor_fulfillCohortReqs_inObservation_") |>
     omopgenerics::recordCohortAttrition(reason = "Record in observation")
+
 }
 
 
@@ -554,7 +604,7 @@ extendOverlap  <- function(cohort,
       dplyr::filter(
         .data$record_id != .data$record_id_overlap,
         .data$cohort_start_date <= .data$cohort_end_date_overlap &
-        .data$cohort_end_date >= .data$cohort_start_date_overlap
+          .data$cohort_end_date >= .data$cohort_start_date_overlap
       )  |>
       dplyr::select("cohort_definition_id", "subject_id",
                     "cohort_start_date", "cohort_end_date",
@@ -621,3 +671,4 @@ hasOverlap <- function(cohort){
   }
 
 }
+
