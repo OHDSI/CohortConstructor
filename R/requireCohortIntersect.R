@@ -61,9 +61,9 @@ requireCohortIntersect <- function(cohort,
   }
 
   if (cdm[[targetCohortTable]] |>
-      cohortCount() |>
       dplyr::filter(.data$cohort_definition_id %in% .env$targetCohortId) |>
-      dplyr::pull("number_subjects") == 0) {
+      dplyr::tally() |>
+      dplyr::pull("n") == 0) {
     cli::cli_inform("Returning entry cohort as the target cohort to intersect is empty.")
     # return entry cohort as cohortId is used to modify not subset
     cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE,

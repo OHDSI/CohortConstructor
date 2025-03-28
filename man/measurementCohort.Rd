@@ -10,6 +10,7 @@ measurementCohort(
   name,
   valueAsConcept = NULL,
   valueAsNumber = NULL,
+  table = c("measurement", "observation"),
   inObservation = TRUE
 )
 }
@@ -31,6 +32,9 @@ they correspond to, as follows:
 list("unit_concept_id" = c(rangeValue1, rangeValue2)). If no name is supplied
 in the list, no requirement on unit concept id will be applied. If NULL, all
 entries independent of their value as number will be included.}
+
+\item{table}{Name of OMOP tables to search for records of the concepts
+provided. Options are "measurement" and/or "observation".}
 
 \item{inObservation}{If TRUE, only records in observation will be used. If
 FALSE, records before the start of observation period will be considered,

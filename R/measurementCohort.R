@@ -26,6 +26,8 @@
 #' list("unit_concept_id" = c(rangeValue1, rangeValue2)). If no name is supplied
 #' in the list, no requirement on unit concept id will be applied. If NULL, all
 #' entries independent of their value as number will be included.
+#' @param table Name of OMOP tables to search for records of the concepts
+#' provided. Options are "measurement" and/or "observation".
 #' @param inObservation If TRUE, only records in observation will be used. If
 #' FALSE, records before the start of observation period will be considered,
 #' with startdate the start of observation.
@@ -86,6 +88,7 @@ measurementCohort <- function(cdm,
                               name,
                               valueAsConcept = NULL,
                               valueAsNumber = NULL,
+                              table = c("measurement", "observation"),
                               inObservation = TRUE) {
   # initial input validation
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
@@ -94,6 +97,10 @@ measurementCohort <- function(cdm,
   omopgenerics::assertNumeric(valueAsConcept, integerish = TRUE, null = TRUE)
   validateValueAsNumber(valueAsNumber)
   omopgenerics::assertLogical(inObservation, length = 1)
+  if (length(table) == 0) cli::cli_abort("`table` argument can't be empty. Options are 'measurement' and 'observation'.")
+  table <- validateTable(table)
+
+  useIndexes <- getOption("CohortConstructor.use_indexes")
 
   # empty concept set
   cohortSet <- conceptSetToCohortSet(conceptSet, cdm)
@@ -106,51 +113,49 @@ measurementCohort <- function(cdm,
     return(cdm[[name]])
   }
 
-  # create concept set tibble
-  tmpCodelist <- omopgenerics::uniqueTableName()
-  cohortCodelist <- lapply(conceptSet, dplyr::as_tibble) |>
-    dplyr::bind_rows(.id = "cohort_name") |>
-    dplyr::inner_join(cohortSet, by = "cohort_name") |>
-    dplyr::select("cohort_definition_id",
-                  "concept_id"  = "value",
-                  "codelist_name" = "cohort_name") |>
-    dplyr::mutate("type" = "index event") |>
-    addDomains(cdm, tmpCodelist)
-
-  ud <- cohortCodelist |>
-    dplyr::filter(!tolower(.data$domain_id) %in% "measurement" |
-                    is.na(.data$domain_id)) |>
-    dplyr::tally() |>
-    dplyr::pull("n")
-
-  if (ud > 0) {
-    cli::cli_inform(
-      c("x" = "{.strong {ud}} concept{?s} excluded because they don't correspond to the `Measurement` domain.")
+  # codelist attribute
+  cohortCodelist <- conceptSetToCohortCodelist(conceptSet)
+  tableCohortCodelist <- omopgenerics::uniqueTableName()
+  cdm <- uploadCohortCodelistToCdm(
+    cdm = cdm,
+    cohortCodelist = cohortCodelist,
+    tableCohortCodelist = tableCohortCodelist,
+    table = table
+  )
+  if (!isFALSE(useIndexes)) {
+    addIndex(
+      cohort = cdm[[tableCohortCodelist]],
+      cols = "concept_id"
     )
   }
 
-  cohortCodelist <- cohortCodelist |>
-    dplyr::filter(tolower(.data$domain_id) %in% "measurement") |>
-    dplyr::compute(name = tmpCodelist, temporary = FALSE,
-                   logPrefix = "CohortConstructor_measurementCohort_codes_")
+  # get cohort entries from omop records
+  cdm[[name]] <- unerafiedConceptCohort(
+    cdm = cdm,
+    conceptSet = conceptSet,
+    cohortSet = cohortSet,
+    cohortCodelist = cohortCodelist,
+    tableCohortCodelist = tableCohortCodelist,
+    name = name,
+    extraCols = c("value_as_number", "value_as_concept_id", "unit_concept_id"),
+    exit = "event_start_date",
+    useSourceFields = FALSE,
+    subsetIndividuals = NULL
+  )
 
-  cli::cli_inform(c("i" = "Subsetting measurement table."))
-  cdm[[name]] <- cdm$measurement |>
-    dplyr::select(
-      "subject_id" = "person_id",
-      "concept_id" = "measurement_concept_id",
-      "cohort_start_date" = "measurement_date",
-      "cohort_end_date" = "measurement_date",
-      "value_as_number",
-      "value_as_concept_id",
-      "unit_concept_id"
-    ) |>
-    dplyr::inner_join(
-      cohortCodelist |> dplyr::select("concept_id", "cohort_definition_id"),
-      by = "concept_id"
-    ) |>
-    dplyr::compute(name = name, temporary = FALSE,
-                   logPrefix = "CohortConstructor_measurementCohort_subset_")
+  if (cdm[[name]] |> dplyr::tally() |> dplyr::pull("n") == 0) {
+    cli::cli_inform(c("i" = "No table could be subsetted, returning empty cohort."))
+    cohortAttrition <- attrition(cdm[[name]])
+    cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name)
+    cdm[[name]] <- cdm[[name]] |>
+      omopgenerics::newCohortTable(
+        cohortSetRef = cohortSet,
+        cohortAttritionRef = NULL,
+        cohortCodelistRef = cohortCodelist
+      )
+    omopgenerics::dropSourceTable(cdm = cdm, name = tableCohortCodelist)
+    return(cdm[[name]])
+  }
 
   if (!is.null(valueAsConcept) || !is.null(valueAsNumber)) {
     cli::cli_inform(c("i" = "Applying measurement requirements."))
@@ -166,8 +171,6 @@ measurementCohort <- function(cdm,
     }
   }
 
-  cohortCodelist <- cohortCodelist |> dplyr::collect() |> dplyr::select(-"domain_id")
-
   cdm[[name]] <- cdm[[name]] |>
     omopgenerics::newCohortTable(
       cohortSetRef = cohortSet,
@@ -180,16 +183,12 @@ measurementCohort <- function(cdm,
     cohortAttrition <- attrition(cdm[[name]])
     cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name)
     cdm[[name]] <- cdm[[name]] |>
-      dplyr::select("cohort_definition_id",
-                    "subject_id",
-                    "cohort_start_date",
-                    "cohort_end_date") |>
       omopgenerics::newCohortTable(
         cohortSetRef = cohortSet,
         cohortAttritionRef = cohortAttrition,
         cohortCodelistRef = cohortCodelist
       )
-    omopgenerics::dropSourceTable(cdm = cdm, name = tmpCodelist)
+    omopgenerics::dropSourceTable(cdm = cdm, name = tableCohortCodelist)
     return(cdm[[name]])
   }
 
@@ -212,7 +211,7 @@ measurementCohort <- function(cdm,
 
   cli::cli_inform(c("v" = "Cohort {.strong {name}} created."))
 
-  omopgenerics::dropSourceTable(cdm = cdm, name = tmpCodelist)
+  omopgenerics::dropSourceTable(cdm = cdm, name = tableCohortCodelist)
 
   useIndexes <- getOption("CohortConstructor.use_indexes")
   if (!isFALSE(useIndexes)) {

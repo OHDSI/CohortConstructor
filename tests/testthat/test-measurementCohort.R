@@ -49,7 +49,8 @@ test_that("mearurementCohorts works", {
     name = "cohort",
     conceptSet = list("normal_blood_pressure" = c(4326744L, 4298393L, 45770407L)),
     valueAsConcept = c(4124457),
-    valueAsNumber = list("8876" = c(70L, 120L))
+    valueAsNumber = list("8876" = c(70L, 120L)),
+    table = "measurement"
   )
 
   expect_true(
@@ -107,7 +108,8 @@ test_that("mearurementCohorts works", {
     name = "cohort3",
     conceptSet = list("normal_blood_pressure" = c(4326744L, 4298393L, 45770407L, 12345L)),
     valueAsConcept = c(4124457),
-    valueAsNumber = list("8876" = c(70, 120))
+    valueAsNumber = list("8876" = c(70, 120)),
+    table = "measurement"
   )
   expect_identical(collectCohort(cdm$cohort3, 1), dplyr::tibble(
     subject_id = c(1L, 3L),
@@ -122,7 +124,8 @@ test_that("mearurementCohorts works", {
   cdm$cohort4 <- measurementCohort(
     cdm = cdm,
     name = "cohort4",
-    conceptSet = list("normal_blood_pressure" = c(4326744L, 4298393L, 45770407L))
+    conceptSet = list("normal_blood_pressure" = c(4326744L, 4298393L, 45770407L)),
+    table = "measurement"
   )
   expect_identical(collectCohort(cdm$cohort4, 1), dplyr::tibble(
     subject_id = as.integer(c(1, 1, 2, 3, 3)),
@@ -138,7 +141,8 @@ test_that("mearurementCohorts works", {
     cdm = cdm,
     name = "cohort5",
     conceptSet = list("normal_blood_pressure" = c(4326744L, 4298393L, 45770407L)),
-    valueAsNumber = list("8876" = c(70, 120), "908" = c(800, 900))
+    valueAsNumber = list("8876" = c(70, 120), "908" = c(800, 900)),
+    table = "measurement"
   )
   expect_identical(collectCohort(cdm$cohort5, 1), dplyr::tibble(
     subject_id = 1L,
@@ -154,7 +158,8 @@ test_that("mearurementCohorts works", {
     cdm = cdm,
     name = "cohort6",
     conceptSet = list("normal_blood_pressure" = c(4326744L, 4298393L, 45770407L)),
-    valueAsConcept = c(4124457, 999999, 12345)
+    valueAsConcept = c(4124457, 999999, 12345),
+    table = "measurement"
   )
   expect_identical(collectCohort(cdm$cohort6, 1), dplyr::tibble(
     subject_id = c(3L, 3L),
@@ -169,7 +174,8 @@ test_that("mearurementCohorts works", {
   cdm$cohort7 <- measurementCohort(
     cdm = cdm,
     name = "cohort7",
-    conceptSet = list("c1" = c(4326744L), "c2" = c(4298393L, 45770407L))
+    conceptSet = list("c1" = c(4326744L), "c2" = c(4298393L, 45770407L)),
+    table = "measurement"
   )
   expect_identical(collectCohort(cdm$cohort7, 1), dplyr::tibble(
     subject_id = c(1L),
@@ -211,7 +217,8 @@ test_that("mearurementCohorts works", {
   cdm$cohort8 <- measurementCohort(
     cdm = cdm,
     name = "cohort8",
-    conceptSet = list("c1" = c(123456L))
+    conceptSet = list("c1" = c(123456L)),
+    table = "measurement"
   )
   expect_true(all(colnames(cdm$cohort8) ==
                     c("cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date")))
@@ -224,7 +231,8 @@ test_that("mearurementCohorts works", {
   cdm$cohort9 <- measurementCohort(
     cdm = cdm,
     name = "cohort9",
-    conceptSet = list("c1" = c(1234567L))
+    conceptSet = list("c1" = c(1234567L)),
+    table = "measurement"
   )
   expect_true(cdm$cohort9 |> dplyr::tally() |> dplyr::pull("n") == 0)
   expect_true(settings(cdm$cohort9)$cohort_name == "c1")
@@ -234,7 +242,8 @@ test_that("mearurementCohorts works", {
   cdm$cohort10 <- measurementCohort(
     cdm = cdm,
     name = "cohort10",
-    conceptSet = list()
+    conceptSet = list(),
+    table = "measurement"
   )
   expect_true(cdm$cohort10 |> dplyr::tally() |> dplyr::pull("n") == 0)
   expect_true(cdm$cohort10 |> attrition() |> nrow() == 0)
@@ -246,7 +255,8 @@ test_that("mearurementCohorts works", {
     cdm = cdm,
     name = "cohort11",
     conceptSet = list("blood_pressure_measurement" = c(4326744L, 4298393L, 45770407L)),
-    valueAsNumber = list(c(0, 100))
+    valueAsNumber = list(c(0, 100)),
+    table = "measurement"
   )
   expect_identical(
     collectCohort(cdm$cohort11, 1),
@@ -300,12 +310,25 @@ test_that("mearurementCohorts - valueAsNumber without unit concept", {
                                      unit_concept_id = c(8876, 8876, 0)
                                    ))
 
+  cdm <- omopgenerics::insertTable(cdm, "observation",
+                                   dplyr::tibble(
+                                     observation_id = 1:3L,
+                                     person_id = as.integer(c(1, 2, 3)),
+                                     observation_concept_id = c(4326744),
+                                     observation_date = as.Date(c("2005-07-01", "2010-12-11", "2019-09-08")),
+                                     observation_type_concept_id = NA_integer_,
+                                     value_as_number = c(100, 105, 110),
+                                     value_as_concept_id = c(0, 0, 0) ,
+                                     unit_concept_id = c(8876, 8876, 0)
+                                   ))
+
 
   cohort_1 <- measurementCohort(
     cdm = cdm,
     name = "cohort",
     conceptSet = list("normal_blood_pressure" = c(4326744L)),
-    valueAsNumber = list("8876" = c(70L, 120L))
+    valueAsNumber = list("8876" = c(70L, 120L)),
+    table = "measurement"
   )
   expect_true(all(sort(cohort_1 |>
                          dplyr::pull("subject_id")) == c(1, 2)))
@@ -317,10 +340,50 @@ test_that("mearurementCohorts - valueAsNumber without unit concept", {
     cdm = cdm,
     name = "cohort",
     conceptSet = list("normal_blood_pressure" = c(4326744L)),
+    valueAsNumber = list(c(70L, 120L)),
+    table = "measurement"
+  )
+  expect_equal(
+    collectCohort(cohort_2, 1),
+    dplyr::tibble(
+      subject_id = 1:3,
+      cohort_start_date = as.Date(c("2000-07-01", "2000-12-11", "2002-09-08")),
+      cohort_end_date = as.Date(c("2000-07-01", "2000-12-11", "2002-09-08"))
+    )
+  )
+
+  # observation
+  cohort_3 <- measurementCohort(
+    cdm = cdm,
+    name = "cohort",
+    conceptSet = list("normal_blood_pressure" = c(4326744L)),
+    valueAsNumber = list(c(70L, 120L)),
+    table = "observation"
+  )
+  expect_equal(
+    collectCohort(cohort_3, 1),
+    dplyr::tibble(
+      subject_id = 1:3,
+      cohort_start_date = as.Date(c("2005-07-01", "2010-12-11", "2019-09-08")),
+      cohort_end_date = as.Date(c("2005-07-01", "2010-12-11", "2019-09-08"))
+    )
+  )
+
+  # observation + measurement
+  cohort_4 <- measurementCohort(
+    cdm = cdm,
+    name = "cohort",
+    conceptSet = list("normal_blood_pressure" = c(4326744L)),
     valueAsNumber = list(c(70L, 120L))
   )
-  expect_true(all(sort(cohort_2 |>
-                         dplyr::pull("subject_id")) == c(1, 2, 3)))
+  expect_equal(
+    collectCohort(cohort_4, 1),
+    dplyr::tibble(
+      subject_id = c(1, 1, 2, 2, 3, 3),
+      cohort_start_date = as.Date(c("2000-07-01", "2005-07-01", "2000-12-11", "2010-12-11", "2002-09-08", "2019-09-08")),
+      cohort_end_date = as.Date(c("2000-07-01", "2005-07-01", "2000-12-11", "2010-12-11", "2002-09-08", "2019-09-08"))
+    )
+  )
 
   # don't allow some with unit concept id and others without
   expect_error(measurementCohort(
@@ -328,7 +391,8 @@ test_that("mearurementCohorts - valueAsNumber without unit concept", {
     name = "cohort",
     conceptSet = list("normal_blood_pressure" = c(4326744L)),
     valueAsNumber = list("8876" = c(70L, 120L),
-                         c(70L, 120L))))
+                         c(70L, 120L)),
+    table = "measurement"))
 
   # don't allow some with unit concept id and others without
   expect_error(measurementCohort(
@@ -336,7 +400,8 @@ test_that("mearurementCohorts - valueAsNumber without unit concept", {
     name = "cohort",
     conceptSet = list("normal_blood_pressure" = c(4326744L)),
     valueAsNumber = list(c(70L, 120L),
-                         c(100L, 150L))))
+                         c(100L, 150L)),
+    table = "measurement"))
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
@@ -382,7 +447,8 @@ test_that("expected errors", {
       name = "cohort",
       conceptSet = list(c(4326744L, 4298393L, 45770407L)),
       valueAsConcept = c(4124457L),
-      valueAsNumber = list("8876" = c(70L, 120L))
+      valueAsNumber = list("8876" = c(70L, 120L)),
+      table = "measurement"
     )
   )
   expect_error(
@@ -391,7 +457,8 @@ test_that("expected errors", {
       name = "cohort",
       conceptSet = list("name " = c(4326744L, 4298393L, 45770407L)),
       valueAsConcept = c(4124457),
-      valueAsNumber = list("8876" = c(700, 120))
+      valueAsNumber = list("8876" = c(700, 120)),
+      table = "measurement"
     )
   )
 
@@ -425,7 +492,8 @@ test_that("test indexes - postgres", {
                                                       cohort_end_date = as.Date("2009-01-03"),
                                                       other_date = as.Date("2009-01-01")))
   cdm$my_cohort <- omopgenerics::newCohortTable(cdm$my_cohort)
-  cdm$my_cohort <- measurementCohort(cdm, name = "my_cohort", conceptSet = list(a = 40660437L))
+  cdm$my_cohort <- measurementCohort(cdm, name = "my_cohort", conceptSet = list(a = 40660437L),
+                                     table = "measurement")
 
   expect_true(
     DBI::dbGetQuery(db, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==

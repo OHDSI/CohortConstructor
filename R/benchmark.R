@@ -161,10 +161,6 @@ benchmarkCohortConstructor <- function(cdm,
     resultsTiming <- NULL
   }
 
-  # Without SQL indexes ----
-  # cli::cli_inform(c("*" = "{.strong Instantiating with CohortConstructor without using indexes}"))
-  # runWithoutIndex(cdm, codes)
-
   # Format time results ----
   resultsTime <- getTimes(tictoc::tic.log(format = FALSE), cdm)
 
@@ -768,8 +764,4 @@ getTimes <- function(log, cdm) {
         )
       )
   )
-}
-
-runWithoutIndex <- function(cdm, codes) {
-
 }
