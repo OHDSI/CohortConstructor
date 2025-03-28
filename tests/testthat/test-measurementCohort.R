@@ -436,3 +436,60 @@ test_that("test indexes - postgres", {
   omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
   CDMConnector::cdmDisconnect(cdm = cdm)
 })
+
+test_that("inObservation FALSE", {
+  cdm <- omock::mockPerson(nPerson = 3)
+  cdm <- omopgenerics::insertTable(
+    cdm = cdm, name = "observation_period", table = dplyr::tibble(
+      "observation_period_id" = c(1L, 2L, 3L),
+      "person_id" = c(1L, 1L, 2L),
+      "observation_period_start_date" = as.Date(c(
+        "2000-02-01", "2000-10-01", "2000-01-01"
+      )),
+      "observation_period_end_date" = as.Date(c(
+        "2000-05-01", "2000-12-01", "2000-12-01"
+      )),
+      "period_type_concept_id" = NA_integer_
+    ))
+  cdm <- omopgenerics::insertTable(
+    cdm = cdm, name = "concept", table = dplyr::tibble(
+      "concept_id" = 1L,
+      "concept_name" = "concept 1",
+      "domain_id" = "measurement",
+      "vocabulary_id" = NA,
+      "concept_class_id" = NA,
+      "concept_code" = NA,
+      "valid_start_date" = NA,
+      "valid_end_date" = NA
+    )
+  )
+  # person 1 - out before, out after, in, in
+  # person 2 - out before
+  cdm <- omopgenerics::insertTable(
+    cdm = cdm, name = "measurement",
+    table = dplyr::tibble(
+      "measurement_id" = 1:6 |> as.integer(),
+      "person_id" = c(1, 1, 1, 1, 1, 2) |> as.integer(),
+      "measurement_concept_id" = 1L,
+      "measurement_date" = as.Date(c(
+        "2000-01-01", "2001-08-01", "2000-03-01", "2000-11-01", "2000-02-01", "1999-11-01"
+      )),
+      "measurement_type_concept_id" = 1
+    )
+  )
+
+  cdm <- cdm |> copyCdm()
+
+  cdm$cohort <- conceptCohort(cdm, list(a = 1L), name = "cohort", inObservation = FALSE)
+  expect_equal(
+    dplyr::tibble(
+      subject_id = c(1L, 1L, 1L, 2L),
+      cohort_start_date = as.Date(c("2000-02-01", "2000-03-01", "2000-11-01", "2000-01-01")),
+      cohort_end_date = as.Date(c("2000-02-01", "2000-03-01", "2000-11-01", "2000-01-01"))
+    ),
+    collectCohort(cdm$cohort, 1)
+  )
+
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
+  CDMConnector::cdmDisconnect(cdm = cdm)
+})

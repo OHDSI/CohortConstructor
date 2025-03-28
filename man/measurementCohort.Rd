@@ -9,7 +9,8 @@ measurementCohort(
   conceptSet,
   name,
   valueAsConcept = NULL,
-  valueAsNumber = NULL
+  valueAsNumber = NULL,
+  inObservation = TRUE
 )
 }
 \arguments{
@@ -30,6 +31,10 @@ they correspond to, as follows:
 list("unit_concept_id" = c(rangeValue1, rangeValue2)). If no name is supplied
 in the list, no requirement on unit concept id will be applied. If NULL, all
 entries independent of their value as number will be included.}
+
+\item{inObservation}{If TRUE, only records in observation will be used. If
+FALSE, records before the start of observation period will be considered,
+with startdate the start of observation.}
 }
 \value{
 A cohort table

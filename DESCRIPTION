@@ -43,7 +43,7 @@ Imports:
     utils
 Suggests: 
     DBI,
-    CodelistGenerator,
+    CodelistGenerator (>= 3.4.1),
     DrugUtilisation,
     duckdb,
     knitr,
