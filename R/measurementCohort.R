@@ -97,6 +97,7 @@ measurementCohort <- function(cdm,
   omopgenerics::assertNumeric(valueAsConcept, integerish = TRUE, null = TRUE)
   validateValueAsNumber(valueAsNumber)
   omopgenerics::assertLogical(inObservation, length = 1)
+  if (length(table) == 0) cli::cli_abort("`table` argument can't be empty. Options are 'measurement' and 'observation'.")
   table <- validateTable(table)
 
   useIndexes <- getOption("CohortConstructor.use_indexes")
