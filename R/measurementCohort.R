@@ -143,6 +143,20 @@ measurementCohort <- function(cdm,
     subsetIndividuals = NULL
   )
 
+  if (cdm[[name]] |> dplyr::tally() |> dplyr::pull("n") == 0) {
+    cli::cli_inform(c("i" = "No table could be subsetted, returning empty cohort."))
+    cohortAttrition <- attrition(cdm[[name]])
+    cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name)
+    cdm[[name]] <- cdm[[name]] |>
+      omopgenerics::newCohortTable(
+        cohortSetRef = cohortSet,
+        cohortAttritionRef = NULL,
+        cohortCodelistRef = cohortCodelist
+      )
+    omopgenerics::dropSourceTable(cdm = cdm, name = tableCohortCodelist)
+    return(cdm[[name]])
+  }
+
   if (!is.null(valueAsConcept) || !is.null(valueAsNumber)) {
     cli::cli_inform(c("i" = "Applying measurement requirements."))
     filterExpr <- getFilterExpression(valueAsConcept, valueAsNumber)
