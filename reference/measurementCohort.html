@@ -97,7 +97,8 @@ be required to have values that fulfill <em>either</em> of the requirements</p><
 <span>  <span class="va">conceptSet</span>,</span>
 <span>  <span class="va">name</span>,</span>
 <span>  valueAsConcept <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  valueAsNumber <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  valueAsNumber <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  inObservation <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -131,6 +132,12 @@ they correspond to, as follows:
 list("unit_concept_id" = c(rangeValue1, rangeValue2)). If no name is supplied
 in the list, no requirement on unit concept id will be applied. If NULL, all
 entries independent of their value as number will be included.</p></dd>
+
+
+<dt id="arg-inobservation">inObservation<a class="anchor" aria-label="anchor" href="#arg-inobservation"></a></dt>
+<dd><p>If TRUE, only records in observation will be used. If
+FALSE, records before the start of observation period will be considered,
+with startdate the start of observation.</p></dd>
 
 </dl></div>
     <div class="section level2">
