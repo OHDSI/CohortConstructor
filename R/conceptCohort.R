@@ -348,12 +348,13 @@ unerafiedConceptCohort <- function(cdm,
 
   cli::cli_inform(c("i" = "Combining tables."))
   cohort <- Reduce(dplyr::union_all, cohorts) |>
-    dplyr::select(
+    dplyr::select(dplyr::any_of(c(
       "cohort_definition_id",
       "subject_id",
       "cohort_start_date",
-      "cohort_end_date"
-    ) |>
+      "cohort_end_date",
+      extraCols
+    ))) |>
     dplyr::mutate(cohort_end_date = dplyr::coalesce(.data$cohort_end_date, .data$cohort_start_date)) |>
     dplyr::compute(name = name, temporary = FALSE,
                    logPrefix = "CohortConstructor_conceptCohort_reduce_")

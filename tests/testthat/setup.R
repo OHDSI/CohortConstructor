@@ -7,6 +7,7 @@ collectCohort <- function(cohort, id) {
   attr(x, "cohort_set") <- NULL
   attr(x, "cohort_attrition") <- NULL
   attr(x, "cohort_codelist") <- NULL
+  class(x) <- c("tbl_df", "tbl", "data.frame")
   return(x)
 }
 compareCohort <- function(cohort1, id1, cohort2, id2) {
