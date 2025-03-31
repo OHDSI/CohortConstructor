@@ -96,7 +96,8 @@ cdm$medications <- conceptCohort(
 cdm$cohort_dates <- cdm$cohort |> 
   addCohortIntersectDate(
     targetCohortTable = "medications", 
-     nameStyle = "{cohort_name}" 
+    nameStyle = "{cohort_name}",
+    name = "cohort_dates"
     ) 
 
 # set cohort start at the first ocurrence of one of the drugs, or the end date
@@ -132,11 +133,10 @@ For instance, next we want the exit to be observation end, except if there is a 
 
 ```{r}
 cdm$cohort_exit_first <- cdm$cohort_dates |>
-  addFutureObservation(futureObservationType = "date") |>
+  addFutureObservation(futureObservationType = "date", name = "cohort_exit_first") |>
   exitAtFirstDate(
     dateColumns = c("future_observation", "acetaminophen", "diclofenac"),
-    keepDateColumns = FALSE,
-    name = "cohort_exit_first"
+    keepDateColumns = FALSE
   )
 
 cdm$cohort_exit_first 
@@ -211,7 +211,16 @@ Similarly, the `padCohortEnd()` function adjusts the cohort end date by adding (
 The example below adds 1000 days to cohort end date, while dropping records that are outside of observation after adding days.
 
 ```{r}
-cdm$cohort <- cdm$cohort |> padCohortEnd(days = 1000, padObservation = FALSE)
+cdm$cohort_pad <- cdm$cohort |> 
+  padCohortEnd(days = 1000, padObservation = FALSE, name = "cohort_pad")
+```
+
+Additionally, days to add can also be specified with a numeric column in the cohort, which allows to add a specific number of days for each record:
+
+```{r}
+cdm$cohort <- cdm$cohort %>% 
+  dplyr::mutate(days_to_add = !!CDMConnector::datediff("cohort_start_date", "cohort_end_date")) |>
+  padCohortEnd(days = "days_to_add", padObservation = FALSE)
 ```
 
 
