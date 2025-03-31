@@ -27,48 +27,6 @@ deathCohort <- function(
                                            validation = "error")
   }
 
-  x <-  cdm$death %>%
-    PatientProfiles::addInObservation(indexDate = "death_date") %>%
-    dplyr::filter(.data$in_observation==1) %>%
-    dplyr::select("subject_id" = "person_id",
-                  "death_date")
-  if (!is.null(subsetCohort)){
-    if (!is.null(subsetCohortId)){
-      x <- x %>%
-        dplyr::inner_join(cdm[[subsetCohort]] %>%
-                            dplyr::filter(.data$cohort_definition_id %in% subsetCohortId) %>%
-                            dplyr::select("subject_id", "cohort_definition_id"),
-                          by = c("subject_id")) %>%
-        dplyr::select("subject_id", "death_date")
-
-    }else{
-      x <- x %>%
-        dplyr::inner_join(cdm[[subsetCohort]] %>%
-                            dplyr::select("subject_id"),
-                          by = c("subject_id")) %>%
-        dplyr::select("subject_id", "death_date")
-    }
-  }
-
-  cohortRef <- x %>%
-    dplyr::group_by(.data$subject_id) %>%
-    dbplyr::window_order(.data$death_date) %>%
-    dplyr::filter(dplyr::row_number()==1) %>%
-    dplyr::rename("cohort_start_date" = "death_date") %>%
-    dplyr::mutate(cohort_definition_id = 1L ,
-                  cohort_end_date = .data$cohort_start_date)  %>%
-    dplyr::select(
-      "cohort_definition_id", "subject_id", "cohort_start_date",
-      "cohort_end_date"
-    ) %>%
-    dplyr::ungroup() %>%
-    dplyr::compute(
-      name = name,
-      temporary = FALSE,
-      overwrite = TRUE)
-
-  attr(cohortRef, "tbl_name") <- name
-
   if (is.null(subsetCohort)) {
     subsetCohort <- as.character(NA)
   }
@@ -82,8 +40,65 @@ deathCohort <- function(
     "subset_cohort_id" = subsetCohortId
   )
 
-  cdm[[name]] <- cohortRef %>%
-    omopgenerics::newCohortTable(cohortSetRef = cohortSetRef)
+  cdm[[name]] <-  cdm$death |>
+    dplyr::mutate(cohort_definition_id = 1L) |>
+    dplyr::select("cohort_definition_id",
+                  "subject_id" = "person_id",
+                  "cohort_start_date" = "death_date",
+                  "cohort_end_date" ="death_date") |>
+    dplyr::compute(temporary = FALSE, name = name)
+
+  cdm[[name]] <- cdm[[name]] |>
+    omopgenerics::newCohortTable(cohortSetRef = cohortSetRef,
+                                 .softValidation = TRUE)
+
+  cdm[[name]] <-  cdm[[name]] |>
+    PatientProfiles::filterInObservation(indexDate = "cohort_start_date") |>
+    dplyr::compute(temporary = FALSE, name = name) |>
+    omopgenerics::recordCohortAttrition("Death record in observation")
+
+  if (!is.na(subsetCohort)){
+    if (!is.na(subsetCohortId)){
+      cdm[[name]] <- cdm[[name]] |>
+        dplyr::inner_join(cdm[[subsetCohort]] |>
+                            dplyr::filter(.data$cohort_definition_id %in% subsetCohortId) |>
+                            dplyr::select("subject_id"),
+                          by = c("subject_id")) |>
+        dplyr::compute(
+          name = name,
+          temporary = FALSE,
+          overwrite = TRUE) |>
+        omopgenerics::recordCohortAttrition("In subset cohort")
+    }else{
+      cdm[[name]] <- cdm[[name]] |>
+        dplyr::inner_join(cdm[[subsetCohort]] |>
+                            dplyr::select("subject_id"),
+                          by = c("subject_id")) |>
+        dplyr::compute(
+          name = name,
+          temporary = FALSE,
+          overwrite = TRUE) |>
+        omopgenerics::recordCohortAttrition("In subset cohort")
+    }
+  }
+
+  cdm[[name]] <- cdm[[name]] |>
+    dplyr::group_by(.data$subject_id) |>
+    dbplyr::window_order(.data$cohort_start_date) |>
+    dplyr::filter(dplyr::row_number()==1) |>
+    dplyr::select(
+      "cohort_definition_id", "subject_id", "cohort_start_date",
+      "cohort_end_date"
+    ) |>
+    dplyr::ungroup() |>
+    dplyr::compute(
+      name = name,
+      temporary = FALSE,
+      overwrite = TRUE) |>
+    omopgenerics::recordCohortAttrition("First death record")
+
+  cdm[[name]] <- omopgenerics::newCohortTable(table = cdm[[name]])
+  cli::cli_inform(c("v" = "Cohort {.strong {name}} created."))
 
   return(cdm[[name]])
 }

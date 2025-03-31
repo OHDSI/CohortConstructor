@@ -47,6 +47,13 @@ test_that("basic example", {
                     "cohort_start_date", "cohort_end_date") %in%
                     colnames(cdm$my_death_cohort)))
 
+  expect_identical(
+    omopgenerics::attrition(cdm$my_death_cohort) |>
+    dplyr::pull("reason"),
+  c("Initial qualifying events",
+    "Death record in observation",
+    "First death record"))
+
   CDMConnector::cdmDisconnect(cdm)
 })
 
@@ -104,6 +111,16 @@ test_that("first death record per person", {
                 dplyr::filter(subject_id == "2") %>%
                 dplyr::select(cohort_start_date) %>%
                 dplyr::pull() == as.Date("2020-01-02"))
+
+  expect_identical(omopgenerics::attrition(cdm2$death_cohort) |>
+    dplyr::filter(reason == "First death record") |>
+    dplyr::pull("excluded_records"),
+    1L)
+
+  expect_identical(omopgenerics::attrition(cdm2$death_cohort) |>
+                     dplyr::filter(reason == "First death record") |>
+                     dplyr::pull("excluded_subjects"),
+                   0L)
 
   CDMConnector::cdmDisconnect(cdm2)
 })
@@ -288,8 +305,7 @@ test_that("test subsetting death table by a cohort table", {
                     dplyr::select(subject_id) %>%
                     dplyr::pull() %in%  c(1,2,3)
   ))
-  # with cohortId
-
+  # with subsetCohortId
   cdm2$death_cohort <-  deathCohort(cdm=cdm2,
                        name = "death_cohort",
                        subsetCohort = "cohort1",
