@@ -38,6 +38,14 @@ First, we'll connect to the Eunomia synthetic data and create a mock cohort of w
 library(CohortConstructor)
 library(CohortCharacteristics)
 library(PatientProfiles)
+library(CDMConnector)
+
+if (Sys.getenv("EUNOMIA_DATA_FOLDER") == ""){
+Sys.setenv("EUNOMIA_DATA_FOLDER" = file.path(tempdir(), "eunomia"))}
+if (!dir.exists(Sys.getenv("EUNOMIA_DATA_FOLDER"))){ dir.create(Sys.getenv("EUNOMIA_DATA_FOLDER"))
+downloadEunomiaData()  
+}
+
 con <- DBI::dbConnect(duckdb::duckdb(), dbdir = CDMConnector::eunomiaDir())
 cdm <- CDMConnector::cdmFromCon(con, cdmSchema = "main", 
                     writeSchema = "main", writePrefix = "my_study_")
