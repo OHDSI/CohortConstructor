@@ -16,6 +16,7 @@ reference:
 - subtitle: Build base cohorts
 - contents:
   - conceptCohort
+  - deathCohort
   - demographicsCohort
   - measurementCohort
 - subtitle: Apply cohort table related requirements
