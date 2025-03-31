@@ -147,13 +147,14 @@ cdm$cohort_exit_first
 Similarly, the `exitAtLastDate()` function sets the cohort end date to the latest date among specified columns.
 
 ```{r}
-cdm$cohort <- cdm$cohort_dates |> 
+cdm$cohort_exit_last <- cdm$cohort_dates |> 
   exitAtLastDate(
     dateColumns = c("cohort_end_date", "acetaminophen", "diclofenac"),
     returnReason = FALSE,
-    keepDateColumns = FALSE
+    keepDateColumns = FALSE,
+    name = "cohort_exit_last"
   )
-cdm$cohort
+cdm$cohort_exit_last
 ```
 
 In this last example, the return cohort doesn't have the specified date columns, neither the "reason" column indicating which date was used for entry/exit. These was set with the `keepDateColumns` and `returnReason` arguments, common throughout the functions in this category.
