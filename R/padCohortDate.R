@@ -173,7 +173,7 @@ padCohortStart <- function(cohort,
   if (is.numeric(days)) {
     omopgenerics::assertNumeric(days, integerish = TRUE, length = 1, msg = msg, call = call)
     reason <- paste0(reason, round(days), " ", ifelse(days == 1, "day", "days"))
-    q <- "as.Date(local(CDMConnector::dateadd(indexDate, {round(days)}L)))"
+    q <- "as.Date(local(CDMConnector::dateadd('{indexDate}', {round(days)}L)))"
 
   } else if (is.character(days)) {
     omopgenerics::assertCharacter(days, length = 1, call = call, msg = msg)
@@ -181,7 +181,7 @@ padCohortStart <- function(cohort,
     reason <- paste0(reason, "'", days, "' days")
     cohort <- cohort |>
       dplyr::mutate(!!days := as.integer(.data[[days]]))
-    q <- "as.Date(local(CDMConnector::dateadd(indexDate, '{days}')))"
+    q <- "as.Date(local(CDMConnector::dateadd('{indexDate}', '{days}')))"
   } else {
     cli::cli_abort(message = msg, call = call)
   }
@@ -278,7 +278,7 @@ solveOverlap <- function(x, collapse, intermediate) {
         xId |>
           dplyr::select(
             "cohort_definition_id", "subject_id",
-            "prior_end_date" = "cohort_end_date"
+            "prior_end_date" = "cohort_end_date", "id"
           ) |>
           dplyr::mutate(id = .data$id + 1L),
         by = c("cohort_definition_id", "subject_id", "id")
