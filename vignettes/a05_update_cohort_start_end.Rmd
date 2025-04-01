@@ -63,10 +63,6 @@ The `exitAtObservationEnd()` function updates the cohort end date to the end of 
 ```{r}
 cdm$cohort_observation_end <- cdm$cohort |> 
   exitAtObservationEnd(name = "cohort_observation_end")
-
-cdm$cohort_observation_end |> 
-  summariseCohortAttrition() |> 
-  plotCohortAttrition(type = "png")
 ```
 
 As cohort entries cannot overlap, updating the end date to the observation end may result in overlapping records. In such cases, overlapping records are collapsed into a single entry (starting at the earliest entry and ending at the end of observation).
@@ -82,7 +78,6 @@ By default, it keeps the end date of subjects who do not have a death record unm
 ```{r}
 cdm$cohort_death <- cdm$cohort |> 
   exitAtDeath(requireDeath = TRUE, name = "cohort_death")
-cdm$cohort_death |> summariseCohortAttrition() |> plotCohortAttrition(type = "png")
 ```
 
 
@@ -190,8 +185,6 @@ For example, to restrict cohort dates to be on or after January 1st, 2015:
 # Trim cohort dates to be within the year 2000
 cdm$cohort_trim <- cdm$cohort_trim |> 
   trimToDateRange(dateRange = as.Date(c("2015-01-01", NA)))
-
-cdm$cohort_trim |> summariseCohortAttrition() |> plotCohortAttrition(type = "png")
 ```
 
 ## Pad Dates Functions
