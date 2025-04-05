@@ -79,3 +79,11 @@ cdm$working_age_cohort <- demographicsCohort(cdm = cdm,
                                              name = "working_age_cohort")
 ```
 
+## Death cohort
+
+Another base cohort we can make is one with individuals who have died. For this we'll simply be finding those people in the OMOP CDM death table and creating a cohort with them.
+
+```{r}
+cdm$death_cohort <- deathCohort(cdm = cdm,
+                                name = "death_cohort")
+```
