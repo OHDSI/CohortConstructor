@@ -66,12 +66,12 @@ unionCohorts <- function(cohort,
       cli::cli_abort("Change `cohortName` as there is already a cohort named `{cohortName}` in the cohort.")
     }
   }
-
   # union cohort
   # save to a separate table so can append to original cohorts at the end
   tmpTable  <- omopgenerics::uniqueTableName()
-  unionedCohort <- cohort |>
-    dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>
+  unionedCohort <- copyCohorts(cohort = cohort,
+                               name = tmpTable,
+                               cohortId = cohortId) |>
     PatientProfiles::addObservationPeriodId(name = tmpTable) |>
     joinOverlap(name = tmpTable,
                 by = c("observation_period_id", "subject_id"),
