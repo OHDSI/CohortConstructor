@@ -62,21 +62,9 @@ intersectCohorts <- function(cohort,
   }
 
   tblName <- omopgenerics::uniqueTableName(prefix = tablePrefix)
-  if (isTRUE(needsIdFilter(cohort, cohortId))) {
-    newCohort <- cohort |>
-      dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>
-      dplyr::compute(
-        name = tblName, temporary = FALSE,
-        logPrefix = "CohortConstructor_intersectCohorts_newCohort_1_"
-      )
-  } else {
-    newCohort <- cohort |>
-      dplyr::compute(
-        name = tblName, temporary = FALSE,
-        logPrefix = "CohortConstructor_intersectCohorts_newCohort_1_"
-      )
-  }
-
+  newCohort <- copyCohorts(cohort,
+                           name = tblName,
+                           cohortId = cohortId)
   # get intersections between cohorts
   lowerWindow <- ifelse(gap != 0, -gap, gap)
   newCohort <- newCohort |>

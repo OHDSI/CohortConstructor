@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 
 The CohortConstructor package is designed to support cohort building pipelines. When using the package the general workflow is to first build a set of base cohorts and then subsequently apply inclusion criteria to derive the final study cohorts of interest. Base cohorts are built by domain (rather than by cohort definition) and from one base cohort many study cohorts can be derived.
 
-## Building a cohort set by domain
+## Building a cohort set by domain/ clinical table
 
 Let´s say we want to build 5 cohorts with 3 (asthma, copd, and diabetes) defined based on concepts seen in the condition occurrence table while the other 2 (acetaminophen and warfarin) are based on concepts recorded in the drug exposure table. We can build these cohorts independently, one after the other. However, this approach will mean repeating 3 joins to the condition occurrence tables and 2 joins to the drug exposure table (with the concepts in the concept sets). To make this less computationally expensive, we could instead create the cohorts by domain. In this case we will instead make one join with the condition occurrence table and one to the drug exposure (using all the concept sets together).
 
