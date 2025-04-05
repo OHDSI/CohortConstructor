@@ -51,6 +51,14 @@ copyCohorts <- function(cohort, name, n = 1, cohortId = NULL) {
       )
   }
 
+  useIndexes <- getOption("CohortConstructor.use_indexes")
+  if (!isFALSE(useIndexes)) {
+    addIndex(
+      cohort = newCohort,
+      cols = c("subject_id", "cohort_start_date")
+    )
+  }
+
   return(newCohort)
 }
 
