@@ -15,6 +15,7 @@
 #' column date of the cohort.
 #' @param negate If set as TRUE, criteria will be applied as exclusion
 #' rather than inclusion (i.e. require absence in another cohort).
+#' @inheritParams softValidationDoc
 #'
 #' @return Cohort table with only those with a death event kept (or without
 #' if negate = TRUE)

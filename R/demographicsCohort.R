@@ -9,6 +9,7 @@
 #' @inheritParams cdmDoc
 #' @inheritParams nameDoc
 #' @inheritParams requireDemographicsDoc
+#' @inheritParams softValidationDoc
 #'
 #' @return A cohort table
 #'
@@ -37,7 +38,8 @@ demographicsCohort <- function(cdm,
                                name,
                                ageRange = NULL,
                                sex = NULL,
-                               minPriorObservation = NULL) {
+                               minPriorObservation = NULL,
+                               .softValidation = TRUE) {
   # initial checks
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cdm <- omopgenerics::validateCdmArgument(cdm)
@@ -71,7 +73,8 @@ demographicsCohort <- function(cdm,
     ageRange = ageRange,
     sex = sex,
     minPriorObservation = minPriorObservation,
-    name = name
+    name = name,
+    .softValidation = .softValidation
   )
 
   return(cdm[[name]])

@@ -4,18 +4,31 @@
 \alias{yearCohorts}
 \title{Generate a new cohort table restricting cohort entries to certain years}
 \usage{
-yearCohorts(cohort, years, cohortId = NULL, name = tableName(cohort))
+yearCohorts(
+  cohort,
+  years,
+  cohortId = NULL,
+  name = tableName(cohort),
+  .softValidation = FALSE
+)
 }
 \arguments{
 \item{cohort}{A cohort table in a cdm reference.}
 
-\item{years}{Numeric vector of years to use to restrict observation to..}
+\item{years}{Numeric vector of years to use to restrict observation to.}
 
 \item{cohortId}{Vector identifying which cohorts to include
 (cohort_definition_id or cohort_name). Cohorts not included will be
 removed from the cohort set.}
 
 \item{name}{Name of the new cohort table created in the cdm object.}
+
+\item{.softValidation}{Whether to perform a soft validation of consistency.
+If set to FALSE four additional checks will be performed: 1) a check that
+cohort end date is not before cohort start date,  2) a check that there
+are no missing values in required columns, 3) a check that cohort duration is
+all within observation period, and 4) that there are no overlapping
+cohort entries}
 }
 \value{
 A cohort table.

@@ -10,6 +10,7 @@
 #' @inheritParams cohortIdModifyDoc
 #' @inheritParams windowDoc
 #' @inheritParams nameDoc
+#' @inheritParams softValidationDoc
 #'
 #' @return Cohort table with only those in the other table kept (or those that
 #' are not in the table if negate = TRUE)
@@ -35,7 +36,8 @@ requireTableIntersect <- function(cohort,
                                   targetEndDate = endDateColumn(tableName),
                                   inObservation = TRUE,
                                   censorDate = NULL,
-                                  name = tableName(cohort)) {
+                                  name = tableName(cohort),
+                                  .softValidation = TRUE) {
   # checks
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cohort <- omopgenerics::validateCohortArgument(cohort)
@@ -45,6 +47,7 @@ requireTableIntersect <- function(cohort,
   cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
   intersections <- validateIntersections(intersections)
   omopgenerics::assertCharacter(tableName)
+  omopgenerics::assertLogical(.softValidation)
 
   if (length(cohortId) == 0) {
     cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
@@ -134,7 +137,7 @@ requireTableIntersect <- function(cohort,
       name = name, temporary = FALSE,
       logPrefix = "CohortConstructor_requireTableIntersect_name_"
     ) |>
-    omopgenerics::newCohortTable(.softValidation = TRUE) |>
+    omopgenerics::newCohortTable(.softValidation = .softValidation) |>
     omopgenerics::recordCohortAttrition(reason = reason, cohortId = cohortId)
 
   omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(tablePrefix))

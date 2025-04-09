@@ -11,6 +11,7 @@
 #' @inheritParams windowDoc
 #' @inheritParams nameDoc
 #' @inheritParams conceptSetDoc
+#' @inheritParams softValidationDoc
 #'
 #' @return Cohort table with only those  with the events in the concept list
 #' kept (or those without the event if negate = TRUE)
@@ -37,7 +38,8 @@ requireConceptIntersect <- function(cohort,
                                     targetEndDate = "event_end_date",
                                     inObservation = TRUE,
                                     censorDate = NULL,
-                                    name = tableName(cohort)) {
+                                    name = tableName(cohort),
+                                    .softValidation = TRUE) {
   # checks
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cohort <- omopgenerics::validateCohortArgument(cohort)
@@ -47,6 +49,7 @@ requireConceptIntersect <- function(cohort,
   cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
   intersections <- validateIntersections(intersections)
   conceptSet <- omopgenerics::validateConceptSetArgument(conceptSet, cdm)
+  omopgenerics::assertLogical(.softValidation)
 
   if (length(cohortId) == 0) {
     cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
@@ -163,7 +166,7 @@ requireConceptIntersect <- function(cohort,
       logPrefix = "CohortConstructor_requireConceptIntersect_join_"
     ) |>
     omopgenerics::newCohortTable(
-      .softValidation = TRUE, cohortCodelistRef = newCodelist
+      .softValidation = .softValidation, cohortCodelistRef = newCodelist
     ) |>
     omopgenerics::recordCohortAttrition(reason = reason, cohortId = cohortId)
 
