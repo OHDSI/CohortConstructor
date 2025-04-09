@@ -66,7 +66,9 @@ Suggests:
     ggpubr,
     SqlRender,
     CirceR,
-    tictoc
+    tictoc,
+    jsonlite,
+    styler
 Config/testthat/edition: 3
 Config/testthat/parallel: true
 VignetteBuilder: knitr
