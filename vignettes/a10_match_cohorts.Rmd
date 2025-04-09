@@ -67,7 +67,7 @@ Notice that matching pairs are randomly assigned, so it is probable that every t
 Notice that if `matchSex = FALSE` and `matchYear = FALSE`, we will obtain an unmatched comparator cohort.
 
 ## ratio parameter
-The default matching ratio is 1:1 (`ratio = 1`). Use `cohort_counts()` from CDMConnector to check if the matching has been done as desired.
+The default matching ratio is 1:1 (`ratio = 1`). Use `cohortCount()` from CDMConnector to check if the matching has been done as desired.
 
 ```{r, eval = FALSE}
 omopgenerics::cohortCount(cdm$matched_cohort1)
