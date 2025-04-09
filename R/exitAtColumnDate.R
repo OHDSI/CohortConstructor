@@ -223,7 +223,7 @@ exitAtColumnDate <- function(cohort,
     newCohort <- newCohort |>
       dplyr::inner_join(
         cohort |>
-          dplyr::select(dplyr::any_of(c(
+          dplyr::select(any_of(c(
             "cohort_definition_id", "subject_id", keptDate, dateColumns
           ))) |>
           dplyr::select(!dplyr::any_of(newDate))

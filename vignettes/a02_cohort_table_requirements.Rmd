@@ -88,6 +88,7 @@ cdm$acetaminophen <- cdm$acetaminophen |>
 
 summary_attrition <- summariseCohortAttrition(cdm$acetaminophen)
 plotCohortAttrition(summary_attrition)
+
 ```
 
 ## Keep only a range of records per person
