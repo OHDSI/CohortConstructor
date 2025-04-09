@@ -94,7 +94,7 @@ We can see that our starting cohorts, before we add any additional restrictions,
 
 ```{r}
 settings(cdm$fractures) |> glimpse()
-cohort_count(cdm$fractures) |> glimpse()
+cohortCount(cdm$fractures) |> glimpse()
 attrition(cdm$fractures) |> glimpse()
 ```
 
@@ -126,7 +126,7 @@ cdm$fractures <- cdm$fractures |>
 Now that we've applied this date restriction, we can see that our cohort attributes have been updated
 
 ```{r}
-cohort_count(cdm$fractures) |> glimpse()
+cohortCount(cdm$fractures) |> glimpse()
 attrition(cdm$fractures) |> 
   filter(reason == "cohort_start_date between 2000-01-01 & 2020-01-01") |> 
   glimpse()

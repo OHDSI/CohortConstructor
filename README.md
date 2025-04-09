@@ -52,17 +52,9 @@ library(CohortCharacteristics)
 con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomiaDir())
 cdm <- cdmFromCon(con, cdmSchema = "main", 
                     writeSchema = c(prefix = "my_study_", schema = "main"))
-#> Support for 'prefix' in writeSchema is deprecated and will be removed in a future release. Please use the `writePrefix` argument in `cdmFromCon()` instead.
-#> Note: method with signature 'DBIConnection#Id' chosen for function 'dbExistsTable',
-#>  target signature 'duckdb_connection#Id'.
-#>  "duckdb_connection#ANY" would also be valid
-#> 
-#> ! cdm name not specified and could not be inferred from the cdm source table
-#> 
-#> This message is displayed once per session.
 cdm
 #> 
-#> ── # OMOP CDM reference (duckdb) of An OMOP CDM database ───────────────────────
+#> ── # OMOP CDM reference (duckdb) of Synthea ────────────────────────────────────
 #> • omop tables: person, observation_period, visit_occurrence, visit_detail,
 #> condition_occurrence, drug_exposure, procedure_occurrence, device_exposure,
 #> measurement, observation, death, note, note_nlp, specimen, fact_relationship,
@@ -84,7 +76,6 @@ synthetic data with a subset of the full vocabularies).
 
 ``` r
 library(CodelistGenerator)
-#> Warning: package 'CodelistGenerator' was built under R version 4.4.2
 
 hip_fx_codes <- getCandidateCodes(cdm, "hip fracture")
 #> Limiting to domains of interest
@@ -147,12 +138,7 @@ settings(cdm$fractures) |> glimpse()
 #> $ cohort_name          <chr> "forearm_fracture", "hip_fracture"
 #> $ cdm_version          <chr> "5.3", "5.3"
 #> $ vocabulary_version   <chr> "v5.0 18-JAN-19", "v5.0 18-JAN-19"
-cohort_count(cdm$fractures) |> glimpse()
-#> Warning: `cohort_count()` was deprecated in CDMConnector 1.7.0.
-#> ℹ Please use `cohortCount()` instead.
-#> This warning is displayed once every 8 hours.
-#> Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-#> generated.
+cohortCount(cdm$fractures) |> glimpse()
 #> Rows: 2
 #> Columns: 3
 #> $ cohort_definition_id <int> 1, 2
@@ -216,7 +202,7 @@ Now that we’ve applied this date restriction, we can see that our cohort
 attributes have been updated
 
 ``` r
-cohort_count(cdm$fractures) |> glimpse()
+cohortCount(cdm$fractures) |> glimpse()
 #> Rows: 3
 #> Columns: 3
 #> $ cohort_definition_id <int> 1, 2, 3
