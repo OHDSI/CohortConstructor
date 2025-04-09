@@ -9,6 +9,7 @@
 #' @inheritParams padObservationDoc
 #' @param cohortDate 'cohort_start_date' or 'cohort_end_date'.
 #' @param indexDate Variable in cohort that contains the index date to add.
+#' @inheritParams softValidationDoc
 #'
 #' @return Cohort table
 #' @export
@@ -30,7 +31,8 @@ padCohortDate <- function(cohort,
                           collapse = TRUE,
                           padObservation = TRUE,
                           cohortId = NULL,
-                          name = tableName(cohort)) {
+                          name = tableName(cohort),
+                          .softValidation = FALSE) {
   cohort |>
     .padCohortDate(
       cohortDate = cohortDate,
@@ -39,7 +41,8 @@ padCohortDate <- function(cohort,
       collapse = collapse,
       padObservation = padObservation,
       cohortId = cohortId,
-      name = name
+      name = name,
+      .softValidation = .softValidation
     )
 }
 
@@ -62,6 +65,7 @@ padCohortDate <- function(cohort,
 #' @inheritParams collapseDoc
 #' @inheritParams daysDoc
 #' @inheritParams padObservationDoc
+#' @inheritParams softValidationDoc
 #'
 #' @return Cohort table
 #' @export
@@ -79,7 +83,8 @@ padCohortEnd <- function(cohort,
                          collapse = TRUE,
                          padObservation = TRUE,
                          cohortId = NULL,
-                         name = tableName(cohort)) {
+                         name = tableName(cohort),
+                         .softValidation = FALSE) {
   cohort |>
     .padCohortDate(
       cohortDate = "cohort_end_date",
@@ -88,7 +93,8 @@ padCohortEnd <- function(cohort,
       collapse = collapse,
       padObservation = padObservation,
       cohortId = cohortId,
-      name = name
+      name = name,
+      .softValidation = .softValidation
     )
 }
 
@@ -108,6 +114,7 @@ padCohortEnd <- function(cohort,
 #' @inheritParams collapseDoc
 #' @inheritParams daysDoc
 #' @inheritParams padObservationDoc
+#' @inheritParams softValidationDoc
 #'
 #' @return Cohort table
 #' @export
@@ -125,7 +132,8 @@ padCohortStart <- function(cohort,
                            collapse = TRUE,
                            padObservation = TRUE,
                            cohortId = NULL,
-                           name = tableName(cohort)) {
+                           name = tableName(cohort),
+                           .softValidation = FALSE) {
   cohort |>
     .padCohortDate(
       cohortDate = "cohort_start_date",
@@ -134,7 +142,8 @@ padCohortStart <- function(cohort,
       collapse = collapse,
       padObservation = padObservation,
       cohortId = cohortId,
-      name = name
+      name = name,
+      .softValidation = .softValidation
     )
 }
 
@@ -146,7 +155,8 @@ padCohortStart <- function(cohort,
                            padObservation,
                            cohortId,
                            name,
-                           call = parent.frame()) {
+                           call = parent.frame(),
+                           .softValidation) {
   # validate input
   cohort <- omopgenerics::validateCohortArgument(cohort = cohort, call = call)
   cohortDate |>
@@ -159,6 +169,7 @@ padCohortStart <- function(cohort,
   cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cdm <- omopgenerics::cdmReference(cohort)
+  omopgenerics::assertLogical(.softValidation)
 
   if (length(cohortId) == 0) {
     cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
@@ -232,7 +243,7 @@ padCohortStart <- function(cohort,
   newCohort <- newCohort |>
     dplyr::compute(name = name, temporary = FALSE,
                    logPrefix = "CohortConstructor_.padCohortDate_recreate_") |>
-    omopgenerics::newCohortTable(.softValidation = FALSE) |>
+    omopgenerics::newCohortTable(.softValidation = .softValidation) |>
     omopgenerics::recordCohortAttrition(cohortId = cohortId, reason = reason)
 
   # drop temp table

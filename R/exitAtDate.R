@@ -10,6 +10,7 @@
 #' @param limitToCurrentPeriod If TRUE, limits the cohort to one entry per
 #' person, ending at the current observation period. If FALSE, subsequent
 #' observation periods will create new cohort entries.
+#' @inheritParams softValidationDoc
 #'
 #' @return The cohort table.
 #'
@@ -31,12 +32,14 @@
 exitAtObservationEnd <- function(cohort,
                                  cohortId = NULL,
                                  limitToCurrentPeriod = TRUE,
-                                 name = tableName(cohort)) {
+                                 name = tableName(cohort),
+                                 .softValidation = FALSE) {
   # checks
   cohort <- omopgenerics::validateCohortArgument(cohort, dropExtraColumns = TRUE)
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
+  omopgenerics::assertLogical(.softValidation)
 
   if (length(cohortId) == 0) {
     cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
@@ -112,7 +115,7 @@ exitAtObservationEnd <- function(cohort,
 
   newCohort <- newCohort |>
     dplyr::compute(name = name, temporary = FALSE) |>
-    omopgenerics::newCohortTable(.softValidation = FALSE) |>
+    omopgenerics::newCohortTable(.softValidation = .softValidation) |>
     omopgenerics::recordCohortAttrition(reason = reason, cohortId = cohortId)
 
   omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(tablePrefix))
@@ -136,6 +139,7 @@ exitAtObservationEnd <- function(cohort,
 #' @inheritParams nameDoc
 #' @param requireDeath If TRUE, subjects without a death record will be dropped,
 #' while if FALSE their end date will be left as is.
+#' @inheritParams softValidationDoc
 #'
 #' @return The cohort table.
 #'
@@ -157,13 +161,15 @@ exitAtObservationEnd <- function(cohort,
 exitAtDeath <- function(cohort,
                         cohortId = NULL,
                         requireDeath = FALSE,
-                        name = tableName(cohort)) {
+                        name = tableName(cohort),
+                        .softValidation = FALSE) {
   # checks
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cohort <- omopgenerics::validateCohortArgument(cohort, dropExtraColumns = TRUE)
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
   omopgenerics::assertLogical(requireDeath, length = 1)
+  omopgenerics::assertLogical(.softValidation)
 
   if (length(cohortId) == 0) {
     cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
@@ -220,7 +226,7 @@ exitAtDeath <- function(cohort,
     ) |>
     omopgenerics::newCohortTable(
       cohortAttritionRef = attrition(newCohort),
-      .softValidation = FALSE
+      .softValidation = .softValidation
     ) |>
     omopgenerics::recordCohortAttrition(reason = "Exit at death", cohortId = cohortId)
 

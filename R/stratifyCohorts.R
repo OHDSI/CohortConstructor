@@ -9,6 +9,7 @@
 #' @inheritParams nameDoc
 #' @param strata A strata list that point to columns in cohort table.
 #' @param removeStrata Whether to remove strata columns from final cohort table.
+#' @inheritParams softValidationDoc
 #'
 #' @return Cohort table stratified.
 #'
@@ -38,7 +39,8 @@ stratifyCohorts <- function(cohort,
                             strata,
                             cohortId = NULL,
                             removeStrata = TRUE,
-                            name = tableName(cohort)) {
+                            name = tableName(cohort),
+                            .softValidation = TRUE) {
   # checks
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cohort <- omopgenerics::validateCohortArgument(cohort)
@@ -49,6 +51,7 @@ stratifyCohorts <- function(cohort,
   }
   strata <- omopgenerics::validateStrataArgument(strata, table = cohort)
   omopgenerics::assertLogical(removeStrata, length = 1)
+  omopgenerics::assertLogical(.softValidation)
 
   if (length(cohortId) == 0) {
     cli::cli_inform("Returning empty cohort as `cohortId` is not valid.")
@@ -165,7 +168,7 @@ stratifyCohorts <- function(cohort,
       cohortSetRef = newSettings,
       cohortAttritionRef = newAttrition,
       cohortCodelistRef = newCodelist,
-      .softValidation = TRUE
+      .softValidation = .softValidation
     )
 
   omopgenerics::dropSourceTable(cdm = cdm, name = nm)

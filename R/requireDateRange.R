@@ -11,6 +11,7 @@
 #' which the index date must have been observed.
 #' @param indexDate Name of the column in the cohort that contains the date of
 #' interest.
+#' @inheritParams softValidationDoc
 #'
 #' @return The cohort table with any cohort entries outside of the date range
 #' dropped
@@ -29,7 +30,8 @@ requireInDateRange <- function(cohort,
                                dateRange,
                                cohortId = NULL,
                                indexDate = "cohort_start_date",
-                               name = tableName(cohort)) {
+                               name = tableName(cohort),
+                               .softValidation = TRUE) {
   # checks
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cohort <- omopgenerics::validateCohortArgument(cohort)
@@ -37,6 +39,7 @@ requireInDateRange <- function(cohort,
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
   dateRange <- validateDateRange(dateRange)
+  omopgenerics::assertLogical(.softValidation)
 
   if (length(cohortId) == 0) {
     cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
@@ -84,7 +87,7 @@ requireInDateRange <- function(cohort,
       name = name, temporary = FALSE,
       logPrefix = "CohortConstructor_requireInDateRange_newCohort_"
     ) |>
-    omopgenerics::newCohortTable(.softValidation = TRUE)
+    omopgenerics::newCohortTable(.softValidation = .softValidation)
 
   useIndexes <- getOption("CohortConstructor.use_indexes")
   if (!isFALSE(useIndexes)) {
@@ -110,6 +113,7 @@ requireInDateRange <- function(cohort,
 #'  have been observed.
 #' @param startDate Variable with earliest date.
 #' @param endDate Variable with latest date.
+#' @inheritParams softValidationDoc
 #'
 #' @return The cohort table with record timings updated to only be within the
 #' date range. Any records with all time outside of the range will have
@@ -132,7 +136,8 @@ trimToDateRange <- function(cohort,
                             cohortId = NULL,
                             startDate = "cohort_start_date",
                             endDate = "cohort_end_date",
-                            name = tableName(cohort)) {
+                            name = tableName(cohort),
+                            .softValidation = FALSE) {
   # checks
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cohort <- omopgenerics::validateCohortArgument(cohort)
@@ -141,6 +146,7 @@ trimToDateRange <- function(cohort,
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
   dateRange <- validateDateRange(dateRange)
+  omopgenerics::assertLogical(.softValidation)
 
   if (length(cohortId) == 0) {
     cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
@@ -209,7 +215,7 @@ trimToDateRange <- function(cohort,
       name = name, temporary = FALSE,
       logPrefix = "CohortConstructor_trimToDateRange_newCohort_"
     ) |>
-    omopgenerics::newCohortTable(.softValidation = FALSE)
+    omopgenerics::newCohortTable(.softValidation = .softValidation)
 
   omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(tablePrefix))
 

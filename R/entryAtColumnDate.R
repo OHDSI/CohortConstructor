@@ -8,6 +8,7 @@
 #' @inheritParams cohortIdModifyDoc
 #' @inheritParams columnDateDoc
 #' @inheritParams nameDoc
+#' @inheritParams softValidationDoc
 #'
 #' @return The cohort table.
 #'
@@ -34,7 +35,8 @@ entryAtFirstDate <- function(cohort,
                              cohortId = NULL,
                              returnReason = TRUE,
                              keepDateColumns = TRUE,
-                             name = tableName(cohort)) {
+                             name = tableName(cohort),
+                             .softValidation = FALSE) {
   exitAtColumnDate(
     cohort = cohort,
     dateColumns = dateColumns,
@@ -43,7 +45,8 @@ entryAtFirstDate <- function(cohort,
     name = name,
     order = "first",
     exit = FALSE,
-    keepDateColumns = keepDateColumns
+    keepDateColumns = keepDateColumns,
+    .softValidation = .softValidation
   )
 }
 
@@ -58,6 +61,7 @@ entryAtFirstDate <- function(cohort,
 #' @inheritParams cohortIdModifyDoc
 #' @inheritParams columnDateDoc
 #' @inheritParams nameDoc
+#' @inheritParams softValidationDoc
 #'
 #' @return The cohort table.
 #'
@@ -84,7 +88,8 @@ entryAtLastDate <- function(cohort,
                             cohortId = NULL,
                             returnReason = TRUE,
                             keepDateColumns = TRUE,
-                            name = tableName(cohort)) {
+                            name = tableName(cohort),
+                            .softValidation = FALSE) {
   exitAtColumnDate(
     cohort = cohort,
     dateColumns = dateColumns,
@@ -93,6 +98,7 @@ entryAtLastDate <- function(cohort,
     name = name,
     order = "last",
     exit = FALSE,
-    keepDateColumns = keepDateColumns
+    keepDateColumns = keepDateColumns,
+    .softValidation = .softValidation
   )
 }

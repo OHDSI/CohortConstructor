@@ -4,7 +4,7 @@
 \alias{copyCohorts}
 \title{Copy a cohort table}
 \usage{
-copyCohorts(cohort, name, n = 1, cohortId = NULL)
+copyCohorts(cohort, name, n = 1, cohortId = NULL, .softValidation = TRUE)
 }
 \arguments{
 \item{cohort}{A cohort table in a cdm reference.}
@@ -16,6 +16,13 @@ copyCohorts(cohort, name, n = 1, cohortId = NULL)
 \item{cohortId}{Vector identifying which cohorts to include
 (cohort_definition_id or cohort_name). Cohorts not included will be
 removed from the cohort set.}
+
+\item{.softValidation}{Whether to perform a soft validation of consistency.
+If set to FALSE four additional checks will be performed: 1) a check that
+cohort end date is not before cohort start date,  2) a check that there
+are no missing values in required columns, 3) a check that cohort duration is
+all within observation period, and 4) that there are no overlapping
+cohort entries}
 }
 \value{
 A new cohort table containing cohorts from the original cohort table.

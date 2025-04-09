@@ -8,6 +8,7 @@
 #' @inheritParams cohortIdModifyDoc
 #' @inheritParams nameDoc
 #' @inheritParams requireDemographicsDoc
+#' @inheritParams softValidationDoc
 #'
 #' @return The cohort table with only records for individuals satisfying the
 #' demographic requirements
@@ -30,7 +31,8 @@ requireDemographics <- function(cohort,
                                 sex = c("Both"),
                                 minPriorObservation = 0,
                                 minFutureObservation = 0,
-                                name = tableName(cohort)) {
+                                name = tableName(cohort),
+                                .softValidation = TRUE) {
   cohort <- demographicsFilter(
     cohort = cohort,
     cohortId = cohortId,
@@ -43,7 +45,8 @@ requireDemographics <- function(cohort,
     reqAge = TRUE,
     reqSex = TRUE,
     reqPriorObservation = TRUE,
-    reqFutureObservation = TRUE
+    reqFutureObservation = TRUE,
+    .softValidation = .softValidation
   )
 
   return(cohort)
@@ -56,6 +59,7 @@ requireDemographics <- function(cohort,
 #' satisfy the specified age criteria.
 #'
 #' @inheritParams requireDemographics
+#' @inheritParams softValidationDoc
 #'
 #' @return The cohort table with only records for individuals satisfying the
 #' age requirement
@@ -73,7 +77,8 @@ requireAge <- function(cohort,
                        ageRange,
                        cohortId = NULL,
                        indexDate = "cohort_start_date",
-                       name = tableName(cohort)) {
+                       name = tableName(cohort),
+                       .softValidation = TRUE) {
   cohort <- demographicsFilter(
     cohort = cohort,
     cohortId = cohortId,
@@ -86,7 +91,8 @@ requireAge <- function(cohort,
     reqAge = TRUE,
     reqSex = FALSE,
     reqPriorObservation = FALSE,
-    reqFutureObservation = FALSE
+    reqFutureObservation = FALSE,
+    .softValidation = .softValidation
   )
 
   return(cohort)
@@ -99,6 +105,7 @@ requireAge <- function(cohort,
 #' satisfy the specified sex criteria.
 #'
 #' @inheritParams requireDemographics
+#' @inheritParams softValidationDoc
 #'
 #' @return The cohort table with only records for individuals satisfying the
 #' sex requirement
@@ -114,7 +121,8 @@ requireAge <- function(cohort,
 requireSex <- function(cohort,
                        sex,
                        cohortId = NULL,
-                       name = tableName(cohort)) {
+                       name = tableName(cohort),
+                       .softValidation = TRUE) {
   cohort <- demographicsFilter(
     cohort = cohort,
     cohortId = cohortId,
@@ -127,7 +135,8 @@ requireSex <- function(cohort,
     reqAge = FALSE,
     reqSex = TRUE,
     reqPriorObservation = FALSE,
-    reqFutureObservation = FALSE
+    reqFutureObservation = FALSE,
+    .softValidation = .softValidation
   )
 
   return(cohort)
@@ -140,6 +149,7 @@ requireSex <- function(cohort,
 #' where individuals satisfy the specified prior observation criteria.
 #'
 #' @inheritParams requireDemographics
+#' @inheritParams softValidationDoc
 #'
 #' @return The cohort table with only records for individuals satisfying the
 #' prior observation requirement
@@ -157,7 +167,8 @@ requirePriorObservation <- function(cohort,
                                     minPriorObservation,
                                     cohortId = NULL,
                                     indexDate = "cohort_start_date",
-                                    name = tableName(cohort)) {
+                                    name = tableName(cohort),
+                                    .softValidation = TRUE) {
   cohort <- demographicsFilter(
     cohort = cohort,
     cohortId = cohortId,
@@ -170,7 +181,8 @@ requirePriorObservation <- function(cohort,
     reqAge = FALSE,
     reqSex = FALSE,
     reqPriorObservation = TRUE,
-    reqFutureObservation = FALSE
+    reqFutureObservation = FALSE,
+    .softValidation = .softValidation
   )
 
   return(cohort)
@@ -183,6 +195,7 @@ requirePriorObservation <- function(cohort,
 #' where individuals satisfy the specified future observation criteria.
 #'
 #' @inheritParams requireDemographics
+#' @inheritParams softValidationDoc
 #'
 #' @return The cohort table with only records for individuals satisfying the
 #' future observation requirement
@@ -201,7 +214,8 @@ requireFutureObservation <- function(cohort,
                                      minFutureObservation,
                                      cohortId = NULL,
                                      indexDate = "cohort_start_date",
-                                     name = tableName(cohort)) {
+                                     name = tableName(cohort),
+                                     .softValidation = TRUE) {
   cohort <- demographicsFilter(
     cohort = cohort,
     cohortId = cohortId,
@@ -214,7 +228,8 @@ requireFutureObservation <- function(cohort,
     reqAge = FALSE,
     reqSex = FALSE,
     reqPriorObservation = FALSE,
-    reqFutureObservation = TRUE
+    reqFutureObservation = TRUE,
+    .softValidation = .softValidation
   )
 
   return(cohort)
@@ -231,7 +246,8 @@ demographicsFilter <- function(cohort,
                                reqAge,
                                reqSex,
                                reqPriorObservation,
-                               reqFutureObservation) {
+                               reqFutureObservation,
+                               .softValidation) {
   # checks
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cohort <- omopgenerics::validateCohortArgument(cohort)
@@ -240,6 +256,7 @@ demographicsFilter <- function(cohort,
   cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
   ageRange <- validateDemographicRequirements(ageRange, sex, minPriorObservation, minFutureObservation)
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
+  omopgenerics::assertLogical(.softValidation)
 
   if (length(cohortId) == 0) {
     cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
@@ -379,7 +396,7 @@ demographicsFilter <- function(cohort,
     dplyr::compute(name = name, temporary = FALSE,
                    logPrefix = "CohortConstructor_demographicsFilter_name_") |>
     omopgenerics::newCohortTable(
-      .softValidation = TRUE, cohortSetRef = newSet
+      .softValidation = .softValidation, cohortSetRef = newSet
     )
 
   omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(tablePrefix))

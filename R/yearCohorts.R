@@ -6,7 +6,8 @@
 #' @inheritParams cohortDoc
 #' @inheritParams cohortIdSubsetDoc
 #' @inheritParams nameDoc
-#' @param years Numeric vector of years to use to restrict observation to..
+#' @param years Numeric vector of years to use to restrict observation to.
+#' @inheritParams softValidationDoc
 #'
 #' @return A cohort table.
 #'
@@ -24,13 +25,15 @@
 yearCohorts <- function(cohort,
                         years,
                         cohortId = NULL,
-                        name = tableName(cohort)) {
+                        name = tableName(cohort),
+                        .softValidation = FALSE) {
   # checks
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cohort <- omopgenerics::validateCohortArgument(cohort)
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
   omopgenerics::assertNumeric(years, integerish = TRUE)
+  omopgenerics::assertLogical(.softValidation)
 
   if (length(cohortId) == 0) {
     cli::cli_inform("Returning empty cohort as `cohortId` is not valid.")
@@ -186,7 +189,7 @@ yearCohorts <- function(cohort,
       cohortSetRef = newSet,
       cohortAttritionRef = newAttrition |> dplyr::bind_rows(),
       cohortCodelistRef = newCodelist,
-      .softValidation = FALSE
+      .softValidation = .softValidation
     )
 
   omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(tablePrefix))

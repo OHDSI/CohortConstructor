@@ -20,6 +20,7 @@
 #' @param matchSex Whether to match in sex.
 #' @param matchYearOfBirth Whether to match in year of birth.
 #' @param ratio Number of allowed matches per individual in the target cohort.
+#' @inheritParams softValidationDoc
 #'
 #' @return A cohort table.
 #'
@@ -45,7 +46,8 @@ matchCohorts <- function(cohort,
                          matchYearOfBirth = TRUE,
                          ratio = 1,
                          keepOriginalCohorts = FALSE,
-                         name = tableName(cohort)) {
+                         name = tableName(cohort),
+                         .softValidation = FALSE) {
   cli::cli_inform("Starting matching")
 
   # validate initial input
@@ -56,6 +58,7 @@ matchCohorts <- function(cohort,
   omopgenerics::assertNumeric(ratio, min = 0, length = 1)
   omopgenerics::assertLogical(matchSex, length = 1)
   omopgenerics::assertLogical(matchYearOfBirth, length = 1)
+  omopgenerics::assertLogical(.softValidation)
 
   if (length(cohortId) == 0) {
     cli::cli_inform("Returning empty cohort as `cohortId` is not valid.")
@@ -152,7 +155,7 @@ matchCohorts <- function(cohort,
           "match_status"
         )
       ,
-      .softValidation = TRUE
+      .softValidation = .softValidation
     )
   cdm[[target]] <- cdm[[target]] |>
     dplyr::relocate(dplyr::all_of(omopgenerics::cohortColumns("cohort"))) |>
@@ -170,7 +173,7 @@ matchCohorts <- function(cohort,
           "match_status" = "target"
         )
       ,
-      .softValidation = FALSE
+      .softValidation = .softValidation
     )
 
   # Bind both cohorts

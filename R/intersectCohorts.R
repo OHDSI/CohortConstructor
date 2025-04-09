@@ -13,6 +13,7 @@
 #' @inheritParams keepOriginalCohortsDoc
 #' @param returnNonOverlappingCohorts Whether the generated cohorts are mutually
 #' exclusive or not.
+#' @inheritParams softValidationDoc
 #'
 #' @export
 #'
@@ -37,7 +38,8 @@ intersectCohorts <- function(cohort,
                              gap = 0,
                              returnNonOverlappingCohorts = FALSE,
                              keepOriginalCohorts = FALSE,
-                             name = tableName(cohort)) {
+                             name = tableName(cohort),
+                             .softValidation = FALSE) {
   # checks
   cohort <- omopgenerics::validateCohortArgument(cohort)
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
@@ -46,6 +48,7 @@ intersectCohorts <- function(cohort,
   omopgenerics::assertNumeric(gap, integerish = TRUE, min = 0, length = 1)
   omopgenerics::assertLogical(returnNonOverlappingCohorts, length = 1)
   omopgenerics::assertLogical(keepOriginalCohorts, length = 1)
+  omopgenerics::assertLogical(.softValidation)
 
   if (length(cohortId) < 2) {
     cli::cli_abort("Settings of cohort table must contain at least two cohorts.")
@@ -64,7 +67,8 @@ intersectCohorts <- function(cohort,
   tblName <- omopgenerics::uniqueTableName(prefix = tablePrefix)
   newCohort <- copyCohorts(cohort,
                            name = tblName,
-                           cohortId = cohortId)
+                           cohortId = cohortId,
+                           .softValidation = .softValidation)
   # get intersections between cohorts
   lowerWindow <- ifelse(gap != 0, -gap, gap)
   newCohort <- newCohort |>
@@ -201,7 +205,7 @@ intersectCohorts <- function(cohort,
       cohortSetRef = cohSet,
       cohortAttritionRef = intersectAttrition,
       cohortCodelistRef = intersectCodelist,
-      .softValidation = FALSE
+      .softValidation = .softValidation
     )
     cdm <- bind(originalCohorts, newCohort, name = name)
   } else {
@@ -213,7 +217,7 @@ intersectCohorts <- function(cohort,
       cohortSetRef = cohSet,
       cohortAttritionRef = intersectAttrition,
       cohortCodelistRef = intersectCodelist,
-      .softValidation = FALSE
+      .softValidation = .softValidation
     )
   }
 

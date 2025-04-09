@@ -8,6 +8,7 @@
 #' @inheritParams cohortIdModifyDoc
 #' @inheritParams gapDoc
 #' @inheritParams nameDoc
+#' @inheritParams softValidationDoc
 #'
 #' @export
 #'
@@ -16,7 +17,8 @@
 collapseCohorts <- function(cohort,
                             cohortId = NULL,
                             gap = 0,
-                            name = tableName(cohort)) {
+                            name = tableName(cohort),
+                            .softValidation = FALSE) {
   # input validation
   cohort <- omopgenerics::validateCohortArgument(cohort, dropExtraColumns = TRUE)
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
@@ -24,6 +26,7 @@ collapseCohorts <- function(cohort,
   cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
   omopgenerics::assertNumeric(gap, integerish = TRUE, min = 0, length = 1)
   ids <- settings(cohort)$cohort_definition_id
+  omopgenerics::assertLogical(.softValidation)
 
   if (length(cohortId) == 0) {
     cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
@@ -72,7 +75,7 @@ collapseCohorts <- function(cohort,
   newCohort <- newCohort |>
     dplyr::compute(name = name, temporary = FALSE,
                    logPrefix = "CohortConstructor_collapseCohorts_name_") |>
-    omopgenerics::newCohortTable(.softValidation = FALSE) |>
+    omopgenerics::newCohortTable(.softValidation = .softValidation) |>
     omopgenerics::recordCohortAttrition(
       reason = "Collapse cohort with a gap of {gap} days.",
       cohortId = cohortId)
@@ -89,5 +92,3 @@ collapseCohorts <- function(cohort,
 
   return(newCohort)
 }
-
-

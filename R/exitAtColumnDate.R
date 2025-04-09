@@ -8,6 +8,7 @@
 #' @inheritParams cohortIdModifyDoc
 #' @inheritParams columnDateDoc
 #' @inheritParams nameDoc
+#' @inheritParams softValidationDoc
 #'
 #' @return The cohort table.
 #'
@@ -34,7 +35,8 @@ exitAtFirstDate <- function(cohort,
                             cohortId = NULL,
                             returnReason = TRUE,
                             keepDateColumns = TRUE,
-                            name = tableName(cohort)) {
+                            name = tableName(cohort),
+                            .softValidation = FALSE) {
   exitAtColumnDate(
     cohort = cohort,
     dateColumns = dateColumns,
@@ -43,7 +45,8 @@ exitAtFirstDate <- function(cohort,
     name = name,
     order = "first",
     exit = TRUE,
-    keepDateColumns = keepDateColumns
+    keepDateColumns = keepDateColumns,
+    .softValidation = .softValidation
   )
 }
 
@@ -58,6 +61,7 @@ exitAtFirstDate <- function(cohort,
 #' @inheritParams cohortIdModifyDoc
 #' @inheritParams columnDateDoc
 #' @inheritParams nameDoc
+#' @inheritParams softValidationDoc
 #'
 #' @return The cohort table.
 #'
@@ -84,7 +88,8 @@ exitAtLastDate <- function(cohort,
                            cohortId = NULL,
                            returnReason = TRUE,
                            keepDateColumns = TRUE,
-                           name = tableName(cohort)) {
+                           name = tableName(cohort),
+                           .softValidation = FALSE) {
   exitAtColumnDate(
     cohort = cohort,
     dateColumns = dateColumns,
@@ -93,7 +98,8 @@ exitAtLastDate <- function(cohort,
     name = name,
     order = "last",
     exit = TRUE,
-    keepDateColumns = keepDateColumns
+    keepDateColumns = keepDateColumns,
+    .softValidation = .softValidation
   )
 }
 
@@ -104,7 +110,8 @@ exitAtColumnDate <- function(cohort,
                              order,
                              name,
                              exit,
-                             keepDateColumns) {
+                             keepDateColumns,
+                             .softValidation) {
   # checks
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
@@ -113,6 +120,7 @@ exitAtColumnDate <- function(cohort,
   validateCohortColumn(dateColumns, cohort, "Date")
   omopgenerics::assertLogical(returnReason, length = 1)
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
+  omopgenerics::assertLogical(.softValidation)
 
   if (length(cohortId) == 0) {
     cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
@@ -200,7 +208,9 @@ exitAtColumnDate <- function(cohort,
                    logPrefix = "CohortConstructor_exitAtColumnDate_newDate_1_")
 
   # checks with informative errors
-  cdm <- validateNewCohort(newCohort, cdm, tablePrefix)
+  if (isFALSE(.softValidation)) {
+    cdm <- validateNewCohort(newCohort, cdm, tablePrefix)
+  }
 
   if (isTRUE(needsIdFilter(cohort, cohortId))) {
     dateColumns <- dateColumns[!dateColumns %in% c("cohort_end_date", "cohort_start_date")]
@@ -240,7 +250,7 @@ exitAtColumnDate <- function(cohort,
       name = name, temporary = FALSE,
       logPrefix = "CohortConstructor_exitAtColumnDate_relocate_"
     ) |>
-    omopgenerics::newCohortTable(.softValidation = FALSE)
+    omopgenerics::newCohortTable(.softValidation = .softValidation)
 
   cdm <- omopgenerics::dropSourceTable(cdm, name = dplyr::starts_with(tablePrefix))
 

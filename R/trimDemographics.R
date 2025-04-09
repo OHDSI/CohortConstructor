@@ -6,6 +6,7 @@
 #'
 #' @inheritParams requireDemographics
 #' @inheritParams cohortIdModifyDoc
+#' @inheritParams softValidationDoc
 #'
 #' @return The cohort table with only records for individuals satisfying the
 #' demographic requirements
@@ -26,7 +27,8 @@ trimDemographics <- function(cohort,
                              sex = NULL,
                              minPriorObservation = NULL,
                              minFutureObservation = NULL,
-                             name = tableName(cohort)) {
+                             name = tableName(cohort),
+                             .softValidation = TRUE) {
   # checks
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cohort <- omopgenerics::validateCohortArgument(cohort)
@@ -40,6 +42,7 @@ trimDemographics <- function(cohort,
     null = TRUE,
     length = NULL
   )
+  omopgenerics::assertLogical(.softValidation)
 
   if (length(cohortId) == 0) {
     cli::cli_inform("Returning empty cohort as `cohortId` is not valid.")
@@ -66,7 +69,7 @@ trimDemographics <- function(cohort,
     ) |>
     dplyr::compute(name = tmpNewCohort, temporary = FALSE,
                    logPrefix = "CohortConstructor_trimDemographics_trimmed_") |>
-    omopgenerics::newCohortTable(.softValidation = TRUE)
+    omopgenerics::newCohortTable(.softValidation = .softValidation)
 
   if (!is.null(ageRange) ||
       !is.null(minPriorObservation) ||
