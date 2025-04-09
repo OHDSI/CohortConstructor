@@ -84,12 +84,12 @@ cdm$measurement <- dplyr::tibble(
   measurement_id = 1:4,
   person_id = c(1, 1, 2, 3),
   measurement_concept_id = c(4326744, 4298393, 4298393, 45770407),
-  measurement_date = as.Date(c("2000-07-01", "2000-12-11", "2002-09-08",
+  measurement_date = as.Date(c("2010-07-01", "2000-12-11", "2002-09-08",
                                 "2015-02-19")),
   measurement_type_concept_id = NA,
   value_as_number = c(100, 125, NA, NA),
-  value_as_concept_id = c(0, 0, 0, 4124457),
-  unit_concept_id = c(8876, 8876, 0, 0)
+  value_as_concept_id = c(4124457, 4124457, 4124457, 4124457),
+  unit_concept_id = c(8876, 8876, 8876, 8876)
 )
 cdm <- CDMConnector::copyCdmTo(
   con = DBI::dbConnect(duckdb::duckdb()),
@@ -100,9 +100,26 @@ cdm$cohort <- measurementCohort(
   name = "cohort",
   conceptSet = list("normal_blood_pressure" = c(4326744, 4298393, 45770407)),
   valueAsConcept = c(4124457),
-  valueAsNumber = list("8876" = c(70, 120))
+  valueAsNumber = list("8876" = c(70, 120)),
+  inObservation = TRUE
 )
 
 cdm$cohort
+
+# You can also create multiple measurement cohorts, and include records outside the observation period.
+
+cdm$cohort2 <- measurementCohort(
+cdm = cdm,
+name = "cohort2",
+conceptSet = list("normal_blood_pressure" = c(4326744, 4298393, 45770407),
+                  "high_blood_pressure" = c(4326744, 4298393, 45770407)),
+                  valueAsConcept = c(4124457),
+                  valueAsNumber = list("8876" = c(70, 120),
+                                      "8876" = c(121, 200)),
+                                      inObservation = FALSE
+                                      )
+
+cdm$cohort2
+
 }
 }
