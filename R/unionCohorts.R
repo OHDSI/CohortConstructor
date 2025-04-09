@@ -74,8 +74,7 @@ unionCohorts <- function(cohort,
   tmpTable  <- omopgenerics::uniqueTableName()
   unionedCohort <- copyCohorts(cohort = cohort,
                                name = tmpTable,
-                               cohortId = cohortId,
-                               .softValidation = .softValidation) |>
+                               cohortId = cohortId) |>
     PatientProfiles::addObservationPeriodId(name = tmpTable) |>
     joinOverlap(name = tmpTable,
                 by = c("observation_period_id", "subject_id"),
