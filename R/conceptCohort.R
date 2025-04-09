@@ -65,11 +65,12 @@
 #'
 #' cdm$cohort |> attrition()
 #'
-#' Create a cohort based on a concept set. The cohort exit is set to the event start date.
-#' If two records overlap, the cohort end date is set as the sum of the duration of
-#' all overlapping records. Only individuals included in the existing `cohort` will be considered.
+#' # Create a cohort based on a concept set. The cohort exit is set to the event start date.
+#' # If two records overlap, the cohort end date is set as the sum of the duration of
+#' # all overlapping records. Only individuals included in the existing `cohort` will be considered.
 #'
-#' conceptSet <- list("nitrogen" = c(35604434, 35604439), "potassium" = c(40741270, 42899580, 44081436))
+#' conceptSet <- list("nitrogen" = c(35604434, 35604439),
+#' "potassium" = c(40741270, 42899580, 44081436))
 #'
 #' cohort_drugs <- conceptCohort(cdm,
 #'                              conceptSet = conceptSet,
