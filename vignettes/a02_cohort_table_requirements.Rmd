@@ -41,7 +41,7 @@ cdm <- CDMConnector::cdmFromCon(con, cdmSchema = "main",
                     writeSchema = "main", writePrefix = "my_study_")
 ```
 
-Let's start by creating a cohort of acetaminophen users. Individuals will have a cohort entry for each drug exposure record they have for acetaminophen with cohort exit based on their drug record end date. Note when creating the cohort, any overlapping records will be concatenated. 
+Let's start by creating a cohort of acetaminophen users. Individuals will have a cohort entry for each drug exposure record they have for acetaminophen with cohort exit based on their drug record end date. Note when creating the cohort, any overlapping records will be concatenated.
 
 ```{r}
 acetaminophen_codes <- getDrugIngredientCodes(cdm, 
@@ -53,13 +53,12 @@ cdm$acetaminophen <- conceptCohort(cdm = cdm,
                                    name = "acetaminophen")
 ```
 
-At this point we have just created our base cohort without having applied any restrictions.
+At this point we have just created our base cohort without having applied any restrictions. To visualise the current state of the cohort, we can use the `summariseCohortAttrition()` function to summarise attrition and then plot the results using `plotCohortAttrition()`.
 
 ```{r}
 summary_attrition <- summariseCohortAttrition(cdm$acetaminophen)
 plotCohortAttrition(summary_attrition)
 ```
-
 
 ## Keep only the first record per person
 
@@ -73,9 +72,41 @@ summary_attrition <- summariseCohortAttrition(cdm$acetaminophen)
 plotCohortAttrition(summary_attrition)
 ```
 
-While the number of individuals remains unchanged, records after an individual's first have been excluded. 
+While the number of individuals remains unchanged, records after an individual's first have been excluded.
 
-If we wanted to keep the latest record per person instead of the earliest we would use `requireIsLastEntry()` instead. Or if we want to keep some range of records per person we can use the `requireIsEntry()` function.
+## Keep only the last record per person
+
+If we want to keep the latest record per person instead of the earliest we would use `requireIsLastEntry()`. This will ensure that only the latest record for acetaminophen use remains in the cohort.
+
+```{r}
+cdm$acetaminophen <- conceptCohort(cdm = cdm, 
+                                   conceptSet = acetaminophen_codes, 
+                                   exit = "event_end_date",
+                                   name = "acetaminophen")
+cdm$acetaminophen <- cdm$acetaminophen |> 
+  requireIsLastEntry()
+
+summary_attrition <- summariseCohortAttrition(cdm$acetaminophen)
+plotCohortAttrition(summary_attrition)
+
+```
+
+## Keep only a range of records per person
+
+If we want to keep only a specific range of records per person, we can use the `requireIsEntry()` function. For example, o keep only the first two entries for each person, we can set `entryRange = c(1, 2)`.
+
+```{r}
+cdm$acetaminophen <- conceptCohort(cdm = cdm, 
+                                   conceptSet = acetaminophen_codes, 
+                                   exit = "event_end_date",
+                                   name = "acetaminophen")
+cdm$acetaminophen <- cdm$acetaminophen |> 
+  requireIsEntry(entryRange = c(1,2))
+
+summary_attrition <- summariseCohortAttrition(cdm$acetaminophen)
+plotCohortAttrition(summary_attrition)
+
+```
 
 ## Keep only records within a date range
 
@@ -130,10 +161,9 @@ And here we see attrition if we apply our date requirement before our entry requ
 plotCohortAttrition(summary_attrition_2)
 ```
 
-
 ## Keep only records from cohorts with a minimum number of individuals
 
-Another useful functionality, particularly when working with multiple cohorts or performing a network study, is provided by `requireMinCohortCount`. Here we will only keep cohorts with a minimum count, filtering out records from cohorts with fewer than this number. 
+Another useful functionality, particularly when working with multiple cohorts or performing a network study, is provided by `requireMinCohortCount`. Here we will only keep cohorts with a minimum count, filtering out records from cohorts with fewer than this number.
 
 As an example let's create a cohort for every drug ingredient we see in Eunomia. We can first get the drug ingredient codes.
 
@@ -176,6 +206,3 @@ cohortCount(cdm$medications) |>
   xlab("Number of subjects") +
   theme_bw()
 ```
-
-
-

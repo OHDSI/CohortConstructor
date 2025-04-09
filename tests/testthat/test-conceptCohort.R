@@ -1160,17 +1160,18 @@ test_that("inObservation FALSE", {
   # 3rd: start and end out
   # 4th: start and end in (to be merged with 3rd)
   # 5th: start out end out in subsequent obs
+  # 6th: starts out and ends out of last obs
   cdm <- omopgenerics::insertTable(
     cdm = cdm, name = "drug_exposure",
     table = dplyr::tibble(
-      "drug_exposure_id" = 1:5 |> as.integer(),
-      "person_id" = c(1, 1, 1, 1, 2) |> as.integer(),
+      "drug_exposure_id" = 1:6 |> as.integer(),
+      "person_id" = c(1, 1, 1, 1, 2, 2) |> as.integer(),
       "drug_concept_id" = 1L,
       "drug_exposure_start_date" = as.Date(c(
-        "2000-04-01", "2000-12-03", "2001-12-11", "2002-01-01", "2000-02-01"
+        "2000-04-01", "2000-12-03", "2001-12-11", "2002-01-01", "2000-02-01", "2004-02-01"
       )),
       "drug_exposure_end_date" = as.Date(c(
-        "2000-11-01", "2001-08-03", "2001-12-12", "2002-11-01", "2003-02-01"
+        "2000-11-01", "2001-08-03", "2001-12-12", "2002-11-01", "2003-02-01", "2004-02-01"
       )),
       "drug_type_concept_id" = 1
     )

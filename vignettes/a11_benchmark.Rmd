@@ -16,7 +16,15 @@ message = FALSE,
 comment = "#>",
 echo = FALSE
 )
+
+library(CDMConnector)
+if (Sys.getenv("EUNOMIA_DATA_FOLDER") == ""){
+Sys.setenv("EUNOMIA_DATA_FOLDER" = file.path(tempdir(), "eunomia"))}
+if (!dir.exists(Sys.getenv("EUNOMIA_DATA_FOLDER"))){ dir.create(Sys.getenv("EUNOMIA_DATA_FOLDER"))
+downloadEunomiaData()  
+}
 ```
+
 
 ```{r}
 # Packages
@@ -67,9 +75,33 @@ niceOverlapLabels <- function(labels) {
 
 Cohorts are a fundamental building block for studies that use the OMOP CDM, identifying people who satisfy one or more inclusion criteria for a duration of time based on their clinical records. Currently cohorts are typically built using [CIRCE](https://github.com/OHDSI/circe-be) which allows complex cohorts to be represented using JSON. This JSON is then converted to SQL for execution against a database containing data mapped to the OMOP CDM. CIRCE JSON can be created via the [ATLAS](https://github.com/OHDSI/Atlas) GUI or programmatically via the [Capr](https://github.com/OHDSI/Capr) R package. However, although a powerful tool for expressing and operationalising cohort definitions, the SQL generated can be cumbersome especially for complex cohort definitions, moreover cohorts are instantiated independently, leading to duplicated work.
 
-The CohortConstructor package offers an alternative approach, emphasizing cohort building in a pipeline format. It first creates base cohorts and then applies specific inclusion criteria. Unlike the "by definition" approach, where::here cohorts are built independently, CohortConstructor follows a "by domain" approach, which minimizes redundant queries to large OMOP tables. More details on this approach can be found in the [Introduction vignette](https://ohdsi.github.io/CohortConstructor/articles/a00_introduction.html).
+The CohortConstructor package offers an alternative approach, emphasising cohort building in a pipeline format. It first creates base cohorts and then applies specific inclusion criteria. Unlike the "by definition" approach, where cohorts are built independently, CohortConstructor follows a "by domain/ table" approach, which minimises redundant queries to large OMOP tables. More details on this approach can be found in the [Introduction vignette](https://ohdsi.github.io/CohortConstructor/articles/a00_introduction.html).
 
-We benchmarked this package using nine phenotypes from the [OHDSI Phenotype library](https://github.com/OHDSI/PhenotypeLibrary) that cover a range of concept domains, entry and inclusion criteria, and cohort exit options. We replicated these cohorts using [CodelistGenerator](https://github.com/darwin-eu/CodelistGenerator) and CohortConstructor to assess computational time and agreement between CIRCE and CohortConstructor.
+To test the performance of the package there is a benchmarking function which uses nine phenotypes from the [OHDSI Phenotype library](https://github.com/OHDSI/PhenotypeLibrary) that cover a range of concept domains, entry and inclusion criteria, and cohort exit options. We replicated these cohorts using CohortConstructor to assess computational time and agreement between CIRCE and CohortConstructor.
+
+```{r, echo=TRUE}
+library(CDMConnector)
+library(CodelistGenerator)
+library(PatientProfiles)
+library(CohortConstructor)
+library(dplyr)
+
+con <- DBI::dbConnect(duckdb::duckdb(), 
+                      dbdir = eunomiaDir())
+cdm <- cdmFromCon(con, cdmSchema = "main", writeSchema = "main", 
+                  writePrefix = "my_study_")
+```
+
+Once we have created our cdm reference we can run the benchmark. Once run we'll have a set of results with the time taken to run the different tasks. For this example we will just run task of creating all the cohorts at once using CohortConstructor.
+
+```{r, echo=TRUE}
+benchmark_results <- benchmarkCohortConstructor(cdm,
+               runCIRCE = FALSE,
+               runCohortConstructorDefinition = FALSE,
+               runCohortConstructorDomain = TRUE)
+benchmark_results |> 
+  glimpse()
+```
 
 ## Code and collaboration
 
