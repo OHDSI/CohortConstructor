@@ -67,5 +67,4 @@ demographicsCohort <- function(cdm,
   )
 
   return(cdm[[name]])
-
 }
