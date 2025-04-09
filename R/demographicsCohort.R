@@ -25,7 +25,7 @@
 #'
 #' attrition(cohort)
 #'
-#' # Can also create multiple demographic cohorts, and add minimum prior history requirements.
+#' # Can also create multiple demographic cohorts, and add minimum prior history requirements (in days).
 #'
 #' cohort <- cdm |>
 #'     demographicsCohort(name = "cohort4", ageRange = list(c(0, 19),c(20, 64),c(65, 150)), sex = c("Male", "Female", "Both"),
@@ -75,4 +75,5 @@ demographicsCohort <- function(cdm,
   )
 
   return(cdm[[name]])
+
 }
