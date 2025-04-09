@@ -11,6 +11,27 @@
 #'
 #' @return A cohort table with a death cohort in cdm
 #' @export
+#'
+#' @examples
+#' \donttest{
+#' library(CohortConstructor)
+#'
+#' cdm <- mockCohortConstructor(death = TRUE)
+#'
+#' # Generate a death cohort
+#' death_cohort <- deathCohort(cdm, name = "death_cohort")
+#' death_cohort
+#'
+#' # Create a death cohort for females aged over 50 years old.
+#'
+#' # Create a demographics cohort with age range and sex filters
+#' cdm$my_cohort <- demographicsCohort(cdm, "my_cohort", ageRange = c(50,100), sex = "Female")
+#'
+#' # Generate a death cohort, restricted to individuals in 'my_cohort'
+#' death_cohort <- deathCohort(cdm, name = "death_cohort", subsetCohort = "my_cohort")
+#' death_cohort |> attrition()
+#'
+#' }
 deathCohort <- function(
     cdm,
     name,
