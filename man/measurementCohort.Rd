@@ -89,7 +89,7 @@ cdm$measurement <- dplyr::tibble(
   measurement_type_concept_id = NA,
   value_as_number = c(100, 125, NA, NA),
   value_as_concept_id = c(0, 0, 0, 4124457),
-  unit_concept_id = c(8876, 8876, 0, 0))
+  unit_concept_id = c(8876, 8876, 0, 0)
 )
 cdm <- CDMConnector::copyCdmTo(
   con = DBI::dbConnect(duckdb::duckdb()),
