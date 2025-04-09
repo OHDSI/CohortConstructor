@@ -106,7 +106,8 @@ cdm$cohort <- measurementCohort(
 
 cdm$cohort
 
-# You can also create multiple measurement cohorts, and include records outside the observation period.
+# You can also create multiple measurement cohorts, and include records
+# outside the observation period.
 
 cdm$cohort2 <- measurementCohort(
   cdm = cdm,
