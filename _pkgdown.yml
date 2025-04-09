@@ -40,9 +40,6 @@ reference:
   - requireCohortIntersect
   - requireConceptIntersect
   - requireTableIntersect
-- subtitle: Impose presence or absence of a death record within a time window
-- contents:
-  - requireDeathFlag
 - subtitle: Update cohort start and end dates
 - contents:
   - matches("^trim|exit|entry|padCohortDate|padCohortStart|padCohortEnd")
