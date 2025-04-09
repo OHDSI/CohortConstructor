@@ -2,7 +2,7 @@
 title: "Splitting cohorts"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{a07_split_cohorts}
+  %\VignetteIndexEntry{a08_split_cohorts}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -13,49 +13,157 @@ knitr::opts_chunk$set(
   eval = TRUE, message = FALSE, warning = FALSE,
   comment = "#>"
 )
-
-library(CohortConstructor)
-library(CohortCharacteristics)
-library(ggplot2)
-library(CDMConnector)
-library(dplyr, warn.conflicts = FALSE)
-library(PatientProfiles)
-
-if (Sys.getenv("EUNOMIA_DATA_FOLDER") == ""){
-  Sys.setenv("EUNOMIA_DATA_FOLDER" = file.path(tempdir(), "eunomia"))}
-if (!dir.exists(Sys.getenv("EUNOMIA_DATA_FOLDER"))){ dir.create(Sys.getenv("EUNOMIA_DATA_FOLDER"))
-  downloadEunomiaData()  
-}
 ```
 
-For this example we'll use the Eunomia synthetic data from the CDMConnector package.
+## Introduction
+
+In this vignette we show how to split existing cohorts. We are going to use the *GiBleed* database to conduct the different examples. To make sure *GiBleed* database is available you can use the function `requireEunomia()` so let's get started.
+
+Load necessary packages:
 
 ```{r}
-con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomiaDir())
-cdm <- CDMConnector::cdmFromCon(con, cdmSchema = "main", 
-                    writeSchema = "main", writePrefix = "my_study_")
+library(duckdb)
+library(CDMConnector)
+library(PatientProfiles)
+library(CohortConstructor)
+library(dplyr, warn.conflicts = FALSE)
+library(clock)
+```
+
+Create `cdm_reference` object from *GiBleed* database:
+
+```{r}
+requireEunomia(datasetName = "GiBleed")
+con <- dbConnect(drv = duckdb(), dbdir = eunomiaDir())
+cdm <- cdmFromCon(
+  con = con, cdmSchema = "main", writeSchema = "main", writePrefix = "my_study_"
+)
 ```
 
 Let's start by creating two drug cohorts, one for users of diclofenac and another for users of acetaminophen.
 
 ```{r}
 cdm$medications <- conceptCohort(cdm = cdm, 
-                                 conceptSet = list("diclofenac" = 1124300,
-                                                   "acetaminophen" = 1127433), 
+                                 conceptSet = list("diclofenac" = 1124300L,
+                                                   "acetaminophen" = 1127433L), 
                                  name = "medications")
 cohortCount(cdm$medications)
 settings(cdm$medications)
 ```
 
-We can stratify cohorts based on specified columns using the function `stratifyCohorts()`. In this example, let's stratify the medications cohort by age and sex.
+## stratifyCohorts
+
+If we want to create separate cohorts by sex we could use the function `requireSex()`:
 
 ```{r}
+cdm$medications_female <- cdm$medications |>
+  requireSex(sex = "Female", name = "medications_female") |>
+  renameCohort(
+    cohortId = c("acetaminophen", "diclofenac"), 
+    newCohortName = c("acetaminophen_female", "diclofenac_female")
+  )
+cdm$medications_male <- cdm$medications |>
+  requireSex(sex = "Male", name = "medications_male") |>
+  renameCohort(
+    cohortId = c("acetaminophen", "diclofenac"), 
+    newCohortName = c("acetaminophen_male", "diclofenac_male")
+  )
+cdm <- bind(cdm$medications_female, cdm$medications_male, name = "medications_sex")
+cohortCount(cdm$medications_sex)
+settings(cdm$medications_sex)
+```
+
+The `stratifyCohorts()` function will produce a similar output but it relies on a column being already created so let's first add a column sex to my existent cohort:
+
+```{r}
+cdm$medications <- cdm$medications |>
+  addSex()
+cdm$medications
+```
+
+Now we can use the function `stratifyCohorts()` to create a new cohort based on the `sex` column, one new cohort will be created for any value of the `sex` column:
+
+```{r}
+cdm$medications_sex_2 <- cdm$medications |>
+  stratifyCohorts(strata = "sex", name = "medications_sex_2")
+cohortCount(cdm$medications_sex_2)
+settings(cdm$medications_sex_2)
+```
+
+Note that both cohorts can be slightly different, in the first case four cohorts will always be created, whereas in the second one it will rely on whatever is in the data, if one the diclofenac cohort does not have 'Female' records the `diclofenac_female` cohort is not going to be created, if we have individuals with sex 'None' then a `{cohort_name}_none` cohort will be created.
+
+The function is very powerful and multiple cohorts can be created in one go, in this example we will create cohorts by "age and sex" and by "year". 
+
+```{r, warning=FALSE}
 cdm$stratified <- cdm$medications |>
-  addAge(ageGroup = list("Child" = c(0,17), "18 to 65" = c(18,64), "65 and Over" = c(65, Inf))) |>
-  addSex(name = "stratified") |>
-  stratifyCohorts(strata = list("sex", "age_group"), name = "stratified")
+  addAge(ageGroup = list("child" = c(0,17), "18_to_65" = c(18,64), "65_and_over" = c(65, Inf))) |>
+  addSex() |>
+  mutate(year = get_year(cohort_start_date)) |>
+  stratifyCohorts(strata = list(c("sex", "age_group"), "year"), name = "stratified")
 
 cohortCount(cdm$stratified)
 settings(cdm$stratified)
 ```
 
+A total of 232 cohorts were created in one go, 12 related to sex & age group combination, and 220 by year.
+
+Note that these year cohorts were created based on the prescription start date, but they can have end dates after that year. If you want to split the cohorts on yearly contributions see the next section.
+
+## yearCohorts
+
+`yearCohorts()` is a function that is used to split the contribution of a cohort into the different years that is spread across, let's see this simple example:
+
+```{r, echo=FALSE}
+library(ggplot2)
+x <- tibble(
+  time = as.Date(c("2010-05-01", "2012-06-12", "2010-05-01", "2010-12-31", "2011-01-01", "2011-12-31", "2012-01-01", "2012-06-12")),
+  y = c(rep(1, 2), rep(0.8, 2), rep(0.78, 2), rep(0.76, 2)),
+  colour = c(rep("1", 2), rep("2", 6)),
+  group = c(1L, 1L, 2L, 2L, 3L, 3L, 4L, 4L)
+)
+ggplot(data = x, mapping = aes(x = time, y = y, colour = colour, group = group)) +
+  geom_line() +
+  geom_point() +
+  scale_y_continuous(limits = c(0.56, 1.2), breaks = NULL, labels = NULL) +
+  theme_bw() +
+  theme(
+    axis.title.y = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    legend.position = "none"
+  )
+```
+
+In this example we have an individual that has a cohort entry that starts on the '2010-05-01' and ends on the '2012-06-12' then its contributions will be split into three contributions:
+
+- From '2010-05-01' to '2010-12-31'.
+- From '2011-01-01' to '2011-12-31'.
+- From '2012-01-01' to '2012-06-12'.
+
+So let's use it in one example:
+
+```{r}
+cdm$medications_year <- cdm$medications |>
+  yearCohorts(years = c(1990:1993), name = "medications_year")
+settings(cdm$medications_year)
+cohortCount(cdm$medications_year)
+```
+
+Note we could choose the years of interest and that invididuals. Let's look closer to one of the individuals (`person_id = 4383`) that has 6 records:
+```{r}
+cdm$medications |> 
+  filter(subject_id == 4383)
+```
+
+From the 6 records only 3 are within our period of interest `1990-1993`, there are two contributions that start and end in the same year that's why they are going to be unaltered and just assigned to the year of interest. But one of the cohort entries starts in 1990 and ends in 1991, then their contribution will be split into the two years, so we expect to see 4 cohort contributions for this subject (2 in 1990, 1 in 1991 and 1 in 1992):
+
+```{r}
+cdm$medications_year |>
+  dplyr::filter(subject_id == 4383)
+```
+
+Let's disconnect from our cdm object to finish.
+
+```{r}
+cdmDisconnect(cdm)
+```

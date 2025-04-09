@@ -44,7 +44,10 @@ stratifyCohorts <- function(cohort,
   cohort <- omopgenerics::validateCohortArgument(cohort)
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
-  strata <- validateStrata(strata, cohort)
+  if (is.character(strata)) {
+    strata <- list(strata) #https://github.com/darwin-eu-dev/omopgenerics/issues/699
+  }
+  strata <- omopgenerics::validateStrataArgument(strata, table = cohort)
   omopgenerics::assertLogical(removeStrata, length = 1)
 
   if (length(cohortId) == 0) {
