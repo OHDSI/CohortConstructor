@@ -430,7 +430,7 @@ fulfillCohortReqs <- function(cdm, name, inObservation, type = "start_end") {
       dplyr::group_by(.data$cohort_definition_id, .data$subject_id, .data$cohort_start_date, .data$cohort_end_date) |>
       # which records to trim
       dplyr::mutate(
-        trim_record =  all(!in_observation_start) & min(.data$days_start_obs) == .data$days_start_obs & !is.na(days_start_obs)
+        trim_record =  all(!.data$in_observation_start) & min(.data$days_start_obs) == .data$days_start_obs & !is.na(.data$days_start_obs)
       ) |>
       dplyr::ungroup() |>
       dplyr::mutate(
@@ -536,7 +536,7 @@ uploadCohortCodelistToCdm <- function(cdm, cohortCodelist, tableCohortCodelist, 
   } else {
     domains <- domainsData |>
       dplyr::filter(.data$table %in% .env$table) |>
-      dplyr::select(domain_id)
+      dplyr::select(dplyr::all_of("domain_id"))
     cohortCodelist <- cohortCodelist |>
       dplyr::select("cohort_definition_id", "concept_id") |>
       dplyr::cross_join(domains) |>
