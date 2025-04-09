@@ -6,7 +6,7 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
-  
+
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
 collapse = TRUE,
@@ -20,7 +20,7 @@ library(CDMConnector)
 requireEunomia()
 ```
 
-## Introduction 
+## Introduction
 
 Let's first create a cdm reference to the Eunomia synthetic data.
 
@@ -39,7 +39,7 @@ cdm <- cdmFromCon(con, cdmSchema = "main", writeSchema = "main",
 
 ## Concept based cohort creation
 
-A way of defining base cohorts is to identify clinical records with codes from some pre-specified list. Here for example we'll first find codes for diclofenac and acetaminophen. 
+A way of defining base cohorts is to identify clinical records with codes from some pre-specified concept list. Here for example we'll first find codes for diclofenac and acetaminophen. We use the `getDrugIngredientCodes()` function from the package **CodelistGenerator** to obtain the codes for these drugs.
 
 ```{r}
 drug_codes <- getDrugIngredientCodes(cdm, 
@@ -65,9 +65,70 @@ cohortCount(cdm$drugs)
 attrition(cdm$drugs)
 ```
 
+This creates a cohort where individuals are defined by their exposure to the specified drugs, and their cohort duration is determined by the exposure end date.
+
+Next, let's create a cohort for individuals with bronchitis. We define a set of codes representing bronchitis and use the `conceptCohort()` function to create the cohort. Here, the cohort exit is defined by the event start date (i.e., `event_start_date`). We set `table = "condition_occurrence"` so that the records for the provided concepts will be searched only in the *condition_occurrence* table. We then set `subsetCohort = "drugs"` to restrict the cohort creation to individuals already in the `drugs` cohort. Additionally, we use `subsetCohortId = 1` to include only subjects from the cohort 1 (which corresponds to individuals who have been exposed to warfarin).
+
+```{r}
+
+bronchitis_codes <- list(bronchitis = c(260139, 256451, 4232302))
+
+cdm$bronchitis <- conceptCohort(cdm, 
+                           conceptSet = bronchitis_codes,
+                           exit = "event_start_date",
+                           name = "bronchitis",
+                           table = "condition_occurrence", 
+                           subsetCohort = "drugs", 
+                           subsetCohortId = 1
+                           )
+
+
+cohortCount(cdm$bronchitis)
+attrition(cdm$bronchitis)
+
+```
+
+When some records in the cohort overlap, the cohort start date will be set to the earliest start date. If we set `overlap = "merge"`, the cohort end date will be set to the latest end date of the overlapping records. 
+
+```{r}
+cdm$drugs_merge <- conceptCohort(cdm, 
+                           conceptSet = drug_codes,
+                           overlap = "merge",
+                           name = "drugs_merge")
+
+cdm$drugs_merge |>
+  attrition()
+
+```
+
+Alternatively, if we set `overlap = "extend"`, the cohort end date will be extended by summing the durations of each overlapping record.
+
+```{r}
+cdm$drugs_extend <- conceptCohort(cdm, 
+                           conceptSet = drug_codes,
+                           overlap = "extend",
+                           name = "drugs_extend")
+
+cdm$drugs_extend |>
+  attrition()
+```
+
+To create a cohort from a concept set and include records outside of the observation period, we can set `inObservation = FALSE`. If we also want to search for the given concepts in the source concept_id fields, rather than only the standard concept_id fields, we can set `useSourceFields = TRUE`.
+
+```{r}
+
+cdm$celecoxib <- conceptCohort(cdm, 
+                           conceptSet = list(celecoxib = 44923712),
+                           name = "celecoxib", 
+                           inObservation = FALSE, 
+                           useSourceFields = TRUE)
+cdm$celecoxib |>
+  glimpse()
+```
+
 ## Demographic based cohort creation
 
-One base cohort we can create is based around patient demographics. Here for example we create a cohort where people enter on their 18th birthday and leave at on the day before their 66th birthday. 
+One base cohort we can create is based around patient demographics. Here for example we create a cohort where people enter on their 18th birthday and leave at on the day before their 66th birthday.
 
 ```{r}
 cdm$working_age_cohort <- demographicsCohort(cdm = cdm, 
@@ -210,4 +271,12 @@ cdm <- cdmFromCon(con, cdmSchema = "main", writeSchema = "main",
 ```{r}
 cdm$death_cohort <- deathCohort(cdm = cdm,
                                 name = "death_cohort")
+```
+
+To create a cohort of individuals who have died, but restrict it to those already part of another cohort (e.g., the "drugs" cohort), you can use `subsetCohort = "drugs"`. This ensures that only individuals from the "drugs" cohort are included in the death cohort.
+
+```{r}
+cdm$death_drugs <- deathCohort(cdm = cdm,
+                               name = "death_drugs",
+                               subsetCohort = "drugs")
 ```
