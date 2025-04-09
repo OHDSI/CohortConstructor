@@ -179,7 +179,7 @@ with startdate the start of observation.</p></dd>
 <span class="r-in"><span>  person_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  measurement_concept_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4326744</span>, <span class="fl">4298393</span>, <span class="fl">4298393</span>, <span class="fl">45770407</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  measurement_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2000-07-01"</span>, <span class="st">"2000-12-11"</span>, <span class="st">"2002-09-08"</span>,</span></span>
-<span class="r-in"><span>                                <span class="st">"2015-02-19"</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"2015-02-19"</span><span class="op">)</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  measurement_type_concept_id <span class="op">=</span> <span class="cn">NA</span>,</span></span>
 <span class="r-in"><span>  value_as_number <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">125</span>, <span class="cn">NA</span>, <span class="cn">NA</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  value_as_concept_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">4124457</span><span class="op">)</span>,</span></span>
@@ -194,7 +194,8 @@ with startdate the start of observation.</p></dd>
 <span class="r-in"><span>  name <span class="op">=</span> <span class="st">"cohort"</span>,</span></span>
 <span class="r-in"><span>  conceptSet <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"normal_blood_pressure"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4326744</span>, <span class="fl">4298393</span>, <span class="fl">45770407</span><span class="op">)</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  valueAsConcept <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4124457</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  valueAsNumber <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"8876"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">70</span>, <span class="fl">120</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  valueAsNumber <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"8876"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">70</span>, <span class="fl">120</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  inObservation <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #BBBB00;">!</span> `codelist` casted to integers.</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #BB0000;">✖</span> Domain <span style="font-weight: bold;">observation</span> (3 concepts) excluded because table observation is not</span>
@@ -211,6 +212,41 @@ with startdate the start of observation.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: DuckDB v1.2.1 [unknown@Linux 6.8.0-1021-azure:R 4.4.3/:memory:]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 4 variables: cohort_definition_id &lt;int&gt;, subject_id &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   cohort_start_date &lt;date&gt;, cohort_end_date &lt;date&gt;</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># You can also create multiple measurement cohorts, and include records</span></span></span>
+<span class="r-in"><span><span class="co"># outside the observation period.</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">cdm</span><span class="op">$</span><span class="va">cohort2</span> <span class="op">&lt;-</span> <span class="fu">measurementCohort</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  cdm <span class="op">=</span> <span class="va">cdm</span>,</span></span>
+<span class="r-in"><span>  name <span class="op">=</span> <span class="st">"cohort2"</span>,</span></span>
+<span class="r-in"><span>  conceptSet <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"normal_blood_pressure"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4326744</span>, <span class="fl">4298393</span>, <span class="fl">45770407</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                  <span class="st">"high_blood_pressure"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4326744</span>, <span class="fl">4298393</span>, <span class="fl">45770407</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  valueAsConcept <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4124457</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  valueAsNumber <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"8876"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">70</span>, <span class="fl">120</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                       <span class="st">"8876"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">121</span>, <span class="fl">200</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  inObservation <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #BBBB00;">!</span> `codelist` casted to integers.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #BB0000;">✖</span> Domain <span style="font-weight: bold;">observation</span> (6 concepts) excluded because table observation is not</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   present in the cdm.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Subsetting table <span style="font-weight: bold;">measurement</span> using 6 concepts with domain: <span style="font-weight: bold;">measurement</span>.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Combining tables.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Applying measurement requirements.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Getting records in observation.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Missing values are always removed in SQL aggregation functions.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> Use `na.rm = TRUE` to silence this warning</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Creating cohort attributes.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Cohort <span style="font-weight: bold;">cohort2</span> created.</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">cdm</span><span class="op">$</span><span class="va">cohort2</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Source:   table&lt;cohort2&gt; [?? x 4]</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: DuckDB v1.2.1 [unknown@Linux 6.8.0-1021-azure:R 4.4.3/:memory:]</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   cohort_definition_id subject_id cohort_start_date cohort_end_date</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>         </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>                    2          1 2009-10-09        2009-10-09     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>                    1          1 2009-10-09        2009-10-09     </span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
