@@ -1,4 +1,4 @@
-#' Create cohorts measurement based cohorts
+#' Create measurement-based cohorts
 #'
 #' @description
 #' `measurementCohort()` creates cohorts based on patient records contained
