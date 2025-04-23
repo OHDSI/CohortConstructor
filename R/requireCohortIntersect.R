@@ -75,7 +75,7 @@ requireCohortIntersect <- function(cohort,
 
   # targetCohortId must be singular
   if (length(targetCohortId) > 1) {
-    cli::cli_abort(c("requireCohortIntersect can only be use with one rarget cohort at a time.",
+    cli::cli_abort(c("requireCohortIntersect can only be use with one target cohort at a time.",
                      "i" = "Cohort IDs {targetCohortId} found in targetCohortTable {targetCohortTable}",
                      "i" = "Use targetCohortId argument to specify just one cohort for intersection"))
   }
