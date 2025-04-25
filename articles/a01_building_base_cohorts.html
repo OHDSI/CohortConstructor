@@ -109,8 +109,11 @@
 <h2 id="concept-based-cohort-creation">Concept based cohort creation<a class="anchor" aria-label="anchor" href="#concept-based-cohort-creation"></a>
 </h2>
 <p>A way of defining base cohorts is to identify clinical records with
-codes from some pre-specified list. Here for example we’ll first find
-codes for diclofenac and acetaminophen.</p>
+codes from some pre-specified concept list. Here for example we’ll first
+find codes for diclofenac and acetaminophen. We use the
+<code><a href="https://darwin-eu.github.io/CodelistGenerator/reference/getDrugIngredientCodes.html" class="external-link">getDrugIngredientCodes()</a></code> function from the package
+<strong>CodelistGenerator</strong> to obtain the codes for these
+drugs.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">drug_codes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/CodelistGenerator/reference/getDrugIngredientCodes.html" class="external-link">getDrugIngredientCodes</a></span><span class="op">(</span><span class="va">cdm</span>, </span>
 <span>                                     name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"acetaminophen"</span>,</span>
@@ -178,6 +181,133 @@ these will be their drug exposure end date).</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">19</span>                    5           <span style="text-decoration: underline;">4</span>309            <span style="text-decoration: underline;">2</span>130         3 Record in obse…</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">20</span>                    5           <span style="text-decoration: underline;">4</span>307            <span style="text-decoration: underline;">2</span>130         4 Merge overlapp…</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2 more variables: excluded_records &lt;int&gt;, excluded_subjects &lt;int&gt;</span></span></span></code></pre></div>
+<p>This creates a cohort where individuals are defined by their exposure
+to the specified drugs, and their cohort duration is determined by the
+exposure end date.</p>
+<p>Next, let’s create a cohort for individuals with bronchitis. We
+define a set of codes representing bronchitis and use the
+<code><a href="../reference/conceptCohort.html">conceptCohort()</a></code> function to create the cohort. Here, the
+cohort exit is defined by the event start date (i.e.,
+<code>event_start_date</code>). We set
+<code>table = "condition_occurrence"</code> so that the records for the
+provided concepts will be searched only in the
+<em>condition_occurrence</em> table. We then set
+<code>subsetCohort = "drugs"</code> to restrict the cohort creation to
+individuals already in the <code>drugs</code> cohort. Additionally, we
+use <code>subsetCohortId = 1</code> to include only subjects from the
+cohort 1 (which corresponds to individuals who have been exposed to
+warfarin).</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="va">bronchitis_codes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>bronchitis <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">260139</span>, <span class="fl">256451</span>, <span class="fl">4232302</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">cdm</span><span class="op">$</span><span class="va">bronchitis</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/conceptCohort.html">conceptCohort</a></span><span class="op">(</span><span class="va">cdm</span>, </span>
+<span>                           conceptSet <span class="op">=</span> <span class="va">bronchitis_codes</span>,</span>
+<span>                           exit <span class="op">=</span> <span class="st">"event_start_date"</span>,</span>
+<span>                           name <span class="op">=</span> <span class="st">"bronchitis"</span>,</span>
+<span>                           table <span class="op">=</span> <span class="st">"condition_occurrence"</span>, </span>
+<span>                           subsetCohort <span class="op">=</span> <span class="st">"drugs"</span>, </span>
+<span>                           subsetCohortId <span class="op">=</span> <span class="fl">1</span></span>
+<span>                           <span class="op">)</span></span>
+<span></span>
+<span></span>
+<span><span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/cohortCount.html" class="external-link">cohortCount</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">bronchitis</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 3</span></span></span>
+<span><span class="co">#&gt;   cohort_definition_id number_records number_subjects</span></span>
+<span><span class="co">#&gt;                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1            533             130</span></span>
+<span><span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/attrition.html" class="external-link">attrition</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">bronchitis</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 4 × 7</span></span></span>
+<span><span class="co">#&gt;   cohort_definition_id number_records number_subjects reason_id reason          </span></span>
+<span><span class="co">#&gt;                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1            533             130         1 Initial qualify…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                    1            533             130         2 Record start &lt;=…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>                    1            533             130         3 Record in obser…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>                    1            533             130         4 Merge overlappi…</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2 more variables: excluded_records &lt;int&gt;, excluded_subjects &lt;int&gt;</span></span></span></code></pre></div>
+<p>When some records in the cohort overlap, the cohort start date will
+be set to the earliest start date. If we set
+<code>overlap = "merge"</code>, the cohort end date will be set to the
+latest end date of the overlapping records.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">drugs_merge</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/conceptCohort.html">conceptCohort</a></span><span class="op">(</span><span class="va">cdm</span>, </span>
+<span>                           conceptSet <span class="op">=</span> <span class="va">drug_codes</span>,</span>
+<span>                           overlap <span class="op">=</span> <span class="st">"merge"</span>,</span>
+<span>                           name <span class="op">=</span> <span class="st">"drugs_merge"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">cdm</span><span class="op">$</span><span class="va">drugs_merge</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/attrition.html" class="external-link">attrition</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 20 × 7</span></span></span>
+<span><span class="co">#&gt;    cohort_definition_id number_records number_subjects reason_id reason         </span></span>
+<span><span class="co">#&gt;                   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>                    1            137             137         1 Initial qualif…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>                    1            137             137         2 Record start &lt;…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>                    1            137             137         3 Record in obse…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>                    1            137             137         4 Merge overlapp…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>                    2          <span style="text-decoration: underline;">14</span>205            <span style="text-decoration: underline;">2</span>679         1 Initial qualif…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>                    2          <span style="text-decoration: underline;">14</span>205            <span style="text-decoration: underline;">2</span>679         2 Record start &lt;…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>                    2          <span style="text-decoration: underline;">14</span>205            <span style="text-decoration: underline;">2</span>679         3 Record in obse…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>                    2          <span style="text-decoration: underline;">13</span>908            <span style="text-decoration: underline;">2</span>679         4 Merge overlapp…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>                    3            850             850         1 Initial qualif…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>                    3            850             850         2 Record start &lt;…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span>                    3            830             830         3 Record in obse…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">12</span>                    3            830             830         4 Merge overlapp…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">13</span>                    4            182             182         1 Initial qualif…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">14</span>                    4            182             182         2 Record start &lt;…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">15</span>                    4            182             182         3 Record in obse…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">16</span>                    4            182             182         4 Merge overlapp…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">17</span>                    5           <span style="text-decoration: underline;">4</span>309            <span style="text-decoration: underline;">2</span>130         1 Initial qualif…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">18</span>                    5           <span style="text-decoration: underline;">4</span>309            <span style="text-decoration: underline;">2</span>130         2 Record start &lt;…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">19</span>                    5           <span style="text-decoration: underline;">4</span>309            <span style="text-decoration: underline;">2</span>130         3 Record in obse…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">20</span>                    5           <span style="text-decoration: underline;">4</span>307            <span style="text-decoration: underline;">2</span>130         4 Merge overlapp…</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2 more variables: excluded_records &lt;int&gt;, excluded_subjects &lt;int&gt;</span></span></span></code></pre></div>
+<p>Alternatively, if we set <code>overlap = "extend"</code>, the cohort
+end date will be extended by summing the durations of each overlapping
+record.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">drugs_extend</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/conceptCohort.html">conceptCohort</a></span><span class="op">(</span><span class="va">cdm</span>, </span>
+<span>                           conceptSet <span class="op">=</span> <span class="va">drug_codes</span>,</span>
+<span>                           overlap <span class="op">=</span> <span class="st">"extend"</span>,</span>
+<span>                           name <span class="op">=</span> <span class="st">"drugs_extend"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">cdm</span><span class="op">$</span><span class="va">drugs_extend</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/attrition.html" class="external-link">attrition</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 30 × 7</span></span></span>
+<span><span class="co">#&gt;    cohort_definition_id number_records number_subjects reason_id reason         </span></span>
+<span><span class="co">#&gt;                   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>                    1            137             137         1 Initial qualif…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>                    1            137             137         2 Record start &lt;…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>                    1            137             137         3 Record in obse…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>                    1            137             137         4 Add overlappin…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>                    1            137             137         5 Record start &lt;…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>                    1            137             137         6 Record in obse…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>                    2          <span style="text-decoration: underline;">14</span>205            <span style="text-decoration: underline;">2</span>679         1 Initial qualif…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>                    2          <span style="text-decoration: underline;">14</span>205            <span style="text-decoration: underline;">2</span>679         2 Record start &lt;…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>                    2          <span style="text-decoration: underline;">14</span>205            <span style="text-decoration: underline;">2</span>679         3 Record in obse…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>                    2          <span style="text-decoration: underline;">13</span>905            <span style="text-decoration: underline;">2</span>679         4 Add overlappin…</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 20 more rows</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2 more variables: excluded_records &lt;int&gt;, excluded_subjects &lt;int&gt;</span></span></span></code></pre></div>
+<p>To create a cohort from a concept set and include records outside of
+the observation period, we can set <code>inObservation = FALSE</code>.
+If we also want to search for the given concepts in the source
+concept_id fields, rather than only the standard concept_id fields, we
+can set <code>useSourceFields = TRUE</code>.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="va">cdm</span><span class="op">$</span><span class="va">celecoxib</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/conceptCohort.html">conceptCohort</a></span><span class="op">(</span><span class="va">cdm</span>, </span>
+<span>                           conceptSet <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>celecoxib <span class="op">=</span> <span class="fl">44923712</span><span class="op">)</span>,</span>
+<span>                           name <span class="op">=</span> <span class="st">"celecoxib"</span>, </span>
+<span>                           inObservation <span class="op">=</span> <span class="cn">FALSE</span>, </span>
+<span>                           useSourceFields <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">cdm</span><span class="op">$</span><span class="va">celecoxib</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Rows: ??</span></span>
+<span><span class="co">#&gt; Columns: 4</span></span>
+<span><span class="co">#&gt; Database: DuckDB v1.2.1 [unknown@Linux 6.11.0-1012-azure:R 4.5.0//tmp/RtmpLbGKhR/file27c02527399d.duckdb]</span></span>
+<span><span class="co">#&gt; $ cohort_definition_id <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> 1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1…</span></span>
+<span><span class="co">#&gt; $ subject_id           <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> 1079<span style="color: #949494;">, </span>2957<span style="color: #949494;">, </span>3263<span style="color: #949494;">, </span>3932<span style="color: #949494;">, </span>4372<span style="color: #949494;">, </span>5083<span style="color: #949494;">, </span>5095<span style="color: #949494;">, </span>1117<span style="color: #949494;">, </span>1…</span></span>
+<span><span class="co">#&gt; $ cohort_start_date    <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 1993-11-26<span style="color: #949494;">, </span>1985-05-14<span style="color: #949494;">, </span>1985-01-27<span style="color: #949494;">, </span>2010-11-10<span style="color: #949494;">, </span>…</span></span>
+<span><span class="co">#&gt; $ cohort_end_date      <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 1993-11-26<span style="color: #949494;">, </span>1985-05-14<span style="color: #949494;">, </span>1985-01-27<span style="color: #949494;">, </span>2010-11-10<span style="color: #949494;">, </span>…</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="demographic-based-cohort-creation">Demographic based cohort creation<a class="anchor" aria-label="anchor" href="#demographic-based-cohort-creation"></a>
@@ -185,7 +315,7 @@ these will be their drug exposure end date).</p>
 <p>One base cohort we can create is based around patient demographics.
 Here for example we create a cohort where people enter on their 18th
 birthday and leave at on the day before their 66th birthday.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">working_age_cohort</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/demographicsCohort.html">demographicsCohort</a></span><span class="op">(</span>cdm <span class="op">=</span> <span class="va">cdm</span>, </span>
 <span>                                             ageRange <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">18</span>, <span class="fl">65</span><span class="op">)</span>, </span>
 <span>                                             name <span class="op">=</span> <span class="st">"working_age_cohort"</span><span class="op">)</span></span>
@@ -209,7 +339,7 @@ birthday and leave at on the day before their 66th birthday.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2 more variables: excluded_records &lt;int&gt;, excluded_subjects &lt;int&gt;</span></span></span></code></pre></div>
 <p>We can also add an additional requirement of only people of working
 age with sex “female”.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">female_working_age_cohort</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/demographicsCohort.html">demographicsCohort</a></span><span class="op">(</span>cdm <span class="op">=</span> <span class="va">cdm</span>, </span>
 <span>                                             ageRange <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">18</span>, <span class="fl">65</span><span class="op">)</span>,</span>
 <span>                                             sex <span class="op">=</span> <span class="st">"Female"</span>,</span>
@@ -235,7 +365,7 @@ age with sex “female”.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2 more variables: excluded_records &lt;int&gt;, excluded_subjects &lt;int&gt;</span></span></span></code></pre></div>
 <p>We can also use this function to create cohorts for different
 combinations of age groups and sex.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">age_sex_cohorts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/demographicsCohort.html">demographicsCohort</a></span><span class="op">(</span>cdm <span class="op">=</span> <span class="va">cdm</span>, </span>
 <span>                                             ageRange <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">17</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">18</span>, <span class="fl">65</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">66</span>,<span class="fl">120</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>                                             sex <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Female"</span>, <span class="st">"Male"</span><span class="op">)</span>,</span>
@@ -286,7 +416,7 @@ combinations of age groups and sex.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2 more variables: excluded_records &lt;int&gt;, excluded_subjects &lt;int&gt;</span></span></span></code></pre></div>
 <p>We can also specify the minimum number of days of prior observation
 required.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">working_age_cohort_0_365</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/demographicsCohort.html">demographicsCohort</a></span><span class="op">(</span>cdm <span class="op">=</span> <span class="va">cdm</span>, </span>
 <span>                                             ageRange <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">18</span>, <span class="fl">65</span><span class="op">)</span>, </span>
 <span>                                             name <span class="op">=</span> <span class="st">"working_age_cohort_0_365"</span>,</span>
@@ -329,7 +459,7 @@ concept is included for the cases where the exact BMI measurement is not
 specified, but the BMI category (i.e. normal, overweight, obese etc) is.
 This means that if a record matches the value concept OR has a normal
 BMI score then it is included in the cohort.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">cohort</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/measurementCohort.html">measurementCohort</a></span><span class="op">(</span></span>
 <span>  cdm <span class="op">=</span> <span class="va">cdm</span>,</span>
 <span>  name <span class="op">=</span> <span class="st">"cohort"</span>,</span>
@@ -354,18 +484,18 @@ BMI score then it is included in the cohort.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1 bmi_normal  5.3         mock</span></span>
 <span><span class="va">cdm</span><span class="op">$</span><span class="va">cohort</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Source:   table&lt;cohort&gt; [?? x 4]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB v1.2.1 [unknown@Linux 6.8.0-1021-azure:R 4.4.3/:memory:]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB v1.2.1 [unknown@Linux 6.11.0-1012-azure:R 4.5.0/:memory:]</span></span></span>
 <span><span class="co">#&gt;   cohort_definition_id subject_id cohort_start_date cohort_end_date</span></span>
 <span><span class="co">#&gt;                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>         </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1          1 2015-02-19        2015-02-19     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                    1          2 1965-03-10        1965-03-10     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>                    1          3 1999-09-08        1999-09-08</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1          2 1965-03-10        1965-03-10     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                    1          3 1999-09-08        1999-09-08     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>                    1          1 2015-02-19        2015-02-19</span></span></code></pre></div>
 <p>As you can see in the above code, the concept set is the list of BMI
 concepts, the concept value is the ‘normal’ weight concept, and the
 values are the minimum and maximum BMI scores to be considered.</p>
 <p>It is also possible to include records outside of observation by
 setting the <code>inObservation</code> argument to false.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">cohort</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/measurementCohort.html">measurementCohort</a></span><span class="op">(</span></span>
 <span>  cdm <span class="op">=</span> <span class="va">cdm</span>,</span>
 <span>  name <span class="op">=</span> <span class="st">"cohort"</span>,</span>
@@ -391,11 +521,11 @@ setting the <code>inObservation</code> argument to false.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1 bmi_normal  5.3         mock</span></span>
 <span><span class="va">cdm</span><span class="op">$</span><span class="va">cohort</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Source:   table&lt;cohort&gt; [?? x 4]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB v1.2.1 [unknown@Linux 6.8.0-1021-azure:R 4.4.3/:memory:]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB v1.2.1 [unknown@Linux 6.11.0-1012-azure:R 4.5.0/:memory:]</span></span></span>
 <span><span class="co">#&gt;   cohort_definition_id subject_id cohort_start_date cohort_end_date</span></span>
 <span><span class="co">#&gt;                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>         </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1          1 2009-10-09        2009-10-09     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                    1          1 2015-02-19        2015-02-19     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1          1 2015-02-19        2015-02-19     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                    1          1 2009-10-09        2009-10-09     </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>                    1          3 1999-09-08        1999-09-08     </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>                    1          2 1965-03-10        1965-03-10</span></span></code></pre></div>
 </div>
@@ -405,9 +535,18 @@ setting the <code>inObservation</code> argument to false.</p>
 <p>Another base cohort we can make is one with individuals who have
 died. For this we’ll simply be finding those people in the OMOP CDM
 death table and creating a cohort with them.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">death_cohort</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/deathCohort.html">deathCohort</a></span><span class="op">(</span>cdm <span class="op">=</span> <span class="va">cdm</span>,</span>
 <span>                                name <span class="op">=</span> <span class="st">"death_cohort"</span><span class="op">)</span></span></code></pre></div>
+<p>To create a cohort of individuals who have died, but restrict it to
+those already part of another cohort (e.g., the “drugs” cohort), you can
+use <code>subsetCohort = "drugs"</code>. This ensures that only
+individuals from the “drugs” cohort are included in the death
+cohort.</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">death_drugs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/deathCohort.html">deathCohort</a></span><span class="op">(</span>cdm <span class="op">=</span> <span class="va">cdm</span>,</span>
+<span>                               name <span class="op">=</span> <span class="st">"death_drugs"</span>,</span>
+<span>                               subsetCohort <span class="op">=</span> <span class="st">"drugs"</span><span class="op">)</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

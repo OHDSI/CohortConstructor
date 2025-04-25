@@ -62,7 +62,12 @@ cohort entry per person.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">requireIsFirstEntry</span><span class="op">(</span><span class="va">cohort</span>, cohortId <span class="op">=</span> <span class="cn">NULL</span>, name <span class="op">=</span> <span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/tableName.html" class="external-link">tableName</a></span><span class="op">(</span><span class="va">cohort</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">requireIsFirstEntry</span><span class="op">(</span></span>
+<span>  <span class="va">cohort</span>,</span>
+<span>  cohortId <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  name <span class="op">=</span> <span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/tableName.html" class="external-link">tableName</a></span><span class="op">(</span><span class="va">cohort</span><span class="op">)</span>,</span>
+<span>  .softValidation <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -82,6 +87,15 @@ rest will remain unchanged.</p></dd>
 
 <dt id="arg-name">name<a class="anchor" aria-label="anchor" href="#arg-name"></a></dt>
 <dd><p>Name of the new cohort table created in the cdm object.</p></dd>
+
+
+<dt id="arg--softvalidation">.softValidation<a class="anchor" aria-label="anchor" href="#arg--softvalidation"></a></dt>
+<dd><p>Whether to perform a soft validation of consistency.
+If set to FALSE four additional checks will be performed: 1) a check that
+cohort end date is not before cohort start date,  2) a check that there
+are no missing values in required columns, 3) a check that cohort duration is
+all within observation period, and 4) that there are no overlapping
+cohort entries</p></dd>
 
 </dl></div>
     <div class="section level2">

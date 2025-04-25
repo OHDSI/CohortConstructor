@@ -67,7 +67,8 @@ where individuals satisfy the specified prior observation criteria.</p>
 <span>  <span class="va">minPriorObservation</span>,</span>
 <span>  cohortId <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  indexDate <span class="op">=</span> <span class="st">"cohort_start_date"</span>,</span>
-<span>  name <span class="op">=</span> <span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/tableName.html" class="external-link">tableName</a></span><span class="op">(</span><span class="va">cohort</span><span class="op">)</span></span>
+<span>  name <span class="op">=</span> <span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/tableName.html" class="external-link">tableName</a></span><span class="op">(</span><span class="va">cohort</span><span class="op">)</span>,</span>
+<span>  .softValidation <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -99,6 +100,15 @@ demographics characteristics on which to restrict on.</p></dd>
 <dt id="arg-name">name<a class="anchor" aria-label="anchor" href="#arg-name"></a></dt>
 <dd><p>Name of the new cohort table created in the cdm object.</p></dd>
 
+
+<dt id="arg--softvalidation">.softValidation<a class="anchor" aria-label="anchor" href="#arg--softvalidation"></a></dt>
+<dd><p>Whether to perform a soft validation of consistency.
+If set to FALSE four additional checks will be performed: 1) a check that
+cohort end date is not before cohort start date,  2) a check that there
+are no missing values in required columns, 3) a check that cohort duration is
+all within observation period, and 4) that there are no overlapping
+cohort entries</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -115,15 +125,15 @@ prior observation requirement</p>
 <span class="r-in"><span>  <span class="fu">requirePriorObservation</span><span class="op">(</span>indexDate <span class="op">=</span> <span class="st">"cohort_start_date"</span>,</span></span>
 <span class="r-in"><span>                          minPriorObservation <span class="op">=</span> <span class="fl">365</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Source:   table&lt;cohort1&gt; [?? x 4]</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: DuckDB v1.2.1 [unknown@Linux 6.8.0-1021-azure:R 4.4.3/:memory:]</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: DuckDB v1.2.1 [unknown@Linux 6.11.0-1012-azure:R 4.5.0/:memory:]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   cohort_definition_id subject_id cohort_start_date cohort_end_date</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>         </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>                    1          2 1964-09-18        1965-08-30     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>                    1          3 1978-04-04        1987-02-26     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>                    1          3 1976-11-28        1977-03-11     </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>                    1          4 1998-06-22        2001-02-12     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span>                    1          5 2008-11-11        2011-09-12     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span>                    1          3 1977-03-12        1978-04-03     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span>                    1          3 1976-11-28        1977-03-11     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span>                    1          3 1978-04-04        1987-02-26     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span>                    1          5 2008-11-11        2011-09-12     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span>                    1          3 1977-03-12        1978-04-03     </span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
