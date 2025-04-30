@@ -82,16 +82,19 @@ test_that("mearurementCohorts works", {
     cdm$cohort |> attrition() |> dplyr::as_tibble(),
     dplyr::tibble(
       "cohort_definition_id" = 1L,
-      "number_records" = c(rep(2L, 4)),
-      "number_subjects" = c(rep(2L, 4)),
-      "reason_id" = 1:4L,
+      "number_records" = c(rep(2L, 6)),
+      "number_subjects" = c(rep(2L, 6)),
+      "reason_id" = 1:6L,
       "reason" = c(
         "Initial qualifying events",
-        "Not missing record date", "Record in observation",
+        "Not missing record date",
+        "Record in observation",
+        "Non-missing sex",
+        "Non-missing year of birth",
         "Distinct measurement records"
       ),
-      "excluded_records" = c(0L, 0L, 0L, 0L),
-      "excluded_subjects" = c(0L, 0L, 0L, 0L),
+      "excluded_records" = c(0L, 0L, 0L, 0L, 0L, 0L),
+      "excluded_subjects" = c(0L, 0L, 0L, 0L, 0L, 0L),
     )
   )
   expect_true(settings(cdm$cohort)$cohort_name == "normal_blood_pressure")
@@ -190,18 +193,22 @@ test_that("mearurementCohorts works", {
   expect_identical(
     attrition(cdm$cohort7) |> dplyr::as_tibble(),
     dplyr::tibble(
-      "cohort_definition_id" = c(rep(1L, 4), rep(2L, 4)),
-      "number_records" = c(rep(1L, 4), rep(4L, 4)),
-      "number_subjects" = c(rep(1L, 4), rep(3L, 4)),
-      "reason_id" = rep(1:4L, 2),
+      "cohort_definition_id" = c(rep(1L, 6), rep(2L, 6)),
+      "number_records" = c(rep(1L, 6), rep(4L, 6)),
+      "number_subjects" = c(rep(1L, 6), rep(3L, 6)),
+      "reason_id" = rep(1:6L, 2),
       "reason" = c(
         "Initial qualifying events",
         "Not missing record date",
         "Record in observation",
+        "Non-missing sex",
+        "Non-missing year of birth",
         "Distinct measurement records",
         "Initial qualifying events",
         "Not missing record date",
         "Record in observation",
+        "Non-missing sex",
+        "Non-missing year of birth",
         "Distinct measurement records"
       ),
       "excluded_records" = 0L,
@@ -336,6 +343,24 @@ test_that("mearurementCohorts - valueAsNumber without unit concept", {
 
   # removing unit_concept_id 8876 - should mean any value between 70 and 120 would be included
   # and we should now get person 3 included
+  cohort_2 <- measurementCohort(
+    cdm = cdm,
+    name = "cohort",
+    conceptSet = list("normal_blood_pressure" = c(4326744L)),
+    valueAsNumber = list(c(70L, 120L)),
+    table = "measurement"
+  )
+
+  # empty gener in person --> empty cohort
+  expect_true(dplyr::tally(cohort_2) |> dplyr::pull() == 0)
+
+  # ad genedr component
+  cdm <- omopgenerics::insertTable(cdm, "person",
+                                   dplyr::tibble(person_id = c(1, 2, 3),
+                                                 gender_concept_id = 8532,
+                                                 year_of_birth = 1990L,
+                                                 race_concept_id = NA_integer_,
+                                                 ethnicity_concept_id = NA_integer_ ))
   cohort_2 <- measurementCohort(
     cdm = cdm,
     name = "cohort",
