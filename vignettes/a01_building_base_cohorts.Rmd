@@ -253,20 +253,18 @@ cdm$cohort
 ```
 ## Death cohort
 
-Another base cohort we can make is one with individuals who have died. For this we'll simply be finding those people in the OMOP CDM death table and creating a cohort with them.
-
 ```{r, include=FALSE}
-library(CDMConnector)
-library(CodelistGenerator)
-library(PatientProfiles)
-library(CohortConstructor)
-library(dplyr)
-
 con <- DBI::dbConnect(duckdb::duckdb(), 
                       dbdir = eunomiaDir())
 cdm <- cdmFromCon(con, cdmSchema = "main", writeSchema = "main", 
                   writePrefix = "my_study_")
+cdm$drugs <- conceptCohort(cdm, 
+                           conceptSet = drug_codes,
+                           exit = "event_end_date",
+                           name = "drugs")
 ```
+
+Another base cohort we can make is one with individuals who have died. For this we'll simply be finding those people in the OMOP CDM death table and creating a cohort with them.
 
 ```{r}
 cdm$death_cohort <- deathCohort(cdm = cdm,
