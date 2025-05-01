@@ -6,12 +6,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Concatenating cohort records • CohortConstructor</title>
-<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
-<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
-<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
-<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
-<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
+<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
+<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="icon" sizes="any" href="../favicon.ico">
+<link rel="manifest" href="../site.webmanifest">
 <script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
@@ -127,22 +126,22 @@ individual.</p>
 <code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">medications</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">subject_id</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Source:   SQL [?? x 4]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB v1.2.1 [unknown@Linux 6.11.0-1012-azure:R 4.5.0//tmp/RtmpG3QYzo/file29ba7df4a28a.duckdb]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB v1.2.2 [unknown@Linux 6.11.0-1012-azure:R 4.5.0//tmp/RtmpK04iZV/file287155b5245d.duckdb]</span></span></span>
 <span><span class="co">#&gt;   cohort_definition_id subject_id cohort_start_date cohort_end_date</span></span>
 <span><span class="co">#&gt;                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>         </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1          1 1976-10-20        1976-11-03     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                    1          1 1980-03-15        1980-03-29     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>                    1          1 1971-01-04        1971-01-18     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>                    1          1 1982-09-11        1982-10-02</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1          1 1980-03-15        1980-03-29     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                    1          1 1971-01-04        1971-01-18     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>                    1          1 1982-09-11        1982-10-02     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>                    1          1 1976-10-20        1976-11-03</span></span>
 <span><span class="va">cdm</span><span class="op">$</span><span class="va">medications_collapsed</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">subject_id</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Source:   SQL [?? x 4]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB v1.2.1 [unknown@Linux 6.11.0-1012-azure:R 4.5.0//tmp/RtmpG3QYzo/file29ba7df4a28a.duckdb]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB v1.2.2 [unknown@Linux 6.11.0-1012-azure:R 4.5.0//tmp/RtmpK04iZV/file287155b5245d.duckdb]</span></span></span>
 <span><span class="co">#&gt;   cohort_definition_id subject_id cohort_start_date cohort_end_date</span></span>
 <span><span class="co">#&gt;                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>         </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1          1 1980-03-15        1982-10-02     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1          1 1971-01-04        1971-01-18     </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                    1          1 1976-10-20        1976-11-03     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>                    1          1 1971-01-04        1971-01-18</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>                    1          1 1980-03-15        1982-10-02</span></span></code></pre></div>
 <p>Subject 1 initially had 4 records between 1971 and 1982. After
 specifying that records within three years of each other are to be
 merged, the number of records decreases to three. The record from
@@ -152,23 +151,23 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">summary_attrition</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/CohortCharacteristics/reference/summariseCohortAttrition.html" class="external-link">summariseCohortAttrition</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">medications_collapsed</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://darwin-eu.github.io/CohortCharacteristics/reference/tableCohortAttrition.html" class="external-link">tableCohortAttrition</a></span><span class="op">(</span><span class="va">summary_attrition</span><span class="op">)</span></span></code></pre></div>
-<div id="gzfelhkpkb" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#gzfelhkpkb table {
+<div id="lmnehfatjc" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#lmnehfatjc table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#gzfelhkpkb thead, #gzfelhkpkb tbody, #gzfelhkpkb tfoot, #gzfelhkpkb tr, #gzfelhkpkb td, #gzfelhkpkb th {
+#lmnehfatjc thead, #lmnehfatjc tbody, #lmnehfatjc tfoot, #lmnehfatjc tr, #lmnehfatjc td, #lmnehfatjc th {
   border-style: none;
 }
 
-#gzfelhkpkb p {
+#lmnehfatjc p {
   margin: 0;
   padding: 0;
 }
 
-#gzfelhkpkb .gt_table {
+#lmnehfatjc .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -194,12 +193,12 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   border-left-color: #D3D3D3;
 }
 
-#gzfelhkpkb .gt_caption {
+#lmnehfatjc .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#gzfelhkpkb .gt_title {
+#lmnehfatjc .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -211,7 +210,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   border-bottom-width: 0;
 }
 
-#gzfelhkpkb .gt_subtitle {
+#lmnehfatjc .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -223,7 +222,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   border-top-width: 0;
 }
 
-#gzfelhkpkb .gt_heading {
+#lmnehfatjc .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -235,13 +234,13 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   border-right-color: #D3D3D3;
 }
 
-#gzfelhkpkb .gt_bottom_border {
+#lmnehfatjc .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#gzfelhkpkb .gt_col_headings {
+#lmnehfatjc .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -256,7 +255,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   border-right-color: #D3D3D3;
 }
 
-#gzfelhkpkb .gt_col_heading {
+#lmnehfatjc .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -276,7 +275,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   overflow-x: hidden;
 }
 
-#gzfelhkpkb .gt_column_spanner_outer {
+#lmnehfatjc .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -288,15 +287,15 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   padding-right: 4px;
 }
 
-#gzfelhkpkb .gt_column_spanner_outer:first-child {
+#lmnehfatjc .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#gzfelhkpkb .gt_column_spanner_outer:last-child {
+#lmnehfatjc .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#gzfelhkpkb .gt_column_spanner {
+#lmnehfatjc .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -308,11 +307,11 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   width: 100%;
 }
 
-#gzfelhkpkb .gt_spanner_row {
+#lmnehfatjc .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#gzfelhkpkb .gt_group_heading {
+#lmnehfatjc .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -338,7 +337,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   text-align: left;
 }
 
-#gzfelhkpkb .gt_empty_group_heading {
+#lmnehfatjc .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -353,15 +352,15 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   vertical-align: middle;
 }
 
-#gzfelhkpkb .gt_from_md > :first-child {
+#lmnehfatjc .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#gzfelhkpkb .gt_from_md > :last-child {
+#lmnehfatjc .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#gzfelhkpkb .gt_row {
+#lmnehfatjc .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -380,7 +379,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   overflow-x: hidden;
 }
 
-#gzfelhkpkb .gt_stub {
+#lmnehfatjc .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -393,7 +392,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   padding-right: 5px;
 }
 
-#gzfelhkpkb .gt_stub_row_group {
+#lmnehfatjc .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -407,15 +406,15 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   vertical-align: top;
 }
 
-#gzfelhkpkb .gt_row_group_first td {
+#lmnehfatjc .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#gzfelhkpkb .gt_row_group_first th {
+#lmnehfatjc .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#gzfelhkpkb .gt_summary_row {
+#lmnehfatjc .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -425,16 +424,16 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   padding-right: 5px;
 }
 
-#gzfelhkpkb .gt_first_summary_row {
+#lmnehfatjc .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#gzfelhkpkb .gt_first_summary_row.thick {
+#lmnehfatjc .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#gzfelhkpkb .gt_last_summary_row {
+#lmnehfatjc .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -444,7 +443,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   border-bottom-color: #D3D3D3;
 }
 
-#gzfelhkpkb .gt_grand_summary_row {
+#lmnehfatjc .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -454,7 +453,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   padding-right: 5px;
 }
 
-#gzfelhkpkb .gt_first_grand_summary_row {
+#lmnehfatjc .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -464,7 +463,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   border-top-color: #D3D3D3;
 }
 
-#gzfelhkpkb .gt_last_grand_summary_row_top {
+#lmnehfatjc .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -474,11 +473,11 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   border-bottom-color: #D3D3D3;
 }
 
-#gzfelhkpkb .gt_striped {
+#lmnehfatjc .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#gzfelhkpkb .gt_table_body {
+#lmnehfatjc .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -487,7 +486,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   border-bottom-color: #D3D3D3;
 }
 
-#gzfelhkpkb .gt_footnotes {
+#lmnehfatjc .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -501,7 +500,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   border-right-color: #D3D3D3;
 }
 
-#gzfelhkpkb .gt_footnote {
+#lmnehfatjc .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -510,7 +509,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   padding-right: 5px;
 }
 
-#gzfelhkpkb .gt_sourcenotes {
+#lmnehfatjc .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -524,7 +523,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   border-right-color: #D3D3D3;
 }
 
-#gzfelhkpkb .gt_sourcenote {
+#lmnehfatjc .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -532,72 +531,72 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   padding-right: 5px;
 }
 
-#gzfelhkpkb .gt_left {
+#lmnehfatjc .gt_left {
   text-align: left;
 }
 
-#gzfelhkpkb .gt_center {
+#lmnehfatjc .gt_center {
   text-align: center;
 }
 
-#gzfelhkpkb .gt_right {
+#lmnehfatjc .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#gzfelhkpkb .gt_font_normal {
+#lmnehfatjc .gt_font_normal {
   font-weight: normal;
 }
 
-#gzfelhkpkb .gt_font_bold {
+#lmnehfatjc .gt_font_bold {
   font-weight: bold;
 }
 
-#gzfelhkpkb .gt_font_italic {
+#lmnehfatjc .gt_font_italic {
   font-style: italic;
 }
 
-#gzfelhkpkb .gt_super {
+#lmnehfatjc .gt_super {
   font-size: 65%;
 }
 
-#gzfelhkpkb .gt_footnote_marks {
+#lmnehfatjc .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#gzfelhkpkb .gt_asterisk {
+#lmnehfatjc .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#gzfelhkpkb .gt_indent_1 {
+#lmnehfatjc .gt_indent_1 {
   text-indent: 5px;
 }
 
-#gzfelhkpkb .gt_indent_2 {
+#lmnehfatjc .gt_indent_2 {
   text-indent: 10px;
 }
 
-#gzfelhkpkb .gt_indent_3 {
+#lmnehfatjc .gt_indent_3 {
   text-indent: 15px;
 }
 
-#gzfelhkpkb .gt_indent_4 {
+#lmnehfatjc .gt_indent_4 {
   text-indent: 20px;
 }
 
-#gzfelhkpkb .gt_indent_5 {
+#lmnehfatjc .gt_indent_5 {
   text-indent: 25px;
 }
 
-#gzfelhkpkb .katex-display {
+#lmnehfatjc .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#gzfelhkpkb div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#lmnehfatjc div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -655,6 +654,28 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
 [header_level]excluded_subjects" class="gt_row gt_right" style="text-align: right;">0</td>
 </tr>
 <tr>
+<td headers="Synthea; acetaminophen  Reason" class="gt_row gt_left" style="text-align: left; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">Non-missing sex</td>
+<td headers="Synthea; acetaminophen  [header_name]Variable name
+[header_level]number_records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">9,365</td>
+<td headers="Synthea; acetaminophen  [header_name]Variable name
+[header_level]number_subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">2,580</td>
+<td headers="Synthea; acetaminophen  [header_name]Variable name
+[header_level]excluded_records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">0</td>
+<td headers="Synthea; acetaminophen  [header_name]Variable name
+[header_level]excluded_subjects" class="gt_row gt_right" style="text-align: right;">0</td>
+</tr>
+<tr>
+<td headers="Synthea; acetaminophen  Reason" class="gt_row gt_left" style="text-align: left; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">Non-missing year of birth</td>
+<td headers="Synthea; acetaminophen  [header_name]Variable name
+[header_level]number_records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">9,365</td>
+<td headers="Synthea; acetaminophen  [header_name]Variable name
+[header_level]number_subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">2,580</td>
+<td headers="Synthea; acetaminophen  [header_name]Variable name
+[header_level]excluded_records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">0</td>
+<td headers="Synthea; acetaminophen  [header_name]Variable name
+[header_level]excluded_subjects" class="gt_row gt_right" style="text-align: right;">0</td>
+</tr>
+<tr>
 <td headers="Synthea; acetaminophen  Reason" class="gt_row gt_left" style="text-align: left; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">Merge overlapping records</td>
 <td headers="Synthea; acetaminophen  [header_name]Variable name
 [header_level]number_records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">9,365</td>
@@ -689,7 +710,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
 </div>
 
     </footer>
