@@ -211,7 +211,14 @@ measurementCohort <- function(cdm,
   }
 
   cli::cli_inform(c("i" = "Getting records in observation."))
-  cdm[[name]] <- fulfillCohortReqs(cdm, name, inObservation = inObservation, type = "start")
+  useIndexes <- getOption("CohortConstructor.use_indexes")
+  if (!isFALSE(useIndexes)) {
+    addIndex(
+      cohort = cdm[[name]],
+      cols = c("subject_id", "cohort_start_date")
+    )
+  }
+  cdm[[name]] <- fulfillCohortReqs(cdm, name, inObservation = inObservation, type = "start", useIndexes = useIndexes)
 
   cdm[[name]] <- cdm[[name]] |>
     dplyr::select("cohort_definition_id",
@@ -231,7 +238,6 @@ measurementCohort <- function(cdm,
 
   omopgenerics::dropSourceTable(cdm = cdm, name = tableCohortCodelist)
 
-  useIndexes <- getOption("CohortConstructor.use_indexes")
   if (!isFALSE(useIndexes)) {
     addIndex(
       cohort = cdm[[name]],

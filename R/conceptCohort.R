@@ -237,7 +237,7 @@ conceptCohort <- function(cdm,
   }
 
   cli::cli_inform(c("i" = "Applying cohort requirements."))
-  cdm[[name]] <- fulfillCohortReqs(cdm = cdm, name = name, inObservation = inObservation)
+  cdm[[name]] <- fulfillCohortReqs(cdm = cdm, name = name, inObservation = inObservation, useIndexes = useIndexes)
 
   if(overlap == "merge"){
     cli::cli_inform(c("i" = "Merging overlapping records."))
@@ -254,7 +254,7 @@ conceptCohort <- function(cdm,
 
     # adding days might mean we no longer satisfy cohort requirements
     cli::cli_inform(c("i" = "Re-appplying cohort requirements."))
-    cdm[[name]] <- fulfillCohortReqs(cdm = cdm, name = name, inObservation = TRUE)
+    cdm[[name]] <- fulfillCohortReqs(cdm = cdm, name = name, inObservation = TRUE, useIndexes = useIndexes)
   }
 
   cdm[[name]] <- omopgenerics::newCohortTable(table = cdm[[name]])
@@ -381,11 +381,27 @@ unerafiedConceptCohort <- function(cdm,
   return(cohort)
 }
 
-fulfillCohortReqs <- function(cdm, name, inObservation, type = "start_end") {
+fulfillCohortReqs <- function(cdm, name, inObservation, type = "start_end", useIndexes) {
   # 1) inObservation == TRUE and start is out of observation, drop cohort entry.
   #    inObservation == FALSE and start is out of observation move to observation start
   # 2) inObservation == TRUE and end is after observation end, set cohort end as observation end,
   #    inObservation == FALSE and end is after observation end set cohort end as observation start
+
+  # start by inner join with observation to use indexes
+  cdm[[name]] <- cdm[[name]] |>
+    dplyr::left_join(
+      cdm$observation_period |>
+        dplyr::select(
+          "person_id",
+          "observation_period_id",
+          "observation_period_start_date",
+          "observation_period_end_date"
+        ),
+      by = c("subject_id" = "person_id")
+    ) |>
+    dplyr::compute(temporary = FALSE, name = name,
+                   logPrefix = "CohortConstructor_fulfillCohortReqs_observationJoin_")
+
   if (type == "start_end") {
     cdm[[name]] <- cdm[[name]] |>
       dplyr::filter(
@@ -404,20 +420,6 @@ fulfillCohortReqs <- function(cdm, name, inObservation, type = "start_end") {
                      logPrefix = "CohortConstructor_fulfillCohortReqs_filterStart_") |>
       omopgenerics::recordCohortAttrition(reason = "Not missing record date")
   }
-
-  cdm[[name]] <- cdm[[name]] |>
-    dplyr::left_join(
-      cdm$observation_period |>
-        dplyr::select(
-          "person_id",
-          "observation_period_id",
-          "observation_period_start_date",
-          "observation_period_end_date"
-        ),
-      by = c("subject_id" = "person_id")
-    ) |>
-    dplyr::compute(temporary = FALSE, name = name,
-                   logPrefix = "CohortConstructor_fulfillCohortReqs_observationJoin_")
 
   if (!inObservation) {
     cdm[[name]] <- cdm[[name]] %>%
@@ -478,6 +480,33 @@ fulfillCohortReqs <- function(cdm, name, inObservation, type = "start_end") {
                    logPrefix = "CohortConstructor_fulfillCohortReqs_inObservation_") |>
     omopgenerics::recordCohortAttrition(reason = "Record in observation")
 
+  # remove missing sex or date of birth
+  if (!isFALSE(useIndexes)) {
+    addIndex(
+      cohort = cdm[[name]],
+      cols = c("subject_id")
+    )
+  }
+  cdm[[name]] <- cdm[[name]] |>
+    dplyr::inner_join(
+      cdm$person |>
+        dplyr::select("subject_id" = "person_id", "gender_concept_id", "year_of_birth"),
+      by = "subject_id"
+    ) |>
+    dplyr::filter(!is.na(.data$gender_concept_id)) |>
+    dplyr::compute(temporary = FALSE, name = name,
+                   logPrefix = "CohortConstructor_fulfillCohortReqs_sex_") |>
+    omopgenerics::recordCohortAttrition(reason = "Non-missing sex") |>
+    dplyr::filter(!is.na(.data$year_of_birth)) |>
+    dplyr::select(
+      "cohort_definition_id",
+      "subject_id",
+      "cohort_start_date",
+      "cohort_end_date"
+    ) |>
+    dplyr::compute(temporary = FALSE, name = name,
+                   logPrefix = "CohortConstructor_fulfillCohortReqs_birth_year_") |>
+    omopgenerics::recordCohortAttrition(reason = "Non-missing year of birth")
 }
 
 
