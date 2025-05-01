@@ -2,7 +2,7 @@
 % Please edit documentation in R/trimDemographics.R
 \name{trimDemographics}
 \alias{trimDemographics}
-\title{Restrict cohort on patient demographics}
+\title{Trim cohort on patient demographics}
 \usage{
 trimDemographics(
   cohort,

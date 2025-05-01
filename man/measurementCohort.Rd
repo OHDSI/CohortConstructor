@@ -2,7 +2,7 @@
 % Please edit documentation in R/measurementCohort.R
 \name{measurementCohort}
 \alias{measurementCohort}
-\title{Create cohorts measurement based cohorts}
+\title{Create measurement-based cohorts}
 \usage{
 measurementCohort(
   cdm,

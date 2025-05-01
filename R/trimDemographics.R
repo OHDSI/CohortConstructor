@@ -1,4 +1,4 @@
-#' Restrict cohort on patient demographics
+#' Trim cohort on patient demographics
 #'
 #' @description
 #' `trimDemographics()` resets the cohort start and end date based on the
