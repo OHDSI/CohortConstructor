@@ -31,7 +31,7 @@ uniqueColumnName <- function(table, n = 1) {
   newCols <- paste0("cohortconstructor_", 1:n)
   ids <- newCols %in% cols
   while (any(ids)) {
-    newCols <- paste0(newCols, round(runif(1, max = 10)))
+    newCols <- paste0(newCols, round(stats::runif(1, max = 10)))
     ids <- newCols %in% cols
   }
   return(newCols)

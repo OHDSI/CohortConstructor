@@ -29,7 +29,9 @@
 #' # Can also create multiple demographic cohorts, and add minimum prior history requirements.
 #'
 #' cohort <- cdm |>
-#'     demographicsCohort(name = "cohort4", ageRange = list(c(0, 19),c(20, 64),c(65, 150)), sex = c("Male", "Female", "Both"),
+#'     demographicsCohort(name = "cohort4",
+#'     ageRange = list(c(0, 19),c(20, 64),c(65, 150)),
+#'     sex = c("Male", "Female", "Both"),
 #'     minPriorObservation = 365)
 #'
 #'attrition(cohort)
