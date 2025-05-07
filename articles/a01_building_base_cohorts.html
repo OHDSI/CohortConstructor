@@ -286,11 +286,11 @@ can set <code>useSourceFields = TRUE</code>.</p>
 <span>  <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Rows: ??</span></span>
 <span><span class="co">#&gt; Columns: 4</span></span>
-<span><span class="co">#&gt; Database: DuckDB v1.2.2 [unknown@Linux 6.11.0-1012-azure:R 4.5.0//tmp/Rtmpx45m1I/file26d87b5a4ae1.duckdb]</span></span>
+<span><span class="co">#&gt; Database: DuckDB v1.2.2 [unknown@Linux 6.11.0-1013-azure:R 4.5.0//tmp/Rtmp9FsJb5/file26b433ecfeca.duckdb]</span></span>
 <span><span class="co">#&gt; $ cohort_definition_id <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> 1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1…</span></span>
-<span><span class="co">#&gt; $ subject_id           <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> 404<span style="color: #949494;">, </span>1015<span style="color: #949494;">, </span>2412<span style="color: #949494;">, </span>3423<span style="color: #949494;">, </span>3752<span style="color: #949494;">, </span>4261<span style="color: #949494;">, </span>4506<span style="color: #949494;">, </span>4898<span style="color: #949494;">, </span>26…</span></span>
-<span><span class="co">#&gt; $ cohort_start_date    <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 2001-12-21<span style="color: #949494;">, </span>1988-06-04<span style="color: #949494;">, </span>1994-12-01<span style="color: #949494;">, </span>2012-01-31<span style="color: #949494;">, </span>…</span></span>
-<span><span class="co">#&gt; $ cohort_end_date      <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 2001-12-21<span style="color: #949494;">, </span>1988-06-04<span style="color: #949494;">, </span>1994-12-01<span style="color: #949494;">, </span>2012-01-31<span style="color: #949494;">, </span>…</span></span></code></pre></div>
+<span><span class="co">#&gt; $ subject_id           <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> 99<span style="color: #949494;">, </span>895<span style="color: #949494;">, </span>2220<span style="color: #949494;">, </span>4791<span style="color: #949494;">, </span>5200<span style="color: #949494;">, </span>188<span style="color: #949494;">, </span>1571<span style="color: #949494;">, </span>2190<span style="color: #949494;">, </span>2266<span style="color: #949494;">,</span>…</span></span>
+<span><span class="co">#&gt; $ cohort_start_date    <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 2000-01-03<span style="color: #949494;">, </span>2005-12-10<span style="color: #949494;">, </span>1987-07-23<span style="color: #949494;">, </span>2004-08-03<span style="color: #949494;">, </span>…</span></span>
+<span><span class="co">#&gt; $ cohort_end_date      <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 2000-01-03<span style="color: #949494;">, </span>2005-12-10<span style="color: #949494;">, </span>1987-07-23<span style="color: #949494;">, </span>2004-08-03<span style="color: #949494;">, </span>…</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="demographic-based-cohort-creation">Demographic based cohort creation<a class="anchor" aria-label="anchor" href="#demographic-based-cohort-creation"></a>
@@ -469,7 +469,7 @@ BMI score then it is included in the cohort.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1 bmi_normal  5.3         mock</span></span>
 <span><span class="va">cdm</span><span class="op">$</span><span class="va">cohort</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Source:   table&lt;cohort&gt; [?? x 4]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB v1.2.2 [unknown@Linux 6.11.0-1012-azure:R 4.5.0/:memory:]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB v1.2.2 [unknown@Linux 6.11.0-1013-azure:R 4.5.0/:memory:]</span></span></span>
 <span><span class="co">#&gt;   cohort_definition_id subject_id cohort_start_date cohort_end_date</span></span>
 <span><span class="co">#&gt;                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>         </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1          1 2015-02-19        2015-02-19     </span></span>
@@ -508,7 +508,7 @@ setting the <code>inObservation</code> argument to false.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1 bmi_normal  5.3         mock</span></span>
 <span><span class="va">cdm</span><span class="op">$</span><span class="va">cohort</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Source:   table&lt;cohort&gt; [?? x 4]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB v1.2.2 [unknown@Linux 6.11.0-1012-azure:R 4.5.0/:memory:]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB v1.2.2 [unknown@Linux 6.11.0-1013-azure:R 4.5.0/:memory:]</span></span></span>
 <span><span class="co">#&gt;   cohort_definition_id subject_id cohort_start_date cohort_end_date</span></span>
 <span><span class="co">#&gt;                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>         </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1          1 2015-02-19        2015-02-19     </span></span>
