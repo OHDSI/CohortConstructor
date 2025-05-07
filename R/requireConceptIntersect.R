@@ -188,12 +188,15 @@ getIntersectionCodelist <- function(cohort, cohortId, codelist) {
   intersectCodelist <- lapply(
     as.list(cohortId),
     function(x, tab = codelist) {
-      tab |> dplyr::mutate(cohort_definition_id = .env$x)
+      tab |>
+        dplyr::mutate(cohort_definition_id = .env$x) |>
+        dplyr::select(!dplyr::any_of(c("type", "codelist_type")))
     }) |>
     dplyr::bind_rows() |>
     dplyr::mutate(type = .env$criteria)
   newCodelist <- attr(cohort, "cohort_codelist") |>
     dplyr::collect() |>
+    dplyr::rename(type = dplyr::any_of("codelist_type")) |>
     dplyr::union(intersectCodelist) |>
     dplyr::arrange(.data$cohort_definition_id)
   return(newCodelist)
