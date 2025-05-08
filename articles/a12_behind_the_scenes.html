@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">CohortConstructor</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -136,7 +136,7 @@ database the SQL would be adapted accordingly.</p>
 <span>  <span class="va">sql_with_quotes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">'"'</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/readLines.html" class="external-link">readLines</a></span><span class="op">(</span><span class="va">sorted_files</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span>, collapse <span class="op">=</span> <span class="st">'\n'</span><span class="op">)</span>, <span class="st">'"'</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">sql_with_quotes</span>, <span class="st">"\n```\n\n"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
-<span><span class="co">#&gt; ### /tmp/RtmpPGB4gE/sql_folder/CohortConstructor_uploadCohortCodelistlogged_query_ran_on_2025_05_07_at_16_14_57.sql</span></span>
+<span><span class="co">#&gt; ### /tmp/Rtmp85v0Zf/sql_folder/CohortConstructor_uploadCohortCodelistlogged_query_ran_on_2025_05_08_at_11_41_55.sql</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "&lt;SQL&gt;</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span></span></span>
@@ -144,14 +144,14 @@ database the SQL would be adapted accordingly.</p>
 <span><span class="co">#&gt;   CAST(concept_id AS INTEGER)<span style="color: #0000BB;"> AS </span>concept_id,</span></span>
 <span><span class="co">#&gt;   LOWER(domain_id)<span style="color: #0000BB;"> AS </span>domain_id</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> (</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> my_study_tmp_001_og_004_1746634497.*, domain_id</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> my_study_tmp_001_og_004_1746634497</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> my_study_tmp_001_og_004_1746704515.*, domain_id</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> my_study_tmp_001_og_004_1746704515</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">LEFT JOIN</span> concept</span></span>
-<span><span class="co">#&gt;     <span style="color: #0000BB;">ON</span> (my_study_tmp_001_og_004_1746634497.concept_id = concept.concept_id)</span></span>
+<span><span class="co">#&gt;     <span style="color: #0000BB;">ON</span> (my_study_tmp_001_og_004_1746704515.concept_id = concept.concept_id)</span></span>
 <span><span class="co">#&gt; ) q01" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/RtmpPGB4gE/sql_folder/CohortConstructor_tempCohort_logged_query_ran_on_2025_05_07_at_16_14_57.sql</span></span>
+<span><span class="co">#&gt; ### /tmp/Rtmp85v0Zf/sql_folder/CohortConstructor_tempCohort_logged_query_ran_on_2025_05_08_at_11_41_55.sql</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "&lt;SQL&gt;</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span></span></span>
@@ -163,13 +163,13 @@ database the SQL would be adapted accordingly.</p>
 <span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> drug_exposure</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">INNER JOIN</span> (</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> concept_id, cohort_definition_id</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> my_study_tmp_001_og_004_1746634497</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> my_study_tmp_001_og_004_1746704515</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">WHERE</span> (domain_id IN ('drug'))</span></span>
 <span><span class="co">#&gt; ) RHS</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">ON</span> (drug_exposure.drug_concept_id = RHS.concept_id)" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/RtmpPGB4gE/sql_folder/CohortConstructor_conceptCohort_reduce_logged_query_ran_on_2025_05_07_at_16_14_58.sql</span></span>
+<span><span class="co">#&gt; ### /tmp/Rtmp85v0Zf/sql_folder/CohortConstructor_conceptCohort_reduce_logged_query_ran_on_2025_05_08_at_11_41_55.sql</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "&lt;SQL&gt;</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span></span></span>
@@ -177,10 +177,10 @@ database the SQL would be adapted accordingly.</p>
 <span><span class="co">#&gt;   subject_id,</span></span>
 <span><span class="co">#&gt;   cohort_start_date,</span></span>
 <span><span class="co">#&gt;   COALESCE(cohort_end_date, cohort_start_date)<span style="color: #0000BB;"> AS </span>cohort_end_date</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> my_study_og_005_1746634498_1" </span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> my_study_og_005_1746704515_1" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/RtmpPGB4gE/sql_folder/CohortConstructor_fulfillCohortReqs_observationJoin_logged_query_ran_on_2025_05_07_at_16_14_58.sql</span></span>
+<span><span class="co">#&gt; ### /tmp/Rtmp85v0Zf/sql_folder/CohortConstructor_fulfillCohortReqs_observationJoin_logged_query_ran_on_2025_05_08_at_11_41_56.sql</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "&lt;SQL&gt;</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span></span></span>
@@ -193,7 +193,7 @@ database the SQL would be adapted accordingly.</p>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">ON</span> (my_study_drugs.subject_id = observation_period.person_id)" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/RtmpPGB4gE/sql_folder/CohortConstructor_fulfillCohortReqs_filterStartEnd_logged_query_ran_on_2025_05_07_at_16_14_58.sql</span></span>
+<span><span class="co">#&gt; ### /tmp/Rtmp85v0Zf/sql_folder/CohortConstructor_fulfillCohortReqs_filterStartEnd_logged_query_ran_on_2025_05_08_at_11_41_56.sql</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "&lt;SQL&gt;</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> my_study_drugs.*</span></span>
@@ -203,7 +203,7 @@ database the SQL would be adapted accordingly.</p>
 <span><span class="co">#&gt;   (cohort_start_date &lt;= cohort_end_date)" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/RtmpPGB4gE/sql_folder/CohortConstructor_fulfillCohortReqs_inObservation_logged_query_ran_on_2025_05_07_at_16_14_59.sql</span></span>
+<span><span class="co">#&gt; ### /tmp/Rtmp85v0Zf/sql_folder/CohortConstructor_fulfillCohortReqs_inObservation_logged_query_ran_on_2025_05_08_at_11_41_57.sql</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "&lt;SQL&gt;</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span></span></span>
@@ -217,7 +217,7 @@ database the SQL would be adapted accordingly.</p>
 <span><span class="co">#&gt;   (cohort_start_date &lt;= observation_period_end_date)" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/RtmpPGB4gE/sql_folder/CohortConstructor_fulfillCohortReqs_sex_logged_query_ran_on_2025_05_07_at_16_14_59.sql</span></span>
+<span><span class="co">#&gt; ### /tmp/Rtmp85v0Zf/sql_folder/CohortConstructor_fulfillCohortReqs_sex_logged_query_ran_on_2025_05_08_at_11_41_57.sql</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "&lt;SQL&gt;</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> q01.*</span></span>
@@ -230,7 +230,7 @@ database the SQL would be adapted accordingly.</p>
 <span><span class="co">#&gt; <span style="color: #0000BB;">WHERE</span> (NOT((gender_concept_id IS NULL)))" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/RtmpPGB4gE/sql_folder/CohortConstructor_fulfillCohortReqs_birth_year_logged_query_ran_on_2025_05_07_at_16_15_00.sql</span></span>
+<span><span class="co">#&gt; ### /tmp/Rtmp85v0Zf/sql_folder/CohortConstructor_fulfillCohortReqs_birth_year_logged_query_ran_on_2025_05_08_at_11_41_58.sql</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "&lt;SQL&gt;</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> cohort_definition_id, subject_id, cohort_start_date, cohort_end_date</span></span>
@@ -238,7 +238,7 @@ database the SQL would be adapted accordingly.</p>
 <span><span class="co">#&gt; <span style="color: #0000BB;">WHERE</span> (NOT((year_of_birth IS NULL)))" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/RtmpPGB4gE/sql_folder/CohortConstructor_joinOverlap_workingTbl_logged_query_ran_on_2025_05_07_at_16_15_01.sql</span></span>
+<span><span class="co">#&gt; ### /tmp/Rtmp85v0Zf/sql_folder/CohortConstructor_joinOverlap_workingTbl_logged_query_ran_on_2025_05_08_at_11_41_59.sql</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "&lt;SQL&gt;</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> q01.*, -1.0<span style="color: #0000BB;"> AS </span>date_id</span></span>
@@ -256,7 +256,7 @@ database the SQL would be adapted accordingly.</p>
 <span><span class="co">#&gt; ) q01" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/RtmpPGB4gE/sql_folder/CohortConstructor_joinOverlap_ids_logged_query_ran_on_2025_05_07_at_16_15_01.sql</span></span>
+<span><span class="co">#&gt; ### /tmp/Rtmp85v0Zf/sql_folder/CohortConstructor_joinOverlap_ids_logged_query_ran_on_2025_05_08_at_11_41_59.sql</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "&lt;SQL&gt;</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span></span></span>
@@ -267,16 +267,16 @@ database the SQL would be adapted accordingly.</p>
 <span><span class="co">#&gt;   date</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> (</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span></span></span>
-<span><span class="co">#&gt;     my_study_og_006_1746634501.*,</span></span>
+<span><span class="co">#&gt;     my_study_og_006_1746704519.*,</span></span>
 <span><span class="co">#&gt;     SUM(date_id) OVER (PARTITION BY cohort_definition_id, subject_id ORDER BY date, date_id ROWS UNBOUNDED PRECEDING)<span style="color: #0000BB;"> AS </span>cum_id,</span></span>
 <span><span class="co">#&gt;     CASE WHEN (date_id = -1.0) THEN 'cohort_start_date' WHEN NOT (date_id = -1.0) THEN 'cohort_end_date' END<span style="color: #0000BB;"> AS </span>"name",</span></span>
 <span><span class="co">#&gt;     CASE WHEN (date_id = -1.0) THEN 1.0 WHEN NOT (date_id = -1.0) THEN 0.0 END<span style="color: #0000BB;"> AS </span>era_id</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> my_study_og_006_1746634501</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> my_study_og_006_1746704519</span></span>
 <span><span class="co">#&gt; ) q01</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">WHERE</span> (cum_id = 0.0 OR (cum_id = -1.0 AND date_id = -1.0))" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/RtmpPGB4gE/sql_folder/CohortConstructor_joinOverlap_pivot_wider_logged_query_ran_on_2025_05_07_at_16_15_02.sql</span></span>
+<span><span class="co">#&gt; ### /tmp/Rtmp85v0Zf/sql_folder/CohortConstructor_joinOverlap_pivot_wider_logged_query_ran_on_2025_05_08_at_11_42_00.sql</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "&lt;SQL&gt;</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span></span></span>
@@ -284,11 +284,11 @@ database the SQL would be adapted accordingly.</p>
 <span><span class="co">#&gt;   subject_id,</span></span>
 <span><span class="co">#&gt;   MAX(CASE WHEN ("name" = 'cohort_end_date') THEN date END)<span style="color: #0000BB;"> AS </span>cohort_end_date,</span></span>
 <span><span class="co">#&gt;   MAX(CASE WHEN ("name" = 'cohort_start_date') THEN date END)<span style="color: #0000BB;"> AS </span>cohort_start_date</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> my_study_og_006_1746634501</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> my_study_og_006_1746704519</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">GROUP BY</span> cohort_definition_id, subject_id, era_id" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/RtmpPGB4gE/sql_folder/CohortConstructor_joinOverlap_relocate_logged_query_ran_on_2025_05_07_at_16_15_02.sql</span></span>
+<span><span class="co">#&gt; ### /tmp/Rtmp85v0Zf/sql_folder/CohortConstructor_joinOverlap_relocate_logged_query_ran_on_2025_05_08_at_11_42_00.sql</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "&lt;SQL&gt;</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">SELECT DISTINCT</span></span></span>
@@ -296,7 +296,7 @@ database the SQL would be adapted accordingly.</p>
 <span><span class="co">#&gt;   subject_id,</span></span>
 <span><span class="co">#&gt;   cohort_start_date,</span></span>
 <span><span class="co">#&gt;   cohort_end_date</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> my_study_og_006_1746634501" </span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> my_study_og_006_1746704519" </span></span>
 <span><span class="co">#&gt; ```</span></span></code></pre></div>
 <p>If we want even more detail, we also have the option to see the
 execution plan along with the SQL.</p>
@@ -316,7 +316,7 @@ execution plan along with the SQL.</p>
 <span>  <span class="va">sql_with_quotes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">'"'</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/readLines.html" class="external-link">readLines</a></span><span class="op">(</span><span class="va">files</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span>, collapse <span class="op">=</span> <span class="st">'\n'</span><span class="op">)</span>, <span class="st">'"'</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">sql_with_quotes</span>, <span class="st">"\n```\n\n"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
-<span><span class="co">#&gt; ### CohortConstructor_requireIsFirstEntry_min_logged_query_ran_on_2025_05_07_at_16_15_03.sql</span></span>
+<span><span class="co">#&gt; ### CohortConstructor_requireIsFirstEntry_min_logged_query_ran_on_2025_05_08_at_11_42_02.sql</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "&lt;SQL&gt;</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> cohort_definition_id, subject_id, cohort_start_date, cohort_end_date</span></span>
