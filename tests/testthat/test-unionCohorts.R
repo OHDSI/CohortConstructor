@@ -260,7 +260,7 @@ test_that("test codelist", {
   codes <- attr(cdm$cohort2, "cohort_codelist")
   expect_true(all(codes |> dplyr::pull("codelist_name") |> sort() == c(rep("c1", 2), "c2")))
   expect_true(all(codes |> dplyr::pull("concept_id") |> sort() == c(1, 2, 3)))
-  expect_true(all(codes |> dplyr::pull("type") |> sort() == rep("index event", 3)))
+  expect_true(all(codes |> dplyr::pull("codelist_type") |> sort() == rep("index event", 3)))
   expect_true(all(codes |> dplyr::pull("cohort_definition_id") |> sort() == c(1, 1, 1)))
 
   # union concept + non concept cohorts
@@ -280,7 +280,7 @@ test_that("test codelist", {
   codes <- attr(cdm$cohort4, "cohort_codelist")
   expect_true(all(codes |> dplyr::pull("codelist_name") |> sort() == c(rep("c1", 2), "c2")))
   expect_true(all(codes |> dplyr::pull("concept_id") |> sort() == c(1, 2, 3)))
-  expect_true(all(codes |> dplyr::pull("type") |> sort() == rep("index event", 3)))
+  expect_true(all(codes |> dplyr::pull("codelist_type") |> sort() == rep("index event", 3)))
   expect_true(all(codes |> dplyr::pull("cohort_definition_id") |> sort() == c(1, 1, 1)))
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
