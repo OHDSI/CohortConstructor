@@ -54,7 +54,7 @@ test_that("mearurementCohorts works", {
   )
 
   expect_true(
-    all(colnames(attr(cdm$cohort, "cohort_codelist")) == c("cohort_definition_id", "codelist_name", "concept_id", "type"))
+    all(colnames(attr(cdm$cohort, "cohort_codelist")) == c("cohort_definition_id", "codelist_name", "concept_id", "codelist_type"))
   )
 
   if(isDuckdb){
