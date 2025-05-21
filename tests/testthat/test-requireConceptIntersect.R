@@ -371,7 +371,7 @@ test_that("codelists", {
       cohort_definition_id = 1:2,
       codelist_name = "a",
       concept_id = 194152L,
-      type = "inclusion criteria"
+      codelist_type = "inclusion criteria"
     )
   )
 
@@ -386,7 +386,7 @@ test_that("codelists", {
       cohort_definition_id = c(1L, 1L, 2L, 2L),
       codelist_name = c("a", "a", "b", "a"),
       concept_id = c(194152L, 194152L, 4151660L, 194152L),
-      type = c("index event", "inclusion criteria", "index event", "inclusion criteria")
+      codelist_type c("index event", "inclusion criteria", "index event", "inclusion criteria")
     )
   )
 
