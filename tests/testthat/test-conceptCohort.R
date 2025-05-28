@@ -1246,7 +1246,7 @@ test_that("conceptSetExpression", {
   codes <- CodelistGenerator::codesFromConceptSet(
     cdm = cdm,
     path = here::here("extras", "ConceptSet"),
-    codelist_type = "concept_set_expression"
+    type = "concept_set_expression"
   )
   cdm$cohort <- conceptCohort(
     cdm = cdm,
