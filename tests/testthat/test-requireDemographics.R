@@ -1,10 +1,58 @@
 test_that("test it works and expected errors", {
   testthat::skip_on_cran()
-  cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 10, seed = 1) |>
-    omock::mockObservationPeriod(seed = 1) |>
-    omock::mockCohort(seed = 1)
-  # to remove in new omock
+
+  person <- dplyr::tibble(
+    person_id = 1:10,
+    gender_concept_id = c(8507L, 8532L, 8532L, 8507L, 8532L, 8532L, 8507L, 8532L, 8507L, 8507L),
+    year_of_birth = c(1997L, 1963L, 1986L, 1978L, 1973L, 1961L, 1986L, 1981L, 1983L, 1998L),
+    month_of_birth = c(8L, 1L, 3L, 11L, 3L, 2L, 12L, 9L, 7L, 6L),
+    day_of_birth = c(22L, 27L, 10L, 8L, 2L, 1L, 16L, 5L, 23L, 2L),
+    race_concept_id = NA_integer_,
+    ethnicity_concept_id = NA_integer_
+  )
+
+  obs <- dplyr::tibble(
+    observation_period_id = 1:10,
+    person_id = 1:10,
+    observation_period_start_date = as.Date(c(
+      "2000-06-03", "1999-04-05", "2015-01-15", "1989-12-09",
+      "2012-03-18", "2010-11-13", "2014-03-04", "1984-10-07",
+      "1985-12-16", "2019-11-23"
+    )),
+    observation_period_end_date = as.Date(c(
+      "2013-06-29", "2003-06-15", "2015-10-11", "2013-12-31",
+      "2013-02-10", "2015-04-15", "2014-04-09", "2009-03-10",
+      "2009-09-17", "2019-12-26"
+    )),
+    period_type_concept_id = NA_integer_
+  )
+
+  cohort_1 <- dplyr::tibble(
+    cohort_definition_id = rep(1L, 10),
+    subject_id = c(1L, 1L, 2L, 2L, 3L, 4L, 5L, 5L, 7L, 7L),
+    cohort_start_date = as.Date(c(
+      "2001-05-30", "2003-05-02", "2000-05-04", "2000-05-18",
+      "2015-01-27", "1996-06-30", "2012-03-20", "2012-05-01",
+      "2014-03-07", "2014-03-08"
+    )),
+    cohort_end_date = as.Date(c(
+      "2003-05-01", "2006-06-10", "2000-05-17", "2001-01-23",
+      "2015-06-28", "1998-11-20", "2012-04-30", "2012-07-24",
+      "2014-03-07", "2014-03-20"
+    ))
+  )
+
+  cdm_local <- omock::mockCdmFromTables(
+    tables = list(
+      "cohort" = cohort_1
+    ),
+    seed = 1
+  )
+
+  cdm_local <- omopgenerics::insertTable(cdm = cdm_local, name = "observation_period", table = obs)
+
+  cdm_local <- omopgenerics::insertTable(cdm = cdm_local, name = "person", table = person)
+
   cdm_local$person <- cdm_local$person |>
     dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
   cdm <- cdm_local |> copyCdm()
@@ -169,10 +217,46 @@ test_that("restrictions applied to single cohort", {
 
 test_that("ignore existing cohort extra variables", {
   testthat::skip_on_cran()
-  cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 1,seed = 1) |>
-    omock::mockObservationPeriod(seed = 1) |>
-    omock::mockCohort(recordPerson = 3,seed = 1)
+
+  cohort_1 <- dplyr::tibble(
+    cohort_definition_id = c(1L, 1L, 1L),
+    subject_id = c(1L, 1L, 1L),
+    cohort_start_date = as.Date(c("2001-03-30", "2003-06-15", "2003-10-03")),
+    cohort_end_date = as.Date(c("2003-06-14", "2003-10-02", "2004-09-10"))
+  )
+
+  person <- dplyr::tibble(
+    person_id = 1L,
+    gender_concept_id = 8507L,
+    year_of_birth = 1997L,
+    month_of_birth = 8L,
+    day_of_birth = 22L,
+    race_concept_id = NA_integer_,
+    ethnicity_concept_id = NA_integer_
+  )
+
+  obs <- dplyr::tibble(
+    observation_period_id = 1L,
+    person_id = 1L,
+    observation_period_start_date = as.Date("2000-06-03"),
+    observation_period_end_date = as.Date("2013-06-29"),
+    period_type_concept_id = NA_integer_
+  )
+
+  cdm_local <- omock::mockCdmFromTables(
+    tables = list(
+      "cohort" = cohort_1
+    ),
+    seed = 1
+  )
+
+  cdm_local <- omopgenerics::insertTable(
+    cdm = cdm_local, name = "observation_period", table = obs)
+
+  cdm_local <- omopgenerics::insertTable(
+    cdm = cdm_local, name = "person", table = person)
+
+
   # to remove in new omock
   cdm_local$person <- cdm_local$person |>
     dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
@@ -235,11 +319,53 @@ test_that("external columns kept after requireDemographics", {
 
 test_that("cohortIds", {
   testthat::skip_on_cran()
-  cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 3,seed = 1) |>
-    omock::mockObservationPeriod(seed = 1) |>
-    omock::mockCohort(numberCohorts = 3,seed = 1)
-  # to remove in new omock
+
+  person <- dplyr::tibble(
+    person_id = c(1L, 2L, 3L),
+    gender_concept_id = c(8532L, 8532L, 8532L),
+    year_of_birth = c(1997L, 1963L, 1986L),
+    month_of_birth = c(8L, 1L, 3L),
+    day_of_birth = c(22L, 27L, 10L),
+    race_concept_id = c(NA_integer_, NA_integer_, NA_integer_),
+    ethnicity_concept_id = c(NA_integer_, NA_integer_, NA_integer_)
+  )
+
+  obs <- dplyr::tibble(
+    observation_period_id = 1:3,
+    person_id = 1:3,
+    observation_period_start_date = as.Date(c("2000-06-03", "1999-04-05", "2015-01-15")),
+    observation_period_end_date = as.Date(c("2013-06-29", "2003-06-15", "2015-10-11")),
+    period_type_concept_id = NA_integer_
+  )
+
+  cohort_1 <- dplyr::tibble(
+    cohort_definition_id = c(1L, 1L, 1L, 2L, 2L, 2L, 3L, 3L, 3L),
+    subject_id = c(1L, 1L, 2L, 1L, 1L, 1L, 2L, 2L, 2L),
+    cohort_start_date = as.Date(c(
+      "2003-06-15", "2004-09-11", "1999-12-17",
+      "2000-06-23", "2001-07-16", "2001-12-04",
+      "1999-11-16", "1999-12-19", "2000-05-15"
+    )),
+    cohort_end_date = as.Date(c(
+      "2004-09-10", "2005-07-25", "2001-02-23",
+      "2001-07-15", "2001-12-03", "2006-09-27",
+      "1999-12-18", "2000-05-14", "2001-08-26"
+    ))
+  )
+
+  cdm_local <- omock::mockCdmFromTables(
+    tables = list(
+      "cohort" = cohort_1
+    ),
+    seed = 1
+  )
+
+  cdm_local <- omopgenerics::insertTable(
+    cdm = cdm_local, name = "observation_period", table = obs)
+
+  cdm_local <- omopgenerics::insertTable(
+    cdm = cdm_local, name = "person", table = person)
+
   cdm_local$person <- cdm_local$person |>
     dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
   cdm <- cdm_local |> copyCdm()

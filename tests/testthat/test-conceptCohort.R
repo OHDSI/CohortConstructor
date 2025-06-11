@@ -254,9 +254,31 @@ test_that("excluded concepts in codelist", {
 
 test_that("out of observation", {
   testthat::skip_on_cran()
-  cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4, seed = 1) |>
-    omock::mockObservationPeriod(seed = 1)
+
+  person <- dplyr::tibble(
+    person_id = 1:4,
+    gender_concept_id = c(8532L, 8507L, 8507L, 8507L),
+    year_of_birth = c(1997L, 1963L, 1986L, 1978L),
+    month_of_birth = c(8L, 1L, 3L, 11L),
+    day_of_birth = c(22L, 27L, 10L, 8L),
+    race_concept_id = NA_integer_,
+    ethnicity_concept_id = NA_integer_
+  )
+
+  obs <- dplyr::tibble(
+    observation_period_id = 1:4,
+    person_id = 1:4,
+    observation_period_start_date = as.Date(c("2000-06-03", "1999-04-05", "2015-01-15", "1989-12-09")),
+    observation_period_end_date = as.Date(c("2013-06-29", "2003-06-15", "2015-10-11", "2013-12-31")),
+    period_type_concept_id = NA_integer_
+  )
+
+  cdm_local <- omock::mockCdmReference()
+
+  cdm_local <- omopgenerics::insertTable(cdm = cdm_local, name = "observation_period", table = obs)
+
+  cdm_local <- omopgenerics::insertTable(cdm = cdm_local, name = "person", table = person)
+
   cdm_local$concept <- dplyr::tibble(
     "concept_id" = c(1L, 2L),
     "concept_name" = c("my concept 1", "my concept 2"),
@@ -314,9 +336,30 @@ test_that("out of observation", {
   # event starts in, ends out (subject 1)
   # event starts out, end in (subject 3)
   # no concept 2
-  cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4, seed = 1) |>
-    omock::mockObservationPeriod(seed = 1)
+  person <- dplyr::tibble(
+    person_id = 1:4,
+    gender_concept_id = c(8532L, 8507L, 8507L, 8507L),
+    year_of_birth = c(1997L, 1963L, 1986L, 1978L),
+    month_of_birth = c(8L, 1L, 3L, 11L),
+    day_of_birth = c(22L, 27L, 10L, 8L),
+    race_concept_id = NA_integer_,
+    ethnicity_concept_id = NA_integer_
+  )
+
+  obs <- dplyr::tibble(
+    observation_period_id = 1:4,
+    person_id = 1:4,
+    observation_period_start_date = as.Date(c("2000-06-03", "1999-04-05", "2015-01-15", "1989-12-09")),
+    observation_period_end_date = as.Date(c("2013-06-29", "2003-06-15", "2015-10-11", "2013-12-31")),
+    period_type_concept_id = NA_integer_
+  )
+
+  cdm_local <- omock::mockCdmReference()
+
+  cdm_local <- omopgenerics::insertTable(cdm = cdm_local, name = "observation_period", table = obs)
+
+  cdm_local <- omopgenerics::insertTable(cdm = cdm_local, name = "person", table = person)
+
   cdm_local$concept <- dplyr::tibble(
     "concept_id" = c(1L, 2L),
     "concept_name" = c("my concept 1", "my concept 2"),
@@ -355,9 +398,29 @@ test_that("out of observation", {
   # overlapping and out of observation (subject 2)
   # out of observation (subject 3)
   # overlapping (subject 4)
-  cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4, seed = 1) |>
-    omock::mockObservationPeriod(seed = 1)
+  person <- dplyr::tibble(
+    person_id = 1:4,
+    gender_concept_id = c(8532L, 8507L, 8507L, 8507L),
+    year_of_birth = c(1997L, 1963L, 1986L, 1978L),
+    month_of_birth = c(8L, 1L, 3L, 11L),
+    day_of_birth = c(22L, 27L, 10L, 8L),
+    race_concept_id = NA_integer_,
+    ethnicity_concept_id = NA_integer_
+  )
+
+  obs <- dplyr::tibble(
+    observation_period_id = 1:4,
+    person_id = 1:4,
+    observation_period_start_date = as.Date(c("2000-06-03", "1999-04-05", "2015-01-15", "1989-12-09")),
+    observation_period_end_date = as.Date(c("2013-06-29", "2003-06-15", "2015-10-11", "2013-12-31")),
+    period_type_concept_id = NA_integer_
+  )
+
+  cdm_local <- omock::mockCdmReference()
+
+  cdm_local <- omopgenerics::insertTable(cdm = cdm_local, name = "observation_period", table = obs)
+
+  cdm_local <- omopgenerics::insertTable(cdm = cdm_local, name = "person", table = person)
   cdm_local$concept <- dplyr::tibble(
     "concept_id" = c(1L, 2L),
     "concept_name" = c("my concept 1", "my concept 2"),

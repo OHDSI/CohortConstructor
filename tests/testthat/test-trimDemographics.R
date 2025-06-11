@@ -323,10 +323,69 @@ test_that("simple duckdb checks", {
 
 test_that("cohort Id, name, additional columns", {
   testthat::skip_on_cran()
-  cdm <- mockCohortConstructor(nPerson = 5,
-                               con = connection(),
-                               writeSchema = writeSchema(),
-                               seed = 1)
+
+  cohort_1 <- dplyr::tibble(
+    cohort_definition_id = 1L,
+    subject_id = c(1L, 1L, 2L, 3L, 4L),
+    cohort_start_date = as.Date(c(
+      "2001-04-03", "2002-05-07", "1999-07-26", "2015-02-19", "1990-09-07"
+    )),
+    cohort_end_date = as.Date(c(
+      "2002-05-06", "2005-11-07", "2002-09-17", "2015-06-27", "2008-02-19"
+    ))
+  )
+
+  cohort_2 <- dplyr::tibble(
+    cohort_definition_id = c(rep(1L, 5), rep(2L, 5)),
+    subject_id = c(1L, 1L, 2L, 3L, 4L, 1L, 1L, 2L, 3L, 4L),
+    cohort_start_date = as.Date(c(
+      # Cohort 1
+      "2001-04-03", "2002-05-07", "1999-07-26", "2015-02-19", "1990-09-07",
+      # Cohort 2
+      "2004-04-07", "2004-05-03", "2000-02-27", "2015-03-10", "1995-05-15"
+    )),
+    cohort_end_date = as.Date(c(
+      # Cohort 1
+      "2002-05-06", "2005-11-07", "2002-09-17", "2015-06-27", "2008-02-19",
+      # Cohort 2
+      "2004-05-02", "2005-05-25", "2001-05-18", "2015-06-15", "1995-11-14"
+    ))
+  )
+
+  obs <- dplyr::tibble(
+    observation_period_id = 1:5,
+    person_id = 1:5,
+    observation_period_start_date = as.Date(c(
+      "2000-06-03", "1999-04-05", "2015-01-15", "1989-12-09", "2012-03-18"
+    )),
+    observation_period_end_date = as.Date(c(
+      "2013-06-29", "2003-06-15", "2015-10-11", "2013-12-31", "2013-02-10"
+    )),
+    period_type_concept_id = NA_integer_
+  )
+
+  person <- dplyr::tibble(
+    person_id = 1:5,
+    gender_concept_id = c(8507L, 8507L, 8507L, 8532L, 8507L),
+    year_of_birth = c(1997L, 1963L, 1986L, 1978L, 1973L),
+    month_of_birth = c(8L, 1L, 3L, 11L, 3L),
+    day_of_birth = c(22L, 27L, 10L, 8L, 2L),
+    race_concept_id = NA_integer_,
+    ethnicity_concept_id = NA_integer_
+  )
+
+  cdm_local <- omock::mockCdmFromTables(
+    tables = list(
+      "cohort1" = cohort_1,
+      "cohort2" = cohort_2
+    ),
+    seed = 1
+  )
+
+  cdm_local <- omopgenerics::insertTable(cdm = cdm_local, name = "observation_period", table = obs)
+  cdm_local <- omopgenerics::insertTable(cdm = cdm_local, name = "person", table = person)
+  cdm <- cdm_local |> copyCdm()
+
   cdm$cohort2 <- cdm$cohort2 |>
     dplyr::mutate(
       col_extra1 = as.numeric(subject_id) + 1,
