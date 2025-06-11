@@ -1,5 +1,5 @@
 pandoc: 3.1.11
-pkgdown: 2.1.2
+pkgdown: 2.1.3
 pkgdown_sha: ~
 articles:
   a00_introduction: a00_introduction.html
@@ -15,7 +15,7 @@ articles:
   a10_match_cohorts: a10_match_cohorts.html
   a11_benchmark: a11_benchmark.html
   a12_behind_the_scenes: a12_behind_the_scenes.html
-last_built: 2025-05-08T11:44Z
+last_built: 2025-06-11T15:54Z
 urls:
   reference: https://ohdsi.github.io/CohortConstructor/reference
   article: https://ohdsi.github.io/CohortConstructor/articles

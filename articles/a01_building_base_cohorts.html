@@ -53,6 +53,7 @@
     <li><a class="dropdown-item" href="../articles/a12_behind_the_scenes.html">Behind the scenes</a></li>
   </ul>
 </li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
@@ -82,7 +83,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Building base cohorts</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/OHDSI/CohortConstructor/blob/v0.4.0/vignettes/a01_building_base_cohorts.Rmd" class="external-link"><code>vignettes/a01_building_base_cohorts.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/OHDSI/CohortConstructor/blob/main/vignettes/a01_building_base_cohorts.Rmd" class="external-link"><code>vignettes/a01_building_base_cohorts.Rmd</code></a></small>
       <div class="d-none name"><code>a01_building_base_cohorts.Rmd</code></div>
     </div>
 
@@ -286,11 +287,11 @@ can set <code>useSourceFields = TRUE</code>.</p>
 <span>  <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Rows: ??</span></span>
 <span><span class="co">#&gt; Columns: 4</span></span>
-<span><span class="co">#&gt; Database: DuckDB v1.2.2 [unknown@Linux 6.11.0-1013-azure:R 4.5.0//tmp/RtmpMPK53w/file276f1c0ab7d8.duckdb]</span></span>
+<span><span class="co">#&gt; Database: DuckDB v1.3.0 [unknown@Linux 6.11.0-1015-azure:R 4.5.0//tmp/RtmpeNvjbN/file28af565319be.duckdb]</span></span>
 <span><span class="co">#&gt; $ cohort_definition_id <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> 1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1…</span></span>
-<span><span class="co">#&gt; $ subject_id           <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> 439<span style="color: #949494;">, </span>539<span style="color: #949494;">, </span>653<span style="color: #949494;">, </span>1385<span style="color: #949494;">, </span>3250<span style="color: #949494;">, </span>3851<span style="color: #949494;">, </span>3967<span style="color: #949494;">, </span>4049<span style="color: #949494;">, </span>5045…</span></span>
-<span><span class="co">#&gt; $ cohort_start_date    <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 2013-05-08<span style="color: #949494;">, </span>1968-12-02<span style="color: #949494;">, </span>1990-05-11<span style="color: #949494;">, </span>1999-12-20<span style="color: #949494;">, </span>…</span></span>
-<span><span class="co">#&gt; $ cohort_end_date      <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 2013-05-08<span style="color: #949494;">, </span>1968-12-02<span style="color: #949494;">, </span>1990-05-11<span style="color: #949494;">, </span>1999-12-20<span style="color: #949494;">, </span>…</span></span></code></pre></div>
+<span><span class="co">#&gt; $ subject_id           <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> 66<span style="color: #949494;">, </span>1432<span style="color: #949494;">, </span>3249<span style="color: #949494;">, </span>3655<span style="color: #949494;">, </span>4246<span style="color: #949494;">, </span>5239<span style="color: #949494;">, </span>362<span style="color: #949494;">, </span>461<span style="color: #949494;">, </span>931<span style="color: #949494;">, </span>…</span></span>
+<span><span class="co">#&gt; $ cohort_start_date    <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 1996-03-09<span style="color: #949494;">, </span>2005-01-30<span style="color: #949494;">, </span>2002-02-18<span style="color: #949494;">, </span>1975-12-08<span style="color: #949494;">, </span>…</span></span>
+<span><span class="co">#&gt; $ cohort_end_date      <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 1996-03-09<span style="color: #949494;">, </span>2005-01-30<span style="color: #949494;">, </span>2002-02-18<span style="color: #949494;">, </span>1975-12-08<span style="color: #949494;">, </span>…</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="demographic-based-cohort-creation">Demographic based cohort creation<a class="anchor" aria-label="anchor" href="#demographic-based-cohort-creation"></a>
@@ -469,7 +470,7 @@ BMI score then it is included in the cohort.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1 bmi_normal  5.3         mock</span></span>
 <span><span class="va">cdm</span><span class="op">$</span><span class="va">cohort</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Source:   table&lt;cohort&gt; [?? x 4]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB v1.2.2 [unknown@Linux 6.11.0-1013-azure:R 4.5.0/:memory:]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB v1.3.0 [unknown@Linux 6.11.0-1015-azure:R 4.5.0/:memory:]</span></span></span>
 <span><span class="co">#&gt;   cohort_definition_id subject_id cohort_start_date cohort_end_date</span></span>
 <span><span class="co">#&gt;                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>         </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1          1 2015-02-19        2015-02-19     </span></span>
@@ -508,13 +509,13 @@ setting the <code>inObservation</code> argument to false.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1 bmi_normal  5.3         mock</span></span>
 <span><span class="va">cdm</span><span class="op">$</span><span class="va">cohort</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Source:   table&lt;cohort&gt; [?? x 4]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB v1.2.2 [unknown@Linux 6.11.0-1013-azure:R 4.5.0/:memory:]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB v1.3.0 [unknown@Linux 6.11.0-1015-azure:R 4.5.0/:memory:]</span></span></span>
 <span><span class="co">#&gt;   cohort_definition_id subject_id cohort_start_date cohort_end_date</span></span>
 <span><span class="co">#&gt;                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>         </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1          1 2009-10-09        2009-10-09     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                    1          2 1965-03-10        1965-03-10     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                    1          1 2015-02-19        2015-02-19     </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>                    1          3 1999-09-08        1999-09-08     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>                    1          1 2015-02-19        2015-02-19</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>                    1          2 1965-03-10        1965-03-10</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="death-cohort">Death cohort<a class="anchor" aria-label="anchor" href="#death-cohort"></a>
@@ -546,7 +547,7 @@ cohort.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer>
