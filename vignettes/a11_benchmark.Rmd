@@ -101,21 +101,21 @@ cdm <- cdmFromCon(con, cdmSchema = "main", writeSchema = "main",
 Once we have created our cdm reference we can run the benchmark. Once run we'll have a set of results with the time taken to run the different tasks. For this example we will just run task of creating all the cohorts at once using CohortConstructor.
 
 ```{r, echo=TRUE}
-benchmark_results <- benchmarkCohortConstructor(cdm,
-               runCIRCE = FALSE,
-               runCohortConstructorDefinition = FALSE,
-               runCohortConstructorDomain = TRUE)
+benchmark_results <- benchmarkCohortConstructor(
+  cdm,
+  runCIRCE = FALSE,
+  runCohortConstructorDefinition = FALSE,
+  runCohortConstructorDomain = TRUE
+)
 benchmark_results |> 
   glimpse()
 ```
 
-## Code and collaboration
-
-The benchmarking code is available on the [BenchmarkCohortConstructor](https://github.com/oxford-pharmacoepi/BenchmarkCohortConstructor) repository on GitHub. 
+## Collaboration
 
 If you are interested in running the code on your database, feel free to reach out to us for assistance, and we can also update the vignette with your results! :)
 
-The benchmark script was executed against the following four databases:
+The benchmark script was executed against the following databases:
 
 - **CPRD Gold**: A primary care database from the UK, capturing data mostly from Northern Ireland, Wales, and Scotland clinics. The benchmark utilized a 100,000-person sample from this dataset, which is managed using PostgreSQL.
 
@@ -160,7 +160,7 @@ benchmarkData$details |>
 We also computed the overlap between patients in CIRCE and CohortConstructor cohorts, with results shown in the plot below:
 
 ```{r, fig.width=10, fig.height=7}
-benchmarkData$comparison |>
+gg <- benchmarkData$comparison |>
   plotCohortOverlap(uniqueCombinations = FALSE, facet = "cdm_name") +
   scale_y_discrete(labels = niceOverlapLabels) +
   theme(
@@ -172,7 +172,34 @@ benchmarkData$comparison |>
   ) +
   # facet_wrap("cdm_name") +
   scale_fill_discrete(labels = c("Both", "CIRCE", "CohortConstructor")) +
-  scale_color_discrete(labels = c("Both", "CIRCE", "CohortConstructor"))
+  scale_color_discrete(labels = c("Both", "CIRCE", "CohortConstructor")) +
+  xlab("") 
+
+gg$data <- gg$data |>
+  dplyr::mutate(
+    cohort_name_reference_cohort_name_comparator = visOmopResults::customiseText(gsub("cc_| -.*", "", cohort_name_reference_cohort_name_comparator)),
+    cohort_name_reference_cohort_name_comparator = case_when(
+      grepl("Asthma", .data[["cohort_name_reference_cohort_name_comparator"]]) ~ "Asthma without COPD",
+      grepl("Covid", .data[["cohort_name_reference_cohort_name_comparator"]]) ~ gsub("Covid|Covid", "COVID-19", cohort_name_reference_cohort_name_comparator),
+      grepl("eutropenia", .data[["cohort_name_reference_cohort_name_comparator"]]) ~ "Acquired neutropenia or unspecified leukopenia",
+      grepl("Hosp", .data[["cohort_name_reference_cohort_name_comparator"]]) ~ "Inpatient hospitalisation",
+      grepl("First", .data[["cohort_name_reference_cohort_name_comparator"]]) ~ "First major depression",
+      grepl("fluoro", .data[["cohort_name_reference_cohort_name_comparator"]]) ~ "New fluoroquinolone users",
+      grepl("Beta", .data[["cohort_name_reference_cohort_name_comparator"]]) ~ "New users of beta blockers nested in essential hypertension",
+      .default = .data[["cohort_name_reference_cohort_name_comparator"]]
+    ),
+    cohort_name_reference_cohort_name_comparator = if_else(
+      grepl("COVID", .data[["cohort_name_reference_cohort_name_comparator"]]),
+      gsub(" female", ": female", gsub(" male", ": male", .data[["cohort_name_reference_cohort_name_comparator"]])),
+      .data[["cohort_name_reference_cohort_name_comparator"]]
+    ),
+    cohort_name_reference_cohort_name_comparator = if_else(
+      grepl(" to ", .data[["cohort_name_reference_cohort_name_comparator"]]),
+      gsub("male ", "male, ", .data[["cohort_name_reference_cohort_name_comparator"]]),
+      .data[["cohort_name_reference_cohort_name_comparator"]]
+    )
+  )
+gg
 ```
 
 # Performance
@@ -271,49 +298,3 @@ benchmarkData$time_strata |>
   tab_style(style = list(cell_text(weight = "bold")), 
             locations = cells_body(columns = 1)) 
 ```
-
-## Use of SQL indexes
-
-For Postgres SQL databases, the package uses indexes in `conceptCohort` by default. To evaluate how much these indexes reduce computation time, we instantiated a subset of concept sets from the benchmark, both with and without indexes.
-
-Four calls were made to `conceptCohort`, each involving a different number of OMOP tables. The combinations were:
-
-1) Drug exposure
-
-2) Drug exposure + condition occurrence
-
-3) Drug exposure + condition occurrence + procedure occurrence
-
-4) Drug exposure + condition occurrence + procedure occurrence + measurement
-
-The plot below shows the computation time with and without SQL indexes for each scenario:
-
-```{r, fig.width=10, fig.height=7}
-benchmarkData$sql_indexes |>
-  distinct() |>
-  group_by(cdm_name, msg) |>
-  summarise(time = sum(as.numeric(toc) - as.numeric(tic))/60, .groups = "drop") |>
-  mutate(
-    Index = if_else(grepl("No index", msg), "Without SQL index", "With SQL index"),
-    Domains = str_to_sentence(gsub("No index: |Index: | domains| domain", "", msg)),
-    Domains = gsub("procedure ", "procedure, ", Domains)
-  ) |>
-  ggplot(aes(y = Domains, x = time, colour = Index, fill = Index)) +
-  geom_col(position = "dodge", width = 0.6) +
-  xlab("Time (minutes)") +
-  scale_y_discrete(labels = label_wrap(15)) +
-  theme(
-    legend.title=element_blank(),
-    legend.position = "bottom",
-    legend.text = element_text(size = 12),
-    strip.text = element_text(size = 14),
-    # axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, size = 12),
-    axis.text.x = element_text(size = 12),
-    axis.text.y = element_text(size = 12),  
-    axis.title.x = element_text(size = 14),  
-    axis.title.y = element_text(size = 14)   
-  ) +
-  facet_wrap(vars(cdm_name), scales = "free_x")
-```
-
-
