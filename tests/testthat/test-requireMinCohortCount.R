@@ -78,7 +78,7 @@ test_that("testing requireMinCohortCount", {
   # drop attributes
   cdm$cohort1_d <- requireMinCohortCount(cdm$cohort1,
                                          minCohortCount = 5,
-                                         dropSettings = TRUE,
+                                         updateSettings = TRUE,
                                          name = "cohort1_d"
   )
   expect_true(nrow(cdm$cohort1_d |>

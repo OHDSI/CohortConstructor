@@ -10,7 +10,7 @@
 #' @inheritParams nameDoc
 #' @param minCohortCount The minimum count of sbjects for a cohort to be
 #' included.
-#' @param dropSettings If TRUE, dropped cohorts will also be removed
+#' @param updateSettings If TRUE, dropped cohorts will also be removed
 #' from all cohort table attributes (i.e., settings, attrition, counts, and
 #' codelist). If FALSE, these attributes will be retained but updated to reflect
 #' that the affected cohorts have been suppressed.
@@ -31,7 +31,7 @@
 requireMinCohortCount <- function(cohort,
                                   minCohortCount,
                                   cohortId = NULL,
-                                  dropSettings = FALSE,
+                                  updateSettings = FALSE,
                                   name = tableName(cohort)){
   # checks
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
@@ -59,7 +59,7 @@ requireMinCohortCount <- function(cohort,
       dplyr::filter(!.data$cohort_definition_id %in% {{cohortsToDrop}})
   }
 
-  if (!dropSettings) {
+  if (!updateSettings) {
     cdm[[name]] <- cohort |>
       dplyr::compute(temporary = FALSE, name = name,
                      logPrefix = "CohortConstructor_requireMinCohortCount_fewer_") |>

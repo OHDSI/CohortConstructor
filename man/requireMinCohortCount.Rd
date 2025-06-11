@@ -8,7 +8,7 @@ requireMinCohortCount(
   cohort,
   minCohortCount,
   cohortId = NULL,
-  dropSettings = FALSE,
+  updateSettings = FALSE,
   name = tableName(cohort)
 )
 }
@@ -23,7 +23,7 @@ included.}
 used; otherwise, only the specified cohorts will be modified, and the
 rest will remain unchanged.}
 
-\item{dropSettings}{If TRUE, dropped cohorts will also be removed
+\item{updateSettings}{If TRUE, dropped cohorts will also be removed
 from all cohort table attributes (i.e., settings, attrition, counts, and
 codelist). If FALSE, these attributes will be retained but updated to reflect
 that the affected cohorts have been suppressed.}
