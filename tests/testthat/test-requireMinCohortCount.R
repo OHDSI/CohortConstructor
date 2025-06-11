@@ -5,7 +5,8 @@ test_that("testing requireMinCohortCount", {
     omock::mockObservationPeriod() |>
     omock::mockCohort(
       name = c("cohort1"),
-      numberCohorts = 5
+      numberCohorts = 5,
+      recordPerson = 2
     )
   cdm <- cdm_local |> copyCdm()
 
@@ -58,7 +59,7 @@ test_that("testing requireMinCohortCount", {
       cohortId = c("cohort_1", "cohort_6"),
       name = "cohort1_c"
     ))
-  expect_true(cdm$cohort1_c |> dplyr::tally() |> dplyr::pull() == 4)
+  expect_true(cdm$cohort1_c |> dplyr::tally() |> dplyr::pull() == 8)
 
 
   # nobody to drop
@@ -73,6 +74,19 @@ test_that("testing requireMinCohortCount", {
       dplyr::filter(reason != "Fewer than minimum cohort count of 0"),
     startAttrition
   )
+
+  # drop attributes
+  cdm$cohort1_d <- requireMinCohortCount(cdm$cohort1,
+                                         minCohortCount = 5,
+                                         updateSettings = TRUE,
+                                         name = "cohort1_d"
+  )
+  expect_true(nrow(cdm$cohort1_d |>
+                     dplyr::collect()) == 0)
+  expect_true(all(cohortCount(cdm$cohort1_d) |>
+                    nrow() == 0))
+  expect_true(all(attrition(cdm$cohort1_d) |>
+                    nrow() == 0))
 
   # settings of original cohort unchanged
   expect_identical(settings(cdm$cohort1), startSettings)

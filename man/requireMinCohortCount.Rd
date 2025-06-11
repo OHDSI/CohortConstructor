@@ -8,6 +8,7 @@ requireMinCohortCount(
   cohort,
   minCohortCount,
   cohortId = NULL,
+  updateSettings = FALSE,
   name = tableName(cohort)
 )
 }
@@ -21,6 +22,11 @@ included.}
 (cohort_definition_id or cohort_name). If NULL, all cohorts will be
 used; otherwise, only the specified cohorts will be modified, and the
 rest will remain unchanged.}
+
+\item{updateSettings}{If TRUE, dropped cohorts will also be removed
+from all cohort table attributes (i.e., settings, attrition, counts, and
+codelist). If FALSE, these attributes will be retained but updated to reflect
+that the affected cohorts have been suppressed.}
 
 \item{name}{Name of the new cohort table created in the cdm object.}
 }
