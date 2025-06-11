@@ -134,12 +134,14 @@ run we’ll have a set of results with the time taken to run the different
 tasks. For this example we will just run task of creating all the
 cohorts at once using CohortConstructor.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">benchmark_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/benchmarkCohortConstructor.html">benchmarkCohortConstructor</a></span><span class="op">(</span><span class="va">cdm</span>,</span>
-<span>               runCIRCE <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>               runCohortConstructorDefinition <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>               runCohortConstructorDomain <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; cc_set_no_strata: 91.316 sec elapsed</span></span>
-<span><span class="co">#&gt; cc_set_strata: 1.448 sec elapsed</span></span>
+<code class="sourceCode R"><span><span class="va">benchmark_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/benchmarkCohortConstructor.html">benchmarkCohortConstructor</a></span><span class="op">(</span></span>
+<span>  <span class="va">cdm</span>,</span>
+<span>  runCIRCE <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  runCohortConstructorDefinition <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  runCohortConstructorDomain <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; cc_set_no_strata: 94.069 sec elapsed</span></span>
+<span><span class="co">#&gt; cc_set_strata: 1.415 sec elapsed</span></span>
 <span><span class="va">benchmark_results</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Rows: 297</span></span>
@@ -158,14 +160,12 @@ cohorts at once using CohortConstructor.</p>
 <span><span class="co">#&gt; $ additional_name  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "overall"<span style="color: #949494;">, </span>"overall"<span style="color: #949494;">, </span>"overall"<span style="color: #949494;">, </span>"overall"<span style="color: #949494;">, </span>"overall"…</span></span>
 <span><span class="co">#&gt; $ additional_level <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "overall"<span style="color: #949494;">, </span>"overall"<span style="color: #949494;">, </span>"overall"<span style="color: #949494;">, </span>"overall"<span style="color: #949494;">, </span>"overall"…</span></span></code></pre></div>
 <div class="section level3">
-<h3 id="code-and-collaboration">Code and collaboration<a class="anchor" aria-label="anchor" href="#code-and-collaboration"></a>
+<h3 id="collaboration">Collaboration<a class="anchor" aria-label="anchor" href="#collaboration"></a>
 </h3>
-<p>The benchmarking code is available on the <a href="https://github.com/oxford-pharmacoepi/BenchmarkCohortConstructor" class="external-link">BenchmarkCohortConstructor</a>
-repository on GitHub.</p>
 <p>If you are interested in running the code on your database, feel free
 to reach out to us for assistance, and we can also update the vignette
 with your results! :)</p>
-<p>The benchmark script was executed against the following four
+<p>The benchmark script was executed against the following
 databases:</p>
 <ul>
 <li><p><strong>CPRD Gold</strong>: A primary care database from the UK,
@@ -3966,27 +3966,6 @@ CohortConstructor.</p>
 </tbody>
 </table>
 </div>
-</div>
-<div class="section level3">
-<h3 id="use-of-sql-indexes">Use of SQL indexes<a class="anchor" aria-label="anchor" href="#use-of-sql-indexes"></a>
-</h3>
-<p>For Postgres SQL databases, the package uses indexes in
-<code>conceptCohort</code> by default. To evaluate how much these
-indexes reduce computation time, we instantiated a subset of concept
-sets from the benchmark, both with and without indexes.</p>
-<p>Four calls were made to <code>conceptCohort</code>, each involving a
-different number of OMOP tables. The combinations were:</p>
-<ol style="list-style-type: decimal">
-<li><p>Drug exposure</p></li>
-<li><p>Drug exposure + condition occurrence</p></li>
-<li><p>Drug exposure + condition occurrence + procedure
-occurrence</p></li>
-<li><p>Drug exposure + condition occurrence + procedure occurrence +
-measurement</p></li>
-</ol>
-<p>The plot below shows the computation time with and without SQL
-indexes for each scenario:</p>
-<p><img src="a11_benchmark_files/figure-html/unnamed-chunk-13-1.png" width="960"></p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
