@@ -626,13 +626,16 @@ test_that("inObservation FALSE", {
       "measurement_date" = as.Date(c(
         "2000-01-01", "2001-08-01", "2000-03-01", "2000-11-01", "2000-02-01", "1999-11-01"
       )),
-      "measurement_type_concept_id" = 1
+      "measurement_type_concept_id" = 1,
+      "value_as_number" = as.integer(1),
+      "value_as_concept_id" = as.integer(1),
+      "unit_concept_id" = as.integer(1)
     )
   )
 
   cdm <- cdm |> copyCdm()
 
-  cdm$cohort <- conceptCohort(cdm, list(a = 1L), name = "cohort", inObservation = FALSE)
+  cdm$cohort <- measurementCohort(cdm, list(a = 1L), name = "cohort", inObservation = FALSE)
   expect_equal(
     dplyr::tibble(
       subject_id = c(1L, 1L, 1L, 2L),
@@ -644,4 +647,140 @@ test_that("inObservation FALSE", {
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   CDMConnector::cdmDisconnect(cdm = cdm)
+})
+
+test_that("edge cases", {
+  # measurement table has zero rows
+  cdm <- omock::mockPerson(nPerson = 3)
+  cdm <- omopgenerics::insertTable(
+    cdm = cdm, name = "observation_period", table = dplyr::tibble(
+      "observation_period_id" = c(1L, 2L, 3L),
+      "person_id" = c(1L, 1L, 2L),
+      "observation_period_start_date" = as.Date(c(
+        "2000-02-01", "2000-10-01", "2000-01-01"
+      )),
+      "observation_period_end_date" = as.Date(c(
+        "2000-05-01", "2000-12-01", "2000-12-01"
+      )),
+      "period_type_concept_id" = NA_integer_
+    ))
+  cdm <- omopgenerics::insertTable(
+    cdm = cdm, name = "concept", table = dplyr::tibble(
+      "concept_id" = 1L,
+      "concept_name" = "concept 1",
+      "domain_id" = "measurement",
+      "vocabulary_id" = NA,
+      "concept_class_id" = NA,
+      "concept_code" = NA,
+      "valid_start_date" = NA,
+      "valid_end_date" = NA
+    )
+  )
+  # person 1 - out before, out after, in, in
+  # person 2 - out before
+  cdm <- omopgenerics::insertTable(
+    cdm = cdm, name = "measurement",
+    table = dplyr::tibble(
+      "measurement_id" = as.integer(),
+      "person_id" = as.integer(),
+      "measurement_concept_id" = as.integer(),
+      "measurement_date" = as.Date(NA),
+      "measurement_type_concept_id" = as.integer(),
+      "value_as_number" = as.integer(),
+      "value_as_concept_id" = as.integer(),
+      "unit_concept_id" = as.integer()
+    )
+  )
+
+  cdm <- cdm |> copyCdm()
+  cdm$cohort <- measurementCohort(cdm, list(a = 1L), name = "cohort")
+  attrition <- attrition(cdm$cohort)
+  class(attrition) <- c("tbl_df", "tbl", "data.frame")
+  expect_equal(
+    attrition,
+    dplyr::tibble(
+      cohort_definition_id = 1L,
+      number_records = 0L,
+      number_subjects = 0L,
+      reason_id = 1L,
+      reason = "Initial qualifying events",
+      excluded_records = 0L,
+      excluded_subjects = 0L
+    )
+  )
+
+  # measurement table once subsetted to concepts of interest has zero rows
+  cdm <- omock::mockPerson(nPerson = 3)
+  cdm <- omopgenerics::insertTable(
+    cdm = cdm, name = "observation_period", table = dplyr::tibble(
+      "observation_period_id" = c(1L, 2L, 3L),
+      "person_id" = c(1L, 1L, 2L),
+      "observation_period_start_date" = as.Date(c(
+        "2000-02-01", "2000-10-01", "2000-01-01"
+      )),
+      "observation_period_end_date" = as.Date(c(
+        "2000-05-01", "2000-12-01", "2000-12-01"
+      )),
+      "period_type_concept_id" = NA_integer_
+    ))
+  cdm <- omopgenerics::insertTable(
+    cdm = cdm, name = "concept", table = dplyr::tibble(
+      "concept_id" = 1L,
+      "concept_name" = "concept 1",
+      "domain_id" = "measurement",
+      "vocabulary_id" = NA,
+      "concept_class_id" = NA,
+      "concept_code" = NA,
+      "valid_start_date" = NA,
+      "valid_end_date" = NA
+    )
+  )
+  cdm <- omopgenerics::insertTable(
+    cdm = cdm, name = "measurement",
+    table = dplyr::tibble(
+      "measurement_id" = 1:6 |> as.integer(),
+      "person_id" = c(1, 1, 1, 1, 1, 2) |> as.integer(),
+      "measurement_concept_id" = 1L,
+      "measurement_date" = as.Date(c(
+        "2000-01-01", "2001-08-01", "2000-03-01", "2000-11-01", "2000-02-01", "1999-11-01"
+      )),
+      "measurement_type_concept_id" = 1,
+      "value_as_number" = as.integer(1),
+      "value_as_concept_id" = as.integer(1),
+      "unit_concept_id" = as.integer(1)
+    )
+  )
+
+  cdm <- cdm |> copyCdm()
+  cdm$cohort <- measurementCohort(cdm, list(a = 2L), name = "cohort")
+  attrition <- attrition(cdm$cohort)
+  class(attrition) <- c("tbl_df", "tbl", "data.frame")
+  expect_equal(
+    attrition,
+    dplyr::tibble(
+      cohort_definition_id = 1L,
+      number_records = 0L,
+      number_subjects = 0L,
+      reason_id = 1L,
+      reason = "Initial qualifying events",
+      excluded_records = 0L,
+      excluded_subjects = 0L
+    )
+  )
+
+  cdm$cohort2 <- measurementCohort(cdm, list(a = 1L), name = "cohort2", valueAsConcept = 0)
+  attrition <- attrition(cdm$cohort2)
+  class(attrition) <- c("tbl_df", "tbl", "data.frame")
+  expect_equal(
+    attrition,
+    dplyr::tibble(
+      cohort_definition_id = 1L,
+      number_records = 0L,
+      number_subjects = 0L,
+      reason_id = 1L,
+      reason = "Initial qualifying events",
+      excluded_records = 0L,
+      excluded_subjects = 0L
+    )
+  )
 })
