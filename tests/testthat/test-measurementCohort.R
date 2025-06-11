@@ -87,8 +87,8 @@ test_that("mearurementCohorts works", {
       "reason_id" = 1:6L,
       "reason" = c(
         "Initial qualifying events",
-        "Not missing record date",
         "Record in observation",
+        "Not missing record date",
         "Non-missing sex",
         "Non-missing year of birth",
         "Distinct measurement records"
@@ -199,14 +199,14 @@ test_that("mearurementCohorts works", {
       "reason_id" = rep(1:6L, 2),
       "reason" = c(
         "Initial qualifying events",
-        "Not missing record date",
         "Record in observation",
+        "Not missing record date",
         "Non-missing sex",
         "Non-missing year of birth",
         "Distinct measurement records",
         "Initial qualifying events",
-        "Not missing record date",
         "Record in observation",
+        "Not missing record date",
         "Non-missing sex",
         "Non-missing year of birth",
         "Distinct measurement records"
