@@ -1,9 +1,52 @@
 test_that("unionCohorts works", {
   skip_on_cran()
-  cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4, seed = 1) |>
-    omock::mockObservationPeriod(seed = 1) |>
-    omock::mockCohort(name = c("cohort1"), numberCohorts = 4, seed = 1)
+
+  obs <- dplyr::tibble(
+    observation_period_id = c(1, 2, 3, 4),
+    person_id = c(1, 2, 3, 4),
+    observation_period_start_date = as.Date(c(
+      "2000-06-03", "1999-04-05", "2015-01-15", "1989-12-09"
+    )),
+    observation_period_end_date = as.Date(c(
+      "2013-06-29", "2003-06-15", "2015-10-11", "2013-12-31"
+    )),
+    "period_type_concept_id" = NA_integer_
+  )
+
+  cohort_1 <- dplyr::tibble(
+    cohort_definition_id = c(1, 1, 1, 1,
+                             2, 2, 2, 2,
+                             3, 3, 3, 3,
+                             4, 4, 4, 4),
+    subject_id = c(1, 1, 2, 3,
+                   1, 1, 1, 1,
+                   1, 1, 2, 3,
+                   1, 2, 3, 3),
+    cohort_start_date = as.Date(c(
+      "2003-05-17", "2004-03-11", "1999-05-03", "2015-02-25",
+      "2001-03-24", "2001-11-28", "2002-01-30", "2002-06-13",
+      "2001-08-30", "2002-01-09", "1999-06-04", "2015-01-22",
+      "2002-11-30", "2000-06-07", "2015-04-05", "2015-04-11"
+    )),
+    cohort_end_date = as.Date(c(
+      "2004-03-10", "2005-07-19", "2001-06-15", "2015-04-30",
+      "2001-11-27", "2002-01-29", "2002-06-12", "2005-01-15",
+      "2002-01-08", "2007-01-17", "2002-06-07", "2015-06-01",
+      "2009-06-12", "2002-02-01", "2015-04-10", "2015-06-22"
+    ))
+  )
+
+
+  cdm_local <- omock::mockCdmFromTables(
+    tables = list(
+      "cohort1" = cohort_1
+    ),
+    seed = 1
+  )
+
+  cdm_local <- omopgenerics::insertTable(
+    cdm = cdm_local, name = "observation_period", table = obs)
+
   cdm <- cdm_local |> copyCdm()
   # simple example
   cdm$cohort2 <- unionCohorts(cdm$cohort1, name = "cohort2")
@@ -80,10 +123,70 @@ test_that("unionCohorts works", {
 test_that("gap and name works", {
   skip_on_cran()
 
-  cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4, seed = 1) |>
-    omock::mockObservationPeriod(seed = 1) |>
-    omock::mockCohort(name = c("cohort"), numberCohorts = 4, seed = 11, recordPerson = 2)
+  obs <- dplyr::tibble(
+    observation_period_id = c(1, 2, 3, 4),
+    person_id = c(1, 2, 3, 4),
+    observation_period_start_date = as.Date(c(
+      "2000-06-03", "1999-04-05", "2015-01-15", "1989-12-09"
+    )),
+    observation_period_end_date = as.Date(c(
+      "2013-06-29", "2003-06-15", "2015-10-11", "2013-12-31"
+    )),
+    "period_type_concept_id" = NA_integer_
+  )
+
+  person <- dplyr::tibble(
+    person_id = c(1, 2, 3, 4),
+    gender_concept_id = c(8532, 8507, 8507, 8507),
+    year_of_birth = c(1997, 1963, 1986, 1978),
+    month_of_birth = c(8, 1, 3, 11),
+    day_of_birth = c(22, 27, 10, 8),
+    race_concept_id = NA_integer_,
+    ethnicity_concept_id = NA_integer_
+  )
+
+  cohort_1 <- dplyr::tibble(
+    cohort_definition_id = c(
+      1, 1, 1, 1, 1, 1, 1, 1,
+      2, 2, 2, 2, 2, 2, 2, 2,
+      3, 3, 3, 3, 3, 3, 3, 3,
+      4, 4, 4, 4, 4, 4, 4, 4
+    ),
+    subject_id = c(
+      1, 1, 1, 2, 2, 2, 4, 4,
+      1, 1, 3, 3, 4, 4, 4, 4,
+      2, 3, 3, 3, 3, 3, 3, 4,
+      1, 1, 2, 2, 3, 3, 3, 4
+    ),
+    cohort_start_date = as.Date(c(
+      "2002-08-29", "2002-12-30", "2004-09-01", "1999-07-26", "1999-08-16", "1999-12-04", "1994-12-29", "1995-01-27",
+      "2003-05-08", "2003-10-04", "2015-03-11", "2015-03-20", "1991-04-29", "1991-07-14", "1991-08-15", "1991-10-21",
+      "2000-06-17", "2015-02-04", "2015-02-13", "2015-02-16", "2015-02-27", "2015-03-07", "2015-03-26", "1993-08-15",
+      "2002-05-31", "2003-02-07", "1999-08-22", "2000-06-06", "2015-03-08", "2015-03-14", "2015-03-18", "1993-03-10"
+    )),
+    cohort_end_date = as.Date(c(
+      "2002-12-29", "2004-08-31", "2007-03-24", "1999-08-15", "1999-12-03", "2001-10-20", "1995-01-26", "1995-09-11",
+      "2003-10-03", "2007-06-11", "2015-03-19", "2015-05-16", "1991-07-13", "1991-08-14", "1991-10-20", "1993-11-13",
+      "2001-03-23", "2015-02-12", "2015-02-15", "2015-02-26", "2015-03-06", "2015-03-25", "2015-07-28", "1994-05-05",
+      "2003-02-06", "2005-01-06", "2000-06-05", "2001-07-23", "2015-03-13", "2015-03-17", "2015-06-24", "1993-04-15"
+    ))
+  )
+
+
+  cdm_local <- omock::mockCdmFromTables(
+    tables = list(
+      "cohort" = cohort_1
+    ),
+    seed = 1
+  )
+
+  cdm_local <- omopgenerics::insertTable(
+    cdm = cdm_local, name = "observation_period", table = obs)
+
+  cdm_local <- omopgenerics::insertTable(
+    cdm = cdm_local, name = "person", table = person)
+
+
   cdm_local$cohort <- cdm_local$cohort |>
     dplyr::arrange(.data$subject_id, .data$cohort_start_date) |>
     dplyr::mutate(id = dplyr::row_number()) |>
@@ -211,10 +314,54 @@ test_that("Expected behaviour", {
 
 test_that("test codelist", {
   testthat::skip_on_cran()
-  cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4,seed = 1) |>
-    omock::mockObservationPeriod(seed = 1) |>
-    omock::mockCohort(seed = 1)
+
+  obs <- dplyr::tibble(
+    observation_period_id = c(1, 2, 3, 4),
+    person_id = c(1, 2, 3, 4),
+    observation_period_start_date = as.Date(c(
+      "2000-06-03", "1999-04-05", "2015-01-15", "1989-12-09"
+    )),
+    observation_period_end_date = as.Date(c(
+      "2013-06-29", "2003-06-15", "2015-10-11", "2013-12-31"
+    )),
+    "period_type_concept_id" = NA_integer_
+  )
+
+  person <- dplyr::tibble(
+    person_id = c(1, 2, 3, 4),
+    gender_concept_id = c(8532, 8507, 8507, 8507),
+    year_of_birth = c(1997, 1963, 1986, 1978),
+    month_of_birth = c(8, 1, 3, 11),
+    day_of_birth = c(22, 27, 10, 8),
+    race_concept_id = NA_integer_,
+    ethnicity_concept_id = NA_integer_
+  )
+
+  cohort_1 <- dplyr::tibble(
+    cohort_definition_id = c(1, 1, 1, 1),
+    subject_id = c(1, 1, 2, 3),
+    cohort_start_date = as.Date(c("2003-05-17", "2004-03-11", "1999-05-03", "2015-02-25")),
+    cohort_end_date = as.Date(c("2004-03-10", "2005-07-19", "2001-06-15", "2015-04-30"))
+  )
+
+  cdm_local <- omock::mockCdmFromTables(
+    tables = list(
+      "person" = person,
+      "cohort" = cohort_1
+    ),
+    seed = 1
+  )
+
+  cdm_local <- omopgenerics::insertTable(cdm = cdm_local,
+                                         name = "observation_period", table = obs)
+
+  cdm_local <- omopgenerics::insertTable(cdm = cdm_local,
+                                         name = "person", table = person)
+
+  # cdm_local <- omock::mockCdmReference() |>
+  #   omock::mockPerson(n = 4,seed = 1) |>
+  #   omock::mockObservationPeriod(seed = 1) |>
+  #   omock::mockCohort(seed = 1)
   cdm_local$concept <- dplyr::tibble(
     "concept_id" = c(1, 2, 3),
     "concept_name" = c("my concept 1", "my concept 2", "my concept 3"),
@@ -237,7 +384,7 @@ test_that("test codelist", {
       "drug_exposure_start_date" = as.Date(.data$drug_exposure_start_date, origin = "2010-01-01"),
       "drug_exposure_end_date" = as.Date(.data$drug_exposure_end_date, origin = "2010-01-01")
     )
-  cdm_local$observation_period <- cdm_local$observation_period|>
+  cdm_local$observation_period <- cdm_local$observation_period |>
     dplyr::mutate(observation_period_start_date = as.Date("1990-01-01"), observation_period_end_date = as.Date("2020-01-01"))
 
   cdm <- cdm_local |> copyCdm()
@@ -260,7 +407,7 @@ test_that("test codelist", {
   codes <- attr(cdm$cohort2, "cohort_codelist")
   expect_true(all(codes |> dplyr::pull("codelist_name") |> sort() == c(rep("c1", 2), "c2")))
   expect_true(all(codes |> dplyr::pull("concept_id") |> sort() == c(1, 2, 3)))
-  expect_true(all(codes |> dplyr::pull("type") |> sort() == rep("index event", 3)))
+  expect_true(all(codes |> dplyr::pull("codelist_type") |> sort() == rep("index event", 3)))
   expect_true(all(codes |> dplyr::pull("cohort_definition_id") |> sort() == c(1, 1, 1)))
 
   # union concept + non concept cohorts
@@ -280,7 +427,7 @@ test_that("test codelist", {
   codes <- attr(cdm$cohort4, "cohort_codelist")
   expect_true(all(codes |> dplyr::pull("codelist_name") |> sort() == c(rep("c1", 2), "c2")))
   expect_true(all(codes |> dplyr::pull("concept_id") |> sort() == c(1, 2, 3)))
-  expect_true(all(codes |> dplyr::pull("type") |> sort() == rep("index event", 3)))
+  expect_true(all(codes |> dplyr::pull("codelist_type") |> sort() == rep("index event", 3)))
   expect_true(all(codes |> dplyr::pull("cohort_definition_id") |> sort() == c(1, 1, 1)))
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
@@ -294,6 +441,7 @@ test_that("keep original cohorts", {
     omock::mockPerson(n = 4, seed = 1) |>
     omock::mockObservationPeriod(seed = 1) |>
     omock::mockCohort(name = c("cohort1"), numberCohorts = 4,seed = 1)
+
   cdm <- cdm_local |> copyCdm()
 
   start_settings <- settings(cdm$cohort1)
@@ -315,8 +463,21 @@ test_that("keep original cohorts", {
 test_that("multiple observation periods", {
   skip_on_cran()
 
-  cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4, seed = 1)
+  person <- dplyr::tibble(
+    person_id = c(1, 2, 3, 4),
+    gender_concept_id = c(8532, 8507, 8507, 8507),
+    year_of_birth = c(1997, 1963, 1986, 1978),
+    month_of_birth = c(8, 1, 3, 11),
+    day_of_birth = c(22, 27, 10, 8),
+    race_concept_id = NA_integer_,
+    ethnicity_concept_id = NA_integer_
+  )
+
+
+  cdm_local <- omock::mockCdmReference()
+
+  cdm_local <- omopgenerics::insertTable(cdm = cdm_local, name = "person", table = person)
+
   cdm_local$observation_period <- dplyr::tibble(
     "observation_period_id" = as.integer(1:7),
     "person_id" = as.integer(c(1, 1, 1, 2, 2, 3, 4)),

@@ -1,9 +1,21 @@
 test_that("yearCohorts - change name", {
   testthat::skip_on_cran()
-  cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4,seed = 1) |>
-    omock::mockObservationPeriod(seed = 1) |>
-    omock::mockCohort(name = c("cohort"),seed = 1)
+  cohort_1 <- dplyr::tibble(
+    cohort_definition_id = c(1, 1, 1, 1),
+    subject_id = c(1, 1, 2, 3),
+    cohort_start_date = as.Date(c("2003-05-17", "2004-03-11", "1999-05-03", "2015-02-25")),
+    cohort_end_date = as.Date(c("2004-03-10", "2005-07-19", "2001-06-15", "2015-04-30"))
+  )
+
+
+  cdm_local <- omock::mockCdmFromTables(
+    tables = list(
+      "cohort" = cohort_1
+    ),
+    seed = 1
+  )
+
+
   cdm <- cdm_local |> copyCdm()
 
   # simple example
@@ -34,10 +46,28 @@ test_that("yearCohorts - change name", {
   )))
 
  # more than 1 cohort
-  cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4,seed = 1) |>
-    omock::mockObservationPeriod(seed = 1) |>
-    omock::mockCohort(name = c("cohort"), numberCohorts = 3, seed = 1)
+  cohort_1 <- dplyr::tibble(
+    cohort_definition_id = c(1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3),
+    subject_id = c(1, 1, 2, 3, 1, 1, 1, 1, 1, 1, 2, 3),
+    cohort_start_date = as.Date(c(
+      "2003-05-17", "2004-03-11", "1999-05-03", "2015-02-25",
+      "2001-03-24", "2001-11-28", "2002-01-30", "2002-06-13",
+      "2001-08-30", "2002-01-09", "1999-06-04", "2015-01-22"
+    )),
+    cohort_end_date = as.Date(c(
+      "2004-03-10", "2005-07-19", "2001-06-15", "2015-04-30",
+      "2001-11-27", "2002-01-29", "2002-06-12", "2005-01-15",
+      "2002-01-08", "2007-01-17", "2002-06-07", "2015-06-01"
+    ))
+  )
+
+  cdm_local <- omock::mockCdmFromTables(
+    tables = list(
+      "cohort" = cohort_1
+    ),
+    seed = 1
+  )
+
   cdm <- cdm_local |> copyCdm()
   # all cohorts
   cdm$cohort1 <- yearCohorts(cohort = cdm$cohort,
@@ -118,10 +148,22 @@ test_that("yearCohorts - change name", {
 
 test_that("yearCohorts - keep name", {
   testthat::skip_on_cran()
-  cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4, seed = 1) |>
-    omock::mockObservationPeriod(seed = 1) |>
-    omock::mockCohort(name = c("cohort"), seed = 1)
+  cohort_1 <- dplyr::tibble(
+    cohort_definition_id = c(1, 1, 1, 1),
+    subject_id = c(1, 1, 2, 3),
+    cohort_start_date = as.Date(c("2003-05-17", "2004-03-11", "1999-05-03", "2015-02-25")),
+    cohort_end_date = as.Date(c("2004-03-10", "2005-07-19", "2001-06-15", "2015-04-30"))
+  )
+
+
+  cdm_local <- omock::mockCdmFromTables(
+    tables = list(
+      "cohort" = cohort_1
+    ),
+    seed = 1
+  )
+
+
   cdm <- cdm_local |> copyCdm()
 
   # simple example
@@ -151,10 +193,27 @@ test_that("yearCohorts - keep name", {
   )))
 
   # more than 1 cohort
-  cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4, seed = 1) |>
-    omock::mockObservationPeriod(seed = 1) |>
-    omock::mockCohort(name = c("cohort"), numberCohorts = 3, seed = 1)
+  cohort_1 <- dplyr::tibble(
+    cohort_definition_id = c(1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3),
+    subject_id = c(1, 1, 2, 3, 1, 1, 1, 1, 1, 1, 2, 3),
+    cohort_start_date = as.Date(c(
+      "2003-05-17", "2004-03-11", "1999-05-03", "2015-02-25",
+      "2001-03-24", "2001-11-28", "2002-01-30", "2002-06-13",
+      "2001-08-30", "2002-01-09", "1999-06-04", "2015-01-22"
+    )),
+    cohort_end_date = as.Date(c(
+      "2004-03-10", "2005-07-19", "2001-06-15", "2015-04-30",
+      "2001-11-27", "2002-01-29", "2002-06-12", "2005-01-15",
+      "2002-01-08", "2007-01-17", "2002-06-07", "2015-06-01"
+    ))
+  )
+
+  cdm_local <- omock::mockCdmFromTables(
+    tables = list(
+      "cohort" = cohort_1
+    ),
+    seed = 1
+  )
   cdm <- cdm_local |> copyCdm()
 
   # just 1 cohort

@@ -396,10 +396,63 @@ test_that("returnNonOverlappingCohorts - three cohorts", {
 
 test_that("attrition and cohortId", {
   testthat::skip_on_cran()
-  cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4, seed = 1) |>
-    omock::mockObservationPeriod(seed = 1) |>
-    omock::mockCohort(name = c("cohort1"), numberCohorts = 4, seed = 2)
+  cohort_1 <- dplyr::tibble(
+    cohort_definition_id = c(rep(1L, 4), rep(2L, 4), rep(3L, 4), rep(4L, 4)),
+    subject_id = c(1L, 2L, 2L, 3L,
+                   1L, 1L, 2L, 3L,
+                   2L, 2L, 3L, 3L,
+                   1L, 2L, 2L, 3L),
+    cohort_start_date = as.Date(c(
+      # Cohort 1
+      "2003-05-08", "2000-01-11", "2000-05-28", "2015-01-25",
+      # Cohort 2
+      "2000-06-17", "2004-12-12", "1999-07-11", "2015-02-02",
+      # Cohort 3
+      "2000-03-29", "2000-07-12", "2015-02-04", "2015-03-17",
+      # Cohort 4
+      "2004-11-07", "1999-08-12", "2000-03-25", "2015-02-17"
+    )),
+    cohort_end_date = as.Date(c(
+      # Cohort 1
+      "2005-04-08", "2000-05-27", "2001-09-08", "2015-04-26",
+      # Cohort 2
+      "2004-12-11", "2007-09-06", "2002-03-26", "2015-08-12",
+      # Cohort 3
+      "2000-07-11", "2001-06-22", "2015-03-16", "2015-06-11",
+      # Cohort 4
+      "2005-10-03", "2000-03-24", "2001-04-29", "2015-03-08"
+    ))
+  )
+
+  person <- dplyr::tibble(
+    person_id = 1:4,
+    gender_concept_id = c(8532L, 8507L, 8507L, 8507L),
+    year_of_birth = c(1997L, 1963L, 1986L, 1978L),
+    month_of_birth = c(8L, 1L, 3L, 11L),
+    day_of_birth = c(22L, 27L, 10L, 8L),
+    race_concept_id = NA_integer_,
+    ethnicity_concept_id = NA_integer_
+  )
+
+  obs <- dplyr::tibble(
+    observation_period_id = 1:4,
+    person_id = 1:4,
+    observation_period_start_date = as.Date(c("2000-06-03", "1999-04-05", "2015-01-15", "1989-12-09")),
+    observation_period_end_date = as.Date(c("2013-06-29", "2003-06-15", "2015-10-11", "2013-12-31")),
+    period_type_concept_id = NA_integer_
+  )
+
+
+  cdm_local <- omock::mockCdmFromTables(
+    tables = list(
+      "cohort1" = cohort_1
+    ),
+    seed = 1
+  )
+
+  cdm_local <- omopgenerics::insertTable(cdm = cdm_local, name = "observation_period", table = obs)
+  cdm_local <- omopgenerics::insertTable(cdm = cdm_local, name = "person", table = person)
+
   cdm_local$person <- cdm_local$person |>
     dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
   cdm <- cdm_local |> copyCdm()
@@ -493,7 +546,7 @@ test_that("codelist", {
   codes <- attr(cdm$cohort2, "cohort_codelist")
   expect_true(all(codes |> dplyr::pull("codelist_name") |> sort() == c(rep("c1", 2), "c2")))
   expect_true(all(codes |> dplyr::pull("concept_id") |> sort() == c(1, 2, 3)))
-  expect_true(all(codes |> dplyr::pull("type") |> sort() == rep("index event", 3)))
+  expect_true(all(codes |> dplyr::pull("codelist_type") |> sort() == rep("index event", 3)))
   expect_true(all(codes |> dplyr::pull("cohort_definition_id") |> sort() == c(1, 1, 1)))
 
   # mutually esclusive
@@ -515,7 +568,7 @@ test_that("codelist", {
   codes <- attr(cdm$cohort3, "cohort_codelist")
   expect_true(all(codes |> dplyr::pull("codelist_name") |> sort() == c(rep("c1", 4), rep("c2", 2))))
   expect_true(all(codes |> dplyr::pull("concept_id") |> sort() == c(1, 1, 2, 2, 3, 3)))
-  expect_true(all(codes |> dplyr::pull("type") |> sort()== rep("index event", 6)))
+  expect_true(all(codes |> dplyr::pull("codelist_type") |> sort()== rep("index event", 6)))
   expect_true(all(codes |> dplyr::pull("cohort_definition_id") |> sort() == c(1, 1, 1, 2, 2, 3)))
 
   # only comb
@@ -534,7 +587,7 @@ test_that("codelist", {
   codes <- attr(cdm$cohort4, "cohort_codelist")
   expect_true(all(codes |> dplyr::pull("codelist_name") |> sort() == c(rep("c1", 2), "c2")))
   expect_true(all(codes |> dplyr::pull("concept_id") |> sort() == c(1, 2, 3)))
-  expect_true(all(codes |> dplyr::pull("type") |> sort() == rep("index event", 3)))
+  expect_true(all(codes |> dplyr::pull("codelist_type") |> sort() == rep("index event", 3)))
   expect_true(all(codes |> dplyr::pull("cohort_definition_id") |> sort() == c(1, 1, 1)))
 
   # union concept + non concept cohorts
@@ -543,7 +596,7 @@ test_that("codelist", {
   codes <- attr(cdm$cohort6, "cohort_codelist")
   expect_true(all(codes |> dplyr::pull("codelist_name") |> sort() == c(rep("c1", 2), "c2")))
   expect_true(all(codes |> dplyr::pull("concept_id") |> sort() == c(1, 2, 3)))
-  expect_true(all(codes |> dplyr::pull("type") |> sort() == rep("index event", 3)))
+  expect_true(all(codes |> dplyr::pull("codelist_type") |> sort() == rep("index event", 3)))
   expect_true(all(codes |> dplyr::pull("cohort_definition_id") |> sort() == c(1, 1, 1)))
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
