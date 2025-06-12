@@ -51,7 +51,10 @@ test_that("basic example", {
     omopgenerics::attrition(cdm$my_death_cohort) |>
     dplyr::pull("reason"),
   c("Initial qualifying events",
-    "Death record in observation",
+    "Record in observation",
+    "Not missing record date",
+    "Non-missing sex",
+    "Non-missing year of birth",
     "First death record"))
 
   CDMConnector::cdmDisconnect(cdm)

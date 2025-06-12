@@ -54,6 +54,9 @@ deathCohort <- function(
   if (is.null(subsetCohortId)) {
     subsetCohortId <- as.numeric(NA)
   }
+
+  useIndexes <- getOption("CohortConstructor.use_indexes")
+
   cohortSetRef <- dplyr::tibble(
     "cohort_definition_id" = 1L,
     "cohort_name" = "death_cohort",
@@ -73,10 +76,15 @@ deathCohort <- function(
     omopgenerics::newCohortTable(cohortSetRef = cohortSetRef,
                                  .softValidation = TRUE)
 
-  cdm[[name]] <-  cdm[[name]] |>
-    PatientProfiles::filterInObservation(indexDate = "cohort_start_date") |>
-    dplyr::compute(temporary = FALSE, name = name) |>
-    omopgenerics::recordCohortAttrition("Death record in observation")
+  if (!isFALSE(useIndexes)) {
+    addIndex(
+      cohort = cdm[[name]],
+      cols = c("subject_id", "cohort_start_date")
+    )
+  }
+
+  cli::cli_inform(c("i" = "Applying cohort requirements."))
+  cdm[[name]] <- fulfillCohortReqs(cdm, name, inObservation = TRUE, type = "start", useIndexes)
 
   if (!is.na(subsetCohort)){
     if (!is.na(subsetCohortId)){
@@ -105,7 +113,7 @@ deathCohort <- function(
 
   cdm[[name]] <- cdm[[name]] |>
     dplyr::group_by(.data$subject_id) |>
-    dbplyr::window_order(.data$cohort_start_date) |>
+    dplyr::arrange(.data$cohort_start_date) |>
     dplyr::filter(dplyr::row_number()==1) |>
     dplyr::select(
       "cohort_definition_id", "subject_id", "cohort_start_date",
@@ -120,6 +128,13 @@ deathCohort <- function(
 
   cdm[[name]] <- omopgenerics::newCohortTable(table = cdm[[name]])
   cli::cli_inform(c("v" = "Cohort {.strong {name}} created."))
+
+  if (!isFALSE(useIndexes)) {
+    addIndex(
+      cohort = cdm[[name]],
+      cols = c("subject_id", "cohort_start_date")
+    )
+  }
 
   return(cdm[[name]])
 }
