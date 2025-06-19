@@ -157,8 +157,8 @@ test_that("simple example", {
       "number_subjects" = 2L,
       "reason_id" = 1:6L,
       "reason" = c(
-        "Initial qualifying events", "Record start <= record end",
-        "Record in observation", "Non-missing sex", "Non-missing year of birth",
+        "Initial qualifying events", "Record in observation", "Record start <= record end",
+        "Non-missing sex", "Non-missing year of birth",
         "Merge overlapping records"
       ),
       "excluded_records" = c(0L, 0L, 0L, 0L, 0L, 1L),
@@ -843,6 +843,9 @@ test_that("overlap option", {
                                                 exit = "event_end_date",
                                                 overlap = "extend"))
   expect_true((cdm$cohort_8 |> dplyr::pull("cohort_end_date")) == as.Date("2020-01-30"))
+
+  # check attrition when >1 observation period
+  expect_true(all(unique(attrition(cdm$cohort_8)$excluded_records) == c(0, 1)))
 
   PatientProfiles::mockDisconnect(cdm)
 })
