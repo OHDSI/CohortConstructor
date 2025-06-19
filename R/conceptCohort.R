@@ -402,25 +402,6 @@ fulfillCohortReqs <- function(cdm, name, inObservation, type = "start_end", useI
     dplyr::compute(temporary = FALSE, name = name,
                    logPrefix = "CohortConstructor_fulfillCohortReqs_observationJoin_")
 
-  if (type == "start_end") {
-    cdm[[name]] <- cdm[[name]] |>
-      dplyr::filter(
-        !is.na(.data$cohort_start_date),
-        .data$cohort_start_date <= .data$cohort_end_date
-      ) |>
-      dplyr::compute(temporary = FALSE, name = name,
-                     logPrefix = "CohortConstructor_fulfillCohortReqs_filterStartEnd_") |>
-      omopgenerics::recordCohortAttrition(reason = "Record start <= record end")
-  } else if (type == "start") {
-    cdm[[name]] <- cdm[[name]] |>
-      dplyr::filter(
-        !is.na(.data$cohort_start_date)
-      ) |>
-      dplyr::compute(temporary = FALSE, name = name,
-                     logPrefix = "CohortConstructor_fulfillCohortReqs_filterStart_") |>
-      omopgenerics::recordCohortAttrition(reason = "Not missing record date")
-  }
-
   if (!inObservation) {
     cdm[[name]] <- cdm[[name]] %>%
       dplyr::mutate(
@@ -432,7 +413,7 @@ fulfillCohortReqs <- function(cdm, name, inObservation, type = "start_end", useI
       dplyr::group_by(.data$cohort_definition_id, .data$subject_id, .data$cohort_start_date, .data$cohort_end_date) |>
       # which records to trim
       dplyr::mutate(
-        trim_record =  all(!in_observation_start) & min(.data$days_start_obs) == .data$days_start_obs & !is.na(days_start_obs)
+        trim_record =  all(!.data$in_observation_start) & min(.data$days_start_obs) == .data$days_start_obs & !is.na(.data$days_start_obs)
       ) |>
       dplyr::ungroup() |>
       dplyr::mutate(
@@ -479,6 +460,25 @@ fulfillCohortReqs <- function(cdm, name, inObservation, type = "start_end", useI
     dplyr::compute(temporary = FALSE, name = name,
                    logPrefix = "CohortConstructor_fulfillCohortReqs_inObservation_") |>
     omopgenerics::recordCohortAttrition(reason = "Record in observation")
+
+  if (type == "start_end") {
+    cdm[[name]] <- cdm[[name]] |>
+      dplyr::filter(
+        !is.na(.data$cohort_start_date),
+        .data$cohort_start_date <= .data$cohort_end_date
+      ) |>
+      dplyr::compute(temporary = FALSE, name = name,
+                     logPrefix = "CohortConstructor_fulfillCohortReqs_filterStartEnd_") |>
+      omopgenerics::recordCohortAttrition(reason = "Record start <= record end")
+  } else if (type == "start") {
+    cdm[[name]] <- cdm[[name]] |>
+      dplyr::filter(
+        !is.na(.data$cohort_start_date)
+      ) |>
+      dplyr::compute(temporary = FALSE, name = name,
+                     logPrefix = "CohortConstructor_fulfillCohortReqs_filterStart_") |>
+      omopgenerics::recordCohortAttrition(reason = "Not missing record date")
+  }
 
   # remove missing sex or date of birth
   if (!isFALSE(useIndexes)) {
@@ -565,7 +565,7 @@ uploadCohortCodelistToCdm <- function(cdm, cohortCodelist, tableCohortCodelist, 
   } else {
     domains <- domainsData |>
       dplyr::filter(.data$table %in% .env$table) |>
-      dplyr::select(domain_id)
+      dplyr::select("domain_id")
     cohortCodelist <- cohortCodelist |>
       dplyr::select("cohort_definition_id", "concept_id") |>
       dplyr::cross_join(domains) |>
