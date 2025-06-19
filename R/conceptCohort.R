@@ -402,25 +402,6 @@ fulfillCohortReqs <- function(cdm, name, inObservation, type = "start_end", useI
     dplyr::compute(temporary = FALSE, name = name,
                    logPrefix = "CohortConstructor_fulfillCohortReqs_observationJoin_")
 
-  if (type == "start_end") {
-    cdm[[name]] <- cdm[[name]] |>
-      dplyr::filter(
-        !is.na(.data$cohort_start_date),
-        .data$cohort_start_date <= .data$cohort_end_date
-      ) |>
-      dplyr::compute(temporary = FALSE, name = name,
-                     logPrefix = "CohortConstructor_fulfillCohortReqs_filterStartEnd_") |>
-      omopgenerics::recordCohortAttrition(reason = "Record start <= record end")
-  } else if (type == "start") {
-    cdm[[name]] <- cdm[[name]] |>
-      dplyr::filter(
-        !is.na(.data$cohort_start_date)
-      ) |>
-      dplyr::compute(temporary = FALSE, name = name,
-                     logPrefix = "CohortConstructor_fulfillCohortReqs_filterStart_") |>
-      omopgenerics::recordCohortAttrition(reason = "Not missing record date")
-  }
-
   if (!inObservation) {
     cdm[[name]] <- cdm[[name]] %>%
       dplyr::mutate(
@@ -479,6 +460,25 @@ fulfillCohortReqs <- function(cdm, name, inObservation, type = "start_end", useI
     dplyr::compute(temporary = FALSE, name = name,
                    logPrefix = "CohortConstructor_fulfillCohortReqs_inObservation_") |>
     omopgenerics::recordCohortAttrition(reason = "Record in observation")
+
+  if (type == "start_end") {
+    cdm[[name]] <- cdm[[name]] |>
+      dplyr::filter(
+        !is.na(.data$cohort_start_date),
+        .data$cohort_start_date <= .data$cohort_end_date
+      ) |>
+      dplyr::compute(temporary = FALSE, name = name,
+                     logPrefix = "CohortConstructor_fulfillCohortReqs_filterStartEnd_") |>
+      omopgenerics::recordCohortAttrition(reason = "Record start <= record end")
+  } else if (type == "start") {
+    cdm[[name]] <- cdm[[name]] |>
+      dplyr::filter(
+        !is.na(.data$cohort_start_date)
+      ) |>
+      dplyr::compute(temporary = FALSE, name = name,
+                     logPrefix = "CohortConstructor_fulfillCohortReqs_filterStart_") |>
+      omopgenerics::recordCohortAttrition(reason = "Not missing record date")
+  }
 
   # remove missing sex or date of birth
   if (!isFALSE(useIndexes)) {
