@@ -1,9 +1,44 @@
 test_that("subsetCohort works", {
   skip_on_cran()
-  cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4, seed = 1) |>
-    omock::mockObservationPeriod(seed = 1) |>
-    omock::mockCohort(name = c("cohort1"), numberCohorts = 5, seed = 2)
+
+  cohort_1 <- dplyr::tibble(
+    cohort_definition_id = c(
+      1, 1, 1, 1,
+      2, 2, 2, 2,
+      3, 3, 3, 3,
+      4, 4, 4, 4,
+      5, 5, 5, 5
+    ),
+    subject_id = c(
+      1, 2, 2, 3,
+      1, 1, 2, 3,
+      2, 2, 3, 3,
+      1, 2, 2, 3,
+      1, 1, 1, 1
+    ),
+    cohort_start_date = as.Date(c(
+      "2003-05-08", "2000-01-11", "2000-05-28", "2015-01-25",
+      "2000-06-17", "2004-12-12", "1999-07-11", "2015-02-02",
+      "2000-03-29", "2000-07-12", "2015-02-04", "2015-03-17",
+      "2004-11-07", "1999-08-12", "2000-03-25", "2015-02-17",
+      "2001-11-22", "2002-10-22", "2003-11-14", "2004-06-09"
+    )),
+    cohort_end_date = as.Date(c(
+      "2005-04-08", "2000-05-27", "2001-09-08", "2015-04-26",
+      "2004-12-11", "2007-09-06", "2002-03-26", "2015-08-12",
+      "2000-07-11", "2001-06-22", "2015-03-16", "2015-06-11",
+      "2005-10-03", "2000-03-24", "2001-04-29", "2015-03-08",
+      "2002-10-21", "2003-11-13", "2004-06-08", "2006-06-02"
+    ))
+  )
+
+  cdm_local <- omock::mockCdmFromTables(
+    tables = list(
+      "cohort1" = cohort_1
+    ),
+    seed = 1
+  )
+
   cdm <- cdm_local |> copyCdm()
 
   # Subset 1 cohort
@@ -46,10 +81,18 @@ test_that("subsetCohort works", {
 
 test_that("codelist works", {
   testthat::skip_on_cran()
-  cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4,seed = 1) |>
-    omock::mockObservationPeriod(seed = 1) |>
-    omock::mockCohort(seed = 1)
+
+  cohort_1 <- dplyr::tibble(
+    cohort_definition_id = c(1, 1, 1, 1),
+    subject_id = c(1, 1, 2, 3),
+    cohort_start_date = as.Date(c("2003-05-17", "2004-03-11", "1999-05-03", "2015-02-25")),
+    cohort_end_date = as.Date(c("2004-03-10", "2005-07-19", "2001-06-15", "2015-04-30"))
+  )
+
+  cdm_local <- omock::mockCdmFromTables(tables = list("cohort1" = cohort_1), seed = 1)
+
+  cdm <- cdm_local |> copyCdm()
+
   cdm_local$concept <- dplyr::tibble(
     "concept_id" = c(1, 2, 3),
     "concept_name" = c("my concept 1", "my concept 2", "my concept 3"),

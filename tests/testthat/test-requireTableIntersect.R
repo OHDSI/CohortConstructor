@@ -1,9 +1,53 @@
 test_that("requiring presence in another table", {
   testthat::skip_on_cran()
-  cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4,seed = 1) |>
-    omock::mockObservationPeriod(seed = 1) |>
-    omock::mockCohort(name = c("cohort1"), numberCohorts = 2,seed = 1)
+  obs <- dplyr::tibble(
+    observation_period_id = c(1, 2, 3, 4),
+    person_id = c(1, 2, 3, 4),
+    observation_period_start_date = as.Date(c(
+      "2000-06-03", "1999-04-05", "2015-01-15", "1989-12-09"
+    )),
+    observation_period_end_date = as.Date(c(
+      "2013-06-29", "2003-06-15", "2015-10-11", "2013-12-31"
+    )),
+    "period_type_concept_id" = NA_integer_
+  )
+
+  person <- dplyr::tibble(
+    person_id = c(1, 2, 3, 4),
+    gender_concept_id = c(8532, 8507, 8507, 8507),
+    year_of_birth = c(1997, 1963, 1986, 1978),
+    month_of_birth = c(8, 1, 3, 11),
+    day_of_birth = c(22, 27, 10, 8),
+    race_concept_id = NA_integer_,
+    ethnicity_concept_id = NA_integer_
+  )
+
+  cohort_1 <- dplyr::tibble(
+    cohort_definition_id = c(1, 1, 1, 1, 2, 2, 2, 2),
+    subject_id = c(1, 1, 2, 3, 1, 1, 1, 1),
+    cohort_start_date = as.Date(c(
+      "2003-05-17", "2004-03-11", "1999-05-03", "2015-02-25",
+      "2001-03-24", "2001-11-28", "2002-01-30", "2002-06-13"
+    )),
+    cohort_end_date = as.Date(c(
+      "2004-03-10", "2005-07-19", "2001-06-15", "2015-04-30",
+      "2001-11-27", "2002-01-29", "2002-06-12", "2005-01-15"
+    ))
+  )
+
+  cdm_local <- omock::mockCdmFromTables(
+    tables = list(
+      "cohort1" = cohort_1
+    ),
+    seed = 1
+  )
+
+  cdm_local <- omopgenerics::insertTable(
+    cdm = cdm_local, name = "observation_period", table = obs)
+
+  cdm_local <- omopgenerics::insertTable(
+    cdm = cdm_local, name = "person", table = person)
+
   cdm_local$table <- dplyr::tibble(
     person_id = c(1, 3, 2, 2),
     date_start = as.Date(c("2002-01-01", "2015-10-01", "2000-01-01", "1999-01-01")),
@@ -113,11 +157,55 @@ test_that("requiring presence in another table", {
 })
 
 test_that("requiring absence in another table", {
-  testthat::skip_on_cran()
-  cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4,seed = 1) |>
-    omock::mockObservationPeriod(seed = 1) |>
-    omock::mockCohort(name = c("cohort1"), numberCohorts = 2,seed = 1)
+  testthat::skip_on_cran
+  obs <- dplyr::tibble(
+    observation_period_id = c(1, 2, 3, 4),
+    person_id = c(1, 2, 3, 4),
+    observation_period_start_date = as.Date(c(
+      "2000-06-03", "1999-04-05", "2015-01-15", "1989-12-09"
+    )),
+    observation_period_end_date = as.Date(c(
+      "2013-06-29", "2003-06-15", "2015-10-11", "2013-12-31"
+    )),
+    "period_type_concept_id" = NA_integer_
+  )
+
+  person <- dplyr::tibble(
+    person_id = c(1, 2, 3, 4),
+    gender_concept_id = c(8532, 8507, 8507, 8507),
+    year_of_birth = c(1997, 1963, 1986, 1978),
+    month_of_birth = c(8, 1, 3, 11),
+    day_of_birth = c(22, 27, 10, 8),
+    race_concept_id = NA_integer_,
+    ethnicity_concept_id = NA_integer_
+  )
+
+  cohort_1 <- dplyr::tibble(
+    cohort_definition_id = c(1, 1, 1, 1, 2, 2, 2, 2),
+    subject_id = c(1, 1, 2, 3, 1, 1, 1, 1),
+    cohort_start_date = as.Date(c(
+      "2003-05-17", "2004-03-11", "1999-05-03", "2015-02-25",
+      "2001-03-24", "2001-11-28", "2002-01-30", "2002-06-13"
+    )),
+    cohort_end_date = as.Date(c(
+      "2004-03-10", "2005-07-19", "2001-06-15", "2015-04-30",
+      "2001-11-27", "2002-01-29", "2002-06-12", "2005-01-15"
+    ))
+  )
+
+  cdm_local <- omock::mockCdmFromTables(
+    tables = list(
+      "cohort1" = cohort_1
+    ),
+    seed = 1
+  )
+
+  cdm_local <- omopgenerics::insertTable(
+    cdm = cdm_local, name = "observation_period", table = obs)
+
+  cdm_local <- omopgenerics::insertTable(
+    cdm = cdm_local, name = "person", table = person)
+
   cdm_local$table <- dplyr::tibble(
     person_id = c(1, 3, 4),
     date_start = as.Date(c("2002-01-01", "2015-10-01", "2000-01-01")),

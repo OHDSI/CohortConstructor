@@ -1,9 +1,49 @@
 test_that("exit at observation end", {
   skip_on_cran()
-  cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4,seed = 1) |>
-    omock::mockObservationPeriod(seed = 1) |>
-    omock::mockCohort(name = c("cohort"), numberCohorts = 2,seed = 1)
+
+  person <- dplyr::tibble(
+    person_id = 1:4,
+    gender_concept_id = c(8532L, 8507L, 8507L, 8507L),
+    year_of_birth = c(1997L, 1963L, 1986L, 1978L),
+    month_of_birth = c(8L, 1L, 3L, 11L),
+    day_of_birth = c(22L, 27L, 10L, 8L),
+    race_concept_id = NA_integer_,
+    ethnicity_concept_id = NA_integer_
+  )
+
+  obs <- dplyr::tibble(
+    observation_period_id = 1:4,
+    person_id = 1:4,
+    observation_period_start_date = as.Date(c("2000-06-03", "1999-04-05", "2015-01-15", "1989-12-09")),
+    observation_period_end_date = as.Date(c("2013-06-29", "2003-06-15", "2015-10-11", "2013-12-31")),
+    period_type_concept_id = NA_integer_
+  )
+
+  cohort_1 <- dplyr::tibble(
+    cohort_definition_id = c(rep(1L, 4), rep(2L, 4)),
+    subject_id = c(1L, 1L, 2L, 3L, 1L, 1L, 1L, 1L),
+    cohort_start_date = as.Date(c(
+      "2003-05-17", "2004-03-11", "1999-05-03", "2015-02-25",
+      "2001-03-24", "2001-11-28", "2002-01-30", "2002-06-13"
+    )),
+    cohort_end_date = as.Date(c(
+      "2004-03-10", "2005-07-19", "2001-06-15", "2015-04-30",
+      "2001-11-27", "2002-01-29", "2002-06-12", "2005-01-15"
+    ))
+  )
+
+
+  cdm_local <- omock::mockCdmFromTables(
+    tables = list(
+      "cohort" = cohort_1
+    ),
+    seed = 1
+  )
+
+  cdm_local <- omopgenerics::insertTable(cdm = cdm_local, name = "observation_period", table = obs)
+
+  cdm_local <- omopgenerics::insertTable(cdm = cdm_local, name = "person", table = person)
+
   cdm <- cdm_local |> copyCdm()
   # simple example - test it works
   cdm$cohort1 <- cdm$cohort |> exitAtObservationEnd(name = "cohort1")
@@ -36,8 +76,10 @@ test_that("exit at observation end", {
 
 
   # multiple observation periods
-  cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4, seed = 1)
+  cdm_local <- omock::mockCdmReference()
+
+  cdm_local <- omopgenerics::insertTable(cdm = cdm_local, name = "person", table = person)
+
   cdm_local$observation_period <- dplyr::tibble(
     "observation_period_id" = as.integer(1:8),
     "person_id" = as.integer(c(1, 1, 1, 2, 2, 3, 4, 1)),
@@ -120,10 +162,50 @@ test_that("exit at observation end", {
 
 test_that("exit at death date", {
   testthat::skip_on_cran()
-  cdm_local <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 4,seed = 1) |>
-    omock::mockObservationPeriod(seed = 1) |>
-    omock::mockCohort(name = c("cohort"), numberCohorts = 2,seed = 1)
+
+  person <- dplyr::tibble(
+    person_id = 1:4,
+    gender_concept_id = c(8532L, 8507L, 8507L, 8507L),
+    year_of_birth = c(1997L, 1963L, 1986L, 1978L),
+    month_of_birth = c(8L, 1L, 3L, 11L),
+    day_of_birth = c(22L, 27L, 10L, 8L),
+    race_concept_id = NA_integer_,
+    ethnicity_concept_id = NA_integer_
+  )
+
+  obs <- dplyr::tibble(
+    observation_period_id = 1:4,
+    person_id = 1:4,
+    observation_period_start_date = as.Date(c("2000-06-03", "1999-04-05", "2015-01-15", "1989-12-09")),
+    observation_period_end_date = as.Date(c("2013-06-29", "2003-06-15", "2015-10-11", "2013-12-31")),
+    period_type_concept_id = NA_integer_
+  )
+
+  cohort_1 <- dplyr::tibble(
+    cohort_definition_id = c(rep(1L, 4), rep(2L, 4)),
+    subject_id = c(1L, 1L, 2L, 3L, 1L, 1L, 1L, 1L),
+    cohort_start_date = as.Date(c(
+      "2003-05-17", "2004-03-11", "1999-05-03", "2015-02-25",
+      "2001-03-24", "2001-11-28", "2002-01-30", "2002-06-13"
+    )),
+    cohort_end_date = as.Date(c(
+      "2004-03-10", "2005-07-19", "2001-06-15", "2015-04-30",
+      "2001-11-27", "2002-01-29", "2002-06-12", "2005-01-15"
+    ))
+  )
+
+
+  cdm_local <- omock::mockCdmFromTables(
+    tables = list(
+      "cohort" = cohort_1
+    ),
+    seed = 1
+  )
+
+  cdm_local <- omopgenerics::insertTable(cdm = cdm_local, name = "observation_period", table = obs)
+
+  cdm_local <- omopgenerics::insertTable(cdm = cdm_local, name = "person", table = person)
+
   cdm_local$death <- dplyr::tibble(
     person_id = 1:2,
     death_date = as.Date(c("2013-06-29", "2003-06-15")),

@@ -1,10 +1,35 @@
 test_that("test restrict to first entry works", {
   skip_on_cran()
-  cdm <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 3, seed = 1) |>
-    omock::mockObservationPeriod(seed = 1) |>
-    omock::mockCohort(name = "cohort1", numberCohorts = 1, recordPerson = 2,seed = 1) |>
-    omock::mockCohort(name = "cohort2", numberCohorts = 2, recordPerson = 2,seed = 1)
+
+
+
+  cohort_1 <- dplyr::tibble(
+    cohort_definition_id = c(1, 1, 1, 1, 1, 1),
+    subject_id = c(1, 1, 1, 2, 3, 3),
+    cohort_start_date = as.Date(c("2001-05-29", "2002-10-24", "2004-01-08", "1999-07-30", "2015-01-23", "2015-02-17")),
+    cohort_end_date = as.Date(c("2002-10-23", "2004-01-07", "2009-10-03", "2001-10-02", "2015-02-16", "2015-03-10"))
+  )
+
+  cohort_2 <- dplyr::tibble(
+    cohort_definition_id = c(1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2),
+    subject_id = c(1, 1, 1, 2, 3, 3, 1, 1, 2, 2, 2, 3),
+    cohort_start_date = as.Date(c(
+      "2001-05-29", "2002-10-24", "2004-01-08", "1999-07-30", "2015-01-23", "2015-02-17",
+      "2002-10-09", "2003-09-12", "1999-04-16", "2000-03-09", "2000-05-05", "2015-02-22"
+    )),
+    cohort_end_date = as.Date(c(
+      "2002-10-23", "2004-01-07", "2009-10-03", "2001-10-02", "2015-02-16", "2015-03-10",
+      "2003-09-11", "2009-03-19", "2000-03-08", "2000-05-04", "2001-04-01", "2015-03-23"
+    ))
+  )
+
+  cdm <- omock::mockCdmFromTables(
+    tables = list(
+      "cohort1" = cohort_1,
+      "cohort2" = cohort_2
+    ),
+    seed = 1
+  )
 
   expect_true(all(cdm$cohort1 |> CohortConstructor::requireIsFirstEntry() |>
                     dplyr::pull(cohort_start_date) == c("2001-05-29", "1999-07-30", "2015-01-23")))
@@ -22,10 +47,28 @@ test_that("test restrict to first entry works", {
 
 test_that("requireIsFirstEntry, cohortIds & name arguments", {
   testthat::skip_on_cran()
-  cdm <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 3,seed = 1) |>
-    omock::mockObservationPeriod(seed = 1) |>
-    omock::mockCohort(numberCohorts = 3, recordPerson = 2,seed = 1)
+
+  cohort_1 <- dplyr::tibble(
+    cohort_definition_id = c(1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3),
+    subject_id = c(1, 1, 1, 2, 3, 3, 1, 1, 2, 2, 2, 3, 1, 2, 2, 2, 2, 2),
+    cohort_start_date = as.Date(c(
+      "2001-05-29", "2002-10-24", "2004-01-08", "1999-07-30", "2015-01-23", "2015-02-17",
+      "2002-10-09", "2003-09-12", "1999-04-16", "2000-03-09", "2000-05-05", "2015-02-22",
+      "2002-09-28", "1999-08-25", "1999-12-14", "1999-12-24", "2000-04-02", "2000-08-11"
+    )),
+    cohort_end_date = as.Date(c(
+      "2002-10-23", "2004-01-07", "2009-10-03", "2001-10-02", "2015-02-16", "2015-03-10",
+      "2003-09-11", "2009-03-19", "2000-03-08", "2000-05-04", "2001-04-01", "2015-03-23",
+      "2008-10-13", "1999-12-13", "1999-12-23", "2000-04-01", "2000-08-10", "2000-09-13"
+    ))
+  )
+
+  cdm <- omock::mockCdmFromTables(
+    tables = list(
+      "cohort" = cohort_1
+    ),
+    seed = 1
+  )
 
   expect_no_error(
     cdm$new_cohort <- CohortConstructor::requireIsFirstEntry(
@@ -83,10 +126,38 @@ test_that("errors", {
 
 test_that("requireIsLastEntry", {
   testthat::skip_on_cran()
-  cdm <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 3,seed = 1) |>
-    omock::mockObservationPeriod(seed = 1) |>
-    omock::mockCohort(numberCohorts = 3, recordPerson = 2,seed = 1)
+
+  cohort_1 <- dplyr::tibble(
+    cohort_definition_id = c(1, 1, 1, 1, 1, 1,
+                             2, 2, 2, 2, 2, 2,
+                             3, 3, 3, 3, 3, 3),
+    subject_id = c(1, 1, 1, 2, 3, 3,
+                   1, 1, 2, 2, 2, 3,
+                   1, 2, 2, 2, 2, 2),
+    cohort_start_date = as.Date(c(
+      "2001-05-29", "2002-10-24", "2004-01-08",
+      "1999-07-30", "2015-01-23", "2015-02-17",
+      "2002-10-09", "2003-09-12", "1999-04-16",
+      "2000-03-09", "2000-05-05", "2015-02-22",
+      "2002-09-28", "1999-08-25", "1999-12-14",
+      "1999-12-24", "2000-04-02", "2000-08-11"
+    )),
+    cohort_end_date = as.Date(c(
+      "2002-10-23", "2004-01-07", "2009-10-03",
+      "2001-10-02", "2015-02-16", "2015-03-10",
+      "2003-09-11", "2009-03-19", "2000-03-08",
+      "2000-05-04", "2001-04-01", "2015-03-23",
+      "2008-10-13", "1999-12-13", "1999-12-23",
+      "2000-04-01", "2000-08-10", "2000-09-13"
+    ))
+  )
+
+  cdm <- omock::mockCdmFromTables(
+    tables = list(
+      "cohort" = cohort_1
+    ),
+    seed = 1
+  )
 
   cdm$new_cohort <- CohortConstructor::requireIsLastEntry(
     cohort = cdm$cohort,
@@ -126,13 +197,53 @@ test_that("requireIsLastEntry", {
 
 test_that("requireEntry", {
   testthat::skip_on_cran()
-  cdm <- omock::mockCdmReference() |>
-    omock::mockPerson(n = 10,seed = 1) |>
-    omock::mockObservationPeriod(seed = 1) |>
-    omock::mockCohort(name = "cohort1",
-                      numberCohorts = 1,
-                      recordPerson = 4,seed = 1)
 
+  cohort_1 <- dplyr::tibble(
+    cohort_definition_id = rep(1, 40),
+    subject_id = c(
+      1, 1, 1,
+      2, 2, 2,
+      3, 3, 3,
+      4, 4, 4, 4,
+      5, 5, 5, 5, 5, 5,
+      6, 6, 6, 6, 6,
+      7, 7, 7, 7,
+      8, 8,
+      9, 9, 9, 9, 9, 9, 9, 9,
+      10, 10
+    ),
+    cohort_start_date = as.Date(c(
+      "2001-01-01", "2001-05-22", "2002-09-22",
+      "1999-05-11", "2000-01-19", "2000-07-31",
+      "2015-02-03", "2015-04-08", "2015-04-13",
+      "1991-08-05", "1993-02-22", "1995-05-12", "1996-09-03",
+      "2012-04-17", "2012-04-20", "2012-04-28", "2012-06-06", "2012-06-10", "2012-06-13",
+      "2011-02-24", "2011-04-25", "2011-07-09", "2011-08-16", "2011-12-13",
+      "2014-03-11", "2014-03-12", "2014-03-13", "2014-03-15",
+      "1986-12-24", "1990-12-06",
+      "1988-06-30", "1988-07-27", "1989-06-09", "1989-06-21", "1989-08-09", "1989-10-14", "1990-05-31", "1993-09-28",
+      "2019-11-24", "2019-11-25"
+    )),
+    cohort_end_date = as.Date(c(
+      "2001-05-21", "2002-09-21", "2010-04-28",
+      "2000-01-18", "2000-07-30", "2001-02-07",
+      "2015-04-07", "2015-04-12", "2015-06-11",
+      "1993-02-21", "1995-05-11", "1996-09-02", "2000-09-10",
+      "2012-04-19", "2012-04-27", "2012-06-05", "2012-06-09", "2012-06-12", "2012-09-06",
+      "2011-04-24", "2011-07-08", "2011-08-15", "2011-12-12", "2012-11-07",
+      "2014-03-11", "2014-03-12", "2014-03-14", "2014-03-21",
+      "1990-12-05", "1997-10-28",
+      "1988-07-26", "1989-06-08", "1989-06-20", "1989-08-08", "1989-10-13", "1990-05-30", "1993-09-27", "1999-04-22",
+      "2019-11-24", "2019-11-25"
+    ))
+  )
+
+  cdm <- omock::mockCdmFromTables(
+    tables = list(
+      "cohort1" = cohort_1
+    ),
+    seed = 1
+  )
   # 1 to inf will leave the cohort table unchanged
   cdm$cohort1_a <- requireIsEntry(
     cohort = cdm$cohort1,
@@ -181,13 +292,12 @@ test_that("requireEntry", {
 
 
  # mock cohort
- cdm_local <- omock::mockCdmReference() |>
-   omock::mockPerson(n = 10,seed = 1) |>
-   omock::mockObservationPeriod(seed = 1) |>
-   omock::mockCohort(name = "cohort1",
-                     numberCohorts = 1,
-                     recordPerson = 4,
-                     seed = 1)
+ cdm_local <- omock::mockCdmFromTables(
+   tables = list(
+     "cohort1" = cohort_1
+   ),
+   seed = 1
+ )
  cdm <- cdm_local |> copyCdm()
  cdm <- omopgenerics::insertTable(cdm, "observation_period",
                            data.frame(observation_period_id = c(1,2),
