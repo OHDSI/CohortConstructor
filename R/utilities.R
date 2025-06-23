@@ -38,6 +38,7 @@ uniqueColumnName <- function(table, n = 1) {
 }
 
 getObservationPeriodId <- function(x, name) {
+  cdm <- omopgenerics::cdmReference(x)
   currentObsId <- x |>
     dplyr::inner_join(
       cdm$observation_period |>
@@ -50,8 +51,8 @@ getObservationPeriodId <- function(x, name) {
       by = "subject_id"
     ) |>
     dplyr::filter(
-      .data[[indexDate]] <= .data[["observation_period_end_date"]] &
-        .data[[indexDate]] >= .data[["observation_period_start_date"]]
+      .data[["cohort_start_date"]] <= .data[["observation_period_end_date"]] &
+        .data[["cohort_start_date"]] >= .data[["observation_period_start_date"]]
     ) |>
     dplyr::select(dplyr::all_of(c(
      "cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date", "observation_period_id"
