@@ -1,6 +1,6 @@
 Package: CohortConstructor
 Title: Build and Manipulate Study Cohorts Using a Common Data Model
-Version: 0.4.0
+Version: 0.4.1
 Authors@R: c(
     person("Edward", "Burn", , "edward.burn@ndorms.ox.ac.uk", 
     role = c("aut", "cre"), comment = c(ORCID = "0000-0002-9286-1128")),
