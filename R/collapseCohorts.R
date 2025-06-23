@@ -40,11 +40,12 @@ collapseCohorts <- function(cohort,
   tmpNewCohort <- omopgenerics::uniqueTableName(tablePrefix)
   tmpUnchanged <- omopgenerics::uniqueTableName(tablePrefix)
   cdm <- filterCohortInternal(cdm, cohort, cohortId, tmpNewCohort, tmpUnchanged)
-  newCohort <- cdm[[tmpNewCohort]]
+  newCohort <- cdm[[tmpNewCohort]] |>
+    dplyr::select(dplyr::all_of(omopgenerics::cohortColumns("cohort")))
 
   if (gap == Inf) {
     newCohort <- newCohort |>
-      PatientProfiles::addObservationPeriodId(name = tmpNewCohort) |>
+      getObservationPeriodId(name = tmpNewCohort) |>
       joinAll(by = c(
         "cohort_definition_id",
         "subject_id",
@@ -53,7 +54,7 @@ collapseCohorts <- function(cohort,
       dplyr::select(!"observation_period_id")
   } else if (gap > 0) {
     newCohort <- newCohort |>
-      PatientProfiles::addObservationPeriodId(name = tmpNewCohort) |>
+      getObservationPeriodId(name = tmpNewCohort) |>
       joinOverlap(
         name = tmpNewCohort,
         gap = gap,
