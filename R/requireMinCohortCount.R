@@ -10,6 +10,10 @@
 #' @inheritParams nameDoc
 #' @param minCohortCount The minimum count of sbjects for a cohort to be
 #' included.
+#' @param updateSettings If TRUE, dropped cohorts will also be removed
+#' from all cohort table attributes (i.e., settings, attrition, counts, and
+#' codelist). If FALSE, these attributes will be retained but updated to reflect
+#' that the affected cohorts have been suppressed.
 #'
 #' @return Cohort table
 #'
@@ -27,6 +31,7 @@
 requireMinCohortCount <- function(cohort,
                                   minCohortCount,
                                   cohortId = NULL,
+                                  updateSettings = FALSE,
                                   name = tableName(cohort)){
   # checks
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
@@ -54,13 +59,26 @@ requireMinCohortCount <- function(cohort,
       dplyr::filter(!.data$cohort_definition_id %in% {{cohortsToDrop}})
   }
 
-  cdm[[name]] <- cohort |>
-    dplyr::compute(temporary = FALSE, name = name,
-                   logPrefix = "CohortConstructor_requireMinCohortCount_fewer_") |>
-    omopgenerics::recordCohortAttrition(
-      reason = "Fewer than minimum cohort count of {minCohortCount}",
-      cohortId = cohortsToDrop
+  if (!updateSettings) {
+    cdm[[name]] <- cohort |>
+      dplyr::compute(temporary = FALSE, name = name,
+                     logPrefix = "CohortConstructor_requireMinCohortCount_fewer_") |>
+      omopgenerics::recordCohortAttrition(
+        reason = "Fewer than minimum cohort count of {minCohortCount}",
+        cohortId = cohortsToDrop
       )
+  } else {
+    cdm[[name]] <- cohort |>
+      dplyr::compute(temporary = FALSE, name = name,
+                     logPrefix = "CohortConstructor_requireMinCohortCount_fewer_") |>
+      omopgenerics::newCohortTable(
+        cohortSetRef = settings(cohort) |> dplyr::filter(!.data$cohort_definition_id %in% .env$cohortsToDrop),
+        cohortAttritionRef = attrition(cohort) |> dplyr::filter(!.data$cohort_definition_id %in% .env$cohortsToDrop),
+        cohortCodelistRef = attr(cohort, "cohort_codelist") |> dplyr::filter(!.data$cohort_definition_id %in% .env$cohortsToDrop),
+        .softValidation = TRUE
+      )
+  }
+
 
   useIndexes <- getOption("CohortConstructor.use_indexes")
   if (!isFALSE(useIndexes)) {
