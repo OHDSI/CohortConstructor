@@ -75,7 +75,8 @@ unionCohorts <- function(cohort,
   unionedCohort <- copyCohorts(cohort = cohort,
                                name = tmpTable,
                                cohortId = cohortId) |>
-    PatientProfiles::addObservationPeriodId(name = tmpTable) |>
+    dplyr::select(dplyr::all_of(omopgenerics::cohortColumns("cohort"))) |>
+    getObservationPeriodId(name = tmpTable) |>
     joinOverlap(name = tmpTable,
                 by = c("observation_period_id", "subject_id"),
                 gap = gap) |>

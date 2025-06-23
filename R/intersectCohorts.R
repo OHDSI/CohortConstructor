@@ -132,13 +132,12 @@ intersectCohorts <- function(cohort,
   )
   newCohort <- newCohort |>
     dplyr::inner_join(cdm[[setName]], by = cohortNames) |>
-    dplyr::select("cohort_definition_id", "subject_id",
-                  "cohort_start_date", "cohort_end_date") |>
+    dplyr::select(dplyr::all_of(omopgenerics::cohortColumns("cohort"))) |>
     dplyr::compute(name = tblName, temporary = FALSE,
                    logPrefix = "CohortConstructor_intersectCohorts_out_")
   if (newCohort |> dplyr::tally() |> dplyr::pull("n") > 0) {
     newCohort <- newCohort |>
-      PatientProfiles::addObservationPeriodId(name = tblName) |>
+      getObservationPeriodId(name = tblName) |>
       joinOverlap(
         name = tblName, gap = gap,
         by = c("observation_period_id", "cohort_definition_id", "subject_id")
