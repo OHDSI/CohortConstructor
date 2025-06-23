@@ -67,6 +67,7 @@ records from cohorts with a minimum number of individuals</p>
 <span>  <span class="va">cohort</span>,</span>
 <span>  <span class="va">minCohortCount</span>,</span>
 <span>  cohortId <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  updateSettings <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  name <span class="op">=</span> <span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/tableName.html" class="external-link">tableName</a></span><span class="op">(</span><span class="va">cohort</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -89,6 +90,13 @@ included.</p></dd>
 (cohort_definition_id or cohort_name). If NULL, all cohorts will be
 used; otherwise, only the specified cohorts will be modified, and the
 rest will remain unchanged.</p></dd>
+
+
+<dt id="arg-updatesettings">updateSettings<a class="anchor" aria-label="anchor" href="#arg-updatesettings"></a></dt>
+<dd><p>If TRUE, dropped cohorts will also be removed
+from all cohort table attributes (i.e., settings, attrition, counts, and
+codelist). If FALSE, these attributes will be retained but updated to reflect
+that the affected cohorts have been suppressed.</p></dd>
 
 
 <dt id="arg-name">name<a class="anchor" aria-label="anchor" href="#arg-name"></a></dt>
