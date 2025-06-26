@@ -437,7 +437,7 @@ test_that("Inf age", {
 
 })
 
-test_that("test it works and expected errors", {
+test_that("test atFirst", {
   testthat::skip_on_cran()
 
   person <- dplyr::tibble(
@@ -481,18 +481,15 @@ test_that("test it works and expected errors", {
     ))
   )
 
-  cdm_local <- omock::mockCdmFromTables(
-    tables = list(
-      "cohort" = cohort_1
-    ),
-    seed = 1
-  )
-
+  cdm_local <- omock::mockCdmReference()
   cdm_local <- omopgenerics::insertTable(cdm = cdm_local, name = "observation_period", table = obs)
   cdm_local <- omopgenerics::insertTable(cdm = cdm_local, name = "person", table = person)
+  cdm_local <- omopgenerics::insertTable(cdm = cdm_local, name = "cohort", table = cohort_1)
+
   cdm_local$person <- cdm_local$person |>
     dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
   cdm <- cdm_local |> copyCdm()
+  cdm$cohort <- cdm$cohort |> omopgenerics::newCohortTable()
 
   cdm$cohort1 <- cdm$cohort |>
     requireDemographics(
