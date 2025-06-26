@@ -133,6 +133,31 @@ test_that("requiring presence in another table", {
     as.Date("1999-05-03")
   )
 
+  # atFirst
+  cdm$cohort7 <-  requireTableIntersect(cohort = cdm$cohort1,
+                                        cohortId = 2,
+                                        tableName = "table",
+                                        targetStartDate = "date_start",
+                                        targetEndDate = "date_end",
+                                        window = c(-Inf, Inf),
+                                        intersections = 0,
+                                        atFirst = TRUE,
+                                        censorDate = "cohort_end_date",
+                                        name = "cohort7")
+  expect_equal(
+    collectCohort(cdm$cohort7, 2),
+    dplyr::tibble(
+      subject_id = 1L,
+      cohort_start_date = as.Date(c("2001-03-24", "2002-01-30", "2002-06-13")),
+      cohort_end_date = as.Date(c("2001-11-27", "2002-06-12", "2005-01-15"))
+    )
+  )
+  expect_equal(
+    attrition(cdm$cohort7)$reason,
+    c('Initial qualifying events', 'Initial qualifying events',
+      'Not in table table between -Inf & Inf days relative to cohort_start_date, censoring at cohort_end_date. Requirement applied to the first entry')
+  )
+
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
 
   # expected errors

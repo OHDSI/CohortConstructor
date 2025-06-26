@@ -31,6 +31,7 @@ requireDemographics <- function(cohort,
                                 sex = c("Both"),
                                 minPriorObservation = 0,
                                 minFutureObservation = 0,
+                                atFirst = FALSE,
                                 name = tableName(cohort),
                                 .softValidation = TRUE) {
   cohort <- demographicsFilter(
@@ -46,6 +47,7 @@ requireDemographics <- function(cohort,
     reqSex = TRUE,
     reqPriorObservation = TRUE,
     reqFutureObservation = TRUE,
+    atFirst = atFirst,
     .softValidation = .softValidation
   )
 
@@ -77,6 +79,7 @@ requireAge <- function(cohort,
                        ageRange,
                        cohortId = NULL,
                        indexDate = "cohort_start_date",
+                       atFirst = FALSE,
                        name = tableName(cohort),
                        .softValidation = TRUE) {
   cohort <- demographicsFilter(
@@ -92,6 +95,7 @@ requireAge <- function(cohort,
     reqSex = FALSE,
     reqPriorObservation = FALSE,
     reqFutureObservation = FALSE,
+    atFirst = atFirst,
     .softValidation = .softValidation
   )
 
@@ -121,6 +125,7 @@ requireAge <- function(cohort,
 requireSex <- function(cohort,
                        sex,
                        cohortId = NULL,
+                       atFirst = FALSE,
                        name = tableName(cohort),
                        .softValidation = TRUE) {
   cohort <- demographicsFilter(
@@ -136,6 +141,7 @@ requireSex <- function(cohort,
     reqSex = TRUE,
     reqPriorObservation = FALSE,
     reqFutureObservation = FALSE,
+    atFirst = atFirst,
     .softValidation = .softValidation
   )
 
@@ -167,6 +173,7 @@ requirePriorObservation <- function(cohort,
                                     minPriorObservation,
                                     cohortId = NULL,
                                     indexDate = "cohort_start_date",
+                                    atFirst = FALSE,
                                     name = tableName(cohort),
                                     .softValidation = TRUE) {
   cohort <- demographicsFilter(
@@ -182,6 +189,7 @@ requirePriorObservation <- function(cohort,
     reqSex = FALSE,
     reqPriorObservation = TRUE,
     reqFutureObservation = FALSE,
+    atFirst = atFirst,
     .softValidation = .softValidation
   )
 
@@ -214,6 +222,7 @@ requireFutureObservation <- function(cohort,
                                      minFutureObservation,
                                      cohortId = NULL,
                                      indexDate = "cohort_start_date",
+                                     atFirst = FALSE,
                                      name = tableName(cohort),
                                      .softValidation = TRUE) {
   cohort <- demographicsFilter(
@@ -229,6 +238,7 @@ requireFutureObservation <- function(cohort,
     reqSex = FALSE,
     reqPriorObservation = FALSE,
     reqFutureObservation = TRUE,
+    atFirst = atFirst,
     .softValidation = .softValidation
   )
 
@@ -247,6 +257,7 @@ demographicsFilter <- function(cohort,
                                reqSex,
                                reqPriorObservation,
                                reqFutureObservation,
+                               atFirst,
                                .softValidation) {
   # checks
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
@@ -256,7 +267,8 @@ demographicsFilter <- function(cohort,
   cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
   ageRange <- validateDemographicRequirements(ageRange, sex, minPriorObservation, minFutureObservation)
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
-  omopgenerics::assertLogical(.softValidation)
+  omopgenerics::assertLogical(.softValidation, length = 1)
+  omopgenerics::assertLogical(atFirst, length = 1)
 
   if (length(cohortId) == 0) {
     cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
@@ -270,10 +282,9 @@ demographicsFilter <- function(cohort,
   }
 
   # output cohort attributes ----
-  reqCols <- c("age_range",
-               "sex",
-               "min_prior_observation",
-               "min_future_observation")[c(reqAge, reqSex, reqPriorObservation, reqFutureObservation)]
+  reqCols <- c("age_range",  "sex", "min_prior_observation","min_future_observation")[c(
+    reqAge, reqSex, reqPriorObservation, reqFutureObservation
+  )]
 
   # new settings
   ind <- reqCols %in% colnames(settings(cohort))
@@ -288,7 +299,8 @@ demographicsFilter <- function(cohort,
         "age_range" = paste0(ageRange[[1]][1], "_", ageRange[[1]][2]),
         "sex" = sex,
         "min_prior_observation" = minPriorObservation,
-        "min_future_observation" = minFutureObservation
+        "min_future_observation" = minFutureObservation,
+        "at_first" = atFirst
       ) |>
         dplyr::select(dplyr::all_of(c("cohort_definition_id", reqCols))),
       by = "cohort_definition_id"
@@ -320,6 +332,27 @@ demographicsFilter <- function(cohort,
       name = tmpNewCohort
     )
 
+  # atFirst
+  filterAge <- ".data[[newCols[1]]] >= .env$min_age & .data[[newCols[1]]] <= .env$max_age"
+  filterSex <- ".data[[newCols[2]]] == .env$sex"
+  filterPriorObservation <- ".data[[newCols[3]]] >= .env$minPriorObservation"
+  filterFutureObservation <- ".data[[newCols[4]]] >= .env$minFutureObservation"
+  atFirstReason <- NULL
+  if (atFirst) {
+    filterAge <- glue::glue("({filterAge} & rec_id_1234 == 1) | rec_id_1234 > 1")
+    filterSex <- glue::glue("({filterSex} & rec_id_1234 == 1) | rec_id_1234 > 1")
+    filterPriorObservation <- glue::glue("({filterPriorObservation} & rec_id_1234 == 1) | rec_id_1234 > 1")
+    filterFutureObservation <- glue::glue("({filterFutureObservation} & rec_id_1234 == 1) | rec_id_1234 > 1")
+    newCohort <- newCohort |>
+      dplyr::group_by(.data$cohort_definition_id, .data$subject_id) |>
+      dplyr::arrange() |>
+      dplyr::mutate(rec_id_1234 = dplyr::row_number()) |>
+      dplyr::ungroup() |>
+      dplyr::compute(name = tmpNewCohort, temporary = FALSE,
+                     logPrefix = "CohortConstructor_demographicsFilter_arrange_")
+    atFirstReason <- ". Requirement applied to the first entry"
+  }
+
   # filter + record attrition ----
   # age
   if (reqAge) {
@@ -328,59 +361,63 @@ demographicsFilter <- function(cohort,
     if (is.infinite(min_age)) min_age <- 0
     if (is.infinite(max_age)) max_age <- 200
     # filter
+    filterAge <- filterAge |> rlang::parse_exprs()
     newCohort <- newCohort |>
-      dplyr::filter(.data[[newCols[1]]] >= .env$min_age & .data[[newCols[1]]] <= .env$max_age) |>
+      dplyr::filter(!!!filterAge) |>
       dplyr::compute(
         name = tmpNewCohort, temporary = FALSE,
         logPrefix = "CohortConstructor_demographicsFilter_reqAge_"
       ) |>
       omopgenerics::recordCohortAttrition(
-        reason = "Age requirement: {ageRange[[1]][1]} to {ageRange[[1]][2]}",
+        reason = "Age requirement: {ageRange[[1]][1]} to {ageRange[[1]][2]}{atFirstReason}",
         cohortId = cohortId
       )
   }
   # sex
   if (reqSex) {
+    filterSex <- filterSex |> rlang::parse_exprs()
     newCohort <- newCohort |>
-      dplyr::filter(.data[[newCols[2]]] == .env$sex) |>
+      dplyr::filter(!!!filterSex) |>
       dplyr::compute(
         name = tmpNewCohort, temporary = FALSE,
         logPrefix = "CohortConstructor_demographicsFilter_reqSex_"
       ) |>
       omopgenerics::recordCohortAttrition(
-        reason = "Sex requirement: {sex}",
+        reason = "Sex requirement: {sex}{atFirstReason}",
         cohortId = cohortId
       )
   }
   # prior observation
   if (reqPriorObservation) {
+    filterPriorObservation <- filterPriorObservation |> rlang::parse_exprs()
     newCohort <- newCohort |>
-      dplyr::filter(.data[[newCols[3]]] >= .env$minPriorObservation) |>
+      dplyr::filter(!!!filterPriorObservation) |>
       dplyr::compute(
         name = tmpNewCohort, temporary = FALSE,
         logPrefix = "CohortConstructor_demographicsFilter_reqPriorObservation_"
       ) |>
       omopgenerics::recordCohortAttrition(
-        reason = "Prior observation requirement: {minPriorObservation} days",
+        reason = "Prior observation requirement: {minPriorObservation} days{atFirstReason}",
         cohortId = cohortId
       )
   }
   # future observation
   if (reqFutureObservation) {
+    filterFutureObservation <- filterFutureObservation |> rlang::parse_exprs()
     newCohort <- newCohort |>
-      dplyr::filter(.data[[newCols[4]]] >= .env$minFutureObservation) |>
+      dplyr::filter(!!!filterFutureObservation) |>
       dplyr::compute(
         name = tmpNewCohort, temporary = FALSE,
         logPrefix = "CohortConstructor_demographicsFilter_reqFutureObservation_"
       ) |>
       omopgenerics::recordCohortAttrition(
-        reason = "Future observation requirement: {minFutureObservation} days",
+        reason = "Future observation requirement: {minFutureObservation} days{atFirstReason}",
         cohortId = cohortId
       )
   }
 
   newCohort <- newCohort |>
-    dplyr::select(!dplyr::any_of(newCols)) |>
+    dplyr::select(!dplyr::any_of(c(newCols, "rec_id_1234"))) |>
     dplyr::compute(name = tmpNewCohort, temporary = FALSE,
                    logPrefix = "CohortConstructor_demographicsFilter_select_")
 

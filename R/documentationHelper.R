@@ -115,6 +115,8 @@ NULL
 #' @param tableName Name of the table to check for intersect.
 #' @param inObservation If TRUE only records inside an observation period will
 #' be considered.
+#' @param atFirst If FALSE the requirement will be applied to all subject's
+#' entries, if TRUE, it will only be applied to the first entry of the subject.
 #'
 #' @name requireIntersectDoc
 #' @keywords internal
@@ -131,6 +133,8 @@ NULL
 #' days in the database.
 #' @param indexDate Variable in cohort that contains the date to compute the
 #' demographics characteristics on which to restrict on.
+#' @param atFirst If FALSE the requirement will be applied to all subject's
+#' entries, if TRUE, it will only be applied to the first entry of the subject.
 #' @param requirementInteractions If TRUE, cohorts will be created for
 #' all combinations of ageGroup, sex, and daysPriorObservation. If FALSE, only
 #' the first value specified for the other factors will be used. Consequently,

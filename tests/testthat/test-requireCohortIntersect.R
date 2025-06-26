@@ -144,6 +144,32 @@ test_that("requiring presence in another cohort", {
                       "Initial qualifying events",
                       "Not in cohort cohort_1 between 0 & Inf days relative to cohort_start_date, censoring at cohort_end_date")))
 
+  # atFirst
+  cdm$cohort8 <- requireCohortIntersect(cohort = cdm$cohort1,
+                                        intersections = c(1,Inf),
+                                        cohortId = 2,
+                                        targetCohortTable = "cohort1",
+                                        targetCohortId = 1,
+                                        window = c(-Inf, 1),
+                                        atFirst = TRUE,
+                                        name = "cohort8")
+  expect_equal(
+    collectCohort(cdm$cohort8, 2),
+    dplyr::tibble(
+      subject_id = 1L,
+      cohort_start_date = as.Date(c("2001-11-28", "2002-01-30", "2002-06-13")),
+      cohort_end_date = as.Date(c("2002-01-29", "2002-06-12", "2005-01-15"))
+    )
+  )
+  expect_equal(
+    attrition(cdm$cohort8)$reason,
+    c('Initial qualifying events',
+    'In cohort cohort_2 between -Inf & Inf days relative to cohort_start_date between 1 and Inf times',
+    'Initial qualifying events',
+    'In cohort cohort_2 between -Inf & Inf days relative to cohort_start_date between 1 and Inf times',
+    'In cohort cohort_1 between -Inf & 1 days relative to cohort_start_date between 1 and Inf times. Requirement applied to the first entry'
+  ))
+
   # expected errors
   # only support one target id
   expect_error(requireCohortIntersect(cohort = cdm$cohort1,

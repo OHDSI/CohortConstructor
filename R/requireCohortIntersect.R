@@ -36,6 +36,7 @@ requireCohortIntersect <- function(cohort,
                                    targetStartDate = "cohort_start_date",
                                    targetEndDate = "cohort_end_date",
                                    censorDate = NULL,
+                                   atFirst = FALSE,
                                    name = tableName(cohort),
                                    .softValidation = TRUE) {
   # checks
@@ -52,7 +53,8 @@ requireCohortIntersect <- function(cohort,
     {{targetCohortId}}, cdm[[targetCohortTable]], validation = "error"
   )
   intersections <- validateIntersections(intersections)
-  omopgenerics::assertLogical(.softValidation)
+  omopgenerics::assertLogical(.softValidation, length = 1)
+  omopgenerics::assertLogical(atFirst, length = 1)
 
   if (length(cohortId) == 0) {
     cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
@@ -79,6 +81,7 @@ requireCohortIntersect <- function(cohort,
                      "i" = "Cohort IDs {targetCohortId} found in targetCohortTable {targetCohortTable}",
                      "i" = "Use targetCohortId argument to specify just one cohort for intersection"))
   }
+
   lower_limit <- as.integer(intersections[[1]])
   upper_limit <- intersections[[2]]
   upper_limit[is.infinite(upper_limit)] <- 999999L
@@ -127,14 +130,7 @@ requireCohortIntersect <- function(cohort,
       name = tmpNewCohort
     )
 
-  newCohort <- newCohort |>
-    dplyr::filter(
-      .data[[intersectCol]] >= .env$lower_limit &
-        .data[[intersectCol]] <= .env$upper_limit
-    ) |>
-    dplyr::select(!dplyr::all_of(intersectCol)) |>
-    dplyr::compute(name = tmpNewCohort, temporary = FALSE,
-                   logPrefix = "CohortConstructor_requireCohortIntersect_subset_")
+  newCohort <- applyRequirement(newCohort, atFirst, tmpNewCohort, intersectCol, lower_limit, upper_limit)
 
   # attrition reason
   if (all(intersections == 0)) {
@@ -155,9 +151,7 @@ requireCohortIntersect <- function(cohort,
       "{intersections[[1]]} times"
     )
   }
-  if (!is.null(censorDate)) {
-    reason <- glue::glue("{reason}, censoring at {censorDate}")
-  }
+  reason <- completeAttritionReason(reason, censorDate, atFirst)
 
   # codelist
   targetCodelist <- attr(cdm[[targetCohortTable]], "cohort_codelist") |>
@@ -197,4 +191,42 @@ requireCohortIntersect <- function(cohort,
   }
 
   return(newCohort)
+}
+
+applyRequirement <- function(newCohort, atFirst, tmpNewCohort, intersectCol, lower_limit, upper_limit) {
+  if (atFirst) {
+    newCohort <- newCohort |>
+      dplyr::group_by(.data$cohort_definition_id, .data$subject_id) |>
+      dplyr::arrange() |>
+      dplyr::mutate(rec_id_1234 = dplyr::row_number()) |>
+      dplyr::ungroup() |>
+      dplyr::compute(name = tmpNewCohort, temporary = FALSE,
+                     logPrefix = "CohortConstructor_requireCohortIntersect_subset_arrange_") |>
+      dplyr::filter(
+        (.data[[intersectCol]] >= .env$lower_limit & .data[[intersectCol]] <= .env$upper_limit & .data$rec_id_1234 == 1) ||
+          .data$rec_id_1234 > 1
+      ) |>
+      dplyr::select(!dplyr::all_of(c(intersectCol, "rec_id_1234"))) |>
+      dplyr::compute(name = tmpNewCohort, temporary = FALSE,
+                     logPrefix = "CohortConstructor_requireCohortIntersect_subset_first_")
+  } else {
+    newCohort <- newCohort |>
+      dplyr::filter(
+        .data[[intersectCol]] >= .env$lower_limit & .data[[intersectCol]] <= .env$upper_limit
+      ) |>
+      dplyr::select(!dplyr::all_of(intersectCol)) |>
+      dplyr::compute(name = tmpNewCohort, temporary = FALSE,
+                     logPrefix = "CohortConstructor_requireCohortIntersect_subset_first_")
+  }
+  return(newCohort)
+}
+
+completeAttritionReason <- function(reason, censorDate, atFirst) {
+  if (!is.null(censorDate)) {
+    reason <- glue::glue("{reason}, censoring at {censorDate}")
+  }
+  if (atFirst) {
+    reason <- glue::glue("{reason}. Requirement applied to the first entry")
+  }
+  return(reason)
 }

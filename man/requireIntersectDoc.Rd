@@ -31,6 +31,9 @@ intersect.}
 
 \item{inObservation}{If TRUE only records inside an observation period will
 be considered.}
+
+\item{atFirst}{If FALSE the requirement will be applied to all subject's
+entries, if TRUE, it will only be applied to the first entry of the subject.}
 }
 \description{
 Helper for consistent documentation of arguments in \code{requireIntersect}

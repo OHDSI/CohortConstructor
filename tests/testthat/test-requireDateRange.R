@@ -127,6 +127,20 @@ test_that("requireDateRange", {
   )
   expect_identical(cdm$cohort7 |> dplyr::collect(), cdm$cohort2 |> dplyr::collect())
 
+  # atFirst
+  cdm$cohort8 <- cdm$cohort2 |>
+    requireInDateRange(dateRange = as.Date(c("2005-01-01", "2006-01-01")), name = "cohort8", atFirst = TRUE)
+  expect_equal(cdm$cohort8 |> dplyr::pull("cohort_start_date") |> sort(), as.Date(c("2000-05-28", "2004-12-12")))
+  expect_equal(
+    attrition(cdm$cohort8)$reason,
+    c('Initial qualifying events',
+      'cohort_start_date after 2005-01-01. Requirement applied to the first entry',
+      'cohort_start_date before 2006-01-01. Requirement applied to the first entry',
+      'Initial qualifying events',
+      'cohort_start_date after 2005-01-01. Requirement applied to the first entry',
+      'cohort_start_date before 2006-01-01. Requirement applied to the first entry')
+  )
+
   # expect error
   expect_error(requireInDateRange(cohort = "a"))
   expect_error(cdm$cohort1 |>

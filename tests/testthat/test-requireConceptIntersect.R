@@ -119,6 +119,29 @@ test_that("require flag in concept", {#need
                       "Initial qualifying events",
                       "Concept a between -Inf & Inf days relative to cohort_start_date between 1 and Inf, censoring at cohort_end_date")))
 
+  # atFirst
+  cdm$cohort6 <- requireConceptIntersect(cohort = cdm$cohort1,
+                                         conceptSet = list(a = 1L),
+                                         window = c(-Inf, 0),
+                                         atFirst = TRUE,
+                                         name = "cohort6")
+  expect_equal(
+    collectCohort(cdm$cohort6, 2),
+    dplyr::tibble(
+      subject_id = 1L,
+      cohort_start_date = as.Date(c("2001-11-28", "2002-01-30", "2002-06-13")),
+      cohort_end_date = as.Date(c("2002-01-29", "2002-06-12", "2005-01-15"))
+    )
+  )
+  expect_equal(
+    collectCohort(cdm$cohort6, 1),
+    dplyr::tibble(
+      subject_id = 1L,
+      cohort_start_date = as.Date(c("2004-03-11")),
+      cohort_end_date = as.Date(c("2005-07-19"))
+    )
+  )
+
   # name
   cdm$cohort1 <-  requireConceptIntersect(cohort = cdm$cohort1,
                                           conceptSet = list(a = 1L),

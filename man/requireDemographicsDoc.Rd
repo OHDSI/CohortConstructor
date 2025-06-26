@@ -17,6 +17,9 @@ days in the database.}
 \item{indexDate}{Variable in cohort that contains the date to compute the
 demographics characteristics on which to restrict on.}
 
+\item{atFirst}{If FALSE the requirement will be applied to all subject's
+entries, if TRUE, it will only be applied to the first entry of the subject.}
+
 \item{requirementInteractions}{If TRUE, cohorts will be created for
 all combinations of ageGroup, sex, and daysPriorObservation. If FALSE, only
 the first value specified for the other factors will be used. Consequently,
