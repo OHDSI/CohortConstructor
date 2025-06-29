@@ -10,10 +10,10 @@
 #' @inheritParams cohortIdModifyDoc
 #' @inheritParams windowDoc
 #' @inheritParams nameDoc
+#' @inheritParams atFirstDoc
 #' @inheritParams softValidationDoc
 #'
-#' @return Cohort table with only those in the other table kept (or those that
-#' are not in the table if negate = TRUE)
+#' @return Cohort table
 #'
 #' @export
 #'
@@ -36,6 +36,7 @@ requireTableIntersect <- function(cohort,
                                   targetEndDate = endDateColumn(tableName),
                                   inObservation = TRUE,
                                   censorDate = NULL,
+                                  atFirst = FALSE,
                                   name = tableName(cohort),
                                   .softValidation = TRUE) {
   # checks
@@ -47,7 +48,8 @@ requireTableIntersect <- function(cohort,
   cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
   intersections <- validateIntersections(intersections)
   omopgenerics::assertCharacter(tableName)
-  omopgenerics::assertLogical(.softValidation)
+  omopgenerics::assertLogical(.softValidation, length = 1)
+  omopgenerics::assertLogical(atFirst, length = 1)
 
   if (length(cohortId) == 0) {
     cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
@@ -88,16 +90,11 @@ requireTableIntersect <- function(cohort,
       inObservation = inObservation,
       nameStyle = intersectCol,
       name = tmpNewCohort
-    ) |>
-    dplyr::filter(
-      .data[[intersectCol]] >= .env$lower_limit &
-        .data[[intersectCol]] <= .env$upper_limit
-    ) |>
-    dplyr::select(!dplyr::all_of(intersectCol)) |>
-    dplyr::compute(
-      name = tmpNewCohort, temporary = FALSE,
-      logPrefix = "CohortConstructor_requireTableIntersect_subset_"
     )
+
+  newCohort <- applyRequirement(
+    newCohort, atFirst, tmpNewCohort, intersectCol, lower_limit, upper_limit, cdm
+  )
 
   # attrition reason
   if (all(intersections == 0)) {
@@ -118,9 +115,7 @@ requireTableIntersect <- function(cohort,
       "{intersections[[1]]} times"
     )
   }
-  if (!is.null(censorDate)) {
-    reason <- glue::glue("{reason}, censoring at {censorDate}")
-  }
+  reason <- completeAttritionReason(reason, censorDate, atFirst)
 
   if (isTRUE(needsIdFilter(cohort, cohortId))) {
     newCohort <- newCohort |>

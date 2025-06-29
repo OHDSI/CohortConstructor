@@ -9,6 +9,7 @@ requireAge(
   ageRange,
   cohortId = NULL,
   indexDate = "cohort_start_date",
+  atFirst = FALSE,
   name = tableName(cohort),
   .softValidation = TRUE
 )
@@ -25,6 +26,9 @@ rest will remain unchanged.}
 
 \item{indexDate}{Variable in cohort that contains the date to compute the
 demographics characteristics on which to restrict on.}
+
+\item{atFirst}{If FALSE the requirement will be applied to all records, if
+TRUE, it will only be required for the first entry of each subject.}
 
 \item{name}{Name of the new cohort table created in the cdm object.}
 

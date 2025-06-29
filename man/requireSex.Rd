@@ -8,6 +8,7 @@ requireSex(
   cohort,
   sex,
   cohortId = NULL,
+  atFirst = FALSE,
   name = tableName(cohort),
   .softValidation = TRUE
 )
@@ -21,6 +22,9 @@ requireSex(
 (cohort_definition_id or cohort_name). If NULL, all cohorts will be
 used; otherwise, only the specified cohorts will be modified, and the
 rest will remain unchanged.}
+
+\item{atFirst}{If FALSE the requirement will be applied to all records, if
+TRUE, it will only be required for the first entry of each subject.}
 
 \item{name}{Name of the new cohort table created in the cdm object.}
 

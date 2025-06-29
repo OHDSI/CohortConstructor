@@ -15,6 +15,7 @@ requireConceptIntersect(
   targetEndDate = "event_end_date",
   inObservation = TRUE,
   censorDate = NULL,
+  atFirst = FALSE,
   name = tableName(cohort),
   .softValidation = TRUE
 )
@@ -53,6 +54,9 @@ be considered.}
 \item{censorDate}{Whether to censor overlap events at a specific date or a
 column date of the cohort.}
 
+\item{atFirst}{If FALSE the requirement will be applied to all records, if
+TRUE, it will only be required for the first entry of each subject.}
+
 \item{name}{Name of the new cohort table created in the cdm object.}
 
 \item{.softValidation}{Whether to perform a soft validation of consistency.
@@ -63,8 +67,7 @@ all within observation period, and 4) that there are no overlapping
 cohort entries}
 }
 \value{
-Cohort table with only those  with the events in the concept list
-kept (or those without the event if negate = TRUE)
+Cohort table
 }
 \description{
 \code{requireConceptIntersect()} filters a cohort table based on a requirement

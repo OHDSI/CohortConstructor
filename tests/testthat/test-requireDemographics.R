@@ -67,9 +67,9 @@ test_that("test it works and expected errors", {
       name = "cohort1"
     )
   expect_true(inherits(cdm$cohort1, "cohort_table"))
-  expect_true(all(cdm$cohort1 |> dplyr::pull("subject_id") == c(1, 1, 3, 4)))
-  expect_true(all(cdm$cohort1 |> dplyr::pull("cohort_start_date") ==
-                    c("2001-05-30", "2003-05-02", "2015-01-27", "1996-06-30")))
+  expect_true(all(cdm$cohort1 |> dplyr::pull("subject_id") |> sort() == c(1, 1, 3, 4)))
+  expect_true(all(cdm$cohort1 |> dplyr::pull("cohort_start_date") |> sort() ==
+                    c("1996-06-30", "2001-05-30", "2003-05-02", "2015-01-27")))
   expect_identical(settings(cdm$cohort1), dplyr::tibble(
       cohort_definition_id = 1L,
       cohort_name = "cohort_1",
@@ -437,7 +437,7 @@ test_that("Inf age", {
 
 })
 
-test_that("test indexes - postgres", {
+test_that("test indexes - postgres, and atFirst", {
   skip_on_cran()
   skip_if(Sys.getenv("CDM5_POSTGRESQL_DBNAME") == "")
   skip_if(!testIndexes)
@@ -455,7 +455,9 @@ test_that("test indexes - postgres", {
     achillesSchema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA")
   )
 
-  omopgenerics::dropSourceTable(cdm = cdm, dplyr::contains("og_"))
+  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::contains("og_"))
+  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::contains("my_cohort"))
+
   cdm <- omopgenerics::insertTable(cdm = cdm,
                                    name = "my_cohort",
                                    table = data.frame(cohort_definition_id = 1L,
@@ -469,6 +471,48 @@ test_that("test indexes - postgres", {
     DBI::dbGetQuery(db, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
       "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
   )
+
+  cohort <- dplyr::tibble(
+    cohort_definition_id = rep(1L, 10),
+    subject_id = c(1L, 1L, 2L, 2L, 3L, 4L, 5L, 5L, 7L, 7L),
+    cohort_start_date = as.Date(c(
+      "2008-05-30", "2009-05-02", "2008-05-04", "2008-05-18",
+      "2009-01-27", "2009-06-30", "2010-03-20", "2008-05-01",
+      "2009-03-07", "2009-03-08"
+    )),
+    cohort_end_date = as.Date(c(
+      "2009-05-01", "2009-06-10", "2008-05-17", "2009-01-23",
+      "2009-06-28", "2009-11-20", "2010-04-30", "2008-07-24",
+      "2009-03-07", "2009-03-20"
+    ))
+  )
+
+  cdm <- omopgenerics::insertTable(cdm = cdm,
+                                   name = "cohort",
+                                   table = cohort)
+  cdm$cohort <- cdm$cohort |> omopgenerics::newCohortTable()
+
+  cdm$cohort1 <- cdm$cohort |>
+    requireDemographics(
+      ageRange = c(60, 70),
+      indexDate = "cohort_start_date",
+      sex = "Both",
+      minPriorObservation = 10,
+      minFutureObservation = 40,
+      atFirst = TRUE,
+      name = "cohort1"
+    )
+  expect_true(all(cdm$cohort1 |> dplyr::pull("subject_id") |> sort() == c(3, 7, 7)))
+  expect_true(all(cdm$cohort1 |> dplyr::pull("cohort_start_date") |> sort() ==
+                    c("2009-01-27", "2009-03-07", "2009-03-08")))
+  expect_true(all(
+    attrition(cdm$cohort1)$reason ==
+      c('Initial qualifying events', 'Age requirement: 60 to 70. Requirement applied to the first entry',
+        'Sex requirement: Both. Requirement applied to the first entry',
+        'Prior observation requirement: 10 days. Requirement applied to the first entry',
+        'Future observation requirement: 40 days. Requirement applied to the first entry')
+  ))
+
 
   expect_true(sum(grepl("og_", omopgenerics::listSourceTables(cdm))) == 0)
   omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))

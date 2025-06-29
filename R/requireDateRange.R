@@ -11,6 +11,7 @@
 #' which the index date must have been observed.
 #' @param indexDate Name of the column in the cohort that contains the date of
 #' interest.
+#' @inheritParams atFirstDoc
 #' @inheritParams softValidationDoc
 #'
 #' @return The cohort table with any cohort entries outside of the date range
@@ -30,6 +31,7 @@ requireInDateRange <- function(cohort,
                                dateRange,
                                cohortId = NULL,
                                indexDate = "cohort_start_date",
+                               atFirst = FALSE,
                                name = tableName(cohort),
                                .softValidation = TRUE) {
   # checks
@@ -39,7 +41,8 @@ requireInDateRange <- function(cohort,
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
   dateRange <- validateDateRange(dateRange)
-  omopgenerics::assertLogical(.softValidation)
+  omopgenerics::assertLogical(.softValidation, length = 1)
+  omopgenerics::assertLogical(atFirst, length = 1)
 
   if (length(cohortId) == 0) {
     cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
@@ -49,55 +52,113 @@ requireInDateRange <- function(cohort,
     return(cdm[[name]])
   }
 
+  # temp tables
+  tablePrefix <- omopgenerics::tmpPrefix()
+  tmpNewCohort <- omopgenerics::uniqueTableName(tablePrefix)
+  tmpUnchanged <- omopgenerics::uniqueTableName(tablePrefix)
+  cdm <- filterCohortInternal(cdm, cohort, cohortId, tmpNewCohort, tmpUnchanged)
+  newCohort <- cdm[[tmpNewCohort]]
+
   # filters
-  filt1 <- glue::glue(".data[[indexDate]] >= as.Date('{dateRange[1]}')")
-  filt2 <- glue::glue(".data[[indexDate]] <= as.Date('{dateRange[2]}')")
+
+  if (!atFirst) {
+    newCohort <- requireDateRangeInternal(
+      newCohort = newCohort,
+      tmpNewCohort = tmpNewCohort,
+      indexDate = indexDate,
+      cohortId = cohortId,
+      dateRange = dateRange,
+      filt1 = rlang::parse_exprs(glue::glue(".data[[indexDate]] >= as.Date('{dateRange[1]}')")),
+      filt2 = rlang::parse_exprs(glue::glue(".data[[indexDate]] <= as.Date('{dateRange[2]}')")),
+      reason1 = glue::glue("{indexDate} after {dateRange[1]}"),
+      reason2 = glue::glue("{indexDate} before {dateRange[2]}")
+    )
+
+  } else {
+    tmpNewCohortFirst <- paste0(tmpNewCohort, "_1")
+    newCohortFirst <- newCohort |>
+      dplyr::group_by(.data$cohort_definition_id, .data$subject_id) |>
+      dplyr::arrange() |>
+      dplyr::mutate(rec_id_1234 = dplyr::row_number()) |>
+      dplyr::ungroup() |>
+      dplyr::filter(.data$rec_id_1234 == 1) |>
+      dplyr::compute(name = tmpNewCohortFirst, temporary = FALSE,
+                     logPrefix = "CohortConstructor_requireInDateRange_subset_arrange_")
+
+    if (!is.na(dateRange[1])) {
+      newCohortFirst <- newCohortFirst |>
+        dplyr::filter(.data[[indexDate]] >= as.Date(!!dateRange[1])) |>
+        dplyr::compute(
+          name = tmpNewCohortFirst, temporary = FALSE,
+          logPrefix = "CohortConstructor_requireDateRange_dateRange1_first_"
+        )
+      newCohort <- newCohort |>
+        dplyr::inner_join(
+          newCohortFirst |>
+            dplyr::select(dplyr::all_of(c("cohort_definition_id", "subject_id"))),
+          by = c("cohort_definition_id", "subject_id")
+        ) |>
+        dplyr::compute(name = tmpNewCohort, temporary = FALSE,
+                       logPrefix = "CohortConstructor_requireInDateRange_requirement1_first_") |>
+        omopgenerics::recordCohortAttrition(
+          reason = "{indexDate} after {dateRange[1]}. Requirement applied to the first entry",
+          cohortId = cohortId
+        )
+    }
+
+    if (!is.na(dateRange[2])) {
+      newCohortFirst <- newCohortFirst |>
+        dplyr::filter(.data[[indexDate]] <= as.Date(!!dateRange[2])) |>
+        dplyr::compute(
+          name = tmpNewCohortFirst, temporary = FALSE,
+          logPrefix = "CohortConstructor_requireDateRange_dateRange1_first_"
+        )
+      newCohort <- newCohort |>
+        dplyr::inner_join(
+          newCohortFirst |>
+            dplyr::select(dplyr::all_of(c("cohort_definition_id", "subject_id"))),
+          by = c("cohort_definition_id", "subject_id")
+        ) |>
+        dplyr::compute(name = tmpNewCohort, temporary = FALSE,
+                       logPrefix = "CohortConstructor_requireInDateRange_requirement2_first_") |>
+        omopgenerics::recordCohortAttrition(
+          reason = "{indexDate} before {dateRange[2]}. Requirement applied to the first entry",
+          cohortId = cohortId
+        )
+    }
+
+    omopgenerics::dropSourceTable(cdm = cdm, name = tmpNewCohortFirst)
+  }
+
   if (isTRUE(needsIdFilter(cohort, cohortId))) {
-    filt1 <- glue::glue("{filt1} | (!.data$cohort_definition_id %in% cohortId)")
-    filt2 <- glue::glue("{filt2} | (!.data$cohort_definition_id %in% cohortId)")
-  }
-  filt1 <- rlang::parse_exprs(glue::glue(filt1))
-  filt2 <- rlang::parse_exprs(glue::glue(filt2))
-
-  # requirement
-  if (!is.na(dateRange[1])) {
-    cohort <- cohort |>
-      dplyr::filter(!!!filt1) |>
-      dplyr::compute(
-        name = name, temporary = FALSE,
-        logPrefix = "CohortConstructor_requireInDateRange_dateRange1_"
+    newCohort <- newCohort |>
+      # join non modified cohorts
+      dplyr::union_all(
+        cdm[[tmpUnchanged]] |>
+          dplyr::select(dplyr::all_of(colnames(newCohort)))
       ) |>
-      omopgenerics::recordCohortAttrition(reason = "{indexDate} after {dateRange[1]}",
-                                          cohortId = cohortId)
+      dplyr::compute(name = tmpNewCohort, temporary = FALSE,
+                     logPrefix = "CohortConstructor_requireDateRange_union_")
   }
 
-  if (!is.na(dateRange[2])) {
-    cohort <- cohort |>
-      dplyr::filter(!!!filt2) |>
-      dplyr::compute(
-        name = name, temporary = FALSE,
-        logPrefix = "CohortConstructor_requireInDateRange_dateRange2_"
-      ) |>
-      omopgenerics::recordCohortAttrition(reason = "{indexDate} before {dateRange[2]}",
-                                          cohortId = cohortId)
-  }
-
-  cohort <- cohort |>
-    dplyr::compute(
-      name = name, temporary = FALSE,
-      logPrefix = "CohortConstructor_requireInDateRange_newCohort_"
-    ) |>
-    omopgenerics::newCohortTable(.softValidation = .softValidation)
+  newCohort <- newCohort |>
+    dplyr::compute(name = name, temporary = FALSE,
+                   logPrefix = "CohortConstructor_requireDateRange_name_") |>
+    omopgenerics::newCohortTable(
+      .softValidation = .softValidation, cohortAttritionRef = attrition(newCohort)
+    )
 
   useIndexes <- getOption("CohortConstructor.use_indexes")
   if (!isFALSE(useIndexes)) {
     addIndex(
-      cohort = cohort,
+      cohort = newCohort,
       cols = c("subject_id", "cohort_start_date")
     )
   }
 
-  return(cohort)
+  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(tablePrefix))
+
+  return(newCohort)
 }
 
 #' Trim cohort dates to be within a date range
@@ -258,4 +319,29 @@ trimEndDate <- function(cohort,
     )) |>
     dplyr::filter(.data[[startDate]] <= .data[[endDate]])
   return(cohort)
+}
+
+requireDateRangeInternal <- function(newCohort, tmpNewCohort, indexDate, cohortId, dateRange, filt1, filt2, reason1, reason2) {
+  # requirement
+  if (!is.na(dateRange[1])) {
+    newCohort <- newCohort |>
+      dplyr::filter(!!!filt1) |>
+      dplyr::compute(
+        name = tmpNewCohort, temporary = FALSE,
+        logPrefix = "CohortConstructor_requireDateRangeInternal_dateRange1_"
+      ) |>
+      omopgenerics::recordCohortAttrition(reason = reason1,
+                                          cohortId = cohortId)
+  }
+  if (!is.na(dateRange[2])) {
+    newCohort <- newCohort |>
+      dplyr::filter(!!!filt2) |>
+      dplyr::compute(
+        name = tmpNewCohort, temporary = FALSE,
+        logPrefix = "CohortConstructor_requireDateRangeInternal_dateRange2_"
+      ) |>
+      omopgenerics::recordCohortAttrition(reason = reason2,
+                                          cohortId = cohortId)
+  }
+  return(newCohort)
 }
