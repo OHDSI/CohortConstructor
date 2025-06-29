@@ -131,7 +131,9 @@ requireCohortIntersect <- function(cohort,
       name = tmpNewCohort
     )
 
-  newCohort <- applyRequirement(newCohort, atFirst, tmpNewCohort, intersectCol, lower_limit, upper_limit)
+  newCohort <- applyRequirement(
+    newCohort, atFirst, tmpNewCohort, intersectCol, lower_limit, upper_limit, cdm
+  )
 
   # attrition reason
   if (all(intersections == 0)) {
@@ -194,7 +196,7 @@ requireCohortIntersect <- function(cohort,
   return(newCohort)
 }
 
-applyRequirement <- function(newCohort, atFirst, tmpNewCohort, intersectCol, lower_limit, upper_limit) {
+applyRequirement <- function(newCohort, atFirst, tmpNewCohort, intersectCol, lower_limit, upper_limit, cdm) {
   if (atFirst) {
     tmpNewCohortFirst <- paste0(tmpNewCohort, "_1")
     newCohortFirst <- newCohort |>

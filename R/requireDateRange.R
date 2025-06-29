@@ -81,7 +81,7 @@ requireInDateRange <- function(cohort,
       dplyr::arrange() |>
       dplyr::mutate(rec_id_1234 = dplyr::row_number()) |>
       dplyr::ungroup() |>
-      dplyr::filter(rec_id_1234 == 1) |>
+      dplyr::filter(.data$rec_id_1234 == 1) |>
       dplyr::compute(name = tmpNewCohortFirst, temporary = FALSE,
                      logPrefix = "CohortConstructor_requireInDateRange_subset_arrange_")
 

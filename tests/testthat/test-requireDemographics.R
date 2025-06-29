@@ -455,7 +455,9 @@ test_that("test indexes - postgres, and atFirst", {
     achillesSchema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA")
   )
 
-  omopgenerics::dropSourceTable(cdm = cdm, dplyr::contains("og_"))
+  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::contains("og_"))
+  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::contains("my_cohort"))
+
   cdm <- omopgenerics::insertTable(cdm = cdm,
                                    name = "my_cohort",
                                    table = data.frame(cohort_definition_id = 1L,

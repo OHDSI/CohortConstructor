@@ -415,6 +415,7 @@ test_that("test indexes - postgres, and atFirst", {
   )
 
   omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::contains("og_"))
+  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::contains("my_cohort"))
 
   cdm <- omopgenerics::insertTable(cdm = cdm,
                                    name = "my_cohort",

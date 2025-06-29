@@ -113,7 +113,9 @@ requireConceptIntersect <- function(cohort,
       name = tmpNewCohort
     )
 
-  newCohort <- applyRequirement(newCohort, atFirst, tmpNewCohort, intersectCol, lower_limit, upper_limit)
+  newCohort <- applyRequirement(
+    newCohort, atFirst, tmpNewCohort, intersectCol, lower_limit, upper_limit, cdm
+  )
 
   # attrition reason
   if (all(intersections == 0)) {
