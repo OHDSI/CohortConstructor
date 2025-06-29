@@ -11,6 +11,7 @@
 #' @inheritParams windowDoc
 #' @inheritParams nameDoc
 #' @inheritParams conceptSetDoc
+#' @inheritParams atFirstDoc
 #' @inheritParams softValidationDoc
 #'
 #' @return Cohort table

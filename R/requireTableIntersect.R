@@ -10,6 +10,7 @@
 #' @inheritParams cohortIdModifyDoc
 #' @inheritParams windowDoc
 #' @inheritParams nameDoc
+#' @inheritParams atFirstDoc
 #' @inheritParams softValidationDoc
 #'
 #' @return Cohort table

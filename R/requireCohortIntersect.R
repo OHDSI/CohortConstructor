@@ -10,6 +10,7 @@
 #' @inheritParams cohortIdModifyDoc
 #' @inheritParams windowDoc
 #' @inheritParams nameDoc
+#' @inheritParams atFirstDoc
 #' @inheritParams softValidationDoc
 #'
 #' @return Cohort table with only those entries satisfying the criteria
@@ -195,20 +196,26 @@ requireCohortIntersect <- function(cohort,
 
 applyRequirement <- function(newCohort, atFirst, tmpNewCohort, intersectCol, lower_limit, upper_limit) {
   if (atFirst) {
-    newCohort <- newCohort |>
+    tmpNewCohortFirst <- paste0(tmpNewCohort, "_1")
+    newCohortFirst <- newCohort |>
       dplyr::group_by(.data$cohort_definition_id, .data$subject_id) |>
       dplyr::arrange() |>
       dplyr::mutate(rec_id_1234 = dplyr::row_number()) |>
       dplyr::ungroup() |>
-      dplyr::compute(name = tmpNewCohort, temporary = FALSE,
-                     logPrefix = "CohortConstructor_requireCohortIntersect_subset_arrange_") |>
+      dplyr::compute(name = tmpNewCohortFirst, temporary = FALSE,
+                     logPrefix = "CohortConstructor_applyRequirement_subset_arrange_") |>
       dplyr::filter(
-        (.data[[intersectCol]] >= .env$lower_limit & .data[[intersectCol]] <= .env$upper_limit & .data$rec_id_1234 == 1) ||
-          .data$rec_id_1234 > 1
-      ) |>
-      dplyr::select(!dplyr::all_of(c(intersectCol, "rec_id_1234"))) |>
+        .data$rec_id_1234 == 1 & .data[[intersectCol]] >= .env$lower_limit & .data[[intersectCol]] <= .env$upper_limit
+        ) |>
+      dplyr::select(dplyr::all_of(c("cohort_definition_id", "subject_id"))) |>
+      dplyr::compute(name = tmpNewCohortFirst, temporary = FALSE,
+                     logPrefix = "CohortConstructor_applyRequirement_subset_first_")
+    newCohort <- newCohort |>
+      dplyr::inner_join(newCohortFirst, by = c("cohort_definition_id", "subject_id")) |>
+      dplyr::select(!dplyr::all_of(intersectCol)) |>
       dplyr::compute(name = tmpNewCohort, temporary = FALSE,
-                     logPrefix = "CohortConstructor_requireCohortIntersect_subset_first_")
+                     logPrefix = "CohortConstructor_applyRequirement_requirement_first_")
+    omopgenerics::dropSourceTable(cdm = cdm, name = tmpNewCohortFirst)
   } else {
     newCohort <- newCohort |>
       dplyr::filter(
@@ -216,7 +223,7 @@ applyRequirement <- function(newCohort, atFirst, tmpNewCohort, intersectCol, low
       ) |>
       dplyr::select(!dplyr::all_of(intersectCol)) |>
       dplyr::compute(name = tmpNewCohort, temporary = FALSE,
-                     logPrefix = "CohortConstructor_requireCohortIntersect_subset_first_")
+                     logPrefix = "CohortConstructor_applyRequirement_subset_")
   }
   return(newCohort)
 }
