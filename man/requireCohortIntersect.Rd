@@ -15,6 +15,7 @@ requireCohortIntersect(
   targetStartDate = "cohort_start_date",
   targetEndDate = "cohort_end_date",
   censorDate = NULL,
+  atFirst = FALSE,
   name = tableName(cohort),
   .softValidation = TRUE
 )
@@ -51,6 +52,9 @@ between cohort and event).}
 
 \item{censorDate}{Whether to censor overlap events at a specific date or a
 column date of the cohort.}
+
+\item{atFirst}{If FALSE the requirement will be applied to all records, if
+TRUE, it will only be required for the first entry of each subject.}
 
 \item{name}{Name of the new cohort table created in the cdm object.}
 

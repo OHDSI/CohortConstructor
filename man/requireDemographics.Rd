@@ -12,6 +12,7 @@ requireDemographics(
   sex = c("Both"),
   minPriorObservation = 0,
   minFutureObservation = 0,
+  atFirst = FALSE,
   name = tableName(cohort),
   .softValidation = TRUE
 )
@@ -36,6 +37,9 @@ days in the database.}
 
 \item{minFutureObservation}{A minimum number of continuous future observation
 days in the database.}
+
+\item{atFirst}{If FALSE the requirement will be applied to all records, if
+TRUE, it will only be required for the first entry of each subject.}
 
 \item{name}{Name of the new cohort table created in the cdm object.}
 

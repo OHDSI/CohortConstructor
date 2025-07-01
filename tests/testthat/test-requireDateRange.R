@@ -214,7 +214,7 @@ test_that("trim cohort dates", {
     trimToDateRange(dateRange = as.Date(c("2001-01-01", "2005-01-01")))
 
   expect_identical(sort(cdm$cohort1 |>
-                      dplyr::pull("subject_id")), as.integer(c(1, 1, 1, 1, 1, 1, 2)))
+                          dplyr::pull("subject_id")), as.integer(c(1, 1, 1, 1, 1, 1, 2)))
   expect_true(all(cdm$cohort1 |>
                     dplyr::pull("cohort_start_date") ==
                     c("2003-05-17", "2004-03-11", "2001-01-01", "2001-03-24", "2001-11-28", "2002-01-30", "2002-06-13")))
@@ -229,7 +229,7 @@ test_that("trim cohort dates", {
                     name = "cohort3")
   expect_true(omopgenerics::cohortCount(cdm$cohort3)$number_records[1] == 2)
   expect_identical(sort(cdm$cohort3 |>
-                      dplyr::pull("subject_id")), as.integer(c(1, 1, 1, 2, 2, 3)))
+                          dplyr::pull("subject_id")), as.integer(c(1, 1, 1, 2, 2, 3)))
   expect_identical(omopgenerics::attrition(cdm$cohort3)$reason[
     omopgenerics::attrition(cdm$cohort3)$cohort_definition_id == 1], c("Initial qualifying events", "cohort_start_date trimmed >= 2001-01-01", "cohort_end_date trimmed <= 2005-01-01"))
   expect_identical(omopgenerics::attrition(cdm$cohort3)$reason[
@@ -260,7 +260,7 @@ test_that("trim cohort dates", {
   PatientProfiles::mockDisconnect(cdm)
 })
 
-test_that("test indexes - postgres", {
+test_that("test indexes - postgres, and atFirst", {
   skip_on_cran()
   skip_if(Sys.getenv("CDM5_POSTGRESQL_DBNAME") == "")
   skip_if(!testIndexes)
@@ -277,6 +277,9 @@ test_that("test indexes - postgres", {
     writePrefix = "cc_",
     achillesSchema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA")
   )
+
+  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::contains("og_"))
+  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::contains("my_cohort"))
 
   cdm <- omopgenerics::insertTable(cdm = cdm,
                                    name = "my_cohort",
@@ -297,6 +300,76 @@ test_that("test indexes - postgres", {
     DBI::dbGetQuery(db, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
       "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
   )
+
+  # atFirst
+  cohort <- dplyr::tibble(
+    cohort_definition_id = c(rep(1L, 4), rep(2L, 4)),
+    subject_id = c(1L, 1L, 2L, 3L, rep(1L, 4)),
+    cohort_start_date = as.Date(c(
+      "2008-05-17", "2009-03-11", "2010-05-03", "2010-02-25",
+      "2008-03-24", "2008-11-28", "2010-01-30", "2009-06-13"
+    )),
+    cohort_end_date = as.Date(c(
+      "2009-03-10", "2009-07-19", "2010-06-15", "2010-04-30",
+      "2008-11-27", "2008-01-29", "2010-06-12", "2010-01-15"
+    ))
+  )
+  cdm <- omopgenerics::insertTable(cdm = cdm,
+                                   name = "my_cohort",
+                                   table = cohort)
+  cdm$my_cohort <- omopgenerics::newCohortTable(cdm$my_cohort, .softValidation = TRUE)
+  cdm$my_cohort_1 <- requireInDateRange(cohort = cdm$my_cohort,
+                                        dateRange = as.Date(c("2008-05-12", NA)),
+                                        atFirst = TRUE,
+                                        name = "my_cohort_1")
+  expect_equal(
+    collectCohort(cdm$my_cohort_1, 2),
+    dplyr::tibble(
+      subject_id = 1L,
+      cohort_start_date = as.Date(NULL),
+      cohort_end_date = as.Date(NULL)
+    )
+  )
+  expect_equal(
+    collectCohort(cdm$my_cohort_1, 1),
+    dplyr::tibble(
+      subject_id = c(1L, 1L, 2L, 3L),
+      cohort_start_date = as.Date(c(
+        "2008-05-17", "2009-03-11", "2010-05-03", "2010-02-25"
+      )),
+      cohort_end_date = as.Date(c(
+        "2009-03-10", "2009-07-19", "2010-06-15", "2010-04-30"
+      ))
+    )
+  )
+  expect_equal(
+    attrition(cdm$my_cohort_1)$reason,
+    c('Initial qualifying events',
+      "cohort_start_date after 2008-05-12. Requirement applied to the first entry",
+      'Initial qualifying events',
+      "cohort_start_date after 2008-05-12. Requirement applied to the first entry"
+    ))
+
+  cdm$my_cohort_2 <- requireInDateRange(cohort = cdm$my_cohort,
+                                        dateRange = as.Date(c("2008-01-01", "2008-02-01")),
+                                        atFirst = TRUE,
+                                        cohortId = 2,
+                                        name = "my_cohort_2")
+  expect_equal(
+    collectCohort(cdm$my_cohort_2, 2),
+    dplyr::tibble(
+      subject_id = 1L,
+      cohort_start_date = as.Date(NULL),
+      cohort_end_date = as.Date(NULL)
+    )
+  )
+  expect_equal(
+    attrition(cdm$my_cohort_2)$reason,
+    c('Initial qualifying events',
+      'Initial qualifying events',
+      "cohort_start_date after 2008-01-01. Requirement applied to the first entry",
+      "cohort_start_date before 2008-02-01. Requirement applied to the first entry"
+    ))
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
