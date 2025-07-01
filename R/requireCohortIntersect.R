@@ -201,8 +201,7 @@ applyRequirement <- function(newCohort, atFirst, tmpNewCohort, intersectCol, low
     tmpNewCohortFirst <- paste0(tmpNewCohort, "_1")
     newCohortFirst <- newCohort |>
       dplyr::group_by(.data$cohort_definition_id, .data$subject_id) |>
-      dplyr::arrange() |>
-      dplyr::mutate(rec_id_1234 = dplyr::row_number()) |>
+      dplyr::filter(.data$cohort_start_date == base::min(.data$cohort_start_date)) |>
       dplyr::ungroup() |>
       dplyr::compute(name = tmpNewCohortFirst, temporary = FALSE,
                      logPrefix = "CohortConstructor_applyRequirement_subset_arrange_") |>
