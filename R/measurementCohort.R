@@ -76,29 +76,17 @@
 #' cdm$cohort <- measurementCohort(
 #'   cdm = cdm,
 #'   name = "cohort",
-#'   conceptSet = list("normal_blood_pressure" = c(4326744, 4298393, 45770407)),
+#'   conceptSet = list("blood_pressure" = c(4326744, 4298393, 45770407)),
 #'   valueAsConcept = c(4124457),
-#'   valueAsNumber = list("8876" = c(70, 120)),
+#'   valueAsNumber = list(
+#'       "blood_pressure_70_120" = list("8876" = c(70, 120)),
+#'       "blood_pressure_120+" = list("8876" = c(120, 99999))
+#'     ),
 #'   inObservation = TRUE
 #' )
 #'
 #' cdm$cohort
 #'
-#'# You can also create multiple measurement cohorts, and include records
-#'# outside the observation period.
-#'
-#' cdm$cohort2 <- measurementCohort(
-#'   cdm = cdm,
-#'   name = "cohort2",
-#'   conceptSet = list("normal_blood_pressure" = c(4326744, 4298393, 45770407),
-#'                   "high_blood_pressure" = c(4326744, 4298393, 45770407)),
-#'   valueAsConcept = c(4124457),
-#'   valueAsNumber = list("8876" = c(70, 120),
-#'                        "8876" = c(121, 200)),
-#'   inObservation = FALSE
-#' )
-#'
-#' cdm$cohort2
 #'
 #' }
 measurementCohort <- function(cdm,
@@ -111,12 +99,12 @@ measurementCohort <- function(cdm,
   # initial input validation
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cdm <- omopgenerics::validateCdmArgument(cdm)
-  conceptSet <- omopgenerics::validateConceptSetArgument(conceptSet, cdm)
-  omopgenerics::assertNumeric(valueAsConcept, integerish = TRUE, null = TRUE)
-  validateValueAsNumber(valueAsNumber)
   omopgenerics::assertLogical(inObservation, length = 1)
   if (length(table) == 0) cli::cli_abort("`table` argument can't be empty. Options are 'measurement' and 'observation'.")
   table <- validateTable(table)
+  conceptSet <- omopgenerics::validateConceptSetArgument(conceptSet, cdm)
+  valueAsConcept <- validateValueAsConcept(valueAsConcept, names(conceptSet))
+  valueAsNumber <- validateValueAsNumber(valueAsNumber, names(conceptSet))
 
   useIndexes <- getOption("CohortConstructor.use_indexes")
 
@@ -161,6 +149,8 @@ measurementCohort <- function(cdm,
     subsetIndividuals = NULL
   )
 
+  cohortSet <- addFilterToSettings(cohortSet, valueAsNumber, valueAsConcept)
+
   if (cdm[[name]] |> dplyr::tally() |> dplyr::pull("n") == 0) {
     cli::cli_inform(c("i" = "No table could be subsetted, returning empty cohort."))
     cohortAttrition <- attrition(cdm[[name]])
@@ -175,26 +165,33 @@ measurementCohort <- function(cdm,
     return(cdm[[name]])
   }
 
-  if (!is.null(valueAsConcept) || !is.null(valueAsNumber)) {
-    cli::cli_inform(c("i" = "Applying measurement requirements."))
-    filterExpr <- getFilterExpression(valueAsConcept, valueAsNumber)
-    cdm[[name]] <- cdm[[name]] |>
-      dplyr::filter(!!!filterExpr) |>
-      dplyr::compute(name = name, temporary = FALSE,
-                     logPrefix = "CohortConstructor_measurementCohort_reqs_")
-    if (cdm[[name]] |> dplyr::tally() |> dplyr::pull("n") == 0) {
-      cli::cli_warn(
-        "There are no subjects with the specified value_as_concept_id or value_as_number."
-      )
-    }
-  }
-
   cdm[[name]] <- cdm[[name]] |>
     omopgenerics::newCohortTable(
       cohortSetRef = cohortSet,
       cohortCodelistRef = cohortCodelist,
       .softValidation = TRUE
     )
+
+  if (!is.null(valueAsConcept) || !is.null(valueAsNumber)) {
+    cli::cli_inform(c("i" = "Applying measurement requirements."))
+    for (id in 1:nrow(cohortSet)) {
+      id <- cohortSet$cohort_definition_id[id]
+      filter <- cohortSet$measurement_filter[id]
+      filter <- glue::glue("({as.character(filter)}) | .data$cohort_definition_id != {id}") |> rlang::parse_expr()
+      cdm[[name]] <- cdm[[name]] |>
+        dplyr::filter(!!!filter) |>
+        dplyr::compute(name = name, temporary = FALSE, logPrefix = "CohortConstructor_measurementCohort_reqs_") |>
+        omopgenerics::recordCohortAttrition(
+          cohortId = id,
+          reason = "Restrict to measurement values of interest"
+        )
+    }
+    if (cdm[[name]] |> dplyr::tally() |> dplyr::pull("n") == 0) {
+      cli::cli_warn(
+        "There are no subjects with the specified value_as_concept_id or value_as_number."
+      )
+    }
+  }
 
   if (cdm[[name]] |> dplyr::tally() |> dplyr::pull("n") == 0) {
     cli::cli_inform(c("i" = "No table could be subsetted, returning empty cohort."))
@@ -248,7 +245,10 @@ measurementCohort <- function(cdm,
   return(cdm[[name]])
 }
 
-getFilterExpression <- function(valueAsConcept, valueAsNumber) {
+getFilterExpression <- function(cohortName, valueAsConcept, valueAsNumber) {
+  valueAsConcept <- valueAsConcept[[cohortName]]
+  valueAsNumber <- valueAsNumber[[cohortName]]
+
   expFilter <- character()
   if (!is.null(valueAsNumber)) {
     for (ii in seq_along(valueAsNumber)) {
@@ -270,10 +270,10 @@ getFilterExpression <- function(valueAsConcept, valueAsNumber) {
   }
 
   if (!is.null(valueAsConcept)) {
-    expFilter[ii + 1] <- ".data$value_as_concept_id %in% .env$valueAsConcept"
+    expFilter[ii + 1] <- glue::glue(".data$value_as_concept_id %in% c({paste0(valueAsConcept, collapse = ', ')})")
   }
 
-  return(paste0(expFilter, collapse = " | ") |>  rlang::parse_exprs())
+  return(paste0(expFilter, collapse = " | "))
 }
 
 addDomains <- function(cohortCodelist, cdm, name) {
@@ -293,4 +293,18 @@ addDomains <- function(cohortCodelist, cdm, name) {
   omopgenerics::dropSourceTable(cdm = cdm, name = tmpName)
 
   return(cohortCodelist)
+}
+
+addFilterToSettings <- function(cohortSet, valueAsNumber, valueAsConcept) {
+  cohortSet |>
+    dplyr::rowwise() |>
+    dplyr::mutate(
+      measurement_filter = getFilterExpression(
+        cohortName = .data$cohort_name,
+        valueAsNumber = valueAsNumber,
+        valueAsConcept = valueAsConcept
+      ) |>
+        rlang::parse_exprs()
+    ) |>
+    dplyr::ungroup()
 }

@@ -104,32 +104,129 @@ validateStrata <- function(strata, cohort) {
   return(strata)
 }
 
-validateValueAsNumber <- function(valueAsNumber) {
+validateValueAsNumber <- function(valueAsNumber, conceptSetName) {
 
-  omopgenerics::assertList(valueAsNumber,
-                           class = c("integer", "numeric"),
-                           null = TRUE
-  )
+  if (length(valueAsNumber) == 0) return(NULL)
 
-  # if any is named all must be
-  if(is.null(names(valueAsNumber)) || any(nchar(names(valueAsNumber)) == 0)){
-    omopgenerics::assertList(valueAsNumber,
-                             length = 1,
-                             null = TRUE,
-                             msg = "If any valueAsNumber has no unit specified, only one range should be specified"
-    )
+  if (!is.list(valueAsNumber)) {
+    cli::cli_abort("`valueAsNumber` must be a list naming the cohorts to be created and the measurement values of each cohort. See the function example.")
   }
 
-  for (i in seq_along(valueAsNumber)) {
-    if (length(valueAsNumber[[i]]) != 2) {
-      cli::cli_abort("Each numeric vector in `valueAsNumber` list must be of length 2.")
+  # if one single list: check elements are OK and replicate for all cohorts
+  if (!any(sapply(valueAsNumber, is.list))) {
+    valueAsNumberSpecificationCheck(valueAsNumber)
+    valueAsNumber <- rep(list(valueAsNumber), length(conceptSetName)) |>
+      rlang::set_names(conceptSetName)
+
+  # if list of lists:
+  } else {
+    # if just one inner list: check specification and names (if unnamed apply to all)
+    if (length(valueAsNumber) == 1) {
+      valueAsNumberSpecificationCheck(unlist(valueAsNumber, recursive = FALSE))
+      # unnamed: apply same to all cohorts
+      if (length(names(valueAsNumber)) == 0) {
+        valueAsNumber <- rep(valueAsNumber, length(conceptSetName)) |>
+          rlang::set_names(conceptSetName)
+      } else { # check names, drop if name not maching any cohort name
+        notId <- !names(valueAsNumber) %in% conceptSetName
+        if (any(notId)) {
+          cli::cli_warn("{names(valueAsNumber)[notId]} {?does/do} not correspond to any cohort in `conceptSet` and will be ignored.")
+          valueAsNumber <- valueAsNumber[!notId]
+        }
+      }
+    } else { # if > 1 inner list: check names (drop not matching with any cohort or missing names) and then check values
+      # check names
+      # 1) check missing names
+      if (length(names(valueAsNumber)) == 0 | any(names(valueAsNumber) == "")) {
+        cli::cli_abort(c("`valueAsNumber` is an unnamed list or some elements are not named.", "Each inner list specifing measurement values should point to a codelist, see function examples."))
+      }
+      # 2) drop non matching with cohort names
+      notId <- !names(valueAsNumber) %in% conceptSetName
+      if (any(notId)) {
+        cli::cli_warn("{names(valueAsNumber)[notId]} {?does/do} not correspond to any codelist in `conceptSet` and will be ignored.")
+        valueAsNumber <- valueAsNumber[!notId]
+      }
+      # check values
+      for (nm in names(valueAsNumber)) {
+        valueAsNumberSpecificationCheck(valueAsNumber[[nm]])
+      }
     }
-    if (valueAsNumber[[i]][1] > valueAsNumber[[i]][2]) {
+  }
+
+  return(valueAsNumber)
+}
+
+valueAsNumberSpecificationCheck <- function(valueAsNumber) {
+  if (!is.null(outterListName)) outterListName <- glue::glue("[['{outterListName}']]")
+  for (unitId in names(valueAsNumber)) {
+    vec <- valueAsNumber[[unitId]]
+    if (!is.numeric(vec) | length(vec) != 2) {
+      cli::cli_abort("Elements in `valueAsNumber` must be a numeric vector of length 2, indicating a numeric range of values.")
+    }
+    if (vec[1] > vec[2]) {
       cli::cli_abort(
-        "Upper `valueAsNumber` value must be equal or higher than lower `valueAsNumber` value."
+        "There are numeric ranges in `valueAsNumber` where the first number is bigger than the second."
       )
     }
   }
+}
+
+validateValueAsConcept <- function(valueAsConcept, conceptSetName) {
+  if (length(valueAsConcept) == 0) return(NULL)
+
+  message <- "`valueAsConcept` must be either a numeric vector of concept IDs (specification applied to codelists in `conceptSet`), or a named list of numeric vectors where names point to specific conceptSets. See function examples."
+
+  # If one single vector: check correct and apply to all
+  if (is.atomic(valueAsConcept)) {
+    if (!rlang::is_integerish(valueAsConcept)) {
+      cli::cli_abort(message)
+    }
+    valueAsConcept <- rep(list(valueAsConcept), length(conceptSetName)) |>
+      rlang::set_names(conceptSetName)
+  }
+
+  if (!is.list(valueAsConcept)) {
+    cli::cli_abort(message)
+  }
+
+  # if length 1: if named - check name and values, if unnamed - check values and apply to all
+  if (length(valueAsConcept) == 1) {
+    # unnamed
+    if (length(names(valueAsConcept)) == 0) {
+      if (!rlang::is_integerish(unlist(valueAsConcept))) {
+        cli::cli_abort(message)
+      }
+      valueAsConcept <- rep(list(unlist(valueAsConcept)), length(conceptSetName)) |>
+        rlang::set_names(conceptSetName)
+
+      # named list
+    } else {
+      notId <- !names(valueAsConcept) %in% conceptSetName
+      if (any(notId)) {
+        cli::cli_warn("{names(valueAsConcept)[notId]} {?does/do} not correspond to any cohort in `conceptSet` and will be ignored.")
+        valueAsConcept <- valueAsConcept[!notId]
+      }
+    }
+
+  # if > 1 element: drop missing names, drop unmatched names, check values
+  } else {
+    # check names
+    # 1) check missing names
+    if (length(names(valueAsConcept)) == 0 | any(names(valueAsConcept) == "")) {
+      cli::cli_abort(c("`valueAsConcept` is an unnamed list or some elements are not named.", message))
+    }
+    # 2) drop non matching with cohort names
+    notId <- !names(valueAsConcept) %in% conceptSetName
+    if (any(notId)) {
+      cli::cli_warn("{names(valueAsConcept)[notId]} {?does/do} not correspond to any codelist in `conceptSet` and will be ignored.")
+      valueAsConcept <- valueAsConcept[!notId]
+    }
+    # check values
+    if (!rlang::is_integerish(unlist(valueAsConcept))) {
+      cli::cli_abort(c("Concept IDs must be integers.", message))
+    }
+  }
+  return(valueAsConcept)
 }
 
 validateN <- function(n) {
