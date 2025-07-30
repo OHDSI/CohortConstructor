@@ -63,6 +63,7 @@ test_that("expected errors and messages", {
 })
 
 test_that("simple example", {
+  skip_on_cran()
   cdm <- omock::mockPerson(nPerson = 3)
   cdm <- omopgenerics::insertTable(
     cdm = cdm, name = "observation_period", table = dplyr::tibble(
@@ -943,6 +944,7 @@ test_that("test indexes - postgres", {
 })
 
 test_that("test subsetCohort arguments", {
+  skip_on_cran()
   cdm <- omock::mockCdmFromTables(
     tables = list(
       condition_occurrence = dplyr::tibble(
@@ -1025,6 +1027,7 @@ test_that("test subsetCohort arguments", {
 })
 
 test_that("table argument", {
+  skip_on_cran()
   cdm <- omock::mockPerson(nPerson = 3)
   cdm <- omopgenerics::insertTable(
     cdm = cdm, name = "observation_period", table = dplyr::tibble(
@@ -1138,6 +1141,7 @@ test_that("table argument", {
 })
 
 test_that("inObservation FALSE", {
+  skip_on_cran()
   cdm <- omock::mockPerson(nPerson = 3)
   cdm <- omopgenerics::insertTable(
     cdm = cdm, name = "observation_period", table = dplyr::tibble(
@@ -1262,8 +1266,8 @@ test_that("inObservation FALSE", {
   CDMConnector::cdmDisconnect(cdm = cdm)
 })
 
-
 test_that("conceptSetExpression", {
+  skip_on_cran()
   cdm <- omock::mockPerson(nPerson = 3)
   cdm <- omopgenerics::insertTable(
     cdm = cdm, name = "observation_period", table = dplyr::tibble(
@@ -1311,7 +1315,7 @@ test_that("conceptSetExpression", {
 
   codes <- CodelistGenerator::codesFromConceptSet(
     cdm = cdm,
-    path = here::here("extras", "ConceptSet"),
+    path = here::here("extras", "concept_set"),
     type = "concept_set_expression"
   )
   cdm$cohort <- conceptCohort(
