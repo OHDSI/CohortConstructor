@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 ```
 
 # Introduction
-CohortConstructor packages includes a function to obtain an age and sex matched cohort, the `generateMatchedCohortSet()` function. In this vignette, we will explore the usage of this function.
+CohortConstructor packages includes a function to obtain an age and sex matched cohort, the `matchCohorts()` function. In this vignette, we will explore the usage of this function.
 
 ## Create mock data
 We will first use `mockDrugUtilisation()` function from DrugUtilisation package to create mock data.
@@ -27,13 +27,13 @@ library(dplyr)
 cdm <- mockCohortConstructor(nPerson = 1000)
 ```
 
-As we will use `cohort1` to explore `generateMatchedCohortSet()`, let us first use `settings()` from omopgenerics package to explore this cohort:
+As we will use `cohort1` to explore `matchCohorts()`, let us first use `settings()` from omopgenerics package to explore this cohort:
 
 ```{r, eval = FALSE}
 omopgenerics::settings(cdm$cohort1)
 ```
 
-# Use generateMatchedCohortSet() to create an age-sex matched cohort
+# Use matchCohorts() to create an age-sex matched cohort
 Let us first see an example of how this function works. For its usage, we need to provide a `cdm` object, the `targetCohortName`, which is the name of the table containing the cohort of interest, and the `name` of the new generated tibble containing the cohort and the matched cohort. We will also use the argument `targetCohortId` to specify that we only want a matched cohort for `cohort_definition_id = 1`.
 
 ```{r, eval = FALSE}
