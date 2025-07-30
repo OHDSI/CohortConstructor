@@ -93,9 +93,8 @@
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
 <p>CohortConstructor packages includes a function to obtain an age and
-sex matched cohort, the <code>generateMatchedCohortSet()</code>
-function. In this vignette, we will explore the usage of this
-function.</p>
+sex matched cohort, the <code><a href="../reference/matchCohorts.html">matchCohorts()</a></code> function. In this
+vignette, we will explore the usage of this function.</p>
 <div class="section level3">
 <h3 id="create-mock-data">Create mock data<a class="anchor" aria-label="anchor" href="#create-mock-data"></a>
 </h3>
@@ -107,16 +106,14 @@ DrugUtilisation package to create mock data.</p>
 <span></span>
 <span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mockCohortConstructor.html">mockCohortConstructor</a></span><span class="op">(</span>nPerson <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span></code></pre></div>
 <p>As we will use <code>cohort1</code> to explore
-<code>generateMatchedCohortSet()</code>, let us first use
-<code><a href="https://darwin-eu.github.io/omopgenerics/reference/settings.html" class="external-link">settings()</a></code> from omopgenerics package to explore this
-cohort:</p>
+<code><a href="../reference/matchCohorts.html">matchCohorts()</a></code>, let us first use <code><a href="https://darwin-eu.github.io/omopgenerics/reference/settings.html" class="external-link">settings()</a></code>
+from omopgenerics package to explore this cohort:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">omopgenerics</span><span class="fu">::</span><span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/settings.html" class="external-link">settings</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">cohort1</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
-<h2 id="use-generatematchedcohortset-to-create-an-age-sex-matched-cohort">Use generateMatchedCohortSet() to create an age-sex matched
-cohort<a class="anchor" aria-label="anchor" href="#use-generatematchedcohortset-to-create-an-age-sex-matched-cohort"></a>
+<h2 id="use-matchcohorts-to-create-an-age-sex-matched-cohort">Use matchCohorts() to create an age-sex matched cohort<a class="anchor" aria-label="anchor" href="#use-matchcohorts-to-create-an-age-sex-matched-cohort"></a>
 </h2>
 <p>Let us first see an example of how this function works. For its
 usage, we need to provide a <code>cdm</code> object, the
