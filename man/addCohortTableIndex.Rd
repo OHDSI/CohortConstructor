@@ -14,5 +14,6 @@ The cohort table
 }
 \description{
 Adds an index on subject_id and cohort_start_date to a cohort table. Note,
-currently only indexes will be added if the table is in a postgres database.
+currently only indexes will be added if the table is in a postgres or sql
+server database.
 }
