@@ -33,7 +33,7 @@
 entryAtFirstDate <- function(cohort,
                              dateColumns,
                              cohortId = NULL,
-                             returnReason = TRUE,
+                             returnReason = FALSE,
                              keepDateColumns = TRUE,
                              name = tableName(cohort),
                              .softValidation = FALSE) {
@@ -86,7 +86,7 @@ entryAtFirstDate <- function(cohort,
 entryAtLastDate <- function(cohort,
                             dateColumns,
                             cohortId = NULL,
-                            returnReason = TRUE,
+                            returnReason = FALSE,
                             keepDateColumns = TRUE,
                             name = tableName(cohort),
                             .softValidation = FALSE) {

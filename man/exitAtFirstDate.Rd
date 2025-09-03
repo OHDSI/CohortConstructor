@@ -8,7 +8,7 @@ exitAtFirstDate(
   cohort,
   dateColumns,
   cohortId = NULL,
-  returnReason = TRUE,
+  returnReason = FALSE,
   keepDateColumns = TRUE,
   name = tableName(cohort),
   .softValidation = FALSE

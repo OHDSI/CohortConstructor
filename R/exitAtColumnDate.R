@@ -33,7 +33,7 @@
 exitAtFirstDate <- function(cohort,
                             dateColumns,
                             cohortId = NULL,
-                            returnReason = TRUE,
+                            returnReason = FALSE,
                             keepDateColumns = TRUE,
                             name = tableName(cohort),
                             .softValidation = FALSE) {
@@ -86,7 +86,7 @@ exitAtFirstDate <- function(cohort,
 exitAtLastDate <- function(cohort,
                            dateColumns,
                            cohortId = NULL,
-                           returnReason = TRUE,
+                           returnReason = FALSE,
                            keepDateColumns = TRUE,
                            name = tableName(cohort),
                            .softValidation = FALSE) {
@@ -191,21 +191,52 @@ exitAtColumnDate <- function(cohort,
     ) |>
     dplyr::filter(.data$new_date_0123456789 == !!atDateFunction) |>
     dplyr::ungroup() |>
-    dplyr::group_by(dplyr::across(!dplyr::all_of(reason))) |>
-    dplyr::arrange(.data[[reason]]) |>
-    dplyr::summarise(!!reason := stringr::str_flatten(.data[[reason]], collapse = '; '),
-                     .groups = "drop") |>
+    dplyr::compute(
+      name = tmpNewCohort, temporary = FALSE,
+      logPrefix = "CohortConstructor_exitAtColumnDate_newDate_1_"
+    )
+
+  if (returnReason) {
+    if (omopgenerics::sourceType(cdm) == "spark") {
+      newCohort <- newCohort |>
+        dplyr::group_by(dplyr::across(!dplyr::all_of(reason))) |>
+        dplyr::arrange(.data[[reason]]) |>
+        dplyr::summarise(
+          !!reason := dplyr::sql(paste0("CONCAT_WS(', ', COLLECT_LIST(", reason, "))")),
+          .groups = "drop"
+        ) |>
+        dplyr::compute(
+          name = tmpNewCohort, temporary = FALSE,
+          logPrefix = "CohortConstructor_exitAtColumnDate_newDate_1_"
+        )
+    } else {
+      newCohort <- newCohort |>
+        dplyr::group_by(dplyr::across(!dplyr::all_of(reason))) |>
+        dplyr::arrange(.data[[reason]]) |>
+        dplyr::summarise(
+          !!reason := stringr::str_flatten(.data[[reason]], collapse = '; '),
+          .groups = "drop"
+        ) |>
+        dplyr::compute(
+          name = tmpNewCohort, temporary = FALSE,
+          logPrefix = "CohortConstructor_exitAtColumnDate_newDate_1_"
+        )
+    }
+    excludeReason <- NULL
+  } else {
+    excludeReason <- reason
+  }
+
+  newCohort <- newCohort |>
     dplyr::mutate(!!newDate := .data$new_date_0123456789, !!keptDate := .data[[paste0(keptDate, "_0123456789")]]) |>
-    dplyr::select(
-      !c(
-        "new_date_0123456789",
-        "cohort_end_date_0123456789",
-        "cohort_start_date_0123456789"
-      )
-    ) |>
+    dplyr::select(!dplyr::all_of(c(
+      "new_date_0123456789", "cohort_end_date_0123456789", "cohort_start_date_0123456789", excludeReason
+    ))) |>
     dplyr::distinct() |>
-    dplyr::compute(name = tmpNewCohort, temporary = FALSE,
-                   logPrefix = "CohortConstructor_exitAtColumnDate_newDate_1_")
+    dplyr::compute(
+      name = tmpNewCohort, temporary = FALSE,
+      logPrefix = "CohortConstructor_exitAtColumnDate_newDate_1_"
+    )
 
   # checks with informative errors
   if (isFALSE(.softValidation)) {
@@ -217,16 +248,12 @@ exitAtColumnDate <- function(cohort,
     newCohort <- newCohort |>
       # join non modified cohorts
       dplyr::union_all(
-        cdm[[tmpUnchanged]] |>
-          dplyr::select(!dplyr::all_of(dateColumns)) |>
-          dplyr::mutate(!!reason := !!newDate)
+        cdm[[tmpUnchanged]]  |>
+          dplyr::mutate(!!reason := !!newDate) |>
+          dplyr::select(!dplyr::all_of(c(dateColumns, excludeReason)))
       ) |>
       dplyr::compute(name = tmpNewCohort, temporary = FALSE,
                      logPrefix = "CohortConstructor_exitAtColumnDate_union_")
-  }
-
-  if (!returnReason) {
-    newCohort <- newCohort |> dplyr::select(!dplyr::all_of(reason))
   }
 
   if (keepDateColumns) {
