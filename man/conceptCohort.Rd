@@ -10,8 +10,8 @@ conceptCohort(
   name,
   exit = "event_end_date",
   overlap = "merge",
-  inObservation = TRUE,
   table = NULL,
+  useRecordsOutOfObservation = FALSE,
   useSourceFields = FALSE,
   subsetCohort = NULL,
   subsetCohortId = NULL
@@ -34,13 +34,15 @@ cases cohort start will be set as the earliest start date. If
 cohort end date will be set by adding together the total days
 from each of the overlapping records.}
 
-\item{inObservation}{If TRUE, only records in observation will be used. If
-FALSE, records before the start of observation period will be considered,
-with startdate the start of observation.}
-
 \item{table}{Name of OMOP tables to search for records of the concepts
 provided. If NULL, each concept will be search at the assigned domain in
 the concept table.}
+
+\item{useRecordsOutOfObservation}{If FALSE, only records in observation will
+be used. If TRUE, records before the start of observation period will be
+considered, with cohort start date set as the start date of the
+individuals next observation period (as cohort records must be within
+observation).}
 
 \item{useSourceFields}{If TRUE, the source concept_id fields will also be
 used when identifying relevant clinical records. If FALSE, only the standard
@@ -103,9 +105,9 @@ cdm$cohort |> attrition()
 conceptSet <- list("nitrogen" = c(35604434, 35604439),
 "potassium" = c(40741270, 42899580, 44081436))
 
-cohort_drugs <- conceptCohort(cdm,
+cdm$study_cohort <- conceptCohort(cdm,
                              conceptSet = conceptSet,
-                             name = "cohort_drugs",
+                             name = "study_cohort",
                              exit = "event_start_date",
                              overlap = "extend",
                              subsetCohort = "cohort"
