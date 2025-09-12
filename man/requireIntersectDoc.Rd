@@ -29,8 +29,9 @@ intersect.}
 
 \item{tableName}{Name of the table to check for intersect.}
 
-\item{inObservation}{If TRUE only records inside an observation period will
-be considered.}
+\item{useRecordsOutOfObservation}{If FALSE only records inside an observation
+period will be considered. If TRUE records outside of an observation period
+will also be considered.}
 }
 \description{
 Helper for consistent documentation of arguments in \code{requireIntersect}

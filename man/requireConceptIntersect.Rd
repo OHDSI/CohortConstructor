@@ -13,7 +13,7 @@ requireConceptIntersect(
   indexDate = "cohort_start_date",
   targetStartDate = "event_start_date",
   targetEndDate = "event_end_date",
-  inObservation = TRUE,
+  useRecordsOutOfObservation = FALSE,
   censorDate = NULL,
   atFirst = FALSE,
   name = tableName(cohort),
@@ -48,8 +48,9 @@ incidence of target event in the window will be considered as intersection,
 otherwise prevalence of that event will be used as intersection (overlap
 between cohort and event).}
 
-\item{inObservation}{If TRUE only records inside an observation period will
-be considered.}
+\item{useRecordsOutOfObservation}{If FALSE only records inside an observation
+period will be considered. If TRUE records outside of an observation period
+will also be considered.}
 
 \item{censorDate}{Whether to censor overlap events at a specific date or a
 column date of the cohort.}

@@ -123,7 +123,7 @@ test_that("requiring presence in another table", {
                                         targetStartDate = "date_start",
                                         targetEndDate = "date_end",
                                         window = c(-Inf, -1),
-                                        inObservation = FALSE,
+                                        useRecordsOutOfObservation = TRUE,
                                         censorDate = "cohort_end_date",
                                         name = "cohort6")
   expect_equal(
