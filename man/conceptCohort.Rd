@@ -113,6 +113,6 @@ cdm$study_cohort <- conceptCohort(cdm,
                              subsetCohort = "cohort"
 )
 
-cohort_drugs |> attrition()
+ cdm$study_cohort |> attrition()
 }
 }
