@@ -27,6 +27,7 @@ benchmarkCohortConstructor <- function(cdm,
   rlang::check_installed("CirceR")
   rlang::check_installed("SqlRender")
   rlang::check_installed("CohortCharacteristics")
+  rlang::check_installed("CDMConnector")
 
   # check inputs
   cdm <- omopgenerics::validateCdmArgument(cdm)

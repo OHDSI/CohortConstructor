@@ -109,7 +109,8 @@ unionCohorts <- function(cohort,
       omopgenerics::newCohortTable(.softValidation = TRUE)
   }
 
-  CDMConnector::dropTable(cdm, name = dplyr::starts_with(tmpTable))
+  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(tmpTable))
+
 
   useIndexes <- getOption("CohortConstructor.use_indexes")
   if (!isFALSE(useIndexes)) {
