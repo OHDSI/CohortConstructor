@@ -1,3 +1,4 @@
+dbToTest <- Sys.getenv("DB_TO_TEST", "duckdb CDMConnector")
 collectCohort <- function(cohort, id) {
   x <- cohort |>
     dplyr::filter(.data$cohort_definition_id == .env$id) |>
@@ -16,52 +17,37 @@ compareCohort <- function(cohort1, id1, cohort2, id2) {
   }
   return(invisible(TRUE))
 }
-writeSchema <- function(dbToTest = Sys.getenv("DB_TO_TEST", "duckdb")) {
-  prefix <- paste0("coco_", sample(letters, 4) |> paste0(collapse = ""), "_")
-  switch(dbToTest,
-    "duckdb" = c(schema = "main", prefix = prefix),
-    "sql server" = c(catalog = "ohdsi", schema = "dbo", prefix = prefix),
-    "redshift" = c(schema = "resultsv281", prefix = prefix)
-  )
-}
-connection <- function(dbToTest = Sys.getenv("DB_TO_TEST", "duckdb")) {
-  switch(dbToTest,
-    "duckdb" = DBI::dbConnect(duckdb::duckdb(), ":memory:"),
-    "sql server" = DBI::dbConnect(
-      odbc::odbc(),
-      Driver = "ODBC Driver 18 for SQL Server",
-      Server = Sys.getenv("CDM5_SQL_SERVER_SERVER"),
-      Database = Sys.getenv("CDM5_SQL_SERVER_CDM_DATABASE"),
-      UID = Sys.getenv("CDM5_SQL_SERVER_USER"),
-      PWD = Sys.getenv("CDM5_SQL_SERVER_PASSWORD"),
-      TrustServerCertificate = "yes",
-      Port = 1433
-    ),
-    "redshift" = DBI::dbConnect(
-      RPostgres::Redshift(),
-      dbname = Sys.getenv("CDM5_REDSHIFT_DBNAME"),
-      port = Sys.getenv("CDM5_REDSHIFT_PORT"),
-      host = Sys.getenv("CDM5_REDSHIFT_HOST"),
-      user = Sys.getenv("CDM5_REDSHIFT_USER"),
-      password = Sys.getenv("CDM5_REDSHIFT_PASSWORD")
-    )
-  )
-}
 copyCdm <- function(cdm) {
-  CDMConnector::copyCdmTo(
-    con = connection(), cdm = cdm, schema = writeSchema(), overwrite = TRUE
+  # create the source to copy the cdm to
+  prefix <- "coco_test_"
+  to <- switch(
+    dbToTest,
+    "duckdb CDMConnector" = CDMConnector::dbSource(
+      con = duckdb::dbConnect(drv = duckdb::duckdb(dbdir = ":memory:")),
+      writeSchema = c(schema = "main", prefix = prefix)
+    ),
+    "sql server CDMConnector" = NULL,
+    "redshift CDMConnector" = NULL,
+    "postgres CDMConnector" = NULL,
+    "local" = omopgenerics::newLocalSource()
   )
+
+  # insert cdm to my source of interest
+  cdm <- omopgenerics::insertCdmTo(cdm = cdm, to = to)
+
+  return(cdm)
+}
+dropCreatedTables <- function(cdm) {
+  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::everything())
 }
 countDuckdbTempTables <- function(con){
-  duckdb_temp_tables <- DBI::dbGetQuery(con, "SHOW ALL TABLES")
-  duckdb_temp_tables |>
+  DBI::dbGetQuery(con, "SHOW ALL TABLES") |>
     dplyr::filter(database == "temp") |>
     dplyr::tally() |>
     dplyr::pull("n")
 }
 countDuckdbPermanentTables <- function(con){
-  duckdb_temp_tables <- DBI::dbGetQuery(con, "SHOW ALL TABLES")
-  duckdb_temp_tables |>
+  DBI::dbGetQuery(con, "SHOW ALL TABLES") |>
     dplyr::filter(database != "temp") |>
     dplyr::tally() |>
     dplyr::pull("n")
