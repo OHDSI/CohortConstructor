@@ -140,8 +140,8 @@ cohorts at once using CohortConstructor.</p>
 <span>  runCohortConstructorDefinition <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  runCohortConstructorDomain <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; cc_set_no_strata: 91.656 sec elapsed</span></span>
-<span><span class="co">#&gt; cc_set_strata: 1.588 sec elapsed</span></span>
+<span><span class="co">#&gt; cc_set_no_strata: 103.571 sec elapsed</span></span>
+<span><span class="co">#&gt; cc_set_strata: 1.662 sec elapsed</span></span>
 <span><span class="va">benchmark_results</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Rows: 297</span></span>
@@ -636,20 +636,20 @@ databases.</p>
 <table class="table gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <thead>
 <tr class="gt_col_headings gt_spanner_row">
-<th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="2" colspan="1" style="text-align: center; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: White; border-right-width: 1px; border-right-style: solid; border-right-color: White; border-top-width: 1px; border-top-style: solid; border-top-color: White; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: White; background-color: #E1E1E1;" scope="col" id="OMOP-table">OMOP table</th>
-      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="7" style="background-color: #C8C8C8; text-align: center; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: White; border-right-width: 1px; border-right-style: solid; border-right-color: White; border-top-width: 1px; border-top-style: solid; border-top-color: White; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: White;" scope="colgroup" id="spanner-[header]Database
+<th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="2" colspan="1" style="text-align: center; font-weight: bold; background-color: #E1E1E1;" scope="col" id="OMOP-table">OMOP table</th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="7" style="background-color: #C8C8C8; text-align: center; font-weight: bold;" scope="colgroup" id="spanner-[header]Database
 [header_level]CPRD Aurum">
         <div class="gt_column_spanner">Database</div>
       </th>
     </tr>
 <tr class="gt_col_headings">
-<th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="background-color: #E1E1E1; text-align: center; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: White; border-right-width: 1px; border-right-style: solid; border-right-color: White; border-top-width: 1px; border-top-style: solid; border-top-color: White; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: White;" scope="col" id="[header]Database-[header_level]CPRD-Aurum">CPRD Aurum</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="background-color: #E1E1E1; text-align: center; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: White; border-right-width: 1px; border-right-style: solid; border-right-color: White; border-top-width: 1px; border-top-style: solid; border-top-color: White; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: White;" scope="col" id="[header]Database-[header_level]CORIVA-Estonia">CORIVA-Estonia</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="background-color: #E1E1E1; text-align: center; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: White; border-right-width: 1px; border-right-style: solid; border-right-color: White; border-top-width: 1px; border-top-style: solid; border-top-color: White; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: White;" scope="col" id="[header]Database-[header_level]CPRD-Gold-100k">CPRD Gold 100k</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="background-color: #E1E1E1; text-align: center; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: White; border-right-width: 1px; border-right-style: solid; border-right-color: White; border-top-width: 1px; border-top-style: solid; border-top-color: White; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: White;" scope="col" id="[header]Database-[header_level]OHDSI-Postgres-server">OHDSI Postgres server</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="background-color: #E1E1E1; text-align: center; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: White; border-right-width: 1px; border-right-style: solid; border-right-color: White; border-top-width: 1px; border-top-style: solid; border-top-color: White; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: White;" scope="col" id="[header]Database-[header_level]OHDSI-redshift">OHDSI redshift</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="background-color: #E1E1E1; text-align: center; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: White; border-right-width: 1px; border-right-style: solid; border-right-color: White; border-top-width: 1px; border-top-style: solid; border-top-color: White; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: White;" scope="col" id="[header]Database-[header_level]OHDSI-snowflake">OHDSI snowflake</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="background-color: #E1E1E1; text-align: center; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: White; border-right-width: 1px; border-right-style: solid; border-right-color: White; border-top-width: 1px; border-top-style: solid; border-top-color: White; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: White;" scope="col" id="[header]Database-[header_level]OHDSI-SQL-server">OHDSI SQL server</th>
+<th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="background-color: #E1E1E1; text-align: center; font-weight: bold;" scope="col" id="[header]Database-[header_level]CPRD-Aurum">CPRD Aurum</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="background-color: #E1E1E1; text-align: center; font-weight: bold;" scope="col" id="[header]Database-[header_level]CORIVA-Estonia">CORIVA-Estonia</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="background-color: #E1E1E1; text-align: center; font-weight: bold;" scope="col" id="[header]Database-[header_level]CPRD-Gold-100k">CPRD Gold 100k</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="background-color: #E1E1E1; text-align: center; font-weight: bold;" scope="col" id="[header]Database-[header_level]OHDSI-Postgres-server">OHDSI Postgres server</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="background-color: #E1E1E1; text-align: center; font-weight: bold;" scope="col" id="[header]Database-[header_level]OHDSI-redshift">OHDSI redshift</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="background-color: #E1E1E1; text-align: center; font-weight: bold;" scope="col" id="[header]Database-[header_level]OHDSI-snowflake">OHDSI snowflake</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="background-color: #E1E1E1; text-align: center; font-weight: bold;" scope="col" id="[header]Database-[header_level]OHDSI-SQL-server">OHDSI SQL server</th>
     </tr>
 </thead>
 <tbody class="gt_table_body">
@@ -1265,29 +1265,29 @@ each cohort across the participating databases:</p>
 <table class="table gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <thead>
 <tr class="gt_col_headings gt_spanner_row">
-<th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="1" style="background-color: #C8C8C8; text-align: center; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: White; border-right-width: 1px; border-right-style: solid; border-right-color: White; border-top-width: 1px; border-top-style: solid; border-top-color: White; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: White;" scope="col"></th>
-      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="4" style="background-color: #C8C8C8; text-align: center; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: White; border-right-width: 1px; border-right-style: solid; border-right-color: White; border-top-width: 1px; border-top-style: solid; border-top-color: White; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: White;" scope="colgroup" id="spanner-[header]Tool
+<th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="1" style="background-color: #C8C8C8; text-align: center; font-weight: bold;" scope="col"></th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="4" style="background-color: #C8C8C8; text-align: center; font-weight: bold;" scope="colgroup" id="spanner-[header]Tool
 [header_level]CIRCE
 [header_level]Number records">
         <div class="gt_column_spanner">Tool</div>
       </th>
     </tr>
 <tr class="gt_col_headings gt_spanner_row">
-<th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="2" colspan="1" style="text-align: center; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: White; border-right-width: 1px; border-right-style: solid; border-right-color: White; border-top-width: 1px; border-top-style: solid; border-top-color: White; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: White; background-color: #E1E1E1;" scope="col" id="Cohort-name">Cohort name</th>
-      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="2" style="background-color: #E1E1E1; text-align: center; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: White; border-right-width: 1px; border-right-style: solid; border-right-color: White; border-top-width: 1px; border-top-style: solid; border-top-color: White; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: White;" scope="colgroup" id="spanner-[header_level]CIRCE
+<th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="2" colspan="1" style="text-align: center; font-weight: bold; background-color: #E1E1E1;" scope="col" id="Cohort-name">Cohort name</th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="2" style="background-color: #E1E1E1; text-align: center; font-weight: bold;" scope="colgroup" id="spanner-[header_level]CIRCE
 [header_level]Number records">
         <div class="gt_column_spanner">CIRCE</div>
       </th>
-      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="2" style="background-color: #E1E1E1; text-align: center; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: White; border-right-width: 1px; border-right-style: solid; border-right-color: White; border-top-width: 1px; border-top-style: solid; border-top-color: White; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: White;" scope="colgroup" id="spanner-[header_level]CohortConstructor
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="2" style="background-color: #E1E1E1; text-align: center; font-weight: bold;" scope="colgroup" id="spanner-[header_level]CohortConstructor
 [header_level]Number records">
         <div class="gt_column_spanner">CohortConstructor</div>
       </th>
     </tr>
 <tr class="gt_col_headings">
-<th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="background-color: #E1E1E1; text-align: center; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: White; border-right-width: 1px; border-right-style: solid; border-right-color: White; border-top-width: 1px; border-top-style: solid; border-top-color: White; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: White;" scope="col" id="[header]Tool-[header_level]CIRCE-[header_level]Number-records">Number records</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="background-color: #E1E1E1; text-align: center; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: White; border-right-width: 1px; border-right-style: solid; border-right-color: White; border-top-width: 1px; border-top-style: solid; border-top-color: White; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: White;" scope="col" id="[header]Tool-[header_level]CIRCE-[header_level]Number-subjects">Number subjects</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="background-color: #E1E1E1; text-align: center; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: White; border-right-width: 1px; border-right-style: solid; border-right-color: White; border-top-width: 1px; border-top-style: solid; border-top-color: White; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: White;" scope="col" id="[header]Tool-[header_level]CohortConstructor-[header_level]Number-records">Number records</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="background-color: #E1E1E1; text-align: center; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: White; border-right-width: 1px; border-right-style: solid; border-right-color: White; border-top-width: 1px; border-top-style: solid; border-top-color: White; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: White;" scope="col" id="[header]Tool-[header_level]CohortConstructor-[header_level]Number-subjects">Number subjects</th>
+<th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="background-color: #E1E1E1; text-align: center; font-weight: bold;" scope="col" id="[header]Tool-[header_level]CIRCE-[header_level]Number-records">Number records</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="background-color: #E1E1E1; text-align: center; font-weight: bold;" scope="col" id="[header]Tool-[header_level]CIRCE-[header_level]Number-subjects">Number subjects</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="background-color: #E1E1E1; text-align: center; font-weight: bold;" scope="col" id="[header]Tool-[header_level]CohortConstructor-[header_level]Number-records">Number records</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="background-color: #E1E1E1; text-align: center; font-weight: bold;" scope="col" id="[header]Tool-[header_level]CohortConstructor-[header_level]Number-subjects">Number subjects</th>
     </tr>
 </thead>
 <tbody class="gt_table_body">
@@ -3376,15 +3376,15 @@ CohortConstructor.</p>
 <table class="table gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <thead>
 <tr class="gt_col_headings gt_spanner_row">
-<th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="2" colspan="1" style="text-align: center; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: White; border-right-width: 1px; border-right-style: solid; border-right-color: White; border-top-width: 1px; border-top-style: solid; border-top-color: White; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: White; background-color: #E1E1E1;" scope="col" id="Database_name">Database_name</th>
-      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="2" style="background-color: #C8C8C8; text-align: center; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: White; border-right-width: 1px; border-right-style: solid; border-right-color: White; border-top-width: 1px; border-top-style: solid; border-top-color: White; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: White;" scope="colgroup" id="spanner-[header]Time (minutes)
+<th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="2" colspan="1" style="text-align: center; font-weight: bold; background-color: #E1E1E1;" scope="col" id="Database_name">Database_name</th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="2" style="background-color: #C8C8C8; text-align: center; font-weight: bold;" scope="colgroup" id="spanner-[header]Time (minutes)
 [header_level]CIRCE">
         <div class="gt_column_spanner">Time (minutes)</div>
       </th>
     </tr>
 <tr class="gt_col_headings">
-<th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="background-color: #E1E1E1; text-align: center; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: White; border-right-width: 1px; border-right-style: solid; border-right-color: White; border-top-width: 1px; border-top-style: solid; border-top-color: White; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: White;" scope="col" id="[header]Time-(minutes)-[header_level]CIRCE">CIRCE</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="background-color: #E1E1E1; text-align: center; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: White; border-right-width: 1px; border-right-style: solid; border-right-color: White; border-top-width: 1px; border-top-style: solid; border-top-color: White; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: White;" scope="col" id="[header]Time-(minutes)-[header_level]CohortConstructor">CohortConstructor</th>
+<th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="background-color: #E1E1E1; text-align: center; font-weight: bold;" scope="col" id="[header]Time-(minutes)-[header_level]CIRCE">CIRCE</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="background-color: #E1E1E1; text-align: center; font-weight: bold;" scope="col" id="[header]Time-(minutes)-[header_level]CohortConstructor">CohortConstructor</th>
     </tr>
 </thead>
 <tbody class="gt_table_body">
@@ -3902,15 +3902,15 @@ CohortConstructor.</p>
 <table class="table gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <thead>
 <tr class="gt_col_headings gt_spanner_row">
-<th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="2" colspan="1" style="text-align: center; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: White; border-right-width: 1px; border-right-style: solid; border-right-color: White; border-top-width: 1px; border-top-style: solid; border-top-color: White; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: White; background-color: #E1E1E1;" scope="col" id="Database">Database</th>
-      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="2" style="background-color: #C8C8C8; text-align: center; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: White; border-right-width: 1px; border-right-style: solid; border-right-color: White; border-top-width: 1px; border-top-style: solid; border-top-color: White; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: White;" scope="colgroup" id="spanner-[header]Time (minutes)
+<th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="2" colspan="1" style="text-align: center; font-weight: bold; background-color: #E1E1E1;" scope="col" id="Database">Database</th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="2" style="background-color: #C8C8C8; text-align: center; font-weight: bold;" scope="colgroup" id="spanner-[header]Time (minutes)
 [header_level]CIRCE">
         <div class="gt_column_spanner">Time (minutes)</div>
       </th>
     </tr>
 <tr class="gt_col_headings">
-<th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="background-color: #E1E1E1; text-align: center; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: White; border-right-width: 1px; border-right-style: solid; border-right-color: White; border-top-width: 1px; border-top-style: solid; border-top-color: White; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: White;" scope="col" id="[header]Time-(minutes)-[header_level]CIRCE">CIRCE</th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="background-color: #E1E1E1; text-align: center; font-weight: bold; border-left-width: 1px; border-left-style: solid; border-left-color: White; border-right-width: 1px; border-right-style: solid; border-right-color: White; border-top-width: 1px; border-top-style: solid; border-top-color: White; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: White;" scope="col" id="[header]Time-(minutes)-[header_level]CohortConstructor">CohortConstructor</th>
+<th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="background-color: #E1E1E1; text-align: center; font-weight: bold;" scope="col" id="[header]Time-(minutes)-[header_level]CIRCE">CIRCE</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="background-color: #E1E1E1; text-align: center; font-weight: bold;" scope="col" id="[header]Time-(minutes)-[header_level]CohortConstructor">CohortConstructor</th>
     </tr>
 </thead>
 <tbody class="gt_table_body">
