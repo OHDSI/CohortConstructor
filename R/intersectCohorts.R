@@ -253,20 +253,10 @@ splitOverlap <- function(x,
                          end = "cohort_end_date",
                          by = c("cohort_definition_id", "subject_id")) {
   # initial checks
-  checkmate::assertCharacter(start,
-                             len = 1,
-                             min.chars = 1,
-                             any.missing = FALSE)
-  checkmate::assertCharacter(end,
-                             len = 1,
-                             min.chars = 1,
-                             any.missing = FALSE)
-  checkmate::assertCharacter(by,
-                             min.len = 1,
-                             min.chars = 1,
-                             any.missing = FALSE)
-  checkmate::assertClass(x, "tbl")
-  checkmate::assertTRUE(all(c(start, end, by) %in% colnames(x)))
+  omopgenerics::assertCharacter(start, length = 1, minNumCharacter = 1)
+  omopgenerics::assertCharacter(end, length = 1, minNumCharacter = 1)
+  omopgenerics::assertCharacter(by, length = 1, minNumCharacter = 1)
+  omopgenerics::assertTable(x, class = "tbl", columns = c(strat, end, by))
 
   ids <- getIdentifier(x, 3)
   id <- ids[1]
@@ -458,17 +448,6 @@ getIdentifier <- function(x,
                           len = 1,
                           prefix = "",
                           nchar = 5) {
-  checkmate::assertClass(x, "tbl")
-  checkmate::assertIntegerish(len,
-                              lower = 1,
-                              len = 1,
-                              any.missing = FALSE)
-  checkmate::assertCharacter(prefix, any.missing = FALSE, len = 1)
-  checkmate::assertIntegerish(nchar,
-                              len = 1,
-                              lower = 1,
-                              any.missing = FALSE)
-
   cols <- colnames(x)
 
   x <- character()
