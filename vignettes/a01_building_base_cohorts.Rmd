@@ -15,9 +15,6 @@ warning = FALSE,
 message = FALSE,
 comment = "#>"
 )
-
-library(CDMConnector)
-requireEunomia()
 ```
 
 ## Introduction
@@ -25,16 +22,13 @@ requireEunomia()
 Let's first create a cdm reference to the Eunomia synthetic data.
 
 ```{r}
-library(CDMConnector)
+library(omock)
 library(CodelistGenerator)
 library(PatientProfiles)
 library(CohortConstructor)
 library(dplyr)
 
-con <- DBI::dbConnect(duckdb::duckdb(), 
-                      dbdir = eunomiaDir())
-cdm <- cdmFromCon(con, cdmSchema = "main", writeSchema = "main", 
-                  writePrefix = "my_study_")
+cdm <- mockCdmFromDataset(datasetName = "GiBleed", source = "duckdb")
 ```
 
 ## Concept based cohort creation
@@ -254,10 +248,7 @@ cdm$cohort
 ## Death cohort
 
 ```{r, include=FALSE}
-con <- DBI::dbConnect(duckdb::duckdb(), 
-                      dbdir = eunomiaDir())
-cdm <- cdmFromCon(con, cdmSchema = "main", writeSchema = "main", 
-                  writePrefix = "my_study_")
+cdm <- mockCdmFromDataset(datasetName = "GiBleed", source = "duckdb")
 cdm$drugs <- conceptCohort(cdm, 
                            conceptSet = drug_codes,
                            exit = "event_end_date",

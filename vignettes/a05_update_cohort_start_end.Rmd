@@ -38,17 +38,10 @@ First, we'll connect to the Eunomia synthetic data and create a mock cohort of w
 library(CohortConstructor)
 library(CohortCharacteristics)
 library(PatientProfiles)
-library(CDMConnector)
+library(omock)
+library(clock)
 
-if (Sys.getenv("EUNOMIA_DATA_FOLDER") == ""){
-Sys.setenv("EUNOMIA_DATA_FOLDER" = file.path(tempdir(), "eunomia"))}
-if (!dir.exists(Sys.getenv("EUNOMIA_DATA_FOLDER"))){ dir.create(Sys.getenv("EUNOMIA_DATA_FOLDER"))
-downloadEunomiaData()  
-}
-
-con <- DBI::dbConnect(duckdb::duckdb(), dbdir = CDMConnector::eunomiaDir())
-cdm <- CDMConnector::cdmFromCon(con, cdmSchema = "main", 
-                    writeSchema = "main", writePrefix = "my_study_")
+cdm <- mockCdmFromDataset(datasetName = "GiBleed", source = "duckdb")
 
 cdm$cohort <- demographicsCohort(cdm = cdm, name = "cohort", sex = "Female")
 ```
@@ -220,7 +213,7 @@ Additionally, days to add can also be specified with a numeric column in the coh
 
 ```{r}
 cdm$cohort <- cdm$cohort %>% 
-  dplyr::mutate(days_to_add = !!CDMConnector::datediff("cohort_start_date", "cohort_end_date")) |>
+  dplyr::mutate(days_to_add = date_count_between(start = cohort_start_date, end = cohort_end_date, precision = "day")) |>
   padCohortEnd(days = "days_to_add", padObservation = FALSE)
 ```
 

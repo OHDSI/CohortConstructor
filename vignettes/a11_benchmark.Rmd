@@ -21,19 +21,10 @@ echo = FALSE,
 eval = NOT_CRAN
 )
 ```
-  
-```{r, include = FALSE}
-library(CDMConnector)
-if (Sys.getenv("EUNOMIA_DATA_FOLDER") == ""){
-Sys.setenv("EUNOMIA_DATA_FOLDER" = file.path(tempdir(), "eunomia"))}
-if (!dir.exists(Sys.getenv("EUNOMIA_DATA_FOLDER"))){ dir.create(Sys.getenv("EUNOMIA_DATA_FOLDER"))
-downloadEunomiaData()  
-}
-```
-
 
 ```{r}
 # Packages
+library(omock)
 library(visOmopResults)
 library(omopgenerics)
 library(ggplot2)
@@ -86,16 +77,7 @@ The CohortConstructor package offers an alternative approach, emphasising cohort
 To test the performance of the package there is a benchmarking function which uses nine phenotypes from the [OHDSI Phenotype library](https://github.com/OHDSI/PhenotypeLibrary) that cover a range of concept domains, entry and inclusion criteria, and cohort exit options. We replicated these cohorts using CohortConstructor to assess computational time and agreement between CIRCE and CohortConstructor.
 
 ```{r, echo=TRUE}
-library(CDMConnector)
-library(CodelistGenerator)
-library(PatientProfiles)
-library(CohortConstructor)
-library(dplyr)
-
-con <- DBI::dbConnect(duckdb::duckdb(), 
-                      dbdir = eunomiaDir())
-cdm <- cdmFromCon(con, cdmSchema = "main", writeSchema = "main", 
-                  writePrefix = "my_study_")
+cdm <- mockCdmFromDataset(datasetName = "GiBleed", source = "duckdb")
 ```
 
 Once we have created our cdm reference we can run the benchmark. Once run we'll have a set of results with the time taken to run the different tasks. For this example we will just run task of creating all the cohorts at once using CohortConstructor.

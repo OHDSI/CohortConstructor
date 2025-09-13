@@ -17,14 +17,6 @@ knitr::opts_chunk$set(
   comment = "#>",
   eval = NOT_CRAN
 )
-
-library(CDMConnector)
-if (Sys.getenv("EUNOMIA_DATA_FOLDER") == ""){
-Sys.setenv("EUNOMIA_DATA_FOLDER" = file.path(tempdir(), "eunomia"))}
-if (!dir.exists(Sys.getenv("EUNOMIA_DATA_FOLDER"))){ dir.create(Sys.getenv("EUNOMIA_DATA_FOLDER"))
-downloadEunomiaData()  
-}
-
 ```
 
 
@@ -35,8 +27,7 @@ In this vignette we show how to split existing cohorts. We are going to use the 
 Load necessary packages:
 
 ```{r}
-library(duckdb)
-library(CDMConnector)
+library(omock)
 library(PatientProfiles)
 library(CohortConstructor)
 library(dplyr, warn.conflicts = FALSE)
@@ -46,11 +37,7 @@ library(clock)
 Create `cdm_reference` object from *GiBleed* database:
 
 ```{r}
-requireEunomia(datasetName = "GiBleed")
-con <- dbConnect(drv = duckdb(), dbdir = eunomiaDir())
-cdm <- cdmFromCon(
-  con = con, cdmSchema = "main", writeSchema = "main", writePrefix = "my_study_"
-)
+cdm <- mockCdmFromDataset(datasetName = "GiBleed", source = "duckdb")
 ```
 
 Let's start by creating two drug cohorts, one for users of diclofenac and another for users of acetaminophen.
