@@ -41,7 +41,7 @@ data.
 
 ``` r
 library(omopgenerics)
-library(CDMConnector)
+library(omock)
 library(PatientProfiles)
 library(dplyr)
 library(CohortConstructor)
@@ -49,19 +49,19 @@ library(CohortCharacteristics)
 ```
 
 ``` r
-con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomiaDir())
-cdm <- cdmFromCon(con, cdmSchema = "main", 
-                    writeSchema = c(prefix = "my_study_", schema = "main"))
+cdm <- mockCdmFromDataset(datasetName = "GiBleed", source = "duckdb")
+#> ℹ Reading GiBleed tables.
+#> ℹ Adding drug_strength table.
 cdm
 #> 
-#> ── # OMOP CDM reference (duckdb) of Synthea ────────────────────────────────────
-#> • omop tables: person, observation_period, visit_occurrence, visit_detail,
-#> condition_occurrence, drug_exposure, procedure_occurrence, device_exposure,
-#> measurement, observation, death, note, note_nlp, specimen, fact_relationship,
-#> location, care_site, provider, payer_plan_period, cost, drug_era, dose_era,
-#> condition_era, metadata, cdm_source, concept, vocabulary, domain,
-#> concept_class, concept_relationship, relationship, concept_synonym,
-#> concept_ancestor, source_to_concept_map, drug_strength
+#> ── # OMOP CDM reference (duckdb) of GiBleed ────────────────────────────────────
+#> • omop tables: care_site, cdm_source, concept, concept_ancestor, concept_class,
+#> concept_relationship, concept_synonym, condition_era, condition_occurrence,
+#> cost, death, device_exposure, domain, dose_era, drug_era, drug_exposure,
+#> drug_strength, fact_relationship, location, measurement, metadata, note,
+#> note_nlp, observation, observation_period, payer_plan_period, person,
+#> procedure_occurrence, provider, relationship, source_to_concept_map, specimen,
+#> visit_detail, visit_occurrence, vocabulary
 #> • cohort tables: -
 #> • achilles tables: -
 #> • other tables: -
@@ -145,15 +145,15 @@ cohortCount(cdm$fractures) |> glimpse()
 #> $ number_records       <int> 569, 138
 #> $ number_subjects      <int> 510, 132
 attrition(cdm$fractures) |> glimpse()
-#> Rows: 10
+#> Rows: 14
 #> Columns: 7
-#> $ cohort_definition_id <int> 1, 1, 1, 1, 1, 2, 2, 2, 2, 2
-#> $ number_records       <int> 569, 569, 569, 569, 569, 138, 138, 138, 138, 138
-#> $ number_subjects      <int> 510, 510, 510, 510, 510, 132, 132, 132, 132, 132
-#> $ reason_id            <int> 1, 2, 3, 4, 5, 1, 2, 3, 4, 5
-#> $ reason               <chr> "Initial qualifying events", "Record start <= rec…
-#> $ excluded_records     <int> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-#> $ excluded_subjects    <int> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+#> $ cohort_definition_id <int> 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2
+#> $ number_records       <int> 569, 569, 569, 569, 569, 569, 569, 138, 138, 138,…
+#> $ number_subjects      <int> 510, 510, 510, 510, 510, 510, 510, 132, 132, 132,…
+#> $ reason_id            <int> 1, 2, 3, 4, 5, 6, 7, 1, 2, 3, 4, 5, 6, 7
+#> $ reason               <chr> "Initial qualifying events", "Record in observati…
+#> $ excluded_records     <int> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+#> $ excluded_subjects    <int> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 ```
 
 ### Create an overall fracture cohort
@@ -245,7 +245,7 @@ attrition(cdm$fractures) |>
 #> $ cohort_definition_id <int> 1, 2, 3
 #> $ number_records       <int> 64, 22, 86
 #> $ number_subjects      <int> 62, 22, 83
-#> $ reason_id            <int> 8, 8, 4
+#> $ reason_id            <int> 10, 10, 4
 #> $ reason               <chr> "Age requirement: 40 to 65", "Age requirement: 40…
 #> $ excluded_records     <int> 88, 40, 128
 #> $ excluded_subjects    <int> 81, 38, 113
@@ -258,7 +258,7 @@ attrition(cdm$fractures) |>
 #> $ cohort_definition_id <int> 1, 2, 3
 #> $ number_records       <int> 37, 12, 49
 #> $ number_subjects      <int> 36, 12, 48
-#> $ reason_id            <int> 9, 9, 5
+#> $ reason_id            <int> 11, 11, 5
 #> $ reason               <chr> "Sex requirement: Female", "Sex requirement: Fema…
 #> $ excluded_records     <int> 27, 10, 37
 #> $ excluded_subjects    <int> 26, 10, 35
@@ -291,7 +291,7 @@ attrition(cdm$fractures) |>
 #> $ cohort_definition_id <int> 1, 2, 3
 #> $ number_records       <int> 30, 10, 40
 #> $ number_subjects      <int> 30, 10, 40
-#> $ reason_id            <int> 12, 12, 8
+#> $ reason_id            <int> 14, 14, 8
 #> $ reason               <chr> "Not in cohort gibleed between -Inf & 0 days rela…
 #> $ excluded_records     <int> 7, 2, 9
 #> $ excluded_subjects    <int> 6, 2, 8
