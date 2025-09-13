@@ -63,7 +63,6 @@ Suggests:
     SqlRender,
     stringr,
     testthat (>= 3.0.0),
-    tibble,
     tictoc,
     visOmopResults
 Config/testthat/edition: 3

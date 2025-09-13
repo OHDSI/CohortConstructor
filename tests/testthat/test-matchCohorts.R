@@ -189,13 +189,13 @@ test_that("test exactMatchingCohort with a ratio bigger than 1", {
   cdm <- omock::emptyCdmReference(cdmName = "mock")
   cdm$person <- cdm$person |>
     dplyr::full_join(
-      tibble::tibble("person_id" = seq(1,10,1),
+      dplyr::tibble("person_id" = seq(1,10,1),
                      "gender_concept_id" = rep(8532,10),
                      "year_of_birth" = rep(1980, 10)),
       by = c("person_id", "gender_concept_id", "year_of_birth")
     )
 
-  condition_occurrence <- tibble::tibble(
+  condition_occurrence <- dplyr::tibble(
     "condition_occurrence_id" = seq(1,10,1),
     "person_id" = seq(1,10,1),
     "condition_concept_id" = c(317009,317009,4266367,4266367,rep(1,6)),
@@ -211,7 +211,7 @@ test_that("test exactMatchingCohort with a ratio bigger than 1", {
                                    name = "condition_occurrence",
                                    table = condition_occurrence)
 
-  observation_period <- tibble::tibble("observation_period_id" = seq(1,10,1),
+  observation_period <- dplyr::tibble("observation_period_id" = seq(1,10,1),
                                        "person_id" = seq(1,10,1),
                                        "observation_period_start_date" = as.Date(rep("1984-01-01",10)),
                                        "observation_period_end_date"   = as.Date(rep("2021-01-01",10)),
@@ -222,7 +222,7 @@ test_that("test exactMatchingCohort with a ratio bigger than 1", {
 
   cdm <- omopgenerics::insertTable(cdm = cdm,
                                    name = "cohort",
-                                   table = tibble::tibble(
+                                   table = dplyr::tibble(
                                        cohort_definition_id = c(1,1,2,2),
                                        subject_id = c(1,2,3,4),
                                        cohort_start_date = as.Date(c("2017-10-30","2003-01-04","2014-12-15","2010-09-09")),

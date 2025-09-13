@@ -131,7 +131,7 @@ test_that("first death record per person", {
 test_that("test death in observation criteria", {
   skip_on_cran()
 
-  observation_period <- tibble::tibble(
+  observation_period <- dplyr::tibble(
     observation_period_id = c(1, 2),
     person_id = c(1,2),
     observation_period_start_date = c(
@@ -190,7 +190,7 @@ test_that("test death in observation criteria", {
 test_that("test different cohort table name", {
   skip_on_cran()
 
-  observation_period <- tibble::tibble(
+  observation_period <- dplyr::tibble(
     observation_period_id = c(1, 2, 3),
     person_id = c(1,2, 3),
     observation_period_start_date = c(
@@ -247,7 +247,7 @@ test_that("test different cohort table name", {
 test_that("test subsetting death table by a cohort table", {
   skip_on_cran()
 
-  observation_period <- tibble::tibble(
+  observation_period <- dplyr::tibble(
     observation_period_id = c(1, 2, 3),
     person_id = c(1,2, 3),
     observation_period_start_date = c(
@@ -277,7 +277,7 @@ test_that("test subsetting death table by a cohort table", {
     race_concept_id = c(rep(0,5))
   )
 
-  cohort1 <- tibble::tibble(
+  cohort1 <- dplyr::tibble(
     cohort_definition_id = c(1,1,2),
     subject_id = c(1,2,3),
     cohort_start_date = as.Date(c("2012-02-01")),
@@ -327,7 +327,7 @@ test_that("test subsetting death table by a cohort table", {
 test_that("test expected errors", {
   skip_on_cran()
 
-  observation_period <- tibble::tibble(
+  observation_period <- dplyr::tibble(
     observation_period_id = c(1, 2, 3),
     person_id = c(1,2, 3),
     observation_period_start_date = c(
@@ -353,7 +353,7 @@ test_that("test expected errors", {
     race_concept_id = c(rep(0,5))
   )
 
-  cohort1 <- tibble::tibble(
+  cohort1 <- dplyr::tibble(
     cohort_definition_id = c(1,1,1),
     subject_id = c(1,2,3),
     cohort_start_date = as.Date(c("2012-02-01")),
@@ -416,7 +416,7 @@ test_that("test expected errors", {
 test_that("test single permanent table created", {
   skip_on_cran()
 
-  observation_period <- tibble::tibble(
+  observation_period <- dplyr::tibble(
     observation_period_id = c(1, 2, 3),
     person_id = c(1,2, 3),
     observation_period_start_date = c(
