@@ -256,7 +256,7 @@ splitOverlap <- function(x,
   omopgenerics::assertCharacter(start, length = 1, minNumCharacter = 1)
   omopgenerics::assertCharacter(end, length = 1, minNumCharacter = 1)
   omopgenerics::assertCharacter(by, length = 1, minNumCharacter = 1)
-  omopgenerics::assertTable(x, class = "tbl", columns = c(strat, end, by))
+  omopgenerics::assertTable(x, class = "tbl", columns = c(start, end, by))
 
   ids <- getIdentifier(x, 3)
   id <- ids[1]

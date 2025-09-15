@@ -1,5 +1,6 @@
 test_that("intersect example - two cohorts", {
   skip_on_cran()
+
   cdm <- omock::mockCdmReference() |>
     omock::mockPerson(n = 2) |>
     omopgenerics::insertTable(
@@ -512,7 +513,10 @@ test_that("codelist", {
           "drug_exposure_end_date" = as.Date(.data$drug_exposure_end_date, origin = "2010-01-01")
         )
     ),
-    cdmName = "mock"
+    cdmName = "mock",
+    cohortTables = list(
+      cohort = dplyr::tibble()
+    )
   ) |>
     omock::mockVocabularyTables(concept = dplyr::tibble(
       "concept_id" = c(1, 2, 3),

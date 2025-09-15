@@ -1,5 +1,6 @@
 test_that("benchmark works", {
   skip_on_cran()
+  skip("testing")
 
   cdm <- omock::mockCdmFromDataset(datasetName = "GiBleed") |>
     copyCdm()

@@ -160,7 +160,7 @@ test_that("Example: mixture of parameters", {
     omock::mockCohort(name = c("cohort1"), numberCohorts = 5, seed = 2) |>
     copyCdm()
 
-  if(dbToTest == "duckdb CDMConnector") {
+  if (dbToTest == "duckdb CDMConnector") {
     startTempTables <- countDuckdbTempTables(con = CDMConnector::cdmCon(cdm))
     startPermanentTables <- countDuckdbPermanentTables(con = CDMConnector::cdmCon(cdm))
   }
@@ -168,12 +168,12 @@ test_that("Example: mixture of parameters", {
   expect_no_error(
     cdm$cohort3 <- cdm |>
       demographicsCohort(name = "cohort3",
-                         ageRange = c(18,90),
+                         ageRange = c(18, 90),
                          sex = "Male",
                          minPriorObservation = 25)
   )
 
-  if(dbToTest == "duckdb CDMConnector") {
+  if (dbToTest == "duckdb CDMConnector") {
     endTempTables <- countDuckdbTempTables(
       con = CDMConnector::cdmCon(cdm))
     endPermanentTables <- countDuckdbPermanentTables(
@@ -205,7 +205,7 @@ test_that("Example: mixture of parameters", {
     PatientProfiles::addAge()
 
   expect_true(all(cdm$cohort3 |> dplyr::pull("age") >= 18))
-  expect_true(all(cdm$cohort3 |> dplyr::pull("age") <= 50))
+  expect_true(all(cdm$cohort3 |> dplyr::pull("age") <= 90))
 
   cdm$cohort3 <- cdm$cohort3 |>
     PatientProfiles::addSex()

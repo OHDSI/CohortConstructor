@@ -26,18 +26,29 @@ test_that("test restrict to first entry works", {
   ) |>
     copyCdm()
 
-  expect_true(all(cdm$cohort1 |> CohortConstructor::requireIsFirstEntry() |>
-                    dplyr::pull(cohort_start_date) == c("2001-05-29", "1999-07-30", "2015-01-23")))
+  expect_true(all(
+    cdm$cohort1 |>
+      CohortConstructor::requireIsFirstEntry() |>
+      dplyr::pull(cohort_start_date) |>
+      sort() == c("1999-07-30", "2001-05-29", "2015-01-23")
+  ))
 
   expect_true(all(cdm$cohort1 |> CohortConstructor::requireIsFirstEntry() |>
                     dplyr::pull(subject_id) %in% 1:3))
 
-  expect_true(all(cdm$cohort2 |> CohortConstructor::requireIsFirstEntry() |>
-                    dplyr::pull(cohort_start_date) ==
-                    c("2001-05-29", "1999-07-30", "2015-01-23", "2002-10-09", "1999-04-16", "2015-02-22")))
+  expect_true(all(
+    cdm$cohort2 |>
+      CohortConstructor::requireIsFirstEntry() |>
+      dplyr::pull(cohort_start_date) |>
+      sort() == c("1999-04-16", "1999-07-30", "2001-05-29", "2002-10-09", "2015-01-23", "2015-02-22")
+  ))
 
-  expect_true(all(cdm$cohort2 |> CohortConstructor::requireIsFirstEntry() |>
-                    dplyr::pull(subject_id) == c(1:3, 1:3)))
+  expect_true(all(
+    cdm$cohort2 |>
+      CohortConstructor::requireIsFirstEntry() |>
+      dplyr::pull(subject_id) |>
+      sort() == c(1, 1, 2, 2, 3, 3)
+  ))
 
   dropCreatedTables(cdm = cdm)
 })
@@ -77,15 +88,23 @@ test_that("requireIsFirstEntry, cohortIds & name arguments", {
   expect_false(counts |> dplyr::filter(cohort_definition_id == 1) |> dplyr::pull(number_records) ==
                  counts_new |> dplyr::filter(cohort_definition_id == 1) |> dplyr::pull(number_records))
   expect_identical(counts_new |> dplyr::filter(cohort_definition_id == 1), dplyr::tibble(cohort_definition_id = 1L, number_records = 3L, number_subjects = 3L))
-  expect_true(all(cdm$new_cohort |>  dplyr::pull(cohort_start_date) ==
-                    c("2001-05-29", "1999-07-30", "2015-01-23", "2002-10-09", "2003-09-12",
-                      "1999-04-16", "2000-03-09", "2000-05-05", "2015-02-22", "2002-09-28",
-                      "1999-08-25", "1999-12-14", "1999-12-24", "2000-04-02", "2000-08-11")))
-  expect_true(all(cdm$new_cohort |> dplyr::pull(cohort_end_date) ==
-                    c("2002-10-23", "2001-10-02", "2015-02-16", "2003-09-11", "2009-03-19",
-                      "2000-03-08", "2000-05-04", "2001-04-01", "2015-03-23", "2008-10-13",
-                      "1999-12-13", "1999-12-23", "2000-04-01", "2000-08-10", "2000-09-13")))
-  expect_true(all(cdm$new_cohort |> dplyr::pull(subject_id) == c(1, 2, 3, 1, 1, 2, 2, 2, 3, 1, 2, 2, 2, 2,2)))
+  expect_true(all(
+    cdm$new_cohort |>
+      dplyr::pull(cohort_start_date) |>
+      sort() == c("1999-04-16", "1999-07-30", "1999-08-25", "1999-12-14",
+                  "1999-12-24", "2000-03-09", "2000-04-02", "2000-05-05",
+                  "2000-08-11", "2001-05-29", "2002-09-28", "2002-10-09",
+                  "2003-09-12", "2015-01-23", "2015-02-22")
+    ))
+  expect_true(all(
+    cdm$new_cohort |>
+      dplyr::pull(cohort_end_date) |>
+      sort() == c("1999-12-13", "1999-12-23", "2000-03-08", "2000-04-01",
+                  "2000-05-04", "2000-08-10", "2000-09-13", "2001-04-01",
+                  "2001-10-02", "2002-10-23", "2003-09-11", "2008-10-13",
+                  "2009-03-19", "2015-02-16", "2015-03-23")))
+  expect_true(all(cdm$new_cohort |> dplyr::pull(subject_id) |> sort() == c(
+    1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3)))
   expect_true(all(
     omopgenerics::attrition(cdm$new_cohort)$reason  ==
       c("Initial qualifying events", "Restricted to first entry",
@@ -165,16 +184,19 @@ test_that("requireIsLastEntry", {
   expect_false(counts |> dplyr::filter(cohort_definition_id == 1) |> dplyr::pull(number_records) ==
                  counts_new |> dplyr::filter(cohort_definition_id == 1) |> dplyr::pull(number_records))
   expect_identical(counts_new |> dplyr::filter(cohort_definition_id == 1), dplyr::tibble(cohort_definition_id = 1L, number_records = 3L, number_subjects = 3L))
-  expect_true(all(cdm$new_cohort |>  dplyr::pull(cohort_start_date) ==
-                    c("2004-01-08", "1999-07-30", "2015-02-17", "2002-10-09", "2003-09-12",
-                      "1999-04-16", "2000-03-09", "2000-05-05", "2015-02-22", "2002-09-28",
-                      "1999-08-25", "1999-12-14", "1999-12-24", "2000-04-02", "2000-08-11")))
-  expect_true(all(cdm$new_cohort |> dplyr::pull(cohort_end_date) ==
-                    c("2009-10-03", "2001-10-02", "2015-03-10", "2003-09-11", "2009-03-19",
-                      "2000-03-08", "2000-05-04", "2001-04-01", "2015-03-23", "2008-10-13",
-                      "1999-12-13", "1999-12-23", "2000-04-01", "2000-08-10", "2000-09-13")))
-  expect_true(all(cdm$new_cohort |> dplyr::pull(subject_id) ==
-                    c(1, 2, 3, 1, 1, 2, 2, 2, 3, 1, 2, 2, 2, 2, 2)))
+  expect_true(all(cdm$new_cohort |>  dplyr::pull(cohort_start_date) |> sort() == c(
+    "1999-04-16", "1999-07-30", "1999-08-25", "1999-12-14", "1999-12-24",
+    "2000-03-09", "2000-04-02", "2000-05-05", "2000-08-11", "2002-09-28",
+    "2002-10-09", "2003-09-12", "2004-01-08", "2015-02-17", "2015-02-22"
+  )))
+  expect_true(all(cdm$new_cohort |> dplyr::pull(cohort_end_date) |> sort() == c(
+    "1999-12-13", "1999-12-23", "2000-03-08", "2000-04-01", "2000-05-04",
+    "2000-08-10", "2000-09-13", "2001-04-01", "2001-10-02", "2003-09-11",
+    "2008-10-13", "2009-03-19", "2009-10-03", "2015-03-10", "2015-03-23"
+  )))
+  expect_true(all(cdm$new_cohort |> dplyr::pull(subject_id) |> sort() == c(
+    1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3
+  )))
   expect_true(all(omopgenerics::attrition(cdm$new_cohort)$reason == c(
     c("Initial qualifying events", "Restricted to last entry", "Initial qualifying events",
       "Initial qualifying events"))
@@ -284,7 +306,7 @@ test_that("requireEntry", {
 
   # mock cohort
   cdm <- omock::mockCdmFromTables(tables = list("cohort1" = cohort_1)) |>
-    omopgenerics::insertTable(nsme = "observation_period", table = data.frame(
+    omopgenerics::insertTable(name = "observation_period", table = data.frame(
       observation_period_id = c(1,2),
       person_id = c(1,2),
       observation_period_start_date  = as.Date("2010-01-01"),

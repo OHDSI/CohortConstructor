@@ -2,19 +2,19 @@ test_that("expected errors and messages", {
   skip_on_cran()
   cdm <- omock::mockCdmReference() |>
     omock::mockPerson() |>
-    omock::mockObservationPeriod()
-  cdm <- omopgenerics::insertTable(
-    cdm = cdm, name = "concept", table = dplyr::tibble(
-      "concept_id" = 1L,
-      "concept_name" = "my concept",
-      "domain_id" = "adsf",
-      "vocabulary_id" = NA,
-      "concept_class_id" = NA,
-      "concept_code" = NA,
-      "valid_start_date" = NA,
-      "valid_end_date" = NA
-    )
-  ) |>
+    omock::mockObservationPeriod() |>
+    omopgenerics::insertTable(
+      name = "concept", table = dplyr::tibble(
+        "concept_id" = 1L,
+        "concept_name" = "my concept",
+        "domain_id" = "adsf",
+        "vocabulary_id" = NA,
+        "concept_class_id" = NA,
+        "concept_code" = NA,
+        "valid_start_date" = NA,
+        "valid_end_date" = NA
+      )
+    ) |>
     copyCdm()
 
   # not a cdm reference
@@ -56,7 +56,7 @@ test_that("expected errors and messages", {
       "cdm_version" = attr(cdm, "cdm_version"), "vocabulary_version" = "mock")
   )
   expect_true(nrow(attrition(x)) == 1)
-  expect_true(nrow(attr(x, "cohort_codelist")) == 1)
+  expect_true(nrow(dplyr::collect(attr(x, "cohort_codelist"))) == 1)
   expect_message(expect_message(
     x <- conceptCohort(cdm = cdm, conceptSet = list(a = 2L), name = "cohort")
   ))
