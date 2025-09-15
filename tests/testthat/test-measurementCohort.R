@@ -50,37 +50,7 @@ test_that("mearurementCohorts works", {
     ethnicity_concept_id = NA_integer_
   )
 
-  cdm_local <- omock::mockCdmFromTables(
-    tables = list(
-      "cohort1" = cohort_1,
-      "cohort2" = cohort_2
-    ),
-    seed = 1
-  )
-
-  cdm_local <- omopgenerics::insertTable(cdm = cdm_local, name = "observation_period", table = obs)
-  cdm_local <- omopgenerics::insertTable(cdm = cdm_local, name = "person", table = person)
-
-  cdm_local$concept <- cdm_local$concept |>
-    dplyr::union_all(
-      dplyr::tibble(
-        concept_id = c(4326744, 4298393, 45770407, 8876, 4124457, 999999, 123456) |> as.integer(),
-        concept_name = c("Blood pressure", "Systemic blood pressure",
-                         "Baseline blood pressure", "millimeter mercury column",
-                         "Normal range", "Normal", "outObs"),
-        domain_id = "Measurement",
-        vocabulary_id = c("SNOMED", "SNOMED", "SNOMED", "UCUM", "SNOMED", "SNOMED", "hi"),
-        standard_concept = "S",
-        concept_class_id = c("Observable Entity", "Observable Entity",
-                             "Observable Entity", "Unit", "Qualifier Value",
-                             "Qualifier Value", "hi"),
-        concept_code = NA,
-        valid_start_date = NA,
-        valid_end_date = NA,
-        invalid_reason = NA
-      )
-    )
-  cdm_local$measurement <- dplyr::tibble(
+  measurement <- dplyr::tibble(
     measurement_id = 1:7L,
     person_id = as.integer(c(1, 1, 2, 3, 3, 1, 1)),
     measurement_concept_id = c(4326744, 4298393, 4298393, 45770407, 45770407, 123456, 123456) |> as.integer(),
@@ -90,16 +60,37 @@ test_that("mearurementCohorts works", {
     value_as_concept_id = c(0, 0, 0, 4124457, 999999, 0, 0) |> as.integer(),
     unit_concept_id = c(8876, 8876, 0, 0, 0, 0, 0) |> as.integer()
   )
-  cdm <- cdm_local |> copyCdm()
 
-  isDuckdb <- attr(omopgenerics::cdmSource(cdm), "source_type") == "duckdb"
-  if(isDuckdb){
-    startTempTables <- countDuckdbTempTables(
-      con = attr(omopgenerics::cdmSource(cdm),
-                 "dbcon"))
-    startPermanentTables <- countDuckdbPermanentTables(
-      con = attr(omopgenerics::cdmSource(cdm),
-                 "dbcon"))
+  conc <- dplyr::tibble(
+    concept_id = c(4326744, 4298393, 45770407, 8876, 4124457, 999999, 123456) |> as.integer(),
+    concept_name = c("Blood pressure", "Systemic blood pressure",
+                     "Baseline blood pressure", "millimeter mercury column",
+                     "Normal range", "Normal", "outObs"),
+    domain_id = "Measurement",
+    vocabulary_id = c("SNOMED", "SNOMED", "SNOMED", "UCUM", "SNOMED", "SNOMED", "hi"),
+    standard_concept = "S",
+    concept_class_id = c("Observable Entity", "Observable Entity",
+                         "Observable Entity", "Unit", "Qualifier Value",
+                         "Qualifier Value", "hi"),
+    concept_code = NA,
+    valid_start_date = NA,
+    valid_end_date = NA,
+    invalid_reason = NA
+  )
+
+  cdm <- omopgenerics::cdmFromTables(
+    tables = list(observation_period = obs, person = person, measurement = measurement),
+    cdmName = "mock",
+    cohortTables = list("cohort1" = cohort_1, "cohort2" = cohort_2)
+  ) |>
+    omock::mockVocabularyTables(
+      concept = dplyr::union_all(omock:::mockConcept, conc)
+    ) |>
+    copyCdm()
+
+  if (dbToTest == "duckdb CDMConnector") {
+    startTempTables <- countDuckdbTempTables(con = CDMConnector::cdmCon(cdm))
+    startPermanentTables <- countDuckdbPermanentTables(con = CDMConnector::cdmCon(cdm))
   }
 
   # simple example
@@ -116,13 +107,9 @@ test_that("mearurementCohorts works", {
     all(colnames(attr(cdm$cohort, "cohort_codelist")) == c("cohort_definition_id", "codelist_name", "concept_id", "codelist_type"))
   )
 
-  if(isDuckdb){
-    endTempTables <- countDuckdbTempTables(
-      con = attr(omopgenerics::cdmSource(cdm),
-                 "dbcon"))
-    endPermanentTables <- countDuckdbPermanentTables(
-      con = attr(omopgenerics::cdmSource(cdm),
-                 "dbcon"))
+  if (dbToTest == "duckdb CDMConnector") {
+    endTempTables <- countDuckdbTempTables(con = CDMConnector::cdmCon(cdm))
+    endPermanentTables <- countDuckdbPermanentTables(con = CDMConnector::cdmCon(cdm))
     # we should have only added 4 permanent tables (the new cohort table and
     # three tables with settings, attrition, and codelist)
     # no temp tables will have been created
@@ -330,64 +317,69 @@ test_that("mearurementCohorts works", {
   )
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  PatientProfiles::mockDisconnect(cdm)
+
+  dropCreatedTables(cdm = cdm)
 })
 
 test_that("mearurementCohorts - valueAsNumber without unit concept", {
   skip_on_cran()
 
-  cdm <- mockCohortConstructor(con = NULL, seed = 1)
+  person <- dplyr::tibble(person_id = c(1, 2, 3),
+                          gender_concept_id = NA_integer_,
+                          year_of_birth = 1990L,
+                          race_concept_id = NA_integer_,
+                          ethnicity_concept_id = NA_integer_ )
 
-  cdm <- omopgenerics::insertTable(cdm, "person",
-                                   dplyr::tibble(person_id = c(1, 2, 3),
-                                                 gender_concept_id = NA_integer_,
-                                                 year_of_birth = 1990L,
-                                                 race_concept_id = NA_integer_,
-                                                 ethnicity_concept_id = NA_integer_ ))
-  cdm <- omopgenerics::insertTable(cdm, "observation_period",
-                                   dplyr::tibble(observation_period_id = c(1, 2, 3),
-                                                 person_id =  c(1, 2, 3),
-                                                 observation_period_start_date = as.Date("2000-01-01"),
-                                                 observation_period_end_date  = as.Date("2020-01-01"),
-                                                 period_type_concept_id  = NA_integer_ ))
+  obs <- dplyr::tibble(observation_period_id = c(1, 2, 3),
+                       person_id =  c(1, 2, 3),
+                       observation_period_start_date = as.Date("2000-01-01"),
+                       observation_period_end_date  = as.Date("2020-01-01"),
+                       period_type_concept_id  = NA_integer_ )
 
-  cdm <- omopgenerics::insertTable(cdm, "concept",
-                                   dplyr::tibble(
-                                     concept_id = c(4326744,  8876),
-                                     concept_name = c("Blood pressure", "my_unit"),
-                                     domain_id = c("Measurement", "Unit"),
-                                     vocabulary_id = c("SNOMED", "UCUM"),
-                                     standard_concept = "S",
-                                     concept_class_id = c("Observable Entity"),
-                                     concept_code = NA,
-                                     valid_start_date = NA,
-                                     valid_end_date = NA,
-                                     invalid_reason = NA))
+  concept <-  dplyr::tibble(
+    concept_id = c(4326744,  8876),
+    concept_name = c("Blood pressure", "my_unit"),
+    domain_id = c("Measurement", "Unit"),
+    vocabulary_id = c("SNOMED", "UCUM"),
+    standard_concept = "S",
+    concept_class_id = c("Observable Entity"),
+    concept_code = NA,
+    valid_start_date = NA,
+    valid_end_date = NA,
+    invalid_reason = NA
+  )
 
-  cdm <- omopgenerics::insertTable(cdm, "measurement",
-                                   dplyr::tibble(
-                                     measurement_id = 1:3L,
-                                     person_id = as.integer(c(1, 2, 3)),
-                                     measurement_concept_id = c(4326744),
-                                     measurement_date = as.Date(c("2000-07-01", "2000-12-11", "2002-09-08")),
-                                     measurement_type_concept_id = NA_integer_,
-                                     value_as_number = c(100, 105, 110),
-                                     value_as_concept_id = c(0, 0, 0) ,
-                                     unit_concept_id = c(8876, 8876, 0)
-                                   ))
+  measurement <- dplyr::tibble(
+    measurement_id = 1:3L,
+    person_id = as.integer(c(1, 2, 3)),
+    measurement_concept_id = c(4326744),
+    measurement_date = as.Date(c("2000-07-01", "2000-12-11", "2002-09-08")),
+    measurement_type_concept_id = NA_integer_,
+    value_as_number = c(100, 105, 110),
+    value_as_concept_id = c(0, 0, 0) ,
+    unit_concept_id = c(8876, 8876, 0)
+  )
 
-  cdm <- omopgenerics::insertTable(cdm, "observation",
-                                   dplyr::tibble(
-                                     observation_id = 1:3L,
-                                     person_id = as.integer(c(1, 2, 3)),
-                                     observation_concept_id = c(4326744),
-                                     observation_date = as.Date(c("2005-07-01", "2010-12-11", "2019-09-08")),
-                                     observation_type_concept_id = NA_integer_,
-                                     value_as_number = c(100, 105, 110),
-                                     value_as_concept_id = c(0, 0, 0) ,
-                                     unit_concept_id = c(8876, 8876, 0)
-                                   ))
+  observation <- dplyr::tibble(
+    observation_id = 1:3L,
+    person_id = as.integer(c(1, 2, 3)),
+    observation_concept_id = c(4326744),
+    observation_date = as.Date(c("2005-07-01", "2010-12-11", "2019-09-08")),
+    observation_type_concept_id = NA_integer_,
+    value_as_number = c(100, 105, 110),
+    value_as_concept_id = c(0, 0, 0) ,
+    unit_concept_id = c(8876, 8876, 0)
+  )
 
+  cdm <- omopgenerics::cdmFromTables(
+    tables = list(
+      person = person, observation_period = obs, measurement = measurement,
+      observation = observation
+    ),
+    cdmName = "mock"
+  ) |>
+    omock::mockVocabularyTables(concept = concept) |>
+    copyCdm()
 
   cohort_1 <- measurementCohort(
     cdm = cdm,
@@ -488,41 +480,41 @@ test_that("mearurementCohorts - valueAsNumber without unit concept", {
     table = "measurement"))
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  PatientProfiles::mockDisconnect(cdm)
+
+  dropCreatedTables(cdm = cdm)
 })
 
 test_that("expected errors", {
   testthat::skip_on_cran()
-  cdm <- mockCohortConstructor(con = NULL, seed = 1)
-  cdm$concept <- cdm$concept |>
-    dplyr::union_all(
-      dplyr::tibble(
-        concept_id = c(4326744L, 4298393L, 45770407L, 8876L, 4124457L),
-        concept_name = c("Blood pressure", "Systemic blood pressure",
-                         "Baseline blood pressure", "millimeter mercury column",
-                         "Normal range"),
-        domain_id = "Measurement",
-        vocabulary_id = c("SNOMED", "SNOMED", "SNOMED", "UCUM", "SNOMED"),
-        standard_concept = "S",
-        concept_class_id = c("Observable Entity", "Observable Entity",
-                             "Observable Entity", "Unit", "Qualifier Value"),
-        concept_code = NA,
-        valid_start_date = NA,
-        valid_end_date = NA,
-        invalid_reason = NA
-      )
+  cdm <- omock::mockCdmFromTables(tables = list(
+    measurement = dplyr::tibble(
+      measurement_id = 1:4L,
+      person_id = c(1L, 1L, 2L, 3L),
+      measurement_concept_id = c(4326744L, 4298393L, 4298393L, 45770407L),
+      measurement_date = as.Date(c("2000-07-01", "2000-12-11", "2002-09-08", "2015-02-19")),
+      measurement_type_concept_id = NA_integer_,
+      value_as_number = c(100L, 125L, NA_integer_, NA_integer_),
+      value_as_concept_id = c(0L, 0L, 0L, 4124457L),
+      unit_concept_id = c(8876L, 8876L, 0L, 0L)
     )
-  cdm$measurement <- dplyr::tibble(
-    measurement_id = 1:4L,
-    person_id = c(1L, 1L, 2L, 3L),
-    measurement_concept_id = c(4326744L, 4298393L, 4298393L, 45770407L),
-    measurement_date = as.Date(c("2000-07-01", "2000-12-11", "2002-09-08", "2015-02-19")),
-    measurement_type_concept_id = NA_integer_,
-    value_as_number = c(100L, 125L, NA_integer_, NA_integer_),
-    value_as_concept_id = c(0L, 0L, 0L, 4124457L),
-    unit_concept_id = c(8876L, 8876L, 0L, 0L)
-  )
-  cdm <- cdm |> copyCdm()
+  )) |>
+    omock::mockVocabularyTables(concept = omock:::mockConcept |>
+                                  dplyr::union_all(dplyr::tibble(
+                                    concept_id = c(4326744L, 4298393L, 45770407L, 8876L, 4124457L),
+                                    concept_name = c("Blood pressure", "Systemic blood pressure",
+                                                     "Baseline blood pressure", "millimeter mercury column",
+                                                     "Normal range"),
+                                    domain_id = "Measurement",
+                                    vocabulary_id = c("SNOMED", "SNOMED", "SNOMED", "UCUM", "SNOMED"),
+                                    standard_concept = "S",
+                                    concept_class_id = c("Observable Entity", "Observable Entity",
+                                                         "Observable Entity", "Unit", "Qualifier Value"),
+                                    concept_code = NA,
+                                    valid_start_date = NA,
+                                    valid_end_date = NA,
+                                    invalid_reason = NA
+                                  ))) |>
+    copyCdm()
 
   # simple example
   expect_error(
@@ -547,93 +539,93 @@ test_that("expected errors", {
   )
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  PatientProfiles::mockDisconnect(cdm)
+
+  dropCreatedTables(cdm = cdm)
 })
 
 test_that("test indexes - postgres", {
   skip_on_cran()
-  skip_if(Sys.getenv("CDM5_POSTGRESQL_DBNAME") == "")
   skip_if(!testIndexes)
 
-  db <- DBI::dbConnect(RPostgres::Postgres(),
-                       dbname = Sys.getenv("CDM5_POSTGRESQL_DBNAME"),
-                       host = Sys.getenv("CDM5_POSTGRESQL_HOST"),
-                       user = Sys.getenv("CDM5_POSTGRESQL_USER"),
-                       password = Sys.getenv("CDM5_POSTGRESQL_PASSWORD"))
-  cdm <- CDMConnector::cdmFromCon(
-    con = db,
-    cdmSchema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA"),
-    writeSchema = Sys.getenv("CDM5_POSTGRESQL_SCRATCH_SCHEMA"),
-    writePrefix = "cc_",
-    achillesSchema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA")
-  )
+  if (dbToTest == "postgres CDMConnector") {
+    cdm <- omock::mockCdmFromDataset(datasetName = "GiBleed", source = "local") |>
+      omock::mockCohort(name = "my_cohort", recordPerson = 0.1) |>
+      copyCdm()
 
-  cdm <- omopgenerics::insertTable(cdm = cdm,
-                                   name = "my_cohort",
-                                   table = data.frame(cohort_definition_id = 1:2L,
-                                                      subject_id = 1L,
-                                                      cohort_start_date = as.Date("2009-01-02"),
-                                                      cohort_end_date = as.Date("2009-01-03"),
-                                                      other_date = as.Date("2009-01-01")))
-  cdm$my_cohort <- omopgenerics::newCohortTable(cdm$my_cohort)
-  cdm$my_cohort <- measurementCohort(cdm, name = "my_cohort", conceptSet = list(a = 40660437L),
-                                     table = "measurement")
+    cdm$my_cohort <- measurementCohort(
+      cdm = cdm,
+      name = "my_cohort",
+      conceptSet = list(a = 45770407),
+      table = "measurement"
+    )
 
-  expect_true(
-    DBI::dbGetQuery(db, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
-      "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
-  )
+    expect_true(
+      DBI::dbGetQuery(db, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
+        "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
+    )
 
-  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
-  CDMConnector::cdmDisconnect(cdm = cdm)
+    expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
+
+    dropCreatedTables(cdm = cdm)
+  }
+
 })
 
 test_that("inObservation FALSE", {
-  cdm <- omock::mockPerson(nPerson = 3)
-  cdm <- omopgenerics::insertTable(
-    cdm = cdm, name = "observation_period", table = dplyr::tibble(
-      "observation_period_id" = c(1L, 2L, 3L),
-      "person_id" = c(1L, 1L, 2L),
-      "observation_period_start_date" = as.Date(c(
-        "2000-02-01", "2000-10-01", "2000-01-01"
-      )),
-      "observation_period_end_date" = as.Date(c(
-        "2000-05-01", "2000-12-01", "2000-12-01"
-      )),
-      "period_type_concept_id" = NA_integer_
-    ))
-  cdm <- omopgenerics::insertTable(
-    cdm = cdm, name = "concept", table = dplyr::tibble(
-      "concept_id" = 1L,
-      "concept_name" = "concept 1",
-      "domain_id" = "measurement",
-      "vocabulary_id" = NA,
-      "concept_class_id" = NA,
-      "concept_code" = NA,
-      "valid_start_date" = NA,
-      "valid_end_date" = NA
-    )
-  )
-  # person 1 - out before, out after, in, in
-  # person 2 - out before
-  cdm <- omopgenerics::insertTable(
-    cdm = cdm, name = "measurement",
-    table = dplyr::tibble(
-      "measurement_id" = 1:6 |> as.integer(),
-      "person_id" = c(1, 1, 1, 1, 1, 2) |> as.integer(),
-      "measurement_concept_id" = 1L,
-      "measurement_date" = as.Date(c(
-        "2000-01-01", "2001-08-01", "2000-03-01", "2000-11-01", "2000-02-01", "1999-11-01"
-      )),
-      "measurement_type_concept_id" = 1,
-      "value_as_number" = as.integer(1),
-      "value_as_concept_id" = as.integer(1),
-      "unit_concept_id" = as.integer(1)
-    )
-  )
-
-  cdm <- cdm |> copyCdm()
+  cdm <- omopgenerics::cdmFromTables(
+    tables = list(
+      person = dplyr::tibble(
+        person_id = 1:3L,
+        gender_concept_id = 8532L,
+        year_of_birth = 1950L,
+        race_concept_id = 0L,
+        ethnicity_concept_id = 0L
+      ),
+      observation_period = dplyr::tibble(
+        "observation_period_id" = c(1L, 2L, 3L),
+        "person_id" = c(1L, 1L, 2L),
+        "observation_period_start_date" = as.Date(c(
+          "2000-02-01", "2000-10-01", "2000-01-01"
+        )),
+        "observation_period_end_date" = as.Date(c(
+          "2000-05-01", "2000-12-01", "2000-12-01"
+        )),
+        "period_type_concept_id" = NA_integer_
+      )
+    ),
+    cdmName = "mock"
+  ) |>
+    omopgenerics::insertTable(
+      name = "concept",
+      table = dplyr::tibble(
+        "concept_id" = 1L,
+        "concept_name" = "concept 1",
+        "domain_id" = "measurement",
+        "vocabulary_id" = NA,
+        "concept_class_id" = NA,
+        "concept_code" = NA,
+        "valid_start_date" = NA,
+        "valid_end_date" = NA
+      )
+    ) |>
+    # person 1 - out before, out after, in, in
+    # person 2 - out before
+    omopgenerics::insertTable(
+      name = "measurement",
+      table = dplyr::tibble(
+        "measurement_id" = 1:6 |> as.integer(),
+        "person_id" = c(1, 1, 1, 1, 1, 2) |> as.integer(),
+        "measurement_concept_id" = 1L,
+        "measurement_date" = as.Date(c(
+          "2000-01-01", "2001-08-01", "2000-03-01", "2000-11-01", "2000-02-01", "1999-11-01"
+        )),
+        "measurement_type_concept_id" = 1,
+        "value_as_number" = as.integer(1),
+        "value_as_concept_id" = as.integer(1),
+        "unit_concept_id" = as.integer(1)
+      )
+    ) |>
+    copyCdm()
 
   cdm$cohort <- measurementCohort(cdm, list(a = 1L), name = "cohort", inObservation = FALSE)
   expect_equal(
@@ -646,7 +638,8 @@ test_that("inObservation FALSE", {
   )
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  CDMConnector::cdmDisconnect(cdm = cdm)
+
+  dropCreatedTables(cdm = cdm)
 })
 
 test_that("edge cases", {
