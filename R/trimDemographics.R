@@ -243,7 +243,7 @@ trimDemographics <- function(cohort,
   }
   if (!is.null(minFutureObservation)) {
     cli::cli_inform(c("Trim future observation"))
-    newCohort <- newCohort %>%
+    newCohort <- newCohort |>
       dplyr::filter(
         clock::date_count_between(start = .data$cohort_start_date, end = .data$future_observation, precision = "day") >=
           .data$min_future_observation

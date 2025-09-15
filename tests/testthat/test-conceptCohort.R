@@ -1263,9 +1263,9 @@ test_that("inObservation FALSE", {
 
 test_that("conceptSetExpression", {
   skip_on_cran()
-  cdm <- omock::mockPerson(nPerson = 3)
-  cdm <- omopgenerics::insertTable(
-    cdm = cdm, name = "observation_period", table = dplyr::tibble(
+  cdm <- omock::mockPerson(nPerson = 3) |>
+    omopgenerics::insertTable(
+    name = "observation_period", table = dplyr::tibble(
       "observation_period_id" = c(1L, 2L, 3L),
       "person_id" = c(1L, 1L, 2L),
       "observation_period_start_date" = as.Date(c(
@@ -1275,9 +1275,9 @@ test_that("conceptSetExpression", {
         "2000-05-01", "2000-12-01", "2000-12-01"
       )),
       "period_type_concept_id" = NA_integer_
-    ))
-  cdm <- omopgenerics::insertTable(
-    cdm = cdm, name = "concept", table = dplyr::tibble(
+    )) |>
+    omopgenerics::insertTable(
+    name = "concept", table = dplyr::tibble(
       "concept_id" = c(1177480L, 43157344L),
       "concept_name" = c("ibuprofen", "Acetaminophen Oral Tablet [PARACETAMOL ALMUS]"),
       "domain_id" = "drug",
@@ -1304,9 +1304,8 @@ test_that("conceptSetExpression", {
       )),
       "drug_type_concept_id" = 1
     )
-  )
-
-  cdm <- cdm |> copyCdm()
+  ) |>
+    copyCdm()
 
   codes <- CodelistGenerator::codesFromConceptSet(
     cdm = cdm,

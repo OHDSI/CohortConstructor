@@ -210,7 +210,7 @@ padCohortStart <- function(cohort,
     as.character() |>
     rlang::parse_exprs() |>
     rlang::set_names(cohortDate)
-  newCohort <- newCohort %>%
+  newCohort <- newCohort |>
     dplyr::mutate(!!!q) |>
     # drop start > end
     dplyr::filter(

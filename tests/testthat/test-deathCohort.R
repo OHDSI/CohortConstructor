@@ -104,14 +104,14 @@ test_that("first death record per person", {
   cdm2$death_cohort <- deathCohort(cdm=cdm2,
                        name = "death_cohort")
 
-  expect_true(nrow(cdm2$death_cohort %>%
-                     dplyr::filter(subject_id == "2") %>%
+  expect_true(nrow(cdm2$death_cohort |>
+                     dplyr::filter(subject_id == "2") |>
                      dplyr::collect()) == 1)
 
 
-  expect_true(cdm2$death_cohort %>%
-                dplyr::filter(subject_id == "2") %>%
-                dplyr::select(cohort_start_date) %>%
+  expect_true(cdm2$death_cohort |>
+                dplyr::filter(subject_id == "2") |>
+                dplyr::select(cohort_start_date) |>
                 dplyr::pull() == as.Date("2020-01-02"))
 
   expect_identical(omopgenerics::attrition(cdm2$death_cohort) |>
@@ -173,14 +173,14 @@ test_that("test death in observation criteria", {
   cdm2$death_cohort <- deathCohort(cdm=cdm2,
                                  name = "death_cohort")
 
-  expect_true(nrow(cdm2$death_cohort %>% dplyr::collect()) == 1)
+  expect_true(nrow(cdm2$death_cohort |> dplyr::collect()) == 1)
 
-  expect_true(cdm2$death_cohort %>%
-                dplyr::select(subject_id) %>%
+  expect_true(cdm2$death_cohort |>
+                dplyr::select(subject_id) |>
                 dplyr::pull() == 2)
 
-  expect_true(cdm2$death_cohort %>%
-                dplyr::select(cohort_start_date) %>%
+  expect_true(cdm2$death_cohort |>
+                dplyr::select(cohort_start_date) |>
                 dplyr::pull() == as.Date("2020-01-02"))
 
   dropCreatedTables(cdm = cdm)
@@ -301,10 +301,10 @@ test_that("test subsetting death table by a cohort table", {
                                  name = "death_cohort",
                                  subsetCohort = "cohort1")
 
-  expect_true(nrow(cdm2$death_cohort %>% dplyr::collect()) == 3)
+  expect_true(nrow(cdm2$death_cohort |> dplyr::collect()) == 3)
 
-  expect_true(all(cdm2$death_cohort %>%
-                    dplyr::select(subject_id) %>%
+  expect_true(all(cdm2$death_cohort |>
+                    dplyr::select(subject_id) |>
                     dplyr::pull() %in%  c(1,2,3)
   ))
   # with subsetCohortId
@@ -313,10 +313,10 @@ test_that("test subsetting death table by a cohort table", {
                        subsetCohort = "cohort1",
                        subsetCohortId = 1)
 
-  expect_true(nrow(cdm2$death_cohort %>% dplyr::collect()) == 2)
+  expect_true(nrow(cdm2$death_cohort |> dplyr::collect()) == 2)
 
-  expect_true(all(cdm2$death_cohort %>%
-                    dplyr::select(subject_id) %>%
+  expect_true(all(cdm2$death_cohort |>
+                    dplyr::select(subject_id) |>
                     dplyr::pull() %in%  c(1,2)
   ))
 

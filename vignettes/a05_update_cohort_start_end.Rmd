@@ -212,7 +212,7 @@ cdm$cohort_pad <- cdm$cohort |>
 Additionally, days to add can also be specified with a numeric column in the cohort, which allows to add a specific number of days for each record:
 
 ```{r}
-cdm$cohort <- cdm$cohort %>% 
+cdm$cohort <- cdm$cohort |> 
   dplyr::mutate(days_to_add = date_count_between(start = cohort_start_date, end = cohort_end_date, precision = "day")) |>
   padCohortEnd(days = "days_to_add", padObservation = FALSE)
 ```
