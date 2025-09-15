@@ -1,5 +1,5 @@
 test_that("test it works and expected errors", {
-  testthat::skip_on_cran()
+  skip_on_cran()
 
   person <- dplyr::tibble(
     person_id = 1:10,
@@ -42,20 +42,10 @@ test_that("test it works and expected errors", {
     ))
   )
 
-  cdm_local <- omock::mockCdmFromTables(
-    tables = list(
-      "cohort" = cohort_1
-    ),
-    seed = 1
-  )
-
-  cdm_local <- omopgenerics::insertTable(cdm = cdm_local, name = "observation_period", table = obs)
-
-  cdm_local <- omopgenerics::insertTable(cdm = cdm_local, name = "person", table = person)
-
-  cdm_local$person <- cdm_local$person |>
-    dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
-  cdm <- cdm_local |> copyCdm()
+  cdm <- omock::mockCdmFromTables(tables = list("cohort" = cohort_1)) |>
+    omopgenerics::insertTable(name = "observation_period", table = obs) |>
+    omopgenerics::insertTable(name = "person", table = person) |>
+    copyCdm()
 
   cdm$cohort1 <- cdm$cohort |>
     requireDemographics(
@@ -165,19 +155,19 @@ test_that("test it works and expected errors", {
   ))
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  PatientProfiles::mockDisconnect(cdm)
+
+  dropCreatedTables(cdm = cdm)
 })
 
 test_that("restrictions applied to single cohort", {
-  testthat::skip_on_cran()
-  cdm_local <- omock::mockCdmReference() |>
+  skip_on_cran()
+
+  cdm <- omock::mockCdmReference() |>
     omock::mockPerson(n = 1,seed = 1) |>
     omock::mockObservationPeriod(seed = 1) |>
-    omock::mockCohort(recordPerson = 3,seed = 1)
-  # to remove in new omock
-  cdm_local$person <- cdm_local$person |>
-    dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
-  cdm <- cdm_local |> copyCdm()
+    omock::mockCohort(recordPerson = 3,seed = 1) |>
+    copyCdm()
+
   cdm$cohort1 <- cdm$cohort |>
     requireDemographics(ageRange = list(c(0, 5)), name = "cohort1")
   expect_true(all(c("2001-03-30", "2003-06-15") == cdm$cohort1 |> dplyr::pull("cohort_start_date")))
@@ -212,11 +202,12 @@ test_that("restrictions applied to single cohort", {
   expect_true(settings(cdm$cohort2)$min_future_observation == 0)
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  PatientProfiles::mockDisconnect(cdm)
+
+  dropCreatedTables(cdm = cdm)
 })
 
 test_that("ignore existing cohort extra variables", {
-  testthat::skip_on_cran()
+  skip_on_cran()
 
   cohort_1 <- dplyr::tibble(
     cohort_definition_id = c(1L, 1L, 1L),
@@ -243,24 +234,10 @@ test_that("ignore existing cohort extra variables", {
     period_type_concept_id = NA_integer_
   )
 
-  cdm_local <- omock::mockCdmFromTables(
-    tables = list(
-      "cohort" = cohort_1
-    ),
-    seed = 1
-  )
-
-  cdm_local <- omopgenerics::insertTable(
-    cdm = cdm_local, name = "observation_period", table = obs)
-
-  cdm_local <- omopgenerics::insertTable(
-    cdm = cdm_local, name = "person", table = person)
-
-
-  # to remove in new omock
-  cdm_local$person <- cdm_local$person |>
-    dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
-  cdm <- cdm_local |> copyCdm()
+  cdm <- omock::mockCdmFromTables(tables = list("cohort" = cohort_1)) |>
+    omopgenerics::insertTable(name = "observation_period", table = obs) |>
+    omopgenerics::insertTable(name = "person", table = person) |>
+    copyCdm()
 
   cdm$cohort <- cdm$cohort |>
     PatientProfiles::addDemographics() |>
@@ -288,25 +265,24 @@ test_that("ignore existing cohort extra variables", {
   expect_true(all(colnames(settings(cdm$cohort)) == c("cohort_definition_id", "cohort_name", "min_prior_observation")))
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  PatientProfiles::mockDisconnect(cdm)
+
+  dropCreatedTables(cdm = cdm)
 })
 
 test_that("external columns kept after requireDemographics", {
-  testthat::skip_on_cran()
-  cdm_local <- omock::mockCdmReference() |>
+  skip_on_cran()
+
+  cdm <- omock::mockCdmReference() |>
     omock::mockPerson(n = 1,seed = 1) |>
     omock::mockObservationPeriod(seed = 1) |>
     omock::mockCohort(recordPerson = 3,seed = 1)
-  cdm_local$cohort <- cdm_local$cohort |>
+  cdm$cohort <- cdm$cohort |>
     dplyr::mutate(
       col_extra1 = as.numeric(subject_id) + 1,
       col_extra2 = as.numeric(subject_id) + 2,
       new_index_date = cohort_start_date + 1
     )
-  # to remove in new omock
-  cdm_local$person <- cdm_local$person |>
-    dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
-  cdm <- cdm_local |> copyCdm()
+  cdm <- cdm |> copyCdm()
 
   cdm$cohort <- cdm$cohort |>
     requireDemographics(indexDate = "new_index_date", ageRange = list(c(0,5)))
@@ -314,11 +290,12 @@ test_that("external columns kept after requireDemographics", {
   expect_true(all(c("col_extra1", "col_extra2", "new_index_date") %in% colnames(cdm$cohort)))
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  PatientProfiles::mockDisconnect(cdm)
+
+  dropCreatedTables(cdm = cdm)
 })
 
 test_that("cohortIds", {
-  testthat::skip_on_cran()
+  skip_on_cran()
 
   person <- dplyr::tibble(
     person_id = c(1L, 2L, 3L),
@@ -353,22 +330,10 @@ test_that("cohortIds", {
     ))
   )
 
-  cdm_local <- omock::mockCdmFromTables(
-    tables = list(
-      "cohort" = cohort_1
-    ),
-    seed = 1
-  )
-
-  cdm_local <- omopgenerics::insertTable(
-    cdm = cdm_local, name = "observation_period", table = obs)
-
-  cdm_local <- omopgenerics::insertTable(
-    cdm = cdm_local, name = "person", table = person)
-
-  cdm_local$person <- cdm_local$person |>
-    dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
-  cdm <- cdm_local |> copyCdm()
+  cdm <- omock::mockCdmFromTables(tables = list("cohort" = cohort_1)) |>
+    omopgenerics::insertTable(name = "observation_period", table = obs) |>
+    omopgenerics::insertTable(name = "person", table = person) |>
+    copyCdm()
 
   cdm$new_cohort <- requireSex(cohort = cdm$cohort, cohortId = 1, sex = "Male", name = "new_cohort") |>
     requirePriorObservation(cohortId = "cohort_3", minPriorObservation = 1000, name = "new_cohort")
@@ -381,19 +346,18 @@ test_that("cohortIds", {
   expect_true(all(cdm$new_cohort |> dplyr::pull("subject_id") == c(1,1,1)))
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  PatientProfiles::mockDisconnect(cdm)
+
+  dropCreatedTables(cdm = cdm)
 })
 
 test_that("settings with extra columns", {
-  testthat::skip_on_cran()
-  cdm_local <- omock::mockCdmReference() |>
+  skip_on_cran()
+
+  cdm <- omock::mockCdmReference() |>
     omock::mockPerson(n = 3,seed = 1) |>
     omock::mockObservationPeriod(seed = 1) |>
-    omock::mockCohort(numberCohorts = 3, seed = 4)
-  # to remove in new omock
-  cdm_local$person <- cdm_local$person |>
-    dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
-  cdm <- cdm_local |> copyCdm()
+    omock::mockCohort(numberCohorts = 3, seed = 4) |>
+    copyCdm()
 
   cdm$cohort <- cdm$cohort |>
     omopgenerics::newCohortTable(
@@ -412,20 +376,18 @@ test_that("settings with extra columns", {
                     c("cohort_definition_id", "number_records", "number_subjects", "reason_id", "reason", "excluded_records", "excluded_subjects" )))
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  PatientProfiles::mockDisconnect(cdm)
+
+  dropCreatedTables(cdm = cdm)
 })
 
 test_that("Inf age", {
+  skip_on_cran()
 
-  testthat::skip_on_cran()
-  cdm_local <- omock::mockCdmReference() |>
+  cdm <- omock::mockCdmReference() |>
     omock::mockPerson(n = 3,seed = 1) |>
     omock::mockObservationPeriod(seed = 1) |>
-    omock::mockCohort(numberCohorts = 3, seed = 4)
-  # to remove in new omock
-  cdm_local$person <- cdm_local$person |>
-    dplyr::mutate(dplyr::across(dplyr::ends_with("of_birth"), ~ as.numeric(.x)))
-  cdm <- cdm_local |> copyCdm()
+    omock::mockCohort(numberCohorts = 3, seed = 4) |>
+    copyCdm()
 
   expect_no_error(cdm$cohort1 <- cdm$cohort |>
     requireDemographics(ageRange = c(0, Inf),
@@ -435,87 +397,77 @@ test_that("Inf age", {
                                                         c(18,Inf)),
                                         name = "cohort2"))
 
+  dropCreatedTables(cdm = cdm)
 })
 
 test_that("test indexes - postgres, and atFirst", {
   skip_on_cran()
-  skip_if(Sys.getenv("CDM5_POSTGRESQL_DBNAME") == "")
   skip_if(!testIndexes)
 
-  db <- DBI::dbConnect(RPostgres::Postgres(),
-                       dbname = Sys.getenv("CDM5_POSTGRESQL_DBNAME"),
-                       host = Sys.getenv("CDM5_POSTGRESQL_HOST"),
-                       user = Sys.getenv("CDM5_POSTGRESQL_USER"),
-                       password = Sys.getenv("CDM5_POSTGRESQL_PASSWORD"))
-  cdm <- CDMConnector::cdmFromCon(
-    con = db,
-    cdmSchema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA"),
-    writeSchema = Sys.getenv("CDM5_POSTGRESQL_SCRATCH_SCHEMA"),
-    writePrefix = "cc_",
-    achillesSchema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA")
-  )
-
-  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::contains("og_"))
-  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::contains("my_cohort"))
-
-  cdm <- omopgenerics::insertTable(cdm = cdm,
-                                   name = "my_cohort",
-                                   table = data.frame(cohort_definition_id = 1L,
-                                                      subject_id = 1L,
-                                                      cohort_start_date = as.Date("2009-01-02"),
-                                                      cohort_end_date = as.Date("2009-01-03"),
-                                                      other_date = as.Date("2009-01-01")))
-  cdm$my_cohort <- omopgenerics::newCohortTable(cdm$my_cohort)
-  cdm$my_cohort <- requireDemographics(cdm$my_cohort)
-  expect_true(
-    DBI::dbGetQuery(db, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
-      "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
-  )
-
-  cohort <- dplyr::tibble(
-    cohort_definition_id = rep(1L, 10),
-    subject_id = c(1L, 1L, 2L, 2L, 3L, 4L, 5L, 5L, 7L, 7L),
-    cohort_start_date = as.Date(c(
-      "2008-05-30", "2009-05-02", "2008-05-04", "2008-05-18",
-      "2009-01-27", "2009-06-30", "2010-03-20", "2008-05-01",
-      "2009-03-07", "2009-03-08"
-    )),
-    cohort_end_date = as.Date(c(
-      "2009-05-01", "2009-06-10", "2008-05-17", "2009-01-23",
-      "2009-06-28", "2009-11-20", "2010-04-30", "2008-07-24",
-      "2009-03-07", "2009-03-20"
+  if (dbToTest == "postgres CDMConnector") {
+    cdm <- omock::mockCdmFromTables(tables = list(
+      my_cohort = dplyr::tibble(
+        cohort_definition_id = 1L,
+        subject_id = 1L,
+        cohort_start_date = as.Date("2009-01-02"),
+        cohort_end_date = as.Date("2009-01-03"),
+        other_date = as.Date("2009-01-01")
+      )
     ))
-  )
 
-  cdm <- omopgenerics::insertTable(cdm = cdm,
-                                   name = "cohort",
-                                   table = cohort)
-  cdm$cohort <- cdm$cohort |> omopgenerics::newCohortTable()
+    omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::contains("og_"))
 
-  cdm$cohort1 <- cdm$cohort |>
-    requireDemographics(
-      ageRange = c(60, 70),
-      indexDate = "cohort_start_date",
-      sex = "Both",
-      minPriorObservation = 10,
-      minFutureObservation = 40,
-      atFirst = TRUE,
-      name = "cohort1"
+    cdm$my_cohort <- requireDemographics(cdm$my_cohort)
+    expect_true(
+      DBI::dbGetQuery(db, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
+        "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
     )
-  expect_true(all(cdm$cohort1 |> dplyr::pull("subject_id") |> sort() == c(3, 7, 7)))
-  expect_true(all(cdm$cohort1 |> dplyr::pull("cohort_start_date") |> sort() ==
-                    c("2009-01-27", "2009-03-07", "2009-03-08")))
-  expect_true(all(
-    attrition(cdm$cohort1)$reason ==
-      c('Initial qualifying events', 'Age requirement: 60 to 70. Requirement applied to the first entry',
-        'Sex requirement: Both. Requirement applied to the first entry',
-        'Prior observation requirement: 10 days. Requirement applied to the first entry',
-        'Future observation requirement: 40 days. Requirement applied to the first entry')
-  ))
 
+    cohort <- dplyr::tibble(
+      cohort_definition_id = rep(1L, 10),
+      subject_id = c(1L, 1L, 2L, 2L, 3L, 4L, 5L, 5L, 7L, 7L),
+      cohort_start_date = as.Date(c(
+        "2008-05-30", "2009-05-02", "2008-05-04", "2008-05-18",
+        "2009-01-27", "2009-06-30", "2010-03-20", "2008-05-01",
+        "2009-03-07", "2009-03-08"
+      )),
+      cohort_end_date = as.Date(c(
+        "2009-05-01", "2009-06-10", "2008-05-17", "2009-01-23",
+        "2009-06-28", "2009-11-20", "2010-04-30", "2008-07-24",
+        "2009-03-07", "2009-03-20"
+      ))
+    )
 
-  expect_true(sum(grepl("og_", omopgenerics::listSourceTables(cdm))) == 0)
-  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
-  CDMConnector::cdmDisconnect(cdm = cdm)
+    cdm <- omopgenerics::insertTable(cdm = cdm,
+                                     name = "cohort",
+                                     table = cohort)
+    cdm$cohort <- cdm$cohort |> omopgenerics::newCohortTable()
+
+    cdm$cohort1 <- cdm$cohort |>
+      requireDemographics(
+        ageRange = c(60, 70),
+        indexDate = "cohort_start_date",
+        sex = "Both",
+        minPriorObservation = 10,
+        minFutureObservation = 40,
+        atFirst = TRUE,
+        name = "cohort1"
+      )
+    expect_true(all(cdm$cohort1 |> dplyr::pull("subject_id") |> sort() == c(3, 7, 7)))
+    expect_true(all(cdm$cohort1 |> dplyr::pull("cohort_start_date") |> sort() ==
+                      c("2009-01-27", "2009-03-07", "2009-03-08")))
+    expect_true(all(
+      attrition(cdm$cohort1)$reason ==
+        c('Initial qualifying events', 'Age requirement: 60 to 70. Requirement applied to the first entry',
+          'Sex requirement: Both. Requirement applied to the first entry',
+          'Prior observation requirement: 10 days. Requirement applied to the first entry',
+          'Future observation requirement: 40 days. Requirement applied to the first entry')
+    ))
+
+    expect_true(sum(grepl("og_", omopgenerics::listSourceTables(cdm))) == 0)
+
+    dropCreatedTables(cdm = cdm)
+  }
+
 })
 

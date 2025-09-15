@@ -9,8 +9,9 @@ test_that("simple example", {
         cohort_start_date = as.Date(c("2020-01-03","2020-01-03")),
         cohort_end_date = as.Date(c("2020-01-04", "2020-01-04"))
       )
-  ))
-  cdm <- cdm |> copyCdm()
+  )) |>
+    copyCdm()
+
   cdm <- omopgenerics::insertTable(
     cdm = cdm,
     name = "observation_period",
@@ -51,7 +52,8 @@ test_that("simple example", {
                      dplyr::collect()) == 0)
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  PatientProfiles::mockDisconnect(cdm)
+
+  dropCreatedTables(cdm = cdm)
 })
 
 test_that("overlapping entries", {
@@ -71,19 +73,18 @@ test_that("overlapping entries", {
                                     "2020-01-10",
                                     "2020-01-04"))
       )
-  ))
-  cdm <- cdm |> copyCdm()
-  cdm <- omopgenerics::insertTable(
-    cdm = cdm,
-    name = "observation_period",
-    table = data.frame(
-      observation_period_id = c(1L, 2L),
-      person_id = c(1L, 2L),
-      observation_period_start_date = as.Date(c("2020-01-01", "2020-01-01")),
-      observation_period_end_date = as.Date(c("2020-01-10", "2020-01-30")),
-      period_type_concept_id = 1L
-    )
-  )
+  )) |>
+    omopgenerics::insertTable(
+      name = "observation_period",
+      table = data.frame(
+        observation_period_id = c(1L, 2L),
+        person_id = c(1L, 2L),
+        observation_period_start_date = as.Date(c("2020-01-01", "2020-01-01")),
+        observation_period_end_date = as.Date(c("2020-01-10", "2020-01-30")),
+        period_type_concept_id = 1L
+      )
+    ) |>
+    copyCdm()
 
   # by adding 10 days, person one will have overlapping entries
   # which should be collapsed
@@ -132,47 +133,38 @@ test_that("overlapping entries", {
  )
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  PatientProfiles::mockDisconnect(cdm)
+
+  dropCreatedTables(cdm = cdm)
 })
 
 test_that("test indexes - postgres", {
   skip_on_cran()
-  skip_if(Sys.getenv("CDM5_POSTGRESQL_DBNAME") == "")
   skip_if(!testIndexes)
 
-  db <- DBI::dbConnect(RPostgres::Postgres(),
-                       dbname = Sys.getenv("CDM5_POSTGRESQL_DBNAME"),
-                       host = Sys.getenv("CDM5_POSTGRESQL_HOST"),
-                       user = Sys.getenv("CDM5_POSTGRESQL_USER"),
-                       password = Sys.getenv("CDM5_POSTGRESQL_PASSWORD"))
-  cdm <- CDMConnector::cdmFromCon(
-    con = db,
-    cdmSchema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA"),
-    writeSchema = Sys.getenv("CDM5_POSTGRESQL_SCRATCH_SCHEMA"),
-    writePrefix = "cc_",
-    achillesSchema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA")
-  )
+  if (dbToTest == "postgres CDMConnector") {
+    cdm <- omock::mockCdmFromTables(tables = list(
+      my_cohort = data.frame(cohort_definition_id = 1L,
+                             subject_id = 1L,
+                             cohort_start_date = as.Date("2009-01-02"),
+                             cohort_end_date = as.Date("2009-01-03"),
+                             other_date = as.Date("2009-01-01"))
+    )) |>
+      copyCdm()
 
-  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::contains("og_"))
+    omopgenerics::dropSourceTable(cdm = cdm, dplyr::starts_with("og"))
 
-  cdm <- omopgenerics::insertTable(cdm = cdm,
-                                   name = "my_cohort",
-                                   table = data.frame(cohort_definition_id = 1L,
-                                                      subject_id = 1L,
-                                                      cohort_start_date = as.Date("2009-01-02"),
-                                                      cohort_end_date = as.Date("2009-01-03"),
-                                                      other_date = as.Date("2009-01-01")))
-  cdm$my_cohort <- omopgenerics::newCohortTable(cdm$my_cohort)
-  cdm$my_cohort <- padCohortEnd(cdm$my_cohort, days = 1)
+    cdm$my_cohort <- padCohortEnd(cdm$my_cohort, days = 1)
 
-  expect_true(
-    DBI::dbGetQuery(db, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
-      "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
-  )
+    expect_true(
+      DBI::dbGetQuery(db, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
+        "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
+    )
 
-  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
-  CDMConnector::cdmDisconnect(cdm = cdm)
+    expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
+
+    dropCreatedTables(cdm = cdm)
+  }
+
 })
 
 test_that("adding days to cohort start", {
@@ -186,19 +178,18 @@ test_that("adding days to cohort start", {
         cohort_start_date = as.Date("2020-01-03"),
         cohort_end_date = as.Date("2020-01-10")
       )
-  ))
-  cdm <- cdm |> copyCdm()
-  cdm <- omopgenerics::insertTable(
-    cdm = cdm,
-    name = "observation_period",
-    table = data.frame(
-      observation_period_id = 1L,
-      person_id = 1L,
-      observation_period_start_date = as.Date("2020-01-01"),
-      observation_period_end_date = as.Date("2020-03-01"),
-      period_type_concept_id = 1L
-    )
-  )
+  )) |>
+    omopgenerics::insertTable(
+      name = "observation_period",
+      table = data.frame(
+        observation_period_id = 1L,
+        person_id = 1L,
+        observation_period_start_date = as.Date("2020-01-01"),
+        observation_period_end_date = as.Date("2020-03-01"),
+        period_type_concept_id = 1L
+      )
+    ) |>
+    copyCdm()
 
   cdm$cohort_1 <- padCohortStart(cdm$cohort,
                                  days = 2,
@@ -326,45 +317,37 @@ test_that("adding days to cohort start", {
   ))
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  PatientProfiles::mockDisconnect(cdm)
+
+  dropCreatedTables(cdm = cdm)
 })
 
 test_that("test indexes - postgres", {
   skip_on_cran()
-  skip_if(Sys.getenv("CDM5_POSTGRESQL_DBNAME") == "")
   skip_if(!testIndexes)
 
-  db <- DBI::dbConnect(RPostgres::Postgres(),
-                       dbname = Sys.getenv("CDM5_POSTGRESQL_DBNAME"),
-                       host = Sys.getenv("CDM5_POSTGRESQL_HOST"),
-                       user = Sys.getenv("CDM5_POSTGRESQL_USER"),
-                       password = Sys.getenv("CDM5_POSTGRESQL_PASSWORD"))
-  cdm <- CDMConnector::cdmFromCon(
-    con = db,
-    cdmSchema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA"),
-    writeSchema = Sys.getenv("CDM5_POSTGRESQL_SCRATCH_SCHEMA"),
-    writePrefix = "cc_",
-    achillesSchema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA")
-  )
+  if (dbToTest == "postgres CDMConnector") {
+    cdm <- omock::mockCdmFromTables(tables = list(
+      my_cohort = dplyr::tibble(
+        cohort_definition_id = 1L,
+        subject_id = 1L,
+        cohort_start_date = as.Date("2009-01-02"),
+        cohort_end_date = as.Date("2009-01-03"),
+        other_date = as.Date("2009-01-01")
+      )
+    ))
 
-  cdm <- omopgenerics::insertTable(cdm = cdm,
-                                   name = "my_cohort",
-                                   table = data.frame(cohort_definition_id = 1L,
-                                                      subject_id = 1L,
-                                                      cohort_start_date = as.Date("2009-01-02"),
-                                                      cohort_end_date = as.Date("2009-01-03"),
-                                                      other_date = as.Date("2009-01-01")))
-  cdm$my_cohort <- omopgenerics::newCohortTable(cdm$my_cohort)
-  cdm$my_cohort <- padCohortStart(cdm$my_cohort, days = 1)
+    cdm$my_cohort <- padCohortStart(cdm$my_cohort, days = 1)
 
-  expect_true(
-    DBI::dbGetQuery(db, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
-      "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
-  )
+    expect_true(
+      DBI::dbGetQuery(db, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
+        "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
+    )
 
-  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
-  CDMConnector::cdmDisconnect(cdm = cdm)
+    expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
+
+    dropCreatedTables(cdm = cdm)
+  }
+
 })
 
 test_that("test padCohortDate", {
@@ -378,9 +361,8 @@ test_that("test padCohortDate", {
       cohort_end_date = as.Date("2020-01-20"),
       days = c(5, 8)
     )
-  ))
-
-  cdm <- copyCdm(cdm)
+  )) |>
+    copyCdm()
 
   expect_no_error(
     cdm$my_cohort <- cdm$cohort |>
@@ -407,5 +389,6 @@ test_that("test padCohortDate", {
   )
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  PatientProfiles::mockDisconnect(cdm)
+
+  dropCreatedTables(cdm = cdm)
 })

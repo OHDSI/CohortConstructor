@@ -37,17 +37,10 @@ test_that("unionCohorts works", {
   )
 
 
-  cdm_local <- omock::mockCdmFromTables(
-    tables = list(
-      "cohort1" = cohort_1
-    ),
-    seed = 1
-  )
+  cdm <- omock::mockCdmFromTables(tables = list("cohort1" = cohort_1)) |>
+    omopgenerics::insertTable(name = "observation_period", table = obs) |>
+    copyCdm()
 
-  cdm_local <- omopgenerics::insertTable(
-    cdm = cdm_local, name = "observation_period", table = obs)
-
-  cdm <- cdm_local |> copyCdm()
   # simple example
   cdm$cohort2 <- unionCohorts(cdm$cohort1, name = "cohort2")
   expect_true(all(
@@ -117,7 +110,8 @@ test_that("unionCohorts works", {
   expect_true(all(settings(cdm$cohort1)$cohort_name %in% c("cohort_1", "cohort_2", "cohort_3", "cohort_4", "cohort_1_cohort_2_cohort_3_cohort_4")))
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  PatientProfiles::mockDisconnect(cdm)
+
+  dropCreatedTables(cdm = cdm)
 })
 
 test_that("gap and name works", {
@@ -172,34 +166,22 @@ test_that("gap and name works", {
     ))
   )
 
-
-  cdm_local <- omock::mockCdmFromTables(
-    tables = list(
-      "cohort" = cohort_1
-    ),
-    seed = 1
-  )
-
-  cdm_local <- omopgenerics::insertTable(
-    cdm = cdm_local, name = "observation_period", table = obs)
-
-  cdm_local <- omopgenerics::insertTable(
-    cdm = cdm_local, name = "person", table = person)
-
-
-  cdm_local$cohort <- cdm_local$cohort |>
+  cdm <- omock::mockCdmFromTables(tables = list("cohort" = cohort_1)) |>
+    omopgenerics::insertTable(name = "observation_period", table = obs) |>
+    omopgenerics::insertTable(name = "person", table = person)
+  cdm$cohort <- cdm$cohort |>
     dplyr::arrange(.data$subject_id, .data$cohort_start_date) |>
     dplyr::mutate(id = dplyr::row_number()) |>
     dplyr::filter(id %% 2 == 0) |>
     dplyr::select(-id)
-  cdm_local$cohort1 <- dplyr::tibble(
+  cdm$cohort1 <- dplyr::tibble(
     cohort_definition_id = c(1, 1, 2),
     subject_id = c(1, 1, 1),
     cohort_start_date = as.Date(c("2000-07-01", "2000-07-10", "2000-07-22")),
     cohort_end_date = as.Date(c("2000-07-02", "2000-07-20", "2000-08-22"))
   )
-  cdm <- cdm_local |> copyCdm()
   cdm$cohort1 <- cdm$cohort1 |> omopgenerics::newCohortTable()
+  cdm <- copyCdm(cdm = cdm)
 
   # gap
   cdm$cohort2 <- unionCohorts(cdm$cohort1, gap = 2,  name = "cohort2")
@@ -255,16 +237,19 @@ test_that("gap and name works", {
   expect_true(settings(cdm$cohort)$cohort_name == "test")
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  PatientProfiles::mockDisconnect(cdm)
+
+  dropCreatedTables(cdm = cdm)
 })
 
 test_that("Expected behaviour", {
-  testthat::skip_on_cran()
-  cdm_local <- omock::mockCdmReference() |>
+  skip_on_cran()
+
+  cdm <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4, seed = 1) |>
     omock::mockObservationPeriod(seed = 1) |>
-    omock::mockCohort(name = c("cohort"), numberCohorts = 4, seed = 8, recordPerson = 2)
-  cdm <- cdm_local |> copyCdm()
+    omock::mockCohort(name = c("cohort"), numberCohorts = 4, seed = 8, recordPerson = 2) |>
+    copyCdm()
+
   expect_error(
     cohort <- unionCohorts(cdm$cohort,
                            cohortId = 1,
@@ -309,11 +294,12 @@ test_that("Expected behaviour", {
   )
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  PatientProfiles::mockDisconnect(cdm)
+
+  dropCreatedTables(cdm = cdm)
 })
 
 test_that("test codelist", {
-  testthat::skip_on_cran()
+  skip_on_cran()
 
   obs <- dplyr::tibble(
     observation_period_id = c(1, 2, 3, 4),
@@ -344,50 +330,32 @@ test_that("test codelist", {
     cohort_end_date = as.Date(c("2004-03-10", "2005-07-19", "2001-06-15", "2015-04-30"))
   )
 
-  cdm_local <- omock::mockCdmFromTables(
-    tables = list(
-      "person" = person,
-      "cohort" = cohort_1
-    ),
-    seed = 1
-  )
-
-  cdm_local <- omopgenerics::insertTable(cdm = cdm_local,
-                                         name = "observation_period", table = obs)
-
-  cdm_local <- omopgenerics::insertTable(cdm = cdm_local,
-                                         name = "person", table = person)
-
-  # cdm_local <- omock::mockCdmReference() |>
-  #   omock::mockPerson(n = 4,seed = 1) |>
-  #   omock::mockObservationPeriod(seed = 1) |>
-  #   omock::mockCohort(seed = 1)
-  cdm_local$concept <- dplyr::tibble(
-    "concept_id" = c(1, 2, 3),
-    "concept_name" = c("my concept 1", "my concept 2", "my concept 3"),
-    "domain_id" = "Drug",
-    "vocabulary_id" = NA,
-    "concept_class_id" = NA,
-    "concept_code" = NA,
-    "valid_start_date" = NA,
-    "valid_end_date" = NA
-  )
-  cdm_local$drug_exposure <- dplyr::tibble(
-    "drug_exposure_id" = 1:17,
-    "person_id" = c(1, 1, 1, 1, 2, 2, 3, 1, 1, 1, 1, 4, 4, 1, 2, 3, 4),
-    "drug_concept_id" = c(1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 2, 3, 3, 3, 3),
-    "drug_exposure_start_date" = c(0, 300, 1500, 750, 10, 800, 150, 1800, 1801, 1802, 1803, 430, -10, 100, 123, -10, 1000),
-    "drug_exposure_end_date" = c(400, 800, 1600, 1550, 2000, 1000, 600, 1801, 1802, 1803, 1804, 400, -100, NA, 190, 123, 1500),
-    "drug_type_concept_id" = 1
-  ) |>
-    dplyr::mutate(
-      "drug_exposure_start_date" = as.Date(.data$drug_exposure_start_date, origin = "2010-01-01"),
-      "drug_exposure_end_date" = as.Date(.data$drug_exposure_end_date, origin = "2010-01-01")
-    )
-  cdm_local$observation_period <- cdm_local$observation_period |>
-    dplyr::mutate(observation_period_start_date = as.Date("1990-01-01"), observation_period_end_date = as.Date("2020-01-01"))
-
-  cdm <- cdm_local |> copyCdm()
+  cdm <- omock::mockCdmFromTables(tables = list("person" = person, "cohort" = cohort_1)) |>
+    omopgenerics::insertTable(name = "observation_period", table = obs) |>
+    omopgenerics::insertTable(name = "person", table = person) |>
+    omock::mockVocabularyTables(concept = dplyr::tibble(
+      "concept_id" = c(1, 2, 3),
+      "concept_name" = c("my concept 1", "my concept 2", "my concept 3"),
+      "domain_id" = "Drug",
+      "vocabulary_id" = NA,
+      "concept_class_id" = NA,
+      "concept_code" = NA,
+      "valid_start_date" = NA,
+      "valid_end_date" = NA
+    )) |>
+    omopgenerics::insertTable(name = "drug_exposure", table = dplyr::tibble(
+      "drug_exposure_id" = 1:17,
+      "person_id" = c(1, 1, 1, 1, 2, 2, 3, 1, 1, 1, 1, 4, 4, 1, 2, 3, 4),
+      "drug_concept_id" = c(1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 2, 3, 3, 3, 3),
+      "drug_exposure_start_date" = c(0, 300, 1500, 750, 10, 800, 150, 1800, 1801, 1802, 1803, 430, -10, 100, 123, -10, 1000),
+      "drug_exposure_end_date" = c(400, 800, 1600, 1550, 2000, 1000, 600, 1801, 1802, 1803, 1804, 400, -100, NA, 190, 123, 1500),
+      "drug_type_concept_id" = 1
+    ) |>
+      dplyr::mutate(
+        "drug_exposure_start_date" = as.Date(.data$drug_exposure_start_date, origin = "2010-01-01"),
+        "drug_exposure_end_date" = as.Date(.data$drug_exposure_end_date, origin = "2010-01-01")
+      )) |>
+    copyCdm()
 
   cdm$cohort1 <- conceptCohort(cdm, conceptSet = list(c1 = c(1L,3L), c2 = c(2L)), name = "cohort1")
 
@@ -431,18 +399,18 @@ test_that("test codelist", {
   expect_true(all(codes |> dplyr::pull("cohort_definition_id") |> sort() == c(1, 1, 1)))
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  PatientProfiles::mockDisconnect(cdm)
+
+  dropCreatedTables(cdm = cdm)
 })
 
 test_that("keep original cohorts", {
   skip_on_cran()
 
-  cdm_local <- omock::mockCdmReference() |>
+  cdm <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4, seed = 1) |>
     omock::mockObservationPeriod(seed = 1) |>
-    omock::mockCohort(name = c("cohort1"), numberCohorts = 4,seed = 1)
-
-  cdm <- cdm_local |> copyCdm()
+    omock::mockCohort(name = c("cohort1"), numberCohorts = 4,seed = 1) |>
+    copyCdm()
 
   start_settings <- settings(cdm$cohort1)
 
@@ -457,7 +425,8 @@ test_that("keep original cohorts", {
   expect_true(nrow(settings(cdm$cohort3)) == nrow(start_settings) + 1)
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  PatientProfiles::mockDisconnect(cdm)
+
+  dropCreatedTables(cdm = cdm)
 })
 
 test_that("multiple observation periods", {
@@ -473,35 +442,33 @@ test_that("multiple observation periods", {
     ethnicity_concept_id = NA_integer_
   )
 
+  cdm <- omock::mockCdmReference() |>
+    omopgenerics::insertTable(name = "person", table = person) |>
+    omopgenerics::insertTable(name = "observation_period", table = dplyr::tibble(
+      "observation_period_id" = as.integer(1:7),
+      "person_id" = as.integer(c(1, 1, 1, 2, 2, 3, 4)),
+      "observation_period_start_date" = as.Date(c(
+        "2000-01-01", "2001-01-01", "2003-01-01", "2001-01-01", "2002-01-01",
+        "2000-01-01", "2000-01-01"
+      )),
+      "observation_period_end_date" =as.Date(c(
+        "2000-12-20", "2002-01-01", "2005-01-01", "2001-12-31", "2004-01-01",
+        "2004-01-01", "2003-01-01"
+      )),
+      "period_type_concept_id" = NA_integer_
+    )) |>
+    omopgenerics::insertTable(name = "cohort", table = dplyr::tibble(
+      "cohort_definition_id" = as.integer(c(1, 1, 1, 1, 2, 2)),
+      "subject_id" = as.integer(c(1, 1, 1, 2, 2, 1)),
+      "cohort_start_date" = as.Date(c(
+        "2000-01-01", "2000-12-01", "2001-01-01", "2001-01-01", "2002-01-01", "2003-01-01"
+      )),
+      "cohort_end_date" =as.Date(c(
+        "2000-05-20", "2000-12-20", "2001-04-01", "2001-12-30", "2003-01-01", "2004-01-01"
+      ))
+    )) |>
+    copyCdm()
 
-  cdm_local <- omock::mockCdmReference()
-
-  cdm_local <- omopgenerics::insertTable(cdm = cdm_local, name = "person", table = person)
-
-  cdm_local$observation_period <- dplyr::tibble(
-    "observation_period_id" = as.integer(1:7),
-    "person_id" = as.integer(c(1, 1, 1, 2, 2, 3, 4)),
-    "observation_period_start_date" = as.Date(c(
-      "2000-01-01", "2001-01-01", "2003-01-01", "2001-01-01", "2002-01-01",
-      "2000-01-01", "2000-01-01"
-    )),
-    "observation_period_end_date" =as.Date(c(
-      "2000-12-20", "2002-01-01", "2005-01-01", "2001-12-31", "2004-01-01",
-      "2004-01-01", "2003-01-01"
-    )),
-    "period_type_concept_id" = NA_integer_
-  )
-  cdm_local$cohort <- dplyr::tibble(
-    "cohort_definition_id" = as.integer(c(1, 1, 1, 1, 2, 2)),
-    "subject_id" = as.integer(c(1, 1, 1, 2, 2, 1)),
-    "cohort_start_date" = as.Date(c(
-      "2000-01-01", "2000-12-01", "2001-01-01", "2001-01-01", "2002-01-01", "2003-01-01"
-    )),
-    "cohort_end_date" =as.Date(c(
-      "2000-05-20", "2000-12-20", "2001-04-01", "2001-12-30", "2003-01-01", "2004-01-01"
-    ))
-  )
-  cdm <- cdm_local |> copyCdm()
   cdm$cohort <- cdm$cohort |> omopgenerics::newCohortTable() |> unionCohorts(gap = 99999)
   expect_identical(collectCohort(cdm$cohort, 1), dplyr::tibble(
       "subject_id" = as.integer(c(1, 1, 1, 2, 2)),
@@ -546,6 +513,6 @@ test_that("test indexes - postgres", {
   )
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
-  CDMConnector::cdmDisconnect(cdm = cdm)
+
+  dropCreatedTables(cdm = cdm)
 })
