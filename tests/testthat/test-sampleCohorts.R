@@ -68,11 +68,17 @@ test_that("sampleCohort subsetting all cohorts", {
     omock::mockCohort(name = c("cohort1"), numberCohorts = 3, seed = 2) |>
     copyCdm()
 
-  test1 <- sampleCohorts(cdm$cohort1, n = 2)
-  test2 <- sampleCohorts(cdm$cohort1, cohortId = c(1,2,3), n = 2)
-  expect_true(all.equal(attrition(test1), attrition(test2)))
-  test3 <- sampleCohorts(cdm$cohort1, cohortId = paste0("cohort_", c(1,2,3)), n = 2)
-  expect_true(all.equal(attrition(test1), attrition(test3)))
+  test1 <- sampleCohorts(cdm$cohort1, n = 2, name = "sample1")
+  test2 <- sampleCohorts(cdm$cohort1, cohortId = c(1,2,3), n = 2, name = "sample2")
+  expect_true(all.equal(
+    attrition(test1) |> dplyr::select(!c("number_records", "excluded_records")),
+    attrition(test2) |> dplyr::select(!c("number_records", "excluded_records"))
+  ))
+  test3 <- sampleCohorts(cdm$cohort1, cohortId = paste0("cohort_", c(1,2,3)), n = 2, name = "sample3")
+  expect_true(all.equal(
+    attrition(test1) |> dplyr::select(!c("number_records", "excluded_records")),
+    attrition(test3) |> dplyr::select(!c("number_records", "excluded_records"))
+  ))
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
 

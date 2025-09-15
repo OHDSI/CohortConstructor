@@ -228,7 +228,7 @@ test_that("requireEntry", {
       8, 8,
       9, 9, 9, 9, 9, 9, 9, 9,
       10, 10
-    ),
+    ) |> as.integer(),
     cohort_start_date = as.Date(c(
       "2001-01-01", "2001-05-22", "2002-09-22",
       "1999-05-11", "2000-01-19", "2000-07-31",
@@ -305,17 +305,26 @@ test_that("requireEntry", {
   expect_warning(cdm$cohort1 |> requireIsEntry(entryRange = c(1, 1), cohortId = c(1, 5)))
 
   # mock cohort
-  cdm <- omock::mockCdmFromTables(tables = list("cohort1" = cohort_1)) |>
+  cdm <- omock::mockCdmFromTables(tables = list("my_cohort" = dplyr::tibble(
+    cohort_definition_id = 1L,
+    subject_id = as.integer(c(1,2, 2, 2, 2)),
+    cohort_start_date  = as.Date(c(
+      "2010-01-01", "2010-10-01", "2010-05-01", "2010-06-01", "2010-07-01"
+    )),
+    cohort_end_date = as.Date(c(
+      "2010-01-01", "2010-10-01", "2010-05-01", "2010-06-01", "2010-07-01"
+    ))
+  ))) |>
     omopgenerics::insertTable(name = "observation_period", table = data.frame(
-      observation_period_id = c(1,2),
-      person_id = c(1,2),
+      observation_period_id = as.integer(c(1,2)),
+      person_id = as.integer(c(1,2)),
       observation_period_start_date  = as.Date("2010-01-01"),
       observation_period_end_date  = as.Date("2011-01-01"),
       period_type_concept_id = NA_integer_
     )) |>
     omopgenerics::insertTable(name = "my_cohort", table = data.frame(
       cohort_definition_id = 1L,
-      subject_id = c(1,2, 2, 2, 2),
+      subject_id = as.integer(c(1,2, 2, 2, 2)),
       cohort_start_date  = c(as.Date("2010-01-01"),
                              as.Date("2010-10-01"),
                              as.Date("2010-05-01"),

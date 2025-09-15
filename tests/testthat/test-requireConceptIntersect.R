@@ -15,7 +15,7 @@ test_that("require flag in concept", {#need
   )
 
   person <- dplyr::tibble(
-    person_id = 1:4,
+    person_id = 1:4L,
     gender_concept_id = c(8532L, 8507L, 8507L, 8507L),
     year_of_birth = c(1997L, 1963L, 1986L, 1978L),
     month_of_birth = c(8L, 1L, 3L, 11L),
@@ -26,7 +26,7 @@ test_that("require flag in concept", {#need
 
   obs <- dplyr::tibble(
     observation_period_id = 1:4,
-    person_id = 1:4,
+    person_id = 1:4L,
     observation_period_start_date = as.Date(c("2000-06-03", "1999-04-05", "2015-01-15", "1989-12-09")),
     observation_period_end_date = as.Date(c("2013-06-29", "2003-06-15", "2015-10-11", "2013-12-31")),
     period_type_concept_id = NA_integer_
@@ -36,7 +36,7 @@ test_that("require flag in concept", {#need
     omopgenerics::insertTable(name = "observation_period", table = obs) |>
     omopgenerics::insertTable(name = "person", table = person) |>
     omock::mockVocabularyTables(concept = dplyr::tibble(
-      "concept_id" = 1,
+      "concept_id" = 1L,
       "concept_name" = "my concept",
       "domain_id" = "Drug",
       "vocabulary_id" = NA,
@@ -47,7 +47,7 @@ test_that("require flag in concept", {#need
     )) |>
     omopgenerics::insertTable(name = "drug_exposure", table = dplyr::tibble(
       "drug_exposure_id" = 1:11,
-      "person_id" = c(1, 1, 1, 1, 2, 2, 3, 1, 1, 1, 1),
+      "person_id" = as.integer(c(1, 1, 1, 1, 2, 2, 3, 1, 1, 1, 1)),
       "drug_concept_id" = c(1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1),
       "drug_exposure_start_date" = c(0, 300, 1500, 750, 10, 800, 150, 1800, 1801, 1802, 1803),
       "drug_exposure_end_date" = c(400, 800, 1600, 1550, 2000, 1000, 600, 1801, 1802, 1803, 1804),

@@ -1,4 +1,4 @@
-dbToTest <- Sys.getenv("DB_TO_TEST", "local omopgenerics")
+dbToTest <- Sys.getenv("DB_TO_TEST", "duckdb CDMConnector")
 collectCohort <- function(cohort, id) {
   x <- cohort |>
     dplyr::filter(.data$cohort_definition_id == .env$id) |>

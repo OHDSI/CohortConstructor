@@ -23,6 +23,83 @@ rename.cdm_table <- function(.data, ...) {
     restoreAttributes(at)
 }
 
+#' @export
+#' @importFrom dplyr distinct
+distinct.cdm_table <- function(.data, ...) {
+  cl <- class(.data)
+  at <- keepAttributes(.data, cl)
+  keepClass(.data) |>
+    dplyr::distinct(...) |>
+    restoreClass(cl) |>
+    restoreAttributes(at)
+}
+
+#' @export
+#' @importFrom dplyr slice
+slice.cdm_table <- function(.data, ...) {
+  cl <- class(.data)
+  at <- keepAttributes(.data, cl)
+  keepClass(.data) |>
+    dplyr::slice(...) |>
+    restoreClass(cl) |>
+    restoreAttributes(at)
+}
+
+#' @export
+#' @importFrom dplyr slice_head
+slice_head.cdm_table <- function(.data, ...) {
+  cl <- class(.data)
+  at <- keepAttributes(.data, cl)
+  keepClass(.data) |>
+    dplyr::slice_head(...) |>
+    restoreClass(cl) |>
+    restoreAttributes(at)
+}
+
+#' @export
+#' @importFrom dplyr slice_tail
+slice_tail.cdm_table <- function(.data, ...) {
+  cl <- class(.data)
+  at <- keepAttributes(.data, cl)
+  keepClass(.data) |>
+    dplyr::slice_tail(...) |>
+    restoreClass(cl) |>
+    restoreAttributes(at)
+}
+
+#' @export
+#' @importFrom dplyr slice_min
+slice_min.cdm_table <- function(.data, ...) {
+  cl <- class(.data)
+  at <- keepAttributes(.data, cl)
+  keepClass(.data) |>
+    dplyr::slice_min(...) |>
+    restoreClass(cl) |>
+    restoreAttributes(at)
+}
+
+#' @export
+#' @importFrom dplyr slice_max
+slice_max.cdm_table <- function(.data, ...) {
+  cl <- class(.data)
+  at <- keepAttributes(.data, cl)
+  keepClass(.data) |>
+    dplyr::slice_max(...) |>
+    restoreClass(cl) |>
+    restoreAttributes(at)
+}
+
+#' @export
+#' @importFrom dplyr slice_sample
+slice_sample.cdm_table <- function(.data, ...) {
+  cl <- class(.data)
+  at <- keepAttributes(.data, cl)
+  keepClass(.data) |>
+    dplyr::slice_sample(...) |>
+    restoreClass(cl) |>
+    restoreAttributes(at)
+}
+
 keepAttributes <- function(x, cl) {
   xx <- list(
     tbl_source = attr(x, "tbl_source"),

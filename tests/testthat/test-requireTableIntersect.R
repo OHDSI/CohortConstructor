@@ -2,8 +2,8 @@ test_that("requiring presence in another table", {
   skip_on_cran()
 
   obs <- dplyr::tibble(
-    observation_period_id = c(1, 2, 3, 4),
-    person_id = c(1, 2, 3, 4),
+    observation_period_id = as.integer(c(1, 2, 3, 4)),
+    person_id = as.integer(c(1, 2, 3, 4)),
     observation_period_start_date = as.Date(c(
       "2000-06-03", "1999-04-05", "2015-01-15", "1989-12-09"
     )),
@@ -14,7 +14,7 @@ test_that("requiring presence in another table", {
   )
 
   person <- dplyr::tibble(
-    person_id = c(1, 2, 3, 4),
+    person_id = as.integer(c(1, 2, 3, 4)),
     gender_concept_id = c(8532, 8507, 8507, 8507),
     year_of_birth = c(1997, 1963, 1986, 1978),
     month_of_birth = c(8, 1, 3, 11),
@@ -25,7 +25,7 @@ test_that("requiring presence in another table", {
 
   cohort_1 <- dplyr::tibble(
     cohort_definition_id = c(1, 1, 1, 1, 2, 2, 2, 2),
-    subject_id = c(1, 1, 2, 3, 1, 1, 1, 1),
+    subject_id = as.integer(c(1, 1, 2, 3, 1, 1, 1, 1)),
     cohort_start_date = as.Date(c(
       "2003-05-17", "2004-03-11", "1999-05-03", "2015-02-25",
       "2001-03-24", "2001-11-28", "2002-01-30", "2002-06-13"
@@ -40,7 +40,7 @@ test_that("requiring presence in another table", {
     omopgenerics::insertTable(name = "observation_period", table = obs) |>
     omopgenerics::insertTable(name = "person", table = person) |>
     omopgenerics::insertTable(name = "table", table = dplyr::tibble(
-      person_id = c(1, 3, 2, 2),
+      person_id = as.integer(c(1, 3, 2, 2)),
       date_start = as.Date(c("2002-01-01", "2015-10-01", "2000-01-01", "1999-01-01")),
       date_end = as.Date(c("2002-01-01", "2015-10-01", "2000-01-01", "1999-01-01"))
     )) |>
@@ -54,7 +54,6 @@ test_that("requiring presence in another table", {
                                         window = list(c(-Inf, Inf)),
                                         name = "cohort2")
   expect_identical(colnames(cdm$cohort2), colnames(cdm$cohort1))
-
 
   expect_identical(cdm$cohort2 |> dplyr::pull("subject_id") |> sort(), cdm$cohort1 |> dplyr::pull("subject_id") |> sort())
   expect_identical(omopgenerics::attrition(cdm$cohort2)$reason, c("Initial qualifying events",
@@ -286,7 +285,7 @@ test_that("different intersection count requirements", {
     )) |>
     omopgenerics::insertTable(name = "drug_exposure", table = dplyr::tibble(
       "drug_exposure_id" = 1:6,
-      "person_id" = c(1,2,2,3,3,3),
+      "person_id" = as.integer(c(1,2,2,3,3,3)),
       "drug_concept_id" = 1,
       "drug_exposure_start_date" = as.Date('2019-01-01'),
       "drug_exposure_end_date" = as.Date('2019-01-01'),
