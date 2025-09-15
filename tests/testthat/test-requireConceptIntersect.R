@@ -80,7 +80,7 @@ test_that("require flag in concept", {#need
                                         conceptSet = list(a = 1L),
                                         intersections = 2,
                                         window = c(0, Inf),
-                                        useRecordsOutOfObservation = TRUE,
+                                        inObservation = FALSE,
                                         name = "in_obs")
   expect_identical(
     collectCohort(cdm$in_obs, 1),

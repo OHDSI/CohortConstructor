@@ -11,7 +11,7 @@ measurementCohort(
   valueAsConcept = NULL,
   valueAsNumber = NULL,
   table = c("measurement", "observation"),
-  useRecordsOutOfObservation = FALSE
+  useRecordsBeforeObservation = FALSE
 )
 }
 \arguments{
@@ -36,7 +36,7 @@ entries independent of their value as number will be included.}
 \item{table}{Name of OMOP tables to search for records of the concepts
 provided. Options are "measurement" and/or "observation".}
 
-\item{useRecordsOutOfObservation}{If FALSE, only records in observation will
+\item{useRecordsBeforeObservation}{If FALSE, only records in observation will
 be used. If FALSE, records before the start of observation period will be
 considered, with cohort start date set to the start of their next observation
 period.}
@@ -102,7 +102,7 @@ cdm$cohort <- measurementCohort(
   conceptSet = list("normal_blood_pressure" = c(4326744, 4298393, 45770407)),
   valueAsConcept = c(4124457),
   valueAsNumber = list("8876" = c(70, 120)),
-  useRecordsOutOfObservation = FALSE
+  useRecordsBeforeObservation = FALSE
 )
 
 cdm$cohort
@@ -118,7 +118,7 @@ cdm$cohort2 <- measurementCohort(
   valueAsConcept = c(4124457),
   valueAsNumber = list("8876" = c(70, 120),
                        "8876" = c(121, 200)),
-  useRecordsOutOfObservation = FALSE
+  useRecordsBeforeObservation = FALSE
 )
 
 cdm$cohort2

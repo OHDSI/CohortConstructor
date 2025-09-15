@@ -34,7 +34,7 @@ requireTableIntersect <- function(cohort,
                                   indexDate = "cohort_start_date",
                                   targetStartDate = startDateColumn(tableName),
                                   targetEndDate = endDateColumn(tableName),
-                                  useRecordsOutOfObservation = FALSE,
+                                  inObservation = TRUE,
                                   censorDate = NULL,
                                   atFirst = FALSE,
                                   name = tableName(cohort),
@@ -79,13 +79,6 @@ requireTableIntersect <- function(cohort,
   newCohort <- cdm[[tmpNewCohort]]
 
   intersectCol <- uniqueColumnName(newCohort)
-  if(isTRUE(useRecordsOutOfObservation)){
-    # note, other way around
-    inObservation <- FALSE
-  } else {
-    inObservation <- TRUE
-  }
-
   newCohort <- newCohort |>
     PatientProfiles::addTableIntersectCount(
       tableName = tableName,

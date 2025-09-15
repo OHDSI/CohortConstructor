@@ -11,7 +11,7 @@ conceptCohort(
   exit = "event_end_date",
   overlap = "merge",
   table = NULL,
-  useRecordsOutOfObservation = FALSE,
+  useRecordsBeforeObservation = FALSE,
   useSourceFields = FALSE,
   subsetCohort = NULL,
   subsetCohortId = NULL
@@ -38,7 +38,7 @@ from each of the overlapping records.}
 provided. If NULL, each concept will be search at the assigned domain in
 the concept table.}
 
-\item{useRecordsOutOfObservation}{If FALSE, only records in observation will
+\item{useRecordsBeforeObservation}{If FALSE, only records in observation will
 be used. If TRUE, records before the start of observation period will be
 considered, with cohort start date set as the start date of the
 individuals next observation period (as cohort records must be within

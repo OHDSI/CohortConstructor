@@ -218,7 +218,7 @@ getAsthma <- function(cdm, codes, pref, name = NULL) {
       indexDate = "cohort_start_date",
       targetStartDate = "event_start_date",
       targetEndDate = NULL,
-      useRecordsOutOfObservation = TRUE,
+      inObservation = FALSE,
       censorDate = NULL
     ) |>
     # union all entries
@@ -239,7 +239,7 @@ getAsthma <- function(cdm, codes, pref, name = NULL) {
       indexDate = "cohort_start_date",
       targetStartDate = "event_start_date",
       targetEndDate = NULL,
-      useRecordsOutOfObservation = FALSE,
+      inObservation = TRUE,
       censorDate = NULL
     ) |>
     # NO long_acting_muscarinic_antagonists_lamas
@@ -251,7 +251,7 @@ getAsthma <- function(cdm, codes, pref, name = NULL) {
       indexDate = "cohort_start_date",
       targetStartDate = "event_start_date",
       targetEndDate = NULL,
-      useRecordsOutOfObservation = FALSE,
+      inObservation = TRUE,
       censorDate = NULL
     )
   return(cdm)
@@ -354,7 +354,7 @@ getEndometriosisProcedure <- function(cdm, codes, pref, name = NULL) {
       indexDate = "cohort_start_date",
       targetStartDate = "event_start_date",
       targetEndDate = NULL,
-      useRecordsOutOfObservation = FALSE
+      inObservation = TRUE
     ) |>
     requireConceptIntersect(
       conceptSet = codes["endometriosis"],
@@ -364,7 +364,7 @@ getEndometriosisProcedure <- function(cdm, codes, pref, name = NULL) {
       indexDate = "cohort_start_date",
       targetStartDate = "event_start_date",
       targetEndDate = NULL,
-      useRecordsOutOfObservation = FALSE
+      inObservation = TRUE
     ) |>
     requireDemographics(
       ageRange = list(c(15, 49)),
@@ -454,7 +454,7 @@ getNeutropeniaLeukopenia <- function(cdm, codes, pref, name = NULL) {
       indexDate = "cohort_start_date",
       targetStartDate = "event_start_date",
       targetEndDate = NULL,
-      useRecordsOutOfObservation = TRUE
+      inObservation = FALSE
     ) |>
     requireConceptIntersect(
       conceptSet = codes["neutrophilia"],
@@ -463,7 +463,7 @@ getNeutropeniaLeukopenia <- function(cdm, codes, pref, name = NULL) {
       indexDate = "cohort_start_date",
       targetStartDate = "event_start_date",
       targetEndDate = NULL,
-      useRecordsOutOfObservation = TRUE
+      inObservation = FALSE
     ) |>
     # TODO "No Normal Neutrophil count on index date" (requireMeasurementInteresct!!)
     PatientProfiles::addCohortIntersectDate(
@@ -525,7 +525,7 @@ getTransverseMyelitis <- function(cdm, codes, pref, name = NULL) {
       indexDate = "cohort_start_date",
       targetStartDate = "event_start_date",
       targetEndDate = NULL,
-      useRecordsOutOfObservation = TRUE,
+      inObservation = FALSE,
     )
   cdm[[paste0(pref, name)]] <- cdm[[paste0(pref, name)]] |>
     requireCohortIntersect(

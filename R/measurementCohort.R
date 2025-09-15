@@ -28,7 +28,7 @@
 #' entries independent of their value as number will be included.
 #' @param table Name of OMOP tables to search for records of the concepts
 #' provided. Options are "measurement" and/or "observation".
-#' @param useRecordsOutOfObservation If FALSE, only records in observation will
+#' @param useRecordsBeforeObservation If FALSE, only records in observation will
 #' be used. If FALSE, records before the start of observation period will be
 #' considered, with cohort start date set to the start of their next observation
 #' period.
@@ -80,7 +80,7 @@
 #'   conceptSet = list("normal_blood_pressure" = c(4326744, 4298393, 45770407)),
 #'   valueAsConcept = c(4124457),
 #'   valueAsNumber = list("8876" = c(70, 120)),
-#'   useRecordsOutOfObservation = FALSE
+#'   useRecordsBeforeObservation = FALSE
 #' )
 #'
 #' cdm$cohort
@@ -96,7 +96,7 @@
 #'   valueAsConcept = c(4124457),
 #'   valueAsNumber = list("8876" = c(70, 120),
 #'                        "8876" = c(121, 200)),
-#'   useRecordsOutOfObservation = FALSE
+#'   useRecordsBeforeObservation = FALSE
 #' )
 #'
 #' cdm$cohort2
@@ -108,14 +108,14 @@ measurementCohort <- function(cdm,
                               valueAsConcept = NULL,
                               valueAsNumber = NULL,
                               table = c("measurement", "observation"),
-                              useRecordsOutOfObservation = FALSE) {
+                              useRecordsBeforeObservation = FALSE) {
   # initial input validation
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cdm <- omopgenerics::validateCdmArgument(cdm)
   conceptSet <- omopgenerics::validateConceptSetArgument(conceptSet, cdm)
   omopgenerics::assertNumeric(valueAsConcept, integerish = TRUE, null = TRUE)
   validateValueAsNumber(valueAsNumber)
-  omopgenerics::assertLogical(useRecordsOutOfObservation, length = 1)
+  omopgenerics::assertLogical(useRecordsBeforeObservation, length = 1)
   if (length(table) == 0) cli::cli_abort("`table` argument can't be empty. Options are 'measurement' and 'observation'.")
   table <- validateTable(table)
 
@@ -220,7 +220,7 @@ measurementCohort <- function(cdm,
     )
   }
   cdm[[name]] <- fulfillCohortReqs(cdm, name,
-                                   useRecordsOutOfObservation = useRecordsOutOfObservation,
+                                   useRecordsBeforeObservation = useRecordsBeforeObservation,
                                    type = "start",
                                    useIndexes = useIndexes)
 

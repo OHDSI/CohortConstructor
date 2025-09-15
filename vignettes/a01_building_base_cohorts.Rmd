@@ -113,14 +113,14 @@ cdm$drugs_extend |>
   attrition()
 ```
 
-To create a cohort from a concept set and include records outside of the observation period, we can set `useRecordsOutOfObservation = TRUE`. If we also want to search for the given concepts in the source concept_id fields, rather than only the standard concept_id fields, we can set `useSourceFields = TRUE`.
+To create a cohort from a concept set and include records outside of the observation period, we can set `useRecordsBeforeObservation = TRUE`. If we also want to search for the given concepts in the source concept_id fields, rather than only the standard concept_id fields, we can set `useSourceFields = TRUE`.
 
 ```{r}
 
 cdm$celecoxib <- conceptCohort(cdm, 
                            conceptSet = list(celecoxib = 44923712),
                            name = "celecoxib", 
-                           useRecordsOutOfObservation = TRUE, 
+                           useRecordsBeforeObservation = TRUE, 
                            useSourceFields = TRUE)
 cdm$celecoxib |>
   glimpse()
@@ -235,7 +235,7 @@ cdm$cohort
 
 As you can see in the above code, the concept set is the list of BMI concepts, the concept value is the 'normal' weight concept, and the values are the minimum and maximum BMI scores to be considered.
 
-It is also possible to include records outside of observation by setting the `useRecordsOutOfObservation` argument to TRUE.
+It is also possible to include records outside of observation by setting the `useRecordsBeforeObservation` argument to TRUE.
 
 ```{r}
 cdm$cohort <- measurementCohort(
@@ -244,7 +244,7 @@ cdm$cohort <- measurementCohort(
   conceptSet = list("bmi_normal" = c(4245997)),
   valueAsConcept = c(4069590),
   valueAsNumber = list("9531" = c(18, 25)),
-  useRecordsOutOfObservation = TRUE
+  useRecordsBeforeObservation = TRUE
 )
 
 attrition(cdm$cohort)

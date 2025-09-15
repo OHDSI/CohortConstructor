@@ -36,7 +36,7 @@ requireConceptIntersect <- function(cohort,
                                     indexDate = "cohort_start_date",
                                     targetStartDate = "event_start_date",
                                     targetEndDate = "event_end_date",
-                                    useRecordsOutOfObservation = FALSE,
+                                    inObservation = TRUE,
                                     censorDate = NULL,
                                     atFirst = FALSE,
                                     name = tableName(cohort),
@@ -100,12 +100,6 @@ requireConceptIntersect <- function(cohort,
   newCohort <- cdm[[tmpNewCohort]]
 
   intersectCol <- uniqueColumnName(newCohort)
-  if(isTRUE(useRecordsOutOfObservation)){
-    # note, other way around
-    inObservation <- FALSE
-  } else {
-    inObservation <- TRUE
-  }
   newCohort <- newCohort |>
     PatientProfiles::addConceptIntersectCount(
       conceptSet = conceptSet,

@@ -85,7 +85,7 @@ deathCohort <- function(
 
   cli::cli_inform(c("i" = "Applying cohort requirements."))
   cdm[[name]] <- fulfillCohortReqs(cdm, name,
-                                   useRecordsOutOfObservation = FALSE,
+                                   useRecordsBeforeObservation = FALSE,
                                    type = "start",
                                    useIndexes)
 

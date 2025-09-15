@@ -38,7 +38,7 @@
 #' @param table Name of OMOP tables to search for records of the concepts
 #' provided. If NULL, each concept will be search at the assigned domain in
 #' the concept table.
-#' @param useRecordsOutOfObservation If FALSE, only records in observation will
+#' @param useRecordsBeforeObservation If FALSE, only records in observation will
 #' be used. If TRUE, records before the start of observation period will be
 #' considered, with cohort start date set as the start date of the
 #' individuals next observation period (as cohort records must be within
@@ -90,7 +90,7 @@ conceptCohort <- function(cdm,
                           exit = "event_end_date",
                           overlap = "merge",
                           table = NULL,
-                          useRecordsOutOfObservation = FALSE,
+                          useRecordsBeforeObservation = FALSE,
                           useSourceFields = FALSE,
                           subsetCohort = NULL,
                           subsetCohortId = NULL) {
@@ -102,7 +102,7 @@ conceptCohort <- function(cdm,
   omopgenerics::assertChoice(exit, c("event_start_date", "event_end_date"))
   omopgenerics::assertChoice(overlap, c("merge", "extend"), length = 1)
   omopgenerics::assertLogical(useSourceFields, length = 1)
-  omopgenerics::assertLogical(useRecordsOutOfObservation, length = 1)
+  omopgenerics::assertLogical(useRecordsBeforeObservation, length = 1)
   omopgenerics::assertCharacter(subsetCohort, length = 1, null = TRUE)
   if (!is.null(subsetCohort)) {
     subsetCohort <- omopgenerics::validateCohortArgument(cdm[[subsetCohort]])
@@ -241,7 +241,7 @@ conceptCohort <- function(cdm,
   cli::cli_inform(c("i" = "Applying cohort requirements."))
   cdm[[name]] <- fulfillCohortReqs(cdm = cdm,
                                    name = name,
-                                   useRecordsOutOfObservation = useRecordsOutOfObservation,
+                                   useRecordsBeforeObservation = useRecordsBeforeObservation,
                                    useIndexes = useIndexes)
 
   if(overlap == "merge"){
@@ -261,7 +261,7 @@ conceptCohort <- function(cdm,
     cli::cli_inform(c("i" = "Re-appplying cohort requirements."))
     cdm[[name]] <- fulfillCohortReqs(cdm = cdm,
                                      name = name,
-                                     useRecordsOutOfObservation = useRecordsOutOfObservation,
+                                     useRecordsBeforeObservation = useRecordsBeforeObservation,
                                      useIndexes = useIndexes)
   }
 
@@ -389,7 +389,7 @@ unerafiedConceptCohort <- function(cdm,
   return(cohort)
 }
 
-fulfillCohortReqs <- function(cdm, name, useRecordsOutOfObservation, type = "start_end", useIndexes) {
+fulfillCohortReqs <- function(cdm, name, useRecordsBeforeObservation, type = "start_end", useIndexes) {
 
   # start by inner join with observation to use indexes
   cdm[[name]] <- cdm[[name]] |>
@@ -406,7 +406,7 @@ fulfillCohortReqs <- function(cdm, name, useRecordsOutOfObservation, type = "sta
     dplyr::compute(temporary = FALSE, name = name,
                    logPrefix = "CohortConstructor_fulfillCohortReqs_observationJoin_")
 
-  if (useRecordsOutOfObservation) {
+  if (useRecordsBeforeObservation) {
     cdm[[name]] <- cdm[[name]] %>%
       dplyr::mutate(
         in_observation_start = .data$observation_period_start_date <= .data$cohort_start_date & .data$observation_period_end_date >= .data$cohort_start_date,
@@ -462,7 +462,7 @@ fulfillCohortReqs <- function(cdm, name, useRecordsOutOfObservation, type = "sta
       "cohort_end_date"
     ) |>
     dplyr::compute(temporary = FALSE, name = name,
-                   logPrefix = "CohortConstructor_fulfillCohortReqs_useRecordsOutOfObservation_") |>
+                   logPrefix = "CohortConstructor_fulfillCohortReqs_useRecordsBeforeObservation_") |>
     omopgenerics::recordCohortAttrition(reason = "Record in observation")
 
   if (type == "start_end") {
