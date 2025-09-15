@@ -29,7 +29,7 @@ copyCdm <- function(cdm) {
     "sql server CDMConnector" = NULL,
     "redshift CDMConnector" = NULL,
     "postgres CDMConnector" = NULL,
-    "local" = omopgenerics::newLocalSource()
+    "local omopgenerics" = omopgenerics::newLocalSource()
   )
 
   # insert cdm to my source of interest

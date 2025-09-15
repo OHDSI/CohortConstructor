@@ -5,7 +5,11 @@ test_that("benchmark works", {
   cdm <- omock::mockCdmFromDataset(datasetName = "GiBleed") |>
     copyCdm()
 
-  expect_no_error(res <- benchmarkCohortConstructor(cdm))
+  if (dbToTest == "local omopgenerics") {
+    expect_warning(res <- benchmarkCohortConstructor(cdm))
+  } else {
+    expect_no_error(res <- benchmarkCohortConstructor(cdm))
+  }
 
   expect_false(any(omopgenerics::listSourceTables(cdm) == "benchmark"))
   expect_equal(

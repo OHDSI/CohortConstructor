@@ -109,7 +109,9 @@ test_that("simple duckdb checks", {
       ) |>
       dplyr::collect() |>
       dplyr::arrange(.data$observation_period_id),
-    cdm$observation_period |> dplyr::collect() |>
+    cdm$observation_period |>
+      dplyr::collect() |>
+      dplyr::as_tibble() |>
       dplyr::arrange(.data$observation_period_id)
   )
   expect_true(
