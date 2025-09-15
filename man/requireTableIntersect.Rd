@@ -48,7 +48,7 @@ otherwise prevalence of that event will be used as intersection (overlap
 between cohort and event).}
 
 \item{inObservation}{If TRUE only records inside an observation period will
-be considered.}
+be considered}
 
 \item{censorDate}{Whether to censor overlap events at a specific date or a
 column date of the cohort.}

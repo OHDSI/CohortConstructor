@@ -589,7 +589,7 @@ test_that("test indexes - postgres", {
   CDMConnector::cdmDisconnect(cdm = cdm)
 })
 
-test_that("inObservation FALSE", {
+test_that("useRecordsBeforeObservation TRUE", {
   cdm <- omock::mockPerson(nPerson = 3)
   cdm <- omopgenerics::insertTable(
     cdm = cdm, name = "observation_period", table = dplyr::tibble(
@@ -635,7 +635,7 @@ test_that("inObservation FALSE", {
 
   cdm <- cdm |> copyCdm()
 
-  cdm$cohort <- measurementCohort(cdm, list(a = 1L), name = "cohort", inObservation = FALSE)
+  cdm$cohort <- measurementCohort(cdm, list(a = 1L), name = "cohort", useRecordsBeforeObservation = TRUE)
   expect_equal(
     dplyr::tibble(
       subject_id = c(1L, 1L, 1L, 2L),
