@@ -166,7 +166,15 @@ test_that("gap and name works", {
     ))
   )
 
-  cdm <- omock::mockCdmFromTables(tables = list("cohort" = cohort_1)) |>
+  cdm <- omock::mockCdmFromTables(tables = list(
+    "cohort" = cohort_1,
+    cohort1 = dplyr::tibble(
+      cohort_definition_id = c(1, 1, 2),
+      subject_id = c(1, 1, 1),
+      cohort_start_date = as.Date(c("2000-07-01", "2000-07-10", "2000-07-22")),
+      cohort_end_date = as.Date(c("2000-07-02", "2000-07-20", "2000-08-22"))
+    )
+  )) |>
     omopgenerics::insertTable(name = "observation_period", table = obs) |>
     omopgenerics::insertTable(name = "person", table = person)
   cdm$cohort <- cdm$cohort |>
@@ -174,13 +182,6 @@ test_that("gap and name works", {
     dplyr::mutate(id = dplyr::row_number()) |>
     dplyr::filter(id %% 2 == 0) |>
     dplyr::select(-id)
-  cdm$cohort1 <- dplyr::tibble(
-    cohort_definition_id = c(1, 1, 2),
-    subject_id = c(1, 1, 1),
-    cohort_start_date = as.Date(c("2000-07-01", "2000-07-10", "2000-07-22")),
-    cohort_end_date = as.Date(c("2000-07-02", "2000-07-20", "2000-08-22"))
-  )
-  cdm$cohort1 <- cdm$cohort1 |> omopgenerics::newCohortTable()
   cdm <- copyCdm(cdm = cdm)
 
   # gap
@@ -301,60 +302,37 @@ test_that("Expected behaviour", {
 test_that("test codelist", {
   skip_on_cran()
 
-  obs <- dplyr::tibble(
-    observation_period_id = c(1, 2, 3, 4),
-    person_id = c(1, 2, 3, 4),
-    observation_period_start_date = as.Date(c(
-      "2000-06-03", "1999-04-05", "2015-01-15", "1989-12-09"
-    )),
-    observation_period_end_date = as.Date(c(
-      "2013-06-29", "2003-06-15", "2015-10-11", "2013-12-31"
-    )),
-    "period_type_concept_id" = NA_integer_
-  )
-
-  person <- dplyr::tibble(
-    person_id = c(1, 2, 3, 4),
-    gender_concept_id = c(8532, 8507, 8507, 8507),
-    year_of_birth = c(1997, 1963, 1986, 1978),
-    month_of_birth = c(8, 1, 3, 11),
-    day_of_birth = c(22, 27, 10, 8),
-    race_concept_id = NA_integer_,
-    ethnicity_concept_id = NA_integer_
-  )
-
-  cohort_1 <- dplyr::tibble(
-    cohort_definition_id = c(1, 1, 1, 1),
-    subject_id = c(1, 1, 2, 3),
-    cohort_start_date = as.Date(c("2003-05-17", "2004-03-11", "1999-05-03", "2015-02-25")),
-    cohort_end_date = as.Date(c("2004-03-10", "2005-07-19", "2001-06-15", "2015-04-30"))
-  )
-
-  cdm <- omock::mockCdmFromTables(tables = list("person" = person, "cohort" = cohort_1)) |>
-    omopgenerics::insertTable(name = "observation_period", table = obs) |>
-    omopgenerics::insertTable(name = "person", table = person) |>
-    omock::mockVocabularyTables(concept = dplyr::tibble(
+  cdm <- omock::mockCdmFromTables(tables = list(
+    drug_exposure = dplyr::tibble(
+      "drug_exposure_id" = 1:17,
+      "person_id" = c(1, 1, 1, 1, 2, 2, 3, 1, 1, 1, 1, 4, 4, 1, 2, 3, 4),
+      "drug_concept_id" = c(1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 2, 3, 3, 3, 3),
+      "drug_exposure_start_date" = c(0, 300, 1500, 750, 10, 800, 150, 1800, 1801, 1802, 1803, 430, -10, 100, 123, -10, 1000),
+      "drug_exposure_end_date" = c(400, 800, 1600, 1550, 2000, 1000, 600, 1801, 1802, 1803, 1804, 400, -100, 123, 190, 123, 1500),
+      "drug_type_concept_id" = 1
+    ) |>
+      dplyr::mutate(
+        "drug_exposure_start_date" = as.Date(.data$drug_exposure_start_date, origin = "2010-01-01"),
+        "drug_exposure_end_date" = as.Date(.data$drug_exposure_end_date, origin = "2010-01-01"),
+        verbatim_end_date = drug_exposure_end_date
+      ),
+    concept = dplyr::tibble(
       "concept_id" = c(1, 2, 3),
       "concept_name" = c("my concept 1", "my concept 2", "my concept 3"),
       "domain_id" = "Drug",
       "vocabulary_id" = NA,
       "concept_class_id" = NA,
       "concept_code" = NA,
-      "valid_start_date" = NA,
-      "valid_end_date" = NA
-    )) |>
-    omopgenerics::insertTable(name = "drug_exposure", table = dplyr::tibble(
-      "drug_exposure_id" = 1:17,
-      "person_id" = c(1, 1, 1, 1, 2, 2, 3, 1, 1, 1, 1, 4, 4, 1, 2, 3, 4),
-      "drug_concept_id" = c(1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 2, 3, 3, 3, 3),
-      "drug_exposure_start_date" = c(0, 300, 1500, 750, 10, 800, 150, 1800, 1801, 1802, 1803, 430, -10, 100, 123, -10, 1000),
-      "drug_exposure_end_date" = c(400, 800, 1600, 1550, 2000, 1000, 600, 1801, 1802, 1803, 1804, 400, -100, NA, 190, 123, 1500),
-      "drug_type_concept_id" = 1
-    ) |>
-      dplyr::mutate(
-        "drug_exposure_start_date" = as.Date(.data$drug_exposure_start_date, origin = "2010-01-01"),
-        "drug_exposure_end_date" = as.Date(.data$drug_exposure_end_date, origin = "2010-01-01")
-      )) |>
+      "valid_start_date" = as.Date("1950-01-01"),
+      "valid_end_date" = as.Date("2100-01-01")
+    ),
+    cohort = dplyr::tibble(
+      cohort_definition_id = c(1, 1, 1, 1),
+      subject_id = c(1, 1, 2, 3),
+      cohort_start_date = as.Date(c("2003-05-17", "2004-03-11", "1999-05-03", "2015-02-25")),
+      cohort_end_date = as.Date(c("2004-03-10", "2005-07-19", "2001-06-15", "2015-04-30"))
+    )
+  )) |>
     copyCdm()
 
   cdm$cohort1 <- conceptCohort(cdm, conceptSet = list(c1 = c(1L,3L), c2 = c(2L)), name = "cohort1")
