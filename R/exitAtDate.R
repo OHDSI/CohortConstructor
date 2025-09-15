@@ -7,9 +7,11 @@
 #' @inheritParams cohortDoc
 #' @inheritParams cohortIdModifyDoc
 #' @inheritParams nameDoc
-#' @param limitToCurrentPeriod If TRUE, limits the cohort to one entry per
-#' person, ending at the current observation period. If FALSE, subsequent
-#' observation periods will create new cohort entries.
+#' @param persistAcrossObservationPeriods If FALSE, limits the cohort to one entry per
+#' person, ending at the current observation period. If TRUE, subsequent
+#' observation periods will create new cohort entries (starting from the start
+#' of that observation period and ending at the end of that observation
+#' period).
 #' @inheritParams softValidationDoc
 #'
 #' @return The cohort table.
@@ -31,7 +33,7 @@
 #'}
 exitAtObservationEnd <- function(cohort,
                                  cohortId = NULL,
-                                 limitToCurrentPeriod = TRUE,
+                                 persistAcrossObservationPeriods = FALSE,
                                  name = tableName(cohort),
                                  .softValidation = FALSE) {
   # checks
@@ -39,6 +41,7 @@ exitAtObservationEnd <- function(cohort,
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
+  omopgenerics::assertLogical(persistAcrossObservationPeriods, length = 1)
   omopgenerics::assertLogical(.softValidation)
 
   if (length(cohortId) == 0) {
@@ -72,7 +75,7 @@ exitAtObservationEnd <- function(cohort,
     dplyr::compute(name = tmpNewCohort, temporary = FALSE,
                    logPrefix = "CohortConstructor_exitAtObservationEnd_filterFuture_")
 
-  if (limitToCurrentPeriod) {
+  if (isFALSE(persistAcrossObservationPeriods)) {
     reason <- "Exit at observation period end date, limited to current observation period"
     newCohort <- newCohort |>
       # filter to current observation period
