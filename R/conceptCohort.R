@@ -411,13 +411,17 @@ fulfillCohortReqs <- function(cdm, name, useRecordsBeforeObservation, type = "st
       dplyr::mutate(
         in_observation_start = .data$observation_period_start_date <= .data$cohort_start_date & .data$observation_period_end_date >= .data$cohort_start_date,
         in_observation_end = .data$observation_period_start_date <= .data$cohort_end_date & .data$observation_period_end_date >= .data$cohort_end_date,
-        days_start_obs = clock::date_count_between("cohort_start_date", "observation_period_start_date", precision = "day"),
+        days_start_obs = clock::date_count_between(
+          start = .data$cohort_start_date,
+          end = .data$observation_period_start_date,
+          precision = "day"
+        ),
         days_start_obs = dplyr::if_else(.data$days_start_obs < 0, NA, .data$days_start_obs)
       ) |>
       dplyr::group_by(.data$cohort_definition_id, .data$subject_id, .data$cohort_start_date, .data$cohort_end_date) |>
       # which records to trim
       dplyr::mutate(
-        trim_record =  all(!.data$in_observation_start) & min(.data$days_start_obs) == .data$days_start_obs & !is.na(.data$days_start_obs)
+        trim_record =  all(!.data$in_observation_start) & suppressWarnings(min(.data$days_start_obs, na.rm = TRUE)) == .data$days_start_obs & !is.na(.data$days_start_obs)
       ) |>
       dplyr::ungroup() |>
       dplyr::mutate(
@@ -687,16 +691,19 @@ extendOverlap  <- function(cohort,
                      logPrefix = "CohortConstructor_extendOverlap_noOverlap_")
 
     cohort_overlap <- cohort_overlap |>
-      dplyr::mutate(days = clock::date_count_between("cohort_start_date",
-                                                     "cohort_end_date",
-                                                     precision = "day")) |>
+      dplyr::mutate(days = clock::date_count_between(
+        start = .data$cohort_start_date,
+        end = .data$cohort_end_date,
+        precision = "day"
+      )) |>
       dplyr::group_by(dplyr::pick("cohort_definition_id",
                                   "subject_id")) |>
       dplyr::summarise(cohort_start_date = min(.data$cohort_start_date, na.rm = TRUE),
                        days  = as.integer(sum(.data$days, na.rm = TRUE)))  |>
       dplyr:: ungroup() |>
-      dplyr::mutate(cohort_end_date = as.Date(clock::add_days("cohort_start_date",
-                                            .data$days))) |>
+      dplyr::mutate(cohort_end_date = as.Date(clock::add_days(
+        x = .data$cohort_start_date, n = .data$days
+      ))) |>
       dplyr::select(!"days")  |>
       dplyr::compute(temporary = FALSE,
                      name = workingTblNames[4],

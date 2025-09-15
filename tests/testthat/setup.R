@@ -1,4 +1,4 @@
-dbToTest <- Sys.getenv("DB_TO_TEST", "duckdb CDMConnector")
+dbToTest <- Sys.getenv("DB_TO_TEST", "local omopgenerics")
 collectCohort <- function(cohort, id) {
   x <- cohort |>
     dplyr::filter(.data$cohort_definition_id == .env$id) |>
@@ -8,7 +8,7 @@ collectCohort <- function(cohort, id) {
   attr(x, "cohort_set") <- NULL
   attr(x, "cohort_attrition") <- NULL
   attr(x, "cohort_codelist") <- NULL
-  class(x) <- c("tbl_df", "tbl", "data.frame")
+  x <- dplyr::as_tibble(x)
   return(x)
 }
 compareCohort <- function(cohort1, id1, cohort2, id2) {

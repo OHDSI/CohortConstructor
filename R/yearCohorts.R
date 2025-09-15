@@ -103,6 +103,9 @@ yearCohorts <- function(cohort,
   cohort <- cohort |>
     subsetCohorts(cohortId = cohortId, name = name)
 
+  # get original attrition
+  originalAttrition <- attrition(cohort)
+
   cohort <- cohort |>
     dplyr::mutate(!!!startDates, !!!endDates) |>
     dplyr::select(!c("cohort_start_date", "cohort_end_date")) |>
@@ -134,7 +137,6 @@ yearCohorts <- function(cohort,
     ) |>
     dplyr::collect() |>
     dplyr::mutate(dplyr::across(dplyr::everything(), as.integer))
-  originalAttrition <- attrition(cohort)
   newAttrition <- list()
   for (k in newSet$cohort_definition_id) {
     targetId <- newSet$target_cohort_definition_id[newSet$cohort_definition_id == k]

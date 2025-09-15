@@ -278,9 +278,9 @@ splitOverlap <- function(x,
   tmpTable_2 <- paste0(tmp, "_2")
   x_a <-  x_a |>
     dplyr::group_by(dplyr::across(dplyr::all_of(by))) |>
-    dbplyr::window_order(.data[[is]]) |>
+    dplyr::arrange(.data[[is]]) |>
     dplyr::mutate(!!id := dplyr::row_number()) |>
-    dbplyr::window_order() |>
+    dplyr::arrange() |>
     dplyr::ungroup() |>
     dplyr::compute(temporary = FALSE, name = tmpTable_2,
                    logPrefix = "CohortConstructor_intersectCohorts_tmpTable_2_")
@@ -295,9 +295,9 @@ splitOverlap <- function(x,
     ) |>
     dplyr::distinct() |>
     dplyr::group_by(dplyr::across(dplyr::all_of(by))) |>
-    dbplyr::window_order(.data[[ie]]) |>
+    dplyr::arrange(.data[[ie]]) |>
     dplyr::mutate(!!id := dplyr::row_number() - 1) |>
-    dbplyr::window_order() |>
+    dplyr::arrange() |>
     dplyr::ungroup() |>
     dplyr::compute(temporary = FALSE, name = tmpTable_3,
                    logPrefix = "CohortConstructor_intersectCohorts_tmpTable_3_")

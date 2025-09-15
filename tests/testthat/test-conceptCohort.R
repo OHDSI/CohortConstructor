@@ -1239,10 +1239,11 @@ test_that("useRecordsBeforeObservation TRUE", {
       )),
       "drug_type_concept_id" = 1
     )
-  )
+  ) |>
+    copyCdm()
 
-  cdm <- cdm |> copyCdm()
   cdm$cohort <- conceptCohort(cdm, list(a = 1L, b = 1L), name = "cohort", useRecordsBeforeObservation = TRUE)
+
   expect_equal(
     dplyr::tibble(
       subject_id = c(1L, 1L, 1L, 2L),
