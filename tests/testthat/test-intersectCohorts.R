@@ -390,7 +390,7 @@ test_that("returnNonOverlappingCohorts - three cohorts", {
 })
 
 test_that("attrition and cohortId", {
-  testthat::skip_on_cran()
+  skip_on_cran()
   cohort_1 <- dplyr::tibble(
     cohort_definition_id = c(rep(1L, 4), rep(2L, 4), rep(3L, 4), rep(4L, 4)),
     subject_id = c(1L, 2L, 2L, 3L,
@@ -482,7 +482,7 @@ test_that("attrition and cohortId", {
 })
 
 test_that("codelist", {
-  testthat::skip_on_cran()
+  skip_on_cran()
   cdm <- omopgenerics::cdmFromTables(
     tables = list(
       person = dplyr::tibble(
@@ -735,12 +735,14 @@ test_that("test indexes - postgres", {
     )) |>
       copyCdm()
 
+    con <- CDMConnector::cdmCon(cdm = cdm)
+
     omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::contains("og_"))
 
     cdm$my_cohort <- intersectCohorts(cdm$my_cohort)
 
     expect_true(
-      DBI::dbGetQuery(db, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
+      DBI::dbGetQuery(con, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
         "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
     )
 

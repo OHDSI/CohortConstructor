@@ -1,5 +1,5 @@
 test_that("exit at first date", {
-  testthat::skip_on_cran()
+  skip_on_cran()
   cdm <- omock::mockCdmFromTables(tables = list(
     "cohort" = dplyr::tibble(
       cohort_definition_id = 1,
@@ -99,7 +99,7 @@ test_that("exit at first date", {
 })
 
 test_that("exit at last date", {
-  testthat::skip_on_cran()
+  skip_on_cran()
   cdm <- omock::mockCdmFromTables(tables = list(
     "cohort" = dplyr::tibble(
       cohort_definition_id = c(1, 1, 2, 2, 2),
@@ -206,7 +206,7 @@ test_that("exit at last date", {
 })
 
 test_that("expected errors", {
-  testthat::skip_on_cran()
+  skip_on_cran()
   # NA
   cdm <- omock::mockCdmFromTables(tables = list(
     "cohort" = dplyr::tibble(
@@ -294,6 +294,8 @@ test_that("test indexes - postgres", {
     cdm <- omock::mockCdmFromDataset(datasetName = "GiBleed", source = "local") |>
       copyCdm()
 
+    con <- CDMConnector::cdmCon(cdm = cdm)
+
     omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::contains("og_"))
 
     cdm <- omopgenerics::insertTable(cdm = cdm,
@@ -307,19 +309,18 @@ test_that("test indexes - postgres", {
     cdm$my_cohort <- exitAtLastDate(cdm$my_cohort, dateColumns = c("cohort_end_date", "other_date"), returnReason = TRUE)
 
     expect_true(
-      DBI::dbGetQuery(db, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
+      DBI::dbGetQuery(con, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
         "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
     )
 
     cdm$my_cohort <- exitAtFirstDate(cdm$my_cohort, dateColumns = c("cohort_start_date", "cohort_end_date"), returnReason = TRUE)
 
     expect_true(
-      DBI::dbGetQuery(db, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
+      DBI::dbGetQuery(con, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
         "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
     )
 
     expect_true(sum(grepl("og_", omopgenerics::listSourceTables(cdm))) == 0)
-    omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
 
     dropCreatedTables(cdm = cdm)
   }

@@ -1,11 +1,11 @@
 test_that("simple example", {
   skip_on_cran()
-  cdm_local <- omock::mockCdmReference() |>
+  cdm <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4, seed = 1) |>
     omock::mockObservationPeriod(seed = 1) |>
     omock::mockCohort(name = c("original_cohort"),
-                      numberCohorts = 2, seed = 1)
-  cdm <- cdm_local |> copyCdm()
+                      numberCohorts = 2, seed = 1) |>
+    copyCdm()
 
   start_settings <- omopgenerics::settings(cdm$original_cohort)
   start_attrition <- omopgenerics::attrition(cdm$original_cohort)
@@ -51,12 +51,12 @@ test_that("simple example", {
 test_that("copy only specific cohort IDs", {
   skip_on_cran()
 
-  cdm_local <- omock::mockCdmReference() |>
+  cdm <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4, seed = 1) |>
     omock::mockObservationPeriod(seed = 1) |>
     omock::mockCohort(name = c("original_cohort"),
-                      numberCohorts = 2, seed = 1)
-  cdm <- cdm_local |> copyCdm()
+                      numberCohorts = 2, seed = 1) |>
+    copyCdm()
 
   start_settings <- omopgenerics::settings(cdm$original_cohort)
   start_attrition <- omopgenerics::attrition(cdm$original_cohort)
@@ -105,13 +105,13 @@ test_that("copy only specific cohort IDs", {
 })
 
 test_that("multiple copies", {
-  testthat::skip_on_cran()
-  cdm_local <- omock::mockCdmReference() |>
+  skip_on_cran()
+  cdm <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4, seed = 1) |>
     omock::mockObservationPeriod(seed = 1) |>
     omock::mockCohort(name = c("original_cohort"),
-                      numberCohorts = 3, seed = 1)
-  cdm <- cdm_local |> copyCdm()
+                      numberCohorts = 3, seed = 1) |>
+    copyCdm()
 
   cdm$copy_cohort <- copyCohorts(
     cdm$original_cohort, n = 4, cohortId = 1, name = "copy_cohort"

@@ -180,7 +180,7 @@ test_that("simple example", {
 })
 
 test_that("concepts from multiple cdm tables duckdb", {
-  testthat::skip_on_cran()
+  skip_on_cran()
   cdm <- omock::mockCdmReference() |>
     omock::mockCdmFromTables(tables = list("cohort" = dplyr::tibble(
       "cohort_definition_id" = 1L,
@@ -210,7 +210,7 @@ test_that("concepts from multiple cdm tables duckdb", {
 })
 
 test_that("excluded concepts in codelist", {
-  testthat::skip_on_cran()
+  skip_on_cran()
   cdm <- omock::mockCdmReference() |>
     omock::mockCdmFromTables(tables = list("cohort" = dplyr::tibble(
       "cohort_definition_id" = 1L,
@@ -258,7 +258,7 @@ test_that("excluded concepts in codelist", {
 })
 
 test_that("out of observation", {
-  testthat::skip_on_cran()
+  skip_on_cran()
 
   person <- dplyr::tibble(
     person_id = 1:4,
@@ -278,36 +278,31 @@ test_that("out of observation", {
     period_type_concept_id = NA_integer_
   )
 
-  cdm_local <- omock::mockCdmReference()
-
-  cdm_local <- omopgenerics::insertTable(cdm = cdm_local, name = "observation_period", table = obs)
-
-  cdm_local <- omopgenerics::insertTable(cdm = cdm_local, name = "person", table = person)
-
-  cdm_local$concept <- dplyr::tibble(
-    "concept_id" = c(1L, 2L),
-    "concept_name" = c("my concept 1", "my concept 2"),
-    "domain_id" = "Drug",
-    "vocabulary_id" = NA,
-    "concept_class_id" = NA,
-    "concept_code" = NA,
-    "valid_start_date" = NA,
-    "valid_end_date" = NA
-  )
-  cdm_local$drug_exposure <- dplyr::tibble(
-    "drug_exposure_id" = 1:13L,
-    "person_id" = c(1, 1, 1, 1, 2, 2, 3, 1, 1, 1, 1, 4, 4) |> as.integer(),
-    "drug_concept_id" = c(1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 2) |> as.integer(),
-    "drug_exposure_start_date" = c(0, 300, 1500, 750, 10, 800, 150, 1800, 1801, 1802, 1803, 430, -10),
-    "drug_exposure_end_date" = c(400, 800, 1600, 1550, 2000, 1000, 600, 1801, 1802, 1803, 1804, 400, -100),
-    "drug_type_concept_id" = 1L
-  ) |>
-    dplyr::mutate(
-      "drug_exposure_start_date" = as.Date(.data$drug_exposure_start_date, origin = "2010-01-01"),
-      "drug_exposure_end_date" = as.Date(.data$drug_exposure_end_date, origin = "2010-01-01")
-    )
-
-  cdm <- cdm_local |>
+  cdm <- omock::mockCdmReference() |>
+    omopgenerics::insertTable(name = "observation_period", table = obs) |>
+    omopgenerics::insertTable(name = "person", table = person) |>
+    omock::mockVocabularyTables(concept = dplyr::tibble(
+      "concept_id" = c(1L, 2L),
+      "concept_name" = c("my concept 1", "my concept 2"),
+      "domain_id" = "Drug",
+      "vocabulary_id" = NA,
+      "concept_class_id" = NA,
+      "concept_code" = NA,
+      "valid_start_date" = NA,
+      "valid_end_date" = NA
+    )) |>
+    omopgenerics::insertTable(name = "drug_exposure", table = dplyr::tibble(
+      "drug_exposure_id" = 1:13L,
+      "person_id" = c(1, 1, 1, 1, 2, 2, 3, 1, 1, 1, 1, 4, 4) |> as.integer(),
+      "drug_concept_id" = c(1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 2) |> as.integer(),
+      "drug_exposure_start_date" = c(0, 300, 1500, 750, 10, 800, 150, 1800, 1801, 1802, 1803, 430, -10),
+      "drug_exposure_end_date" = c(400, 800, 1600, 1550, 2000, 1000, 600, 1801, 1802, 1803, 1804, 400, -100),
+      "drug_type_concept_id" = 1L
+    ) |>
+      dplyr::mutate(
+        "drug_exposure_start_date" = as.Date(.data$drug_exposure_start_date, origin = "2010-01-01"),
+        "drug_exposure_end_date" = as.Date(.data$drug_exposure_end_date, origin = "2010-01-01")
+      )) |>
     copyCdm()
 
   # start end after (subject 2, and some of 1)
@@ -361,31 +356,28 @@ test_that("out of observation", {
     period_type_concept_id = NA_integer_
   )
 
-  cdm_local <- omock::mockCdmReference()
-
-  cdm_local <- omopgenerics::insertTable(cdm = cdm_local, name = "observation_period", table = obs)
-
-  cdm_local <- omopgenerics::insertTable(cdm = cdm_local, name = "person", table = person)
-
-  cdm_local$concept <- dplyr::tibble(
-    "concept_id" = c(1L, 2L),
-    "concept_name" = c("my concept 1", "my concept 2"),
-    "domain_id" = "Drug",
-    "vocabulary_id" = NA,
-    "concept_class_id" = NA,
-    "concept_code" = NA,
-    "valid_start_date" = NA,
-    "valid_end_date" = NA
-  )
-  cdm_local$drug_exposure <- dplyr::tibble(
-    "drug_exposure_id" = 1:4L,
-    "person_id" = c(1L, 3L, 4L, 2L),
-    "drug_concept_id" = 1L,
-    "drug_exposure_start_date" = as.Date(c("2004-01-01", "2014-01-01", "2001-01-01", "2000-01-01")),
-    "drug_exposure_end_date" = as.Date(c("2015-01-01", "2015-05-01", "2002-01-01", "2000-02-02")),
-    "drug_type_concept_id" = 1L
-  )
-  cdm <- cdm_local |> copyCdm()
+  cdm <- omock::mockCdmReference() |>
+    omopgenerics::insertTable(name = "observation_period", table = obs) |>
+    omopgenerics::insertTable(name = "person", table = person) |>
+    omock::mockVocabularyTables(concept = dplyr::tibble(
+      "concept_id" = c(1L, 2L),
+      "concept_name" = c("my concept 1", "my concept 2"),
+      "domain_id" = "Drug",
+      "vocabulary_id" = NA,
+      "concept_class_id" = NA,
+      "concept_code" = NA,
+      "valid_start_date" = NA,
+      "valid_end_date" = NA
+    )) |>
+    omopgenerics::insertTable(name = "drug_exposure", table = dplyr::tibble(
+      "drug_exposure_id" = 1:4L,
+      "person_id" = c(1L, 3L, 4L, 2L),
+      "drug_concept_id" = 1L,
+      "drug_exposure_start_date" = as.Date(c("2004-01-01", "2014-01-01", "2001-01-01", "2000-01-01")),
+      "drug_exposure_end_date" = as.Date(c("2015-01-01", "2015-05-01", "2002-01-01", "2000-02-02")),
+      "drug_type_concept_id" = 1L
+    )) |>
+    copyCdm()
 
   cdm$cohort2 <- conceptCohort(cdm = cdm, conceptSet = list(a = 1L, b = 2L), name = "cohort2")
   expect_true(all(c("cohort_table", "cdm_table") %in% class(cdm$cohort2)))
@@ -423,30 +415,28 @@ test_that("out of observation", {
     period_type_concept_id = NA_integer_
   )
 
-  cdm_local <- omock::mockCdmReference()
-
-  cdm_local <- omopgenerics::insertTable(cdm = cdm_local, name = "observation_period", table = obs)
-
-  cdm_local <- omopgenerics::insertTable(cdm = cdm_local, name = "person", table = person)
-  cdm_local$concept <- dplyr::tibble(
-    "concept_id" = c(1L, 2L),
-    "concept_name" = c("my concept 1", "my concept 2"),
-    "domain_id" = "Drug",
-    "vocabulary_id" = NA,
-    "concept_class_id" = NA,
-    "concept_code" = NA,
-    "valid_start_date" = NA,
-    "valid_end_date" = NA
-  )
-  cdm_local$drug_exposure <- dplyr::tibble(
-    "drug_exposure_id" = 1:6L,
-    "person_id" = c(1, 2, 2, 3, 4, 4) |> as.integer(),
-    "drug_concept_id" = c(1, 1, 1, 1, 2, 2) |> as.integer(),
-    "drug_exposure_start_date" = as.Date(c("2004-01-01", "2014-01-01", "2015-04-01", "2000-01-01", "2000-01-01", "1999-01-01")),
-    "drug_exposure_end_date" = as.Date(c("2003-01-01", "2015-05-01", "2015-07-01", "2000-02-02", "2000-01-01", "2001-01-01")),
-    "drug_type_concept_id" = 1L
-  )
-  cdm <- cdm_local |> copyCdm()
+  cdm <- omock::mockCdmReference() |>
+    omopgenerics::insertTable(name = "observation_period", table = obs) |>
+    omopgenerics::insertTable(name = "person", table = person) |>
+    omock::mockVocabularyTables(concept = dplyr::tibble(
+      "concept_id" = c(1L, 2L),
+      "concept_name" = c("my concept 1", "my concept 2"),
+      "domain_id" = "Drug",
+      "vocabulary_id" = NA,
+      "concept_class_id" = NA,
+      "concept_code" = NA,
+      "valid_start_date" = NA,
+      "valid_end_date" = NA
+    )) |>
+    omopgenerics::insertTable(name = "drug_exposure", table = dplyr::tibble(
+      "drug_exposure_id" = 1:6L,
+      "person_id" = c(1, 2, 2, 3, 4, 4) |> as.integer(),
+      "drug_concept_id" = c(1, 1, 1, 1, 2, 2) |> as.integer(),
+      "drug_exposure_start_date" = as.Date(c("2004-01-01", "2014-01-01", "2015-04-01", "2000-01-01", "2000-01-01", "1999-01-01")),
+      "drug_exposure_end_date" = as.Date(c("2003-01-01", "2015-05-01", "2015-07-01", "2000-02-02", "2000-01-01", "2001-01-01")),
+      "drug_type_concept_id" = 1L
+    )) |>
+    copyCdm()
 
   # empty cohort
   cdm$cohort3 <- conceptCohort(cdm = cdm, conceptSet = list(a = 1L), name = "cohort3")
@@ -471,7 +461,7 @@ test_that("out of observation", {
 })
 
 test_that("table not present in the cdm", {
-  testthat::skip_on_cran()
+  skip_on_cran()
   # cdm <- omock::mockCdmReference() |>
   #   omock::mockCdmFromTables(tables = list("cohort" = dplyr::tibble(
   #     "cohort_definition_id" = 1L,
@@ -646,7 +636,7 @@ test_that("use source field concepts", {
 })
 
 test_that("missing event end dates", {
-  testthat::skip_on_cran()
+  skip_on_cran()
   cdm <- omock::mockCdmReference() |>
     omock::mockCdmFromTables(tables = list("cohort" = dplyr::tibble(
       "cohort_definition_id" = 1L,
@@ -931,9 +921,11 @@ test_that("test indexes - postgres", {
     cdm <- omock::mockCdmFromDataset(datasetName = "GiBleed", source = "local") |>
       copyCdm()
 
+    con <- CDMConnector::cdmCon(cdm = cdm)
+
     cdm$cohort <- conceptCohort(cdm = cdm, conceptSet = list(a = 24134L), name = "cohort")
     expect_true(
-      DBI::dbGetQuery(db, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_cohort';")) |> dplyr::pull("indexdef") ==
+      DBI::dbGetQuery(con, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_cohort';")) |> dplyr::pull("indexdef") ==
         "CREATE INDEX cc_cohort_subject_id_cohort_start_date_idx ON public.cc_cohort USING btree (subject_id, cohort_start_date)"
     )
 

@@ -29,16 +29,15 @@ test_that("basic example", {
     race_concept_id = c(rep(0,5))
   )
 
-  cdm_local <- omopgenerics::cdmFromTables(
+  cdm <- omopgenerics::cdmFromTables(
     tables = list(
       person = person,
       observation_period = observation_period,
       death = deathTable
     ),
     cdmName = "mock"
-  )
-
-  cdm <- cdm_local |> copyCdm()
+  ) |>
+    copyCdm()
 
   cdm$my_death_cohort <- deathCohort(cdm=cdm,
                                      name = "my_death_cohort")
@@ -465,7 +464,7 @@ test_that("test single permanent table created", {
 
   end_tables <- names(cdm)
 
-  testthat::expect_equal(
+  expect_equal(
     sort(end_tables),
     sort(c(start_tables, "my_death_cohort")))
 

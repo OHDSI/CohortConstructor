@@ -323,7 +323,7 @@ test_that("simple duckdb checks", {
 })
 
 test_that("cohort Id, name, additional columns", {
-  testthat::skip_on_cran()
+  skip_on_cran()
 
   cohort_1 <- dplyr::tibble(
     cohort_definition_id = 1L,
@@ -456,10 +456,12 @@ test_that("test indexes - postgres", {
     )) |>
       copyCdm()
 
+    con <- CDMConnector::cdmCon(cdm = cdm)
+
     cdm$my_cohort <- trimDemographics(cdm$my_cohort, ageRange = list(c(0, 50)))
 
     expect_true(
-      DBI::dbGetQuery(db, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
+      DBI::dbGetQuery(con, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
         "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
     )
 

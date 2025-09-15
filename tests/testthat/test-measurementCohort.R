@@ -485,7 +485,7 @@ test_that("mearurementCohorts - valueAsNumber without unit concept", {
 })
 
 test_that("expected errors", {
-  testthat::skip_on_cran()
+  skip_on_cran()
   cdm <- omock::mockCdmFromTables(tables = list(
     measurement = dplyr::tibble(
       measurement_id = 1:4L,
@@ -552,6 +552,8 @@ test_that("test indexes - postgres", {
       omock::mockCohort(name = "my_cohort", recordPerson = 0.1) |>
       copyCdm()
 
+    con <- CDMConnector::cdmCon(cdm = cdm)
+
     cdm$my_cohort <- measurementCohort(
       cdm = cdm,
       name = "my_cohort",
@@ -560,7 +562,7 @@ test_that("test indexes - postgres", {
     )
 
     expect_true(
-      DBI::dbGetQuery(db, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
+      DBI::dbGetQuery(con, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
         "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
     )
 

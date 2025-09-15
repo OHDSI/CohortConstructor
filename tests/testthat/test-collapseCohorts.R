@@ -241,6 +241,8 @@ test_that("multiple observation periods", {
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
 
   if (dbToTest == "postgres CDMConnector") {
+    con <- CDMConnector::cdmCon(cdm = cdm)
+
     # check indexes are still there
     indexdef <- dplyr::tbl(con, "pg_indexes") |>
       dplyr::filter(.data$table_name == "coco_test_cohort_1") |>

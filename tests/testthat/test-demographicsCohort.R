@@ -1,10 +1,10 @@
 test_that("input validation", {
   skip_on_cran()
-  cdm_local <- omock::mockCdmReference() |>
+  cdm <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
-    omock::mockCohort(name = c("cohort1"), numberCohorts = 5, seed = 2)
-  cdm <- cdm_local |> copyCdm()
+    omock::mockCohort(name = c("cohort1"), numberCohorts = 5, seed = 2) |>
+    copyCdm()
 
   expect_no_error(
     cdm$cohort3 <- cdm |>
@@ -43,11 +43,11 @@ test_that("input validation", {
 
 test_that("Example: sex", {
   skip_on_cran()
-  cdm_local <- omock::mockCdmReference() |>
+  cdm <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
-    omock::mockCohort(name = c("cohort1"), numberCohorts = 5, seed = 2)
-  cdm <- cdm_local |> copyCdm()
+    omock::mockCohort(name = c("cohort1"), numberCohorts = 5, seed = 2) |>
+    copyCdm()
 
   expect_no_error(
     cdm$cohort3 <- cdm |>
@@ -82,11 +82,11 @@ test_that("Example: sex", {
 
 test_that("Example: ageRange", {
   skip_on_cran()
-  cdm_local <- omock::mockCdmReference() |>
+  cdm <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
-    omock::mockCohort(name = c("cohort1"), numberCohorts = 5, seed = 2)
-  cdm <- cdm_local |> copyCdm()
+    omock::mockCohort(name = c("cohort1"), numberCohorts = 5, seed = 2) |>
+    copyCdm()
 
   expect_no_error(
     cdm$cohort3 <- cdm |>
@@ -115,11 +115,11 @@ test_that("Example: ageRange", {
 
 test_that("Example: priorObs", {
   skip_on_cran()
-  cdm_local <- omock::mockCdmReference() |>
+  cdm <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
-    omock::mockCohort(name = c("cohort1"), numberCohorts = 5, seed = 2)
-  cdm <- cdm_local |> copyCdm()
+    omock::mockCohort(name = c("cohort1"), numberCohorts = 5, seed = 2) |>
+    copyCdm()
 
   expect_no_error(
     cdm$cohort3 <- cdm |>
@@ -154,11 +154,11 @@ test_that("Example: priorObs", {
 
 test_that("Example: mixture of parameters", {
   skip_on_cran()
-  cdm_local <- omock::mockCdmReference() |>
+  cdm <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4) |>
     omock::mockObservationPeriod() |>
-    omock::mockCohort(name = c("cohort1"), numberCohorts = 5, seed = 2)
-  cdm <- cdm_local |> copyCdm()
+    omock::mockCohort(name = c("cohort1"), numberCohorts = 5, seed = 2) |>
+    copyCdm()
 
   if(dbToTest == "duckdb CDMConnector") {
     startTempTables <- countDuckdbTempTables(con = CDMConnector::cdmCon(cdm))
@@ -213,7 +213,6 @@ test_that("Example: mixture of parameters", {
   expect_true(all(cdm$cohort3 |> dplyr::pull("sex")== "Male"))
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
 
   dropCreatedTables(cdm = cdm)
 })
@@ -226,10 +225,12 @@ test_that("test indexes - postgres", {
     cdm <- omock::mockCdmFromDataset(datasetName = "GiBleed", source = "local") |>
       copyCdm()
 
+    con <- CDMConnector::cdmCon(cdm = cdm)
+
     cdm$my_cohort <- demographicsCohort(cdm, name = "my_cohort", ageRange = list(c(0, 50)))
 
     expect_true(
-      DBI::dbGetQuery(db, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
+      DBI::dbGetQuery(con, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
         "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
     )
 

@@ -396,11 +396,13 @@ test_that("test indexes - postgres, and atFirst", {
     )) |>
       copyCdm()
 
+    con <- CDMConnector::cdmCon(cdm = cdm)
+
     omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::contains("og_"))
 
     cdm$my_cohort <- requireTableIntersect(cdm$my_cohort, tableName = "visit_occurrence", window = list(c(-Inf, 0)))
     expect_true(
-      DBI::dbGetQuery(db, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
+      DBI::dbGetQuery(con, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
         "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
     )
 

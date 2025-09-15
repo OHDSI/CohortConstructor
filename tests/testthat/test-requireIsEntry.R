@@ -106,7 +106,7 @@ test_that("requireIsFirstEntry, cohortIds & name arguments", {
 })
 
 test_that("errors", {
-  testthat::skip_on_cran()
+  skip_on_cran()
   cdm <- omock::mockCdmReference() |>
     omock::mockPerson(n = 3,seed = 1) |>
     omock::mockObservationPeriod(seed = 1) |>
@@ -282,36 +282,31 @@ test_that("requireEntry", {
   expect_error(cdm$cohort1 |> dplyr::collect() |> requireIsEntry(entryRange = c(1, 1)))
   expect_warning(cdm$cohort1 |> requireIsEntry(entryRange = c(1, 1), cohortId = c(1, 5)))
 
-
   # mock cohort
-  cdm_local <- omock::mockCdmFromTables(
-    tables = list(
-      "cohort1" = cohort_1
-    ),
-    seed = 1
-  )
-  cdm <- cdm_local |> copyCdm()
-  cdm <- omopgenerics::insertTable(cdm, "observation_period",
-                                   data.frame(observation_period_id = c(1,2),
-                                              person_id = c(1,2),
-                                              observation_period_start_date  = as.Date("2010-01-01"),
-                                              observation_period_end_date  = as.Date("2011-01-01"),
-                                              period_type_concept_id = NA_integer_)
-  )
-  cdm <- omopgenerics::insertTable(cdm, "my_cohort",
-                                   data.frame(cohort_definition_id = 1L,
-                                              subject_id = c(1,2, 2, 2, 2),
-                                              cohort_start_date  = c(as.Date("2010-01-01"),
-                                                                     as.Date("2010-10-01"),
-                                                                     as.Date("2010-05-01"),
-                                                                     as.Date("2010-06-01"),
-                                                                     as.Date("2010-07-01")),
-                                              cohort_end_date  = c(as.Date("2010-01-01"),
-                                                                   as.Date("2010-10-01"),
-                                                                   as.Date("2010-05-01"),
-                                                                   as.Date("2010-06-01"),
-                                                                   as.Date("2010-07-01")))
-  )
+  cdm <- omock::mockCdmFromTables(tables = list("cohort1" = cohort_1)) |>
+    omopgenerics::insertTable(nsme = "observation_period", table = data.frame(
+      observation_period_id = c(1,2),
+      person_id = c(1,2),
+      observation_period_start_date  = as.Date("2010-01-01"),
+      observation_period_end_date  = as.Date("2011-01-01"),
+      period_type_concept_id = NA_integer_
+    )) |>
+    omopgenerics::insertTable(name = "my_cohort", table = data.frame(
+      cohort_definition_id = 1L,
+      subject_id = c(1,2, 2, 2, 2),
+      cohort_start_date  = c(as.Date("2010-01-01"),
+                             as.Date("2010-10-01"),
+                             as.Date("2010-05-01"),
+                             as.Date("2010-06-01"),
+                             as.Date("2010-07-01")),
+      cohort_end_date  = c(as.Date("2010-01-01"),
+                           as.Date("2010-10-01"),
+                           as.Date("2010-05-01"),
+                           as.Date("2010-06-01"),
+                           as.Date("2010-07-01")))
+    ) |>
+    copyCdm()
+
   cdm$my_cohort <- cdm$my_cohort |> omopgenerics::newCohortTable(cohortSetRef = data.frame(cohort_definition_id = 1L,
                                                                                            cohort_name = "cohort"))
   cdm$my_cohort_1 <- requireIsEntry(
@@ -342,30 +337,32 @@ test_that("test indexes - postgres", {
         cohort_end_date = as.Date("2009-01-03"),
         other_date = as.Date("2009-01-01")
       )
-    )) |.
+    )) |>
     copyCdm()
+
+    con <- CDMConnector::cdmCon(cdm = cdm)
 
     cdm$my_cohort <- requireIsEntry(cdm$my_cohort, entryRange = c(0,2))
     expect_true(
-      DBI::dbGetQuery(db, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
+      DBI::dbGetQuery(con, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
         "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
     )
 
     cdm$my_cohort <- requireIsEntry(cdm$my_cohort, entryRange = c(1,Inf))
     expect_true(
-      DBI::dbGetQuery(db, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
+      DBI::dbGetQuery(con, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
         "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
     )
 
     cdm$my_cohort <- requireIsFirstEntry(cdm$my_cohort)
     expect_true(
-      DBI::dbGetQuery(db, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
+      DBI::dbGetQuery(con, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
         "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
     )
 
     cdm$my_cohort <- requireIsLastEntry(cdm$my_cohort)
     expect_true(
-      DBI::dbGetQuery(db, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
+      DBI::dbGetQuery(con, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
         "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
     )
 

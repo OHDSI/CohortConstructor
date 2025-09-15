@@ -54,14 +54,9 @@ test_that("yearCohorts - change name", {
     ))
   )
 
-  cdm_local <- omock::mockCdmFromTables(
-    tables = list(
-      "cohort" = cohort_1
-    ),
-    seed = 1
-  )
+  cdm <- omock::mockCdmFromTables(tables = list("cohort" = cohort_1)) |>
+    copyCdm()
 
-  cdm <- cdm_local |> copyCdm()
   # all cohorts
   cdm$cohort1 <- yearCohorts(cohort = cdm$cohort,
                             years = 2005:2008,
@@ -195,13 +190,8 @@ test_that("yearCohorts - keep name", {
     ))
   )
 
-  cdm_local <- omock::mockCdmFromTables(
-    tables = list(
-      "cohort" = cohort_1
-    ),
-    seed = 1
-  )
-  cdm <- cdm_local |> copyCdm()
+  cdm <- omock::mockCdmFromTables(tables = list("cohort" = cohort_1)) |>
+    copyCdm()
 
   # just 1 cohort
   cdm$cohort <- yearCohorts(cohort = cdm$cohort,
@@ -251,9 +241,11 @@ test_that("test indexes - postgres", {
     )) |>
       copyCdm()
 
+    con <- CDMConnector::cdmCon(cdm = cdm)
+
     cdm$my_cohort <- yearCohorts(cdm$my_cohort, years = 2008:2010)
     expect_true(
-      DBI::dbGetQuery(db, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
+      DBI::dbGetQuery(con, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
         "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
     )
 

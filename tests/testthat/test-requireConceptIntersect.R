@@ -383,7 +383,10 @@ test_that("test indexes - postgres, atFirst", {
         cohort_end_date = as.Date("2009-01-03"),
         other_date = as.Date("2009-01-01")
       )
-    ))
+    )) |>
+      copyCdm()
+
+    con <- CDMConnector::cdmCon(cdm = cdm)
 
     omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::contains("og_"))
 
@@ -396,7 +399,7 @@ test_that("test indexes - postgres, atFirst", {
     expect_no_error(cdm$my_cohort |> head(1))
     expect_no_error(omopgenerics::settings(cdm$my_cohort))
     expect_true(
-      DBI::dbGetQuery(db, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_test_my_cohort';")) |> dplyr::pull("indexdef") ==
+      DBI::dbGetQuery(con, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_test_my_cohort';")) |> dplyr::pull("indexdef") ==
         "CREATE INDEX cc_test_my_cohort_subject_id_cohort_start_date_idx ON public.cc_test_my_cohort USING btree (subject_id, cohort_start_date)"
     )
 

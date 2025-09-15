@@ -32,8 +32,7 @@ test_that("exit at observation end", {
     ))
   )
 
-
-  cdm_local <- omock::mockCdmFromTables(tables = list("cohort" = cohort_1)) |>
+  cdm <- omock::mockCdmFromTables(tables = list("cohort" = cohort_1)) |>
     omopgenerics::insertTable(name = "observation_period", table = obs) |>
     omopgenerics::insertTable(name = "person", table = person) |>
     copyCdm()
@@ -155,7 +154,7 @@ test_that("exit at observation end", {
 })
 
 test_that("exit at death date", {
-  testthat::skip_on_cran()
+  skip_on_cran()
 
   person <- dplyr::tibble(
     person_id = 1:4,
@@ -263,22 +262,23 @@ test_that("test indexes - postgres", {
     )) |>
       copyCdm()
 
+    con <- CDMConnector::cdmCon(cdm = cdm)
+
     cdm$my_cohort <- exitAtObservationEnd(cdm$my_cohort)
 
     expect_true(
-      DBI::dbGetQuery(db, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
+      DBI::dbGetQuery(con, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
         "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
     )
 
     cdm$my_cohort <- exitAtDeath(cdm$my_cohort)
 
     expect_true(
-      DBI::dbGetQuery(db, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
+      DBI::dbGetQuery(con, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
         "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
     )
 
     expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-    omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
 
     dropCreatedTables()
   }
