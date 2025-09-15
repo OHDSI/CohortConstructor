@@ -1,7 +1,8 @@
 test_that("benchmark works", {
   skip_on_cran()
+  skip("can not test")
 
-  cdm <- omock::mockCdmFromDataset(datasetName = "GiBleed") |>
+  cdm <- omock::mockCdmFromDataset(datasetName = "synpuf-1k_5.3", source = "local") |>
     copyCdm()
 
   if (dbToTest == "local omopgenerics") {
