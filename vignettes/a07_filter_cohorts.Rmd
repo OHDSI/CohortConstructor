@@ -55,9 +55,7 @@ When cohortId = NULL all cohorts in the table are used. Note that this function 
 It is also possible to only sample one cohort within cohort table, however the remaining cohorts will still remain.
 
 ```{r include = FALSE, warning = FALSE}
-con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomiaDir())
-cdm <- cdmFromCon(con, cdmSchema = "main", 
-                    writeSchema = c(prefix = "my_study_", schema = "main"))
+cdm <- mockCdmFromDataset(datasetName = "GiBleed", source = "duckdb")
 cdm$medications <- conceptCohort(cdm = cdm, 
                                  conceptSet = list("diclofenac" = 1124300,
                                                    "acetaminophen" = 1127433), 
@@ -75,9 +73,7 @@ The chosen cohort (users of diclofenac) has been reduced to 100 individuals, as 
 If you want to filter the cohort table to only include individuals and records from a specified cohort, you can use the function `subsetCohorts`. 
 
 ```{r include = FALSE, warning = FALSE}
-con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomiaDir())
-cdm <- cdmFromCon(con, cdmSchema = "main", 
-                    writeSchema = c(prefix = "my_study_", schema = "main"))
+cdm <- mockCdmFromDataset(datasetName = "GiBleed", source = "duckdb")
 cdm$medications <- conceptCohort(cdm = cdm, 
                                  conceptSet = list("diclofenac" = 1124300,
                                                    "acetaminophen" = 1127433), 
