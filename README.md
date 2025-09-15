@@ -17,6 +17,11 @@ coverage](https://codecov.io/gh/OHDSI/CohortConstructor/branch/main/graph/badge.
 The goal of CohortConstructor is to support the creation and
 manipulation of study cohorts in data mapped to the OMOP CDM.
 
+## Tested sources
+
+[![](https://github.com/OHDSI/CohortConstructor/actions/workflows/test-local-omopgenerics.yaml/badge.svg?branch=main)](https://github.com/OHDSI/CohortConstructor/actions/workflows/test-local-omopgenerics.yaml)
+[![](https://github.com/OHDSI/CohortConstructor/actions/workflows/test-duckdb-CDMConnector.yaml/badge.svg?branch=main)](https://github.com/OHDSI/CohortConstructor/actions/workflows/test-duckdb-CDMConnector.yaml)
+
 ## Installation
 
 The package can be installed from CRAN:
