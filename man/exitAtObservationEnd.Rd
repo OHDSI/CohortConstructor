@@ -7,7 +7,7 @@
 exitAtObservationEnd(
   cohort,
   cohortId = NULL,
-  limitToCurrentPeriod = TRUE,
+  persistAcrossObservationPeriods = FALSE,
   name = tableName(cohort),
   .softValidation = FALSE
 )
@@ -20,9 +20,11 @@ exitAtObservationEnd(
 used; otherwise, only the specified cohorts will be modified, and the
 rest will remain unchanged.}
 
-\item{limitToCurrentPeriod}{If TRUE, limits the cohort to one entry per
-person, ending at the current observation period. If FALSE, subsequent
-observation periods will create new cohort entries.}
+\item{persistAcrossObservationPeriods}{If FALSE, limits the cohort to one entry per
+person, ending at the current observation period. If TRUE, subsequent
+observation periods will create new cohort entries (starting from the start
+of that observation period and ending at the end of that observation
+period).}
 
 \item{name}{Name of the new cohort table created in the cdm object.}
 

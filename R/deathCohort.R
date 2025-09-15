@@ -84,7 +84,10 @@ deathCohort <- function(
   }
 
   cli::cli_inform(c("i" = "Applying cohort requirements."))
-  cdm[[name]] <- fulfillCohortReqs(cdm, name, inObservation = TRUE, type = "start", useIndexes)
+  cdm[[name]] <- fulfillCohortReqs(cdm, name,
+                                   useRecordsBeforeObservation = FALSE,
+                                   type = "start",
+                                   useIndexes)
 
   if (!is.na(subsetCohort)){
     if (!is.na(subsetCohortId)){

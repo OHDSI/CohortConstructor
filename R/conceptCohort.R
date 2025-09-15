@@ -35,6 +35,14 @@
 #' "merge", cohort end will be the latest end date. If "extend",
 #' cohort end date will be set by adding together the total days
 #' from each of the overlapping records.
+#' @param table Name of OMOP tables to search for records of the concepts
+#' provided. If NULL, each concept will be search at the assigned domain in
+#' the concept table.
+#' @param useRecordsBeforeObservation If FALSE, only records in observation will
+#' be used. If TRUE, records before the start of observation period will be
+#' considered, with cohort start date set as the start date of the
+#' individuals next observation period (as cohort records must be within
+#' observation).
 #' @param useSourceFields If TRUE, the source concept_id fields will also be
 #' used when identifying relevant clinical records. If FALSE, only the standard
 #' concept_id fields will be used.
@@ -44,12 +52,6 @@
 #' @param subsetCohortId Optional. Specifies cohort IDs from the `subsetCohort`
 #' table to include. If none are provided, all cohorts from the `subsetCohort`
 #' are included.
-#' @param table Name of OMOP tables to search for records of the concepts
-#' provided. If NULL, each concept will be search at the assigned domain in
-#' the concept table.
-#' @param inObservation If TRUE, only records in observation will be used. If
-#' FALSE, records before the start of observation period will be considered,
-#' with startdate the start of observation.
 #'
 #' @export
 #'
@@ -72,23 +74,23 @@
 #' conceptSet <- list("nitrogen" = c(35604434, 35604439),
 #' "potassium" = c(40741270, 42899580, 44081436))
 #'
-#' cohort_drugs <- conceptCohort(cdm,
+#' cdm$study_cohort <- conceptCohort(cdm,
 #'                              conceptSet = conceptSet,
-#'                              name = "cohort_drugs",
+#'                              name = "study_cohort",
 #'                              exit = "event_start_date",
 #'                              overlap = "extend",
 #'                              subsetCohort = "cohort"
 #' )
 #'
-#' cohort_drugs |> attrition()
+#'  cdm$study_cohort |> attrition()
 #' }
 conceptCohort <- function(cdm,
                           conceptSet,
                           name,
                           exit = "event_end_date",
                           overlap = "merge",
-                          inObservation = TRUE,
                           table = NULL,
+                          useRecordsBeforeObservation = FALSE,
                           useSourceFields = FALSE,
                           subsetCohort = NULL,
                           subsetCohortId = NULL) {
@@ -100,7 +102,7 @@ conceptCohort <- function(cdm,
   omopgenerics::assertChoice(exit, c("event_start_date", "event_end_date"))
   omopgenerics::assertChoice(overlap, c("merge", "extend"), length = 1)
   omopgenerics::assertLogical(useSourceFields, length = 1)
-  omopgenerics::assertLogical(inObservation, length = 1)
+  omopgenerics::assertLogical(useRecordsBeforeObservation, length = 1)
   omopgenerics::assertCharacter(subsetCohort, length = 1, null = TRUE)
   if (!is.null(subsetCohort)) {
     subsetCohort <- omopgenerics::validateCohortArgument(cdm[[subsetCohort]])
@@ -237,7 +239,10 @@ conceptCohort <- function(cdm,
   }
 
   cli::cli_inform(c("i" = "Applying cohort requirements."))
-  cdm[[name]] <- fulfillCohortReqs(cdm = cdm, name = name, inObservation = inObservation, useIndexes = useIndexes)
+  cdm[[name]] <- fulfillCohortReqs(cdm = cdm,
+                                   name = name,
+                                   useRecordsBeforeObservation = useRecordsBeforeObservation,
+                                   useIndexes = useIndexes)
 
   if(overlap == "merge"){
     cli::cli_inform(c("i" = "Merging overlapping records."))
@@ -254,7 +259,10 @@ conceptCohort <- function(cdm,
 
     # adding days might mean we no longer satisfy cohort requirements
     cli::cli_inform(c("i" = "Re-appplying cohort requirements."))
-    cdm[[name]] <- fulfillCohortReqs(cdm = cdm, name = name, inObservation = TRUE, useIndexes = useIndexes)
+    cdm[[name]] <- fulfillCohortReqs(cdm = cdm,
+                                     name = name,
+                                     useRecordsBeforeObservation = useRecordsBeforeObservation,
+                                     useIndexes = useIndexes)
   }
 
   cdm[[name]] <- omopgenerics::newCohortTable(table = cdm[[name]])
@@ -381,11 +389,7 @@ unerafiedConceptCohort <- function(cdm,
   return(cohort)
 }
 
-fulfillCohortReqs <- function(cdm, name, inObservation, type = "start_end", useIndexes) {
-  # 1) inObservation == TRUE and start is out of observation, drop cohort entry.
-  #    inObservation == FALSE and start is out of observation move to observation start
-  # 2) inObservation == TRUE and end is after observation end, set cohort end as observation end,
-  #    inObservation == FALSE and end is after observation end set cohort end as observation start
+fulfillCohortReqs <- function(cdm, name, useRecordsBeforeObservation, type = "start_end", useIndexes) {
 
   # start by inner join with observation to use indexes
   cdm[[name]] <- cdm[[name]] |>
@@ -402,7 +406,7 @@ fulfillCohortReqs <- function(cdm, name, inObservation, type = "start_end", useI
     dplyr::compute(temporary = FALSE, name = name,
                    logPrefix = "CohortConstructor_fulfillCohortReqs_observationJoin_")
 
-  if (!inObservation) {
+  if (useRecordsBeforeObservation) {
     cdm[[name]] <- cdm[[name]] |>
       dplyr::mutate(
         in_observation_start = .data$observation_period_start_date <= .data$cohort_start_date & .data$observation_period_end_date >= .data$cohort_start_date,
@@ -458,7 +462,7 @@ fulfillCohortReqs <- function(cdm, name, inObservation, type = "start_end", useI
       "cohort_end_date"
     ) |>
     dplyr::compute(temporary = FALSE, name = name,
-                   logPrefix = "CohortConstructor_fulfillCohortReqs_inObservation_") |>
+                   logPrefix = "CohortConstructor_fulfillCohortReqs_useRecordsBeforeObservation_") |>
     omopgenerics::recordCohortAttrition(reason = "Record in observation")
 
   if (type == "start_end") {

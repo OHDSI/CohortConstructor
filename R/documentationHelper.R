@@ -114,7 +114,7 @@ NULL
 #' @param targetCohortId Vector of cohort definition ids to include.
 #' @param tableName Name of the table to check for intersect.
 #' @param inObservation If TRUE only records inside an observation period will
-#' be considered.
+#' be considered
 #'
 #' @name requireIntersectDoc
 #' @keywords internal

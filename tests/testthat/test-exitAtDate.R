@@ -118,7 +118,7 @@ test_that("exit at observation end", {
   expect_true(attrition(cdm$cohort1)$reason[2] ==
                 "Exit at observation period end date, limited to current observation period")
   # not limit to first
-  cdm$cohort2 <- cdm$cohort |> exitAtObservationEnd(name = "cohort2", limitToCurrentPeriod = FALSE)
+  cdm$cohort2 <- cdm$cohort |> exitAtObservationEnd(name = "cohort2", persistAcrossObservationPeriods = TRUE)
   expect_equal(
     collectCohort(cdm$cohort2, 1),
     dplyr::tibble(
@@ -138,7 +138,7 @@ test_that("exit at observation end", {
   expect_true(attrition(cdm$cohort2)$reason[2] ==
                 "Exit at observation period end date")
   # not limit to first + only first cohort
-  cdm$cohort3 <- cdm$cohort |> exitAtObservationEnd(name = "cohort3", limitToCurrentPeriod = FALSE, cohortId = 1)
+  cdm$cohort3 <- cdm$cohort |> exitAtObservationEnd(name = "cohort3", persistAcrossObservationPeriods = TRUE, cohortId = 1)
   expect_equal(
     collectCohort(cdm$cohort3, 1),
     collectCohort(cdm$cohort2, 1)

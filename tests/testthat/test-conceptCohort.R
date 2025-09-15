@@ -1133,7 +1133,7 @@ test_that("table argument", {
   dropCreatedTables(cdm = cdm)
 })
 
-test_that("inObservation FALSE", {
+test_that("useRecordsBeforeObservation TRUE", {
   skip_on_cran()
   cdm <- omock::mockPerson(nPerson = 3)
   cdm <- omopgenerics::insertTable(
@@ -1180,7 +1180,7 @@ test_that("inObservation FALSE", {
 
   cdm <- cdm |> copyCdm()
 
-  cdm$cohort <- conceptCohort(cdm, list(a = 1L), name = "cohort", inObservation = FALSE)
+  cdm$cohort <- conceptCohort(cdm, list(a = 1L), name = "cohort", useRecordsBeforeObservation = TRUE)
   expect_equal(
     dplyr::tibble(
       subject_id = c(1L, 1L, 2L),
@@ -1242,7 +1242,7 @@ test_that("inObservation FALSE", {
   )
 
   cdm <- cdm |> copyCdm()
-  cdm$cohort <- conceptCohort(cdm, list(a = 1L, b = 1L), name = "cohort", inObservation = FALSE)
+  cdm$cohort <- conceptCohort(cdm, list(a = 1L, b = 1L), name = "cohort", useRecordsBeforeObservation = TRUE)
   expect_equal(
     dplyr::tibble(
       subject_id = c(1L, 1L, 1L, 2L),
