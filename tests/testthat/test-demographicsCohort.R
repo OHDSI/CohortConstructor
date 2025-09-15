@@ -5,6 +5,7 @@ test_that("input validation", {
     omock::mockObservationPeriod() |>
     omock::mockCohort(name = c("cohort1"), numberCohorts = 5, seed = 2)
   cdm <- cdm_local |> copyCdm()
+
   expect_no_error(
     cdm$cohort3 <- cdm |>
       demographicsCohort(name = "cohort3", ageRange = c(18,40), sex = "Male")
@@ -36,7 +37,8 @@ test_that("input validation", {
   )
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  PatientProfiles::mockDisconnect(cdm)
+
+  dropCreatedTables(cdm = cdm)
 })
 
 test_that("Example: sex", {
@@ -46,6 +48,7 @@ test_that("Example: sex", {
     omock::mockObservationPeriod() |>
     omock::mockCohort(name = c("cohort1"), numberCohorts = 5, seed = 2)
   cdm <- cdm_local |> copyCdm()
+
   expect_no_error(
     cdm$cohort3 <- cdm |>
       demographicsCohort(name = "cohort3", sex = "Male")
@@ -73,7 +76,8 @@ test_that("Example: sex", {
   expect_true(all(cdm$cohort3 |> dplyr::pull("check2")== TRUE))
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  PatientProfiles::mockDisconnect(cdm)
+
+  dropCreatedTables(cdm = cdm)
 })
 
 test_that("Example: ageRange", {
@@ -83,6 +87,7 @@ test_that("Example: ageRange", {
     omock::mockObservationPeriod() |>
     omock::mockCohort(name = c("cohort1"), numberCohorts = 5, seed = 2)
   cdm <- cdm_local |> copyCdm()
+
   expect_no_error(
     cdm$cohort3 <- cdm |>
       demographicsCohort(name = "cohort3", ageRange = c(18, 40))
@@ -104,7 +109,8 @@ test_that("Example: ageRange", {
   expect_true(all(cdm$cohort3 |> dplyr::pull("check2")== TRUE))
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  PatientProfiles::mockDisconnect(cdm)
+
+  dropCreatedTables(cdm = cdm)
 })
 
 test_that("Example: priorObs", {
@@ -114,6 +120,7 @@ test_that("Example: priorObs", {
     omock::mockObservationPeriod() |>
     omock::mockCohort(name = c("cohort1"), numberCohorts = 5, seed = 2)
   cdm <- cdm_local |> copyCdm()
+
   expect_no_error(
     cdm$cohort3 <- cdm |>
       demographicsCohort(name = "cohort3", minPriorObservation = 15)
@@ -141,7 +148,8 @@ test_that("Example: priorObs", {
   expect_true(all(loc_cohort3 |> dplyr::pull("check3")== TRUE))
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  PatientProfiles::mockDisconnect(cdm)
+
+  dropCreatedTables(cdm = cdm)
 })
 
 test_that("Example: mixture of parameters", {
@@ -152,14 +160,9 @@ test_that("Example: mixture of parameters", {
     omock::mockCohort(name = c("cohort1"), numberCohorts = 5, seed = 2)
   cdm <- cdm_local |> copyCdm()
 
-  isDuckdb <- attr(omopgenerics::cdmSource(cdm), "source_type") == "duckdb"
-  if(isDuckdb){
-    startTempTables <- countDuckdbTempTables(
-      con = attr(omopgenerics::cdmSource(cdm),
-                 "dbcon"))
-    startPermanentTables <- countDuckdbPermanentTables(
-      con = attr(omopgenerics::cdmSource(cdm),
-                 "dbcon"))
+  if(dbToTest == "duckdb CDMConnector") {
+    startTempTables <- countDuckdbTempTables(con = CDMConnector::cdmCon(cdm))
+    startPermanentTables <- countDuckdbPermanentTables(con = CDMConnector::cdmCon(cdm))
   }
 
   expect_no_error(
@@ -170,13 +173,11 @@ test_that("Example: mixture of parameters", {
                          minPriorObservation = 25)
   )
 
-  if(isDuckdb){
+  if(dbToTest == "duckdb CDMConnector") {
     endTempTables <- countDuckdbTempTables(
-      con = attr(omopgenerics::cdmSource(cdm),
-                 "dbcon"))
+      con = CDMConnector::cdmCon(cdm))
     endPermanentTables <- countDuckdbPermanentTables(
-      con = attr(omopgenerics::cdmSource(cdm),
-                 "dbcon"))
+      con = CDMConnector::cdmCon(cdm))
     # we should have only added 4 permanent tables (the new cohort table and
     # three tables with settings, attrition, and codelist)
     # no temp tables will have been created
@@ -213,35 +214,28 @@ test_that("Example: mixture of parameters", {
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
-  PatientProfiles::mockDisconnect(cdm)
+
+  dropCreatedTables(cdm = cdm)
 })
 
 test_that("test indexes - postgres", {
   skip_on_cran()
-  skip_if(Sys.getenv("CDM5_POSTGRESQL_DBNAME") == "")
   skip_if(!testIndexes)
 
-  db <- DBI::dbConnect(RPostgres::Postgres(),
-                       dbname = Sys.getenv("CDM5_POSTGRESQL_DBNAME"),
-                       host = Sys.getenv("CDM5_POSTGRESQL_HOST"),
-                       user = Sys.getenv("CDM5_POSTGRESQL_USER"),
-                       password = Sys.getenv("CDM5_POSTGRESQL_PASSWORD"))
-  cdm <- CDMConnector::cdmFromCon(
-    con = db,
-    cdmSchema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA"),
-    writeSchema = Sys.getenv("CDM5_POSTGRESQL_SCRATCH_SCHEMA"),
-    writePrefix = "cc_",
-    achillesSchema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA")
-  )
+  if (dbToTest == "postgres CDMConnector") {
+    cdm <- omock::mockCdmFromDataset(datasetName = "GiBleed", source = "local") |>
+      copyCdm()
 
-  cdm$my_cohort <- demographicsCohort(cdm, name = "my_cohort", ageRange = list(c(0, 50)))
+    cdm$my_cohort <- demographicsCohort(cdm, name = "my_cohort", ageRange = list(c(0, 50)))
 
-  expect_true(
-    DBI::dbGetQuery(db, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
-      "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
-  )
+    expect_true(
+      DBI::dbGetQuery(db, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
+        "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
+    )
 
-  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
-  CDMConnector::cdmDisconnect(cdm = cdm)
+    expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
+
+    dropCreatedTables(cdm = cdm)
+  }
+
 })

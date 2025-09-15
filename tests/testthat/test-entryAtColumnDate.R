@@ -1,24 +1,16 @@
 test_that("entry at first date", {
   testthat::skip_on_cran()
-  cdm <- mockCohortConstructor(
-    tables = list(
-      "cohort" = dplyr::tibble(
-        cohort_definition_id = 1L,
-        subject_id = c(1, 2, 3, 4, 4)  |> as.integer(),
-        cohort_start_date = as.Date(c("2000-06-03", "2000-01-01", "2015-01-15", "1989-12-09", "2000-12-09")),
-        cohort_end_date = as.Date(c("2001-09-01", "2001-01-12", "2015-02-15", "1990-12-09", "2002-12-09")),
-        other_date_1 = as.Date(c("2001-08-01", "2001-01-01", "2015-01-15", NA, "2002-12-09")),
-        other_date_2 = as.Date(c("2001-08-01", NA, "2015-04-15", "1990-11-09", "2002-12-09"))
-      )
-    ),
-    con = connection(),
-    writeSchema = writeSchema()
-  )
-  # remove when omock > 0.3.1
-  cdm$cohort <- cdm$cohort |>
-    dplyr::select("cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date", "other_date_1", "other_date_2") |>
-    dplyr::compute(name = "cohort", temporary = FALSE) |>
-    omopgenerics::newCohortTable()
+  cdm <- omock::mockCdmFromTables(tables = list(
+    "cohort" = dplyr::tibble(
+      cohort_definition_id = 1L,
+      subject_id = c(1, 2, 3, 4, 4)  |> as.integer(),
+      cohort_start_date = as.Date(c("2000-06-03", "2000-01-01", "2015-01-15", "1989-12-09", "2000-12-09")),
+      cohort_end_date = as.Date(c("2001-09-01", "2001-01-12", "2015-02-15", "1990-12-09", "2002-12-09")),
+      other_date_1 = as.Date(c("2001-08-01", "2001-01-01", "2015-01-15", NA, "2002-12-09")),
+      other_date_2 = as.Date(c("2001-08-01", NA, "2015-04-15", "1990-11-09", "2002-12-09"))
+    )
+  )) |>
+    copyCdm()
 
   # works
   cdm$cohort1 <- cdm$cohort |>
@@ -98,7 +90,8 @@ test_that("entry at first date", {
                     c("cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date")))
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  PatientProfiles::mockDisconnect(cdm)
+
+  dropCreatedTables(cdm = cdm)
 })
 
 test_that("entry at last date", {

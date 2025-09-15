@@ -57,7 +57,7 @@ test_that("basic example", {
     "Non-missing year of birth",
     "First death record"))
 
-  CDMConnector::cdmDisconnect(cdm)
+  dropCreatedTables(cdm = cdm)
 })
 
 test_that("first death record per person", {
@@ -125,7 +125,7 @@ test_that("first death record per person", {
                      dplyr::pull("excluded_subjects"),
                    0L)
 
-  CDMConnector::cdmDisconnect(cdm2)
+  dropCreatedTables(cdm = cdm)
 })
 
 test_that("test death in observation criteria", {
@@ -184,7 +184,7 @@ test_that("test death in observation criteria", {
                 dplyr::select(cohort_start_date) %>%
                 dplyr::pull() == as.Date("2020-01-02"))
 
-  CDMConnector::cdmDisconnect(cdm2)
+  dropCreatedTables(cdm = cdm)
 })
 
 test_that("test different cohort table name", {
@@ -241,7 +241,7 @@ test_that("test different cohort table name", {
                     "cohort_start_date", "cohort_end_date") %in%
                     colnames(cdm2$my_cohort_death)))
 
-  CDMConnector::cdmDisconnect(cdm2)
+  dropCreatedTables(cdm = cdm)
 })
 
 test_that("test subsetting death table by a cohort table", {
@@ -320,8 +320,8 @@ test_that("test subsetting death table by a cohort table", {
                     dplyr::select(subject_id) %>%
                     dplyr::pull() %in%  c(1,2)
   ))
-  CDMConnector::cdmDisconnect(cdm2)
 
+  dropCreatedTables(cdm = cdm)
 })
 
 test_that("test expected errors", {
@@ -371,10 +371,10 @@ test_that("test expected errors", {
     cdmName = "mock_es"
   )
 
-  cdm2 = copyCdm(cdm)
+  cdm = copyCdm(cdm)
 
   # no death table in CDM
-  expect_error(deathCohort(cdm=cdm2,
+  expect_error(deathCohort(cdm=cdm,
                            name = "death_cohort"))
 
   # cohortTable & cohortId
@@ -397,20 +397,20 @@ test_that("test expected errors", {
     cdmName = "mock_es"
   )
 
-  cdm2 = copyCdm(cdm)
+  cdm = copyCdm(cdm)
 
   # cohortTable not exist
-  expect_error( deathCohort(cdm=cdm2,
+  expect_error( deathCohort(cdm=cdm,
                             name = "death_cohort",
                             subsetCohort = "non_exist_cohort"))
 
   # wrong cohortId input
-  expect_error(deathCohort(cdm=cdm2,
+  expect_error(deathCohort(cdm=cdm,
                            name = "death_cohort",
                            subsetCohort = "cohort1",
                            subsetCohortId = "1"))
 
-  CDMConnector::cdmDisconnect(cdm2)
+  dropCreatedTables(cdm = cdm)
 })
 
 test_that("test single permanent table created", {
@@ -457,18 +457,17 @@ test_that("test single permanent table created", {
     cdmName = "mock_es"
   )
 
-  cdm2 = copyCdm(cdm)
+  cdm = copyCdm(cdm)
 
-  start_tables <- attr(cdm2, "names")
+  start_tables <- names(cdm)
 
-  cdm2$my_death_cohort <- deathCohort(cdm=cdm2,
-                                 name = "my_death_cohort")
+  cdm$my_death_cohort <- deathCohort(cdm=cdm, name = "my_death_cohort")
 
-  end_tables <- attr(cdm2, "names")
+  end_tables <- names(cdm)
 
   testthat::expect_equal(
     sort(end_tables),
     sort(c(start_tables, "my_death_cohort")))
 
-  CDMConnector::cdmDisconnect(cdm2)
+  dropCreatedTables(cdm = cdm)
 })
