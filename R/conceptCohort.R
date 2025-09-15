@@ -421,7 +421,7 @@ fulfillCohortReqs <- function(cdm, name, useRecordsBeforeObservation, type = "st
       dplyr::group_by(.data$cohort_definition_id, .data$subject_id, .data$cohort_start_date, .data$cohort_end_date) |>
       # which records to trim
       dplyr::mutate(
-        trim_record =  all(!.data$in_observation_start) & suppressWarnings(min(.data$days_start_obs, na.rm = TRUE)) == .data$days_start_obs & !is.na(.data$days_start_obs)
+        trim_record =  all(!.data$in_observation_start) & min(.data$days_start_obs, na.rm = TRUE) == .data$days_start_obs & !is.na(.data$days_start_obs)
       ) |>
       dplyr::ungroup() |>
       dplyr::mutate(
