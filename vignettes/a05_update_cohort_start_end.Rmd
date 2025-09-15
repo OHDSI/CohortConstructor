@@ -67,7 +67,7 @@ cdm$cohort_observation_end <- cdm$cohort |>
 
 As cohort entries cannot overlap, updating the end date to the observation end may result in overlapping records. In such cases, overlapping records are collapsed into a single entry (starting at the earliest entry and ending at the end of observation).
 
-This function has an argument `limitToCurrentPeriod` to consider cases when a subject may have more than one observation period. If `limitToCurrentPeriod = TRUE` (default) end date will be set to the end of the observation period where the record is registered.  If `limitToCurrentPeriod = FALSE`, in addition to updating the cohort end to the allocated observation end, cohort entries are created for each of the subsequent observation periods.
+This function has an argument `persistAcrossObservationPeriods` to consider cases when a subject may have more than one observation period. If `persistAcrossObservationPeriods = FALSE` then cohort end date will be set to the end of the observation period where the record occurs.  If `persistAcrossObservationPeriods = TRUE`, in addition to updating the cohort end to the current observation end, cohort entries are created for each of the subsequent observation periods.
 
 ### `exitAtDeath()`
 
