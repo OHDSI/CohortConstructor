@@ -513,10 +513,7 @@ test_that("codelist", {
           "drug_exposure_end_date" = as.Date(.data$drug_exposure_end_date, origin = "2010-01-01")
         )
     ),
-    cdmName = "mock",
-    cohortTables = list(
-      cohort = dplyr::tibble()
-    )
+    cdmName = "mock"
   ) |>
     omock::mockVocabularyTables(concept = dplyr::tibble(
       "concept_id" = c(1, 2, 3),
@@ -528,6 +525,7 @@ test_that("codelist", {
       "valid_start_date" = as.Date(NA),
       "valid_end_date" = as.Date(NA)
     )) |>
+    omock::mockCohort() |>
     copyCdm()
 
   cdm$cohort1 <- conceptCohort(cdm, conceptSet = list(c1 = c(1L,3L), c2 = c(2L)), name = "cohort1")
@@ -697,7 +695,7 @@ test_that("multiple observation periods", {
     ),
     cdmName = "mock",
     cohortTables = list(
-      my_cohort = dplyr::tibble(
+      cohort1 = dplyr::tibble(
         "cohort_definition_id" = as.integer(c(1, 2, 1, 2)),
         "subject_id" = as.integer(c(1, 1, 1, 1)),
         "cohort_start_date" = as.Date(c(

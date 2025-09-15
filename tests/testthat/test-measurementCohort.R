@@ -597,19 +597,16 @@ test_that("inObservation FALSE", {
     ),
     cdmName = "mock"
   ) |>
-    omopgenerics::insertTable(
-      name = "concept",
-      table = dplyr::tibble(
-        "concept_id" = 1L,
-        "concept_name" = "concept 1",
-        "domain_id" = "measurement",
-        "vocabulary_id" = NA,
-        "concept_class_id" = NA,
-        "concept_code" = NA,
-        "valid_start_date" = NA,
-        "valid_end_date" = NA
-      )
-    ) |>
+    omock::mockVocabularyTables(concept = dplyr::tibble(
+      "concept_id" = 1L,
+      "concept_name" = "concept 1",
+      "domain_id" = "measurement",
+      "vocabulary_id" = NA,
+      "concept_class_id" = NA,
+      "concept_code" = NA,
+      "valid_start_date" = NA,
+      "valid_end_date" = NA
+    )) |>
     # person 1 - out before, out after, in, in
     # person 2 - out before
     omopgenerics::insertTable(

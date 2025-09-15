@@ -272,7 +272,18 @@ test_that("different intersection count requirements", {#need
     cohort_start_date = as.Date('2020-01-01'),
     cohort_end_date = as.Date('2020-01-01'))
 
-  cdm <- omock::mockCdmFromTables(tables = list("cohort1" = cohort1)) |>
+  cdm <- omock::mockCdmFromTables(tables = list(
+    "cohort1" = cohort1,
+    drug_exposure = dplyr::tibble(
+      "drug_exposure_id" = 1:6,
+      "person_id" = c(1,2,2,3,3,3),
+      "drug_concept_id" = 1,
+      "drug_exposure_start_date" = as.Date('2019-01-01'),
+      "drug_exposure_end_date" = as.Date('2019-01-01'),
+      "drug_type_concept_id" = 1,
+      verbatim_end_date = drug_exposure_end_date
+    )
+  )) |>
     omock::mockVocabularyTables(concept = dplyr::tibble(
       "concept_id" = 1,
       "concept_name" = "my concept",
@@ -282,14 +293,6 @@ test_that("different intersection count requirements", {#need
       "concept_code" = NA,
       "valid_start_date" = NA,
       "valid_end_date" = NA
-    )) |>
-    omopgenerics::insertTable(name = "drug_exposure", table = dplyr::tibble(
-      "drug_exposure_id" = 1:6,
-      "person_id" = c(1,2,2,3,3,3),
-      "drug_concept_id" = 1,
-      "drug_exposure_start_date" = as.Date('2019-01-01'),
-      "drug_exposure_end_date" = as.Date('2019-01-01'),
-      "drug_type_concept_id" = 1
     )) |>
     copyCdm()
 

@@ -1,9 +1,10 @@
 test_that("matchCohorts runs without errors", {
   skip_on_cran()
-  cdm <- omock::mockPerson(nPerson = 1000) |>
+
+  cdm <- omock::mockPerson(nPerson = 100) |>
     omock::mockObservationPeriod() |>
-    omock::mockCohort(name = "cohort1") |>
-    omock::mockCohort(name = "cohort2") |>
+    omock::mockCohort(name = "cohort1", numberCohorts = 2) |>
+    omock::mockCohort(name = "cohort2", numberCohorts = 2) |>
     copyCdm()
 
   expect_no_error(a <- matchCohorts(cohort = cdm$cohort1,
@@ -68,13 +69,18 @@ test_that("matchCohorts runs without errors", {
 
 test_that("matchCohorts, no duplicated people within a cohort", {
   skip_on_cran()
-  skip("DONT UNDERSTAND THIS TEST")
 
-  cdm <- omock::mockPerson(nPerson = 1000) |>
+  cdm <- omock::mockPerson(nPerson = 100) |>
     omock::mockObservationPeriod() |>
     omock::mockCohort(name = "cohort1") |>
     omock::mockCohort(name = "cohort2") |>
     copyCdm()
+
+  # one record per person
+  cdm$cohort1 <- cdm$cohort1 |>
+    CohortConstructor::requireIsFirstEntry()
+  cdm$cohort2 <- cdm$cohort2 |>
+    CohortConstructor::requireIsFirstEntry()
 
   cdm$new_cohort <- matchCohorts(cohort = cdm$cohort1,
                                  name = "new_cohort",
@@ -114,11 +120,10 @@ test_that("matchCohorts, no duplicated people within a cohort", {
 
 test_that("check that we obtain expected result when ratio is 1", {
   skip_on_cran()
-  skip("I DONT UNDERSTAND THIS TEST")
 
-  cdm <- omock::mockPerson(nPerson = 1000) |>
+  cdm <- omock::mockPerson(nPerson = 100) |>
     omock::mockObservationPeriod() |>
-    omock::mockCohort(name = "cohort2") |>
+    omock::mockCohort(name = "cohort2", numberCohorts = 2) |>
     copyCdm()
 
   # Number of counts for the initial cohorts are the same as in the matched cohorts
@@ -260,8 +265,8 @@ test_that("test exactMatchingCohort with a ratio bigger than 1", {
   )
 
   outc <- cdm[["new_cohort"]] |>
-    dplyr::filter(subject_id == 5) |> dplyr::reframe(cohort_start_date) |>
-    dplyr::pull() %in% as.Date(c("2017-10-30","2003-01-04","2014-12-15","2010-09-09"))
+    dplyr::filter(subject_id == 5) |>
+    dplyr::pull("cohort_start_date") %in% as.Date(c("2017-10-30","2003-01-04","2014-12-15","2010-09-09"))
   expect_true(unique(outc) == TRUE)
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
