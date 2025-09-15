@@ -132,8 +132,8 @@ as to end at the preceding observation period end date.</p></li>
 <span>  <span class="va">name</span>,</span>
 <span>  exit <span class="op">=</span> <span class="st">"event_end_date"</span>,</span>
 <span>  overlap <span class="op">=</span> <span class="st">"merge"</span>,</span>
-<span>  inObservation <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  table <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  useRecordsBeforeObservation <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  useSourceFields <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  subsetCohort <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  subsetCohortId <span class="op">=</span> <span class="cn">NULL</span></span>
@@ -170,16 +170,18 @@ cohort end date will be set by adding together the total days
 from each of the overlapping records.</p></dd>
 
 
-<dt id="arg-inobservation">inObservation<a class="anchor" aria-label="anchor" href="#arg-inobservation"></a></dt>
-<dd><p>If TRUE, only records in observation will be used. If
-FALSE, records before the start of observation period will be considered,
-with startdate the start of observation.</p></dd>
-
-
 <dt id="arg-table">table<a class="anchor" aria-label="anchor" href="#arg-table"></a></dt>
 <dd><p>Name of OMOP tables to search for records of the concepts
 provided. If NULL, each concept will be search at the assigned domain in
 the concept table.</p></dd>
+
+
+<dt id="arg-userecordsbeforeobservation">useRecordsBeforeObservation<a class="anchor" aria-label="anchor" href="#arg-userecordsbeforeobservation"></a></dt>
+<dd><p>If FALSE, only records in observation will
+be used. If TRUE, records before the start of observation period will be
+considered, with cohort start date set as the start date of the
+individuals next observation period (as cohort records must be within
+observation).</p></dd>
 
 
 <dt id="arg-usesourcefields">useSourceFields<a class="anchor" aria-label="anchor" href="#arg-usesourcefields"></a></dt>
@@ -241,9 +243,9 @@ are included.</p></dd>
 <span class="r-in"><span><span class="va">conceptSet</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"nitrogen"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">35604434</span>, <span class="fl">35604439</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span><span class="st">"potassium"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">40741270</span>, <span class="fl">42899580</span>, <span class="fl">44081436</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">cohort_drugs</span> <span class="op">&lt;-</span> <span class="fu">conceptCohort</span><span class="op">(</span><span class="va">cdm</span>,</span></span>
+<span class="r-in"><span><span class="va">cdm</span><span class="op">$</span><span class="va">study_cohort</span> <span class="op">&lt;-</span> <span class="fu">conceptCohort</span><span class="op">(</span><span class="va">cdm</span>,</span></span>
 <span class="r-in"><span>                             conceptSet <span class="op">=</span> <span class="va">conceptSet</span>,</span></span>
-<span class="r-in"><span>                             name <span class="op">=</span> <span class="st">"cohort_drugs"</span>,</span></span>
+<span class="r-in"><span>                             name <span class="op">=</span> <span class="st">"study_cohort"</span>,</span></span>
 <span class="r-in"><span>                             exit <span class="op">=</span> <span class="st">"event_start_date"</span>,</span></span>
 <span class="r-in"><span>                             overlap <span class="op">=</span> <span class="st">"extend"</span>,</span></span>
 <span class="r-in"><span>                             subsetCohort <span class="op">=</span> <span class="st">"cohort"</span></span></span>
@@ -255,9 +257,9 @@ are included.</p></dd>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Applying cohort requirements.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Adding overlapping records.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Re-appplying cohort requirements.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Cohort <span style="font-weight: bold;">cohort_drugs</span> created.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Cohort <span style="font-weight: bold;">study_cohort</span> created.</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">cohort_drugs</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/attrition.html" class="external-link">attrition</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span> <span class="va">cdm</span><span class="op">$</span><span class="va">study_cohort</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/attrition.html" class="external-link">attrition</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 20 × 7</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    cohort_definition_id number_records number_subjects reason_id reason         </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          </span>
