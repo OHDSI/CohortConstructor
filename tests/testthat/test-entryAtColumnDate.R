@@ -1,24 +1,16 @@
 test_that("entry at first date", {
-  testthat::skip_on_cran()
-  cdm <- mockCohortConstructor(
-    tables = list(
-      "cohort" = dplyr::tibble(
-        cohort_definition_id = 1L,
-        subject_id = c(1, 2, 3, 4, 4)  |> as.integer(),
-        cohort_start_date = as.Date(c("2000-06-03", "2000-01-01", "2015-01-15", "1989-12-09", "2000-12-09")),
-        cohort_end_date = as.Date(c("2001-09-01", "2001-01-12", "2015-02-15", "1990-12-09", "2002-12-09")),
-        other_date_1 = as.Date(c("2001-08-01", "2001-01-01", "2015-01-15", NA, "2002-12-09")),
-        other_date_2 = as.Date(c("2001-08-01", NA, "2015-04-15", "1990-11-09", "2002-12-09"))
-      )
-    ),
-    con = connection(),
-    writeSchema = writeSchema()
-  )
-  # remove when omock > 0.3.1
-  cdm$cohort <- cdm$cohort |>
-    dplyr::select("cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date", "other_date_1", "other_date_2") |>
-    dplyr::compute(name = "cohort", temporary = FALSE) |>
-    omopgenerics::newCohortTable()
+  skip_on_cran()
+  cdm <- omock::mockCdmFromTables(tables = list(
+    "cohort" = dplyr::tibble(
+      cohort_definition_id = 1L,
+      subject_id = c(1, 2, 3, 4, 4)  |> as.integer(),
+      cohort_start_date = as.Date(c("2000-06-03", "2000-01-01", "2015-01-15", "1989-12-09", "2000-12-09")),
+      cohort_end_date = as.Date(c("2001-09-01", "2001-01-12", "2015-02-15", "1990-12-09", "2002-12-09")),
+      other_date_1 = as.Date(c("2001-08-01", "2001-01-01", "2015-01-15", NA, "2002-12-09")),
+      other_date_2 = as.Date(c("2001-08-01", NA, "2015-04-15", "1990-11-09", "2002-12-09"))
+    )
+  )) |>
+    copyCdm()
 
   # works
   cdm$cohort1 <- cdm$cohort |>
@@ -98,31 +90,23 @@ test_that("entry at first date", {
                     c("cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date")))
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  PatientProfiles::mockDisconnect(cdm)
+
+  dropCreatedTables(cdm = cdm)
 })
 
 test_that("entry at last date", {
-  testthat::skip_on_cran()
-  cdm <- mockCohortConstructor(
-    tables = list(
-      "cohort" = dplyr::tibble(
-        cohort_definition_id = c(1, 1, 2, 2, 2) |> as.integer(),
-        subject_id = c(1, 2, 3, 4, 4) |> as.integer(),
-        cohort_start_date = as.Date(c("2000-06-03", "2000-01-01", "2015-01-15", "1989-12-09", "2000-12-09")),
-        cohort_end_date = as.Date(c("2001-10-01", "2001-04-15", "2015-02-15", "1990-12-09", "2002-12-09")),
-        other_date_1 = as.Date(c("2001-09-02", "2001-01-01", "2015-01-15", "1989-11-09", "2002-12-09")),
-        other_date_2 = as.Date(c("2001-08-01", NA, "2015-02-15", "1990-11-09", "2002-12-09"))
-      )
-    ),
-    con = connection(),
-    writeSchema = writeSchema()
-  )
-
-  # remove when omock > 0.3.1
-  cdm$cohort <- cdm$cohort |>
-    dplyr::select("cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date", "other_date_1", "other_date_2") |>
-    dplyr::compute(name = "cohort", temporary = FALSE) |>
-    omopgenerics::newCohortTable()
+  skip_on_cran()
+  cdm <- omock::mockCdmFromTables(tables = list(
+    "cohort" = dplyr::tibble(
+      cohort_definition_id = c(1, 1, 2, 2, 2) |> as.integer(),
+      subject_id = c(1, 2, 3, 4, 4) |> as.integer(),
+      cohort_start_date = as.Date(c("2000-06-03", "2000-01-01", "2015-01-15", "1989-12-09", "2000-12-09")),
+      cohort_end_date = as.Date(c("2001-10-01", "2001-04-15", "2015-02-15", "1990-12-09", "2002-12-09")),
+      other_date_1 = as.Date(c("2001-09-02", "2001-01-01", "2015-01-15", "1989-11-09", "2002-12-09")),
+      other_date_2 = as.Date(c("2001-08-01", NA, "2015-02-15", "1990-11-09", "2002-12-09"))
+    )
+  )) |>
+    copyCdm()
 
   cdm$cohort1 <- cdm$cohort |>
     entryAtLastDate(
@@ -223,50 +207,45 @@ test_that("entry at last date", {
                     c("cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date")))
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  PatientProfiles::mockDisconnect(cdm)
+
+  dropCreatedTables(cdm = cdm)
 })
 
 test_that("test indexes - postgres", {
   skip_on_cran()
-  skip_if(Sys.getenv("CDM5_POSTGRESQL_DBNAME") == "")
   skip_if(!testIndexes)
 
-  db <- DBI::dbConnect(RPostgres::Postgres(),
-                       dbname = Sys.getenv("CDM5_POSTGRESQL_DBNAME"),
-                       host = Sys.getenv("CDM5_POSTGRESQL_HOST"),
-                       user = Sys.getenv("CDM5_POSTGRESQL_USER"),
-                       password = Sys.getenv("CDM5_POSTGRESQL_PASSWORD"))
-  cdm <- CDMConnector::cdmFromCon(
-    con = db,
-    cdmSchema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA"),
-    writeSchema = Sys.getenv("CDM5_POSTGRESQL_SCRATCH_SCHEMA"),
-    writePrefix = "cc_",
-    achillesSchema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA")
-  )
+  if (dbToTest == "postgres CDMConnector") {
+    cdm <- omock::mockCdmFromDataset(datasetName = "GiBleed", source = "local") |>
+      copyCdm()
 
-  cdm <- omopgenerics::insertTable(cdm = cdm,
-                                   name = "my_cohort",
-                                   table = data.frame(cohort_definition_id = 1L,
-                                                      subject_id = 1L,
-                                                      cohort_start_date = as.Date("2009-01-02"),
-                                                      cohort_end_date = as.Date("2009-01-03"),
-                                                      other_date = as.Date("2009-01-01")))
-  cdm$my_cohort <- omopgenerics::newCohortTable(cdm$my_cohort)
-  cdm$my_cohort <- entryAtFirstDate(cdm$my_cohort, dateColumns = c("cohort_end_date", "other_date"), returnReason = TRUE)
+    con <- CDMConnector::cdmCon(cdm = cdm)
 
-  expect_true(
-    DBI::dbGetQuery(db, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
-      "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
-  )
+    cdm <- omopgenerics::insertTable(cdm = cdm,
+                                     name = "my_cohort",
+                                     table = data.frame(cohort_definition_id = 1L,
+                                                        subject_id = 1L,
+                                                        cohort_start_date = as.Date("2009-01-02"),
+                                                        cohort_end_date = as.Date("2009-01-03"),
+                                                        other_date = as.Date("2009-01-01")))
+    cdm$my_cohort <- omopgenerics::newCohortTable(cdm$my_cohort)
+    cdm$my_cohort <- entryAtFirstDate(cdm$my_cohort, dateColumns = c("cohort_end_date", "other_date"), returnReason = TRUE)
 
-  cdm$my_cohort <- entryAtLastDate(cdm$my_cohort, dateColumns = c("cohort_start_date", "cohort_end_date"), returnReason = FALSE)
+    expect_true(
+      DBI::dbGetQuery(con, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
+        "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
+    )
 
-  expect_true(
-    DBI::dbGetQuery(db, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
-      "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
-  )
+    cdm$my_cohort <- entryAtLastDate(cdm$my_cohort, dateColumns = c("cohort_start_date", "cohort_end_date"), returnReason = FALSE)
 
-  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
-  CDMConnector::cdmDisconnect(cdm = cdm)
+    expect_true(
+      DBI::dbGetQuery(con, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
+        "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
+    )
+
+    expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
+
+    dropCreatedTables(cdm = cdm)
+  }
+
 })

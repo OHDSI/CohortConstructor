@@ -1,68 +1,49 @@
-test_that("local tibble and duckdb test - will do nothing for these", {
+
+test_that("test adds indexes", {
   skip_on_cran()
-  cdm <- omock::mockCdmReference() |>
-    omock::mockCdmFromTables(tables = list("cohort" = dplyr::tibble(
-      "cohort_definition_id" = 1,
-      "subject_id" = c(1, 2, 3),
-      "cohort_start_date" = as.Date("2020-01-01"),
-      "cohort_end_date" = as.Date("2024-01-01")
-    )))
-  expect_no_error(cdm$cohort <- cdm$cohort |>
-    addCohortTableIndex())
 
-  cdm <- cdm |> copyCdm()
-  expect_no_error(cdm$cohort |>
-    addCohortTableIndex())
+  cdm <- omock::mockCdmFromTables(tables = list(my_cohort = dplyr::tibble(
+    cohort_definition_id = 1L,
+    subject_id = 1L,
+    cohort_start_date = as.Date("2009-01-01"),
+    cohort_end_date = as.Date("2009-01-02")
+  ))) |>
+    copyCdm()
 
-  # expected error
-  expect_error(cdm$person |>
-    addCohortTableIndex())
+  if (dbToTest == "postgres CDMConnector") {
+    # get connection
+    con <- CDMConnector::cdmCon(cdm = cdm)
 
-})
+    # check indexes at start
+    indexes_start <- dplyr::tbl(con, "pg_indexes") |>
+      dplyr::filter(.data$table_name == "coco_test_my_cohort") |>
+      dplyr::pull("indexname")
+    expect_true(length(indexes_start) == 0)
 
-test_that("postgres test - adds indexes", {
-  skip_on_cran()
-  skip_if(Sys.getenv("CDM5_POSTGRESQL_DBNAME") == "")
+    # add indexes
+    expect_no_error(cdm$my_cohort <- addCohortTableIndex(cdm$my_cohort))
 
-  db <- DBI::dbConnect(RPostgres::Postgres(),
-                       dbname = Sys.getenv("CDM5_POSTGRESQL_DBNAME"),
-                       host = Sys.getenv("CDM5_POSTGRESQL_HOST"),
-                       user = Sys.getenv("CDM5_POSTGRESQL_USER"),
-                       password = Sys.getenv("CDM5_POSTGRESQL_PASSWORD"))
-  cdm <- CDMConnector::cdmFromCon(
-    con = db,
-    cdmSchema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA"),
-    writeSchema = Sys.getenv("CDM5_POSTGRESQL_SCRATCH_SCHEMA"),
-    writePrefix = "cc_",
-    achillesSchema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA")
-  )
+    # check that one index exists
+    indexes_after <- dplyr::tbl(con, "pg_indexes") |>
+      dplyr::filter(.data$table_name == "coco_test_my_cohort") |>
+      dplyr::pull("indexname")
+    expect_true(length(indexes_after) == 1)
 
-  cdm <- omopgenerics::insertTable(cdm = cdm,
-              name = "my_cohort",
-              table = data.frame(cohort_definition_id = 1L,
-                                 subject_id = 1L,
-                                 cohort_start_date = as.Date("2009-01-01"),
-                                 cohort_end_date = as.Date("2009-01-02")))
-  cdm$my_cohort <- omopgenerics::newCohortTable(cdm$my_cohort)
+    # add indexes again
+    expect_no_error(cdm$my_cohort <- addCohortTableIndex(cdm$my_cohort))
 
-  indexes_start <- DBI::dbGetQuery(db,
-                        paste0("SELECT indexname FROM pg_indexes WHERE tablename = 'cc_my_cohort';"))
-  expect_true(nrow(indexes_start) == 0)
+    # check indexes remain the same
+    indexes_after <- dplyr::tbl(con, "pg_indexes") |>
+      dplyr::filter(.data$table_name == "coco_test_my_cohort") |>
+      dplyr::pull("indexname")
+    expect_true(length(indexes_after) == 1)
+  } else {
+    # do nothing for a cohort
+    expect_no_error(addCohortTableIndex(cdm$my_cohort))
 
-  cdm$my_cohort <- cdm$my_cohort |> addCohortTableIndex()
-  indexes_end <- DBI::dbGetQuery(db,
-                            paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';"))
-  expect_true(nrow(indexes_end) == 1)
+    # throw error if not a cohort
+    expect_error(addCohortTableIndex(cdm$person))
+  }
 
-  # no error if we add another index - it will just be skipped
-  cdm$my_cohort <- cdm$my_cohort |> addCohortTableIndex()
-  indexes_end_2 <- DBI::dbGetQuery(db, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';"))
-  expect_true(nrow(indexes_end_2) == 1)
-
-  # should still all work as before
-  cdm$my_cohort <- omopgenerics::newCohortTable(cdm$my_cohort)
-
-  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
-  CDMConnector::cdmDisconnect(cdm = cdm)
-
+  dropCreatedTables(cdm = cdm)
 })

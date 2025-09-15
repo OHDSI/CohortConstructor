@@ -17,14 +17,6 @@ knitr::opts_chunk$set(
   comment = "#>",
   eval = NOT_CRAN
 )
-
-library(CDMConnector)
-if (Sys.getenv("EUNOMIA_DATA_FOLDER") == ""){
-Sys.setenv("EUNOMIA_DATA_FOLDER" = file.path(tempdir(), "eunomia"))}
-if (!dir.exists(Sys.getenv("EUNOMIA_DATA_FOLDER"))){ dir.create(Sys.getenv("EUNOMIA_DATA_FOLDER"))
-downloadEunomiaData()  
-}
-
 ```
 
 In previous vignettes we have seen numerous R functions that can help us to add a cohort of interest to a cdm reference. When our cdm reference is to tables in a database, as is often the code, our R code will have been translated to SQL that is run against tables in the databases (for more details on how this is all implemented see <https://oxford-pharmacoepi.github.io/Tidy-R-programming-with-OMOP/>).
@@ -32,16 +24,14 @@ In previous vignettes we have seen numerous R functions that can help us to add 
 Let's again work with Eunomia and get the codes needed to create a set of drug cohorts. 
 
 ```{r}
-library(CDMConnector)
+library(omock)
 library(CodelistGenerator)
 library(PatientProfiles)
 library(CohortConstructor)
 library(dplyr)
 
-con <- DBI::dbConnect(duckdb::duckdb(), 
-                      dbdir = eunomiaDir())
-cdm <- cdmFromCon(con, cdmSchema = "main", writeSchema = "main", 
-                  writePrefix = "my_study_")
+cdm <- mockCdmFromDataset(datasetName = "GiBleed", source = "duckdb")
+
 drug_codes <- getDrugIngredientCodes(cdm, 
                                      name = c("acetaminophen",
                                               "amoxicillin", 

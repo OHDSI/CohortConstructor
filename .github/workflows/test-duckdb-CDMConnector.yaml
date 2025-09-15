@@ -1,0 +1,45 @@
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * *"
+
+name: duckdb-CDMConnector
+
+jobs:
+  duckdb-CDMConnector:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: true
+      matrix:
+        config:
+          - {os: ubuntu-latest,   r: 'release'}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: r-lib/actions/setup-pandoc@v2
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: ${{ matrix.config.r }}
+          http-user-agent: ${{ matrix.config.http-user-agent }}
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::devtools
+          needs: check
+
+      - name: Run tests on duckdb
+        run: |
+          Sys.setenv("DB_TO_TEST" = "duckdb CDMConnector")
+          x <- devtools::test()
+          error <- sum(as.numeric(dplyr::as_tibble(x)$error))
+          failed <- sum(as.numeric(dplyr::as_tibble(x)$failed))
+          if (error + failed > 0) cli::cli_abort(c(x = "Tests failed"))
+        shell: Rscript {0}

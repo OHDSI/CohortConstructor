@@ -24,8 +24,6 @@ benchmarkCohortConstructor <- function(cdm,
                                        dropCohorts = TRUE) {
   # Package checks
   rlang::check_installed("tictoc")
-  rlang::check_installed("CirceR")
-  rlang::check_installed("SqlRender")
   rlang::check_installed("CohortCharacteristics")
   rlang::check_installed("CDMConnector")
 
@@ -37,12 +35,20 @@ benchmarkCohortConstructor <- function(cdm,
   omopgenerics::assertLogical(dropCohorts)
   tictoc::tic.clearlog()
 
+  # check local
+  if (runCIRCE & "local_cdm" %in% class(omopgenerics::cdmSource(cdm))) {
+    runCIRCE <- FALSE
+    cli::cli_warn(c("!" = "ATLAS cohort instantiation is not supported for local_cdm, `runCIRCE` has been switch to {.pkg FALSE}."))
+  }
+
   # prefix for cohorts created - to drop later
   pref <- paste0("bench", paste0(sample.int(9,3), collapse = ""))
 
   # Instantiate or read Atlas ----
   if (runCIRCE) {
     cli::cli_inform(c("*" = "{.strong Instantiating JSON cohort defintions with CDMConnector}"))
+    rlang::check_installed("CirceR")
+    rlang::check_installed("SqlRender")
     for (json in jsons$cohort_name_snakecase) {
       tictoc::tic(msg = paste0("atlas_", json))
       cdm <- CDMConnector::generateCohortSet(
