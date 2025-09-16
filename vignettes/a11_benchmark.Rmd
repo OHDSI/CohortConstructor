@@ -86,13 +86,15 @@ The CohortConstructor package offers an alternative approach, emphasising cohort
 To test the performance of the package there is a benchmarking function which uses nine phenotypes from the [OHDSI Phenotype library](https://github.com/OHDSI/PhenotypeLibrary) that cover a range of concept domains, entry and inclusion criteria, and cohort exit options. We replicated these cohorts using CohortConstructor to assess computational time and agreement between CIRCE and CohortConstructor.
 
 ```{r, echo=TRUE}
+library(DBI)
+library(duckdb)
 library(CDMConnector)
 library(CodelistGenerator)
 library(PatientProfiles)
 library(CohortConstructor)
 library(dplyr)
 
-con <- DBI::dbConnect(duckdb::duckdb(), 
+con <- dbConnect(duckdb(), 
                       dbdir = eunomiaDir())
 cdm <- cdmFromCon(con, cdmSchema = "main", writeSchema = "main", 
                   writePrefix = "my_study_")
@@ -129,7 +131,7 @@ The table below presents the number of records in the OMOP tables used in the be
 
 ```{r}
 benchmarkData$omop |>
-  visOmopResults::formatTable() |>
+  formatTable() |>
   tab_style(style = list(cell_fill(color = "#e1e1e1"), cell_text(weight = "bold")),
             locations = cells_column_labels()) |>
   tab_style(style = list(cell_text(weight = "bold")),
@@ -150,7 +152,7 @@ The following table displays the number of records and subjects for each cohort 
 
 ```{r}
 benchmarkData$details |>
-  visOmopResults::formatTable(groupColumn = "cdm_name") |>
+  formatTable(groupColumn = "cdm_name") |>
   tab_style(style = list(cell_fill(color = "#e1e1e1"), cell_text(weight = "bold")),
             locations = cells_column_labels()) |>
   tab_style(style = list(cell_text(weight = "bold")),
@@ -176,8 +178,8 @@ gg <- benchmarkData$comparison |>
   xlab("") 
 
 gg$data <- gg$data |>
-  dplyr::mutate(
-    cohort_name_reference_cohort_name_comparator = visOmopResults::customiseText(gsub("cc_| -.*", "", cohort_name_reference_cohort_name_comparator)),
+  mutate(
+    cohort_name_reference_cohort_name_comparator = customiseText(gsub("cc_| -.*", "", cohort_name_reference_cohort_name_comparator)),
     cohort_name_reference_cohort_name_comparator = case_when(
       grepl("Asthma", .data[["cohort_name_reference_cohort_name_comparator"]]) ~ "Asthma without COPD",
       grepl("Covid", .data[["cohort_name_reference_cohort_name_comparator"]]) ~ gsub("Covid|Covid", "COVID-19", cohort_name_reference_cohort_name_comparator),

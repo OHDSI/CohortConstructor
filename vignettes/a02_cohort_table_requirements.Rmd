@@ -20,6 +20,9 @@ knitr::opts_chunk$set(
 In this vignette we'll show how requirements related to the data contained in the cohort table can be applied. For this we'll use the Eunomia synthetic data.
 
 ```{r}
+library(DBI)
+library(duckdb)
+library(CDMConnector)
 library(CodelistGenerator)
 library(CohortConstructor)
 library(CohortCharacteristics)
@@ -31,13 +34,13 @@ library(dplyr)
 if (Sys.getenv("EUNOMIA_DATA_FOLDER") == ""){
   Sys.setenv("EUNOMIA_DATA_FOLDER" = file.path(tempdir(), "eunomia"))}
 if (!dir.exists(Sys.getenv("EUNOMIA_DATA_FOLDER"))){ dir.create(Sys.getenv("EUNOMIA_DATA_FOLDER"))
-  CDMConnector::downloadEunomiaData()  
+  downloadEunomiaData()  
 }
 ```
 
 ```{r}
-con <- DBI::dbConnect(duckdb::duckdb(), dbdir = CDMConnector::eunomiaDir())
-cdm <- CDMConnector::cdmFromCon(con, cdmSchema = "main", 
+con <- dbConnect(duckdb(), dbdir = eunomiaDir())
+cdm <- cdmFromCon(con, cdmSchema = "main", 
                     writeSchema = "main", writePrefix = "my_study_")
 ```
 

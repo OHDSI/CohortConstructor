@@ -36,6 +36,7 @@ Load necessary packages:
 
 ```{r}
 library(duckdb)
+library(dplyr)
 library(CDMConnector)
 library(PatientProfiles)
 library(CohortConstructor)
@@ -172,7 +173,7 @@ From the 6 records only 3 are within our period of interest `1990-1993`, there a
 
 ```{r}
 cdm$medications_year |>
-  dplyr::filter(subject_id == 4383)
+  filter(subject_id == 4383)
 ```
 
 Let's disconnect from our cdm object to finish.
