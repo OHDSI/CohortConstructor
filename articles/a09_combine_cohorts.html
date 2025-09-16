@@ -90,13 +90,16 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ohdsi.github.io/CohortConstructor/">CohortConstructor</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dbi.r-dbi.org" class="external-link">DBI</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r.duckdb.org/" class="external-link">duckdb</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://darwin-eu.github.io/CDMConnector/" class="external-link">CDMConnector</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ohdsi.github.io/CohortConstructor/">CohortConstructor</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://darwin-eu.github.io/CohortCharacteristics/" class="external-link">CohortCharacteristics</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span></code></pre></div>
 <p>For this example we’ll use the Eunomia synthetic data from the
 CDMConnector package.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">duckdb</span><span class="fu">::</span><span class="fu"><a href="https://r.duckdb.org/reference/duckdb.html" class="external-link">duckdb</a></span><span class="op">(</span><span class="op">)</span>, dbdir <span class="op">=</span> <span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/eunomiaDir.html" class="external-link">eunomiaDir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu"><a href="https://r.duckdb.org/reference/duckdb.html" class="external-link">duckdb</a></span><span class="op">(</span><span class="op">)</span>, dbdir <span class="op">=</span> <span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/eunomiaDir.html" class="external-link">eunomiaDir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/cdmFromCon.html" class="external-link">cdmFromCon</a></span><span class="op">(</span><span class="va">con</span>, cdmSchema <span class="op">=</span> <span class="st">"main"</span>, </span>
 <span>                    writeSchema <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>prefix <span class="op">=</span> <span class="st">"my_study_"</span>, schema <span class="op">=</span> <span class="st">"main"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Let’s start by creating two drug cohorts, one for users of diclofenac
@@ -115,7 +118,7 @@ and another for users of acetaminophen.</p>
 <p>To check whether there is an overlap between records in both cohorts
 using the function <code><a href="../reference/intersectCohorts.html">intersectCohorts()</a></code>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">medintersect</span> <span class="op">&lt;-</span> <span class="fu">CohortConstructor</span><span class="fu">::</span><span class="fu"><a href="../reference/intersectCohorts.html">intersectCohorts</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">medintersect</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/intersectCohorts.html">intersectCohorts</a></span><span class="op">(</span></span>
 <span>  cohort <span class="op">=</span> <span class="va">cdm</span><span class="op">$</span><span class="va">medications</span>,</span>
 <span>  name <span class="op">=</span> <span class="st">"medintersect"</span></span>
 <span><span class="op">)</span></span>
@@ -130,7 +133,7 @@ and acetaminophen cohorts.</p>
 <p>We can choose the number of days between cohort entries using the
 <code>gap</code> argument.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">medintersect</span> <span class="op">&lt;-</span> <span class="fu">CohortConstructor</span><span class="fu">::</span><span class="fu"><a href="../reference/intersectCohorts.html">intersectCohorts</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">medintersect</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/intersectCohorts.html">intersectCohorts</a></span><span class="op">(</span></span>
 <span>  cohort <span class="op">=</span> <span class="va">cdm</span><span class="op">$</span><span class="va">medications</span>,</span>
 <span>  gap <span class="op">=</span> <span class="fl">365</span>,</span>
 <span>  name <span class="op">=</span> <span class="st">"medintersect"</span></span>
@@ -146,7 +149,7 @@ days) in the diclofenac and acetaminophen cohorts.</p>
 <p>We can also combine different cohorts using the function
 <code><a href="../reference/unionCohorts.html">unionCohorts()</a></code>.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">medunion</span> <span class="op">&lt;-</span> <span class="fu">CohortConstructor</span><span class="fu">::</span><span class="fu"><a href="../reference/unionCohorts.html">unionCohorts</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">medunion</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/unionCohorts.html">unionCohorts</a></span><span class="op">(</span></span>
 <span>  cohort <span class="op">=</span> <span class="va">cdm</span><span class="op">$</span><span class="va">medications</span>,</span>
 <span>  name <span class="op">=</span> <span class="st">"medunion"</span></span>
 <span><span class="op">)</span></span>
@@ -161,7 +164,7 @@ the diclofenac cohort or the acetaminophen cohort.</p>
 <p>You can keep the original cohorts in the new table if you use the
 argument <code>keepOriginalCohorts = TRUE</code>.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">medunion</span> <span class="op">&lt;-</span> <span class="fu">CohortConstructor</span><span class="fu">::</span><span class="fu"><a href="../reference/unionCohorts.html">unionCohorts</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">medunion</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/unionCohorts.html">unionCohorts</a></span><span class="op">(</span></span>
 <span>  cohort <span class="op">=</span> <span class="va">cdm</span><span class="op">$</span><span class="va">medications</span>,</span>
 <span>  name <span class="op">=</span> <span class="st">"medunion"</span>,</span>
 <span>  keepOriginalCohorts <span class="op">=</span> <span class="cn">TRUE</span></span>
@@ -177,7 +180,7 @@ argument <code>keepOriginalCohorts = TRUE</code>.</p>
 <p>You can also choose the number of days between two subsequent cohort
 entries to be merged using the <code>gap</code> argument.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">medunion</span> <span class="op">&lt;-</span> <span class="fu">CohortConstructor</span><span class="fu">::</span><span class="fu"><a href="../reference/unionCohorts.html">unionCohorts</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">medunion</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/unionCohorts.html">unionCohorts</a></span><span class="op">(</span></span>
 <span>  cohort <span class="op">=</span> <span class="va">cdm</span><span class="op">$</span><span class="va">medications</span>,</span>
 <span>  name <span class="op">=</span> <span class="st">"medunion"</span>,</span>
 <span>  gap <span class="op">=</span> <span class="fl">365</span>,</span>

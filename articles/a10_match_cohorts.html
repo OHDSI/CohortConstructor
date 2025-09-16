@@ -109,7 +109,7 @@ DrugUtilisation package to create mock data.</p>
 <code><a href="../reference/matchCohorts.html">matchCohorts()</a></code>, let us first use <code><a href="https://darwin-eu.github.io/omopgenerics/reference/settings.html" class="external-link">settings()</a></code>
 from omopgenerics package to explore this cohort:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">omopgenerics</span><span class="fu">::</span><span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/settings.html" class="external-link">settings</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">cohort1</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/settings.html" class="external-link">settings</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">cohort1</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -128,7 +128,7 @@ matched cohort for <code>cohort_definition_id = 1</code>.</p>
 <span>  cohortId <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  name <span class="op">=</span> <span class="st">"matched_cohort1"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">omopgenerics</span><span class="fu">::</span><span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/settings.html" class="external-link">settings</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">matched_cohort1</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/settings.html" class="external-link">settings</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">matched_cohort1</span><span class="op">)</span></span></code></pre></div>
 <p>Notice that in the generated tibble, there are two cohorts:
 <code>cohort_definition_id = 1</code> (original cohort), and
 <code>cohort_definition_id = 4</code> (matched cohort).
@@ -143,10 +143,10 @@ is the cohort_id of the original cohort.</p>
 using <code><a href="https://darwin-eu.github.io/omopgenerics/reference/attrition.html" class="external-link">attrition()</a></code> from omopgenerics package:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Original cohort</span></span>
-<span><span class="fu">omopgenerics</span><span class="fu">::</span><span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/attrition.html" class="external-link">attrition</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">matched_cohort1</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">cohort_definition_id</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/attrition.html" class="external-link">attrition</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">matched_cohort1</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">cohort_definition_id</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Matched cohort</span></span>
-<span><span class="fu">omopgenerics</span><span class="fu">::</span><span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/attrition.html" class="external-link">attrition</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">matched_cohort1</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">cohort_definition_id</span> <span class="op">==</span> <span class="fl">4</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/attrition.html" class="external-link">attrition</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">matched_cohort1</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">cohort_definition_id</span> <span class="op">==</span> <span class="fl">4</span><span class="op">)</span></span></code></pre></div>
 <p>Briefly, from the original cohort, we exclude first those individuals
 that do not have a match, and then individuals that their matching pair
 is not in observation during the assigned <em>cohort_start_date</em>.
@@ -183,7 +183,7 @@ cohort.</p>
 <code><a href="https://darwin-eu.github.io/omopgenerics/reference/cohortCount.html" class="external-link">cohortCount()</a></code> from CDMConnector to check if the matching
 has been done as desired.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">omopgenerics</span><span class="fu">::</span><span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/cohortCount.html" class="external-link">cohortCount</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">matched_cohort1</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/cohortCount.html" class="external-link">cohortCount</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">matched_cohort1</span><span class="op">)</span></span></code></pre></div>
 <p>You can modify the <code>ratio</code> parameter to tailor your
 matched cohort. <code>ratio</code> can adopt values from 1 to Inf.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
@@ -193,7 +193,7 @@ matched cohort. <code>ratio</code> can adopt values from 1 to Inf.</p>
 <span>  name <span class="op">=</span> <span class="st">"matched_cohort2"</span>,</span>
 <span>  ratio <span class="op">=</span> <span class="cn">Inf</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">omopgenerics</span><span class="fu">::</span><span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/cohortCount.html" class="external-link">cohortCount</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">matched_cohort2</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/cohortCount.html" class="external-link">cohortCount</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">matched_cohort2</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="generate-matched-cohorts-simultaneously-across-multiple-cohorts">Generate matched cohorts simultaneously across multiple cohorts<a class="anchor" aria-label="anchor" href="#generate-matched-cohorts-simultaneously-across-multiple-cohorts"></a>
@@ -209,9 +209,9 @@ are the cohorts of interest. If set to NULL, all the cohorts present in
 <span>  name <span class="op">=</span> <span class="st">"matched_cohort3"</span>,</span>
 <span>  ratio <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">omopgenerics</span><span class="fu">::</span><span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/settings.html" class="external-link">settings</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">matched_cohort3</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">cohort_definition_id</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/settings.html" class="external-link">settings</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">matched_cohort3</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">cohort_definition_id</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">omopgenerics</span><span class="fu">::</span><span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/cohortCount.html" class="external-link">cohortCount</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">matched_cohort3</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">cohort_definition_id</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/cohortCount.html" class="external-link">cohortCount</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">matched_cohort3</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">cohort_definition_id</span><span class="op">)</span></span></code></pre></div>
 <p>Notice that each cohort has their own (and independent of other
 cohorts) matched cohort.</p>
 </div>
