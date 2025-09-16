@@ -15,6 +15,10 @@ knitr::opts_chunk$set(
 ```
 
 ```{r}
+library(DBI)
+library(dplyr)
+library(duckdb)
+library(CDMConnector)
 library(CodelistGenerator)
 library(CohortConstructor)
 library(CohortCharacteristics)
@@ -41,8 +45,8 @@ if (!dir.exists(Sys.getenv("EUNOMIA_DATA_FOLDER"))){ dir.create(Sys.getenv("EUNO
 In this vignette we'll show how requirements related to patient demographics can be applied to a cohort. Again we'll use the Eunomia synthetic data.
 
 ```{r}
-con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomiaDir())
-cdm <- CDMConnector::cdmFromCon(con, cdmSchema = "main", 
+con <- dbConnect(duckdb(), dbdir = eunomiaDir())
+cdm <- cdmFromCon(con, cdmSchema = "main", 
                     writeSchema = "main", writePrefix = "my_study_")
 ```
 

@@ -32,14 +32,16 @@ In previous vignettes we have seen numerous R functions that can help us to add 
 Let's again work with Eunomia and get the codes needed to create a set of drug cohorts. 
 
 ```{r}
+library(DBI)
+library(duckdb)
 library(CDMConnector)
 library(CodelistGenerator)
 library(PatientProfiles)
 library(CohortConstructor)
 library(dplyr)
 
-con <- DBI::dbConnect(duckdb::duckdb(), 
-                      dbdir = eunomiaDir())
+con <- dbConnect(duckdb(),
+                 dbdir = eunomiaDir())
 cdm <- cdmFromCon(con, cdmSchema = "main", writeSchema = "main", 
                   writePrefix = "my_study_")
 drug_codes <- getDrugIngredientCodes(cdm, 

@@ -29,6 +29,9 @@ downloadEunomiaData()
 
 
 ```{r setup}
+library(DBI)
+library(duckdb)
+library(CDMConnector)
 library(CohortConstructor)
 library(CohortCharacteristics)
 library(ggplot2)
@@ -54,8 +57,8 @@ if (!dir.exists(Sys.getenv("EUNOMIA_DATA_FOLDER"))){ dir.create(Sys.getenv("EUNO
 For this example we'll use the Eunomia synthetic data from the CDMConnector package.
 
 ```{r}
-con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomiaDir())
-cdm <- CDMConnector::cdmFromCon(con, cdmSchema = "main", 
+con <- dbConnect(duckdb(), dbdir = eunomiaDir())
+cdm <- cdmFromCon(con, cdmSchema = "main", 
                     writeSchema = "main", writePrefix = "my_study_")
 ```
 
