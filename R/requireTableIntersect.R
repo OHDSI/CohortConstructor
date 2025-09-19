@@ -11,7 +11,6 @@
 #' @inheritParams windowDoc
 #' @inheritParams nameDoc
 #' @inheritParams atFirstDoc
-#' @inheritParams softValidationDoc
 #'
 #' @return Cohort table
 #'
@@ -37,8 +36,7 @@ requireTableIntersect <- function(cohort,
                                   inObservation = TRUE,
                                   censorDate = NULL,
                                   atFirst = FALSE,
-                                  name = tableName(cohort),
-                                  .softValidation = TRUE) {
+                                  name = tableName(cohort)) {
   # checks
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cohort <- omopgenerics::validateCohortArgument(cohort)
@@ -48,7 +46,6 @@ requireTableIntersect <- function(cohort,
   cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
   intersections <- validateIntersections(intersections)
   omopgenerics::assertCharacter(tableName)
-  omopgenerics::assertLogical(.softValidation, length = 1)
   omopgenerics::assertLogical(atFirst, length = 1)
 
   if (length(cohortId) == 0) {
@@ -132,7 +129,7 @@ requireTableIntersect <- function(cohort,
       name = name, temporary = FALSE,
       logPrefix = "CohortConstructor_requireTableIntersect_name_"
     ) |>
-    omopgenerics::newCohortTable(.softValidation = .softValidation) |>
+    omopgenerics::newCohortTable(.softValidation = TRUE) |>
     omopgenerics::recordCohortAttrition(reason = reason, cohortId = cohortId)
 
   omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(tablePrefix))

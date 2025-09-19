@@ -16,8 +16,7 @@ requireCohortIntersect(
   targetEndDate = "cohort_end_date",
   censorDate = NULL,
   atFirst = FALSE,
-  name = tableName(cohort),
-  .softValidation = TRUE
+  name = tableName(cohort)
 )
 }
 \arguments{
@@ -57,13 +56,6 @@ column date of the cohort.}
 TRUE, it will only be required for the first entry of each subject.}
 
 \item{name}{Name of the new cohort table created in the cdm object.}
-
-\item{.softValidation}{Whether to perform a soft validation of consistency.
-If set to FALSE four additional checks will be performed: 1) a check that
-cohort end date is not before cohort start date,  2) a check that there
-are no missing values in required columns, 3) a check that cohort duration is
-all within observation period, and 4) that there are no overlapping
-cohort entries}
 }
 \value{
 Cohort table with only those entries satisfying the criteria
