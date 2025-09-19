@@ -32,7 +32,7 @@ copyCohorts <- function(cohort, name, n = 1, cohortId = NULL) {
                      logPrefix = "CohortConstructor_copyCohors_subset_")
   } else {
     newCohort <- cohort |>
-      CohortConstructor::subsetCohorts(cohortId = cohortId, name = name, .softValidation = TRUE)
+      CohortConstructor::subsetCohorts(cohortId = cohortId, name = name)
   }
 
   # duplicate
