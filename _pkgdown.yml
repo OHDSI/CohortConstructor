@@ -23,6 +23,7 @@ reference:
 - contents:
   - requireMinCohortCount
   - requireInDateRange
+  - requireDuration
   - requireIsFirstEntry
   - requireIsLastEntry
   - requireIsEntry
