@@ -79,19 +79,17 @@ While the number of individuals remains unchanged, records after an individual's
 
 ## Keep only the last record per person
 
-If we want to keep the latest record per person instead of the earliest we would use `requireIsLastEntry()`. This will ensure that only the latest record for acetaminophen use remains in the cohort.
+If we want to require cohort entries to last a specific amount of time then we can use `requireDuration()`. Here for example we create an acetaminophen cohort and keep only those records that last for at least 30 days.
 
 ```{r}
 cdm$acetaminophen <- conceptCohort(cdm = cdm, 
                                    conceptSet = acetaminophen_codes, 
                                    exit = "event_end_date",
-                                   name = "acetaminophen")
-cdm$acetaminophen <- cdm$acetaminophen |> 
-  requireIsLastEntry()
+                                   name = "acetaminophen") |> 
+  requireDuration(c(30, Inf))
 
 summary_attrition <- summariseCohortAttrition(cdm$acetaminophen)
 plotCohortAttrition(summary_attrition)
-
 ```
 
 ## Keep only a range of records per person
@@ -129,6 +127,20 @@ summary_attrition <- summariseCohortAttrition(cdm$acetaminophen)
 plotCohortAttrition(summary_attrition)
 ```
 
+## Keep only if entry lasts a given duration
+```{r}
+cdm$acetaminophen <- conceptCohort(cdm = cdm, 
+                                 conceptSet = acetaminophen_codes, 
+                                 name = "acetaminophen")
+```
+
+```{r}
+cdm$acetaminophen <- cdm$acetaminophen |> 
+  requireInDateRange(dateRange = as.Date(c("2010-01-01", "2015-01-01")))
+
+summary_attrition <- summariseCohortAttrition(cdm$acetaminophen)
+plotCohortAttrition(summary_attrition)
+```
 ## Applying multiple cohort requirements
 
 Multiple restrictions can be applied to a cohort, however it is important to note that the order that requirements are applied will often matter.
