@@ -61,6 +61,7 @@
 <url><loc>https://ohdsi.github.io/CohortConstructor/reference/requireConceptIntersect.html</loc></url>
 <url><loc>https://ohdsi.github.io/CohortConstructor/reference/requireDemographics.html</loc></url>
 <url><loc>https://ohdsi.github.io/CohortConstructor/reference/requireDemographicsDoc.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/reference/requireDuration.html</loc></url>
 <url><loc>https://ohdsi.github.io/CohortConstructor/reference/requireFutureObservation.html</loc></url>
 <url><loc>https://ohdsi.github.io/CohortConstructor/reference/requireInDateRange.html</loc></url>
 <url><loc>https://ohdsi.github.io/CohortConstructor/reference/requireIntersectDoc.html</loc></url>
