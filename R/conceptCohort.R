@@ -182,7 +182,6 @@ conceptCohort <- function(cdm,
     tableCohortCodelist = tableCohortCodelist,
     supportedDomains = domainsData$domain_id
   )
-
   # get cohort entries from omop records
   cdm[[name]] <- unerafiedConceptCohort(
     cdm = cdm,
