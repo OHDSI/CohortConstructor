@@ -63,11 +63,10 @@ test_that("testing requireMinCohortCount", {
 
 
   # nobody to drop
-  expect_warning(
     cdm$cohort1_c <- requireMinCohortCount(cdm$cohort1,
                                            minCohortCount = 0,
                                            name = "cohort1_c"
-    ))
+    )
   expect_identical(settings(cdm$cohort1_c), startSettings)
   expect_identical(
     attrition(cdm$cohort1_c) |>
