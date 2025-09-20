@@ -76,7 +76,7 @@ for(i in seq_along(sorted_files)) {
 
 If we want even more detail, we also have the option to see the execution plan along with the SQL.
 
-```{r}
+```{r, eval=FALSE}
 dir_explain <- file.path(tempdir(), "explain_folder")
 dir.create(dir_explain)
 options("omopgenerics.log_sql_explain_path" = dir_explain)

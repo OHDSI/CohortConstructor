@@ -12,7 +12,6 @@
 #' @param indexDate Name of the column in the cohort that contains the date of
 #' interest.
 #' @inheritParams atFirstDoc
-#' @inheritParams softValidationDoc
 #'
 #' @return The cohort table with any cohort entries outside of the date range
 #' dropped
@@ -32,8 +31,7 @@ requireInDateRange <- function(cohort,
                                cohortId = NULL,
                                indexDate = "cohort_start_date",
                                atFirst = FALSE,
-                               name = tableName(cohort),
-                               .softValidation = TRUE) {
+                               name = tableName(cohort)) {
   # checks
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cohort <- omopgenerics::validateCohortArgument(cohort)
@@ -41,7 +39,6 @@ requireInDateRange <- function(cohort,
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
   dateRange <- validateDateRange(dateRange)
-  omopgenerics::assertLogical(.softValidation, length = 1)
   omopgenerics::assertLogical(atFirst, length = 1)
 
   if (length(cohortId) == 0) {
@@ -143,7 +140,7 @@ requireInDateRange <- function(cohort,
     dplyr::compute(name = name, temporary = FALSE,
                    logPrefix = "CohortConstructor_requireDateRange_name_") |>
     omopgenerics::newCohortTable(
-      .softValidation = .softValidation, cohortAttritionRef = attrition(newCohort)
+      .softValidation = TRUE, cohortAttritionRef = attrition(newCohort)
     )
 
   useIndexes <- getOption("CohortConstructor.use_indexes")
