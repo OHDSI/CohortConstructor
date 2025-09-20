@@ -4,7 +4,6 @@
 #' @inheritParams cohortDoc
 #' @inheritParams cohortIdModifyDoc
 #' @param newCohortName Character vector with same
-#' @inheritParams softValidationDoc
 #'
 #' @return A cohort_table object.
 #' @export
@@ -24,8 +23,7 @@
 #' }
 renameCohort <- function(cohort,
                          cohortId,
-                         newCohortName,
-                         .softValidation = TRUE) {
+                         newCohortName) {
   # check input
   cohort <- omopgenerics::validateCohortArgument(cohort = cohort)
   cohortId <- omopgenerics::validateCohortIdArgument(
@@ -37,7 +35,6 @@ renameCohort <- function(cohort,
   if (length(cohortId) != length(newCohortName)) {
     cli::cli_abort(c(x = "`cohortId` and `newCohortName` must have the same length."))
   }
-  omopgenerics::assertLogical(.softValidation)
 
   # new settings
   set <- omopgenerics::settings(cohort)
@@ -54,5 +51,5 @@ renameCohort <- function(cohort,
 
   # update cohort attributes
   cohort |>
-    omopgenerics::newCohortTable(cohortSetRef = set, .softValidation = .softValidation) # validate new names
+    omopgenerics::newCohortTable(cohortSetRef = set, .softValidation = TRUE)
 }

@@ -67,8 +67,7 @@ intersectCohorts <- function(cohort,
   tblName <- omopgenerics::uniqueTableName(prefix = tablePrefix)
   newCohort <- copyCohorts(cohort,
                            name = tblName,
-                           cohortId = cohortId,
-                           .softValidation = .softValidation)
+                           cohortId = cohortId)
   # get intersections between cohorts
   lowerWindow <- ifelse(gap != 0, -gap, gap)
   newCohort <- newCohort |>

@@ -58,6 +58,8 @@ yearCohorts <- function(cohort,
     return(cohort)
   }
 
+  originalAttrition <- attrition(cohort)
+
   # temp tables
   tablePrefix <- omopgenerics::tmpPrefix()
   tmpName <- omopgenerics::uniqueTableName(tablePrefix)
@@ -134,7 +136,6 @@ yearCohorts <- function(cohort,
     ) |>
     dplyr::collect() |>
     dplyr::mutate(dplyr::across(dplyr::everything(), as.integer))
-  originalAttrition <- attrition(cohort)
   newAttrition <- list()
   for (k in newSet$cohort_definition_id) {
     targetId <- newSet$target_cohort_definition_id[newSet$cohort_definition_id == k]

@@ -12,7 +12,6 @@
 #' @inheritParams keepOriginalCohortsDoc
 #' @param cohortName Name of the returned cohort. If NULL, the cohort name will
 #' be created by collapsing the individual cohort names, separated by "_".
-#' @inheritParams softValidationDoc
 #'
 #' @export
 #'
@@ -33,8 +32,7 @@ unionCohorts <- function(cohort,
                          gap = 0,
                          cohortName = NULL,
                          keepOriginalCohorts = FALSE,
-                         name = tableName(cohort),
-                         .softValidation = TRUE) {
+                         name = tableName(cohort)) {
   # checks
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cohort <- omopgenerics::validateCohortArgument(cohort)
@@ -43,7 +41,6 @@ unionCohorts <- function(cohort,
   omopgenerics::assertNumeric(gap, integerish = TRUE, min = 0, length = 1)
   omopgenerics::assertCharacter(cohortName, length = 1, null = TRUE)
   omopgenerics::assertLogical(keepOriginalCohorts, length = 1)
-  omopgenerics::assertLogical(.softValidation)
 
   if (is.infinite(gap)) {
     cli::cli_abort("`gap` can't be infinite")
@@ -97,7 +94,7 @@ unionCohorts <- function(cohort,
       cohortSetRef = cohSet,
       cohortAttritionRef = NULL,
       cohortCodelistRef = cohCodelist,
-      .softValidation = .softValidation
+      .softValidation = TRUE
     )
 
   if (isTRUE(keepOriginalCohorts)) {

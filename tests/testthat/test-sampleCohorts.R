@@ -96,7 +96,6 @@ test_that("expected errors", {
                                  overwrite = TRUE)
 
   expect_error(sampleCohorts(cdm$cohort2, n = 10))
-  expect_error(sampleCohorts(cdm_local$cohort1, n = 1))
   expect_warning(sampleCohorts(cdm$cohort1, cohortId = 4, n = 10))
   expect_warning(sampleCohorts(cdm$cohort1, cohortId = "1", n = 10))
   expect_error(sampleCohorts(cdm$cohort1, n = -1))

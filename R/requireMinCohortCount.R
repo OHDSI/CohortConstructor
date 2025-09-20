@@ -65,7 +65,7 @@ requireMinCohortCount <- function(cohort,
                      logPrefix = "CohortConstructor_requireMinCohortCount_fewer_") |>
       omopgenerics::recordCohortAttrition(
         reason = "Fewer than minimum cohort count of {minCohortCount}",
-        cohortId = cohortsToDrop
+        cohortId = cohortId
       )
   } else {
     cdm[[name]] <- cohort |>

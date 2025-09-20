@@ -11,7 +11,6 @@
 #' @inheritParams windowDoc
 #' @inheritParams nameDoc
 #' @inheritParams atFirstDoc
-#' @inheritParams softValidationDoc
 #'
 #' @return Cohort table with only those entries satisfying the criteria
 #'
@@ -38,8 +37,7 @@ requireCohortIntersect <- function(cohort,
                                    targetEndDate = "cohort_end_date",
                                    censorDate = NULL,
                                    atFirst = FALSE,
-                                   name = tableName(cohort),
-                                   .softValidation = TRUE) {
+                                   name = tableName(cohort)) {
   # checks
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cohort <- omopgenerics::validateCohortArgument(cohort)
@@ -54,7 +52,6 @@ requireCohortIntersect <- function(cohort,
     {{targetCohortId}}, cdm[[targetCohortTable]], validation = "error"
   )
   intersections <- validateIntersections(intersections)
-  omopgenerics::assertLogical(.softValidation, length = 1)
   omopgenerics::assertLogical(atFirst, length = 1)
 
   if (length(cohortId) == 0) {
@@ -179,7 +176,7 @@ requireCohortIntersect <- function(cohort,
     dplyr::compute(name = name, temporary = FALSE,
                    logPrefix = "CohortConstructor_requireCohortIntersect_name_") |>
     omopgenerics::newCohortTable(
-      .softValidation = .softValidation, cohortCodelistRef = newCodelist
+      .softValidation = TRUE, cohortCodelistRef = newCodelist
     ) |>
     omopgenerics::recordCohortAttrition(reason = reason, cohortId = cohortId)
 
