@@ -4,17 +4,17 @@
 \alias{renameCohort}
 \title{Utility function to change the name of a cohort.}
 \usage{
-renameCohort(cohort, cohortId, newCohortName)
+renameCohort(cohort, newCohortName, cohortId = NULL)
 }
 \arguments{
 \item{cohort}{A cohort table in a cdm reference.}
+
+\item{newCohortName}{Character vector with same}
 
 \item{cohortId}{Vector identifying which cohorts to modify
 (cohort_definition_id or cohort_name). If NULL, all cohorts will be
 used; otherwise, only the specified cohorts will be modified, and the
 rest will remain unchanged.}
-
-\item{newCohortName}{Character vector with same}
 }
 \value{
 A cohort_table object.
@@ -31,7 +31,7 @@ cdm <- mockCohortConstructor(nPerson = 100)
 settings(cdm$cohort1)
 
 cdm$cohort1 <- cdm$cohort1 |>
-  renameCohort(cohortId = 1, newCohortName = "new_name")
+  renameCohort(newCohortName = "new_name")
 
 settings(cdm$cohort1)
 }
