@@ -2,8 +2,8 @@
 #' Utility function to change the name of a cohort.
 #'
 #' @inheritParams cohortDoc
-#' @inheritParams cohortIdModifyDoc
 #' @param newCohortName Character vector with same
+#' @inheritParams cohortIdModifyDoc
 #'
 #' @return A cohort_table object.
 #' @export
@@ -17,21 +17,34 @@
 #' settings(cdm$cohort1)
 #'
 #' cdm$cohort1 <- cdm$cohort1 |>
-#'   renameCohort(cohortId = 1, newCohortName = "new_name")
+#'   renameCohort(newCohortName = "new_name")
 #'
 #' settings(cdm$cohort1)
 #' }
 renameCohort <- function(cohort,
-                         cohortId,
-                         newCohortName) {
+                         newCohortName,
+                         cohortId = NULL) {
   # check input
   cohort <- omopgenerics::validateCohortArgument(cohort = cohort)
   cohortId <- omopgenerics::validateCohortIdArgument(
-    cohortId = cohortId, cohort = cohort, null = FALSE
+    cohortId = cohortId, cohort = cohort
   )
   omopgenerics::assertCharacter(
     newCohortName, unique = TRUE, minNumCharacter = 1
   )
+
+  if(length(newCohortName) == 1 &&
+     stringr::str_detect(string = newCohortName,
+                         pattern = "\\{cohort_name\\}")){
+    originalNames <- omopgenerics::settings(cohort) |>
+      dplyr::pull("cohort_name")
+    newCohortName <- stringr::str_replace_all(
+      string = newCohortName,
+      pattern = "\\{cohort_name\\}",
+      replacement = originalNames
+    )
+  }
+
   if (length(cohortId) != length(newCohortName)) {
     cli::cli_abort(c(x = "`cohortId` and `newCohortName` must have the same length."))
   }
