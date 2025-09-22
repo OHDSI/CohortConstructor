@@ -4,6 +4,7 @@
 #' `measurementCohort()` creates cohorts based on patient records contained
 #' in the measurement table. This function extends the `conceptCohort()` as it
 #' allows for measurement values associated with the records to be specified.
+#' The function supports the measurement and observation tables.
 #'
 #' * If `valueAsConcept` and `valueAsNumber` are NULL then no requirements on
 #' of the values associated with measurement records and using
@@ -107,7 +108,7 @@ measurementCohort <- function(cdm,
                               name,
                               valueAsConcept = NULL,
                               valueAsNumber = NULL,
-                              table = c("measurement", "observation"),
+                              table = NULL,
                               useRecordsBeforeObservation = FALSE) {
   # initial input validation
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
@@ -116,11 +117,10 @@ measurementCohort <- function(cdm,
   omopgenerics::assertNumeric(valueAsConcept, integerish = TRUE, null = TRUE)
   validateValueAsNumber(valueAsNumber)
   omopgenerics::assertLogical(useRecordsBeforeObservation, length = 1)
-  if (length(table) == 0) cli::cli_abort("`table` argument can't be empty. Options are 'measurement' and 'observation'.")
+  omopgenerics::assertChoice(table, choices = c("measurement", "observation"), null = TRUE)
   table <- validateTable(table)
 
   useIndexes <- getOption("CohortConstructor.use_indexes")
-
   # empty concept set
   cohortSet <- conceptSetToCohortSet(conceptSet, cdm)
   if (length(conceptSet) == 0) {
