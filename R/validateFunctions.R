@@ -32,20 +32,14 @@ validateDateRange <- function(dateRange) {
 }
 
 validateDaysInCohort <- function(daysInCohort) {
-omopgenerics::assertNumeric(daysInCohort)
-if(length(daysInCohort) == 1){
-omopgenerics::assertNumeric(daysInCohort, min = 0, max = 99999)
-} else if(length(daysInCohort) == 2){
+omopgenerics::assertNumeric(daysInCohort, length = 2)
 omopgenerics::assertNumeric(daysInCohort[1], min = 0)
 omopgenerics::assertNumeric(daysInCohort[2], min = 0)
 if(daysInCohort[1] > daysInCohort[2]){
 cli::cli_abort("First value for daysInCohort cannot be larger than second")
-}} else{
-  cli::cli_abort("daysInCohort must be a vector of length 1 or 2")
 }
-
-  daysInCohort
-  }
+daysInCohort
+}
 
 validateDemographicRequirements <- function(ageRange,
                                             sex,
