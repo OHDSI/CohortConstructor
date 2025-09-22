@@ -143,9 +143,6 @@ trimDuration <- function(cohort,
   cohort <- omopgenerics::validateCohortArgument(cohort)
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
-  # make sure a range of length two is given
-  # unlike requireDurationn where we allow length 1 or 2
-  daysInCohort <- omopgenerics::assertNumeric(daysInCohort, length = 2)
   daysInCohort <- validateDaysInCohort(daysInCohort)
 
   newCol <- omopgenerics::uniqueTableName()
@@ -243,7 +240,7 @@ trimDuration <- function(cohort,
                     .data$cohort_end_date) |>
     dplyr::compute(
       name = name, temporary = FALSE,
-      logPrefix = "CohortConstructor_requireDuration2_"
+      logPrefix = "CohortConstructor_trimDuration_"
     ) |>
     omopgenerics::recordCohortAttrition(
       reason = "Trim records to {daysInCohort[1]} to {daysInCohort[2]} days following entry",
