@@ -6,9 +6,13 @@
 #' for the specified amount of days
 #'
 #' @inheritParams cohortDoc
-#' @param daysInCohort Range of days that cohort entries must include. For
-#' example, if set to c(30, 90) then only cohort entries that are 30 days
-#' or more longer and shorter or equal to 90 days will be kept.
+#' @param daysInCohort Number of days cohort entries must last. Can be a vector
+#' of length two if a range, or a vector of length one if a specific number
+#' of days. Note, cohort entry and exit on the same day counts as one day in
+#' the cohort. So if, for example, you wish to require individuals are in the
+#' cohort for at least one night then set daysInCohort to c(2, Inf). Meanwhile,
+#'  if set to c(30, 90) then only cohort entries that are 30 days or more
+#'  longer and shorter or equal to 90 days will be kept.
 #' @inheritParams cohortIdModifyDoc
 #' @inheritParams nameDoc
 #'
@@ -22,7 +26,7 @@
 #'
 #' cdm <- mockCohortConstructor(nPerson = 100)
 #' cdm$cohort1 |>
-#'   requireDuration(daysInCohort = c(1, Inf))
+#'   requireDuration(daysInCohort = c(2, Inf))
 #' }
 requireDuration <- function(cohort,
                             daysInCohort,
@@ -38,6 +42,13 @@ requireDuration <- function(cohort,
   newCol <- omopgenerics::uniqueTableName()
 
   IdFilter <- needsIdFilter(cohort, cohortId)
+
+  # we consider same day entry and exit to count as one day
+  startDaysInCohort <- daysInCohort
+  daysInCohort[1] <- daysInCohort[1] - 1L
+  if(daysInCohort[2] != Inf){
+    daysInCohort[2] <- daysInCohort[2] - 1L
+  }
 
   cohort <- cohort |>
     dplyr::mutate(!!newCol := clock::date_count_between(
@@ -95,7 +106,7 @@ requireDuration <- function(cohort,
       logPrefix = "CohortConstructor_requireDuration2_"
     ) |>
     omopgenerics::recordCohortAttrition(
-      reason = "Keep records with duration {daysInCohort[1]} to {daysInCohort[2]} days",
+      reason = "Keep records with duration {startDaysInCohort[1]} to {startDaysInCohort[2]} days",
       cohortId = cohortId)
 
 
@@ -118,7 +129,9 @@ requireDuration <- function(cohort,
 #'
 #' @inheritParams cohortDoc
 #' @param daysInCohort Number of days cohort relative to current cohort start
-#' dates. Cohort entries will be trimmed to these dates
+#' dates. Cohort entries will be trimmed to these dates. Note, cohort entry and
+#' exit on the same day counts as one day in the cohort.Set lower bound
+#' to 1 if keeping cohort start to the same as current cohort start.
 #' @inheritParams cohortIdModifyDoc
 #' @inheritParams nameDoc
 #'
@@ -132,7 +145,7 @@ requireDuration <- function(cohort,
 #'
 #' cdm <- mockCohortConstructor(nPerson = 100)
 #' cdm$cohort1 |>
-#'   requireDuration(daysInCohort = c(1, Inf))
+#'   requireDuration(daysInCohort = c(2, Inf))
 #' }
 trimDuration <- function(cohort,
                          daysInCohort,
@@ -148,6 +161,13 @@ trimDuration <- function(cohort,
   newCol <- omopgenerics::uniqueTableName()
 
   IdFilter <- needsIdFilter(cohort, cohortId)
+
+  # we consider same day entry and exit to count as one day
+  startDaysInCohort <- daysInCohort
+  daysInCohort[1] <- daysInCohort[1] - 1L
+  if(daysInCohort[2] != Inf){
+  daysInCohort[2] <- daysInCohort[2] - 1L
+  }
 
     # only needs lower mutate
     if(daysInCohort[1] > 0 &&
@@ -235,7 +255,8 @@ trimDuration <- function(cohort,
       }
     }
 
-  cohort <- cohort|>
+  cohort <- cohort |>
+    dplyr::select(!dplyr::any_of(newCol)) |>
     dplyr::filter(.data$cohort_start_date <=
                     .data$cohort_end_date) |>
     dplyr::compute(
@@ -243,7 +264,7 @@ trimDuration <- function(cohort,
       logPrefix = "CohortConstructor_trimDuration_"
     ) |>
     omopgenerics::recordCohortAttrition(
-      reason = "Trim records to {daysInCohort[1]} to {daysInCohort[2]} days following entry",
+      reason = "Trim records to {startDaysInCohort[1]} to {startDaysInCohort[2]} days following entry",
       cohortId = cohortId)
 
 useIndexes <- getOption("CohortConstructor.use_indexes")

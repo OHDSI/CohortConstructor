@@ -30,14 +30,14 @@ test_that("require certain range of days for cohort entries", {
     dplyr::pull("cohort_start_date") |>
     sort(),
   cdm$cohort |>
-    requireDuration(daysInCohort = c(0, Inf),
+    requireDuration(daysInCohort = c(1, Inf),
                     name = "new_cohort") |>
     dplyr::pull("cohort_start_date") |>
     sort())
 
-  expect_true("Keep records with duration 0 to Inf days" %in%
+  expect_true("Keep records with duration 1 to Inf days" %in%
   (cdm$cohort |>
-    requireDuration(daysInCohort = c(0, Inf),
+    requireDuration(daysInCohort = c(1, Inf),
                     name = "new_cohort") |>
     attrition() |>
     dplyr::pull("reason") |>
@@ -45,12 +45,12 @@ test_that("require certain range of days for cohort entries", {
 
   # drop last record
   expect_true(!"2015-02-17" %in% (cdm$cohort |>
-    requireDuration(daysInCohort = c(1, Inf),
+    requireDuration(daysInCohort = c(2, Inf),
                     name = "new_cohort") |>
     dplyr::pull("cohort_start_date")))
-  expect_true("Keep records with duration 1 to Inf days" %in%
+  expect_true("Keep records with duration 2 to Inf days" %in%
                 (cdm$cohort |>
-                   requireDuration(daysInCohort = c(1, Inf),
+                   requireDuration(daysInCohort = c(2, Inf),
                                    name = "new_cohort") |>
                    attrition() |>
                    dplyr::pull("reason") |>
@@ -58,25 +58,25 @@ test_that("require certain range of days for cohort entries", {
 
   # keep if not cohort of interest
   expect_true("2015-02-17" %in% (cdm$cohort |>
-                                    requireDuration(daysInCohort = c(1, Inf),
+                                    requireDuration(daysInCohort = c(2, Inf),
                                                     cohortId = 1,
                                                     name = "new_cohort") |>
                                     dplyr::pull("cohort_start_date")))
 
   # keep only one day cohort
   expect_true(cdm$cohort |>
-    requireDuration(daysInCohort = c(1, 1),
+    requireDuration(daysInCohort = c(2, 2),
                     name = "new_cohort") |>
     dplyr::tally() |>
     dplyr::pull("n") == 1)
 
   expect_true("2001-05-03" %in%  (cdm$cohort |>
-    requireDuration(daysInCohort = c(1, 1),
+    requireDuration(daysInCohort = c(2, 2),
                     name = "new_cohort") |>
     dplyr::pull("cohort_start_date")))
 
   expect_true(cdm$cohort |>
-                requireDuration(daysInCohort = c(1, 1),
+                requireDuration(daysInCohort = c(2, 2),
                                 cohortId = 1,
                                 name = "new_cohort") |>
                 dplyr::tally() |>
@@ -132,29 +132,10 @@ test_that("trim duration", {
                      dplyr::pull("cohort_start_date") |>
                      sort(),
                    cdm$cohort |>
-                     trimDuration(daysInCohort = c(0, Inf),
+                     trimDuration(daysInCohort = c(1, Inf),
                                      name = "new_cohort") |>
                      dplyr::pull("cohort_start_date") |>
                      sort())
-
-  expect_true("Trim records to 0 to Inf days following entry" %in%
-                (cdm$cohort |>
-                   trimDuration(daysInCohort = c(0, Inf),
-                                   name = "new_cohort") |>
-                   attrition() |>
-                   dplyr::pull("reason") |>
-                   unique()))
-
-  # drop last record
-  # other records get a day added to cohort start
-  expect_true(!"2015-02-17" %in% (cdm$cohort |>
-                                    trimDuration(daysInCohort = c(1, Inf),
-                                                    name = "new_cohort") |>
-                                    dplyr::pull("cohort_start_date")))
-  expect_true("2001-05-04" %in% (cdm$cohort |>
-                                    trimDuration(daysInCohort = c(1, Inf),
-                                                    name = "new_cohort") |>
-                                    dplyr::pull("cohort_start_date")))
 
   expect_true("Trim records to 1 to Inf days following entry" %in%
                 (cdm$cohort |>
@@ -164,9 +145,28 @@ test_that("trim duration", {
                    dplyr::pull("reason") |>
                    unique()))
 
+  # drop last record
+  # other records get a day added to cohort start
+  expect_true(!"2015-02-17" %in% (cdm$cohort |>
+                                    trimDuration(daysInCohort = c(2, Inf),
+                                                    name = "new_cohort") |>
+                                    dplyr::pull("cohort_start_date")))
+  expect_true("2001-05-04" %in% (cdm$cohort |>
+                                    trimDuration(daysInCohort = c(2, Inf),
+                                                    name = "new_cohort") |>
+                                    dplyr::pull("cohort_start_date")))
+
+  expect_true("Trim records to 2 to Inf days following entry" %in%
+                (cdm$cohort |>
+                   trimDuration(daysInCohort = c(2, Inf),
+                                   name = "new_cohort") |>
+                   attrition() |>
+                   dplyr::pull("reason") |>
+                   unique()))
+
   # keep if not cohort of interest
   expect_true("2015-02-17" %in% (cdm$cohort |>
-                                   trimDuration(daysInCohort = c(1, Inf),
+                                   trimDuration(daysInCohort = c(2, Inf),
                                                    cohortId = 1,
                                                    name = "new_cohort") |>
                                    dplyr::pull("cohort_start_date")))
@@ -174,7 +174,7 @@ test_that("trim duration", {
   # subtracting days only from end
   # only if cohort end is currently more
  cdm$new_cohort <- cdm$cohort |>
-    trimDuration(daysInCohort = c(0, 3),
+    trimDuration(daysInCohort = c(1, 4),
                  name = "new_cohort")
  expect_true(cdm$new_cohort |>
    dplyr::collect() |>
@@ -202,7 +202,7 @@ test_that("trim duration", {
 
  # only cohort 1
  cdm$new_cohort <- cdm$cohort |>
-    trimDuration(daysInCohort = c(0, 3),
+    trimDuration(daysInCohort = c(1, 4),
                  cohortId = 1,
                  name = "new_cohort")
  expect_identical(cdm$new_cohort |>
@@ -227,7 +227,7 @@ test_that("trim duration", {
                   )))
 
  cdm$new_cohort <- cdm$cohort |>
-   trimDuration(daysInCohort = c(0, 3),
+   trimDuration(daysInCohort = c(1, 4),
                 cohortId = 2,
                 name = "new_cohort")
  expect_identical(cdm$new_cohort |>
@@ -243,7 +243,7 @@ test_that("trim duration", {
 
   # adding days to start and taking days off end
  cdm$new_cohort <- cdm$cohort |>
-    trimDuration(daysInCohort = c(3, 5),
+    trimDuration(daysInCohort = c(4, 6),
                  name = "new_cohort")
  expect_true(cdm$new_cohort |>
                dplyr::collect() |>
@@ -268,7 +268,7 @@ test_that("trim duration", {
 
 
  cdm$new_cohort <- cdm$cohort |>
-    trimDuration(daysInCohort = c(3, 3),
+    trimDuration(daysInCohort = c(4, 4),
                  cohortId = 1,
                  name = "new_cohort")
   expect_true(cdm$new_cohort |>
