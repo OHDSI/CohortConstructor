@@ -325,7 +325,7 @@ demographicsFilter <- function(cohort,
   if (is.infinite(min_age)) min_age <- 0
   if (is.infinite(max_age)) max_age <- 200
   filterAge <- glue::glue(".data${newCols[1]} >= {min_age} & .data${newCols[1]} <= {max_age}") |> rlang::parse_exprs()
-  filterSex <- glue::glue(".data${newCols[2]} == '{sex}' | .env$sex == 'Both'") |> rlang::parse_exprs()
+  filterSex <- glue::glue(".data${newCols[2]} == '{sex}' | (.env$sex == 'Both' & .data${newCols[2]} %in% c('Female', 'Male'))") |> rlang::parse_exprs()
   filterPriorObservation <- glue::glue(".data${newCols[3]} >= {minPriorObservation}") |> rlang::parse_exprs()
   filterFutureObservation <- glue::glue(".data${newCols[4]} >= {minFutureObservation}") |> rlang::parse_exprs()
   atFirstReason <- NULL
