@@ -52,6 +52,7 @@ requireCohortIntersect <- function(cohort,
     {{targetCohortId}}, cdm[[targetCohortTable]], validation = "error"
   )
   intersections <- validateIntersections(intersections)
+  lower_limit <- as.integer(intersections[[1]])
   omopgenerics::assertLogical(atFirst, length = 1)
 
   if (length(cohortId) == 0) {
@@ -62,15 +63,18 @@ requireCohortIntersect <- function(cohort,
     return(cdm[[name]])
   }
 
-  if (cdm[[targetCohortTable]] |>
-      dplyr::filter(.data$cohort_definition_id %in% .env$targetCohortId) |>
-      dplyr::tally() |>
-      dplyr::pull("n") == 0) {
-    cli::cli_inform("Returning entry cohort as the target cohort to intersect is empty.")
-    # return entry cohort as cohortId is used to modify not subset
-    cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE,
-                                            logPrefix = "CohortConstructor_requireCohortIntersect_entry_2_")
-    return(cdm[[name]])
+  # Check if the target cohort is empty for the specified targetCohortId
+  targetCohortCount <- cdm[[targetCohortTable]] |>
+    dplyr::filter(.data$cohort_definition_id %in% .env$targetCohortId) |>
+    dplyr::tally() |>
+    dplyr::pull("n")
+
+  if (targetCohortCount == 0) {
+    if (lower_limit == 0) {
+      cli::cli_inform("Target cohort is empty. No subjects will be excluded from the result.")
+    } else {
+      cli::cli_inform("Target cohort is empty. All subjects will be excluded from the result.")
+    }
   }
 
   # targetCohortId must be singular

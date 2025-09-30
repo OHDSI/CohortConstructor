@@ -215,8 +215,6 @@ test_that("requiring absence in another cohort", {
                                                  window = c(-Inf, Inf),
                                                  name = "cohort1_equal")
   )
-  expect_equal(collectCohort(cdm$cohort1_equal, 1), collectCohort(cdm$cohort1, 1))
-
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   PatientProfiles::mockDisconnect(cdm)
 })
@@ -467,3 +465,68 @@ test_that("codelists", {
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   CDMConnector::cdmDisconnect(cdm = cdm)
 })
+
+test_that("empty target cohort behavior", {
+  cdm_local <- omock::mockCdmReference() |>
+    omock::mockPerson(n = 4,seed = 1) |>
+    omock::mockObservationPeriod(seed = 1) |>
+    omock::mockCohort(name = c("cohort1"), numberCohorts = 2, seed = 1) |>
+    omock::mockCohort(name = c("cohort2"), numberCohorts = 2, seed = 2)
+  cdm <- cdm_local |> copyCdm()
+
+  # First, make the target cohort empty by filtering out the target cohort ID
+  cdm$cohort2 <- cdm$cohort2 |> dplyr::filter(cohort_definition_id != 1)
+
+  # intersections = c(1, Inf) - should exclude all subjects when target is empty
+  cdm$cohort_res_1 <-  requireCohortIntersect(
+    cohort = cdm$cohort1,
+    targetCohortTable = "cohort2",
+    targetCohortId = 1,
+    window = c(-Inf, Inf),
+    intersections = c(1, Inf),
+    name = "cohort_res_1"
+  )
+  expect_true(cdm$cohort_res_1 |> dplyr::tally() |> dplyr::pull("n") == 0)
+  expect_true(
+    "In cohort cohort_1 between -Inf & Inf days relative to cohort_start_date between 1 and Inf times" %in%
+      (omopgenerics::attrition(cdm$cohort_res_1) |> dplyr::pull(reason))
+  )
+
+  # intersections = c(0, 0) - should keep all subjects when target is empty
+  cdm$cohort_res_2 <- requireCohortIntersect(
+    cohort = cdm$cohort1,
+    targetCohortTable = "cohort2",
+    targetCohortId = 1,
+    window = c(-Inf, Inf),
+    intersections = c(0, 0),
+    name = "cohort_res_2"
+  )
+  # Check that all subjects are kept when intersections = c(0, 0) and target is empty
+  expect_equal(
+    cdm$cohort1 |> dplyr::tally() |> dplyr::pull("n"),
+    cdm$cohort_res_2 |> dplyr::tally() |> dplyr::pull("n")
+  )
+  expect_true(
+    "Not in cohort cohort_1 between -Inf & Inf days relative to cohort_start_date" %in%
+      (omopgenerics::attrition(cdm$cohort_res_2) |> dplyr::pull(reason))
+  )
+
+  # Test that attrition is always recorded when target cohort is empty
+  expect_message(
+    cdm$cohort_res_3 <- requireCohortIntersect(
+      cohort = cdm$cohort1,
+      targetCohortTable = "cohort2",
+      targetCohortId = 1,
+      window = c(-Inf, Inf),
+      name = "cohort_res_3"
+    )
+  )
+  # With default intersections = c(1, Inf), all subjects should be excluded when target is empty
+  expect_true(cdm$cohort_res_3 |> dplyr::tally() |> dplyr::pull("n") == 0)
+  expect_true(
+    "In cohort cohort_1 between -Inf & Inf days relative to cohort_start_date between 1 and Inf times" %in%
+      (omopgenerics::attrition(cdm$cohort_res_3) |> dplyr::pull(reason))
+  )
+  PatientProfiles::mockDisconnect(cdm)
+})
+
