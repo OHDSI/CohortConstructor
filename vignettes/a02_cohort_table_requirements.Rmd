@@ -106,7 +106,6 @@ cdm$acetaminophen <- cdm$acetaminophen |>
 
 summary_attrition <- summariseCohortAttrition(cdm$acetaminophen)
 plotCohortAttrition(summary_attrition)
-
 ```
 
 ## Keep only records within a date range
@@ -128,19 +127,40 @@ plotCohortAttrition(summary_attrition)
 ```
 
 ## Keep only if entry lasts a given duration
+
+Let's create an acetaminophen cohort again.
 ```{r}
 cdm$acetaminophen <- conceptCohort(cdm = cdm, 
                                  conceptSet = acetaminophen_codes, 
                                  name = "acetaminophen")
 ```
 
-```{r}
-cdm$acetaminophen <- cdm$acetaminophen |> 
-  requireInDateRange(dateRange = as.Date(c("2010-01-01", "2015-01-01")))
+If people on start and stop on the same day they will be considered to be in the cohort for one day. So to require them to have been in the cohort until at least the day after cohort start we can use the `requireDuration` function. Here we'll create a new cohort table and then bind our original and new cohorts so that we can see the impact of this requirement.
 
-summary_attrition <- summariseCohortAttrition(cdm$acetaminophen)
+```{r}
+cdm$acetaminophen_one_night <- cdm$acetaminophen |> 
+  requireDuration(c(2, Inf), 
+                  name = "acetaminophen_one_night") |> 
+  renameCohort("acetaminophen_one_night")
+
+cdm <- bind(cdm$acetaminophen,
+            cdm$acetaminophen_one_night, 
+            name = "both_cohorts")
+```
+
+Now when summarising days in cohort we can see the difference this makes.
+
+```{r}
+summary_attrition <- summariseCohortAttrition(cdm$both_cohorts)
 plotCohortAttrition(summary_attrition)
 ```
+
+```{r, warning=FALSE}
+summary_characteristics <- summariseCharacteristics(cdm$both_cohorts)
+tableCharacteristics(summary_characteristics |>
+                       filter(variable_name %in% c("Number subjects", "Days in cohort")))
+```
+
 ## Applying multiple cohort requirements
 
 Multiple restrictions can be applied to a cohort, however it is important to note that the order that requirements are applied will often matter.
@@ -150,30 +170,27 @@ cdm$acetaminophen_1 <- conceptCohort(cdm = cdm,
                                  conceptSet = acetaminophen_codes, 
                                  name = "acetaminophen_1") |> 
   requireIsFirstEntry() |>
-  requireInDateRange(dateRange = as.Date(c("2010-01-01", "2016-01-01")))
+  requireInDateRange(dateRange = as.Date(c("2010-01-01", "2016-01-01"))) |> 
+  renameCohort("entry_before_date")
 
 cdm$acetaminophen_2 <- conceptCohort(cdm = cdm, 
                                  conceptSet = acetaminophen_codes, 
                                  name = "acetaminophen_2") |>
   requireInDateRange(dateRange = as.Date(c("2010-01-01", "2016-01-01"))) |> 
-  requireIsFirstEntry()
+  requireIsFirstEntry("date_before_entry")
 ```
 
 ```{r}
-summary_attrition_1 <- summariseCohortAttrition(cdm$acetaminophen_1)
-summary_attrition_2 <- summariseCohortAttrition(cdm$acetaminophen_2)
+cdm <- bind(cdm$acetaminophen_1,
+            cdm$acetaminophen_2, 
+            name = "both_cohorts")
+summary_attrition <- summariseCohortAttrition(cdm$both_cohorts)
 ```
 
-Here we see attrition if we apply our entry requirement before our date requirement. In this case we have a cohort of people with their first ever record of acetaminophen which occurs in our study period.
+If we apply our entry requirement before our date requirement then we have a cohort of people with their first ever record of acetaminophen which occurs in our study period. But if we apply our date requirement before our entry requirement we have a cohort of people with their first record of acetaminophen in the study period, but this will not necessarily be their first record ever.
 
 ```{r}
-plotCohortAttrition(summary_attrition_1)
-```
-
-And here we see attrition if we apply our date requirement before our entry requirement. In this case we have a cohort of people with their first record of acetaminophen in the study period, although this will not necessarily be their first record ever.
-
-```{r}
-plotCohortAttrition(summary_attrition_2)
+plotCohortAttrition(summary_attrition)
 ```
 
 ## Keep only records from cohorts with a minimum number of individuals
