@@ -133,7 +133,7 @@ cohort of women in the database to use as example in the vignette.</p>
 <span><span class="co">#&gt; Download completed!</span></span>
 <span></span>
 <span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu"><a href="https://r.duckdb.org/reference/duckdb.html" class="external-link">duckdb</a></span><span class="op">(</span><span class="op">)</span>, dbdir <span class="op">=</span> <span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/eunomiaDir.html" class="external-link">eunomiaDir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Creating CDM database /tmp/RtmpyzmcuJ/eunomia/GiBleed_5.3.zip</span></span>
+<span><span class="co">#&gt; Creating CDM database /tmp/RtmpFZtscG/eunomia/GiBleed_5.3.zip</span></span>
 <span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/cdmFromCon.html" class="external-link">cdmFromCon</a></span><span class="op">(</span><span class="va">con</span>, cdmSchema <span class="op">=</span> <span class="st">"main"</span>, </span>
 <span>                    writeSchema <span class="op">=</span> <span class="st">"main"</span>, writePrefix <span class="op">=</span> <span class="st">"my_study_"</span><span class="op">)</span></span>
 <span></span>
@@ -228,19 +228,19 @@ acetaminophen prescriptions after cohort start, or cohort end date.</p>
 <span><span class="co">#&gt; Joining with `by = join_by(cohort_definition_id, subject_id, cohort_end_date)`</span></span>
 <span><span class="va">cdm</span><span class="op">$</span><span class="va">cohort_entry_first</span> </span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Source:   table&lt;my_study_cohort_entry_first&gt; [?? x 6]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB 1.4.0 [unknown@Linux 6.11.0-1018-azure:R 4.5.1//tmp/RtmpyzmcuJ/file28bf416d943b.duckdb]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB 1.4.0 [unknown@Linux 6.11.0-1018-azure:R 4.5.1//tmp/RtmpFZtscG/file29ed2eaf2a6e.duckdb]</span></span></span>
 <span><span class="co">#&gt;    cohort_definition_id subject_id cohort_start_date cohort_end_date diclofenac</span></span>
 <span><span class="co">#&gt;                   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>                    1       <span style="text-decoration: underline;">2</span>651 1951-04-27        2019-06-26      <span style="color: #BB0000;">NA</span>        </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>                    1       <span style="text-decoration: underline;">2</span>858 1950-07-19        2019-05-29      1953-05-26</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>                    1       <span style="text-decoration: underline;">4</span>763 1989-11-21        2018-06-26      <span style="color: #BB0000;">NA</span>        </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>                    1       <span style="text-decoration: underline;">1</span>597 1954-07-08        2018-12-15      <span style="color: #BB0000;">NA</span>        </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>                    1        580 1942-08-16        2019-05-19      <span style="color: #BB0000;">NA</span>        </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>                    1       <span style="text-decoration: underline;">3</span>553 1948-05-01        2012-10-07      <span style="color: #BB0000;">NA</span>        </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>                    1       <span style="text-decoration: underline;">3</span>803 1975-05-04        2018-09-19      <span style="color: #BB0000;">NA</span>        </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>                    1       <span style="text-decoration: underline;">4</span>715 1970-01-26        2018-12-26      <span style="color: #BB0000;">NA</span>        </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>                    1       <span style="text-decoration: underline;">3</span>849 1976-06-06        2019-01-17      2003-06-29</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>                    1       <span style="text-decoration: underline;">1</span>646 1946-01-14        2019-04-06      <span style="color: #BB0000;">NA</span>        </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>                    1       <span style="text-decoration: underline;">4</span>890 1938-10-12        2019-01-30      <span style="color: #BB0000;">NA</span>        </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>                    1       <span style="text-decoration: underline;">3</span>370 2003-05-17        2019-04-20      2011-10-30</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>                    1       <span style="text-decoration: underline;">3</span>885 1978-07-27        2018-10-12      2004-10-26</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>                    1       <span style="text-decoration: underline;">2</span>097 1982-09-06        2019-03-16      <span style="color: #BB0000;">NA</span>        </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>                    1         36 1966-07-12        2019-01-15      <span style="color: #BB0000;">NA</span>        </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>                    1       <span style="text-decoration: underline;">1</span>782 1968-12-01        2018-12-18      <span style="color: #BB0000;">NA</span>        </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>                    1       <span style="text-decoration: underline;">1</span>870 1927-04-13        1961-02-26      <span style="color: #BB0000;">NA</span>        </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>                    1       <span style="text-decoration: underline;">3</span>509 1954-12-12        2019-06-21      <span style="color: #BB0000;">NA</span>        </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>                    1       <span style="text-decoration: underline;">1</span>282 1985-09-14        2018-03-03      <span style="color: #BB0000;">NA</span>        </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>                    1       <span style="text-decoration: underline;">2</span>542 1980-03-02        2019-01-11      2003-03-07</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ more rows</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1 more variable: acetaminophen &lt;date&gt;</span></span></span></code></pre></div>
 </div>
@@ -261,7 +261,7 @@ latest date among specified columns.</p>
 <span></span>
 <span><span class="va">cdm</span><span class="op">$</span><span class="va">cohort_entry_last</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Source:   table&lt;my_study_cohort_entry_last&gt; [?? x 4]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB 1.4.0 [unknown@Linux 6.11.0-1018-azure:R 4.5.1//tmp/RtmpyzmcuJ/file28bf416d943b.duckdb]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB 1.4.0 [unknown@Linux 6.11.0-1018-azure:R 4.5.1//tmp/RtmpFZtscG/file29ed2eaf2a6e.duckdb]</span></span></span>
 <span><span class="co">#&gt;    cohort_definition_id subject_id cohort_start_date cohort_end_date</span></span>
 <span><span class="co">#&gt;                   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>         </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>                    1         16 2017-11-02        2017-11-02     </span></span>
@@ -297,19 +297,19 @@ would be the end:</p>
 <span></span>
 <span><span class="va">cdm</span><span class="op">$</span><span class="va">cohort_exit_first</span> </span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Source:   table&lt;my_study_cohort_exit_first&gt; [?? x 4]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB 1.4.0 [unknown@Linux 6.11.0-1018-azure:R 4.5.1//tmp/RtmpyzmcuJ/file28bf416d943b.duckdb]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB 1.4.0 [unknown@Linux 6.11.0-1018-azure:R 4.5.1//tmp/RtmpFZtscG/file29ed2eaf2a6e.duckdb]</span></span></span>
 <span><span class="co">#&gt;    cohort_definition_id subject_id cohort_start_date cohort_end_date</span></span>
 <span><span class="co">#&gt;                   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>         </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>                    1        458 1972-08-13        1974-02-06     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>                    1        743 1975-11-02        1991-11-08     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>                    1        758 1973-03-25        1988-12-01     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>                    1        795 1936-08-19        1980-06-21     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>                    1       <span style="text-decoration: underline;">1</span>250 1953-03-23        1961-06-11     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>                    1       <span style="text-decoration: underline;">1</span>425 1935-11-27        1954-06-17     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>                    1       <span style="text-decoration: underline;">1</span>537 1956-06-13        1956-08-13     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>                    1       <span style="text-decoration: underline;">2</span>156 1964-07-23        1978-10-10     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>                    1       <span style="text-decoration: underline;">2</span>459 1976-06-21        1993-04-23     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>                    1       <span style="text-decoration: underline;">2</span>602 1948-09-29        1948-11-30     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>                    1        276 1977-06-10        1983-04-11     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>                    1        387 1973-08-31        1975-08-22     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>                    1        525 1949-04-04        1994-09-07     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>                    1        700 1978-06-14        2003-05-06     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>                    1       <span style="text-decoration: underline;">1</span>118 1973-08-12        1990-06-03     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>                    1       <span style="text-decoration: underline;">1</span>496 1920-04-18        1924-06-28     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>                    1       <span style="text-decoration: underline;">1</span>864 1965-12-03        1971-04-08     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>                    1       <span style="text-decoration: underline;">1</span>962 1964-04-09        1979-06-03     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>                    1       <span style="text-decoration: underline;">2</span>088 1908-09-22        1909-09-18     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>                    1       <span style="text-decoration: underline;">2</span>176 1956-08-20        1959-01-08     </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ more rows</span></span></span></code></pre></div>
 </div>
 <div class="section level3">
@@ -328,19 +328,19 @@ end date to the latest date among specified columns.</p>
 <span>  <span class="op">)</span></span>
 <span><span class="va">cdm</span><span class="op">$</span><span class="va">cohort_exit_last</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Source:   table&lt;my_study_cohort_exit_last&gt; [?? x 4]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB 1.4.0 [unknown@Linux 6.11.0-1018-azure:R 4.5.1//tmp/RtmpyzmcuJ/file28bf416d943b.duckdb]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB 1.4.0 [unknown@Linux 6.11.0-1018-azure:R 4.5.1//tmp/RtmpFZtscG/file29ed2eaf2a6e.duckdb]</span></span></span>
 <span><span class="co">#&gt;    cohort_definition_id subject_id cohort_start_date cohort_end_date</span></span>
 <span><span class="co">#&gt;                   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>         </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>                    1         16 1971-10-14        2017-11-02     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>                    1        280 1938-10-28        2019-06-04     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>                    1        715 1983-02-15        2018-02-20     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>                    1        758 1973-03-25        2018-06-03     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>                    1       <span style="text-decoration: underline;">1</span>245 1934-09-07        2018-07-13     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>                    1       <span style="text-decoration: underline;">1</span>250 1953-03-23        2019-06-24     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>                    1       <span style="text-decoration: underline;">1</span>524 1967-01-12        2019-05-02     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>                    1       <span style="text-decoration: underline;">1</span>537 1956-06-13        2019-04-24     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>                    1       <span style="text-decoration: underline;">1</span>770 1978-06-11        2017-12-31     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>                    1       <span style="text-decoration: underline;">1</span>796 1979-04-04        2018-12-05     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>                    1        163 1966-06-28        2018-07-10     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>                    1        209 1951-02-23        2019-06-07     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>                    1        484 1938-01-03        2019-07-01     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>                    1        564 1955-10-20        2018-09-27     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>                    1        877 1977-05-03        2019-05-14     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>                    1       <span style="text-decoration: underline;">1</span>159 1980-07-27        2018-05-27     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>                    1       <span style="text-decoration: underline;">1</span>439 1977-08-13        2019-05-18     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>                    1       <span style="text-decoration: underline;">1</span>746 1952-11-13        2019-05-02     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>                    1       <span style="text-decoration: underline;">1</span>911 1945-11-26        2009-11-16     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>                    1       <span style="text-decoration: underline;">2</span>051 1962-11-18        2018-12-23     </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ more rows</span></span></span></code></pre></div>
 <p>In this last example, the return cohort doesn’t have the specified
 date columns, neither the “reason” column indicating which date was used

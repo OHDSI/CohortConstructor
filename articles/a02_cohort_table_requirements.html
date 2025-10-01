@@ -206,18 +206,574 @@ the <code>requireInDateRange</code> function.</p>
 <div class="section level2">
 <h2 id="keep-only-if-entry-lasts-a-given-duration">Keep only if entry lasts a given duration<a class="anchor" aria-label="anchor" href="#keep-only-if-entry-lasts-a-given-duration"></a>
 </h2>
+<p>Let’s create an acetaminophen cohort again.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">acetaminophen</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/conceptCohort.html">conceptCohort</a></span><span class="op">(</span>cdm <span class="op">=</span> <span class="va">cdm</span>, </span>
 <span>                                 conceptSet <span class="op">=</span> <span class="va">acetaminophen_codes</span>, </span>
 <span>                                 name <span class="op">=</span> <span class="st">"acetaminophen"</span><span class="op">)</span></span></code></pre></div>
+<p>If people on start and stop on the same day they will be considered
+to be in the cohort for one day. So to require them to have been in the
+cohort until at least the day after cohort start we can use the
+<code>requireDuration</code> function. Here we’ll create a new cohort
+table and then bind our original and new cohorts so that we can see the
+impact of this requirement.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">acetaminophen</span> <span class="op">&lt;-</span> <span class="va">cdm</span><span class="op">$</span><span class="va">acetaminophen</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="../reference/requireInDateRange.html">requireInDateRange</a></span><span class="op">(</span>dateRange <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2010-01-01"</span>, <span class="st">"2015-01-01"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">acetaminophen_one_night</span> <span class="op">&lt;-</span> <span class="va">cdm</span><span class="op">$</span><span class="va">acetaminophen</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="../reference/requireDuration.html">requireDuration</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="cn">Inf</span><span class="op">)</span>, </span>
+<span>                  name <span class="op">=</span> <span class="st">"acetaminophen_one_night"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="../reference/renameCohort.html">renameCohort</a></span><span class="op">(</span><span class="st">"acetaminophen_one_night"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">summary_attrition</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/CohortCharacteristics/reference/summariseCohortAttrition.html" class="external-link">summariseCohortAttrition</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">acetaminophen</span><span class="op">)</span></span>
+<span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/bind.html" class="external-link">bind</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">acetaminophen</span>,</span>
+<span>            <span class="va">cdm</span><span class="op">$</span><span class="va">acetaminophen_one_night</span>, </span>
+<span>            name <span class="op">=</span> <span class="st">"both_cohorts"</span><span class="op">)</span></span></code></pre></div>
+<p>Now when summarising days in cohort we can see the difference this
+makes.</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">summary_attrition</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/CohortCharacteristics/reference/summariseCohortAttrition.html" class="external-link">summariseCohortAttrition</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">both_cohorts</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://darwin-eu.github.io/CohortCharacteristics/reference/plotCohortAttrition.html" class="external-link">plotCohortAttrition</a></span><span class="op">(</span><span class="va">summary_attrition</span><span class="op">)</span></span></code></pre></div>
 <div class="grViz html-widget html-fill-item" id="htmlwidget-10b3b7155e8045a1b2ad" style="width:700px;height:432.632880098888px;"></div>
-<script type="application/json" data-for="htmlwidget-10b3b7155e8045a1b2ad">{"x":{"diagram":"digraph {\n\ngraph [layout = \"neato\",\n       outputorder = \"edgesfirst\",\n       bgcolor = \"white\"]\n\nnode [fontname = \"Helvetica\",\n      fontsize = \"10\",\n      shape = \"circle\",\n      fixedsize = \"true\",\n      width = \"0.5\",\n      style = \"filled\",\n      fillcolor = \"aliceblue\",\n      color = \"gray70\",\n      fontcolor = \"gray50\"]\n\nedge [fontname = \"Helvetica\",\n     fontsize = \"8\",\n     len = \"1.5\",\n     color = \"gray80\",\n     arrowsize = \"0.5\"]\n\n  \"1\" [label = \"Database: Synthea\nCohort name: acetaminophen\", shape = \"box\", color = \"#FFFFFF\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"1\", pos = \"0,0!\"] \n  \"2\" [label = \"N subjects = 2,679\nN records = 14,205\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"0,-0.885!\"] \n  \"3\" [label = \"N subjects = 2,679\nN records = 14,205\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"0,-1.835!\"] \n  \"4\" [label = \"N subjects = 2,679\nN records = 14,205\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"0,-2.785!\"] \n  \"5\" [label = \"N subjects = 2,679\nN records = 14,205\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"0,-3.735!\"] \n  \"6\" [label = \"N subjects = 2,679\nN records = 14,205\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"0,-4.685!\"] \n  \"7\" [label = \"N subjects = 2,679\nN records = 13,908\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"0,-5.635!\"] \n  \"8\" [label = \"N subjects = 1,276\nN records = 1,689\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"0,-6.715!\"] \n  \"9\" [label = \"N subjects = 786\nN records = 889\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"0,-7.795!\"] \n  \"10\" [label = \"Initial qualifying events\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"0,-0.41!\"] \n  \"11\" [label = \"Record in observation\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"0,-1.36!\"] \n  \"12\" [label = \"N subjects = 0\nN records = 0\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"1.95,-1.36!\"] \n  \"13\" [label = \"Record start <= record end\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"0,-2.31!\"] \n  \"14\" [label = \"N subjects = 0\nN records = 0\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"1.95,-2.31!\"] \n  \"15\" [label = \"Non-missing sex\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"0,-3.26!\"] \n  \"16\" [label = \"N subjects = 0\nN records = 0\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"1.95,-3.26!\"] \n  \"17\" [label = \"Non-missing year of birth\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"0,-4.21!\"] \n  \"18\" [label = \"N subjects = 0\nN records = 0\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"1.95,-4.21!\"] \n  \"19\" [label = \"Merge overlapping records\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"0,-5.16!\"] \n  \"20\" [label = \"N subjects = 0\nN records = 297\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"1.95,-5.16!\"] \n  \"21\" [label = \"cohort_start_date after\n2010-01-01\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"2\", pos = \"0,-6.175!\"] \n  \"22\" [label = \"N subjects = 1,403\nN records = 12,219\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"1.95,-6.175!\"] \n  \"23\" [label = \"cohort_start_date before\n2015-01-01\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"2\", pos = \"0,-7.255!\"] \n  \"24\" [label = \"N subjects = 490\nN records = 800\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"1.95,-7.255!\"] \n\"2\"->\"3\" [color = \"#000000\"] \n\"3\"->\"4\" [color = \"#000000\"] \n\"4\"->\"5\" [color = \"#000000\"] \n\"5\"->\"6\" [color = \"#000000\"] \n\"6\"->\"7\" [color = \"#000000\"] \n\"7\"->\"8\" [color = \"#000000\"] \n\"8\"->\"9\" [color = \"#000000\"] \n\"11\"->\"12\" [color = \"#000000\"] \n\"13\"->\"14\" [color = \"#000000\"] \n\"15\"->\"16\" [color = \"#000000\"] \n\"17\"->\"18\" [color = \"#000000\"] \n\"19\"->\"20\" [color = \"#000000\"] \n\"21\"->\"22\" [color = \"#000000\"] \n\"23\"->\"24\" [color = \"#000000\"] \n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<script type="application/json" data-for="htmlwidget-10b3b7155e8045a1b2ad">{"x":{"diagram":"digraph {\n\ngraph [layout = \"neato\",\n       outputorder = \"edgesfirst\",\n       bgcolor = \"white\"]\n\nnode [fontname = \"Helvetica\",\n      fontsize = \"10\",\n      shape = \"circle\",\n      fixedsize = \"true\",\n      width = \"0.5\",\n      style = \"filled\",\n      fillcolor = \"aliceblue\",\n      color = \"gray70\",\n      fontcolor = \"gray50\"]\n\nedge [fontname = \"Helvetica\",\n     fontsize = \"8\",\n     len = \"1.5\",\n     color = \"gray80\",\n     arrowsize = \"0.5\"]\n\n  \"1\" [label = \"Database: Synthea\nCohort name: acetaminophen\", shape = \"box\", color = \"#FFFFFF\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"1\", pos = \"0,0!\"] \n  \"2\" [label = \"N subjects = 2,679\nN records = 14,205\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"0,-0.885!\"] \n  \"3\" [label = \"N subjects = 2,679\nN records = 14,205\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"0,-1.835!\"] \n  \"4\" [label = \"N subjects = 2,679\nN records = 14,205\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"0,-2.785!\"] \n  \"5\" [label = \"N subjects = 2,679\nN records = 14,205\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"0,-3.735!\"] \n  \"6\" [label = \"N subjects = 2,679\nN records = 14,205\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"0,-4.685!\"] \n  \"7\" [label = \"N subjects = 2,679\nN records = 13,908\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"0,-5.635!\"] \n  \"8\" [label = \"Initial qualifying events\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"0,-0.41!\"] \n  \"9\" [label = \"Record in observation\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"0,-1.36!\"] \n  \"10\" [label = \"N subjects = 0\nN records = 0\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"1.95,-1.36!\"] \n  \"11\" [label = \"Record start <= record end\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"0,-2.31!\"] \n  \"12\" [label = \"N subjects = 0\nN records = 0\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"1.95,-2.31!\"] \n  \"13\" [label = \"Non-missing sex\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"0,-3.26!\"] \n  \"14\" [label = \"N subjects = 0\nN records = 0\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"1.95,-3.26!\"] \n  \"15\" [label = \"Non-missing year of birth\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"0,-4.21!\"] \n  \"16\" [label = \"N subjects = 0\nN records = 0\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"1.95,-4.21!\"] \n  \"17\" [label = \"Merge overlapping records\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"0,-5.16!\"] \n  \"18\" [label = \"N subjects = 0\nN records = 297\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"1.95,-5.16!\"] \n  \"19\" [label = \"Database: Synthea\nCohort name: acetaminophen_one_night\", shape = \"box\", color = \"#FFFFFF\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"1\", pos = \"4,0!\"] \n  \"20\" [label = \"N subjects = 2,679\nN records = 14,205\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"4,-0.885!\"] \n  \"21\" [label = \"N subjects = 2,679\nN records = 14,205\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"4,-1.835!\"] \n  \"22\" [label = \"N subjects = 2,679\nN records = 14,205\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"4,-2.785!\"] \n  \"23\" [label = \"N subjects = 2,679\nN records = 14,205\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"4,-3.735!\"] \n  \"24\" [label = \"N subjects = 2,679\nN records = 14,205\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"4,-4.685!\"] \n  \"25\" [label = \"N subjects = 2,679\nN records = 13,908\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"4,-5.635!\"] \n  \"26\" [label = \"N subjects = 2,678\nN records = 13,469\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"4,-6.715!\"] \n  \"27\" [label = \"Initial qualifying events\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"4,-0.41!\"] \n  \"28\" [label = \"Record in observation\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"4,-1.36!\"] \n  \"29\" [label = \"N subjects = 0\nN records = 0\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"5.95,-1.36!\"] \n  \"30\" [label = \"Record start <= record end\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"4,-2.31!\"] \n  \"31\" [label = \"N subjects = 0\nN records = 0\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"5.95,-2.31!\"] \n  \"32\" [label = \"Non-missing sex\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"4,-3.26!\"] \n  \"33\" [label = \"N subjects = 0\nN records = 0\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"5.95,-3.26!\"] \n  \"34\" [label = \"Non-missing year of birth\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"4,-4.21!\"] \n  \"35\" [label = \"N subjects = 0\nN records = 0\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"5.95,-4.21!\"] \n  \"36\" [label = \"Merge overlapping records\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"4,-5.16!\"] \n  \"37\" [label = \"N subjects = 0\nN records = 297\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"5.95,-5.16!\"] \n  \"38\" [label = \"Keep records with duration 2 to Inf\ndays\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"2\", pos = \"4,-6.175!\"] \n  \"39\" [label = \"N subjects = 1\nN records = 439\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"5.95,-6.175!\"] \n\"2\"->\"3\" [color = \"#000000\"] \n\"3\"->\"4\" [color = \"#000000\"] \n\"4\"->\"5\" [color = \"#000000\"] \n\"5\"->\"6\" [color = \"#000000\"] \n\"6\"->\"7\" [color = \"#000000\"] \n\"9\"->\"10\" [color = \"#000000\"] \n\"11\"->\"12\" [color = \"#000000\"] \n\"13\"->\"14\" [color = \"#000000\"] \n\"15\"->\"16\" [color = \"#000000\"] \n\"17\"->\"18\" [color = \"#000000\"] \n\"20\"->\"21\" [color = \"#000000\"] \n\"21\"->\"22\" [color = \"#000000\"] \n\"22\"->\"23\" [color = \"#000000\"] \n\"23\"->\"24\" [color = \"#000000\"] \n\"24\"->\"25\" [color = \"#000000\"] \n\"25\"->\"26\" [color = \"#000000\"] \n\"28\"->\"29\" [color = \"#000000\"] \n\"30\"->\"31\" [color = \"#000000\"] \n\"32\"->\"33\" [color = \"#000000\"] \n\"34\"->\"35\" [color = \"#000000\"] \n\"36\"->\"37\" [color = \"#000000\"] \n\"38\"->\"39\" [color = \"#000000\"] \n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script><div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">summary_characteristics</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/CohortCharacteristics/reference/summariseCharacteristics.html" class="external-link">summariseCharacteristics</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">both_cohorts</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://darwin-eu.github.io/CohortCharacteristics/reference/tableCharacteristics.html" class="external-link">tableCharacteristics</a></span><span class="op">(</span><span class="va">summary_characteristics</span> <span class="op">|&gt;</span></span>
+<span>                       <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">variable_name</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Number subjects"</span>, <span class="st">"Days in cohort"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<div id="myiegyjytf" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#myiegyjytf table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#myiegyjytf thead, #myiegyjytf tbody, #myiegyjytf tfoot, #myiegyjytf tr, #myiegyjytf td, #myiegyjytf th {
+  border-style: none;
+}
+
+#myiegyjytf p {
+  margin: 0;
+  padding: 0;
+}
+
+#myiegyjytf .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 3px;
+  border-top-color: #D9D9D9;
+  border-right-style: solid;
+  border-right-width: 3px;
+  border-right-color: #D9D9D9;
+  border-bottom-style: solid;
+  border-bottom-width: 3px;
+  border-bottom-color: #D9D9D9;
+  border-left-style: solid;
+  border-left-width: 3px;
+  border-left-color: #D9D9D9;
+}
+
+#myiegyjytf .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#myiegyjytf .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#myiegyjytf .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#myiegyjytf .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#myiegyjytf .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#myiegyjytf .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#myiegyjytf .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#myiegyjytf .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#myiegyjytf .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#myiegyjytf .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#myiegyjytf .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#myiegyjytf .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#myiegyjytf .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#myiegyjytf .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#myiegyjytf .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#myiegyjytf .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#myiegyjytf .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#myiegyjytf .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#myiegyjytf .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#myiegyjytf .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#myiegyjytf .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#myiegyjytf .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#myiegyjytf .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#myiegyjytf .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#myiegyjytf .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#myiegyjytf .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#myiegyjytf .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#myiegyjytf .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#myiegyjytf .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#myiegyjytf .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 3px;
+  border-top-color: #D9D9D9;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#myiegyjytf .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#myiegyjytf .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#myiegyjytf .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#myiegyjytf .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#myiegyjytf .gt_left {
+  text-align: left;
+}
+
+#myiegyjytf .gt_center {
+  text-align: center;
+}
+
+#myiegyjytf .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#myiegyjytf .gt_font_normal {
+  font-weight: normal;
+}
+
+#myiegyjytf .gt_font_bold {
+  font-weight: bold;
+}
+
+#myiegyjytf .gt_font_italic {
+  font-style: italic;
+}
+
+#myiegyjytf .gt_super {
+  font-size: 65%;
+}
+
+#myiegyjytf .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#myiegyjytf .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#myiegyjytf .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#myiegyjytf .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#myiegyjytf .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#myiegyjytf .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#myiegyjytf .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#myiegyjytf .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#myiegyjytf div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+<table class="table gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_col_headings gt_spanner_row">
+<th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="3" style="background-color: #D9D9D9; text-align: center; font-weight: bold;" scope="colgroup"></th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="2" style="background-color: #D9D9D9; text-align: center; font-weight: bold;" scope="colgroup" id="spanner-[header_name]CDM name
+[header_level]Synthea
+[header_name]Cohort name
+[header_level]acetaminophen">
+        <div class="gt_column_spanner">CDM name</div>
+      </th>
+    </tr>
+<tr class="gt_col_headings gt_spanner_row">
+<th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="3" style="background-color: #E1E1E1; text-align: center; font-weight: bold;" scope="colgroup"></th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="2" style="background-color: #E1E1E1; text-align: center; font-weight: bold;" scope="colgroup" id="spanner-[header_level]Synthea
+[header_name]Cohort name
+[header_level]acetaminophen">
+        <div class="gt_column_spanner">Synthea</div>
+      </th>
+    </tr>
+<tr class="gt_col_headings gt_spanner_row">
+<th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="2" colspan="1" style="text-align: center; font-weight: bold;" scope="col" id="Variable-name">Variable name</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="2" colspan="1" style="text-align: center; font-weight: bold;" scope="col" id="Variable-level">Variable level</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="2" colspan="1" style="text-align: center; font-weight: bold;" scope="col" id="Estimate-name">Estimate name</th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="2" style="background-color: #D9D9D9; text-align: center; font-weight: bold;" scope="colgroup" id="spanner-[header_name]Cohort name
+[header_level]acetaminophen">
+        <div class="gt_column_spanner">Cohort name</div>
+      </th>
+    </tr>
+<tr class="gt_col_headings">
+<th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="background-color: #E1E1E1; text-align: center; font-weight: bold;" scope="col" id="[header_name]CDM-name-[header_level]Synthea-[header_name]Cohort-name-[header_level]acetaminophen">acetaminophen</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="background-color: #E1E1E1; text-align: center; font-weight: bold;" scope="col" id="[header_name]CDM-name-[header_level]Synthea-[header_name]Cohort-name-[header_level]acetaminophen_one_night">acetaminophen_one_night</th>
+    </tr>
+</thead>
+<tbody class="gt_table_body">
+<tr>
+<td headers="Variable name" class="gt_row gt_left" style="text-align: left;">Number subjects</td>
+<td headers="Variable level" class="gt_row gt_right" style="text-align: left; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">-</td>
+<td headers="Estimate name" class="gt_row gt_left" style="text-align: left; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">N</td>
+<td headers="[header_name]CDM name
+[header_level]Synthea
+[header_name]Cohort name
+[header_level]acetaminophen" class="gt_row gt_left" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">2,679</td>
+<td headers="[header_name]CDM name
+[header_level]Synthea
+[header_name]Cohort name
+[header_level]acetaminophen_one_night" class="gt_row gt_left" style="text-align: right;">2,678</td>
+</tr>
+<tr>
+<td headers="Variable name" class="gt_row gt_left" style="text-align: left;">Days in cohort</td>
+<td headers="Variable level" class="gt_row gt_right" style="text-align: left; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">-</td>
+<td headers="Estimate name" class="gt_row gt_left" style="text-align: left; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">Median [Q25 - Q75]</td>
+<td headers="[header_name]CDM name
+[header_level]Synthea
+[header_name]Cohort name
+[header_level]acetaminophen" class="gt_row gt_left" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">15 [8 - 15]</td>
+<td headers="[header_name]CDM name
+[header_level]Synthea
+[header_name]Cohort name
+[header_level]acetaminophen_one_night" class="gt_row gt_left" style="text-align: right;">15 [8 - 15]</td>
+</tr>
+<tr>
+<td headers="Variable name" class="gt_row gt_left" style="text-align: left; border-top-width: 1px; border-top-style: hidden; border-top-color: #000000;"></td>
+<td headers="Variable level" class="gt_row gt_right" style="text-align: left; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: hidden; border-top-color: #000000; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;"></td>
+<td headers="Estimate name" class="gt_row gt_left" style="text-align: left; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">Mean (SD)</td>
+<td headers="[header_name]CDM name
+[header_level]Synthea
+[header_name]Cohort name
+[header_level]acetaminophen" class="gt_row gt_left" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">17.99 (16.17)</td>
+<td headers="[header_name]CDM name
+[header_level]Synthea
+[header_name]Cohort name
+[header_level]acetaminophen_one_night" class="gt_row gt_left" style="text-align: right;">18.55 (16.13)</td>
+</tr>
+<tr>
+<td headers="Variable name" class="gt_row gt_left" style="text-align: left; border-top-width: 1px; border-top-style: hidden; border-top-color: #000000;"></td>
+<td headers="Variable level" class="gt_row gt_right" style="text-align: left; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: hidden; border-top-color: #000000; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;"></td>
+<td headers="Estimate name" class="gt_row gt_left" style="text-align: left; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">Range</td>
+<td headers="[header_name]CDM name
+[header_level]Synthea
+[header_name]Cohort name
+[header_level]acetaminophen" class="gt_row gt_left" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">1 to 101</td>
+<td headers="[header_name]CDM name
+[header_level]Synthea
+[header_name]Cohort name
+[header_level]acetaminophen_one_night" class="gt_row gt_left" style="text-align: right;">2 to 101</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <div class="section level2">
 <h2 id="applying-multiple-cohort-requirements">Applying multiple cohort requirements<a class="anchor" aria-label="anchor" href="#applying-multiple-cohort-requirements"></a>
@@ -225,35 +781,34 @@ the <code>requireInDateRange</code> function.</p>
 <p>Multiple restrictions can be applied to a cohort, however it is
 important to note that the order that requirements are applied will
 often matter.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">acetaminophen_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/conceptCohort.html">conceptCohort</a></span><span class="op">(</span>cdm <span class="op">=</span> <span class="va">cdm</span>, </span>
 <span>                                 conceptSet <span class="op">=</span> <span class="va">acetaminophen_codes</span>, </span>
 <span>                                 name <span class="op">=</span> <span class="st">"acetaminophen_1"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="../reference/requireIsFirstEntry.html">requireIsFirstEntry</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/requireInDateRange.html">requireInDateRange</a></span><span class="op">(</span>dateRange <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2010-01-01"</span>, <span class="st">"2016-01-01"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="../reference/requireInDateRange.html">requireInDateRange</a></span><span class="op">(</span>dateRange <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2010-01-01"</span>, <span class="st">"2016-01-01"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="../reference/renameCohort.html">renameCohort</a></span><span class="op">(</span><span class="st">"entry_before_date"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">cdm</span><span class="op">$</span><span class="va">acetaminophen_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/conceptCohort.html">conceptCohort</a></span><span class="op">(</span>cdm <span class="op">=</span> <span class="va">cdm</span>, </span>
 <span>                                 conceptSet <span class="op">=</span> <span class="va">acetaminophen_codes</span>, </span>
 <span>                                 name <span class="op">=</span> <span class="st">"acetaminophen_2"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/requireInDateRange.html">requireInDateRange</a></span><span class="op">(</span>dateRange <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2010-01-01"</span>, <span class="st">"2016-01-01"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="../reference/requireIsFirstEntry.html">requireIsFirstEntry</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">summary_attrition_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/CohortCharacteristics/reference/summariseCohortAttrition.html" class="external-link">summariseCohortAttrition</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">acetaminophen_1</span><span class="op">)</span></span>
-<span><span class="va">summary_attrition_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/CohortCharacteristics/reference/summariseCohortAttrition.html" class="external-link">summariseCohortAttrition</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">acetaminophen_2</span><span class="op">)</span></span></code></pre></div>
-<p>Here we see attrition if we apply our entry requirement before our
-date requirement. In this case we have a cohort of people with their
-first ever record of acetaminophen which occurs in our study period.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://darwin-eu.github.io/CohortCharacteristics/reference/plotCohortAttrition.html" class="external-link">plotCohortAttrition</a></span><span class="op">(</span><span class="va">summary_attrition_1</span><span class="op">)</span></span></code></pre></div>
-<div class="grViz html-widget html-fill-item" id="htmlwidget-4018eef1a407a0df6b52" style="width:700px;height:432.632880098888px;"></div>
-<script type="application/json" data-for="htmlwidget-4018eef1a407a0df6b52">{"x":{"diagram":"digraph {\n\ngraph [layout = \"neato\",\n       outputorder = \"edgesfirst\",\n       bgcolor = \"white\"]\n\nnode [fontname = \"Helvetica\",\n      fontsize = \"10\",\n      shape = \"circle\",\n      fixedsize = \"true\",\n      width = \"0.5\",\n      style = \"filled\",\n      fillcolor = \"aliceblue\",\n      color = \"gray70\",\n      fontcolor = \"gray50\"]\n\nedge [fontname = \"Helvetica\",\n     fontsize = \"8\",\n     len = \"1.5\",\n     color = \"gray80\",\n     arrowsize = \"0.5\"]\n\n  \"1\" [label = \"Database: Synthea\nCohort name: acetaminophen\", shape = \"box\", color = \"#FFFFFF\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"1\", pos = \"0,0!\"] \n  \"2\" [label = \"N subjects = 2,679\nN records = 14,205\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"0,-0.885!\"] \n  \"3\" [label = \"N subjects = 2,679\nN records = 14,205\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"0,-1.835!\"] \n  \"4\" [label = \"N subjects = 2,679\nN records = 14,205\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"0,-2.785!\"] \n  \"5\" [label = \"N subjects = 2,679\nN records = 14,205\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"0,-3.735!\"] \n  \"6\" [label = \"N subjects = 2,679\nN records = 14,205\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"0,-4.685!\"] \n  \"7\" [label = \"N subjects = 2,679\nN records = 13,908\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"0,-5.635!\"] \n  \"8\" [label = \"N subjects = 2,679\nN records = 2,679\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"0,-6.585!\"] \n  \"9\" [label = \"N subjects = 14\nN records = 14\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"0,-7.665!\"] \n  \"10\" [label = \"N subjects = 13\nN records = 13\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"0,-8.745!\"] \n  \"11\" [label = \"Initial qualifying events\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"0,-0.41!\"] \n  \"12\" [label = \"Record in observation\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"0,-1.36!\"] \n  \"13\" [label = \"N subjects = 0\nN records = 0\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"1.95,-1.36!\"] \n  \"14\" [label = \"Record start <= record end\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"0,-2.31!\"] \n  \"15\" [label = \"N subjects = 0\nN records = 0\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"1.95,-2.31!\"] \n  \"16\" [label = \"Non-missing sex\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"0,-3.26!\"] \n  \"17\" [label = \"N subjects = 0\nN records = 0\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"1.95,-3.26!\"] \n  \"18\" [label = \"Non-missing year of birth\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"0,-4.21!\"] \n  \"19\" [label = \"N subjects = 0\nN records = 0\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"1.95,-4.21!\"] \n  \"20\" [label = \"Merge overlapping records\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"0,-5.16!\"] \n  \"21\" [label = \"N subjects = 0\nN records = 297\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"1.95,-5.16!\"] \n  \"22\" [label = \"Restricted to first entry\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"0,-6.11!\"] \n  \"23\" [label = \"N subjects = 0\nN records = 11,229\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"1.95,-6.11!\"] \n  \"24\" [label = \"cohort_start_date after\n2010-01-01\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"2\", pos = \"0,-7.125!\"] \n  \"25\" [label = \"N subjects = 2,665\nN records = 2,665\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"1.95,-7.125!\"] \n  \"26\" [label = \"cohort_start_date before\n2016-01-01\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"2\", pos = \"0,-8.205!\"] \n  \"27\" [label = \"N subjects = 1\nN records = 1\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"1.95,-8.205!\"] \n\"2\"->\"3\" [color = \"#000000\"] \n\"3\"->\"4\" [color = \"#000000\"] \n\"4\"->\"5\" [color = \"#000000\"] \n\"5\"->\"6\" [color = \"#000000\"] \n\"6\"->\"7\" [color = \"#000000\"] \n\"7\"->\"8\" [color = \"#000000\"] \n\"8\"->\"9\" [color = \"#000000\"] \n\"9\"->\"10\" [color = \"#000000\"] \n\"12\"->\"13\" [color = \"#000000\"] \n\"14\"->\"15\" [color = \"#000000\"] \n\"16\"->\"17\" [color = \"#000000\"] \n\"18\"->\"19\" [color = \"#000000\"] \n\"20\"->\"21\" [color = \"#000000\"] \n\"22\"->\"23\" [color = \"#000000\"] \n\"24\"->\"25\" [color = \"#000000\"] \n\"26\"->\"27\" [color = \"#000000\"] \n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script><p>And here we see attrition if we apply our date requirement before our
-entry requirement. In this case we have a cohort of people with their
-first record of acetaminophen in the study period, although this will
-not necessarily be their first record ever.</p>
+<span>  <span class="fu"><a href="../reference/requireIsFirstEntry.html">requireIsFirstEntry</a></span><span class="op">(</span><span class="st">"date_before_entry"</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://darwin-eu.github.io/CohortCharacteristics/reference/plotCohortAttrition.html" class="external-link">plotCohortAttrition</a></span><span class="op">(</span><span class="va">summary_attrition_2</span><span class="op">)</span></span></code></pre></div>
-<div class="grViz html-widget html-fill-item" id="htmlwidget-5b1b2f4ad92281566982" style="width:700px;height:432.632880098888px;"></div>
-<script type="application/json" data-for="htmlwidget-5b1b2f4ad92281566982">{"x":{"diagram":"digraph {\n\ngraph [layout = \"neato\",\n       outputorder = \"edgesfirst\",\n       bgcolor = \"white\"]\n\nnode [fontname = \"Helvetica\",\n      fontsize = \"10\",\n      shape = \"circle\",\n      fixedsize = \"true\",\n      width = \"0.5\",\n      style = \"filled\",\n      fillcolor = \"aliceblue\",\n      color = \"gray70\",\n      fontcolor = \"gray50\"]\n\nedge [fontname = \"Helvetica\",\n     fontsize = \"8\",\n     len = \"1.5\",\n     color = \"gray80\",\n     arrowsize = \"0.5\"]\n\n  \"1\" [label = \"Database: Synthea\nCohort name: acetaminophen\", shape = \"box\", color = \"#FFFFFF\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"1\", pos = \"0,0!\"] \n  \"2\" [label = \"N subjects = 2,679\nN records = 14,205\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"0,-0.885!\"] \n  \"3\" [label = \"N subjects = 2,679\nN records = 14,205\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"0,-1.835!\"] \n  \"4\" [label = \"N subjects = 2,679\nN records = 14,205\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"0,-2.785!\"] \n  \"5\" [label = \"N subjects = 2,679\nN records = 14,205\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"0,-3.735!\"] \n  \"6\" [label = \"N subjects = 2,679\nN records = 14,205\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"0,-4.685!\"] \n  \"7\" [label = \"N subjects = 2,679\nN records = 13,908\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"0,-5.635!\"] \n  \"8\" [label = \"N subjects = 1,276\nN records = 1,689\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"0,-6.715!\"] \n  \"9\" [label = \"N subjects = 907\nN records = 1,060\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"0,-7.795!\"] \n  \"10\" [label = \"N subjects = 907\nN records = 907\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"0,-8.745!\"] \n  \"11\" [label = \"Initial qualifying events\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"0,-0.41!\"] \n  \"12\" [label = \"Record in observation\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"0,-1.36!\"] \n  \"13\" [label = \"N subjects = 0\nN records = 0\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"1.95,-1.36!\"] \n  \"14\" [label = \"Record start <= record end\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"0,-2.31!\"] \n  \"15\" [label = \"N subjects = 0\nN records = 0\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"1.95,-2.31!\"] \n  \"16\" [label = \"Non-missing sex\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"0,-3.26!\"] \n  \"17\" [label = \"N subjects = 0\nN records = 0\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"1.95,-3.26!\"] \n  \"18\" [label = \"Non-missing year of birth\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"0,-4.21!\"] \n  \"19\" [label = \"N subjects = 0\nN records = 0\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"1.95,-4.21!\"] \n  \"20\" [label = \"Merge overlapping records\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"0,-5.16!\"] \n  \"21\" [label = \"N subjects = 0\nN records = 297\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"1.95,-5.16!\"] \n  \"22\" [label = \"cohort_start_date after\n2010-01-01\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"2\", pos = \"0,-6.175!\"] \n  \"23\" [label = \"N subjects = 1,403\nN records = 12,219\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"1.95,-6.175!\"] \n  \"24\" [label = \"cohort_start_date before\n2016-01-01\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"2\", pos = \"0,-7.255!\"] \n  \"25\" [label = \"N subjects = 369\nN records = 629\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"1.95,-7.255!\"] \n  \"26\" [label = \"Restricted to first entry\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"0,-8.27!\"] \n  \"27\" [label = \"N subjects = 0\nN records = 153\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"1.95,-8.27!\"] \n\"2\"->\"3\" [color = \"#000000\"] \n\"3\"->\"4\" [color = \"#000000\"] \n\"4\"->\"5\" [color = \"#000000\"] \n\"5\"->\"6\" [color = \"#000000\"] \n\"6\"->\"7\" [color = \"#000000\"] \n\"7\"->\"8\" [color = \"#000000\"] \n\"8\"->\"9\" [color = \"#000000\"] \n\"9\"->\"10\" [color = \"#000000\"] \n\"12\"->\"13\" [color = \"#000000\"] \n\"14\"->\"15\" [color = \"#000000\"] \n\"16\"->\"17\" [color = \"#000000\"] \n\"18\"->\"19\" [color = \"#000000\"] \n\"20\"->\"21\" [color = \"#000000\"] \n\"22\"->\"23\" [color = \"#000000\"] \n\"24\"->\"25\" [color = \"#000000\"] \n\"26\"->\"27\" [color = \"#000000\"] \n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<code class="sourceCode R"><span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/bind.html" class="external-link">bind</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">acetaminophen_1</span>,</span>
+<span>            <span class="va">cdm</span><span class="op">$</span><span class="va">acetaminophen_2</span>, </span>
+<span>            name <span class="op">=</span> <span class="st">"both_cohorts"</span><span class="op">)</span></span>
+<span><span class="va">summary_attrition</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/CohortCharacteristics/reference/summariseCohortAttrition.html" class="external-link">summariseCohortAttrition</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">both_cohorts</span><span class="op">)</span></span></code></pre></div>
+<p>If we apply our entry requirement before our date requirement then we
+have a cohort of people with their first ever record of acetaminophen
+which occurs in our study period. But if we apply our date requirement
+before our entry requirement we have a cohort of people with their first
+record of acetaminophen in the study period, but this will not
+necessarily be their first record ever.</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://darwin-eu.github.io/CohortCharacteristics/reference/plotCohortAttrition.html" class="external-link">plotCohortAttrition</a></span><span class="op">(</span><span class="va">summary_attrition</span><span class="op">)</span></span></code></pre></div>
+<div class="grViz html-widget html-fill-item" id="htmlwidget-4018eef1a407a0df6b52" style="width:700px;height:432.632880098888px;"></div>
+<script type="application/json" data-for="htmlwidget-4018eef1a407a0df6b52">{"x":{"diagram":"digraph {\n\ngraph [layout = \"neato\",\n       outputorder = \"edgesfirst\",\n       bgcolor = \"white\"]\n\nnode [fontname = \"Helvetica\",\n      fontsize = \"10\",\n      shape = \"circle\",\n      fixedsize = \"true\",\n      width = \"0.5\",\n      style = \"filled\",\n      fillcolor = \"aliceblue\",\n      color = \"gray70\",\n      fontcolor = \"gray50\"]\n\nedge [fontname = \"Helvetica\",\n     fontsize = \"8\",\n     len = \"1.5\",\n     color = \"gray80\",\n     arrowsize = \"0.5\"]\n\n  \"1\" [label = \"Database: Synthea\nCohort name: acetaminophen\", shape = \"box\", color = \"#FFFFFF\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"1\", pos = \"0,0!\"] \n  \"2\" [label = \"N subjects = 2,679\nN records = 14,205\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"0,-0.885!\"] \n  \"3\" [label = \"N subjects = 2,679\nN records = 14,205\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"0,-1.835!\"] \n  \"4\" [label = \"N subjects = 2,679\nN records = 14,205\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"0,-2.785!\"] \n  \"5\" [label = \"N subjects = 2,679\nN records = 14,205\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"0,-3.735!\"] \n  \"6\" [label = \"N subjects = 2,679\nN records = 14,205\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"0,-4.685!\"] \n  \"7\" [label = \"N subjects = 2,679\nN records = 13,908\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"0,-5.635!\"] \n  \"8\" [label = \"N subjects = 1,276\nN records = 1,689\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"0,-6.715!\"] \n  \"9\" [label = \"N subjects = 907\nN records = 1,060\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"0,-7.795!\"] \n  \"10\" [label = \"Initial qualifying events\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"0,-0.41!\"] \n  \"11\" [label = \"Record in observation\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"0,-1.36!\"] \n  \"12\" [label = \"N subjects = 0\nN records = 0\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"1.95,-1.36!\"] \n  \"13\" [label = \"Record start <= record end\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"0,-2.31!\"] \n  \"14\" [label = \"N subjects = 0\nN records = 0\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"1.95,-2.31!\"] \n  \"15\" [label = \"Non-missing sex\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"0,-3.26!\"] \n  \"16\" [label = \"N subjects = 0\nN records = 0\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"1.95,-3.26!\"] \n  \"17\" [label = \"Non-missing year of birth\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"0,-4.21!\"] \n  \"18\" [label = \"N subjects = 0\nN records = 0\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"1.95,-4.21!\"] \n  \"19\" [label = \"Merge overlapping records\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"0,-5.16!\"] \n  \"20\" [label = \"N subjects = 0\nN records = 297\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"1.95,-5.16!\"] \n  \"21\" [label = \"cohort_start_date after\n2010-01-01\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"2\", pos = \"0,-6.175!\"] \n  \"22\" [label = \"N subjects = 1,403\nN records = 12,219\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"1.95,-6.175!\"] \n  \"23\" [label = \"cohort_start_date before\n2016-01-01\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"2\", pos = \"0,-7.255!\"] \n  \"24\" [label = \"N subjects = 369\nN records = 629\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"1.95,-7.255!\"] \n  \"25\" [label = \"Database: Synthea\nCohort name: entry_before_date\", shape = \"box\", color = \"#FFFFFF\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"1\", pos = \"4,0!\"] \n  \"26\" [label = \"N subjects = 2,679\nN records = 14,205\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"4,-0.885!\"] \n  \"27\" [label = \"N subjects = 2,679\nN records = 14,205\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"4,-1.835!\"] \n  \"28\" [label = \"N subjects = 2,679\nN records = 14,205\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"4,-2.785!\"] \n  \"29\" [label = \"N subjects = 2,679\nN records = 14,205\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"4,-3.735!\"] \n  \"30\" [label = \"N subjects = 2,679\nN records = 14,205\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"4,-4.685!\"] \n  \"31\" [label = \"N subjects = 2,679\nN records = 13,908\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"4,-5.635!\"] \n  \"32\" [label = \"N subjects = 2,679\nN records = 2,679\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"4,-6.585!\"] \n  \"33\" [label = \"N subjects = 14\nN records = 14\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"4,-7.665!\"] \n  \"34\" [label = \"N subjects = 13\nN records = 13\", shape = \"box\", color = \"#000000\", fillcolor = \"#FFFFFF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"4,-8.745!\"] \n  \"35\" [label = \"Initial qualifying events\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"4,-0.41!\"] \n  \"36\" [label = \"Record in observation\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"4,-1.36!\"] \n  \"37\" [label = \"N subjects = 0\nN records = 0\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"5.95,-1.36!\"] \n  \"38\" [label = \"Record start <= record end\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"4,-2.31!\"] \n  \"39\" [label = \"N subjects = 0\nN records = 0\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"5.95,-2.31!\"] \n  \"40\" [label = \"Non-missing sex\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"4,-3.26!\"] \n  \"41\" [label = \"N subjects = 0\nN records = 0\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"5.95,-3.26!\"] \n  \"42\" [label = \"Non-missing year of birth\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"4,-4.21!\"] \n  \"43\" [label = \"N subjects = 0\nN records = 0\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"5.95,-4.21!\"] \n  \"44\" [label = \"Merge overlapping records\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"4,-5.16!\"] \n  \"45\" [label = \"N subjects = 0\nN records = 297\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"5.95,-5.16!\"] \n  \"46\" [label = \"Restricted to first entry\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.26\", width = \"2\", pos = \"4,-6.11!\"] \n  \"47\" [label = \"N subjects = 0\nN records = 11,229\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"5.95,-6.11!\"] \n  \"48\" [label = \"cohort_start_date after\n2010-01-01\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"2\", pos = \"4,-7.125!\"] \n  \"49\" [label = \"N subjects = 2,665\nN records = 2,665\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"5.95,-7.125!\"] \n  \"50\" [label = \"cohort_start_date before\n2016-01-01\", shape = \"box\", color = \"#000000\", fillcolor = \"#F0F8FF\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"2\", pos = \"4,-8.205!\"] \n  \"51\" [label = \"N subjects = 1\nN records = 1\", shape = \"box\", color = \"#000000\", fillcolor = \"#F8F8F8\", fontname = \"Calibri\", fontsize = \"8\", fontcolor = \"#000000\", height = \"0.39\", width = \"1.2\", pos = \"5.95,-8.205!\"] \n\"2\"->\"3\" [color = \"#000000\"] \n\"3\"->\"4\" [color = \"#000000\"] \n\"4\"->\"5\" [color = \"#000000\"] \n\"5\"->\"6\" [color = \"#000000\"] \n\"6\"->\"7\" [color = \"#000000\"] \n\"7\"->\"8\" [color = \"#000000\"] \n\"8\"->\"9\" [color = \"#000000\"] \n\"11\"->\"12\" [color = \"#000000\"] \n\"13\"->\"14\" [color = \"#000000\"] \n\"15\"->\"16\" [color = \"#000000\"] \n\"17\"->\"18\" [color = \"#000000\"] \n\"19\"->\"20\" [color = \"#000000\"] \n\"21\"->\"22\" [color = \"#000000\"] \n\"23\"->\"24\" [color = \"#000000\"] \n\"26\"->\"27\" [color = \"#000000\"] \n\"27\"->\"28\" [color = \"#000000\"] \n\"28\"->\"29\" [color = \"#000000\"] \n\"29\"->\"30\" [color = \"#000000\"] \n\"30\"->\"31\" [color = \"#000000\"] \n\"31\"->\"32\" [color = \"#000000\"] \n\"32\"->\"33\" [color = \"#000000\"] \n\"33\"->\"34\" [color = \"#000000\"] \n\"36\"->\"37\" [color = \"#000000\"] \n\"38\"->\"39\" [color = \"#000000\"] \n\"40\"->\"41\" [color = \"#000000\"] \n\"42\"->\"43\" [color = \"#000000\"] \n\"44\"->\"45\" [color = \"#000000\"] \n\"46\"->\"47\" [color = \"#000000\"] \n\"48\"->\"49\" [color = \"#000000\"] \n\"50\"->\"51\" [color = \"#000000\"] \n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 </div>
 <div class="section level2">
 <h2 id="keep-only-records-from-cohorts-with-a-minimum-number-of-individuals">Keep only records from cohorts with a minimum number of
@@ -266,7 +821,7 @@ a minimum count, filtering out records from cohorts with fewer than this
 number.</p>
 <p>As an example let’s create a cohort for every drug ingredient we see
 in Eunomia. We can first get the drug ingredient codes.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">medication_codes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/CodelistGenerator/reference/getDrugIngredientCodes.html" class="external-link">getDrugIngredientCodes</a></span><span class="op">(</span>cdm <span class="op">=</span> <span class="va">cdm</span>, nameStyle <span class="op">=</span> <span class="st">"{concept_name}"</span><span class="op">)</span></span>
 <span><span class="va">medication_codes</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -279,7 +834,7 @@ in Eunomia. We can first get the drug ingredient codes.</p>
 <span><span class="co">#&gt; along with 85 more codelists</span></span></code></pre></div>
 <p>We can see that when we make all these cohorts many have only a small
 number of individuals.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">medications</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/conceptCohort.html">conceptCohort</a></span><span class="op">(</span>cdm <span class="op">=</span> <span class="va">cdm</span>, </span>
 <span>                                 conceptSet <span class="op">=</span> <span class="va">medication_codes</span>,</span>
 <span>                                 name <span class="op">=</span> <span class="st">"medications"</span><span class="op">)</span></span>
@@ -293,10 +848,10 @@ number of individuals.</p>
 <span>                 binwidth <span class="op">=</span> <span class="fl">25</span><span class="op">)</span> <span class="op">+</span>  </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Number of subjects"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="a02_cohort_table_requirements_files/figure-html/unnamed-chunk-19-1.png" width="700"></p>
+<p><img src="a02_cohort_table_requirements_files/figure-html/unnamed-chunk-20-1.png" width="700"></p>
 <p>If we apply a minimum cohort count of 500, we end up with far fewer
 cohorts that all have a sufficient number of study participants.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">medications</span> <span class="op">&lt;-</span> <span class="va">cdm</span><span class="op">$</span><span class="va">medications</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="../reference/requireMinCohortCount.html">requireMinCohortCount</a></span><span class="op">(</span>minCohortCount <span class="op">=</span> <span class="fl">500</span><span class="op">)</span></span>
 <span></span>
@@ -309,7 +864,7 @@ cohorts that all have a sufficient number of study participants.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/lims.html" class="external-link">xlim</a></span><span class="op">(</span><span class="fl">0</span>, <span class="cn">NA</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Number of subjects"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="a02_cohort_table_requirements_files/figure-html/unnamed-chunk-20-1.png" width="700"></p>
+<p><img src="a02_cohort_table_requirements_files/figure-html/unnamed-chunk-21-1.png" width="700"></p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
