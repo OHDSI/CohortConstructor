@@ -258,14 +258,14 @@ getFilterExpression <- function(valueAsConcept, valueAsNumber) {
     for (ii in seq_along(valueAsNumber)) {
       if(!is.null(names(valueAsNumber)[ii])){
         expFilter[ii] <- glue::glue(
-          "(.data$unit_concept_id %in% {names(valueAsNumber)[ii]} &
-      .data$value_as_number >= {valueAsNumber[[ii]][1]} &
-      .data$value_as_number <= {valueAsNumber[[ii]][2]})"
+          "(.data$unit_concept_id %in% {as.integer(names(valueAsNumber)[ii])} &
+      as.numeric(.data$value_as_number) >= {valueAsNumber[[ii]][1]} &
+      as.numeric(.data$value_as_number) <= {valueAsNumber[[ii]][2]})"
         )
       } else {
         expFilter[ii] <- glue::glue(
-          "(.data$value_as_number >= {valueAsNumber[[ii]][1]} &
-          .data$value_as_number <= {valueAsNumber[[ii]][2]})"
+          "(as.numeric(.data$value_as_number) >= {valueAsNumber[[ii]][1]} &
+          as.numeric(.data$value_as_number) <= {valueAsNumber[[ii]][2]})"
         )
       }
     }

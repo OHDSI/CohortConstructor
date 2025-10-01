@@ -622,7 +622,7 @@ getDomainCohort <- function(cdm,
       "concept_id" = dplyr::all_of(.env$concept),
       "cohort_start_date" = dplyr::all_of(.env$start),
       "cohort_end_date" = dplyr::all_of(.env$end),
-      dplyr::all_of(extraCols)
+      dplyr::any_of(extraCols)
     )
   if (!is.null(subsetIndividuals)) {
     tempCohort <- tempCohort |>
