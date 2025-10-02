@@ -36,7 +36,6 @@ First, we'll connect to the Eunomia synthetic data and create a mock cohort of w
 
 ```{r}
 library(dplyr, warn.conflicts = FALSE)
-library(CDMConnector)
 library(CohortConstructor)
 library(CohortCharacteristics)
 library(PatientProfiles)

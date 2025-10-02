@@ -135,7 +135,7 @@ trimDemographics <- function(cohort,
 
   newChangeIds <- newSet |>
     dplyr::filter(.data$requirements) |>
-    dplyr::pull(cohort_definition_id)
+    dplyr::pull("cohort_definition_id")
 
   if (!is.null(sex)) {
 

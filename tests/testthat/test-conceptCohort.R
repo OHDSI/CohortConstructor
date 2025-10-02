@@ -1303,7 +1303,7 @@ test_that("conceptSetExpression", {
       "drug_exposure_end_date" = as.Date(c(
         "2000-10-02", "2001-08-03", "2000-03-01", "2000-11-01", "2001-02-01", "2001-02-01"
       )),
-      "drug_type_concept_id" = 1
+      "drug_type_concept_id" = 1L
     )
   ) |>
     copyCdm()

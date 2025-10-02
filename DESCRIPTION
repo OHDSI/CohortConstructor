@@ -29,10 +29,8 @@ RoxygenNote: 7.3.2
 Imports: 
     cli,
     clock,
-    dbplyr (>= 2.5.0),
     dplyr,
     glue,
-    magrittr,
     omopgenerics (>= 1.0.0),
     PatientProfiles (>= 1.2.3),
     purrr,
