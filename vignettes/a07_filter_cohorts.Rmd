@@ -56,6 +56,7 @@ It is also possible to only sample one cohort within cohort table, however the r
 
 ```{r include = FALSE, warning = FALSE}
 cdm <- mockCdmFromDataset(datasetName = "GiBleed", source = "duckdb")
+
 cdm$medications <- conceptCohort(cdm = cdm, 
                                  conceptSet = list("diclofenac" = 1124300,
                                                    "acetaminophen" = 1127433), 
@@ -74,6 +75,7 @@ If you want to filter the cohort table to only include individuals and records f
 
 ```{r include = FALSE, warning = FALSE}
 cdm <- mockCdmFromDataset(datasetName = "GiBleed", source = "duckdb")
+
 cdm$medications <- conceptCohort(cdm = cdm, 
                                  conceptSet = list("diclofenac" = 1124300,
                                                    "acetaminophen" = 1127433), 

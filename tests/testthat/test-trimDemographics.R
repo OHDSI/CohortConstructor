@@ -324,7 +324,7 @@ test_that("simple duckdb checks", {
   dropCreatedTables(cdm = cdm)
 })
 
-test_that("cohort Id, name, additional columns", {
+test_that("cohort Id, name, additional columns, missing year of birth", {
   skip_on_cran()
 
   cohort_1 <- dplyr::tibble(
@@ -369,8 +369,8 @@ test_that("cohort Id, name, additional columns", {
 
   person <- dplyr::tibble(
     person_id = 1:5,
-    gender_concept_id = c(8507L, 8507L, 8507L, 8532L, 8507L),
-    year_of_birth = c(1997L, 1963L, 1986L, 1978L, 1973L),
+    gender_concept_id = c(8507L, 8507L, 8507L, NA, 8507L),
+    year_of_birth = c(NA, 1963L, 1986L, 1978L, 1973L),
     month_of_birth = c(8L, 1L, 3L, 11L, 3L),
     day_of_birth = c(22L, 27L, 10L, 8L, 2L),
     race_concept_id = NA_integer_,
@@ -393,7 +393,7 @@ test_that("cohort Id, name, additional columns", {
 
   cdm$cohort3 <- trimDemographics(cohort = cdm$cohort2,
                                   cohortId = "cohort_1",
-                                  ageRange = NULL,
+                                  ageRange = c(0, 150),
                                   sex = "Male",
                                   minPriorObservation = c(0, 400),
                                   minFutureObservation = NULL,
@@ -405,25 +405,28 @@ test_that("cohort Id, name, additional columns", {
   x1 <- collectCohort(cdm$cohort3, 1)
   x3 <- collectCohort(cdm$cohort3, 3)
   expect_identical(x1, dplyr::tibble(
-    subject_id = c(1, 1, 2, 3) |> as.integer(),
-    cohort_start_date = as.Date(c("2001-04-03", "2002-05-07", "1999-07-26", "2015-02-19")),
-    cohort_end_date = as.Date(c("2002-05-06", "2005-11-07", "2002-09-17", "2015-06-27"))
+    subject_id = c(2, 3) |> as.integer(),
+    cohort_start_date = as.Date(c("1999-07-26", "2015-02-19")),
+    cohort_end_date = as.Date(c("2002-09-17", "2015-06-27"))
   ))
   expect_identical(x3, dplyr::tibble(
-    subject_id = c(1, 1, 2) |> as.integer(),
-    cohort_start_date = as.Date(c("2001-07-08", "2002-05-07", "2000-05-09")),
-    cohort_end_date = as.Date(c("2002-05-06", "2005-11-07", "2002-09-17"))
+    subject_id = c(2) |> as.integer(),
+    cohort_start_date = as.Date(c("2000-05-09")),
+    cohort_end_date = as.Date(c("2002-09-17"))
   ))
   expect_true(all(
     attrition(cdm$cohort3)$reason ==
-      c('Initial qualifying events', 'Sex requirement: Male',
+      c('Initial qualifying events', "Non-missing sex", 'Sex requirement: Male',
+        "Non-missing year of birth", "Age requirement: 0 to 150" ,
         'Prior observation requirement: 0 days', 'Initial qualifying events',
-        'Initial qualifying events', 'Sex requirement: Male',
+        'Initial qualifying events', "Non-missing sex", 'Sex requirement: Male',
+        "Non-missing year of birth", "Age requirement: 0 to 150",
         'Prior observation requirement: 400 days')
   ))
   expect_identical(settings(cdm$cohort3), dplyr::tibble(
     cohort_definition_id = as.integer(1:3),
     cohort_name = c("cohort_1_1", "cohort_2", "cohort_1_2"),
+    age_range = "0_150",
     sex = c("Male", "Both", "Male"),
     min_prior_observation = c(0, 0, 400)
   ))

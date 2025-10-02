@@ -58,6 +58,8 @@ yearCohorts <- function(cohort,
     return(cohort)
   }
 
+  originalAttrition <- attrition(cohort)
+
   # temp tables
   tablePrefix <- omopgenerics::tmpPrefix()
   tmpName <- omopgenerics::uniqueTableName(tablePrefix)

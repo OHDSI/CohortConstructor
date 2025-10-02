@@ -12,7 +12,6 @@
 #' @inheritParams nameDoc
 #' @inheritParams conceptSetDoc
 #' @inheritParams atFirstDoc
-#' @inheritParams softValidationDoc
 #'
 #' @return Cohort table
 #'
@@ -39,8 +38,7 @@ requireConceptIntersect <- function(cohort,
                                     inObservation = TRUE,
                                     censorDate = NULL,
                                     atFirst = FALSE,
-                                    name = tableName(cohort),
-                                    .softValidation = TRUE) {
+                                    name = tableName(cohort)) {
   # checks
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cohort <- omopgenerics::validateCohortArgument(cohort)
@@ -50,7 +48,6 @@ requireConceptIntersect <- function(cohort,
   cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
   intersections <- validateIntersections(intersections)
   conceptSet <- omopgenerics::validateConceptSetArgument(conceptSet, cdm)
-  omopgenerics::assertLogical(.softValidation, length = 1)
   omopgenerics::assertLogical(atFirst, length = 1)
 
   if (length(cohortId) == 0) {
@@ -161,7 +158,7 @@ requireConceptIntersect <- function(cohort,
       logPrefix = "CohortConstructor_requireConceptIntersect_join_"
     ) |>
     omopgenerics::newCohortTable(
-      .softValidation = .softValidation, cohortCodelistRef = newCodelist
+      .softValidation = TRUE, cohortCodelistRef = newCodelist
     ) |>
     omopgenerics::recordCohortAttrition(reason = reason, cohortId = cohortId)
 

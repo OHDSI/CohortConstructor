@@ -405,7 +405,7 @@ test_that("mearurementCohorts - valueAsNumber without unit concept", {
   # empty gener in person --> empty cohort
   expect_true(dplyr::tally(cohort_2) |> dplyr::pull() == 0)
 
-  # ad genedr component
+  # add gender component
   cdm <- omopgenerics::insertTable(cdm, "person",
                                    dplyr::tibble(person_id = c(1, 2, 3),
                                                  gender_concept_id = 8532,
@@ -450,7 +450,8 @@ test_that("mearurementCohorts - valueAsNumber without unit concept", {
     cdm = cdm,
     name = "cohort",
     conceptSet = list("normal_blood_pressure" = c(4326744L)),
-    valueAsNumber = list(c(70L, 120L))
+    valueAsNumber = list(c(70L, 120L)),
+    table = c("measurement", "observation")
   )
   expect_equal(
     collectCohort(cohort_4, 1),

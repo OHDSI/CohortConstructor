@@ -59,14 +59,12 @@ If we want to create separate cohorts by sex we could use the function `requireS
 cdm$medications_female <- cdm$medications |>
   requireSex(sex = "Female", name = "medications_female") |>
   renameCohort(
-    cohortId = c("acetaminophen", "diclofenac"), 
-    newCohortName = c("acetaminophen_female", "diclofenac_female")
+    newCohortName = "{cohort_name}_female"
   )
 cdm$medications_male <- cdm$medications |>
   requireSex(sex = "Male", name = "medications_male") |>
   renameCohort(
-    cohortId = c("acetaminophen", "diclofenac"), 
-    newCohortName = c("acetaminophen_male", "diclofenac_male")
+    newCohortName = "{cohort_name}_male"
   )
 cdm <- bind(cdm$medications_female, cdm$medications_male, name = "medications_sex")
 cohortCount(cdm$medications_sex)
@@ -159,5 +157,5 @@ From the 6 records only 3 are within our period of interest `1990-1993`, there a
 
 ```{r}
 cdm$medications_year |>
-  dplyr::filter(subject_id == 4383)
+  filter(subject_id == 4383)
 ```

@@ -32,12 +32,10 @@ library(dplyr)
 
 cdm <- mockCdmFromDataset(datasetName = "GiBleed", source = "duckdb")
 
-drug_codes <- getDrugIngredientCodes(cdm, 
-                                     name = c("acetaminophen",
-                                              "amoxicillin", 
-                                              "diclofenac", 
-                                              "simvastatin",
-                                              "warfarin"))
+drug_codes <- getDrugIngredientCodes(
+  cdm = cdm, 
+  name = c("acetaminophen", "amoxicillin", "diclofenac", "simvastatin", "warfarin")
+)
 ```
 
 To capture all the SQL executed as we use CohortConstructor functions we can set a global option. For this, we just need to point to a directory in which we'll save each SQL statement run behind the scenes. Note that in this example we're using duckdb so the SQL is for this database management system. If you were running on a different type of database the SQL would be adapted accordingly.
@@ -64,7 +62,7 @@ for(i in seq_along(sorted_files)) {
 
 If we want even more detail, we also have the option to see the execution plan along with the SQL.
 
-```{r}
+```{r, eval=FALSE}
 dir_explain <- file.path(tempdir(), "explain_folder")
 dir.create(dir_explain)
 options("omopgenerics.log_sql_explain_path" = dir_explain)

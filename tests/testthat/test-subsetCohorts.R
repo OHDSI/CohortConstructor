@@ -141,8 +141,11 @@ test_that("Expected behaviour", {
   expect_warning(cdm$cohort2 <- subsetCohorts(cdm$cohort1, "1", name = "cohort2"))
   expect_error(cdm$cohort2 <- subsetCohorts(cdm$cohort1, 2, name = "cohort3"))
   expect_warning(cdm$cohort2 <- subsetCohorts(cdm$cohort1, 10, name = "cohort2"))
-  expect_no_error(cohort <- subsetCohorts(cdm$cohort1, NULL))
-  expect_identical(cohort, cdm$cohort1)
+  expect_no_error(cdm$cohort3 <- subsetCohorts(cdm$cohort1, NULL, name = "cohort3"))
+  expect_identical(cdm$cohort3 |>
+                     dplyr::collect(),
+                   cdm$cohort1 |>
+                     dplyr::collect())
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
 

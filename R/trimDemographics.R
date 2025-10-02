@@ -6,7 +6,6 @@
 #'
 #' @inheritParams requireDemographics
 #' @inheritParams cohortIdModifyDoc
-#' @inheritParams softValidationDoc
 #'
 #' @return The cohort table with only records for individuals satisfying the
 #' demographic requirements
@@ -27,8 +26,7 @@ trimDemographics <- function(cohort,
                              sex = NULL,
                              minPriorObservation = NULL,
                              minFutureObservation = NULL,
-                             name = tableName(cohort),
-                             .softValidation = TRUE) {
+                             name = tableName(cohort)) {
   # checks
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cohort <- omopgenerics::validateCohortArgument(cohort)
@@ -42,15 +40,12 @@ trimDemographics <- function(cohort,
     null = TRUE,
     length = NULL
   )
-  omopgenerics::assertLogical(.softValidation)
 
   if (length(cohortId) == 0) {
     cli::cli_inform("Returning empty cohort as `cohortId` is not valid.")
     cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name)
     return(cdm[[name]])
   }
-
-  ids <- settings(cohort)$cohort_definition_id
 
   # replace age Inf to avoid potential sql issues
   # temp tables
@@ -69,7 +64,7 @@ trimDemographics <- function(cohort,
     ) |>
     dplyr::compute(name = tmpNewCohort, temporary = FALSE,
                    logPrefix = "CohortConstructor_trimDemographics_trimmed_") |>
-    omopgenerics::newCohortTable(.softValidation = .softValidation)
+    omopgenerics::newCohortTable(.softValidation = TRUE)
 
   if (!is.null(ageRange) ||
       !is.null(minPriorObservation) ||
@@ -90,8 +85,9 @@ trimDemographics <- function(cohort,
       )
   }
 
+  oldSet <- settings(cohort)
   newSet <- reqDemographicsCohortSet(
-    set = settings(cohort),
+    set = oldSet,
     targetIds = as.integer(cohortId),
     ageRange = ageRange,
     sex = sex,
@@ -137,11 +133,26 @@ trimDemographics <- function(cohort,
       .softValidation = TRUE
     )
 
+  newChangeIds <- newSet |>
+    dplyr::filter(.data$requirements) |>
+    dplyr::pull(cohort_definition_id)
+
   if (!is.null(sex)) {
+
+    filterSexMissing <- ".data$sex != 'None'"
+    if (!all(oldSet$cohort_definition_id %in% cohortId)) {
+      filterSexMissing <- paste0(filterSexMissing, " | !.data$cohort_definition_id %in% newChangeIds")
+    }
+
     cli::cli_inform(c("Trim sex"))
     newCohort <- newCohort |>
-      dplyr::filter(.data$sex == .data$sex_req |
-                      .data$sex_req == "Both") |>
+      dplyr::filter(!!rlang::parse_expr(filterSexMissing)) |>
+      dplyr::compute(temporary = FALSE, name = tmpNewCohort,
+                     logPrefix = "CohortConstructor_trimDemographics_sexMissing_") |>
+      omopgenerics::recordCohortAttrition(reason = "Non-missing sex", cohortId = newChangeIds) |>
+      dplyr::filter(
+        .data$sex == .data$sex_req | .data$sex_req == "Both"
+      ) |>
       dplyr::compute(name = tmpNewCohort, temporary = FALSE,
                      logPrefix = "CohortConstructor_trimDemographics_sex_")
     # attrition
@@ -168,7 +179,18 @@ trimDemographics <- function(cohort,
       ageRange[[j]][is.infinite(ageRange[[j]])] <- 999L
     }
 
+    filterBirthMissing <- "!is.na(.data$date_0)"
+    if (!all(oldSet$cohort_definition_id %in% cohortId)) {
+      filterBirthMissing <- paste0(filterBirthMissing, " | !.data$cohort_definition_id %in% newChangeIds")
+    }
+
     newCohort <- newCohort |>
+      dplyr::filter(!!rlang::parse_expr(filterBirthMissing)) |>
+      dplyr::compute(
+        temporary = FALSE, name = tmpNewCohort,
+        logPrefix = "CohortConstructor_trimDemographics_year_"
+      ) |>
+      omopgenerics::recordCohortAttrition(reason = "Non-missing year of birth", cohortId = newChangeIds) |>
       dplyr::mutate(!!!datesAgeRange(ageRange)) |>
       dplyr::mutate(
         !!!caseAge(ageRange),
@@ -300,9 +322,9 @@ trimDemographics <- function(cohort,
       )
     ) |>
     dplyr::left_join(
-      settings(cohort) |>
+      oldSet |>
         dplyr::select(!dplyr::any_of(c(
-          trimCols, "cohort_name"
+          trimCols, "cohort_name", "target_cohort_rand01"
         ))) |>
         dplyr::rename("target_cohort_rand01" = "cohort_definition_id"),
       by = "target_cohort_rand01"

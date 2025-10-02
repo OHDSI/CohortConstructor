@@ -31,6 +31,16 @@ validateDateRange <- function(dateRange) {
   return(invisible(dateRange))
 }
 
+validateDaysInCohort <- function(daysInCohort) {
+omopgenerics::assertNumeric(daysInCohort, length = 2)
+omopgenerics::assertNumeric(daysInCohort[1], min = 1)
+omopgenerics::assertNumeric(daysInCohort[2], min = 1)
+if(daysInCohort[1] > daysInCohort[2]){
+cli::cli_abort("First value for daysInCohort cannot be larger than second")
+}
+daysInCohort
+}
+
 validateDemographicRequirements <- function(ageRange,
                                             sex,
                                             minPriorObservation,

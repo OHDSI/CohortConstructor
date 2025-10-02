@@ -10,7 +10,7 @@ measurementCohort(
   name,
   valueAsConcept = NULL,
   valueAsNumber = NULL,
-  table = c("measurement", "observation"),
+  table = NULL,
   useRecordsBeforeObservation = FALSE
 )
 }
@@ -48,6 +48,7 @@ A cohort table
 \code{measurementCohort()} creates cohorts based on patient records contained
 in the measurement table. This function extends the \code{conceptCohort()} as it
 allows for measurement values associated with the records to be specified.
+The function supports the measurement and observation tables.
 \itemize{
 \item If \code{valueAsConcept} and \code{valueAsNumber} are NULL then no requirements on
 of the values associated with measurement records and using
