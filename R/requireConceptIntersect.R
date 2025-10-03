@@ -20,7 +20,9 @@
 #' @examples
 #' \donttest{
 #' library(CohortConstructor)
-#' cdm <- mockCohortConstructor(conditionOccurrence = TRUE)
+#'
+#' cdm <- mockCohortConstructor()
+#'
 #' cdm$cohort2 <-  requireConceptIntersect(
 #'   cohort = cdm$cohort1,
 #'   conceptSet = list(a = 194152),

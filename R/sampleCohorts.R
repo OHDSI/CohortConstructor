@@ -17,7 +17,7 @@
 #' \donttest{
 #' library(CohortConstructor)
 #'
-#' cdm <- mockCohortConstructor(nPerson = 100)
+#' cdm <- mockCohortConstructor()
 #'
 #' cdm$cohort2 |> sampleCohorts(cohortId = 1, n = 10)
 #' }

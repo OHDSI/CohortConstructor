@@ -53,7 +53,9 @@ individuals satisfy the specified demographic criteria.
 \examples{
 \donttest{
 library(CohortConstructor)
-cdm <- mockCohortConstructor(nPerson = 100)
+
+cdm <- mockCohortConstructor()
+
 cdm$cohort1 |>
   requireDemographics(indexDate = "cohort_start_date",
                       ageRange = list(c(18, 65)),

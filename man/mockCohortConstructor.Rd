@@ -4,49 +4,10 @@
 \alias{mockCohortConstructor}
 \title{Function to create a mock cdm reference for CohortConstructor}
 \usage{
-mockCohortConstructor(
-  nPerson = 10,
-  conceptTable = NULL,
-  tables = NULL,
-  conceptId = NULL,
-  conceptIdClass = NULL,
-  drugExposure = FALSE,
-  conditionOccurrence = FALSE,
-  measurement = FALSE,
-  death = FALSE,
-  otherTables = NULL,
-  con = DBI::dbConnect(duckdb::duckdb()),
-  writeSchema = "main",
-  seed = 123
-)
+mockCohortConstructor(source = "local")
 }
 \arguments{
-\item{nPerson}{number of person in the cdm}
-
-\item{conceptTable}{user defined concept table}
-
-\item{tables}{list of tables to include in the cdm}
-
-\item{conceptId}{list of concept id}
-
-\item{conceptIdClass}{the domain class of the conceptId}
-
-\item{drugExposure}{T/F include drug exposure table in the cdm}
-
-\item{conditionOccurrence}{T/F include condition occurrence in the cdm}
-
-\item{measurement}{T/F include measurement in the cdm}
-
-\item{death}{T/F include death table in the cdm}
-
-\item{otherTables}{it takes a list of single tibble with names to include other tables in the cdm}
-
-\item{con}{A DBI connection to create the cdm mock object.}
-
-\item{writeSchema}{Name of an schema on the same connection with writing
-permissions.}
-
-\item{seed}{Seed passed to omock::mockCdmFromTable}
+\item{source}{Source for the mock cdm, it can either be 'local' or 'duckdb'.}
 }
 \value{
 cdm object

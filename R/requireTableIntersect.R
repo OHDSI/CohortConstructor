@@ -19,7 +19,9 @@
 #' @examples
 #' \donttest{
 #' library(CohortConstructor)
-#' cdm <- mockCohortConstructor(drugExposure = TRUE)
+#'
+#' cdm <- mockCohortConstructor()
+#'
 #' cdm$cohort1 |>
 #'   requireTableIntersect(tableName = "drug_exposure",
 #'                             indexDate = "cohort_start_date",

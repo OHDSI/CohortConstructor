@@ -61,28 +61,31 @@
 #' \donttest{
 #' library(CohortConstructor)
 #'
-#' cdm <- mockCohortConstructor(conditionOccurrence = TRUE, drugExposure = TRUE)
+#' cdm <- mockCohortConstructor()
 #'
 #' cdm$cohort <- conceptCohort(cdm = cdm, conceptSet = list(a = 444074), name = "cohort")
 #'
-#' cdm$cohort |> attrition()
+#' cdm$cohort |>
+#'   attrition()
 #'
 #' # Create a cohort based on a concept set. The cohort exit is set to the event start date.
 #' # If two records overlap, the cohort end date is set as the sum of the duration of
 #' # all overlapping records. Only individuals included in the existing `cohort` will be considered.
 #'
-#' conceptSet <- list("nitrogen" = c(35604434, 35604439),
-#' "potassium" = c(40741270, 42899580, 44081436))
-#'
-#' cdm$study_cohort <- conceptCohort(cdm,
-#'                              conceptSet = conceptSet,
-#'                              name = "study_cohort",
-#'                              exit = "event_start_date",
-#'                              overlap = "extend",
-#'                              subsetCohort = "cohort"
+#' conceptSet <- list(
+#'   "nitrogen" = c(35604434, 35604439),
+#'   "potassium" = c(40741270, 42899580, 44081436)
 #' )
 #'
-#'  cdm$study_cohort |> attrition()
+#' cdm$study_cohort <- conceptCohort(cdm = cdm,
+#'                                   conceptSet = conceptSet,
+#'                                   name = "study_cohort",
+#'                                   exit = "event_start_date",
+#'                                   overlap = "extend",
+#'                                   subsetCohort = "cohort")
+#'
+#' cdm$study_cohort |>
+#'   attrition()
 #' }
 conceptCohort <- function(cdm,
                           conceptSet,

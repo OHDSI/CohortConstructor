@@ -30,7 +30,9 @@
 #' \donttest{
 #' library(CohortConstructor)
 #' library(dplyr)
-#' cdm <- mockCohortConstructor(nPerson = 200)
+#'
+#' cdm <- mockCohortConstructor()
+#'
 #' cdm$new_matched_cohort <- cdm$cohort2 |>
 #'   matchCohorts(
 #'     name = "new_matched_cohort",

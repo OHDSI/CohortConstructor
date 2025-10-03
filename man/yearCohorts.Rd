@@ -40,9 +40,11 @@ A cohort table.
 \donttest{
 library(CohortConstructor)
 
-cdm <- mockCohortConstructor(nPerson = 100)
+cdm <- mockCohortConstructor()
 
-cdm$cohort1 <- cdm$cohort1 |> yearCohorts(years = 2000:2002)
+cdm$cohort1 <- cdm$cohort1 |>
+  yearCohorts(years = 2000:2002)
+
 settings(cdm$cohort1)
 }
 }
