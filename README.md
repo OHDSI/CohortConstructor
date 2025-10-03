@@ -19,8 +19,14 @@ manipulation of study cohorts in data mapped to the OMOP CDM.
 
 ## Tested sources
 
-[![](https://github.com/OHDSI/CohortConstructor/actions/workflows/test-local-omopgenerics.yaml/badge.svg?branch=main)](https://github.com/OHDSI/CohortConstructor/actions/workflows/test-local-omopgenerics.yaml)
-[![](https://github.com/OHDSI/CohortConstructor/actions/workflows/test-duckdb-CDMConnector.yaml/badge.svg?branch=main)](https://github.com/OHDSI/CohortConstructor/actions/workflows/test-duckdb-CDMConnector.yaml)
+| Source | Driver | CDM reference | Status |
+|----|----|----|----|
+| Local R dataframe | N/A | `omopgenerics::cdmFromTables()` | [![](https://github.com/OHDSI/CohortConstructor/actions/workflows/test-local-omopgenerics.yaml/badge.svg?branch=main)](https://github.com/OHDSI/CohortConstructor/actions/workflows/test-local-omopgenerics.yaml) |
+| In-memory duckdb datatabase | duckdb | `CDMConnector::cdmFromCon()` | [![](https://github.com/OHDSI/CohortConstructor/actions/workflows/test-duckdb-CDMConnector.yaml/badge.svg?branch=main)](https://github.com/OHDSI/CohortConstructor/actions/workflows/test-duckdb-CDMConnector.yaml) |
+| Postgres database | RPostgres | `CDMConnector::cdmFromCon()` |  |
+| Postgres database | DatabaseConnector | `CDMConnector::cdmFromCon()` |  |
+| SQL Server database | odbc | `CDMConnector::cdmFromCon()` |  |
+| SQL Server database | DatabaseConnector | `CDMConnector::cdmFromCon()` |  |
 
 ## Installation
 
@@ -119,6 +125,13 @@ cdm$fractures <- cdm |>
   conceptCohort(conceptSet = fx_codes, 
                 exit = "event_start_date", 
                 name = "fractures")
+#> Warning: There was 1 warning in `dplyr::mutate()`.
+#> ℹ In argument: `vocabulary_version = CodelistGenerator::getVocabVersion(cdm)`.
+#> Caused by warning:
+#> ! The `cdm` argument of `vocabularyVersion()` is deprecated as of
+#>   CodelistGenerator 4.0.0.
+#> ℹ The deprecated feature was likely used in the CohortConstructor package.
+#>   Please report the issue to the authors.
 ```
 
 After creating our initial cohort we will update it so that exit is set
