@@ -516,13 +516,20 @@ fulfillCohortReqs <- function(cdm, name, useRecordsBeforeObservation, type = "st
     omopgenerics::recordCohortAttrition(reason = "Non-missing year of birth")
 }
 
+checkCodelistGeneratorVersion <- function(cdm){
+  if(utils::packageVersion("CodelistGenerator") == "3.5.9" | utils::packageVersion("CodelistGenerator") == "4.0.0"){
+    return(CodelistGenerator::vocabularyVersion(cdm))
+  }else{
+    return(CodelistGenerator::getVocabVersion(cdm))
+  }
+}
 
 conceptSetToCohortSet <- function(conceptSet, cdm) {
   cohSet <- dplyr::tibble("cohort_name" = names(conceptSet)) |>
     dplyr::mutate(
       "cohort_definition_id" = as.integer(dplyr::row_number()),
       "cdm_version" = attr(cdm, "cdm_version"),
-      "vocabulary_version" = CodelistGenerator::getVocabVersion(cdm)
+      "vocabulary_version" = checkCodelistGeneratorVersion(cdm)
     )
   if (length(conceptSet) == 0) {
     cohSet <- cohSet |>
