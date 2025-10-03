@@ -98,9 +98,7 @@ To make sure <em>GiBleed</em> database is available you can use the
 function <code><a href="https://darwin-eu.github.io/CDMConnector/reference/requireEunomia.html" class="external-link">requireEunomia()</a></code> so let’s get started.</p>
 <p>Load necessary packages:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r.duckdb.org/" class="external-link">duckdb</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://darwin-eu.github.io/CDMConnector/" class="external-link">CDMConnector</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ohdsi.github.io/omock/" class="external-link">omock</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://darwin-eu.github.io/PatientProfiles/" class="external-link">PatientProfiles</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ohdsi.github.io/CohortConstructor/">CohortConstructor</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span>, warn.conflicts <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
@@ -108,11 +106,7 @@ function <code><a href="https://darwin-eu.github.io/CDMConnector/reference/requi
 <p>Create <code>cdm_reference</code> object from <em>GiBleed</em>
 database:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/requireEunomia.html" class="external-link">requireEunomia</a></span><span class="op">(</span>datasetName <span class="op">=</span> <span class="st">"GiBleed"</span><span class="op">)</span></span>
-<span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span>drv <span class="op">=</span> <span class="fu"><a href="https://r.duckdb.org/reference/duckdb.html" class="external-link">duckdb</a></span><span class="op">(</span><span class="op">)</span>, dbdir <span class="op">=</span> <span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/eunomiaDir.html" class="external-link">eunomiaDir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/cdmFromCon.html" class="external-link">cdmFromCon</a></span><span class="op">(</span></span>
-<span>  con <span class="op">=</span> <span class="va">con</span>, cdmSchema <span class="op">=</span> <span class="st">"main"</span>, writeSchema <span class="op">=</span> <span class="st">"main"</span>, writePrefix <span class="op">=</span> <span class="st">"my_study_"</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ohdsi.github.io/omock/reference/mockCdmFromDataset.html" class="external-link">mockCdmFromDataset</a></span><span class="op">(</span>datasetName <span class="op">=</span> <span class="st">"GiBleed"</span>, source <span class="op">=</span> <span class="st">"duckdb"</span><span class="op">)</span></span></code></pre></div>
 <p>Let’s start by creating two drug cohorts, one for users of diclofenac
 and another for users of acetaminophen.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
@@ -173,20 +167,20 @@ add a column sex to my existent cohort:</p>
 <code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">medications</span> <span class="op">&lt;-</span> <span class="va">cdm</span><span class="op">$</span><span class="va">medications</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://darwin-eu.github.io/PatientProfiles/reference/addSex.html" class="external-link">addSex</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">cdm</span><span class="op">$</span><span class="va">medications</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Source:   table&lt;og_009_1759350966&gt; [?? x 5]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB 1.4.0 [unknown@Linux 6.11.0-1018-azure:R 4.5.1//tmp/RtmpDPsjEg/file2abd1077def9.duckdb]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Source:   table&lt;og_009_1759471926&gt; [?? x 5]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB 1.4.0 [unknown@Linux 6.11.0-1018-azure:R 4.5.1//tmp/RtmpCCJr0a/file2b98b33240d.duckdb]</span></span></span>
 <span><span class="co">#&gt;    cohort_definition_id subject_id cohort_start_date cohort_end_date sex   </span></span>
 <span><span class="co">#&gt;                   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>                    1        123 1972-02-13        1972-02-20      Male  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>                    1        148 2008-09-09        2008-09-23      Female</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>                    1        219 1968-08-28        1968-09-11      Male  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>                    1        276 2011-08-10        2011-08-24      Female</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>                    1        759 2015-11-02        2015-11-23      Male  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>                    1        782 1963-11-14        1963-11-28      Female</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>                    1        863 2018-02-10        2018-02-24      Female</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>                    1        938 2000-12-30        2001-01-06      Female</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>                    1       <span style="text-decoration: underline;">1</span>229 2001-08-24        2001-09-07      Female</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>                    1       <span style="text-decoration: underline;">1</span>280 1976-03-04        1976-04-03      Male  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>                    1        335 1982-03-24        1982-04-14      Male  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>                    1        348 1991-05-05        1991-06-09      Male  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>                    1        673 1973-11-20        1973-11-27      Female</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>                    1        752 1971-07-25        1971-08-01      Male  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>                    1        762 2017-01-23        2017-01-30      Male  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>                    1        883 1975-09-30        1975-10-14      Female</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>                    1       <span style="text-decoration: underline;">1</span>634 1971-02-18        1971-03-11      Female</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>                    1       <span style="text-decoration: underline;">1</span>634 1992-01-13        1992-01-20      Female</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>                    1       <span style="text-decoration: underline;">1</span>703 1949-08-10        1949-08-17      Male  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>                    1       <span style="text-decoration: underline;">2</span>332 1975-12-31        1976-01-07      Female</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ more rows</span></span></span></code></pre></div>
 <p>Now we can use the function <code><a href="../reference/stratifyCohorts.html">stratifyCohorts()</a></code> to create
 a new cohort based on the <code>sex</code> column, one new cohort will
@@ -320,12 +314,12 @@ Let’s look closer to one of the individuals
 <code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">medications</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">subject_id</span> <span class="op">==</span> <span class="fl">4383</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Source:   SQL [?? x 5]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB 1.4.0 [unknown@Linux 6.11.0-1018-azure:R 4.5.1//tmp/RtmpDPsjEg/file2abd1077def9.duckdb]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB 1.4.0 [unknown@Linux 6.11.0-1018-azure:R 4.5.1//tmp/RtmpCCJr0a/file2b98b33240d.duckdb]</span></span></span>
 <span><span class="co">#&gt;   cohort_definition_id subject_id cohort_start_date cohort_end_date sex  </span></span>
 <span><span class="co">#&gt;                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1       <span style="text-decoration: underline;">4</span>383 1990-10-13        1990-10-27      Male </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                    1       <span style="text-decoration: underline;">4</span>383 2000-03-12        2000-03-19      Male </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>                    1       <span style="text-decoration: underline;">4</span>383 1971-02-06        1971-02-13      Male </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1       <span style="text-decoration: underline;">4</span>383 1971-02-06        1971-02-13      Male </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                    1       <span style="text-decoration: underline;">4</span>383 1990-10-13        1990-10-27      Male </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>                    1       <span style="text-decoration: underline;">4</span>383 2000-03-12        2000-03-19      Male </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>                    1       <span style="text-decoration: underline;">4</span>383 1992-07-18        1992-08-22      Male </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>                    1       <span style="text-decoration: underline;">4</span>383 1990-12-20        1991-01-03      Male </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>                    1       <span style="text-decoration: underline;">4</span>383 2004-05-21        2004-06-11      Male</span></span></code></pre></div>
@@ -340,16 +334,13 @@ two years, so we expect to see 4 cohort contributions for this subject
 <code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">medications_year</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">subject_id</span> <span class="op">==</span> <span class="fl">4383</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Source:   SQL [?? x 5]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB 1.4.0 [unknown@Linux 6.11.0-1018-azure:R 4.5.1//tmp/RtmpDPsjEg/file2abd1077def9.duckdb]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB 1.4.0 [unknown@Linux 6.11.0-1018-azure:R 4.5.1//tmp/RtmpCCJr0a/file2b98b33240d.duckdb]</span></span></span>
 <span><span class="co">#&gt;   cohort_definition_id subject_id cohort_start_date cohort_end_date sex  </span></span>
 <span><span class="co">#&gt;                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1       <span style="text-decoration: underline;">4</span>383 1990-10-13        1990-10-27      Male </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                    1       <span style="text-decoration: underline;">4</span>383 1990-12-20        1990-12-31      Male </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>                    3       <span style="text-decoration: underline;">4</span>383 1991-01-01        1991-01-03      Male </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>                    5       <span style="text-decoration: underline;">4</span>383 1992-07-18        1992-08-22      Male</span></span></code></pre></div>
-<p>Let’s disconnect from our cdm object to finish.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/cdmDisconnect.html" class="external-link">cdmDisconnect</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">)</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
@@ -358,7 +349,7 @@ two years, so we expect to see 4 cohort contributions for this subject
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Edward Burn, Marti Catala, Nuria Mercade-Besora, Marta Alcalde-Herraiz, Mike Du, Yuchen Guo, Xihang Chen, Kim Lopez-Guell, Elin Rowlands.</p>
+  <p>Developed by Edward Burn, Martí Català, Nuria Mercade-Besora, Marta Alcalde-Herraiz, Mike Du, Yuchen Guo, Xihang Chen, Kim Lopez-Guell, Elin Rowlands.</p>
 </div>
 
 <div class="pkgdown-footer-right">

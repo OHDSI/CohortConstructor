@@ -80,9 +80,13 @@ for the specified amount of days</p>
 
 
 <dt id="arg-daysincohort">daysInCohort<a class="anchor" aria-label="anchor" href="#arg-daysincohort"></a></dt>
-<dd><p>Range of days that cohort entries must include. For
-example, if set to c(30, 90) then only cohort entries that are 30 days
-or more longer and shorter or equal to 90 days will be kept.</p></dd>
+<dd><p>Number of days cohort entries must last. Can be a vector
+of length two if a range, or a vector of length one if a specific number
+of days. Note, cohort entry and exit on the same day counts as one day in
+the cohort. So if, for example, you wish to require individuals are in the
+cohort for at least one night then set daysInCohort to c(2, Inf). Meanwhile,
+if set to c(30, 90) then only cohort entries that are 30 days or more
+longer and shorter or equal to 90 days will be kept.</p></dd>
 
 
 <dt id="arg-cohortid">cohortId<a class="anchor" aria-label="anchor" href="#arg-cohortid"></a></dt>
@@ -109,7 +113,7 @@ the required duration dropped</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="mockCohortConstructor.html">mockCohortConstructor</a></span><span class="op">(</span>nPerson <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">cdm</span><span class="op">$</span><span class="va">cohort1</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu">requireDuration</span><span class="op">(</span>daysInCohort <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="cn">Inf</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu">requireDuration</span><span class="op">(</span>daysInCohort <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="cn">Inf</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Source:   table&lt;cohort1&gt; [?? x 4]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: DuckDB 1.4.0 [unknown@Linux 6.11.0-1018-azure:R 4.5.1/:memory:]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    cohort_definition_id subject_id cohort_start_date cohort_end_date</span>
@@ -133,7 +137,7 @@ the required duration dropped</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Edward Burn, Marti Catala, Nuria Mercade-Besora, Marta Alcalde-Herraiz, Mike Du, Yuchen Guo, Xihang Chen, Kim Lopez-Guell, Elin Rowlands.</p>
+  <p>Developed by Edward Burn, Martí Català, Nuria Mercade-Besora, Marta Alcalde-Herraiz, Mike Du, Yuchen Guo, Xihang Chen, Kim Lopez-Guell, Elin Rowlands.</p>
 </div>
 
 <div class="pkgdown-footer-right">

@@ -90,18 +90,14 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dbi.r-dbi.org" class="external-link">DBI</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r.duckdb.org/" class="external-link">duckdb</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://darwin-eu.github.io/CDMConnector/" class="external-link">CDMConnector</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ohdsi.github.io/omock/" class="external-link">omock</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ohdsi.github.io/CohortConstructor/">CohortConstructor</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://darwin-eu.github.io/CohortCharacteristics/" class="external-link">CohortCharacteristics</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span></code></pre></div>
-<p>For this example we’ll use the Eunomia synthetic data from the
-CDMConnector package.</p>
+<p>For this example we’ll use the Eunomia synthetic data from the <a href="https://ohdsi.github.io/omock/" class="external-link">omock</a> package.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu"><a href="https://r.duckdb.org/reference/duckdb.html" class="external-link">duckdb</a></span><span class="op">(</span><span class="op">)</span>, dbdir <span class="op">=</span> <span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/eunomiaDir.html" class="external-link">eunomiaDir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/CDMConnector/reference/cdmFromCon.html" class="external-link">cdmFromCon</a></span><span class="op">(</span><span class="va">con</span>, cdmSchema <span class="op">=</span> <span class="st">"main"</span>, </span>
-<span>                    writeSchema <span class="op">=</span> <span class="st">"main"</span>, writePrefix <span class="op">=</span> <span class="st">"my_study_"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ohdsi.github.io/omock/reference/mockCdmFromDataset.html" class="external-link">mockCdmFromDataset</a></span><span class="op">(</span>datasetName <span class="op">=</span> <span class="st">"GiBleed"</span>, source <span class="op">=</span> <span class="st">"duckdb"</span><span class="op">)</span></span></code></pre></div>
 <p>Let’s start by creating a cohort of users of acetaminophen</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">medications</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/conceptCohort.html">conceptCohort</a></span><span class="op">(</span>cdm <span class="op">=</span> <span class="va">cdm</span>, </span>
@@ -130,22 +126,22 @@ individual.</p>
 <code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">medications</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">subject_id</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Source:   SQL [?? x 4]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB 1.4.0 [unknown@Linux 6.11.0-1018-azure:R 4.5.1//tmp/Rtmpmw90qp/file2a1f5d8df665.duckdb]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB 1.4.0 [unknown@Linux 6.11.0-1018-azure:R 4.5.1//tmp/Rtmp5WnHtj/file2b02187e6792.duckdb]</span></span></span>
 <span><span class="co">#&gt;   cohort_definition_id subject_id cohort_start_date cohort_end_date</span></span>
 <span><span class="co">#&gt;                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>         </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1          1 1980-03-15        1980-03-29     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                    1          1 1971-01-04        1971-01-18     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>                    1          1 1982-09-11        1982-10-02     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1          1 1971-01-04        1971-01-18     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                    1          1 1982-09-11        1982-10-02     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>                    1          1 1980-03-15        1980-03-29     </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>                    1          1 1976-10-20        1976-11-03</span></span>
 <span><span class="va">cdm</span><span class="op">$</span><span class="va">medications_collapsed</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">subject_id</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Source:   SQL [?? x 4]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB 1.4.0 [unknown@Linux 6.11.0-1018-azure:R 4.5.1//tmp/Rtmpmw90qp/file2a1f5d8df665.duckdb]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB 1.4.0 [unknown@Linux 6.11.0-1018-azure:R 4.5.1//tmp/Rtmp5WnHtj/file2b02187e6792.duckdb]</span></span></span>
 <span><span class="co">#&gt;   cohort_definition_id subject_id cohort_start_date cohort_end_date</span></span>
 <span><span class="co">#&gt;                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>         </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1          1 1976-10-20        1976-11-03     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1          1 1971-01-04        1971-01-18     </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                    1          1 1980-03-15        1982-10-02     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>                    1          1 1971-01-04        1971-01-18</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>                    1          1 1976-10-20        1976-11-03</span></span></code></pre></div>
 <p>Subject 1 initially had 4 records between 1971 and 1982. After
 specifying that records within three years of each other are to be
 merged, the number of records decreases to three. The record from
@@ -155,23 +151,23 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">summary_attrition</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/CohortCharacteristics/reference/summariseCohortAttrition.html" class="external-link">summariseCohortAttrition</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">medications_collapsed</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://darwin-eu.github.io/CohortCharacteristics/reference/tableCohortAttrition.html" class="external-link">tableCohortAttrition</a></span><span class="op">(</span><span class="va">summary_attrition</span><span class="op">)</span></span></code></pre></div>
-<div id="yrcpilmneh" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#yrcpilmneh table {
+<div id="qafymiqnfj" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#qafymiqnfj table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#yrcpilmneh thead, #yrcpilmneh tbody, #yrcpilmneh tfoot, #yrcpilmneh tr, #yrcpilmneh td, #yrcpilmneh th {
+#qafymiqnfj thead, #qafymiqnfj tbody, #qafymiqnfj tfoot, #qafymiqnfj tr, #qafymiqnfj td, #qafymiqnfj th {
   border-style: none;
 }
 
-#yrcpilmneh p {
+#qafymiqnfj p {
   margin: 0;
   padding: 0;
 }
 
-#yrcpilmneh .gt_table {
+#qafymiqnfj .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -197,12 +193,12 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   border-left-color: #D9D9D9;
 }
 
-#yrcpilmneh .gt_caption {
+#qafymiqnfj .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#yrcpilmneh .gt_title {
+#qafymiqnfj .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -214,7 +210,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   border-bottom-width: 0;
 }
 
-#yrcpilmneh .gt_subtitle {
+#qafymiqnfj .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -226,7 +222,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   border-top-width: 0;
 }
 
-#yrcpilmneh .gt_heading {
+#qafymiqnfj .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -238,13 +234,13 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   border-right-color: #D3D3D3;
 }
 
-#yrcpilmneh .gt_bottom_border {
+#qafymiqnfj .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#yrcpilmneh .gt_col_headings {
+#qafymiqnfj .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -259,7 +255,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   border-right-color: #D3D3D3;
 }
 
-#yrcpilmneh .gt_col_heading {
+#qafymiqnfj .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -279,7 +275,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   overflow-x: hidden;
 }
 
-#yrcpilmneh .gt_column_spanner_outer {
+#qafymiqnfj .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -291,15 +287,15 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   padding-right: 4px;
 }
 
-#yrcpilmneh .gt_column_spanner_outer:first-child {
+#qafymiqnfj .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#yrcpilmneh .gt_column_spanner_outer:last-child {
+#qafymiqnfj .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#yrcpilmneh .gt_column_spanner {
+#qafymiqnfj .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -311,11 +307,11 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   width: 100%;
 }
 
-#yrcpilmneh .gt_spanner_row {
+#qafymiqnfj .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#yrcpilmneh .gt_group_heading {
+#qafymiqnfj .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -341,7 +337,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   text-align: left;
 }
 
-#yrcpilmneh .gt_empty_group_heading {
+#qafymiqnfj .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -356,15 +352,15 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   vertical-align: middle;
 }
 
-#yrcpilmneh .gt_from_md > :first-child {
+#qafymiqnfj .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#yrcpilmneh .gt_from_md > :last-child {
+#qafymiqnfj .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#yrcpilmneh .gt_row {
+#qafymiqnfj .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -383,7 +379,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   overflow-x: hidden;
 }
 
-#yrcpilmneh .gt_stub {
+#qafymiqnfj .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -396,7 +392,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   padding-right: 5px;
 }
 
-#yrcpilmneh .gt_stub_row_group {
+#qafymiqnfj .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -410,15 +406,15 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   vertical-align: top;
 }
 
-#yrcpilmneh .gt_row_group_first td {
+#qafymiqnfj .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#yrcpilmneh .gt_row_group_first th {
+#qafymiqnfj .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#yrcpilmneh .gt_summary_row {
+#qafymiqnfj .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -428,16 +424,16 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   padding-right: 5px;
 }
 
-#yrcpilmneh .gt_first_summary_row {
+#qafymiqnfj .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#yrcpilmneh .gt_first_summary_row.thick {
+#qafymiqnfj .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#yrcpilmneh .gt_last_summary_row {
+#qafymiqnfj .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -447,7 +443,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   border-bottom-color: #D3D3D3;
 }
 
-#yrcpilmneh .gt_grand_summary_row {
+#qafymiqnfj .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -457,7 +453,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   padding-right: 5px;
 }
 
-#yrcpilmneh .gt_first_grand_summary_row {
+#qafymiqnfj .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -467,7 +463,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   border-top-color: #D3D3D3;
 }
 
-#yrcpilmneh .gt_last_grand_summary_row_top {
+#qafymiqnfj .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -477,11 +473,11 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   border-bottom-color: #D3D3D3;
 }
 
-#yrcpilmneh .gt_striped {
+#qafymiqnfj .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#yrcpilmneh .gt_table_body {
+#qafymiqnfj .gt_table_body {
   border-top-style: solid;
   border-top-width: 3px;
   border-top-color: #D9D9D9;
@@ -490,7 +486,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   border-bottom-color: #D3D3D3;
 }
 
-#yrcpilmneh .gt_footnotes {
+#qafymiqnfj .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -504,7 +500,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   border-right-color: #D3D3D3;
 }
 
-#yrcpilmneh .gt_footnote {
+#qafymiqnfj .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -513,7 +509,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   padding-right: 5px;
 }
 
-#yrcpilmneh .gt_sourcenotes {
+#qafymiqnfj .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -527,7 +523,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   border-right-color: #D3D3D3;
 }
 
-#yrcpilmneh .gt_sourcenote {
+#qafymiqnfj .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -535,72 +531,72 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   padding-right: 5px;
 }
 
-#yrcpilmneh .gt_left {
+#qafymiqnfj .gt_left {
   text-align: left;
 }
 
-#yrcpilmneh .gt_center {
+#qafymiqnfj .gt_center {
   text-align: center;
 }
 
-#yrcpilmneh .gt_right {
+#qafymiqnfj .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#yrcpilmneh .gt_font_normal {
+#qafymiqnfj .gt_font_normal {
   font-weight: normal;
 }
 
-#yrcpilmneh .gt_font_bold {
+#qafymiqnfj .gt_font_bold {
   font-weight: bold;
 }
 
-#yrcpilmneh .gt_font_italic {
+#qafymiqnfj .gt_font_italic {
   font-style: italic;
 }
 
-#yrcpilmneh .gt_super {
+#qafymiqnfj .gt_super {
   font-size: 65%;
 }
 
-#yrcpilmneh .gt_footnote_marks {
+#qafymiqnfj .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#yrcpilmneh .gt_asterisk {
+#qafymiqnfj .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#yrcpilmneh .gt_indent_1 {
+#qafymiqnfj .gt_indent_1 {
   text-indent: 5px;
 }
 
-#yrcpilmneh .gt_indent_2 {
+#qafymiqnfj .gt_indent_2 {
   text-indent: 10px;
 }
 
-#yrcpilmneh .gt_indent_3 {
+#qafymiqnfj .gt_indent_3 {
   text-indent: 15px;
 }
 
-#yrcpilmneh .gt_indent_4 {
+#qafymiqnfj .gt_indent_4 {
   text-indent: 20px;
 }
 
-#yrcpilmneh .gt_indent_5 {
+#qafymiqnfj .gt_indent_5 {
   text-indent: 25px;
 }
 
-#yrcpilmneh .katex-display {
+#qafymiqnfj .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#yrcpilmneh div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#qafymiqnfj div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -622,83 +618,83 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
 </thead>
 <tbody class="gt_table_body">
 <tr class="gt_group_heading_row">
-<th colspan="5" class="gt_group_heading" style="background-color: #E9E9E9; font-weight: bold;" scope="colgroup" id="Synthea; acetaminophen">Synthea; acetaminophen</th>
+<th colspan="5" class="gt_group_heading" style="background-color: #E9E9E9; font-weight: bold;" scope="colgroup" id="GiBleed; acetaminophen">GiBleed; acetaminophen</th>
     </tr>
 <tr class="gt_row_group_first">
-<td headers="Synthea; acetaminophen  Reason" class="gt_row gt_left" style="text-align: left; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">Initial qualifying events</td>
-<td headers="Synthea; acetaminophen  [header_name]Variable name
+<td headers="GiBleed; acetaminophen  Reason" class="gt_row gt_left" style="text-align: left; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">Initial qualifying events</td>
+<td headers="GiBleed; acetaminophen  [header_name]Variable name
 [header_level]number_records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">9,365</td>
-<td headers="Synthea; acetaminophen  [header_name]Variable name
+<td headers="GiBleed; acetaminophen  [header_name]Variable name
 [header_level]number_subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">2,580</td>
-<td headers="Synthea; acetaminophen  [header_name]Variable name
+<td headers="GiBleed; acetaminophen  [header_name]Variable name
 [header_level]excluded_records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">0</td>
-<td headers="Synthea; acetaminophen  [header_name]Variable name
+<td headers="GiBleed; acetaminophen  [header_name]Variable name
 [header_level]excluded_subjects" class="gt_row gt_right" style="text-align: right;">0</td>
 </tr>
 <tr>
-<td headers="Synthea; acetaminophen  Reason" class="gt_row gt_left" style="text-align: left; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">Record in observation</td>
-<td headers="Synthea; acetaminophen  [header_name]Variable name
+<td headers="GiBleed; acetaminophen  Reason" class="gt_row gt_left" style="text-align: left; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">Record in observation</td>
+<td headers="GiBleed; acetaminophen  [header_name]Variable name
 [header_level]number_records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">9,365</td>
-<td headers="Synthea; acetaminophen  [header_name]Variable name
+<td headers="GiBleed; acetaminophen  [header_name]Variable name
 [header_level]number_subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">2,580</td>
-<td headers="Synthea; acetaminophen  [header_name]Variable name
+<td headers="GiBleed; acetaminophen  [header_name]Variable name
 [header_level]excluded_records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">0</td>
-<td headers="Synthea; acetaminophen  [header_name]Variable name
+<td headers="GiBleed; acetaminophen  [header_name]Variable name
 [header_level]excluded_subjects" class="gt_row gt_right" style="text-align: right;">0</td>
 </tr>
 <tr>
-<td headers="Synthea; acetaminophen  Reason" class="gt_row gt_left" style="text-align: left; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">Record start &lt;= record end</td>
-<td headers="Synthea; acetaminophen  [header_name]Variable name
+<td headers="GiBleed; acetaminophen  Reason" class="gt_row gt_left" style="text-align: left; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">Record start &lt;= record end</td>
+<td headers="GiBleed; acetaminophen  [header_name]Variable name
 [header_level]number_records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">9,365</td>
-<td headers="Synthea; acetaminophen  [header_name]Variable name
+<td headers="GiBleed; acetaminophen  [header_name]Variable name
 [header_level]number_subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">2,580</td>
-<td headers="Synthea; acetaminophen  [header_name]Variable name
+<td headers="GiBleed; acetaminophen  [header_name]Variable name
 [header_level]excluded_records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">0</td>
-<td headers="Synthea; acetaminophen  [header_name]Variable name
+<td headers="GiBleed; acetaminophen  [header_name]Variable name
 [header_level]excluded_subjects" class="gt_row gt_right" style="text-align: right;">0</td>
 </tr>
 <tr>
-<td headers="Synthea; acetaminophen  Reason" class="gt_row gt_left" style="text-align: left; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">Non-missing sex</td>
-<td headers="Synthea; acetaminophen  [header_name]Variable name
+<td headers="GiBleed; acetaminophen  Reason" class="gt_row gt_left" style="text-align: left; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">Non-missing sex</td>
+<td headers="GiBleed; acetaminophen  [header_name]Variable name
 [header_level]number_records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">9,365</td>
-<td headers="Synthea; acetaminophen  [header_name]Variable name
+<td headers="GiBleed; acetaminophen  [header_name]Variable name
 [header_level]number_subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">2,580</td>
-<td headers="Synthea; acetaminophen  [header_name]Variable name
+<td headers="GiBleed; acetaminophen  [header_name]Variable name
 [header_level]excluded_records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">0</td>
-<td headers="Synthea; acetaminophen  [header_name]Variable name
+<td headers="GiBleed; acetaminophen  [header_name]Variable name
 [header_level]excluded_subjects" class="gt_row gt_right" style="text-align: right;">0</td>
 </tr>
 <tr>
-<td headers="Synthea; acetaminophen  Reason" class="gt_row gt_left" style="text-align: left; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">Non-missing year of birth</td>
-<td headers="Synthea; acetaminophen  [header_name]Variable name
+<td headers="GiBleed; acetaminophen  Reason" class="gt_row gt_left" style="text-align: left; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">Non-missing year of birth</td>
+<td headers="GiBleed; acetaminophen  [header_name]Variable name
 [header_level]number_records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">9,365</td>
-<td headers="Synthea; acetaminophen  [header_name]Variable name
+<td headers="GiBleed; acetaminophen  [header_name]Variable name
 [header_level]number_subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">2,580</td>
-<td headers="Synthea; acetaminophen  [header_name]Variable name
+<td headers="GiBleed; acetaminophen  [header_name]Variable name
 [header_level]excluded_records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">0</td>
-<td headers="Synthea; acetaminophen  [header_name]Variable name
+<td headers="GiBleed; acetaminophen  [header_name]Variable name
 [header_level]excluded_subjects" class="gt_row gt_right" style="text-align: right;">0</td>
 </tr>
 <tr>
-<td headers="Synthea; acetaminophen  Reason" class="gt_row gt_left" style="text-align: left; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">Merge overlapping records</td>
-<td headers="Synthea; acetaminophen  [header_name]Variable name
+<td headers="GiBleed; acetaminophen  Reason" class="gt_row gt_left" style="text-align: left; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">Merge overlapping records</td>
+<td headers="GiBleed; acetaminophen  [header_name]Variable name
 [header_level]number_records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">9,365</td>
-<td headers="Synthea; acetaminophen  [header_name]Variable name
+<td headers="GiBleed; acetaminophen  [header_name]Variable name
 [header_level]number_subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">2,580</td>
-<td headers="Synthea; acetaminophen  [header_name]Variable name
+<td headers="GiBleed; acetaminophen  [header_name]Variable name
 [header_level]excluded_records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">0</td>
-<td headers="Synthea; acetaminophen  [header_name]Variable name
+<td headers="GiBleed; acetaminophen  [header_name]Variable name
 [header_level]excluded_subjects" class="gt_row gt_right" style="text-align: right;">0</td>
 </tr>
 <tr>
-<td headers="Synthea; acetaminophen  Reason" class="gt_row gt_left" style="text-align: left; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">Collapse cohort with a gap of 1095 days.</td>
-<td headers="Synthea; acetaminophen  [header_name]Variable name
+<td headers="GiBleed; acetaminophen  Reason" class="gt_row gt_left" style="text-align: left; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">Collapse cohort with a gap of 1095 days.</td>
+<td headers="GiBleed; acetaminophen  [header_name]Variable name
 [header_level]number_records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">7,975</td>
-<td headers="Synthea; acetaminophen  [header_name]Variable name
+<td headers="GiBleed; acetaminophen  [header_name]Variable name
 [header_level]number_subjects" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">2,580</td>
-<td headers="Synthea; acetaminophen  [header_name]Variable name
+<td headers="GiBleed; acetaminophen  [header_name]Variable name
 [header_level]excluded_records" class="gt_row gt_right" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">1,390</td>
-<td headers="Synthea; acetaminophen  [header_name]Variable name
+<td headers="GiBleed; acetaminophen  [header_name]Variable name
 [header_level]excluded_subjects" class="gt_row gt_right" style="text-align: right;">0</td>
 </tr>
 </tbody>
@@ -710,7 +706,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Edward Burn, Marti Catala, Nuria Mercade-Besora, Marta Alcalde-Herraiz, Mike Du, Yuchen Guo, Xihang Chen, Kim Lopez-Guell, Elin Rowlands.</p>
+  <p>Developed by Edward Burn, Martí Català, Nuria Mercade-Besora, Marta Alcalde-Herraiz, Mike Du, Yuchen Guo, Xihang Chen, Kim Lopez-Guell, Elin Rowlands.</p>
 </div>
 
 <div class="pkgdown-footer-right">
