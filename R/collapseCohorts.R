@@ -52,7 +52,7 @@ collapseCohorts <- function(cohort,
         "observation_period_id"
       )) |>
       dplyr::select(!"observation_period_id")
-  } else if (gap > 0) {
+  } else if (gap >= 0) {
     newCohort <- newCohort |>
       getObservationPeriodId(name = tmpNewCohort) |>
       joinOverlap(
