@@ -518,10 +518,11 @@ fulfillCohortReqs <- function(cdm, name, useRecordsBeforeObservation, type = "st
 
 checkCodelistGeneratorVersion <- function(cdm){
   if(utils::packageVersion("CodelistGenerator") == "3.5.9" | utils::packageVersion("CodelistGenerator") == "4.0.0"){
-    return(CodelistGenerator::vocabularyVersion(cdm))
+    x <- CodelistGenerator::vocabularyVersion(cdm)
   }else{
-    return(CodelistGenerator::getVocabVersion(cdm))
+    x <- CodelistGenerator::getVocabVersion(cdm)
   }
+  return(x)
 }
 
 conceptSetToCohortSet <- function(conceptSet, cdm) {
