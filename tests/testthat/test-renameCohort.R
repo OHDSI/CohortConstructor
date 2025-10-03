@@ -1,5 +1,5 @@
 test_that("test renameCohort", {
-  testthat::skip_on_cran()
+  skip_on_cran()
 
   cdm <- omock::mockPerson(nPerson = 10) |>
     omock::mockObservationPeriod() |>
@@ -134,5 +134,6 @@ test_that("test renameCohort", {
                        "c")))
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  CDMConnector::cdmDisconnect(cdm = cdm)
+
+  dropCreatedTables(cdm = cdm)
 })

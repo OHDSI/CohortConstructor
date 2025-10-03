@@ -35,24 +35,14 @@ We'll explore each category in the following sections.
 First, we'll connect to the Eunomia synthetic data and create a mock cohort of women in the database to use as example in the vignette.
 
 ```{r}
-library(DBI)
-library(duckdb)
 library(dplyr, warn.conflicts = FALSE)
-library(CDMConnector)
 library(CohortConstructor)
 library(CohortCharacteristics)
 library(PatientProfiles)
-library(CDMConnector)
+library(omock)
+library(clock)
 
-if (Sys.getenv("EUNOMIA_DATA_FOLDER") == ""){
-Sys.setenv("EUNOMIA_DATA_FOLDER" = file.path(tempdir(), "eunomia"))}
-if (!dir.exists(Sys.getenv("EUNOMIA_DATA_FOLDER"))){ dir.create(Sys.getenv("EUNOMIA_DATA_FOLDER"))
-downloadEunomiaData()  
-}
-
-con <- dbConnect(duckdb(), dbdir = eunomiaDir())
-cdm <- cdmFromCon(con, cdmSchema = "main", 
-                    writeSchema = "main", writePrefix = "my_study_")
+cdm <- mockCdmFromDataset(datasetName = "GiBleed", source = "duckdb")
 
 cdm$cohort <- demographicsCohort(cdm = cdm, name = "cohort", sex = "Female")
 ```
@@ -223,8 +213,8 @@ cdm$cohort_pad <- cdm$cohort |>
 Additionally, days to add can also be specified with a numeric column in the cohort, which allows to add a specific number of days for each record:
 
 ```{r}
-cdm$cohort <- cdm$cohort %>% 
-  mutate(days_to_add = !!datediff("cohort_start_date", "cohort_end_date")) |>
+cdm$cohort <- cdm$cohort |> 
+  dplyr::mutate(days_to_add = date_count_between(start = cohort_start_date, end = cohort_end_date, precision = "day")) |>
   padCohortEnd(days = "days_to_add", padObservation = FALSE)
 ```
 

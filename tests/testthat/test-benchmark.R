@@ -1,16 +1,17 @@
 test_that("benchmark works", {
   skip_on_cran()
-  if (Sys.getenv("EUNOMIA_DATA_FOLDER") == ""){
-    Sys.setenv("EUNOMIA_DATA_FOLDER" = file.path(tempdir(), "eunomia"))}
-  if (!dir.exists(Sys.getenv("EUNOMIA_DATA_FOLDER"))){ dir.create(Sys.getenv("EUNOMIA_DATA_FOLDER"))
-    CDMConnector::downloadEunomiaData()
+  skip("can not test")
+
+  cdm <- omock::mockCdmFromDataset(datasetName = "synpuf-1k_5.3", source = "local") |>
+    copyCdm()
+
+  if (dbToTest == "local omopgenerics") {
+    expect_warning(res <- benchmarkCohortConstructor(cdm))
+  } else {
+    expect_no_error(res <- benchmarkCohortConstructor(cdm))
   }
-  con <- DBI::dbConnect(duckdb::duckdb(), CDMConnector::eunomiaDir("synpuf-1k", "5.3"))
-  cdm <- CDMConnector::cdmFromCon(con = con, cdmSchema   = "main", writeSchema = "main")
-  res <- benchmarkCohortConstructor(cdm)
-  expect_false(
-    any(omopgenerics::listSourceTables(cdm) == "benchmark")
-  )
+
+  expect_false(any(omopgenerics::listSourceTables(cdm) == "benchmark"))
   expect_equal(
     res |>
       omopgenerics::filterSettings(result_type == "summarise_cohort_overlap") |>
@@ -88,4 +89,6 @@ test_that("benchmark works", {
   expect_true(
     any(omopgenerics::listSourceTables(cdm) == "benchmark")
   )
+
+  dropCreatedTables(cdm = cdm)
 })

@@ -17,49 +17,21 @@ knitr::opts_chunk$set(
   comment = "#>",
   eval = NOT_CRAN
 )
-
-library(CDMConnector)
-if (Sys.getenv("EUNOMIA_DATA_FOLDER") == ""){
-Sys.setenv("EUNOMIA_DATA_FOLDER" = file.path(tempdir(), "eunomia"))}
-if (!dir.exists(Sys.getenv("EUNOMIA_DATA_FOLDER"))){ dir.create(Sys.getenv("EUNOMIA_DATA_FOLDER"))
-downloadEunomiaData()  
-}
-
 ```
 
 
 ```{r setup}
-library(DBI)
-library(duckdb)
-library(CDMConnector)
+library(omock)
+library(dplyr)
 library(CohortConstructor)
 library(CohortCharacteristics)
 library(ggplot2)
 ```
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  eval = TRUE, message = FALSE, warning = FALSE,
-  comment = "#>"
-)
-
-library(CDMConnector)
-library(dplyr, warn.conflicts = FALSE)
-
-if (Sys.getenv("EUNOMIA_DATA_FOLDER") == ""){
-  Sys.setenv("EUNOMIA_DATA_FOLDER" = file.path(tempdir(), "eunomia"))}
-if (!dir.exists(Sys.getenv("EUNOMIA_DATA_FOLDER"))){ dir.create(Sys.getenv("EUNOMIA_DATA_FOLDER"))
-  downloadEunomiaData()  
-}
-```
-
-For this example we'll use the Eunomia synthetic data from the CDMConnector package.
+For this example we'll use the Eunomia synthetic data from the [omock](https://ohdsi.github.io/omock/) package.
 
 ```{r}
-con <- dbConnect(duckdb(), dbdir = eunomiaDir())
-cdm <- cdmFromCon(con, cdmSchema = "main", 
-                    writeSchema = "main", writePrefix = "my_study_")
+cdm <- mockCdmFromDataset(datasetName = "GiBleed", source = "duckdb")
 ```
 
 Let's start by creating two drug cohorts, one for users of diclofenac and another for users of acetaminophen.
@@ -83,9 +55,8 @@ When cohortId = NULL all cohorts in the table are used. Note that this function 
 It is also possible to only sample one cohort within cohort table, however the remaining cohorts will still remain.
 
 ```{r include = FALSE, warning = FALSE}
-con <- dbConnect(duckdb(), dbdir = eunomiaDir())
-cdm <- cdmFromCon(con, cdmSchema = "main", 
-                    writeSchema = c(prefix = "my_study_", schema = "main"))
+cdm <- mockCdmFromDataset(datasetName = "GiBleed", source = "duckdb")
+
 cdm$medications <- conceptCohort(cdm = cdm, 
                                  conceptSet = list("diclofenac" = 1124300,
                                                    "acetaminophen" = 1127433), 
@@ -103,9 +74,8 @@ The chosen cohort (users of diclofenac) has been reduced to 100 individuals, as 
 If you want to filter the cohort table to only include individuals and records from a specified cohort, you can use the function `subsetCohorts`. 
 
 ```{r include = FALSE, warning = FALSE}
-con <- dbConnect(duckdb(), dbdir = eunomiaDir())
-cdm <- cdmFromCon(con, cdmSchema = "main", 
-                    writeSchema = c(prefix = "my_study_", schema = "main"))
+cdm <- mockCdmFromDataset(datasetName = "GiBleed", source = "duckdb")
+
 cdm$medications <- conceptCohort(cdm = cdm, 
                                  conceptSet = list("diclofenac" = 1124300,
                                                    "acetaminophen" = 1127433), 

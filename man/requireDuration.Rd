@@ -14,9 +14,13 @@ requireDuration(
 \arguments{
 \item{cohort}{A cohort table in a cdm reference.}
 
-\item{daysInCohort}{Range of days that cohort entries must include. For
-example, if set to c(30, 90) then only cohort entries that are 30 days
-or more longer and shorter or equal to 90 days will be kept.}
+\item{daysInCohort}{Number of days cohort entries must last. Can be a vector
+of length two if a range, or a vector of length one if a specific number
+of days. Note, cohort entry and exit on the same day counts as one day in
+the cohort. So if, for example, you wish to require individuals are in the
+cohort for at least one night then set daysInCohort to c(2, Inf). Meanwhile,
+if set to c(30, 90) then only cohort entries that are 30 days or more
+longer and shorter or equal to 90 days will be kept.}
 
 \item{cohortId}{Vector identifying which cohorts to modify
 (cohort_definition_id or cohort_name). If NULL, all cohorts will be
@@ -39,6 +43,6 @@ library(CohortConstructor)
 
 cdm <- mockCohortConstructor(nPerson = 100)
 cdm$cohort1 |>
-  requireDuration(daysInCohort = c(1, Inf))
+  requireDuration(daysInCohort = c(2, Inf))
 }
 }

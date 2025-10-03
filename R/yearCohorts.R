@@ -105,6 +105,9 @@ yearCohorts <- function(cohort,
   cohort <- cohort |>
     subsetCohorts(cohortId = cohortId, name = name)
 
+  # get original attrition
+  originalAttrition <- attrition(cohort)
+
   cohort <- cohort |>
     dplyr::mutate(!!!startDates, !!!endDates) |>
     dplyr::select(!c("cohort_start_date", "cohort_end_date")) |>

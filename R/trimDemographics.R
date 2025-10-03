@@ -135,7 +135,7 @@ trimDemographics <- function(cohort,
 
   newChangeIds <- newSet |>
     dplyr::filter(.data$requirements) |>
-    dplyr::pull(cohort_definition_id)
+    dplyr::pull("cohort_definition_id")
 
   if (!is.null(sex)) {
 
@@ -232,15 +232,9 @@ trimDemographics <- function(cohort,
   if (!is.null(minPriorObservation)) {
     cli::cli_inform(c("Trim prior observation"))
     newCohort <- newCohort |>
-      dplyr::mutate("min_prior_observation" = as.integer(.data$min_prior_observation)) %>%
+      dplyr::mutate("min_prior_observation" = as.integer(.data$min_prior_observation)) |>
       dplyr::mutate(
-        "new_cohort_start_date" = as.Date(
-          !!CDMConnector::dateadd(
-            date = "prior_observation",
-            number = "min_prior_observation",
-            interval = "day"
-          )
-        ),
+        "new_cohort_start_date" = as.Date(clock::add_days(x = .data$prior_observation, n = .data$min_prior_observation)),
         "cohort_start_date" = dplyr::if_else(
           .data$new_cohort_start_date >= .data$cohort_start_date,
           .data$new_cohort_start_date,
@@ -271,9 +265,9 @@ trimDemographics <- function(cohort,
   }
   if (!is.null(minFutureObservation)) {
     cli::cli_inform(c("Trim future observation"))
-    newCohort <- newCohort %>%
+    newCohort <- newCohort |>
       dplyr::filter(
-        !!CDMConnector::datediff("cohort_start_date", "future_observation") >=
+        clock::date_count_between(start = .data$cohort_start_date, end = .data$future_observation, precision = "day") >=
           .data$min_future_observation
       ) |>
       dplyr::compute(name = tmpNewCohort, temporary = FALSE,

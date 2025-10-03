@@ -1,5 +1,6 @@
 test_that("simple duckdb checks", {
-  testthat::skip_on_cran()
+  skip_on_cran()
+
   # create test mock ----
   cdm <- omopgenerics::cdmFromTables(
     tables = list(
@@ -37,8 +38,8 @@ test_that("simple duckdb checks", {
         ))
       )
     )
-  )
-  cdm <- cdm |> copyCdm()
+  ) |>
+    copyCdm()
 
   # test with cohort1 ----
   expect_no_error(
@@ -108,7 +109,9 @@ test_that("simple duckdb checks", {
       ) |>
       dplyr::collect() |>
       dplyr::arrange(.data$observation_period_id),
-    cdm$observation_period |> dplyr::collect() |>
+    cdm$observation_period |>
+      dplyr::collect() |>
+      dplyr::as_tibble() |>
       dplyr::arrange(.data$observation_period_id)
   )
   expect_true(
@@ -173,7 +176,6 @@ test_that("simple duckdb checks", {
       "cohort_end_date" = as.Date(c("2013-04-18", "2017-01-01", "2020-01-14", "2024-01-01"))
     )
   )
-
 
   # check sex is consistent ----
   expect_no_error(
@@ -318,11 +320,12 @@ test_that("simple duckdb checks", {
   )
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  PatientProfiles::mockDisconnect(cdm)
+
+  dropCreatedTables(cdm = cdm)
 })
 
 test_that("cohort Id, name, additional columns, missing year of birth", {
-  testthat::skip_on_cran()
+  skip_on_cran()
 
   cohort_1 <- dplyr::tibble(
     cohort_definition_id = 1L,
@@ -374,17 +377,12 @@ test_that("cohort Id, name, additional columns, missing year of birth", {
     ethnicity_concept_id = NA_integer_
   )
 
-  cdm_local <- omock::mockCdmFromTables(
-    tables = list(
-      "cohort1" = cohort_1,
-      "cohort2" = cohort_2
-    ),
-    seed = 1
-  )
-
-  cdm_local <- omopgenerics::insertTable(cdm = cdm_local, name = "observation_period", table = obs)
-  cdm_local <- omopgenerics::insertTable(cdm = cdm_local, name = "person", table = person)
-  cdm <- cdm_local |> copyCdm()
+  cdm <- omock::mockCdmFromTables(
+    tables = list("cohort1" = cohort_1, "cohort2" = cohort_2)
+  ) |>
+    omopgenerics::insertTable(name = "observation_period", table = obs) |>
+    omopgenerics::insertTable(name = "person", table = person) |>
+    copyCdm()
 
   cdm$cohort2 <- cdm$cohort2 |>
     dplyr::mutate(
@@ -443,44 +441,37 @@ test_that("cohort Id, name, additional columns, missing year of birth", {
   )
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  PatientProfiles::mockDisconnect(cdm)
+
+  dropCreatedTables(cdm = cdm)
 })
 
 test_that("test indexes - postgres", {
   skip_on_cran()
-  skip_if(Sys.getenv("CDM5_POSTGRESQL_DBNAME") == "")
   skip_if(!testIndexes)
 
-  db <- DBI::dbConnect(RPostgres::Postgres(),
-                       dbname = Sys.getenv("CDM5_POSTGRESQL_DBNAME"),
-                       host = Sys.getenv("CDM5_POSTGRESQL_HOST"),
-                       user = Sys.getenv("CDM5_POSTGRESQL_USER"),
-                       password = Sys.getenv("CDM5_POSTGRESQL_PASSWORD"))
-  cdm <- CDMConnector::cdmFromCon(
-    con = db,
-    cdmSchema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA"),
-    writeSchema = Sys.getenv("CDM5_POSTGRESQL_SCRATCH_SCHEMA"),
-    writePrefix = "cc_",
-    achillesSchema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA")
-  )
+  if (dbToTest == "postgres CDMConnector") {
+    cdm <- omock::mockCdmFromTables(tables = list(
+      my_cohort = dplyr::tibble(
+        cohort_definition_id = 1L,
+        subject_id = 1L,
+        cohort_start_date = as.Date("2009-01-02"),
+        cohort_end_date = as.Date("2009-01-03"),
+        other_date = as.Date("2009-01-01")
+      )
+    )) |>
+      copyCdm()
 
-  cdm <- omopgenerics::insertTable(
-    cdm = cdm,
-    name = "my_cohort",
-    table = data.frame(cohort_definition_id = 1L,
-                       subject_id = 1L,
-                       cohort_start_date = as.Date("2009-01-01"),
-                       cohort_end_date = as.Date("2009-01-02"))
-  )
-  cdm$my_cohort <- omopgenerics::newCohortTable(cdm$my_cohort)
-  cdm$my_cohort <- trimDemographics(cdm$my_cohort, ageRange = list(c(0, 50)))
+    con <- CDMConnector::cdmCon(cdm = cdm)
 
-  expect_true(
-    DBI::dbGetQuery(db, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
-      "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
-  )
+    cdm$my_cohort <- trimDemographics(cdm$my_cohort, ageRange = list(c(0, 50)))
 
-  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
-  CDMConnector::cdmDisconnect(cdm = cdm)
+    expect_true(
+      DBI::dbGetQuery(con, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
+        "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
+    )
+
+    expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
+
+    dropCreatedTables(cdm = cdm)
+  }
 })

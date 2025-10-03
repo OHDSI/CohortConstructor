@@ -17,14 +17,6 @@ knitr::opts_chunk$set(
   comment = "#>",
   eval = NOT_CRAN
 )
-
-library(CDMConnector)
-if (Sys.getenv("EUNOMIA_DATA_FOLDER") == ""){
-Sys.setenv("EUNOMIA_DATA_FOLDER" = file.path(tempdir(), "eunomia"))}
-if (!dir.exists(Sys.getenv("EUNOMIA_DATA_FOLDER"))){ dir.create(Sys.getenv("EUNOMIA_DATA_FOLDER"))
-downloadEunomiaData()  
-}
-
 ```
 
 In previous vignettes we have seen numerous R functions that can help us to add a cohort of interest to a cdm reference. When our cdm reference is to tables in a database, as is often the code, our R code will have been translated to SQL that is run against tables in the databases (for more details on how this is all implemented see <https://oxford-pharmacoepi.github.io/Tidy-R-programming-with-OMOP/>).
@@ -32,24 +24,18 @@ In previous vignettes we have seen numerous R functions that can help us to add 
 Let's again work with Eunomia and get the codes needed to create a set of drug cohorts. 
 
 ```{r}
-library(DBI)
-library(duckdb)
-library(CDMConnector)
+library(omock)
 library(CodelistGenerator)
 library(PatientProfiles)
 library(CohortConstructor)
 library(dplyr)
 
-con <- dbConnect(duckdb(),
-                 dbdir = eunomiaDir())
-cdm <- cdmFromCon(con, cdmSchema = "main", writeSchema = "main", 
-                  writePrefix = "my_study_")
-drug_codes <- getDrugIngredientCodes(cdm, 
-                                     name = c("acetaminophen",
-                                              "amoxicillin", 
-                                              "diclofenac", 
-                                              "simvastatin",
-                                              "warfarin"))
+cdm <- mockCdmFromDataset(datasetName = "GiBleed", source = "duckdb")
+
+drug_codes <- getDrugIngredientCodes(
+  cdm = cdm, 
+  name = c("acetaminophen", "amoxicillin", "diclofenac", "simvastatin", "warfarin")
+)
 ```
 
 To capture all the SQL executed as we use CohortConstructor functions we can set a global option. For this, we just need to point to a directory in which we'll save each SQL statement run behind the scenes. Note that in this example we're using duckdb so the SQL is for this database management system. If you were running on a different type of database the SQL would be adapted accordingly.

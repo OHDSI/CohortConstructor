@@ -252,20 +252,10 @@ splitOverlap <- function(x,
                          end = "cohort_end_date",
                          by = c("cohort_definition_id", "subject_id")) {
   # initial checks
-  checkmate::assertCharacter(start,
-                             len = 1,
-                             min.chars = 1,
-                             any.missing = FALSE)
-  checkmate::assertCharacter(end,
-                             len = 1,
-                             min.chars = 1,
-                             any.missing = FALSE)
-  checkmate::assertCharacter(by,
-                             min.len = 1,
-                             min.chars = 1,
-                             any.missing = FALSE)
-  checkmate::assertClass(x, "tbl")
-  checkmate::assertTRUE(all(c(start, end, by) %in% colnames(x)))
+  omopgenerics::assertCharacter(start, length = 1, minNumCharacter = 1)
+  omopgenerics::assertCharacter(end, length = 1, minNumCharacter = 1)
+  omopgenerics::assertCharacter(by, length = 1, minNumCharacter = 1)
+  omopgenerics::assertTable(x, class = "tbl", columns = c(start, end, by))
 
   ids <- getIdentifier(x, 3)
   id <- ids[1]
@@ -287,9 +277,9 @@ splitOverlap <- function(x,
   tmpTable_2 <- paste0(tmp, "_2")
   x_a <-  x_a |>
     dplyr::group_by(dplyr::across(dplyr::all_of(by))) |>
-    dbplyr::window_order(.data[[is]]) |>
+    dplyr::arrange(.data[[is]]) |>
     dplyr::mutate(!!id := dplyr::row_number()) |>
-    dbplyr::window_order() |>
+    dplyr::arrange() |>
     dplyr::ungroup() |>
     dplyr::compute(temporary = FALSE, name = tmpTable_2,
                    logPrefix = "CohortConstructor_intersectCohorts_tmpTable_2_")
@@ -304,9 +294,9 @@ splitOverlap <- function(x,
     ) |>
     dplyr::distinct() |>
     dplyr::group_by(dplyr::across(dplyr::all_of(by))) |>
-    dbplyr::window_order(.data[[ie]]) |>
+    dplyr::arrange(.data[[ie]]) |>
     dplyr::mutate(!!id := dplyr::row_number() - 1) |>
-    dbplyr::window_order() |>
+    dplyr::arrange() |>
     dplyr::ungroup() |>
     dplyr::compute(temporary = FALSE, name = tmpTable_3,
                    logPrefix = "CohortConstructor_intersectCohorts_tmpTable_3_")
@@ -457,17 +447,6 @@ getIdentifier <- function(x,
                           len = 1,
                           prefix = "",
                           nchar = 5) {
-  checkmate::assertClass(x, "tbl")
-  checkmate::assertIntegerish(len,
-                              lower = 1,
-                              len = 1,
-                              any.missing = FALSE)
-  checkmate::assertCharacter(prefix, any.missing = FALSE, len = 1)
-  checkmate::assertIntegerish(nchar,
-                              len = 1,
-                              lower = 1,
-                              any.missing = FALSE)
-
   cols <- colnames(x)
 
   x <- character()

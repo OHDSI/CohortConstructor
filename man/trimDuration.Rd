@@ -10,7 +10,9 @@ trimDuration(cohort, daysInCohort, cohortId = NULL, name = tableName(cohort))
 \item{cohort}{A cohort table in a cdm reference.}
 
 \item{daysInCohort}{Number of days cohort relative to current cohort start
-dates. Cohort entries will be trimmed to these dates}
+dates. Cohort entries will be trimmed to these dates. Note, cohort entry and
+exit on the same day counts as one day in the cohort.Set lower bound
+to 1 if keeping cohort start to the same as current cohort start.}
 
 \item{cohortId}{Vector identifying which cohorts to modify
 (cohort_definition_id or cohort_name). If NULL, all cohorts will be
@@ -33,6 +35,6 @@ library(CohortConstructor)
 
 cdm <- mockCohortConstructor(nPerson = 100)
 cdm$cohort1 |>
-  requireDuration(daysInCohort = c(1, Inf))
+  requireDuration(daysInCohort = c(2, Inf))
 }
 }

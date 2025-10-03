@@ -27,15 +27,10 @@ test_that("requiring presence in another cohort", {
     ))
   )
 
-  cdm_local <- omock::mockCdmFromTables(
-    tables = list(
-      "cohort1" = cohort_1,
-      "cohort2" = cohort_2
-    ),
-    seed = 1
-  )
-
-  cdm <- cdm_local |> copyCdm()
+  cdm <- omock::mockCdmFromTables(
+    tables = list("cohort1" = cohort_1, "cohort2" = cohort_2)
+  ) |>
+    copyCdm()
 
   start_cols <- colnames(cdm$cohort1)
   cdm$cohort3 <-  requireCohortIntersect(cohort = cdm$cohort1,
@@ -170,18 +165,17 @@ test_that("requiring presence in another cohort", {
                                       targetCohortId = 1,
                                       window = c(-Inf, Inf)))
 
-
-  PatientProfiles::mockDisconnect(cdm)
+  dropCreatedTables(cdm = cdm)
 })
 
 test_that("requiring absence in another cohort", {
-  testthat::skip_on_cran()
-  cdm_local <- omock::mockCdmReference() |>
+  skip_on_cran()
+  cdm <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4,seed = 1) |>
     omock::mockObservationPeriod(seed = 1) |>
     omock::mockCohort(name = c("cohort1"), numberCohorts = 2, seed = 1) |>
-    omock::mockCohort(name = c("cohort2"), numberCohorts = 2, seed = 2)
-  cdm <- cdm_local |> copyCdm()
+    omock::mockCohort(name = c("cohort2"), numberCohorts = 2, seed = 2) |>
+    copyCdm()
 
   cdm$cohort3_inclusion <-  requireCohortIntersect(cohort = cdm$cohort1,
                                                    targetCohortTable = "cohort2",
@@ -216,11 +210,12 @@ test_that("requiring absence in another cohort", {
                                                  name = "cohort1_equal")
   )
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  PatientProfiles::mockDisconnect(cdm)
+
+  dropCreatedTables(cdm = cdm)
 })
 
 test_that("different intersection count requirements", {
-  testthat::skip_on_cran()
+  skip_on_cran()
 
   cohort1 <- dplyr::tibble(
     subject_id = 1:10,
@@ -243,9 +238,10 @@ test_that("different intersection count requirements", {
                          as.Date('2019-01-05'),
                          as.Date('2019-01-06'))
   )
-  cdm_local <- omock::mockCdmReference() |> omock::mockCdmFromTables(tables = list("cohort1" = cohort1,
-                                                                                   "cohort2" = cohort2), seed = 1)
-  cdm <- cdm_local |> copyCdm()
+  cdm <- omock::mockCdmFromTables(
+    tables = list("cohort1" = cohort1, "cohort2" = cohort2)
+  ) |>
+    copyCdm()
 
   # no intersections - people not in cohort2
   expect_identical(sort(cdm$cohort1 |>
@@ -335,99 +331,91 @@ test_that("different intersection count requirements", {
                                       targetCohortTable = "cohort2"))
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  PatientProfiles::mockDisconnect(cdm)
+
+  dropCreatedTables(cdm = cdm)
 })
 
 test_that("test indexes - postgres, and atFirst", {
   skip_on_cran()
-  skip_if(Sys.getenv("CDM5_POSTGRESQL_DBNAME") == "")
   skip_if(!testIndexes)
 
-  db <- DBI::dbConnect(RPostgres::Postgres(),
-                       dbname = Sys.getenv("CDM5_POSTGRESQL_DBNAME"),
-                       host = Sys.getenv("CDM5_POSTGRESQL_HOST"),
-                       user = Sys.getenv("CDM5_POSTGRESQL_USER"),
-                       password = Sys.getenv("CDM5_POSTGRESQL_PASSWORD"))
-  cdm <- CDMConnector::cdmFromCon(
-    con = db,
-    cdmSchema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA"),
-    writeSchema = Sys.getenv("CDM5_POSTGRESQL_SCRATCH_SCHEMA"),
-    writePrefix = "cc_",
-    achillesSchema = Sys.getenv("CDM5_POSTGRESQL_CDM_SCHEMA")
-  )
+  if (dbToTest == "postgres CDMConnector") {
+    cdm <- omock::mockCdmFromTables(tables = list(
+      my_cohort = dplyr::tibble(
+        cohort_definition_id = 1L,
+        subject_id = 1L,
+        cohort_start_date = as.Date("2009-01-02"),
+        cohort_end_date = as.Date("2009-01-03"),
+        other_date = as.Date("2009-01-01")
+      )
+    )) |>
+      copyCdm()
 
-  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::contains("og_"))
-  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::contains("my_cohort"))
+    con <- CDMConnector::cdmCon(cdm = cdm)
 
-  cdm <- omopgenerics::insertTable(cdm = cdm,
-                                   name = "my_cohort",
-                                   table = data.frame(cohort_definition_id = 1L,
-                                                      subject_id = 1L,
-                                                      cohort_start_date = as.Date("2009-01-02"),
-                                                      cohort_end_date = as.Date("2009-01-03"),
-                                                      other_date = as.Date("2009-01-01")))
-  cdm$my_cohort <- omopgenerics::newCohortTable(cdm$my_cohort)
-  cdm$my_cohort <- requireCohortIntersect(cdm$my_cohort, targetCohortTable = "my_cohort", window = list(c(-Inf, Inf)))
+    omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::contains("og_"))
 
-  expect_true(
-    DBI::dbGetQuery(db, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
-      "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
-  )
+    cdm$my_cohort <- requireCohortIntersect(cdm$my_cohort, targetCohortTable = "my_cohort", window = list(c(-Inf, Inf)))
 
-
-  # atFirst
-  cohort <- dplyr::tibble(
-    cohort_definition_id = c(rep(1L, 4), rep(2L, 4)),
-    subject_id = c(1L, 1L, 2L, 3L, rep(1L, 4)),
-    cohort_start_date = as.Date(c(
-      "2008-05-17", "2009-03-11", "2010-05-03", "2010-02-25",
-      "2008-03-24", "2008-11-28", "2010-01-30", "2009-06-13"
-    )),
-    cohort_end_date = as.Date(c(
-      "2009-03-10", "2009-07-19", "2010-06-15", "2010-04-30",
-      "2008-11-27", "2008-01-29", "2010-06-12", "2010-01-15"
-    ))
-  )
-  cdm <- omopgenerics::insertTable(cdm = cdm,
-                                   name = "my_cohort",
-                                   table = cohort)
-  cdm$my_cohort <- omopgenerics::newCohortTable(cdm$my_cohort, .softValidation = TRUE)
-  cdm$my_cohort_1 <- requireCohortIntersect(cohort = cdm$my_cohort,
-                                        intersections = c(1,Inf),
-                                        cohortId = 2,
-                                        targetCohortTable = "my_cohort",
-                                        targetCohortId = 1,
-                                        window = c(-365, -1),
-                                        atFirst = TRUE,
-                                        name = "my_cohort_1")
-  expect_equal(
-    collectCohort(cdm$my_cohort_1, 2),
-    dplyr::tibble(
-      subject_id = 1L,
-      cohort_start_date = as.Date(NULL),
-      cohort_end_date = as.Date(NULL)
+    expect_true(
+      DBI::dbGetQuery(con, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
+        "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
     )
-  )
-  expect_equal(
-    attrition(cdm$my_cohort_1)$reason,
-    c('Initial qualifying events',
-      'Initial qualifying events',
-      'In cohort cohort_1 between -365 & -1 days relative to cohort_start_date between 1 and Inf times. Requirement applied to the first entry'
-    ))
 
-  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with("my_cohort"))
-  CDMConnector::cdmDisconnect(cdm = cdm)
+    # atFirst
+    cohort <- dplyr::tibble(
+      cohort_definition_id = c(rep(1L, 4), rep(2L, 4)),
+      subject_id = c(1L, 1L, 2L, 3L, rep(1L, 4)),
+      cohort_start_date = as.Date(c(
+        "2008-05-17", "2009-03-11", "2010-05-03", "2010-02-25",
+        "2008-03-24", "2008-11-28", "2010-01-30", "2009-06-13"
+      )),
+      cohort_end_date = as.Date(c(
+        "2009-03-10", "2009-07-19", "2010-06-15", "2010-04-30",
+        "2008-11-27", "2008-01-29", "2010-06-12", "2010-01-15"
+      ))
+    )
+    cdm <- omopgenerics::insertTable(cdm = cdm,
+                                     name = "my_cohort",
+                                     table = cohort)
+    cdm$my_cohort <- omopgenerics::newCohortTable(cdm$my_cohort, .softValidation = TRUE)
+    cdm$my_cohort_1 <- requireCohortIntersect(cohort = cdm$my_cohort,
+                                              intersections = c(1,Inf),
+                                              cohortId = 2,
+                                              targetCohortTable = "my_cohort",
+                                              targetCohortId = 1,
+                                              window = c(-365, -1),
+                                              atFirst = TRUE,
+                                              name = "my_cohort_1")
+    expect_equal(
+      collectCohort(cdm$my_cohort_1, 2),
+      dplyr::tibble(
+        subject_id = 1L,
+        cohort_start_date = as.Date(NULL),
+        cohort_end_date = as.Date(NULL)
+      )
+    )
+    expect_equal(
+      attrition(cdm$my_cohort_1)$reason,
+      c('Initial qualifying events',
+        'Initial qualifying events',
+        'In cohort cohort_1 between -365 & -1 days relative to cohort_start_date between 1 and Inf times. Requirement applied to the first entry'
+      ))
+
+    expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
+
+    dropCreatedTables(cdm = cdm)
+  }
 })
 
 test_that("codelists", {
   skip_on_cran()
-  cdm_local <- omock::mockCdmReference() |>
+  cdm <- omock::mockCdmReference() |>
     omock::mockPerson(n = 4, seed = 1) |>
     omock::mockObservationPeriod(seed = 1) |>
     omock::mockCohort(name = c("cohort1"), numberCohorts = 2, seed = 1)  |>
-    omock::mockConditionOccurrence()
-  cdm <- cdm_local |> copyCdm()
+    omock::mockConditionOccurrence() |>
+    copyCdm()
 
   cdm$cohort2 <- conceptCohort(cdm, list("a" = 194152L, "b" = 4151660L), name = "cohort2")
   # Only inclusion codes
@@ -463,7 +451,8 @@ test_that("codelists", {
   )
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-  CDMConnector::cdmDisconnect(cdm = cdm)
+
+  dropCreatedTables(cdm = cdm)
 })
 
 test_that("empty target cohort behavior", {

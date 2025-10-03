@@ -25,6 +25,11 @@ knitr::opts_chunk$set(
 
 The goal of CohortConstructor is to support the creation and manipulation of study cohorts in data mapped to the OMOP CDM.  
 
+## Tested sources
+
+[![](https://github.com/OHDSI/CohortConstructor/actions/workflows/test-local-omopgenerics.yaml/badge.svg?branch=main)](https://github.com/OHDSI/CohortConstructor/actions/workflows/test-local-omopgenerics.yaml)
+[![](https://github.com/OHDSI/CohortConstructor/actions/workflows/test-duckdb-CDMConnector.yaml/badge.svg?branch=main)](https://github.com/OHDSI/CohortConstructor/actions/workflows/test-duckdb-CDMConnector.yaml)
+
 ## Installation
 
 The package can be installed from CRAN:
@@ -45,7 +50,7 @@ To illustrate the functionality provided by CohortConstructor let's create a coh
 
 ```{r, message=FALSE, warning=FALSE}
 library(omopgenerics)
-library(CDMConnector)
+library(omock)
 library(PatientProfiles)
 library(dplyr)
 library(CohortConstructor)
@@ -53,9 +58,7 @@ library(CohortCharacteristics)
 ```
 
 ```{r, message=TRUE, warning=FALSE}
-con <- DBI::dbConnect(duckdb::duckdb(), dbdir = eunomiaDir())
-cdm <- cdmFromCon(con, cdmSchema = "main", 
-                    writeSchema = c(prefix = "my_study_", schema = "main"))
+cdm <- mockCdmFromDataset(datasetName = "GiBleed", source = "duckdb")
 cdm
 ```
 

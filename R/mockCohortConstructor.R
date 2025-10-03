@@ -99,12 +99,8 @@ mockCohortConstructor <- function(nPerson = 10,
 
 
   if (!is.null(con)) {
-    cdm <- CDMConnector::copyCdmTo(
-      con = con,
-      cdm = cdm,
-      schema = writeSchema,
-      overwrite = TRUE
-    )
+    src <- CDMConnector::dbSource(con = con, writeSchema = writeSchema)
+    cdm <- omopgenerics::insertCdmTo(cdm = cdm, to = src)
   }
 
   return(cdm)

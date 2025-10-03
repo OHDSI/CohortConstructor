@@ -20,9 +20,7 @@ knitr::opts_chunk$set(
 In this vignette we'll show how requirements related to the data contained in the cohort table can be applied. For this we'll use the Eunomia synthetic data.
 
 ```{r}
-library(DBI)
-library(duckdb)
-library(CDMConnector)
+library(omock)
 library(CodelistGenerator)
 library(CohortConstructor)
 library(CohortCharacteristics)
@@ -30,18 +28,8 @@ library(ggplot2)
 library(dplyr)
 ```
 
-```{r, include = FALSE}
-if (Sys.getenv("EUNOMIA_DATA_FOLDER") == ""){
-  Sys.setenv("EUNOMIA_DATA_FOLDER" = file.path(tempdir(), "eunomia"))}
-if (!dir.exists(Sys.getenv("EUNOMIA_DATA_FOLDER"))){ dir.create(Sys.getenv("EUNOMIA_DATA_FOLDER"))
-  downloadEunomiaData()  
-}
-```
-
 ```{r}
-con <- dbConnect(duckdb(), dbdir = eunomiaDir())
-cdm <- cdmFromCon(con, cdmSchema = "main", 
-                    writeSchema = "main", writePrefix = "my_study_")
+cdm <- mockCdmFromDataset(datasetName = "GiBleed", source = "duckdb")
 ```
 
 Let's start by creating a cohort of acetaminophen users. Individuals will have a cohort entry for each drug exposure record they have for acetaminophen with cohort exit based on their drug record end date. Note when creating the cohort, any overlapping records will be concatenated.
