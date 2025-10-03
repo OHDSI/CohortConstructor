@@ -163,102 +163,37 @@ trimDuration <- function(cohort,
   IdFilter <- needsIdFilter(cohort, cohortId)
 
   # we consider same day entry and exit to count as one day
-  startDaysInCohort <- daysInCohort
-  daysInCohort[1] <- daysInCohort[1] - 1L
-  if (!is.infinite(daysInCohort[2])) {
-    daysInCohort[2] <- daysInCohort[2] - 1L
+  if (daysInCohort[1] > 1) {
+    daysStart <- daysInCohort[1] - 1L
+    qs <- "as.Date(clock::add_days(x = .data$cohort_start_date, n = .env$daysStart))"
+    if (isTRUE(IdFilter)) {
+      qs <- paste0("dplyr::if_else(.data$cohort_definition_id %in% .env$cohortId, ", qs, ", .data$cohort_start_date)")
+    }
+    qs <- rlang::set_names(x = qs, nm = "cohort_start_date")
+  } else {
+    qs <- character()
   }
 
-  # only needs lower mutate
-  if(daysInCohort[1] > 0 && is.infinite(daysInCohort[2])){
-    if(isTRUE(IdFilter)){
-      cohort <- cohort |>
-        dplyr::mutate(cohort_start_date = dplyr::if_else(
-          .data$cohort_definition_id %in% .env$cohortId,
-          as.Date(clock::add_days(
-            x = .data$cohort_start_date,
-            n = !!daysInCohort[1])
-          ),
-          .data$cohort_start_date
-        ))
-    } else {
-      cohort <- cohort |>
-        dplyr::mutate(cohort_start_date = as.Date(clock::add_days(
-          x = .data$cohort_start_date,
-          n = !!daysInCohort[1]
-        )))
+  if (!is.infinite(daysInCohort[2])) {
+    daysEnd <- daysInCohort[2] - 1L
+    qe <- "pmin(.data$cohort_end_date, as.Date(clock::add_days(x = .data$cohort_start_date, n = .env$daysEnd)), na.rm = TRUE)"
+    if (isTRUE(IdFilter)) {
+      qe <- paste0("dplyr::if_else(.data$cohort_definition_id %in% .env$cohortId, ", qe, ", .data$cohort_end_date)")
     }
+    qe <- rlang::set_names(x = qe, nm = "cohort_end_date")
+  } else {
+    qe <- character()
   }
-  # only needs upper mutate
-  if (daysInCohort[1] == 0 && !is.infinite(daysInCohort[2])) {
-    if(isTRUE(IdFilter)){
-      cohort <- cohort |>
-        dplyr::mutate(!!newCol :=  as.Date(clock::add_days(
-          x = .data$cohort_start_date,
-          n = !!daysInCohort[2]
-        ))) |>
-        dplyr::mutate(cohort_end_date = dplyr::if_else(
-          (.data[[newCol]] < .data$cohort_end_date &
-             .data$cohort_definition_id %in% .env$cohortId),
-          .data[[newCol]], .data$cohort_end_date
-        ))
-    } else {
-      cohort <- cohort |>
-        dplyr::mutate(!!newCol :=  as.Date(clock::add_days(
-          x = .data$cohort_start_date,
-          n = !!daysInCohort[2]
-        ))) |>
-        dplyr::mutate(cohort_end_date = dplyr::if_else(
-          .data[[newCol]] < .data$cohort_end_date,
-          .data[[newCol]], .data$cohort_end_date
-        ))
-    }
-  }
-  # needs lower and upper
-  if (daysInCohort[1] > 0 && !is.infinite(daysInCohort[2])) {
-    if(isTRUE(IdFilter)){
-      cohort <- cohort |>
-        dplyr::mutate(
-          cohort_start_date = dplyr::if_else(
-            .data$cohort_definition_id %in% !!cohortId,
-            as.Date(clock::add_days(x = .data$cohort_start_date, n = !!daysInCohort[1])),
-            .data$cohort_start_date
-          ),
-          !!newCol := dplyr::if_else(
-            .data$cohort_definition_id %in% .env$cohortId,
-            as.Date(clock::add_days(x = .data$cohort_start_date, n = !!daysInCohort[2])),
-            .data$cohort_end_date
-          )
-        )|>
-        dplyr::mutate(cohort_end_date = dplyr::if_else(
-          .data[[newCol]] < .data$cohort_end_date,
-          .data[[newCol]], .data$cohort_end_date
-        ))
-    } else {
-      cohort <- cohort |>
-        dplyr::mutate(
-          cohort_start_date =  as.Date(clock::add_days(
-            x = .data$cohort_start_date,
-            n = !!daysInCohort[1]
-          )),
-          !!newCol :=  as.Date(clock::add_days(
-            x = .data$cohort_start_date,
-            n = !!daysInCohort[2]
-          ))
-        ) |>
-        dplyr::mutate(cohort_end_date = dplyr::if_else(
-          .data[[newCol]] < .data$cohort_end_date,
-          .data[[newCol]], .data$cohort_end_date
-        ))
-    }
-  }
+
+  q <- c(qe, qs) |>
+    rlang::parse_exprs()
 
   cohort <- cohort |>
-    dplyr::select(!dplyr::any_of(newCol)) |>
+    dplyr::mutate(!!!q) |>
     dplyr::filter(.data$cohort_start_date <= .data$cohort_end_date) |>
     dplyr::compute(name = name, logPrefix = "CohortConstructor_trimDuration_") |>
     omopgenerics::recordCohortAttrition(
-      reason = "Trim records to {startDaysInCohort[1]} to {startDaysInCohort[2]} days following entry",
+      reason = "Trim records to {daysInCohort[1]} to {daysInCohort[2]} days following entry",
       cohortId = cohortId
     )
 

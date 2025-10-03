@@ -1,9 +1,7 @@
 
 # check if we will need to filter based on cohort ID
 needsIdFilter <- function(cohort, cohortId){
-  !identical(omopgenerics::cohortCount(cohort) |>
-             dplyr::pull("cohort_definition_id"),
-             cohortId)
+  !identical(omopgenerics::settings(cohort)$cohort_definition_id, cohortId)
 }
 
 filterCohortInternal <- function(cdm, cohort, cohortId, tmpNewCohort, tmpUnchanged) {
