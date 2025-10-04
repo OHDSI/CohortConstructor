@@ -90,7 +90,58 @@
 <div class="section level2">
 <h2 id="tested-sources">Tested sources<a class="anchor" aria-label="anchor" href="#tested-sources"></a>
 </h2>
-<p><a href="https://github.com/OHDSI/CohortConstructor/actions/workflows/test-local-omopgenerics.yaml" class="external-link"><img src="https://github.com/OHDSI/CohortConstructor/actions/workflows/test-local-omopgenerics.yaml/badge.svg?branch=main"></a> <a href="https://github.com/OHDSI/CohortConstructor/actions/workflows/test-duckdb-CDMConnector.yaml" class="external-link"><img src="https://github.com/OHDSI/CohortConstructor/actions/workflows/test-duckdb-CDMConnector.yaml/badge.svg?branch=main"></a></p>
+<table class="table">
+<colgroup>
+<col width="25%">
+<col width="25%">
+<col width="25%">
+<col width="25%">
+</colgroup>
+<thead><tr class="header">
+<th>Source</th>
+<th>Driver</th>
+<th>CDM reference</th>
+<th>Status</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>Local R dataframe</td>
+<td>N/A</td>
+<td><code><a href="https://darwin-eu.github.io/omopgenerics/reference/cdmFromTables.html" class="external-link">omopgenerics::cdmFromTables()</a></code></td>
+<td><a href="https://github.com/OHDSI/CohortConstructor/actions/workflows/test-local-omopgenerics.yaml" class="external-link"><img src="https://github.com/OHDSI/CohortConstructor/actions/workflows/test-local-omopgenerics.yaml/badge.svg?branch=main"></a></td>
+</tr>
+<tr class="even">
+<td>In-memory duckdb datatabase</td>
+<td>duckdb</td>
+<td><code><a href="https://darwin-eu.github.io/CDMConnector/reference/cdmFromCon.html" class="external-link">CDMConnector::cdmFromCon()</a></code></td>
+<td><a href="https://github.com/OHDSI/CohortConstructor/actions/workflows/test-duckdb-CDMConnector.yaml" class="external-link"><img src="https://github.com/OHDSI/CohortConstructor/actions/workflows/test-duckdb-CDMConnector.yaml/badge.svg?branch=main"></a></td>
+</tr>
+<tr class="odd">
+<td>Postgres database</td>
+<td>RPostgres</td>
+<td><code><a href="https://darwin-eu.github.io/CDMConnector/reference/cdmFromCon.html" class="external-link">CDMConnector::cdmFromCon()</a></code></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Postgres database</td>
+<td>DatabaseConnector</td>
+<td><code><a href="https://darwin-eu.github.io/CDMConnector/reference/cdmFromCon.html" class="external-link">CDMConnector::cdmFromCon()</a></code></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>SQL Server database</td>
+<td>odbc</td>
+<td><code><a href="https://darwin-eu.github.io/CDMConnector/reference/cdmFromCon.html" class="external-link">CDMConnector::cdmFromCon()</a></code></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>SQL Server database</td>
+<td>DatabaseConnector</td>
+<td><code><a href="https://darwin-eu.github.io/CDMConnector/reference/cdmFromCon.html" class="external-link">CDMConnector::cdmFromCon()</a></code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -168,7 +219,14 @@
 <code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span> <span class="op">&lt;-</span> <span class="va">cdm</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="reference/conceptCohort.html">conceptCohort</a></span><span class="op">(</span>conceptSet <span class="op">=</span> <span class="va">fx_codes</span>, </span>
 <span>                exit <span class="op">=</span> <span class="st">"event_start_date"</span>, </span>
-<span>                name <span class="op">=</span> <span class="st">"fractures"</span><span class="op">)</span></span></code></pre></div>
+<span>                name <span class="op">=</span> <span class="st">"fractures"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: There was 1 warning in `dplyr::mutate()`.</span></span>
+<span><span class="co">#&gt; ℹ In argument: `vocabulary_version = CodelistGenerator::getVocabVersion(cdm)`.</span></span>
+<span><span class="co">#&gt; Caused by warning:</span></span>
+<span><span class="co">#&gt; ! The `cdm` argument of `vocabularyVersion()` is deprecated as of</span></span>
+<span><span class="co">#&gt;   CodelistGenerator 4.0.0.</span></span>
+<span><span class="co">#&gt; ℹ The deprecated feature was likely used in the CohortConstructor package.</span></span>
+<span><span class="co">#&gt;   Please report the issue to the authors.</span></span></code></pre></div>
 <p>After creating our initial cohort we will update it so that exit is set at up to 180 days after start (so long as individuals’ observation end date is on or after this - if not, exit will be at observation period end).</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span> <span class="op">&lt;-</span> <span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span> <span class="op">|&gt;</span> </span>
