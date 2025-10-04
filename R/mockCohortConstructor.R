@@ -33,6 +33,13 @@ mockCohortConstructor <- function(source = "local") {
     omock::mockCohort(name = "cohort1") |>
     omock::mockCohort(name = "cohort2", numberCohorts = 2)
 
+  cdm$cohort1 <- cdm$cohort1 |>
+    dplyr::group_by(.data$subject_id, .data$cohort_definition_id) |>
+    dplyr::filter(.data$cohort_start_date == min(.data$cohort_start_date, na.rm = TRUE)) |>
+    dplyr::ungroup() |>
+    dplyr::compute(name = "cohort1") |>
+    omopgenerics::newCohortTable(cohortAttritionRef = NULL, .softValidation = TRUE)
+
   if (source == "duckdb") {
     rlang::check_installed("duckdb")
     rlang::check_installed("CDMConnector")

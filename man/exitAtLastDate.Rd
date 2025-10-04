@@ -52,6 +52,8 @@ column dates. The last date that occurs is chosen.
 library(CohortConstructor)
 library(PatientProfiles)
 
+cdm <- mockCohortConstructor()
+
 cdm$cohort1 <- cdm$cohort1 |>
   addTableIntersectDate(tableName = "observation", nameStyle = "next_obs", order = "first") |>
   addFutureObservation(futureObservationType = "date", name = "cohort1")
