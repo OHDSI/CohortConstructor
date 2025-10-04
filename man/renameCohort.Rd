@@ -26,7 +26,7 @@ Utility function to change the name of a cohort.
 \donttest{
 library(CohortConstructor)
 
-cdm <- mockCohortConstructor(nPerson = 100)
+cdm <- mockCohortConstructor()
 
 settings(cdm$cohort1)
 
