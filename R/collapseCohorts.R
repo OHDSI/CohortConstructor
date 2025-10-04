@@ -20,7 +20,7 @@ collapseCohorts <- function(cohort,
                             name = tableName(cohort),
                             .softValidation = FALSE) {
   # input validation
-  cohort <- omopgenerics::validateCohortArgument(cohort, dropExtraColumns = TRUE)
+  cohort <- omopgenerics::validateCohortArgument(cohort, dropExtraColumns = FALSE)
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
@@ -40,8 +40,7 @@ collapseCohorts <- function(cohort,
   tmpNewCohort <- omopgenerics::uniqueTableName(tablePrefix)
   tmpUnchanged <- omopgenerics::uniqueTableName(tablePrefix)
   cdm <- filterCohortInternal(cdm, cohort, cohortId, tmpNewCohort, tmpUnchanged)
-  newCohort <- cdm[[tmpNewCohort]] |>
-    dplyr::select(dplyr::all_of(omopgenerics::cohortColumns("cohort")))
+  newCohort <- cdm[[tmpNewCohort]]
 
   if (gap == Inf) {
     newCohort <- newCohort |>
