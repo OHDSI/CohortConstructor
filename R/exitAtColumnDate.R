@@ -18,17 +18,16 @@
 #' @examples
 #' \donttest{
 #' library(CohortConstructor)
-#' cdm <- mockCohortConstructor(tables = list(
-#' "cohort" = dplyr::tibble(
-#'   cohort_definition_id = 1,
-#'   subject_id = c(1, 2, 3, 4),
-#'   cohort_start_date = as.Date(c("2000-06-03", "2000-01-01", "2015-01-15", "2000-12-09")),
-#'   cohort_end_date = as.Date(c("2001-09-01", "2001-01-12", "2015-02-15", "2002-12-09")),
-#'   date_1 = as.Date(c("2001-08-01", "2001-01-01", "2015-01-15", "2002-12-09")),
-#'   date_2 = as.Date(c("2001-08-01", NA, "2015-04-15", "2002-12-09"))
-#' )
-#' ))
-#' cdm$cohort |> exitAtFirstDate(dateColumns = c("date_1", "date_2"))
+#' library(PatientProfiles)
+#'
+#' cdm <- mockCohortConstructor()
+#'
+#' cdm$cohort1 <- cdm$cohort1 |>
+#'   addTableIntersectDate(tableName = "observation", nameStyle = "next_obs", order = "first") |>
+#'   addFutureObservation(futureObservationType = "date", name = "cohort1")
+#'
+#' cdm$cohort1 |>
+#'   exitAtFirstDate(dateColumns = c("next_obs", "future_observation"))
 #' }
 exitAtFirstDate <- function(cohort,
                             dateColumns,
@@ -71,17 +70,16 @@ exitAtFirstDate <- function(cohort,
 #' @examples
 #' \donttest{
 #' library(CohortConstructor)
-#' cdm <- mockCohortConstructor(tables = list(
-#' "cohort" = dplyr::tibble(
-#'   cohort_definition_id = 1,
-#'   subject_id = c(1, 2, 3, 4),
-#'   cohort_start_date = as.Date(c("2000-06-03", "2000-01-01", "2015-01-15", "2000-12-09")),
-#'   cohort_end_date = as.Date(c("2001-09-01", "2001-01-12", "2015-02-15", "2002-12-09")),
-#'   date_1 = as.Date(c("2001-08-01", "2001-01-01", "2015-01-15", "2002-12-09")),
-#'   date_2 = as.Date(c("2001-08-01", NA, "2015-04-15", "2002-12-09"))
-#' )
-#' ))
-#' cdm$cohort |> exitAtLastDate(dateColumns = c("date_1", "date_2"))
+#' library(PatientProfiles)
+#'
+#' cdm <- mockCohortConstructor()
+#'
+#' cdm$cohort1 <- cdm$cohort1 |>
+#'   addTableIntersectDate(tableName = "observation", nameStyle = "next_obs", order = "first") |>
+#'   addFutureObservation(futureObservationType = "date", name = "cohort1")
+#'
+#' cdm$cohort1 |>
+#'   exitAtLastDate(dateColumns = c("next_obs", "future_observation"))
 #' }
 exitAtLastDate <- function(cohort,
                            dateColumns,

@@ -41,7 +41,8 @@ for the specified amount of days
 \donttest{
 library(CohortConstructor)
 
-cdm <- mockCohortConstructor(nPerson = 100)
+cdm <- mockCohortConstructor()
+
 cdm$cohort1 |>
   requireDuration(daysInCohort = c(2, Inf))
 }

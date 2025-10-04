@@ -43,9 +43,11 @@ that overlap combined and kept. Cohort entries are when an individual was in
 \donttest{
 library(CohortConstructor)
 
-cdm <- mockCohortConstructor(nPerson = 100)
+cdm <- mockCohortConstructor()
 
-cdm$cohort2 <- cdm$cohort2 |> unionCohorts()
+cdm$cohort2 <- cdm$cohort2 |>
+  unionCohorts()
+
 settings(cdm$cohort2)
 
 }

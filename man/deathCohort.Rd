@@ -29,7 +29,7 @@ Create cohort based on the death table
 \donttest{
 library(CohortConstructor)
 
-cdm <- mockCohortConstructor(death = TRUE)
+cdm <- mockCohortConstructor()
 
 # Generate a death cohort
 death_cohort <- deathCohort(cdm, name = "death_cohort")

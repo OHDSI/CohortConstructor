@@ -24,7 +24,8 @@
 #' \donttest{
 #' library(CohortConstructor)
 #'
-#' cdm <- mockCohortConstructor(nPerson = 100)
+#' cdm <- mockCohortConstructor()
+#'
 #' cdm$cohort1 |>
 #'   requireDuration(daysInCohort = c(2, Inf))
 #' }
@@ -143,7 +144,8 @@ requireDuration <- function(cohort,
 #' \donttest{
 #' library(CohortConstructor)
 #'
-#' cdm <- mockCohortConstructor(nPerson = 100)
+#' cdm <- mockCohortConstructor()
+#'
 #' cdm$cohort1 |>
 #'   requireDuration(daysInCohort = c(2, Inf))
 #' }

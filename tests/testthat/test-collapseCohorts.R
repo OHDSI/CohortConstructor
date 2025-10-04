@@ -255,3 +255,64 @@ test_that("multiple observation periods", {
 
   dropCreatedTables(cdm = cdm)
 })
+
+test_that("overlapping input cohort", {
+  skip_on_cran()
+  cdm <- omock::mockCdmFromTables(tables = list(
+    observation_period = dplyr::tibble(
+      "observation_period_id" = c(1L, 2L, 3L),
+      "person_id" = c(1L, 2L, 3L),
+      "observation_period_start_date" = as.Date("2000-01-01"),
+      "observation_period_end_date" = as.Date("2024-01-01"),
+      "period_type_concept_id" = 1L
+    ))) |>
+    copyCdm()
+
+  # overlap should still work if input cohort has overlaps
+  cdm <- omopgenerics::insertTable(
+    cdm = cdm,
+    name = "cohort",
+    table = dplyr::tibble(
+      "cohort_definition_id" = 1L,
+      "subject_id" = c(1L, 1L, 2L, 3L),
+      "cohort_start_date" = as.Date(c(
+        "2020-01-01", "2020-01-08", "2021-01-01", "2022-01-01"
+      )),
+      "cohort_end_date" = as.Date(c(
+        "2020-01-10", "2020-01-15", "2021-01-01", "2022-01-01"
+      ))
+    ))
+  cdm$cohort <- omopgenerics::newCohortTable(cdm$cohort, .softValidation = TRUE)
+
+  expect_no_error(cdm$collapsed_cohort <- cdm$cohort |>
+                    collapseCohorts(gap = 0,
+                                    name = "collapsed_cohort"))
+  expect_true(cdm$collapsed_cohort |>
+    dplyr::filter(subject_id == 1) |>
+    dplyr::pull(cohort_start_date) == "2020-01-01")
+  expect_true(cdm$collapsed_cohort |>
+    dplyr::filter(subject_id == 1) |>
+    dplyr::pull(cohort_end_date) == "2020-01-15")
+
+  expect_no_error(cdm$collapsed_cohort <- cdm$cohort |>
+                    collapseCohorts(gap = 1,
+                                    name = "collapsed_cohort"))
+  expect_true(cdm$collapsed_cohort |>
+                dplyr::filter(subject_id == 1) |>
+                dplyr::pull(cohort_start_date) == "2020-01-01")
+  expect_true(cdm$collapsed_cohort |>
+                dplyr::filter(subject_id == 1) |>
+                dplyr::pull(cohort_end_date) == "2020-01-15")
+
+  expect_no_error(cdm$collapsed_cohort <- cdm$cohort |>
+                    collapseCohorts(gap = Inf,
+                                    name = "collapsed_cohort"))
+  expect_true(cdm$collapsed_cohort |>
+                dplyr::filter(subject_id == 1) |>
+                dplyr::pull(cohort_start_date) == "2020-01-01")
+  expect_true(cdm$collapsed_cohort |>
+                dplyr::filter(subject_id == 1) |>
+                dplyr::pull(cohort_end_date) == "2020-01-15")
+
+ dropCreatedTables(cdm = cdm)
+})

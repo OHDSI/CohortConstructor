@@ -23,12 +23,9 @@
 #' \donttest{
 #' library(CohortConstructor)
 #'
-#' cdm <- mockCohortConstructor(nPerson = 100)
+#' cdm <- mockCohortConstructor()
 #'
-#' cdm$cohort3 <- intersectCohorts(
-#'   cohort = cdm$cohort2,
-#'   name = "cohort3",
-#' )
+#' cdm$cohort3 <- intersectCohorts(cohort = cdm$cohort2, name = "cohort3")
 #'
 #' settings(cdm$cohort3)
 #'

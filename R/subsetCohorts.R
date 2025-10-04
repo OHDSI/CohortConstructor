@@ -16,9 +16,10 @@
 #' \donttest{
 #' library(CohortConstructor)
 #'
-#' cdm <- mockCohortConstructor(nPerson = 100)
+#' cdm <- mockCohortConstructor()
 #'
-#' cdm$cohort1 |> subsetCohorts(cohortId = 1)
+#' cdm$cohort1 |>
+#'   subsetCohorts(cohortId = 1)
 #' }
 subsetCohorts <- function(cohort,
                           cohortId,

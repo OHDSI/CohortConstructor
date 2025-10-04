@@ -16,9 +16,10 @@
 #' \donttest{
 #' library(CohortConstructor)
 #'
-#' cdm <- mockCohortConstructor(nPerson = 100)
+#' cdm <- mockCohortConstructor()
 #'
-#' cdm$cohort1 |> trimDemographics(ageRange = list(c(10, 30)))
+#' cdm$cohort1 |>
+#'   trimDemographics(ageRange = list(c(10, 30)))
 #' }
 trimDemographics <- function(cohort,
                              cohortId = NULL,
