@@ -255,4 +255,3 @@ test_that("multiple observation periods", {
 
   dropCreatedTables(cdm = cdm)
 })
-
