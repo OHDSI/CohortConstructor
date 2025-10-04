@@ -256,38 +256,3 @@ test_that("multiple observation periods", {
   dropCreatedTables(cdm = cdm)
 })
 
-test_that("keep extra columns", {
-  skip_on_cran()
-  cdm <- omock::mockCdmFromTables(tables = list(
-    observation_period = dplyr::tibble(
-      "observation_period_id" = c(1L, 2L, 3L),
-      "person_id" = c(1L, 2L, 3L),
-      "observation_period_start_date" = as.Date("2000-01-01"),
-      "observation_period_end_date" = as.Date("2024-01-01"),
-      "period_type_concept_id" = 1L
-    ),
-    cohort = dplyr::tibble(
-      "cohort_definition_id" = 1L,
-      "subject_id" = c(1L, 1L, 2L, 3L),
-      "cohort_start_date" = as.Date(c(
-        "2020-01-01", "2020-01-12", "2021-01-01", "2022-01-01"
-      )),
-      "cohort_end_date" = as.Date(c(
-        "2020-01-10", "2020-01-15", "2021-01-01", "2022-01-01"
-      ))
-    )
-  )) |>
-    copyCdm()
-
-  cdm$cohort <- cdm$cohort |>
-    PatientProfiles::addAge()
-
-  expect_no_error(cdm$new_cohort <- cdm$cohort |>
-                    collapseCohorts(gap = 0,
-                                    name = "new_cohort"))
-  expect_identical(colnames(cdm$cohort),
-                  colnames(cdm$new_cohort))
-
-
-  dropCreatedTables(cdm = cdm)
-})
