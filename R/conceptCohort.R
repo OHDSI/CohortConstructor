@@ -520,12 +520,20 @@ fulfillCohortReqs <- function(cdm, name, useRecordsBeforeObservation, type = "st
 }
 
 
+vocabVersion <- function(cdm) {
+  as.character(cdm$vocabulary |>
+                          dplyr::rename_with(tolower) |>
+                          dplyr::filter(.data$vocabulary_id == "None") |>
+                          dplyr::select("vocabulary_version") |>
+                          dplyr::collect())
+}
+
 conceptSetToCohortSet <- function(conceptSet, cdm) {
   cohSet <- dplyr::tibble("cohort_name" = names(conceptSet)) |>
     dplyr::mutate(
       "cohort_definition_id" = as.integer(dplyr::row_number()),
       "cdm_version" = attr(cdm, "cdm_version"),
-      "vocabulary_version" = CodelistGenerator::getVocabVersion(cdm)
+      "vocabulary_version" = vocabVersion(cdm)
     )
   if (length(conceptSet) == 0) {
     cohSet <- cohSet |>
