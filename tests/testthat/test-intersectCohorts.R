@@ -501,12 +501,12 @@ test_that("codelist", {
         period_type_concept_id = 0L
       ),
       drug_exposure = dplyr::tibble(
-        "drug_exposure_id" = 1:17,
-        "person_id" = c(1, 1, 1, 1, 2, 2, 3, 1, 1, 1, 1, 3, 3, 1, 2, 3, 3),
-        "drug_concept_id" = c(1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 2, 3, 3, 3, 3),
+        "drug_exposure_id" = 1:17L,
+        "person_id" = c(1, 1, 1, 1, 2, 2, 3, 1, 1, 1, 1, 3, 3, 1, 2, 3, 3) |> as.integer(),
+        "drug_concept_id" = c(1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 2, 3, 3, 3, 3) |> as.integer(),
         "drug_exposure_start_date" = c(0, 300, 1500, 750, 10, 800, 150, 1800, 1801, 1802, 1803, 430, -10, 100, 123, -10, 1000),
         "drug_exposure_end_date" = c(400, 800, 1600, 1550, 2000, 1000, 600, 1801, 1802, 1803, 1804, 400, -100, NA, 190, 123, 1500),
-        "drug_type_concept_id" = 1
+        "drug_type_concept_id" = 1L
       ) |>
         dplyr::mutate(
           "drug_exposure_start_date" = as.Date(.data$drug_exposure_start_date, origin = "2010-01-01"),
@@ -516,7 +516,7 @@ test_that("codelist", {
     cdmName = "mock"
   ) |>
     omock::mockVocabularyTables(concept = dplyr::tibble(
-      "concept_id" = c(1, 2, 3),
+      "concept_id" = c(1L, 2L, 3L),
       "concept_name" = c("my concept 1", "my concept 2", "my concept 3"),
       "domain_id" = "Drug",
       "vocabulary_id" = NA_character_,
@@ -534,14 +534,14 @@ test_that("codelist", {
   cdm$cohort2 <- intersectCohorts(cdm$cohort1, name = "cohort2")
   expect_true(all(
     cdm$cohort2 |> dplyr::pull("cohort_start_date") |> sort() ==
-      c("2012-01-21", "2014-02-09")
+      c("2009-12-22", "2011-03-07", "2012-01-21", "2014-02-09")
   ))
   expect_true(all(
     cdm$cohort2 |> dplyr::pull("cohort_end_date") |> sort() ==
-      c("2012-03-11", "2014-03-31")
+      c("2009-12-22", "2011-03-07", "2012-03-11", "2014-03-31")
   ))
   expect_true(all(
-    cdm$cohort2 |> dplyr::pull("subject_id") |> sort() == c(1, 1)
+    cdm$cohort2 |> dplyr::pull("subject_id") |> sort() == c(1, 1, 3, 3)
   ))
   codes <- attr(cdm$cohort2, "cohort_codelist")
   expect_true(all(codes |> dplyr::pull("codelist_name") |> sort() == c(rep("c1", 2), "c2")))
@@ -554,16 +554,14 @@ test_that("codelist", {
   expect_identical(collectCohort(cdm$cohort3, 1), collectCohort(cdm$cohort2, 1))
   expect_true(all(
     cdm$cohort3 |> dplyr::pull("cohort_start_date") |> sort() ==
-      c('2009-12-22', '2010-01-01', '2010-01-11', '2010-05-31', '2012-01-21',
-        '2012-03-12', '2012-09-27', '2014-02-09', '2014-04-01', '2014-12-06')
+      c('2009-12-22', '2009-12-23', '2010-01-01', '2010-01-11', '2010-05-31', '2011-03-07', '2011-03-08', '2012-01-21', '2012-03-12', '2012-09-27', '2014-02-09', '2014-04-01', '2014-12-06')
   ))
   expect_true(all(
     cdm$cohort3 |> dplyr::pull("cohort_end_date") |> sort() ==
-      c('2010-05-04', '2011-08-24', '2012-01-20', '2012-03-11', '2014-02-08',
-        '2014-02-09', '2014-03-31', '2014-05-20', '2014-12-10', '2015-06-24')
+      c('2009-12-22', '2010-05-04', '2011-03-06', '2011-03-07', '2011-08-24', '2012-01-20', '2012-03-11', '2014-02-08', '2014-02-09', '2014-03-31', '2014-05-20', '2014-12-10', '2015-06-24')
   ))
   expect_true(all(
-    cdm$cohort3 |> dplyr::pull("subject_id") |> sort() == c(1, 1, 1, 1, 1, 1, 2, 3, 3, 3)
+    cdm$cohort3 |> dplyr::pull("subject_id") |> sort() == c(1, 1, 1, 1, 1, 1, 2, 3, 3, 3, 3, 3, 3)
   ))
   codes <- attr(cdm$cohort3, "cohort_codelist")
   expect_true(all(codes |> dplyr::pull("codelist_name") |> sort() == c(rep("c1", 4), rep("c2", 2))))
@@ -575,14 +573,14 @@ test_that("codelist", {
   cdm$cohort4 <- intersectCohorts(cdm$cohort1, keepOriginalCohorts = FALSE, name = "cohort4")
   expect_true(all(
     cdm$cohort4 |> dplyr::pull("cohort_start_date") |> sort() ==
-      c("2012-01-21", "2014-02-09")
+      c("2009-12-22", "2011-03-07", "2012-01-21", "2014-02-09")
   ))
   expect_true(all(
     cdm$cohort4 |> dplyr::pull("cohort_end_date") |> sort() ==
-      c("2012-03-11", "2014-03-31")
+      c("2009-12-22", "2011-03-07", "2012-03-11", "2014-03-31")
   ))
   expect_true(all(
-    cdm$cohort4 |> dplyr::pull("subject_id") |> sort() == c(1, 1)
+    cdm$cohort4 |> dplyr::pull("subject_id") |> sort() == c(1, 1, 3, 3)
   ))
   codes <- attr(cdm$cohort4, "cohort_codelist")
   expect_true(all(codes |> dplyr::pull("codelist_name") |> sort() == c(rep("c1", 2), "c2")))

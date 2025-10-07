@@ -330,8 +330,8 @@ test_that("out of observation", {
   )
 
   obs <- dplyr::tibble(
-    observation_period_id = 1:4,
-    person_id = 1:4,
+    observation_period_id = 1:4L,
+    person_id = 1:4L,
     observation_period_start_date = as.Date(c("2000-06-03", "1999-04-05", "2015-01-15", "1989-12-09")),
     observation_period_end_date = as.Date(c("2013-06-29", "2003-06-15", "2015-10-11", "2013-12-31")),
     period_type_concept_id = NA_integer_
@@ -344,11 +344,11 @@ test_that("out of observation", {
       "concept_id" = c(1L, 2L),
       "concept_name" = c("my concept 1", "my concept 2"),
       "domain_id" = "Drug",
-      "vocabulary_id" = NA,
-      "concept_class_id" = NA,
-      "concept_code" = NA,
-      "valid_start_date" = NA,
-      "valid_end_date" = NA
+      "vocabulary_id" = NA_character_,
+      "concept_class_id" = NA_character_,
+      "concept_code" = NA_character_,
+      "valid_start_date" = as.Date(NA),
+      "valid_end_date" = as.Date(NA)
     )) |>
     omopgenerics::insertTable(name = "drug_exposure", table = dplyr::tibble(
       "drug_exposure_id" = 1:13L,
@@ -374,19 +374,19 @@ test_that("out of observation", {
   # the first - same dates as drug exposure
   # the second - limit cohort end based on observation period end date
   expect_true(all(cdm$cohort1 |>
-                    dplyr::pull("subject_id") == 1))
-  expect_true(cdm$cohort1 |>
+                    dplyr::pull("subject_id") %in% c(1, 4)))
+  expect_true(all(cdm$cohort1 |>
                 dplyr::filter(cohort_definition_id == 1) |>
-                dplyr::pull("cohort_start_date") == "2010-01-01")
-  expect_true(cdm$cohort1 |>
-                dplyr::filter(cohort_definition_id == 1) |>
-                dplyr::pull("cohort_end_date") == "2012-03-11")
-  expect_true(cdm$cohort1 |>
-                dplyr::filter(cohort_definition_id == 2) |>
-                dplyr::pull("cohort_start_date") == "2012-01-21")
-  expect_true(cdm$cohort1 |>
-                dplyr::filter(cohort_definition_id == 2) |>
-                dplyr::pull("cohort_end_date") == "2013-06-29")
+                dplyr::pull("cohort_start_date") |> sort() == as.Date(c("2010-01-01", "2011-03-07"))))
+  expect_true(all(cdm$cohort1 |>
+                    dplyr::filter(cohort_definition_id == 1) |>
+                    dplyr::pull("cohort_end_date") |> sort() == as.Date(c("2011-03-07", "2012-03-11"))))
+  expect_true(all(cdm$cohort1 |>
+                    dplyr::filter(cohort_definition_id == 2) |>
+                    dplyr::pull("cohort_start_date") |> sort() == as.Date(c("2009-12-22", "2012-01-21"))))
+  expect_true(all(cdm$cohort1 |>
+                    dplyr::filter(cohort_definition_id == 2) |>
+                    dplyr::pull("cohort_end_date") |> sort() == as.Date(c("2009-12-22", "2013-06-29"))))
 
   expect_true(all(omopgenerics::settings(cdm$cohort1)$cohort_name == c("a", "b")))
   expect_true(cohortCodelist(cdm$cohort1, 1)$a == 1)
@@ -398,7 +398,7 @@ test_that("out of observation", {
   # event starts out, end in (subject 3)
   # no concept 2
   person <- dplyr::tibble(
-    person_id = 1:4,
+    person_id = 1:4L,
     gender_concept_id = c(8532L, 8507L, 8507L, 8507L),
     year_of_birth = c(1997L, 1963L, 1986L, 1978L),
     month_of_birth = c(8L, 1L, 3L, 11L),
@@ -408,8 +408,8 @@ test_that("out of observation", {
   )
 
   obs <- dplyr::tibble(
-    observation_period_id = 1:4,
-    person_id = 1:4,
+    observation_period_id = 1:4L,
+    person_id = 1:4L,
     observation_period_start_date = as.Date(c("2000-06-03", "1999-04-05", "2015-01-15", "1989-12-09")),
     observation_period_end_date = as.Date(c("2013-06-29", "2003-06-15", "2015-10-11", "2013-12-31")),
     period_type_concept_id = NA_integer_
@@ -422,11 +422,11 @@ test_that("out of observation", {
       "concept_id" = c(1L, 2L),
       "concept_name" = c("my concept 1", "my concept 2"),
       "domain_id" = "Drug",
-      "vocabulary_id" = NA,
-      "concept_class_id" = NA,
-      "concept_code" = NA,
-      "valid_start_date" = NA,
-      "valid_end_date" = NA
+      "vocabulary_id" = NA_character_,
+      "concept_class_id" = NA_character_,
+      "concept_code" = NA_character_,
+      "valid_start_date" = as.Date(NA),
+      "valid_end_date" = as.Date(NA)
     )) |>
     omopgenerics::insertTable(name = "drug_exposure", table = dplyr::tibble(
       "drug_exposure_id" = 1:4L,
@@ -481,11 +481,11 @@ test_that("out of observation", {
       "concept_id" = c(1L, 2L),
       "concept_name" = c("my concept 1", "my concept 2"),
       "domain_id" = "Drug",
-      "vocabulary_id" = NA,
-      "concept_class_id" = NA,
-      "concept_code" = NA,
-      "valid_start_date" = NA,
-      "valid_end_date" = NA
+      "vocabulary_id" = NA_character_,
+      "concept_class_id" = NA_character_,
+      "concept_code" = NA_character_,
+      "valid_start_date" = as.Date(NA),
+      "valid_end_date" = as.Date(NA)
     )) |>
     omopgenerics::insertTable(name = "drug_exposure", table = dplyr::tibble(
       "drug_exposure_id" = 1:6L,
@@ -502,17 +502,17 @@ test_that("out of observation", {
   expect_true(all(colnames(cdm$cohort3) ==
                     c("cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date")))
   expect_true(all(c("cohort_table", "cdm_table") %in% class(cdm$cohort3)))
-  expect_true(cdm$cohort3 |> dplyr::tally() |> dplyr::pull("n") == 0)
+  expect_true(cdm$cohort3 |> dplyr::tally() |> dplyr::pull("n") == 1)
   expect_true(cohortCodelist(cdm$cohort3, 1)$a == 1)
 
   # empty cohort
   cdm$cohort4 <- conceptCohort(cdm = cdm, conceptSet = list(a = 1L, b = 2L), name = "cohort4")
   expect_true(all(c("cohort_table", "cdm_table") %in% class(cdm$cohort4)))
-  expect_true(cdm$cohort4 |> dplyr::tally() |> dplyr::pull("n") == 1)
+  expect_true(cdm$cohort4 |> dplyr::tally() |> dplyr::pull("n") == 2)
   expect_true(cohortCodelist(cdm$cohort4, 1)$a == 1)
   expect_true(cohortCodelist(cdm$cohort4, 2)$b == 2)
-  expect_true(cdm$cohort4 |> dplyr::pull("subject_id") |> sort() == 4)
-  expect_true(cdm$cohort4 |> dplyr::pull("cohort_start_date") == "1999-01-01")
+  expect_true(all(cdm$cohort4 |> dplyr::pull("subject_id") |> sort() == c(1, 4)))
+  expect_true(all(cdm$cohort4 |> dplyr::pull("cohort_start_date") |> sort() == as.Date(c("1999-01-01", "2004-01-01"))))
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
 
@@ -555,11 +555,11 @@ test_that("overlap option", {
       "concept_id" = c(1L, 2L),
       "concept_name" = c("concept 1", "concept 2"),
       "domain_id" = "drug",
-      "vocabulary_id" = NA,
-      "concept_class_id" = NA,
-      "concept_code" = NA,
-      "valid_start_date" = NA,
-      "valid_end_date" = NA
+      "vocabulary_id" = NA_character_,
+      "concept_class_id" = NA_character_,
+      "concept_code" = NA_character_,
+      "valid_start_date" = as.Date(NA),
+      "valid_end_date" = as.Date(NA)
     )
   )
 
@@ -751,11 +751,11 @@ test_that("useRecordsBeforeObservation TRUE", {
       "concept_id" = 1L,
       "concept_name" = "concept 1",
       "domain_id" = "drug",
-      "vocabulary_id" = NA,
-      "concept_class_id" = NA,
-      "concept_code" = NA,
-      "valid_start_date" = NA,
-      "valid_end_date" = NA
+      "vocabulary_id" = NA_character_,
+      "concept_class_id" = NA_character_,
+      "concept_code" = NA_character_,
+      "valid_start_date" = as.Date(NA),
+      "valid_end_date" = as.Date(NA)
     )
   )
   # person 1 - 2 record in obs, 2 records out with one eding out and the other in aother observation period
@@ -772,7 +772,7 @@ test_that("useRecordsBeforeObservation TRUE", {
       "drug_exposure_end_date" = as.Date(c(
         "2000-10-02", "2001-08-03", "2000-03-01", "2000-11-01", "2001-02-01", "2001-02-01"
       )),
-      "drug_type_concept_id" = 1
+      "drug_type_concept_id" = 1L
     )
   )
 
@@ -810,11 +810,11 @@ test_that("useRecordsBeforeObservation TRUE", {
       "concept_id" = 1L,
       "concept_name" = "concept 1",
       "domain_id" = "drug",
-      "vocabulary_id" = NA,
-      "concept_class_id" = NA,
-      "concept_code" = NA,
-      "valid_start_date" = NA,
-      "valid_end_date" = NA
+      "vocabulary_id" = NA_character_,
+      "concept_class_id" = NA_character_,
+      "concept_code" = NA_character_,
+      "valid_start_date" = as.Date(NA),
+      "valid_end_date" = as.Date(NA)
     )
   )
   # 1st: start in one obs ends in another
@@ -835,7 +835,7 @@ test_that("useRecordsBeforeObservation TRUE", {
       "drug_exposure_end_date" = as.Date(c(
         "2000-11-01", "2001-08-03", "2001-12-12", "2002-11-01", "2003-02-01", "2004-02-01"
       )),
-      "drug_type_concept_id" = 1
+      "drug_type_concept_id" = 1L
     )
   ) |>
     copyCdm()
