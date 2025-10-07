@@ -467,27 +467,35 @@ fulfillCohortReqs <- function(cdm, name, useRecordsBeforeObservation, type = "st
       "cohort_start_date",
       "cohort_end_date"
     ) |>
-    dplyr::compute(temporary = FALSE, name = name,
-                   logPrefix = "CohortConstructor_fulfillCohortReqs_useRecordsBeforeObservation_") |>
+    dplyr::compute(
+      temporary = FALSE, name = name,
+      logPrefix = "CohortConstructor_fulfillCohortReqs_useRecordsBeforeObservation_"
+    ) |>
     omopgenerics::recordCohortAttrition(reason = "Record in observation")
+
+  cdm[[name]] <- cdm[[name]] |>
+    dplyr::filter(
+      !is.na(.data$cohort_start_date)
+    ) |>
+    dplyr::compute(
+      temporary = FALSE, name = name,
+      logPrefix = "CohortConstructor_fulfillCohortReqs_filterStart_"
+    ) |>
+    omopgenerics::recordCohortAttrition(reason = "Not missing record date")
 
   if (type == "start_end") {
     cdm[[name]] <- cdm[[name]] |>
-      dplyr::filter(
-        !is.na(.data$cohort_start_date),
-        .data$cohort_start_date <= .data$cohort_end_date
+      dplyr::mutate(
+        cohort_end_date = dplyr::if_else(
+          .data$cohort_start_date <= .data$cohort_end_date,
+          .data$cohort_end_date,
+          .data$cohort_start_date
+        )
       ) |>
-      dplyr::compute(temporary = FALSE, name = name,
-                     logPrefix = "CohortConstructor_fulfillCohortReqs_filterStartEnd_") |>
-      omopgenerics::recordCohortAttrition(reason = "Record start <= record end")
-  } else if (type == "start") {
-    cdm[[name]] <- cdm[[name]] |>
-      dplyr::filter(
-        !is.na(.data$cohort_start_date)
-      ) |>
-      dplyr::compute(temporary = FALSE, name = name,
-                     logPrefix = "CohortConstructor_fulfillCohortReqs_filterStart_") |>
-      omopgenerics::recordCohortAttrition(reason = "Not missing record date")
+      dplyr::compute(
+        temporary = FALSE, name = name,
+        logPrefix = "CohortConstructor_fulfillCohortReqs_filterStartEnd_"
+      )
   }
 
   # remove missing sex or date of birth
@@ -522,10 +530,10 @@ fulfillCohortReqs <- function(cdm, name, useRecordsBeforeObservation, type = "st
 
 vocabVersion <- function(cdm) {
   as.character(cdm$vocabulary |>
-                          dplyr::rename_with(tolower) |>
-                          dplyr::filter(.data$vocabulary_id == "None") |>
-                          dplyr::select("vocabulary_version") |>
-                          dplyr::collect())
+                 dplyr::rename_with(tolower) |>
+                 dplyr::filter(.data$vocabulary_id == "None") |>
+                 dplyr::select("vocabulary_version") |>
+                 dplyr::collect())
 }
 
 conceptSetToCohortSet <- function(conceptSet, cdm) {

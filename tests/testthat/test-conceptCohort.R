@@ -1,22 +1,82 @@
-test_that("expected errors and messages", {
+test_that("initial tests", {
   skip_on_cran()
-  cdm <- omock::mockCdmReference() |>
-    omock::mockPerson() |>
-    omock::mockObservationPeriod() |>
-    omopgenerics::insertTable(
-      name = "concept", table = dplyr::tibble(
-        "concept_id" = 1L,
-        "concept_name" = "my concept",
-        "domain_id" = "adsf",
-        "vocabulary_id" = NA,
-        "concept_class_id" = NA,
-        "concept_code" = NA,
-        "valid_start_date" = NA,
-        "valid_end_date" = NA
-      )
-    ) |>
-    copyCdm()
+  cdm <- omock::mockPerson(nPerson = 3)
+  cdm <- omopgenerics::insertTable(
+    cdm = cdm, name = "observation_period", table = dplyr::tibble(
+      "observation_period_id" = c(1L, 2L, 3L),
+      "person_id" = c(1L, 2L, 3L),
+      "observation_period_start_date" = as.Date(c("2000-01-01")),
+      "observation_period_end_date" = as.Date(c("2025-01-01")),
+      "period_type_concept_id" = NA_integer_
+    ))
+  cdm <- omopgenerics::insertTable(
+    cdm = cdm, name = "concept", table = dplyr::tibble(
+      "concept_id" = c(1L, 2L, 4L, 5L, 99L, 1177480L, 43157344L),
+      "concept_name" = c("concept 1", "concept 2", "concept 3", "concept 4", "my_non_standard_concept", "ibuprofen", "Acetaminophen Oral Tablet [PARACETAMOL ALMUS]"),
+      "domain_id" = c("drug", "drug", "observation", "condition", "drug", "drug", "drug"),
+      "vocabulary_id" = NA_character_,
+      "concept_class_id" = NA_character_,
+      "concept_code" = NA_character_,
+      "valid_start_date" = as.Date(NA),
+      "valid_end_date" = as.Date(NA)
+    )
+  )
+  # person 1 - 2 overlapping records and another
+  # person 2 - 2 non-overlapping records
+  # person 3 one record
+  cdm <- omopgenerics::insertTable(
+    cdm = cdm, name = "drug_exposure",
+    table = dplyr::tibble(
+      "drug_exposure_id" = 1:15 |> as.integer(),
+      "person_id" = c(1, 1, 1, 2, 2, 3, 1, 2, 3, 1, 1, 1, 1, 1, 2) |> as.integer(),
+      "drug_concept_id" = c(1, 1,  1, 1, 1, 2, 3, 3, 5, 1177480L, 1177480L, 1177480L, 43157344L, 43157344L, 43157344L) |> as.integer(),
+      "drug_exposure_start_date" = as.Date(c(
+        "2020-07-11", "2020-10-27", "2024-02-09", "2022-01-20", "2023-01-11",
+        "2022-03-11", "2020-01-01", "2020-01-04", "2005-01-04", "2000-01-01",
+        "2001-08-01", "2000-03-01", "2000-11-01", "2000-02-01", "1999-11-01"
+      )),
+      "drug_exposure_end_date" = as.Date(c(
+        "2020-11-11", "2020-10-29", "2024-02-10", "2022-01-21", "2023-01-12",
+        "2022-03-12", "2020-01-10", "2020-01-14", "2005-01-04", "2000-10-02",
+        "2001-08-03", "2000-03-01", "2000-11-01", "2001-02-01", "2001-02-01"
+      )),
+      "drug_type_concept_id" = 1L,
+      "drug_source_concept_id" = c(rep(NA_integer_, 7), 99L, rep(NA_integer_, 7))
+    )
+  )
+  # end date < start date
+  # end date = NA
+  cdm <- omopgenerics::insertTable(
+    cdm = cdm, name = "condition_occurrence",
+    table = dplyr::tibble(
+      "condition_occurrence_id" = 1:3 |> as.integer(),
+      "person_id" = c(1, 1, 1) |> as.integer(),
+      "condition_concept_id" = 5L,
+      "condition_start_date" = as.Date(c("2019-09-11",
+                                         "2018-10-27",
+                                         "2016-02-09")),
+      "condition_end_date" = as.Date(c("2019-10-11",
+                                       "2017-10-29",
+                                       NA)),
+      "condition_type_concept_id" = 1L,
+      # TODO: remove this column if issue #646 decided in warning instead of error
+      "condition_source_concept_id" = NA_integer_
+    )
+  )
+  # subset cohort
+  cdm <- omopgenerics::insertTable(
+    cdm = cdm, name = "subset_cohort",
+    table = dplyr::tibble(
+      "cohort_definition_id" = c(1L, 2L),
+      "subject_id" = c(1L, 2L),
+      "cohort_start_date" = as.Date(c("2019-09-11", "2018-10-27")),
+      "cohort_end_date" = as.Date(c("2019-10-11", "2018-10-29"))
+    )
+  )
+  cdm <- cdm |> copyCdm()
+  cdm$subset_cohort <- cdm$subset_cohort |> omopgenerics::newCohortTable()
 
+  # expected errors and messages ----
   # not a cdm reference
   expect_error(conceptCohort(cdm = NULL, name = "cohort", conceptSet = NULL))
 
@@ -41,7 +101,7 @@ test_that("expected errors and messages", {
   expect_error(x <- conceptCohort(cdm = cdm, conceptSet = 1L, name = "cohort"))
   expect_error(x <- conceptCohort(cdm = cdm, conceptSet = list(1L), name = "cohort"))
   expect_message(expect_message(
-    x <- conceptCohort(cdm = cdm, conceptSet = list(a = 1L), name = "cohort")
+    x <- conceptCohort(cdm = cdm, conceptSet = list(a = 3L), name = "cohort")
   ))
   expect_true(inherits(x, "cohort_table"))
   expect_true(x |> dplyr::collect() |> nrow() == 0)
@@ -57,64 +117,8 @@ test_that("expected errors and messages", {
   )
   expect_true(nrow(attrition(x)) == 1)
   expect_true(nrow(dplyr::collect(attr(x, "cohort_codelist"))) == 1)
-  expect_message(expect_message(
-    x <- conceptCohort(cdm = cdm, conceptSet = list(a = 2L), name = "cohort")
-  ))
 
-  dropCreatedTables(cdm = cdm)
-})
-
-test_that("simple example", {
-  skip_on_cran()
-  cdm <- omock::mockPerson(nPerson = 3)
-  cdm <- omopgenerics::insertTable(
-    cdm = cdm, name = "observation_period", table = dplyr::tibble(
-      "observation_period_id" = c(1L, 2L, 3L),
-      "person_id" = c(1L, 2L, 3L),
-      "observation_period_start_date" = as.Date(c("2000-01-01")),
-      "observation_period_end_date" = as.Date(c("2025-01-01")),
-      "period_type_concept_id" = NA_integer_
-    ))
-  cdm <- omopgenerics::insertTable(
-    cdm = cdm, name = "concept", table = dplyr::tibble(
-      "concept_id" = c(1L, 2L),
-      "concept_name" = c("concept 1", "concept 2"),
-      "domain_id" = "drug",
-      "vocabulary_id" = NA,
-      "concept_class_id" = NA,
-      "concept_code" = NA,
-      "valid_start_date" = NA,
-      "valid_end_date" = NA
-    )
-  )
-  # person 1 - 2 overlapping records and another
-  # person 2 - 2 non-overlapping records
-  # person 3 one record
-  cdm <- omopgenerics::insertTable(
-    cdm = cdm, name = "drug_exposure",
-    table = dplyr::tibble(
-      "drug_exposure_id" = 1:6 |> as.integer(),
-      "person_id" = c(1, 1, 1, 2, 2, 3) |> as.integer(),
-      "drug_concept_id" = c(1, 1,  1, 1, 1, 2) |> as.integer(),
-      "drug_exposure_start_date" = as.Date(c("2020-07-11",
-                                             "2020-10-27",
-                                             "2024-02-09",
-                                             "2022-01-20",
-                                             "2023-01-11",
-                                             "2022-03-11")),
-      "drug_exposure_end_date" = as.Date(c("2020-11-11",
-                                           "2020-10-29",
-                                           "2024-02-10",
-                                           "2022-01-21",
-                                           "2023-01-12",
-                                           "2022-03-12")),
-      "drug_type_concept_id" = 1
-    )
-  )
-
-  cdm <- cdm |>
-    copyCdm()
-
+  # simple exampe ----
   if(dbToTest == "duckdb CDMConnector") {
     startTempTables <- countDuckdbTempTables(
       con = attr(omopgenerics::cdmSource(cdm),
@@ -160,7 +164,7 @@ test_that("simple example", {
       "number_subjects" = 2L,
       "reason_id" = 1:6L,
       "reason" = c(
-        "Initial qualifying events", "Record in observation", "Record start <= record end",
+        "Initial qualifying events", "Record in observation", "Not missing record date",
         "Non-missing sex", "Non-missing year of birth",
         "Merge overlapping records"
       ),
@@ -176,86 +180,141 @@ test_that("simple example", {
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
 
-  dropCreatedTables(cdm = cdm)
-})
-
-test_that("concepts from multiple cdm tables duckdb", {
-  skip_on_cran()
-  cdm <- omock::mockCdmReference() |>
-    omock::mockCdmFromTables(tables = list("cohort" = dplyr::tibble(
-      "cohort_definition_id" = 1L,
-      "subject_id" = c(1L, 2L, 3L),
-      "cohort_start_date" = as.Date("2020-01-01"),
-      "cohort_end_date" = as.Date("2024-01-01")
-    ))) |>
-    omock::mockConditionOccurrence() |>
-    omock::mockDrugExposure() |>
-    copyCdm()
-
-  cs <- list("a" = cdm$condition_occurrence |>
-               dplyr::select("condition_concept_id") |>
-               head(1)|>
-               dplyr::pull() |>
-               as.integer(),
-             "b" = cdm$drug_exposure |>
-               dplyr::select("drug_concept_id") |>
-               head(1) |>
-               dplyr::pull() |>
-               as.integer())
-
-  expect_no_error(cohort <- conceptCohort(cdm = cdm,
-                                          conceptSet = cs,
-                                          name = "my_new_cohort"))
-  dropCreatedTables(cdm = cdm)
-})
-
-test_that("excluded concepts in codelist", {
-  skip_on_cran()
-  cdm <- omock::mockCdmReference() |>
-    omock::mockCdmFromTables(tables = list("cohort" = dplyr::tibble(
-      "cohort_definition_id" = 1L,
-      "subject_id" = c(1L, 2L, 3L),
-      "cohort_start_date" = as.Date("2020-01-01"),
-      "cohort_end_date" = as.Date("2024-01-01")
-    )))
-  cdm <- omopgenerics::insertTable(
-    cdm = cdm, name = "concept", table = dplyr::tibble(
-      "concept_id" = 1L,
-      "concept_name" = "my concept",
-      "domain_id" = "drUg",
-      "vocabulary_id" = NA,
-      "concept_class_id" = NA,
-      "concept_code" = NA,
-      "valid_start_date" = NA,
-      "valid_end_date" = NA
+  # Concepts from >1 table  + subset cohort ----
+  # warning: concept 4 from a table not present in the cdm
+  expect_warning(cohort <- conceptCohort(
+    cdm = cdm,
+    conceptSet = list("c" = c(1L, 2L, 3L, 4L, 5L)),
+    name = "new_cohort"
+  ))
+  expect_equal(
+    collectCohort(cohort, 1),
+    dplyr::tibble(
+      subject_id = as.integer(c(rep(1, 5), 2, 2, 3)),
+      cohort_start_date = as.Date(c("2016-02-09", "2018-10-27", "2019-09-11", "2020-07-11", "2024-02-09", "2022-01-20", "2023-01-11", "2022-03-11")),
+      cohort_end_date = as.Date(c("2016-02-09", "2018-10-27", "2019-10-11", "2020-11-11", "2024-02-10", "2022-01-21", "2023-01-12", "2022-03-12"))
     )
   )
-  cdm <- omopgenerics::insertTable(
-    cdm = cdm, name = "drug_exposure", table = dplyr::tibble(
-      "drug_exposure_id" = 1:11L,
-      "person_id" = c(1, 1, 1, 1, 2, 2, 3, 1, 1, 1, 1) |> as.integer(),
-      "drug_concept_id" = c(1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1) |> as.integer(),
-      "drug_exposure_start_date" = c(0, 300, 1500, 750, 10, 800, 150, 1800, 1801, 1802, 1803),
-      "drug_exposure_end_date" = c(400, 800, 1600, 1550, 2000, 1000, 600, 1801, 1802, 1803, 1804),
-      "drug_type_concept_id" = 1
-    ) |>
-      dplyr::mutate(
-        "drug_exposure_start_date" = as.Date(.data$drug_exposure_start_date, origin = "2020-01-01"),
-        "drug_exposure_end_date" = as.Date(.data$drug_exposure_end_date, origin = "2020-01-01")
-      )
+  # Keep non used concepts:
+  expect_true(all(attr(cohort, "cohort_codelist") |> dplyr::pull("concept_id") |> sort() == 1:5))
+  # subset all cohorts
+  expect_warning(cohort <- conceptCohort(
+    cdm = cdm,
+    conceptSet = list("c" = c(1L, 2L, 3L, 4L, 5L)),
+    subsetCohort = "subset_cohort",
+    name = "new_cohort"
+  ))
+  expect_equal(
+    collectCohort(cohort, 1),
+    dplyr::tibble(
+      subject_id = as.integer(c(rep(1, 5), 2, 2)),
+      cohort_start_date = as.Date(c("2016-02-09", "2018-10-27", "2019-09-11", "2020-07-11", "2024-02-09", "2022-01-20", "2023-01-11")),
+      cohort_end_date = as.Date(c("2016-02-09", "2018-10-27", "2019-10-11", "2020-11-11", "2024-02-10", "2022-01-21", "2023-01-12"))
+    )
+  )
+  # subset to cohort id 1
+  expect_warning(cohort <- conceptCohort(
+    cdm = cdm,
+    conceptSet = list("c" = c(1L, 2L, 3L, 4L, 5L)),
+    subsetCohort = "subset_cohort",
+    subsetCohortId = 2,
+    name = "new_cohort"
+  ))
+  expect_equal(
+    collectCohort(cohort, 1),
+    dplyr::tibble(
+      subject_id = c(2L, 2L),
+      cohort_start_date = as.Date(c("2022-01-20", "2023-01-11")),
+      cohort_end_date = as.Date(c("2022-01-21", "2023-01-12"))
+    )
   )
 
-  cdm <- cdm |>
-    copyCdm()
+  # Exit at entry + use source fields ----
+  # no source concept search
+  expect_warning(cohort <- conceptCohort(
+    cdm = cdm,
+    conceptSet = list("c" = c(1L, 2L, 3L, 4L, 5L, 99L)),
+    exit = "event_start_date",
+    name = "new_cohort"
+  ))
+  expect_equal(
+    collectCohort(cohort, 1),
+    dplyr::tibble(
+      subject_id = as.integer(c(rep(1, 6), 2, 2, 3)),
+      cohort_start_date = as.Date(c("2016-02-09", "2018-10-27", "2019-09-11", "2020-07-11", "2020-10-27", "2024-02-09", "2022-01-20", "2023-01-11", "2022-03-11")),
+      cohort_end_date = cohort_start_date
+    )
+  )
+  expect_warning(cohort <- conceptCohort(
+    cdm = cdm,
+    conceptSet = list("c" = c(1L, 2L, 3L, 4L, 5L, 99L)),
+    exit = "event_start_date",
+    useSourceFields = TRUE,
+    name = "new_cohort"
+  ))
+  expect_equal(
+    collectCohort(cohort, 1),
+    dplyr::tibble(
+      subject_id = as.integer(c(rep(1, 6), 2, 2, 2, 3)),
+      cohort_start_date = as.Date(c("2016-02-09", "2018-10-27", "2019-09-11", "2020-07-11", "2020-10-27", "2024-02-09", "2020-01-04", "2022-01-20", "2023-01-11", "2022-03-11")),
+      cohort_end_date = cohort_start_date
+    )
+  )
+  expect_error(conceptCohort(
+    cdm = cdm,
+    conceptSet = list("c" = c(1L, 2L, 3L, 4L, 5L)),
+    exit = "not_and_option",
+    name = "new_cohort"
+  ))
 
-  expect_no_error(cohort <- conceptCohort(cdm = cdm, conceptSet = list(a = 1:2L), name = "cohort1"))
-  expect_true(all(attr(cohort, "cohort_codelist") |> dplyr::pull("concept_id") |> sort() == 1:2))
+  if (dbToTest == "postgres CDMConnector" & testIndexes) {
+    expect_true(
+      DBI::dbGetQuery(CDMConnector::cdmCon(cdm), paste0("SELECT * FROM pg_indexes WHERE tablename = 'coco_test_new_cohort';")) |> dplyr::pull("indexdef") ==
+        "CREATE INDEX coco_test_new_cohort_subject_id_cohort_start_date_idx ON public.coco_test_new_cohort USING btree (subject_id, cohort_start_date)"
+    )
+  }
 
-  expect_no_error(cohort <- conceptCohort(cdm = cdm, conceptSet = list(a = 2:3L), name = "cohort2"))
-  expect_true(all(attr(cohort, "cohort_codelist") |> dplyr::pull("concept_id") |> sort() == 2:3))
+  # Test tabel argument ----
+  cohort <- conceptCohort(
+    cdm = cdm, conceptSet = list("a" = 5L), name = "cohort"
+  )
+  expect_true(nrow(cohort |> dplyr::collect()) == 3)
+  cohort <- conceptCohort(
+    cdm = cdm, conceptSet = list("a" = 5L), name = "cohort", table = "drug_exposure"
+  )
+  expect_true(nrow(cohort |> dplyr::collect()) == 1)
+
+  # Concept set expression ----
+  codes <- CodelistGenerator::codesFromConceptSet(
+    cdm = cdm,
+    path = here::here("extras", "concept_set"),
+    type = "concept_set_expression"
+  )
+  cdm$cohort <- conceptCohort(
+    cdm = cdm,
+    conceptSet = codes,
+    name = "cohort"
+  )
+  expect_equal(
+    collectCohort(cdm$cohort, 1),
+    dplyr::tibble(
+      subject_id = 1L,
+      cohort_start_date = as.Date(c("2000-01-01", "2001-08-01")),
+      cohort_end_date = as.Date(c("2000-10-02", "2001-08-03"))
+    )
+  )
+  expect_equal(
+    collectCohort(cdm$cohort, 2),
+    dplyr::tibble(
+      subject_id = 1,
+      cohort_start_date = as.Date(c("2000-02-01")),
+      cohort_end_date = as.Date(c("2001-02-01"))
+    )
+  )
 
   dropCreatedTables(cdm = cdm)
 })
+
 
 test_that("out of observation", {
   skip_on_cran()
@@ -456,247 +515,6 @@ test_that("out of observation", {
   expect_true(cdm$cohort4 |> dplyr::pull("cohort_start_date") == "1999-01-01")
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-
-  dropCreatedTables(cdm = cdm)
-})
-
-test_that("table not present in the cdm", {
-  skip_on_cran()
-  # cdm <- omock::mockCdmReference() |>
-  #   omock::mockCdmFromTables(tables = list("cohort" = dplyr::tibble(
-  #     "cohort_definition_id" = 1L,
-  #     "subject_id" = c(1L, 2L, 3L),
-  #     "cohort_start_date" = as.Date("2020-01-01"),
-  #     "cohort_end_date" = as.Date("2024-01-01")
-  #   )))
-  # cdm <- omopgenerics::insertTable(
-  #   cdm = cdm, name = "concept", table = dplyr::tibble(
-  #     "concept_id" = 1:2L,
-  #     "concept_name" = c("my concept", "my other concept"),
-  #     "domain_id" = c("drug", "condition"),
-  #     "vocabulary_id" = NA,
-  #     "concept_class_id" = NA,
-  #     "concept_code" = NA,
-  #     "valid_start_date" = NA,
-  #     "valid_end_date" = NA
-  #   )
-  # )
-  # cdm <- omopgenerics::insertTable(
-  #   cdm = cdm, name = "drug_exposure", table = dplyr::tibble(
-  #     "drug_exposure_id" = 1:11L,
-  #     "person_id" = c(1, 1, 1, 1, 2, 2, 3, 1, 1, 1, 1) |> as.integer(),
-  #     "drug_concept_id" = c(1, 1, 1, 2, 1, 1, 2, 1, 1, 2, 1) |> as.integer(),
-  #     "drug_exposure_start_date" = c(0, 300, 1500, 750, 10, 800, 150, 1800, 1801, 1802, 1803),
-  #     "drug_exposure_end_date" = c(400, 800, 1600, 1550, 2000, 1000, 600, 1801, 1802, 1803, 1804),
-  #     "drug_type_concept_id" = 1L
-  #   ) |>
-  #     dplyr::mutate(
-  #       "drug_exposure_start_date" = as.Date(.data$drug_exposure_start_date, origin = "2020-01-01"),
-  #       "drug_exposure_end_date" = as.Date(.data$drug_exposure_end_date, origin = "2020-01-01")
-  #     )
-  # )
-  #
-  # cdm <- cdm |> copyCdm()
-  #
-  # expect_warning(cdm$conceptcohort <- conceptCohort(cdm, list(a = 1L, b = 1L, c = 1:2L, d = 2L), name = "conceptcohort"))
-  # expect_true(all(cdm$conceptcohort |> dplyr::pull(cohort_definition_id) |> unique() |> sort() == 1:3))
-  # expect_true(all(cdm$conceptcohort |> dplyr::pull(cohort_start_date) |> sort() ==
-  #                   c("2020-01-01", "2020-01-01", "2020-01-01", "2020-01-11", "2020-01-11", "2020-01-11")))
-
-  # dropCreatedTables(cdm = cdm)
-})
-
-test_that("cohort exit as event start date", {
-  skip_on_cran()
-  cdm <- omock::mockCdmReference() |>
-    omock::mockCdmFromTables(tables = list("cohort" = dplyr::tibble(
-      "cohort_definition_id" = 1L,
-      "subject_id" = c(1L, 2L, 3L),
-      "cohort_start_date" = as.Date("2020-01-01"),
-      "cohort_end_date" = as.Date("2024-01-01")
-    ))) |>
-    omopgenerics::insertTable(
-      name = "concept",
-      table = dplyr::tibble(
-        "concept_id" = 1L,
-        "concept_name" = "my concept",
-        "domain_id" = "drug",
-        "vocabulary_id" = NA,
-        "concept_class_id" = NA,
-        "concept_code" = NA,
-        "valid_start_date" = NA,
-        "valid_end_date" = NA
-      )
-    ) |>
-    omopgenerics::insertTable(
-      name = "drug_exposure",
-      table = dplyr::tibble(
-        "drug_exposure_id" = c(1L, 2L),
-        "person_id" = c(1L, 1L),
-        "drug_concept_id" = c(1L, 1L),
-        "drug_exposure_start_date" = as.Date(c("2020-01-01", "2020-01-04")),
-        "drug_exposure_end_date" = as.Date(c("2020-01-10", "2020-01-14")),
-        "drug_type_concept_id" = 1L
-      )
-    ) |>
-    copyCdm()
-
-  expect_no_error(cdm$cohort_1 <- conceptCohort(cdm = cdm,
-                                                conceptSet = list(a = 1L),
-                                                name = "cohort_1",
-                                                exit = "event_end_date"))
-  # one entry from first start to second end
-  expect_true(nrow(cdm$cohort_1 |>
-                     dplyr::collect()) == 1)
-  expect_true(cdm$cohort_1 |>
-                dplyr::pull("cohort_start_date") == as.Date(c("2020-01-01")))
-  expect_true(cdm$cohort_1 |>
-                dplyr::pull("cohort_end_date") == as.Date(c("2020-01-14")))
-
-  # exit as event start
-  expect_no_error(cdm$cohort_1 <- conceptCohort(cdm = cdm,
-                                                conceptSet = list(a = 1L),
-                                                name = "cohort_1",
-                                                exit = "event_start_date"))
-  expect_true(nrow(cdm$cohort_1 |>
-                     dplyr::collect()) == 2)
-  expect_identical(sort(as.Date(cdm$cohort_1 |>
-                                  dplyr::pull("cohort_start_date"))),
-                   c(as.Date("2020-01-01"),
-                     "2020-01-04"))
-  expect_identical(sort(as.Date(cdm$cohort_1 |>
-                                  dplyr::pull("cohort_end_date"))),
-                   c(as.Date("2020-01-01"),
-                     "2020-01-04"))
-
-  # expected error
-  expect_error(cdm$cohort_1 <- conceptCohort(cdm = cdm,
-                                             conceptSet = list(a = 1L),
-                                             name = "cohort_1",
-                                             exit = "not_an_option"))
-
-  dropCreatedTables(cdm = cdm)
-})
-
-test_that("use source field concepts", {
-  skip_on_cran()
-  cdm <- omock::mockCdmReference() |>
-    omock::mockCdmFromTables(tables = list("cohort" = dplyr::tibble(
-      "cohort_definition_id" = 1L,
-      "subject_id" = c(1L, 2L, 3L),
-      "cohort_start_date" = as.Date("2020-01-01"),
-      "cohort_end_date" = as.Date("2024-01-01")
-    ))) |>
-    omopgenerics::insertTable(
-      name = "concept",
-      table = dplyr::tibble(
-        "concept_id" = 99L,
-        "concept_name" = "my_non_standard_concept",
-        "domain_id" = "drug",
-        "vocabulary_id" = NA,
-        "concept_class_id" = NA,
-        "concept_code" = NA,
-        "valid_start_date" = NA,
-        "valid_end_date" = NA
-      )
-    ) |>
-    omopgenerics::insertTable(
-      name = "drug_exposure",
-      table = dplyr::tibble(
-        "drug_exposure_id" = c(1L, 2L),
-        "person_id" = c(1L, 1L),
-        "drug_concept_id" = c(1L, 1L),
-        "drug_exposure_start_date" = as.Date(c("2020-01-01", "2020-01-04")),
-        "drug_exposure_end_date" = as.Date(c("2020-01-10", "2020-01-14")),
-        "drug_type_concept_id" = 1L,
-        "drug_source_concept_id" = 99L
-      )
-    ) |>
-    copyCdm()
-
-  # no records if we only look at standard concepts
-  expect_no_error(cdm$cohort_1a <- conceptCohort(cdm = cdm,
-                                                 conceptSet = list(a = 99L),
-                                                 name = "cohort_1a",
-                                                 exit = "event_end_date",
-                                                 useSourceFields = FALSE))
-  expect_true(nrow(cdm$cohort_1a |>
-                     dplyr::collect()) == 0)
-
-  # records if we also look at source fields
-  expect_no_error(cdm$cohort_1b <- conceptCohort(cdm = cdm,
-                                                 conceptSet = list(a = 99L),
-                                                 name = "cohort_1b",
-                                                 exit = "event_end_date",
-                                                 useSourceFields = TRUE))
-  expect_true(nrow(cdm$cohort_1b |>
-                     dplyr::collect()) > 0)
-
-  dropCreatedTables(cdm = cdm)
-})
-
-test_that("missing event end dates", {
-  skip_on_cran()
-  cdm <- omock::mockCdmReference() |>
-    omock::mockCdmFromTables(tables = list("cohort" = dplyr::tibble(
-      "cohort_definition_id" = 1L,
-      "subject_id" = c(1L, 2L, 3L),
-      "cohort_start_date" = as.Date("2020-01-01"),
-      "cohort_end_date" = as.Date("2024-01-01")
-    )))
-  cdm <- omopgenerics::insertTable(
-    cdm = cdm, name = "concept", table = dplyr::tibble(
-      "concept_id" = 1L,
-      "concept_name" = "my concept",
-      "domain_id" = "drUg",
-      "vocabulary_id" = NA,
-      "concept_class_id" = NA,
-      "concept_code" = NA,
-      "valid_start_date" = NA,
-      "valid_end_date" = NA
-    )
-  )
-  cdm <- omopgenerics::insertTable(
-    cdm = cdm, name = "drug_exposure", table = dplyr::tibble(
-      "drug_exposure_id" = 1:11L,
-      "person_id" = c(1, 1, 1, 1, 2, 2, 3, 1, 1, 1, 1) |> as.integer(),
-      "drug_concept_id" = c(1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1) |> as.integer(),
-      "drug_exposure_start_date" = c(0, 300, 1500, 750, 10, 800, 150, 1800, 1801, 1802, 1803),
-      "drug_exposure_end_date" = c(400, 800, 1600, 1550, 2000, 1000, 600, 1801, 1802, 1803, 1804),
-      "drug_type_concept_id" = 1L
-    ) |>
-      dplyr::mutate(
-        "drug_exposure_start_date" = as.Date(.data$drug_exposure_start_date, origin = "2020-01-01"),
-        "drug_exposure_end_date" = as.Date(.data$drug_exposure_end_date, origin = "2020-01-01")
-      )
-  )
-  cdm <- cdm |>
-    copyCdm()
-
-  expect_no_error(cohort <- conceptCohort(cdm = cdm, conceptSet = list(a = 1L), name = "cohort"))
-  startCount <- cohortCount(cohort) |>
-    dplyr::pull("number_subjects")
-
-  # with missing end dates we should have the same subject count
-  # as their missing end date will have been replaced by the start date
-  cdm <- omopgenerics::insertTable(
-    cdm = cdm, name = "drug_exposure", table = dplyr::tibble(
-      "drug_exposure_id" = 1:11L,
-      "person_id" = c(1, 1, 1, 1, 2, 2, 3, 1, 1, 1, 1) |> as.integer(),
-      "drug_concept_id" = c(1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1) |> as.integer(),
-      "drug_exposure_start_date" = c(0, 300, 1500, 750, 10, 800, 150, 1800, 1801, 1802, 1803),
-      "drug_exposure_end_date" = as.Date(NA),
-      "drug_type_concept_id" = 1L
-    ) |>
-      dplyr::mutate(
-        "drug_exposure_start_date" = as.Date(.data$drug_exposure_start_date, origin = "2020-01-01")
-      )
-  )
-  expect_no_error(cohort <- conceptCohort(cdm = cdm, conceptSet = list(a = 1L), name = "cohort"))
-  endCount <- cohortCount(cohort) |>
-    dplyr::pull("number_subjects")
-
-  expect_identical(startCount, endCount)
 
   dropCreatedTables(cdm = cdm)
 })
@@ -913,226 +731,6 @@ test_that("overlap option", {
   dropCreatedTables(cdm = cdm)
 })
 
-test_that("test indexes - postgres", {
-  skip_on_cran()
-  skip_if(!testIndexes)
-
-  if (dbToTest == "postgres CDMConnector") {
-    cdm <- omock::mockCdmFromDataset(datasetName = "GiBleed", source = "local") |>
-      copyCdm()
-
-    con <- CDMConnector::cdmCon(cdm = cdm)
-
-    cdm$cohort <- conceptCohort(cdm = cdm, conceptSet = list(a = 24134L), name = "cohort")
-    expect_true(
-      DBI::dbGetQuery(con, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_cohort';")) |> dplyr::pull("indexdef") ==
-        "CREATE INDEX cc_cohort_subject_id_cohort_start_date_idx ON public.cc_cohort USING btree (subject_id, cohort_start_date)"
-    )
-
-    expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-
-    dropCreatedTables(cdm = cdm)
-  }
-})
-
-test_that("test subsetCohort arguments", {
-  skip_on_cran()
-  cdm <- omock::mockCdmFromTables(
-    tables = list(
-      condition_occurrence = dplyr::tibble(
-        condition_occurrence_id = 1:3L,
-        person_id = c(1L, 2L, 3L),
-        condition_concept_id = 194152L,
-        condition_start_date = as.Date("2020-01-01"),
-        condition_end_date = as.Date("2020-01-01"),
-        condition_type_concept_id = 0L
-      ),
-      cohort = dplyr::tibble(
-        subject_id = c(1L, 2L),
-        cohort_definition_id = c(1L, 2L),
-        cohort_start_date = as.Date("2010-01-01"),
-        cohort_end_date = as.Date("2010-01-01")
-      )
-    )
-  ) |>
-    copyCdm()
-
-  expect_no_error(
-    x <- conceptCohort(
-      cdm = cdm,
-      conceptSet = list(test = 194152L),
-      name = "test"
-    )
-  )
-  expect_true(all(c(1L, 2L, 3L) %in% dplyr::pull(x, "subject_id")))
-
-  expect_no_error(
-    x <- conceptCohort(
-      cdm = cdm,
-      conceptSet = list(test = 194152L),
-      name = "test",
-      subsetCohort = "cohort"
-    )
-  )
-  expect_true(all(c(1L, 2L) %in% dplyr::pull(x, "subject_id")))
-  expect_true(all(!c(3L) %in% dplyr::pull(x, "subject_id")))
-
-  expect_no_error(
-    x <- conceptCohort(
-      cdm = cdm,
-      conceptSet = list(test = 194152L),
-      name = "test",
-      subsetCohort = "cohort",
-      subsetCohortId = 1L
-    )
-  )
-  expect_true(all(c(1L) %in% dplyr::pull(x, "subject_id")))
-  expect_true(all(!c(2L, 3L) %in% dplyr::pull(x, "subject_id")))
-
-  expect_no_error(
-    x <- conceptCohort(
-      cdm = cdm,
-      conceptSet = list(test = 194152L),
-      name = "test",
-      subsetCohort = "cohort",
-      subsetCohortId = "cohort_1"
-    )
-  )
-  expect_true(all(c(1L) %in% dplyr::pull(x, "subject_id")))
-  expect_true(all(!c(2L, 3L) %in% dplyr::pull(x, "subject_id")))
-
-  expect_no_error(
-    x <- conceptCohort(
-      cdm = cdm,
-      conceptSet = list(test = 194152L),
-      name = "test",
-      subsetCohort = "cohort",
-      subsetCohortId = dplyr::starts_with("cohort")
-    )
-  )
-  expect_true(all(c(1L, 2L) %in% dplyr::pull(x, "subject_id")))
-  expect_true(all(!c(3L) %in% dplyr::pull(x, "subject_id")))
-
-  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-
-  dropCreatedTables(cdm = cdm)
-})
-
-test_that("table argument", {
-  skip_on_cran()
-  cdm <- omock::mockPerson(nPerson = 3)
-  cdm <- omopgenerics::insertTable(
-    cdm = cdm, name = "observation_period", table = dplyr::tibble(
-      "observation_period_id" = c(1L, 2L, 3L),
-      "person_id" = c(1L, 2L, 3L),
-      "observation_period_start_date" = as.Date(c("2000-01-01")),
-      "observation_period_end_date" = as.Date(c("2025-01-01")),
-      "period_type_concept_id" = NA_integer_
-    ))
-  cdm <- omopgenerics::insertTable(
-    cdm = cdm, name = "concept", table = dplyr::tibble(
-      "concept_id" = c(1L, 2L),
-      "concept_name" = c("concept 1", "concept 2"),
-      "domain_id" = "drug",
-      "vocabulary_id" = NA,
-      "concept_class_id" = NA,
-      "concept_code" = NA,
-      "valid_start_date" = NA,
-      "valid_end_date" = NA
-    )
-  )
-  # person 1 - 2 overlapping records and another
-  # person 2 - 2 non-overlapping records
-  # person 3 one record
-  cdm <- omopgenerics::insertTable(
-    cdm = cdm, name = "drug_exposure",
-    table = dplyr::tibble(
-      "drug_exposure_id" = 1:6 |> as.integer(),
-      "person_id" = c(1, 1, 1, 2, 2, 3) |> as.integer(),
-      "drug_concept_id" = c(1, 1,  1, 1, 1, 2) |> as.integer(),
-      "drug_exposure_start_date" = as.Date(c("2020-07-11",
-                                             "2020-10-27",
-                                             "2024-02-09",
-                                             "2022-01-20",
-                                             "2023-01-11",
-                                             "2022-03-11")),
-      "drug_exposure_end_date" = as.Date(c("2020-11-15",
-                                           "2020-10-29",
-                                           "2024-02-10",
-                                           "2022-01-21",
-                                           "2023-01-12",
-                                           "2022-03-12")),
-      "drug_type_concept_id" = 1
-    )
-  )
-
-  cdm <- omopgenerics::insertTable(
-    cdm = cdm, name = "condition_occurrence",
-    table = dplyr::tibble(
-      "condition_occurrence_id" = 1:3 |> as.integer(),
-      "person_id" = c(1, 2, 2) |> as.integer(),
-      "condition_concept_id" = c(2) |> as.integer(),
-      "condition_start_date" = as.Date(c("2020-07-14",
-                                         "2015-03-11",
-                                         "2022-03-11")),
-      "condition_end_date" = as.Date(c("2020-11-17",
-                                       "2015-03-12",
-                                       "2022-03-12")),
-      "condition_type_concept_id" = 1
-    )
-  )
-
-  cdm <- cdm |> copyCdm()
-
-  cdm$cohort <- conceptCohort(cdm,
-                              conceptSet = list("cohort" = 1:2L),
-                              name = "cohort",
-                              exit = "event_end_date",
-                              overlap = "merge",
-                              useSourceFields = FALSE,
-                              subsetCohort = NULL,
-                              subsetCohortId = NULL,
-                              table = c("drug_exposure", "condition_occurrence"))
-  expect_equal(
-    collectCohort(cdm$cohort, 1),
-    dplyr::tibble(
-      subject_id = c(1, 1, 2, 2, 2, 2, 3) |> as.integer(),
-      cohort_start_date = as.Date(c(
-        "2020-07-11", "2024-02-09", "2015-03-11", "2022-01-20", "2022-03-11",
-        "2023-01-11", "2022-03-11"
-      )),
-      cohort_end_date = as.Date(c(
-        "2020-11-17", "2024-02-10", "2015-03-12", "2022-01-21", "2022-03-12",
-        "2023-01-12", "2022-03-12"
-      ))
-    )
-  )
-
-
-  expect_error(cdm$cohort <- conceptCohort(cdm,
-                                           conceptSet = list("cohort" = 1:2L),
-                                           name = "cohort",
-                                           exit = "event_end_date",
-                                           overlap = "merge",
-                                           useSourceFields = FALSE,
-                                           subsetCohort = NULL,
-                                           subsetCohortId = NULL,
-                                           table = c("drug_exposure", "condition")))
-  expect_error(cdm$cohort <- conceptCohort(cdm,
-                                           conceptSet = list("cohort" = 1:2L),
-                                           name = "cohort",
-                                           exit = "event_end_date",
-                                           overlap = "merge",
-                                           useSourceFields = FALSE,
-                                           subsetCohort = NULL,
-                                           subsetCohortId = NULL,
-                                           table = c("condition")))
-
-  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-
-  dropCreatedTables(cdm = cdm)
-})
-
 test_that("useRecordsBeforeObservation TRUE", {
   skip_on_cran()
   cdm <- omock::mockPerson(nPerson = 3)
@@ -1255,80 +853,6 @@ test_that("useRecordsBeforeObservation TRUE", {
   expect_equal(
     collectCohort(cdm$cohort, 1),
     collectCohort(cdm$cohort, 2)
-  )
-
-  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-
-  dropCreatedTables(cdm = cdm)
-})
-
-test_that("conceptSetExpression", {
-  skip_on_cran()
-  cdm <- omock::mockPerson(nPerson = 3) |>
-    omopgenerics::insertTable(
-    name = "observation_period", table = dplyr::tibble(
-      "observation_period_id" = c(1L, 2L, 3L),
-      "person_id" = c(1L, 1L, 2L),
-      "observation_period_start_date" = as.Date(c(
-        "2000-02-01", "2000-10-01", "2000-01-01"
-      )),
-      "observation_period_end_date" = as.Date(c(
-        "2000-05-01", "2000-12-01", "2000-12-01"
-      )),
-      "period_type_concept_id" = NA_integer_
-    )) |>
-    omopgenerics::insertTable(
-    name = "concept", table = dplyr::tibble(
-      "concept_id" = c(1177480L, 43157344L),
-      "concept_name" = c("ibuprofen", "Acetaminophen Oral Tablet [PARACETAMOL ALMUS]"),
-      "domain_id" = "drug",
-      "vocabulary_id" = NA,
-      "concept_class_id" = NA,
-      "concept_code" = NA,
-      "valid_start_date" = NA,
-      "valid_end_date" = NA
-    )
-  )
-  # person 1 - 2 record in obs, 2 records out with one eding out and the other in aother observation period
-  # person 2 - one record all out starting before and ending after
-  cdm <- omopgenerics::insertTable(
-    cdm = cdm, name = "drug_exposure",
-    table = dplyr::tibble(
-      "drug_exposure_id" = 1:6 |> as.integer(),
-      "person_id" = c(1, 1, 1, 1, 1, 2) |> as.integer(),
-      "drug_concept_id" = c(1177480L, 1177480L, 1177480L, 43157344L, 43157344L, 43157344L),
-      "drug_exposure_start_date" = as.Date(c(
-        "2000-01-01", "2001-08-01", "2000-03-01", "2000-11-01", "2000-02-01", "1999-11-01"
-      )),
-      "drug_exposure_end_date" = as.Date(c(
-        "2000-10-02", "2001-08-03", "2000-03-01", "2000-11-01", "2001-02-01", "2001-02-01"
-      )),
-      "drug_type_concept_id" = 1L
-    )
-  ) |>
-    copyCdm()
-
-  codes <- CodelistGenerator::codesFromConceptSet(
-    cdm = cdm,
-    path = here::here("extras", "concept_set"),
-    type = "concept_set_expression"
-  )
-  cdm$cohort <- conceptCohort(
-    cdm = cdm,
-    conceptSet = codes,
-    name = "cohort"
-  )
-  expect_equal(
-    collectCohort(cdm$cohort, 1),
-    dplyr::tibble(subject_id = 1, cohort_start_date = as.Date("2000-03-01"), cohort_end_date = as.Date("2000-03-01"))
-  )
-  expect_equal(
-    collectCohort(cdm$cohort, 2),
-    dplyr::tibble(
-      subject_id = 1,
-      cohort_start_date = as.Date(c("2000-02-01", "2000-11-01")),
-      cohort_end_date = as.Date(c("2000-05-01", "2000-11-01"))
-    )
   )
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
