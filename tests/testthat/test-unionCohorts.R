@@ -2,8 +2,8 @@ test_that("unionCohorts works", {
   skip_on_cran()
 
   obs <- dplyr::tibble(
-    observation_period_id = c(1, 2, 3, 4),
-    person_id = c(1, 2, 3, 4),
+    observation_period_id = c(1L, 2L, 3L, 4L),
+    person_id = c(1L, 2L, 3L, 4L),
     observation_period_start_date = as.Date(c(
       "2000-06-03", "1999-04-05", "2015-01-15", "1989-12-09"
     )),
@@ -154,7 +154,7 @@ test_that("unionCohorts works", {
   # Test same name and keep cohorts ----
   cdm$cohort1 <- cdm$cohort1 |>
     CohortConstructor::unionCohorts(name = "cohort1", keepOriginalCohorts = TRUE)
-  expect_true(all(settings(cdm$cohort1)$cohort_name %in% c("cohort_1", "cohort_2", "cohort_3", "cohort_4", "cohort_1_cohort_2_cohort_3_cohort_4_cohort_5")))
+  expect_true(all(settings(cdm$cohort1)$cohort_name %in% c("cohort_1", "cohort_2", "cohort_3", "cohort_4", "cohort_5", "cohort_1_cohort_2_cohort_3_cohort_4_cohort_5")))
 
   # Expected errors/warnings/messages ----
   expect_error(
@@ -245,7 +245,7 @@ test_that("multiple observation periods", {
     "cohort_end_date" = as.Date(c("2000-12-20", "2001-04-01", "2004-01-01", "2001-12-30", "2003-01-01"))
   ))
 
-  expect_true(sum(grepl("og", omopgenerics::listSourceTablesceTables(cdm))) == 0)
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
 
   dropCreatedTables(cdm = cdm)
 })
