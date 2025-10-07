@@ -248,9 +248,11 @@ conceptCohort <- function(cdm,
 
   if(overlap == "merge"){
     cli::cli_inform(c("i" = "Merging overlapping records."))
+    if (exit == "event_end_date") reason <- "Merge overlapping records"
+    if (exit == "event_start_date") reason <- "Drop duplicate records"
     cdm[[name]] <- cdm[[name]] |>
       joinOverlap(name = name, gap = 0)  |>
-      omopgenerics::recordCohortAttrition(reason = "Merge overlapping records")
+      omopgenerics::recordCohortAttrition(reason = reason)
   }
 
   if(overlap == "extend"){

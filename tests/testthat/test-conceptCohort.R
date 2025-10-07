@@ -245,6 +245,10 @@ test_that("initial tests", {
       cohort_end_date = cohort_start_date
     )
   )
+  expect_equal(
+    attrition(cohort)$reason,
+    c('Initial qualifying events', 'Record in observation', 'Not missing record date', 'Non-missing sex', 'Non-missing year of birth', 'Drop duplicate records')
+  )
   expect_warning(cohort <- conceptCohort(
     cdm = cdm,
     conceptSet = list("c" = c(1L, 2L, 3L, 4L, 5L, 99L)),
