@@ -86,12 +86,16 @@ unionCohorts <- function(cohort,
                    logPrefix = "CohortConstructor_unionCohorts_tmpTable_")
   cohCodelist <- attr(cohort, "cohort_codelist")
   if (!is.null(cohCodelist)) {
-    cohCodelist <- cohCodelist |> dplyr::mutate("cohort_definition_id" = 1L)
+    cohCodelist <- cohCodelist |>
+      dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>
+      dplyr::mutate("cohort_definition_id" = 1L)
   }
 
   unionedCohort  <- unionedCohort |>
-    dplyr::compute(name = tmpTable, temporary = FALSE,
-                   logPrefix = "CohortConstructor_unionCohorts_newCohort_") |>
+    dplyr::compute(
+      name = tmpTable, temporary = FALSE,
+      logPrefix = "CohortConstructor_unionCohorts_newCohort_"
+    ) |>
     omopgenerics::newCohortTable(
       cohortSetRef = cohSet,
       cohortAttritionRef = NULL,
@@ -103,13 +107,14 @@ unionCohorts <- function(cohort,
     cdm <- bind(cohort, unionedCohort, name = name)
   } else {
     cdm[[name]] <- unionedCohort |>
-      dplyr::compute(name = name, temporary = FALSE,
-                     logPrefix = "CohortConstructor_unionCohorts_name_") |>
+      dplyr::compute(
+        name = name, temporary = FALSE,
+        logPrefix = "CohortConstructor_unionCohorts_name_"
+      ) |>
       omopgenerics::newCohortTable(.softValidation = TRUE)
   }
 
   omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(tmpTable))
-
 
   useIndexes <- getOption("CohortConstructor.use_indexes")
   if (!isFALSE(useIndexes)) {

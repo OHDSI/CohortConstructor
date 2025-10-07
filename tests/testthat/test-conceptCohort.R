@@ -267,6 +267,7 @@ test_that("initial tests", {
     name = "new_cohort"
   ))
 
+  # Indexes ----
   if (dbToTest == "postgres CDMConnector" & testIndexes) {
     expect_true(
       DBI::dbGetQuery(CDMConnector::cdmCon(cdm), paste0("SELECT * FROM pg_indexes WHERE tablename = 'coco_test_new_cohort';")) |> dplyr::pull("indexdef") ==
