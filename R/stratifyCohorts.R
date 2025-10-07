@@ -157,7 +157,7 @@ stratifyCohorts <- function(cohort,
     dplyr::select(!"target_cohort_id")
 
   newCohort <- purrr::reduce(newCohort, dplyr::union_all) |>
-    dplyr::select(!dplyr::all_of(c("target_cohort_id", strataCols[removeStrata]))) |>
+    dplyr::select(!dplyr::any_of(c("target_cohort_id", "id", strataCols[removeStrata]))) |>
     dplyr::relocate(dplyr::all_of(omopgenerics::cohortColumns("cohort"))) |>
     dplyr::compute(name = name, temporary = FALSE,
                    logPrefix = "CohortConstructor_stratifyCohorts_reduce_") |>
