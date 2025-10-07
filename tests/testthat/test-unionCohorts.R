@@ -341,14 +341,14 @@ test_that("test codelist", {
   cdm$cohort2 <- unionCohorts(cdm$cohort1, name = "cohort2")
   expect_true(all(
     cdm$cohort2 |> dplyr::pull("cohort_start_date") |> sort() ==
-      c("2009-12-22", "2010-01-01", "2010-01-11", "2010-05-31", "2012-09-27", "2014-12-06")
+      c("2009-12-22", "2009-12-22", "2010-01-01", "2010-01-11", "2010-05-31", "2011-03-07", "2012-09-27", "2014-12-06")
   ))
   expect_true(all(
     cdm$cohort2 |> dplyr::pull("cohort_end_date") |> sort() ==
-      c("2010-05-04", "2011-08-24", "2014-02-09", "2014-05-20", "2014-12-10", "2015-06-24")
+      c("2009-12-22", "2010-05-04", "2011-03-07", "2011-08-24", "2014-02-09", "2014-05-20", "2014-12-10", "2015-06-24")
   ))
   expect_true(all(
-    cdm$cohort2 |> dplyr::pull("subject_id") |> sort() == c(1, 1, 2, 3, 3, 4)
+    cdm$cohort2 |> dplyr::pull("subject_id") |> sort() == c(1, 1, 2, 3, 3, 4, 4, 4)
   ))
   codes <- attr(cdm$cohort2, "cohort_codelist")
   expect_true(all(codes |> dplyr::pull("codelist_name") |> sort() == c(rep("c1", 2), "c2")))
@@ -361,14 +361,14 @@ test_that("test codelist", {
   cdm$cohort4 <- unionCohorts(cdm$cohort3, name = "cohort4")
   expect_true(all(
     cdm$cohort4 |> dplyr::pull("cohort_start_date") |> sort() ==
-      c("1999-05-03", "2003-05-17", "2004-03-11", "2009-12-22", "2010-01-01", "2010-01-11", "2010-05-31", "2012-09-27", "2014-12-06", "2015-02-25")
+      c('1999-05-03', '2003-05-17', '2004-03-11', '2009-12-22', '2009-12-22', '2010-01-01', '2010-01-11', '2010-05-31', '2011-03-07', '2012-09-27', '2014-12-06', '2015-02-25')
   ))
   expect_true(all(
     cdm$cohort4 |> dplyr::pull("cohort_end_date") |> sort() ==
-      c("2001-06-15", "2004-03-10", "2005-07-19", "2010-05-04", "2011-08-24", "2014-02-09", "2014-05-20", "2014-12-10", "2015-04-30", "2015-06-24")
+      c('2001-06-15', '2004-03-10', '2005-07-19', '2009-12-22', '2010-05-04', '2011-03-07', '2011-08-24', '2014-02-09', '2014-05-20', '2014-12-10', '2015-04-30', '2015-06-24')
   ))
   expect_true(all(
-    cdm$cohort4 |> dplyr::pull("subject_id") |> sort() == c(1, 1, 1, 1, 2, 2, 3, 3, 3, 4)
+    cdm$cohort4 |> dplyr::pull("subject_id") |> sort() == c(1, 1, 1, 1, 2, 2, 3, 3, 3, 4, 4, 4)
   ))
   codes <- attr(cdm$cohort4, "cohort_codelist")
   expect_true(all(codes |> dplyr::pull("codelist_name") |> sort() == c(rep("c1", 2), "c2")))
