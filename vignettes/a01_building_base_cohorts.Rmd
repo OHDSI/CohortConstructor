@@ -182,15 +182,15 @@ attrition(cdm$working_age_cohort_0_365)
 
 ```{r, include = FALSE}
 cdm <- mockVocabularyTables(concept = tibble(
-  concept_id = c(4326744, 4298393, 45770407, 8876, 4124457),
+  concept_id = c(4326744, 4298393, 45770407, 8876, 4124457, 1990036),
   concept_name = c("Blood pressure", "Systemic blood pressure",
                    "Baseline blood pressure", "millimeter mercury column",
-                   "Normal range"),
+                   "Normal range", "Overweight"),
   domain_id = "Measurement",
-  vocabulary_id = c("SNOMED", "SNOMED", "SNOMED", "UCUM", "SNOMED"),
+  vocabulary_id = c("SNOMED", "SNOMED", "SNOMED", "UCUM", "SNOMED", "SNOMED"),
   standard_concept = "S",
   concept_class_id = c("Observable Entity", "Observable Entity",
-                       "Observable Entity", "Unit", "Qualifier Value"),
+                       "Observable Entity", "Unit", "Qualifier Value", "Qualifier Value"),
   concept_code = NA_character_,
   valid_start_date = as.Date(NA_character_),
   valid_end_date = as.Date(NA_character_),
@@ -198,14 +198,14 @@ cdm <- mockVocabularyTables(concept = tibble(
 )) |>
   mockCdmFromTables(tables = list(
     measurement = tibble(
-      measurement_id = 1:4L,
-      person_id = c(1L, 1L, 2L, 3L),
-      measurement_concept_id = c(4326744L, 4298393L, 4298393L, 45770407L),
-      measurement_date = as.Date(c("2000-07-01", "2000-12-11", "2002-09-08", "2015-02-19")),
+      measurement_id = 1:5L,
+      person_id = c(1L, 1L, 2L, 3L, 2L),
+      measurement_concept_id = c(4326744L, 4298393L, 4298393L, 1990036L),
+      measurement_date = as.Date(c("2000-07-01", "2000-12-11", "2002-09-08", "2015-02-19", "2002-09-08")),
       measurement_type_concept_id = 0L,
-      value_as_number = c(100, 125, NA, NA),
-      value_as_concept_id = c(0L, 0L, 0L, 4124457L),
-      unit_concept_id = c(8876L, 8876L, 0L, 0L)
+      value_as_number = c(100, 125, NA, NA, NA),
+      value_as_concept_id = c(0L, 0L, 0L, 4124457L, 4328749L),
+      unit_concept_id = c(8876L, 8876L, 0L, 0L, 0L)
    )
  ))
 
@@ -214,15 +214,15 @@ src <- dbSource(con = dbConnect(drv = duckdb()), writeSchema = "main")
 cdm <- insertCdmTo(cdm = cdm, to = src)
 ```
 
-Another base cohort we can create is based around patient measurements. Here for example we create a cohort of patients who have a normal BMI (BMI between 18 and 25). To do this you must first identify the measurement you want to look at (in this case BMI (concept id = 4245997)), the unit of measurement (kg per square-meter (concept id = 9531)) and 'normal' value concept (concept id = 4069590). The value concept is included for the cases where the exact BMI measurement is not specified, but the BMI category (i.e. normal, overweight, obese etc) is. This means that if a record matches the value concept OR has a normal BMI score then it is included in the cohort.
+Another base cohort we can create is based around patient measurements. Here for example we create a cohort of patients who have a normal BMI (BMI between 18 and 25), and a high BMI (BMI between 26 and 40). To do this you must first identify the measurement you want to look at (in this case BMI (concept id = 4245997)), the unit of measurement (kg per square-meter (concept id = 9531)), the 'normal' value concept (concept id = 4069590), and the concept for 'overweight' (concept id = 1990036). The value concept is included for the cases where the exact BMI measurement is not specified, but the BMI category (i.e. normal, overweight, obese etc) is. This means that if a record matches the value concept OR has a normal BMI score then it is included in the cohort.
 
 ```{r}
 cdm$cohort <- measurementCohort(
   cdm = cdm,
   name = "cohort",
-  conceptSet = list("bmi_normal" = c(4245997)),
-  valueAsConcept = c(4069590),
-  valueAsNumber = list("9531" = c(18, 25))
+  conceptSet = list("bmi" = c(4245997)),
+  valueAsConcept = list("bmi_normal" = c(4069590), "bmi_overweight" = c(1990036)),
+  valueAsNumber = list("bmi_normal" = list("9531" = c(18, 25)), "bmi_overweight" = list("9531" = c(26, 30)))
 )
 
 attrition(cdm$cohort)
@@ -230,7 +230,7 @@ settings(cdm$cohort)
 cdm$cohort
 ```
 
-As you can see in the above code, the concept set is the list of BMI concepts, the concept value is the 'normal' weight concept, and the values are the minimum and maximum BMI scores to be considered.
+As you can see in the above code, the concept set is the list of BMI concepts, for the "bmi_normal" cohort, the concept value is the 'normal' weight concept, and the values are the minimum and maximum BMI scores to be considered. Similary for the "bmi_overweight", the concept value refers to "overweight" and the numeric range goes from minimum and maximum BMI score for that category.
 
 It is also possible to include records outside of observation by setting the `useRecordsBeforeObservation` argument to TRUE.
 
@@ -238,9 +238,9 @@ It is also possible to include records outside of observation by setting the `us
 cdm$cohort <- measurementCohort(
   cdm = cdm,
   name = "cohort",
-  conceptSet = list("bmi_normal" = c(4245997)),
-  valueAsConcept = c(4069590),
-  valueAsNumber = list("9531" = c(18, 25)),
+  conceptSet = list("bmi" = c(4245997)),
+  valueAsConcept = list("bmi_normal" = c(4069590)),
+  valueAsNumber = list("bmi_normal" = list("9531" = c(18, 25))),
   useRecordsBeforeObservation = TRUE
 )
 
@@ -248,6 +248,7 @@ attrition(cdm$cohort)
 settings(cdm$cohort)
 cdm$cohort
 ```
+
 ## Death cohort
 
 ```{r, include=FALSE}
