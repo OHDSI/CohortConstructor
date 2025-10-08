@@ -141,7 +141,7 @@ measurementCohort <- function(cdm,
   table <- validateTable(table)
 
   useIndexes <- getOption("CohortConstructor.use_indexes")
-  cohortSet <- measurementConceptSet(valueAsNumber, valueAsConcept)
+  cohortSet <- measurementConceptSet(valueAsNumber, valueAsConcept, cdm)
   # empty concept set
   if (length(conceptSet) == 0) {
     cli::cli_inform(c("i" = "Empty codelist provided, returning empty cohort"))
@@ -348,7 +348,7 @@ addDomains <- function(cohortCodelist, cdm, name) {
   return(cohortCodelist)
 }
 
-measurementConceptSet <- function(valueAsNumber, valueAsConcept) {
+measurementConceptSet <- function(valueAsNumber, valueAsConcept, cdm) {
   cohortNames <- unique(c(names(valueAsNumber), names(valueAsConcept))) |> sort()
   dplyr::tibble(
     "cohort_definition_id" = as.integer(1:length(cohortNames)),
