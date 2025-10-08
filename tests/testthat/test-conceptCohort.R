@@ -59,7 +59,6 @@ test_that("initial tests", {
                                        "2017-10-29",
                                        NA)),
       "condition_type_concept_id" = 1L,
-      # TODO: remove this column if issue #646 decided in warning instead of error
       "condition_source_concept_id" = NA_integer_
     )
   )
@@ -270,6 +269,17 @@ test_that("initial tests", {
     exit = "not_and_option",
     name = "new_cohort"
   ))
+  cdm$condition_occurrence <- cdm$condition_occurrence |>
+    dplyr::select(!"condition_source_concept_id")
+  expect_error(
+    conceptCohort(
+      cdm = cdm,
+      conceptSet = list("c" = c(1L, 2L, 3L, 4L, 5L, 99L)),
+      exit = "event_start_date",
+      useSourceFields = TRUE,
+      name = "new_cohort"
+    )
+  )
 
   # Indexes ----
   if (dbToTest == "postgres CDMConnector" & testIndexes) {
