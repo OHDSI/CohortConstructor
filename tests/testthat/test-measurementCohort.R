@@ -280,6 +280,14 @@ test_that("mearurementCohorts works", {
   codes <- attr(cdm$cohort8, "cohort_codelist") |> dplyr::collect()
   expect_true(all(codes$concept_id  |> sort() == c(123456)))
 
+  # Indexes ----
+  if (dbToTest == "postgres CDMConnector" & testIndexes) {
+    expect_true(
+      DBI::dbGetQuery(CDMConnector::cdmCon(cdm), paste0("SELECT * FROM pg_indexes WHERE tablename = 'coco_test_cohort8';")) |> dplyr::pull("indexdef") ==
+        "CREATE INDEX coco_test_cohort8_subject_id_cohort_start_date_idx ON public.coco_test_cohort8 USING btree (subject_id, cohort_start_date)"
+    )
+  }
+
   # empty cohort but non empty codelist ----
   cdm$cohort9 <- measurementCohort(
     cdm = cdm,
@@ -316,12 +324,35 @@ test_that("mearurementCohorts works", {
     dplyr::tibble(subject_id = 1L, cohort_start_date = as.Date("2000-07-01"), cohort_end_date = as.Date("2000-07-01"))
   )
 
+  # Expected behaviour ----
+  # simple example
+  expect_error(
+    measurementCohort(
+      cdm = cdm,
+      name = "cohort",
+      conceptSet = list(c(4326744L, 4298393L, 45770407L)),
+      valueAsConcept = c(4124457L),
+      valueAsNumber = list("8876" = c(70L, 120L)),
+      table = "measurement"
+    )
+  )
+  expect_error(
+    measurementCohort(
+      cdm = cdm,
+      name = "cohort",
+      conceptSet = list("name " = c(4326744L, 4298393L, 45770407L)),
+      valueAsConcept = c(4124457),
+      valueAsNumber = list("8876" = c(700, 120)),
+      table = "measurement"
+    )
+  )
+
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
 
   dropCreatedTables(cdm = cdm)
 })
 
-test_that("mearurementCohorts - valueAsNumber without unit concept", {
+test_that("valueAsNumber without unit concept", {
   skip_on_cran()
 
   person <- dplyr::tibble(person_id = c(1, 2, 3),
@@ -483,95 +514,6 @@ test_that("mearurementCohorts - valueAsNumber without unit concept", {
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
 
   dropCreatedTables(cdm = cdm)
-})
-
-test_that("expected errors", {
-  skip_on_cran()
-  cdm <- omock::mockCdmFromTables(tables = list(
-    measurement = dplyr::tibble(
-      measurement_id = 1:4L,
-      person_id = c(1L, 1L, 2L, 3L),
-      measurement_concept_id = c(4326744L, 4298393L, 4298393L, 45770407L),
-      measurement_date = as.Date(c("2000-07-01", "2000-12-11", "2002-09-08", "2015-02-19")),
-      measurement_type_concept_id = NA_integer_,
-      value_as_number = c(100L, 125L, NA_integer_, NA_integer_),
-      value_as_concept_id = c(0L, 0L, 0L, 4124457L),
-      unit_concept_id = c(8876L, 8876L, 0L, 0L)
-    )
-  )) |>
-    omock::mockVocabularyTables(concept = omock:::mockConcept |>
-                                  dplyr::union_all(dplyr::tibble(
-                                    concept_id = c(4326744L, 4298393L, 45770407L, 8876L, 4124457L),
-                                    concept_name = c("Blood pressure", "Systemic blood pressure",
-                                                     "Baseline blood pressure", "millimeter mercury column",
-                                                     "Normal range"),
-                                    domain_id = "Measurement",
-                                    vocabulary_id = c("SNOMED", "SNOMED", "SNOMED", "UCUM", "SNOMED"),
-                                    standard_concept = "S",
-                                    concept_class_id = c("Observable Entity", "Observable Entity",
-                                                         "Observable Entity", "Unit", "Qualifier Value"),
-                                    concept_code = NA,
-                                    valid_start_date = NA,
-                                    valid_end_date = NA,
-                                    invalid_reason = NA
-                                  ))) |>
-    copyCdm()
-
-  # simple example
-  expect_error(
-    measurementCohort(
-      cdm = cdm,
-      name = "cohort",
-      conceptSet = list(c(4326744L, 4298393L, 45770407L)),
-      valueAsConcept = c(4124457L),
-      valueAsNumber = list("8876" = c(70L, 120L)),
-      table = "measurement"
-    )
-  )
-  expect_error(
-    measurementCohort(
-      cdm = cdm,
-      name = "cohort",
-      conceptSet = list("name " = c(4326744L, 4298393L, 45770407L)),
-      valueAsConcept = c(4124457),
-      valueAsNumber = list("8876" = c(700, 120)),
-      table = "measurement"
-    )
-  )
-
-  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-
-  dropCreatedTables(cdm = cdm)
-})
-
-test_that("test indexes - postgres", {
-  skip_on_cran()
-  skip_if(!testIndexes)
-
-  if (dbToTest == "postgres CDMConnector") {
-    cdm <- omock::mockCdmFromDataset(datasetName = "GiBleed", source = "local") |>
-      omock::mockCohort(name = "my_cohort", recordPerson = 0.1) |>
-      copyCdm()
-
-    con <- CDMConnector::cdmCon(cdm = cdm)
-
-    cdm$my_cohort <- measurementCohort(
-      cdm = cdm,
-      name = "my_cohort",
-      conceptSet = list(a = 45770407),
-      table = "measurement"
-    )
-
-    expect_true(
-      DBI::dbGetQuery(con, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
-        "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
-    )
-
-    expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-
-    dropCreatedTables(cdm = cdm)
-  }
-
 })
 
 test_that("useRecordsBeforeObservation TRUE", {
