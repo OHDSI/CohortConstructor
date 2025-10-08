@@ -1,48 +1,57 @@
 test_that("exit at first date", {
   skip_on_cran()
-  cdm <- omock::mockCdmFromTables(tables = list(
-    "cohort_1" = dplyr::tibble(
-      cohort_definition_id = 1,
-      subject_id = c(1, 2, 3, 4, 4),
-      cohort_start_date = as.Date(c("2000-06-03", "2000-01-01", "2015-01-15", "1989-12-09", "2000-12-09")),
-      cohort_end_date = as.Date(c("2001-09-01", "2001-01-12", "2015-02-15", "1990-12-09", "2002-12-09")),
-      other_date_1 = as.Date(c("2001-08-01", "2001-01-01", "2015-01-15", NA, "2002-12-09")),
-      other_date_2 = as.Date(c("2001-08-01", NA, "2015-04-15", "1990-13-09", "2002-12-09"))
-    ),
-    "cohort_2" = dplyr::tibble(
-      cohort_definition_id = c(1, 1, 2, 2, 2),
-      subject_id = c(1, 2, 3, 4, 4),
-      cohort_start_date = as.Date(c("2000-06-03", "2000-01-01", "2015-01-15", "1989-12-09", "2000-12-09")),
-      cohort_end_date = as.Date(c("2001-09-01", "2001-01-12", "2015-02-15", "1990-12-09", "2002-12-09")),
-      other_date_1 = as.Date(c("2001-09-02", "2001-01-01", "2015-01-15", "2000-11-09", "2002-12-09")),
-      other_date_2 = as.Date(c("2001-08-01", NA, "2015-04-15", "1990-13-09", "2002-12-10"))
-    ),
-    "cohort_3" = dplyr::tibble(
-      cohort_definition_id = 1,
-      subject_id = c(1, 2, 3, 4, 4),
-      cohort_start_date = as.Date(c("2000-06-03", "2000-01-01", "2015-01-15", "1989-12-09", "2000-12-09")),
-      cohort_end_date = as.Date(c("2001-09-01", "2001-01-12", "2015-02-15", "1990-12-09", "2002-12-09")),
-      other_date_1 = as.Date(c("2001-09-02", NA, "2015-01-15", "2000-11-09", "2002-12-09")),
-      other_date_2 = as.Date(c("2001-08-01", NA, "2015-04-15", "2002-12-10", "2002-12-10"))
-    ),
-    "cohort_4" = dplyr::tibble(
-      cohort_definition_id = 1,
-      subject_id = c(1, 2, 3, 4),
-      cohort_start_date = as.Date(c("2000-06-03", "2015-01-15", "1989-12-09", "2000-12-09")),
-      cohort_end_date = as.Date(c("2001-09-01", "2015-02-15", "1990-12-09", "2002-12-09")),
-      other_date_1 = as.Date(c("2001-09-02", "2015-01-15", "2000-11-09", "2002-12-09")),
-      other_date_2 = as.Date(c("2001-08-01", "2016-04-15", "2002-12-10", "2002-12-10"))
-    ),
-    "cohort_5" = dplyr::tibble(
-      cohort_definition_id = 1,
-      subject_id = c(1, 2, 3),
-      cohort_start_date = as.Date(c("2000-06-03", "2015-01-15", "1989-12-09")),
-      cohort_end_date = as.Date(c("2001-09-01", "2015-02-15", "1990-12-09")),
-      other_date_1 = as.Date(c("2000-06-02", "2015-01-15", "2000-11-09")),
-      other_date_2 = as.Date(c("2001-08-01", "2016-04-15", "2002-12-10"))
-    )
-  )) |>
-    copyCdm()
+  cdm <- omock::mockCdmFromTables(
+    tables = list(
+      "cohort_1" = dplyr::tibble(
+        cohort_definition_id = 1,
+        subject_id = c(1, 2, 3, 4, 4),
+        cohort_start_date = as.Date(c("2000-06-03", "2000-01-01", "2015-01-15", "1989-12-09", "2000-12-09")),
+        cohort_end_date = as.Date(c("2001-09-01", "2001-01-12", "2015-02-15", "1990-12-09", "2002-12-09")),
+        other_date_1 = as.Date(c("2001-08-01", "2001-01-01", "2015-01-15", NA, "2002-12-09")),
+        other_date_2 = as.Date(c("2001-08-01", NA, "2015-04-15", "1990-13-09", "2002-12-09"))
+      ),
+      "cohort_2" = dplyr::tibble(
+        cohort_definition_id = c(1, 1, 2, 2, 2),
+        subject_id = c(1, 2, 3, 4, 4),
+        cohort_start_date = as.Date(c("2000-06-03", "2000-01-01", "2015-01-15", "1989-12-09", "2000-12-09")),
+        cohort_end_date = as.Date(c("2001-09-01", "2001-01-12", "2015-02-15", "1990-12-09", "2002-12-09")),
+        other_date_1 = as.Date(c("2001-09-02", "2001-01-01", "2015-01-15", "2000-11-09", "2002-12-09")),
+        other_date_2 = as.Date(c("2001-08-01", NA, "2015-04-15", "1990-13-09", "2002-12-10"))
+      ),
+      "cohort_3" = dplyr::tibble(
+        cohort_definition_id = 1,
+        subject_id = c(1, 2, 3, 4, 4),
+        cohort_start_date = as.Date(c("2000-06-03", "2000-01-01", "2015-01-15", "1989-12-09", "2000-12-09")),
+        cohort_end_date = as.Date(c("2001-09-01", "2001-01-12", "2015-02-15", "1990-12-09", "2002-12-09")),
+        other_date_1 = as.Date(c("2001-09-02", NA, "2015-01-15", "2000-11-09", "2002-12-09")),
+        other_date_2 = as.Date(c("2001-08-01", NA, "2015-04-15", "2002-12-10", "2002-12-10"))
+      ),
+      "cohort_4" = dplyr::tibble(
+        cohort_definition_id = 1,
+        subject_id = c(1, 2, 3, 4),
+        cohort_start_date = as.Date(c("2000-06-03", "2015-01-15", "1989-12-09", "2000-12-09")),
+        cohort_end_date = as.Date(c("2001-09-01", "2015-02-15", "1990-12-09", "2002-12-09")),
+        other_date_1 = as.Date(c("2001-09-02", "2015-01-15", "2000-11-09", "2002-12-09")),
+        other_date_2 = as.Date(c("2001-08-01", "2016-04-15", "2002-12-10", "2002-12-10"))
+      ),
+      "cohort_5" = dplyr::tibble(
+        cohort_definition_id = 1,
+        subject_id = c(1, 2, 3),
+        cohort_start_date = as.Date(c("2000-06-03", "2015-01-15", "1989-12-09")),
+        cohort_end_date = as.Date(c("2001-09-01", "2015-02-15", "1990-12-09")),
+        other_date_1 = as.Date(c("2000-06-02", "2015-01-15", "2000-11-09")),
+        other_date_2 = as.Date(c("2001-08-01", "2016-04-15", "2002-12-10"))
+      )
+    ))
+  cdm <- omopgenerics::insertTable(
+    cdm = cdm, name = "observation_period", table = dplyr::tibble(
+      "observation_period_id" = c(1L, 2L, 3L, 4L, 5L),
+      "person_id" = observation_period_id,
+      "observation_period_start_date" = as.Date(c("1978-01-01")),
+      "observation_period_end_date" = as.Date(c("2025-01-01")),
+      "period_type_concept_id" = NA_integer_
+    ))
+  cdm <- cdm |> copyCdm()
 
   # Exit at first date ----
   cdm$cohort1 <- cdm$cohort_1 |>
