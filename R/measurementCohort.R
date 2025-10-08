@@ -244,7 +244,7 @@ measurementCohort <- function(cdm,
         cohortAttritionRef = cohortAttrition,
         cohortCodelistRef = cohortCodelist
       )
-    omopgenerics::dropSourceTable(cdm = cdm, name = tableCohortCodelist)
+    omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(tablePref))
     return(cdm[[name]])
   }
 
@@ -279,7 +279,7 @@ measurementCohort <- function(cdm,
 
   cli::cli_inform(c("v" = "Cohort {.strong {name}} created."))
 
-  omopgenerics::dropSourceTable(cdm = cdm, name = tableCohortCodelist)
+  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(tablePref))
 
   if (!isFALSE(useIndexes)) {
     addIndex(

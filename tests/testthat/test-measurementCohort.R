@@ -29,8 +29,8 @@ test_that("mearurementCohorts works", {
   )
 
   obs <- dplyr::tibble(
-    observation_period_id = 1:5,
-    person_id = 1:5,
+    observation_period_id = 1:5L,
+    person_id = 1:5L,
     observation_period_start_date = as.Date(c(
       "2000-06-03", "1999-04-05", "2015-01-15", "1989-12-09", "2012-03-18"
     )),
@@ -56,7 +56,7 @@ test_that("mearurementCohorts works", {
     measurement_concept_id = c(4326744, 4298393, 4298393, 45770407, 45770407, 123456, 123456) |> as.integer(),
     measurement_date = as.Date(c("2000-07-01", "2000-12-11", "2002-09-08", "2015-02-19", "2015-02-20", "1900-01-01", "2050-01-01")),
     measurement_type_concept_id = NA_integer_,
-    value_as_number = c(100, 125, NA, NA, NA, NA, NA) |> as.integer(),
+    value_as_number = c(100, 125, NA, NA, NA, NA, NA),
     value_as_concept_id = c(0, 0, 0, 4124457, 999999, 0, 0) |> as.integer(),
     unit_concept_id = c(8876, 8876, 0, 0, 0, 0, 0) |> as.integer()
   )
@@ -72,10 +72,10 @@ test_that("mearurementCohorts works", {
     concept_class_id = c("Observable Entity", "Observable Entity",
                          "Observable Entity", "Unit", "Qualifier Value",
                          "Qualifier Value", "hi"),
-    concept_code = NA,
-    valid_start_date = NA,
-    valid_end_date = NA,
-    invalid_reason = NA
+    concept_code = NA_character_,
+    valid_start_date = as.Date(NA),
+    valid_end_date = as.Date(NA),
+    invalid_reason = NA_character_
   )
 
   cdm <- omopgenerics::cdmFromTables(
@@ -420,7 +420,7 @@ test_that("useRecordsBeforeObservation TRUE + edge cases", {
           "2000-01-01", "2001-08-01", "2000-03-01", "2000-11-01", "2000-02-01", "1999-11-01"
         )),
         "measurement_type_concept_id" = 1L,
-        "value_as_number" = as.integer(1),
+        "value_as_number" = 1,
         "value_as_concept_id" = as.integer(1),
         "unit_concept_id" = as.integer(1)
       )
