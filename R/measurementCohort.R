@@ -51,6 +51,7 @@
 #'
 #' @return A cohort table.
 #'
+#' @export
 #'
 #' @examples
 #' \donttest{
