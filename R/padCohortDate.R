@@ -6,7 +6,7 @@
 #' @inheritParams nameDoc
 #' @inheritParams collapseDoc
 #' @inheritParams daysDoc
-#' @inheritParams padObservationDoc
+#' @inheritParams requireFullContributionDoc
 #' @param cohortDate 'cohort_start_date' or 'cohort_end_date'.
 #' @param indexDate Variable in cohort that contains the index date to add.
 #' @inheritParams softValidationDoc
@@ -29,7 +29,7 @@ padCohortDate <- function(cohort,
                           cohortDate = "cohort_start_date",
                           indexDate = "cohort_start_date",
                           collapse = TRUE,
-                          padObservation = TRUE,
+                          requireFullContribution = FALSE,
                           cohortId = NULL,
                           name = tableName(cohort),
                           .softValidation = FALSE) {
@@ -39,7 +39,7 @@ padCohortDate <- function(cohort,
       indexDate = indexDate,
       days = days,
       collapse = collapse,
-      padObservation = padObservation,
+      requireFullContribution = requireFullContribution,
       cohortId = cohortId,
       name = name,
       .softValidation = .softValidation
@@ -64,7 +64,7 @@ padCohortDate <- function(cohort,
 #' @inheritParams nameDoc
 #' @inheritParams collapseDoc
 #' @inheritParams daysDoc
-#' @inheritParams padObservationDoc
+#' @inheritParams requireFullContributionDoc
 #' @inheritParams softValidationDoc
 #'
 #' @return Cohort table
@@ -81,7 +81,7 @@ padCohortDate <- function(cohort,
 padCohortEnd <- function(cohort,
                          days,
                          collapse = TRUE,
-                         padObservation = TRUE,
+                         requireFullContribution = FALSE,
                          cohortId = NULL,
                          name = tableName(cohort),
                          .softValidation = FALSE) {
@@ -91,7 +91,7 @@ padCohortEnd <- function(cohort,
       indexDate = "cohort_end_date",
       days = days,
       collapse = collapse,
-      padObservation = padObservation,
+      requireFullContribution = requireFullContribution,
       cohortId = cohortId,
       name = name,
       .softValidation = .softValidation
@@ -113,7 +113,7 @@ padCohortEnd <- function(cohort,
 #' @inheritParams nameDoc
 #' @inheritParams collapseDoc
 #' @inheritParams daysDoc
-#' @inheritParams padObservationDoc
+#' @inheritParams requireFullContributionDoc
 #' @inheritParams softValidationDoc
 #'
 #' @return Cohort table
@@ -130,7 +130,7 @@ padCohortEnd <- function(cohort,
 padCohortStart <- function(cohort,
                            days,
                            collapse = TRUE,
-                           padObservation = TRUE,
+                           requireFullContribution = FALSE,
                            cohortId = NULL,
                            name = tableName(cohort),
                            .softValidation = FALSE) {
@@ -140,7 +140,7 @@ padCohortStart <- function(cohort,
       indexDate = "cohort_start_date",
       days = days,
       collapse = collapse,
-      padObservation = padObservation,
+      requireFullContribution = requireFullContribution,
       cohortId = cohortId,
       name = name,
       .softValidation = .softValidation
@@ -152,7 +152,7 @@ padCohortStart <- function(cohort,
                            indexDate,
                            days,
                            collapse,
-                           padObservation,
+                           requireFullContribution,
                            cohortId,
                            name,
                            call = parent.frame(),
@@ -222,7 +222,7 @@ padCohortStart <- function(cohort,
 
   # solve observation
   newCohort <- newCohort |>
-    solveObservation(padObservation, tmpNewCohort, cohortDate)
+    solveObservation(requireFullContribution, tmpNewCohort, cohortDate)
 
   # solve overlap
   newCohort <- newCohort |>
@@ -306,7 +306,7 @@ solveOverlap <- function(x, collapse, intermediate) {
   }
   return(x)
 }
-solveObservation <- function(x, padObservation, intermediate, cohortDate) {
+solveObservation <- function(x, requireFullContribution, intermediate, cohortDate) {
   idcol <- omopgenerics::uniqueId(exclude = colnames(x))
   if (cohortDate == "cohort_start_date") {
     x <- x |>
@@ -315,7 +315,7 @@ solveObservation <- function(x, padObservation, intermediate, cohortDate) {
         priorObservationName = idcol,
         priorObservationType = "date"
       )
-    if (padObservation) {
+    if (isFALSE(requireFullContribution)) {
       x <- x |>
         dplyr::mutate("cohort_start_date" = dplyr::if_else(
           .data$cohort_start_date < .data[[idcol]],
@@ -333,7 +333,7 @@ solveObservation <- function(x, padObservation, intermediate, cohortDate) {
         futureObservationName = idcol,
         futureObservationType = "date"
       )
-    if (padObservation) {
+    if (isFALSE(requireFullContribution)) {
       x <- x |>
         dplyr::mutate("cohort_end_date" = dplyr::if_else(
           .data$cohort_end_date > .data[[idcol]],

@@ -210,14 +210,14 @@ test_that("adding days to cohort start", {
     cdm$cohort,
     days = -90,
     name = "cohort_3",
-    padObservation = FALSE
+    requireFullContribution = TRUE
   )
   expect_true(nrow(dplyr::collect(cdm$cohort_3)) == 0)
   cdm$cohort_3 <- padCohortStart(
     cdm$cohort,
     days = -90,
     name = "cohort_3",
-    padObservation = TRUE
+    requireFullContribution = FALSE
   )
   expect_true(nrow(dplyr::collect(cdm$cohort_3)) == 1)
   expect_identical(

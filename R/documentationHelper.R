@@ -174,13 +174,14 @@ NULL
 #' @keywords internal
 NULL
 
-#' Helper for consistent documentation of `padObservation`.
+#' Helper for consistent documentation of `requireFullContribution`.
 #'
-#' @param padObservation Whether to pad observations if they are outside
-#' observation_period (TRUE) or drop the records if they are outside
-#' observation_period (FALSE)
+#' @param requireFullContribution Whether to require individuals to contribute all
+#' required days. If TRUE, those individuals for which adding days would take
+#' them out of observation will be dropped. If FALSE, days will only be added
+#' up to the day when the individual leaves observation.
 #'
-#' @name padObservationDoc
+#' @name requireFullContributionDoc
 #' @keywords internal
 NULL
 
