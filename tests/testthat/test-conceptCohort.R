@@ -289,7 +289,7 @@ test_that("initial tests", {
     )
   }
 
-  # Test tabel argument ----
+  # Test table argument ----
   cohort <- conceptCohort(
     cdm = cdm, conceptSet = list("a" = 5L), name = "cohort"
   )
@@ -326,6 +326,18 @@ test_that("initial tests", {
       cohort_end_date = as.Date(c("2001-02-01"))
     )
   )
+
+
+  # error if missing columns
+  cdm$drug_exposure <- cdm$drug_exposure |>
+    dplyr::select(!"drug_source_concept_id")
+  expect_no_error(conceptCohort(cdm, conceptSet = list("a" = 5L),
+                name = "cohort",
+                table = "drug_exposure"))
+  expect_error(conceptCohort(cdm, conceptSet = list("a" = 5L),
+                useSourceFields = TRUE,
+                name = "cohort",
+                table = "drug_exposure"))
 
   dropCreatedTables(cdm = cdm)
 })

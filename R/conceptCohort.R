@@ -641,6 +641,17 @@ getDomainCohort <- function(cdm,
   if (source) {
     name = paste0(name, "_source")
   }
+
+  if(!concept %in% colnames(cdm[[table]])){
+    cli::cli_abort("{concept} not found in {table} table")
+  }
+  if(!start %in% colnames(cdm[[table]])){
+    cli::cli_abort("{start} not found in {table} table")
+  }
+  if(!end %in% colnames(cdm[[table]])){
+    cli::cli_abort("{end} not found in {table} table")
+  }
+
   tempCohort <- cdm[[table]] |>
     dplyr::select(
       "subject_id" = "person_id",
