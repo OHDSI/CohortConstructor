@@ -195,7 +195,7 @@ For example, to subtract 50 days from the cohort start date:
 cdm$cohort <- cdm$cohort |> padCohortStart(days = -50, collapse = FALSE)
 ```
 
-When subtracting days, it may result in cohort start dates preceding the observation period start. By default, such entries are corrected to the observation period start. To drop these entries instead, set the `padObservation` argument to FALSE.
+When subtracting days, it may result in cohort start dates preceding the observation period start. By default, such entries are corrected to the observation period start. To drop these entries instead, set the `requireFullContribution` argument to TRUE
 
 Additionally, adjusting cohort start dates may lead to overlapping entries for the same subject. The `collapse` argument manages this: if TRUE, merges overlapping entries into a single record with the earliest start and latest end date (default), if FALSE retains only the first of the overlapping entries.
 
@@ -207,7 +207,7 @@ The example below adds 1000 days to cohort end date, while dropping records that
 
 ```{r}
 cdm$cohort_pad <- cdm$cohort |> 
-  padCohortEnd(days = 1000, padObservation = FALSE, name = "cohort_pad")
+  padCohortEnd(days = 1000, requireFullContribution = TRUE, name = "cohort_pad")
 ```
 
 Additionally, days to add can also be specified with a numeric column in the cohort, which allows to add a specific number of days for each record:
@@ -215,7 +215,7 @@ Additionally, days to add can also be specified with a numeric column in the coh
 ```{r}
 cdm$cohort <- cdm$cohort |> 
   dplyr::mutate(days_to_add = date_count_between(start = cohort_start_date, end = cohort_end_date, precision = "day")) |>
-  padCohortEnd(days = "days_to_add", padObservation = FALSE)
+  padCohortEnd(days = "days_to_add", requireFullContribution = TRUE)
 ```
 
 
