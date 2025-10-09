@@ -287,11 +287,11 @@ than only the standard concept_id fields, we can set
 <span>  <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Rows: ??</span></span>
 <span><span class="co">#&gt; Columns: 4</span></span>
-<span><span class="co">#&gt; Database: DuckDB 1.4.0 [unknown@Linux 6.11.0-1018-azure:R 4.5.1//tmp/RtmpLyYehj/file28716792c11e.duckdb]</span></span>
+<span><span class="co">#&gt; Database: DuckDB 1.4.0 [unknown@Linux 6.11.0-1018-azure:R 4.5.1//tmp/Rtmpb3z17L/file282c69553230.duckdb]</span></span>
 <span><span class="co">#&gt; $ cohort_definition_id <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> 1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1…</span></span>
-<span><span class="co">#&gt; $ subject_id           <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> 1565<span style="color: #949494;">, </span>2837<span style="color: #949494;">, </span>3537<span style="color: #949494;">, </span>3553<span style="color: #949494;">, </span>3887<span style="color: #949494;">, </span>4268<span style="color: #949494;">, </span>4283<span style="color: #949494;">, </span>4401<span style="color: #949494;">, </span>2…</span></span>
-<span><span class="co">#&gt; $ cohort_start_date    <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 1999-11-24<span style="color: #949494;">, </span>2008-01-10<span style="color: #949494;">, </span>2002-04-01<span style="color: #949494;">, </span>1966-09-20<span style="color: #949494;">, </span>…</span></span>
-<span><span class="co">#&gt; $ cohort_end_date      <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 1999-11-24<span style="color: #949494;">, </span>2008-01-10<span style="color: #949494;">, </span>2002-04-01<span style="color: #949494;">, </span>1966-09-20<span style="color: #949494;">, </span>…</span></span></code></pre></div>
+<span><span class="co">#&gt; $ subject_id           <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> 66<span style="color: #949494;">, </span>1432<span style="color: #949494;">, </span>3249<span style="color: #949494;">, </span>3655<span style="color: #949494;">, </span>4246<span style="color: #949494;">, </span>5239<span style="color: #949494;">, </span>648<span style="color: #949494;">, </span>1148<span style="color: #949494;">, </span>1464…</span></span>
+<span><span class="co">#&gt; $ cohort_start_date    <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 1996-03-09<span style="color: #949494;">, </span>2005-01-30<span style="color: #949494;">, </span>2002-02-18<span style="color: #949494;">, </span>1975-12-08<span style="color: #949494;">, </span>…</span></span>
+<span><span class="co">#&gt; $ cohort_end_date      <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 1996-03-09<span style="color: #949494;">, </span>2005-01-30<span style="color: #949494;">, </span>2002-02-18<span style="color: #949494;">, </span>1975-12-08<span style="color: #949494;">, </span>…</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="demographic-based-cohort-creation">Demographic based cohort creation<a class="anchor" aria-label="anchor" href="#demographic-based-cohort-creation"></a>
@@ -433,42 +433,48 @@ required.</p>
 </h2>
 <p>Another base cohort we can create is based around patient
 measurements. Here for example we create a cohort of patients who have a
-normal BMI (BMI between 18 and 25). To do this you must first identify
-the measurement you want to look at (in this case BMI (concept id =
-4245997)), the unit of measurement (kg per square-meter (concept id =
-9531)) and ‘normal’ value concept (concept id = 4069590). The value
-concept is included for the cases where the exact BMI measurement is not
-specified, but the BMI category (i.e. normal, overweight, obese etc) is.
-This means that if a record matches the value concept OR has a normal
-BMI score then it is included in the cohort.</p>
+normal BMI (BMI between 18 and 25), and a high BMI (BMI between 26 and
+40). To do this you must first identify the measurement you want to look
+at (in this case BMI (concept id = 4245997)), the unit of measurement
+(kg per square-meter (concept id = 9531)), the ‘normal’ value concept
+(concept id = 4069590), and the concept for ‘overweight’ (concept id =
+1990036). The value concept is included for the cases where the exact
+BMI measurement is not specified, but the BMI category (i.e. normal,
+overweight, obese etc) is. This means that if a record matches the value
+concept OR has a normal BMI score then it is included in the cohort.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">cohort</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/measurementCohort.html">measurementCohort</a></span><span class="op">(</span></span>
 <span>  cdm <span class="op">=</span> <span class="va">cdm</span>,</span>
 <span>  name <span class="op">=</span> <span class="st">"cohort"</span>,</span>
-<span>  conceptSet <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"bmi_normal"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4245997</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  valueAsConcept <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4069590</span><span class="op">)</span>,</span>
-<span>  valueAsNumber <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"9531"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">18</span>, <span class="fl">25</span><span class="op">)</span><span class="op">)</span></span>
+<span>  conceptSet <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"bmi"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4245997</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  valueAsConcept <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"bmi_normal"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4069590</span><span class="op">)</span>, <span class="st">"bmi_overweight"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1990036</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  valueAsNumber <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"bmi_normal"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"9531"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">18</span>, <span class="fl">25</span><span class="op">)</span><span class="op">)</span>, <span class="st">"bmi_overweight"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"9531"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">26</span>, <span class="fl">30</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/attrition.html" class="external-link">attrition</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">cohort</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 7</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 7</span></span></span>
 <span><span class="co">#&gt;   cohort_definition_id number_records number_subjects reason_id reason          </span></span>
 <span><span class="co">#&gt;                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1              0               0         1 Initial qualify…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                    2              0               0         1 Initial qualify…</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2 more variables: excluded_records &lt;int&gt;, excluded_subjects &lt;int&gt;</span></span></span>
 <span><span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/settings.html" class="external-link">settings</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">cohort</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 4</span></span></span>
-<span><span class="co">#&gt;   cohort_definition_id cohort_name cdm_version vocabulary_version</span></span>
-<span><span class="co">#&gt;                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1 bmi_normal  5.3         mock</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 4</span></span></span>
+<span><span class="co">#&gt;   cohort_definition_id cohort_name    cdm_version vocabulary_version</span></span>
+<span><span class="co">#&gt;                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1 bmi_normal     5.3         mock              </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                    2 bmi_overweight 5.3         mock</span></span>
 <span><span class="va">cdm</span><span class="op">$</span><span class="va">cohort</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Source:   table&lt;cohort&gt; [?? x 4]</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB 1.4.0 [unknown@Linux 6.11.0-1018-azure:R 4.5.1/:memory:]</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 4 variables: cohort_definition_id &lt;int&gt;, subject_id &lt;int&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   cohort_start_date &lt;date&gt;, cohort_end_date &lt;date&gt;</span></span></span></code></pre></div>
 <p>As you can see in the above code, the concept set is the list of BMI
-concepts, the concept value is the ‘normal’ weight concept, and the
-values are the minimum and maximum BMI scores to be considered.</p>
+concepts, for the “bmi_normal” cohort, the concept value is the ‘normal’
+weight concept, and the values are the minimum and maximum BMI scores to
+be considered. Similary for the “bmi_overweight”, the concept value
+refers to “overweight” and the numeric range goes from minimum and
+maximum BMI score for that category.</p>
 <p>It is also possible to include records outside of observation by
 setting the <code>useRecordsBeforeObservation</code> argument to
 TRUE.</p>
@@ -476,9 +482,9 @@ TRUE.</p>
 <code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">cohort</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/measurementCohort.html">measurementCohort</a></span><span class="op">(</span></span>
 <span>  cdm <span class="op">=</span> <span class="va">cdm</span>,</span>
 <span>  name <span class="op">=</span> <span class="st">"cohort"</span>,</span>
-<span>  conceptSet <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"bmi_normal"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4245997</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  valueAsConcept <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4069590</span><span class="op">)</span>,</span>
-<span>  valueAsNumber <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"9531"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">18</span>, <span class="fl">25</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  conceptSet <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"bmi"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4245997</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  valueAsConcept <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"bmi_normal"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4069590</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  valueAsNumber <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"bmi_normal"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"9531"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">18</span>, <span class="fl">25</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  useRecordsBeforeObservation <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
