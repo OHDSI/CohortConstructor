@@ -53,7 +53,6 @@
 <url><loc>https://ohdsi.github.io/CohortConstructor/reference/padCohortDate.html</loc></url>
 <url><loc>https://ohdsi.github.io/CohortConstructor/reference/padCohortEnd.html</loc></url>
 <url><loc>https://ohdsi.github.io/CohortConstructor/reference/padCohortStart.html</loc></url>
-<url><loc>https://ohdsi.github.io/CohortConstructor/reference/padObservationDoc.html</loc></url>
 <url><loc>https://ohdsi.github.io/CohortConstructor/reference/reexports.html</loc></url>
 <url><loc>https://ohdsi.github.io/CohortConstructor/reference/renameCohort.html</loc></url>
 <url><loc>https://ohdsi.github.io/CohortConstructor/reference/requireAge.html</loc></url>
@@ -62,6 +61,7 @@
 <url><loc>https://ohdsi.github.io/CohortConstructor/reference/requireDemographics.html</loc></url>
 <url><loc>https://ohdsi.github.io/CohortConstructor/reference/requireDemographicsDoc.html</loc></url>
 <url><loc>https://ohdsi.github.io/CohortConstructor/reference/requireDuration.html</loc></url>
+<url><loc>https://ohdsi.github.io/CohortConstructor/reference/requireFullContributionDoc.html</loc></url>
 <url><loc>https://ohdsi.github.io/CohortConstructor/reference/requireFutureObservation.html</loc></url>
 <url><loc>https://ohdsi.github.io/CohortConstructor/reference/requireInDateRange.html</loc></url>
 <url><loc>https://ohdsi.github.io/CohortConstructor/reference/requireIntersectDoc.html</loc></url>
