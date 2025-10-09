@@ -75,6 +75,7 @@ filter will be included.
 \donttest{
 library(CohortConstructor)
 library(omock)
+library(dplyr)
 
 cdm <- mockVocabularyTables(concept = tibble(
   concept_id = c(4326744, 4298393, 45770407, 8876, 4124457),
