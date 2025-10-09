@@ -1,92 +1,85 @@
 test_that("mearurementCohorts works", {
   skip_on_cran()
-  cohort_1 <- dplyr::tibble(
-    cohort_definition_id = 1L,
-    subject_id = c(1L, 1L, 2L, 3L, 4L),
-    cohort_start_date = as.Date(c(
-      "2001-04-03", "2002-05-07", "1999-07-26", "2015-02-19", "1990-09-07"
-    )),
-    cohort_end_date = as.Date(c(
-      "2002-05-06", "2005-11-07", "2002-09-17", "2015-06-27", "2008-02-19"
+  cdm <- omock::mockPerson(nPerson = 5)
+  cdm <- omopgenerics::insertTable(
+    cdm = cdm, name = "cohort_1", table =dplyr::tibble(
+      cohort_definition_id = 1L,
+      subject_id = c(1L, 1L, 2L, 3L, 4L),
+      cohort_start_date = as.Date(c(
+        "2001-04-03", "2002-05-07", "1999-07-26", "2015-02-19", "1990-09-07"
+      )),
+      cohort_end_date = as.Date(c(
+        "2002-05-06", "2005-11-07", "2002-09-17", "2015-06-27", "2008-02-19"
+      ))
     ))
-  )
-
-  cohort_2 <- dplyr::tibble(
-    cohort_definition_id = c(rep(1L, 5), rep(2L, 5)),
-    subject_id = c(1L, 1L, 2L, 3L, 4L, 1L, 1L, 2L, 3L, 4L),
-    cohort_start_date = as.Date(c(
-      # Cohort 1
-      "2001-04-03", "2002-05-07", "1999-07-26", "2015-02-19", "1990-09-07",
-      # Cohort 2
-      "2004-04-07", "2004-05-03", "2000-02-27", "2015-03-10", "1995-05-15"
-    )),
-    cohort_end_date = as.Date(c(
-      # Cohort 1
-      "2002-05-06", "2005-11-07", "2002-09-17", "2015-06-27", "2008-02-19",
-      # Cohort 2
-      "2004-05-02", "2005-05-25", "2001-05-18", "2015-06-15", "1995-11-14"
+  cdm <- omopgenerics::insertTable(
+    cdm = cdm, name = "cohort_2", table = dplyr::tibble(
+      cohort_definition_id = c(rep(1L, 5), rep(2L, 5)),
+      subject_id = c(1L, 1L, 2L, 3L, 4L, 1L, 1L, 2L, 3L, 4L),
+      cohort_start_date = as.Date(c(
+        # Cohort 1
+        "2001-04-03", "2002-05-07", "1999-07-26", "2015-02-19", "1990-09-07",
+        # Cohort 2
+        "2004-04-07", "2004-05-03", "2000-02-27", "2015-03-10", "1995-05-15"
+      )),
+      cohort_end_date = as.Date(c(
+        # Cohort 1
+        "2002-05-06", "2005-11-07", "2002-09-17", "2015-06-27", "2008-02-19",
+        # Cohort 2
+        "2004-05-02", "2005-05-25", "2001-05-18", "2015-06-15", "1995-11-14"
+      ))
     ))
-  )
-
-  obs <- dplyr::tibble(
-    observation_period_id = 1:5,
-    person_id = 1:5,
-    observation_period_start_date = as.Date(c(
-      "2000-06-03", "1999-04-05", "2015-01-15", "1989-12-09", "2012-03-18"
-    )),
-    observation_period_end_date = as.Date(c(
-      "2013-06-29", "2003-06-15", "2015-10-11", "2013-12-31", "2013-02-10"
-    )),
-    period_type_concept_id = NA_integer_
-  )
-
-  person <- dplyr::tibble(
-    person_id = 1:5,
-    gender_concept_id = c(8507L, 8507L, 8507L, 8532L, 8507L),
-    year_of_birth = c(1997L, 1963L, 1986L, 1978L, 1973L),
-    month_of_birth = c(8L, 1L, 3L, 11L, 3L),
-    day_of_birth = c(22L, 27L, 10L, 8L, 2L),
-    race_concept_id = NA_integer_,
-    ethnicity_concept_id = NA_integer_
-  )
-
-  measurement <- dplyr::tibble(
-    measurement_id = 1:7L,
-    person_id = as.integer(c(1, 1, 2, 3, 3, 1, 1)),
-    measurement_concept_id = c(4326744, 4298393, 4298393, 45770407, 45770407, 123456, 123456) |> as.integer(),
-    measurement_date = as.Date(c("2000-07-01", "2000-12-11", "2002-09-08", "2015-02-19", "2015-02-20", "1900-01-01", "2050-01-01")),
-    measurement_type_concept_id = NA_integer_,
-    value_as_number = c(100, 125, NA, NA, NA, NA, NA) |> as.integer(),
-    value_as_concept_id = c(0, 0, 0, 4124457, 999999, 0, 0) |> as.integer(),
-    unit_concept_id = c(8876, 8876, 0, 0, 0, 0, 0) |> as.integer()
-  )
-
-  conc <- dplyr::tibble(
-    concept_id = c(4326744, 4298393, 45770407, 8876, 4124457, 999999, 123456) |> as.integer(),
-    concept_name = c("Blood pressure", "Systemic blood pressure",
-                     "Baseline blood pressure", "millimeter mercury column",
-                     "Normal range", "Normal", "outObs"),
-    domain_id = "Measurement",
-    vocabulary_id = c("SNOMED", "SNOMED", "SNOMED", "UCUM", "SNOMED", "SNOMED", "hi"),
-    standard_concept = "S",
-    concept_class_id = c("Observable Entity", "Observable Entity",
-                         "Observable Entity", "Unit", "Qualifier Value",
-                         "Qualifier Value", "hi"),
-    concept_code = NA,
-    valid_start_date = NA,
-    valid_end_date = NA,
-    invalid_reason = NA
-  )
-
-  cdm <- omopgenerics::cdmFromTables(
-    tables = list(observation_period = obs, person = person, measurement = measurement),
-    cdmName = "mock",
-    cohortTables = list("cohort1" = cohort_1, "cohort2" = cohort_2)
-  ) |>
-    omock::mockVocabularyTables(
-      concept = dplyr::union_all(omock:::mockConcept, conc)
-    ) |>
-    copyCdm()
+  cdm <- omopgenerics::insertTable(
+    cdm = cdm, name = "observation_period", table = dplyr::tibble(
+      observation_period_id = 1:5L,
+      person_id = 1:5L,
+      observation_period_start_date = as.Date(c(
+        "2000-06-03", "1999-04-05", "2015-01-15", "1989-12-09", "2012-03-18"
+      )),
+      observation_period_end_date = as.Date(c(
+        "2013-06-29", "2003-06-15", "2015-10-11", "2013-12-31", "2013-02-10"
+      )),
+      period_type_concept_id = NA_integer_
+    ))
+  cdm <- omopgenerics::insertTable(
+    cdm = cdm, name = "person", table = dplyr::tibble(
+      person_id = 1:5,
+      gender_concept_id = c(8507L, 8507L, 8507L, 8532L, 8507L),
+      year_of_birth = c(1997L, 1963L, 1986L, 1978L, 1973L),
+      month_of_birth = c(8L, 1L, 3L, 11L, 3L),
+      day_of_birth = c(22L, 27L, 10L, 8L, 2L),
+      race_concept_id = NA_integer_,
+      ethnicity_concept_id = NA_integer_
+    ))
+  cdm <- omopgenerics::insertTable(
+    cdm = cdm, name = "measurement", table = dplyr::tibble(
+      measurement_id = 1:7L,
+      person_id = as.integer(c(1, 1, 2, 3, 3, 1, 1)),
+      measurement_concept_id = c(4326744, 4298393, 4298393, 45770407, 45770407, 123456, 123456) |> as.integer(),
+      measurement_date = as.Date(c("2000-07-01", "2000-12-11", "2002-09-08", "2015-02-19", "2015-02-20", "1900-01-01", "2050-01-01")),
+      measurement_type_concept_id = NA_integer_,
+      value_as_number = c(100, 125, NA, NA, NA, NA, NA),
+      value_as_concept_id = c(0, 0, 0, 4124457, 999999, 0, 0) |> as.integer(),
+      unit_concept_id = c(8876, 8876, 0, 0, 0, 0, 0) |> as.integer()
+    ))
+  cdm <- omopgenerics::insertTable(
+    cdm = cdm, name = "concept", table = dplyr::tibble(
+      concept_id = c(4326744, 4298393, 45770407, 8876, 4124457, 999999, 123456) |> as.integer(),
+      concept_name = c("Blood pressure", "Systemic blood pressure",
+                       "Baseline blood pressure", "millimeter mercury column",
+                       "Normal range", "Normal", "outObs"),
+      domain_id = "Measurement",
+      vocabulary_id = c("SNOMED", "SNOMED", "SNOMED", "UCUM", "SNOMED", "SNOMED", "hi"),
+      standard_concept = "S",
+      concept_class_id = c("Observable Entity", "Observable Entity",
+                           "Observable Entity", "Unit", "Qualifier Value",
+                           "Qualifier Value", "hi"),
+      concept_code = NA_character_,
+      valid_start_date = as.Date(NA),
+      valid_end_date = as.Date(NA),
+      invalid_reason = NA_character_
+    ))
+  cdm <- cdm |> copyCdm()
 
   if (dbToTest == "duckdb CDMConnector") {
     startTempTables <- countDuckdbTempTables(con = CDMConnector::cdmCon(cdm))
@@ -98,8 +91,8 @@ test_that("mearurementCohorts works", {
     cdm = cdm,
     name = "cohort",
     conceptSet = list("normal_blood_pressure" = c(4326744L, 4298393L, 45770407L)),
-    valueAsConcept = c(4124457),
-    valueAsNumber = list("8876" = c(70L, 120L)),
+    valueAsConcept = list("normal_blood_pressure" = c(4124457)),
+    valueAsNumber = list("normal_blood_pressure" = list("8876" = c(70L, 120L))),
     table = "measurement"
   )
 
@@ -114,8 +107,7 @@ test_that("mearurementCohorts works", {
     # three tables with settings, attrition, and codelist)
     # no temp tables will have been created
     expect_true(startTempTables == endTempTables)
-    expect_true(
-      startPermanentTables + 4 == endPermanentTables
+    expect_true(startPermanentTables + 4 == endPermanentTables
     )
   }
 
@@ -128,8 +120,8 @@ test_that("mearurementCohorts works", {
     cdm$cohort |> attrition() |> dplyr::as_tibble(),
     dplyr::tibble(
       "cohort_definition_id" = 1L,
-      "number_records" = c(rep(2L, 6)),
-      "number_subjects" = c(rep(2L, 6)),
+      "number_records" = rep(2L, 6),
+      "number_subjects" = rep(2L, 6),
       "reason_id" = 1:6L,
       "reason" = c(
         "Initial qualifying events",
@@ -137,7 +129,7 @@ test_that("mearurementCohorts works", {
         "Not missing record date",
         "Non-missing sex",
         "Non-missing year of birth",
-        "Distinct measurement records"
+        "Drop duplicate records"
       ),
       "excluded_records" = c(0L, 0L, 0L, 0L, 0L, 0L),
       "excluded_subjects" = c(0L, 0L, 0L, 0L, 0L, 0L),
@@ -156,8 +148,8 @@ test_that("mearurementCohorts works", {
     cdm = cdm,
     name = "cohort3",
     conceptSet = list("normal_blood_pressure" = c(4326744L, 4298393L, 45770407L, 12345L)),
-    valueAsConcept = c(4124457),
-    valueAsNumber = list("8876" = c(70, 120)),
+    valueAsConcept = list("normal_blood_pressure" = c(4124457)),
+    valueAsNumber = list("normal_blood_pressure" = list("8876" = c(70, 120))),
     table = "measurement"
   )
   expect_identical(collectCohort(cdm$cohort3, 1), dplyr::tibble(
@@ -169,28 +161,23 @@ test_that("mearurementCohorts works", {
   codes <- attr(cdm$cohort3, "cohort_codelist") |> dplyr::collect()
   expect_true(all(c(4298393, 4326744, 45770407) %in% codes$concept_id))
 
-  # no values ----
+  # no subjects with concept ----
   cdm$cohort4 <- measurementCohort(
     cdm = cdm,
     name = "cohort4",
-    conceptSet = list("normal_blood_pressure" = c(4326744L, 4298393L, 45770407L)),
+    conceptSet = list("normal_blood_pressure" = c(4L)),
+    valueAsConcept = list("normal_blood_pressure" = c(4124457)),
     table = "measurement"
   )
-  expect_identical(collectCohort(cdm$cohort4, 1), dplyr::tibble(
-    subject_id = as.integer(c(1, 1, 2, 3, 3)),
-    cohort_start_date = as.Date(c("2000-07-01", "2000-12-11", "2002-09-08", "2015-02-19", "2015-02-20")),
-    cohort_end_date = as.Date(c("2000-07-01", "2000-12-11", "2002-09-08", "2015-02-19", "2015-02-20"))
-  ))
   expect_true(settings(cdm$cohort4)$cohort_name == "normal_blood_pressure")
-  codes <- attr(cdm$cohort4, "cohort_codelist") |> dplyr::collect()
-  expect_true(all(codes$concept_id  |> sort() == c(4298393, 4326744, 45770407)))
+  expect_true(cdm$cohort4 |> dplyr::tally() |> dplyr::pull() == 0)
 
-  # number values ----
+  # > 1 number values ----
   cdm$cohort5 <- measurementCohort(
     cdm = cdm,
     name = "cohort5",
-    conceptSet = list("normal_blood_pressure" = c(4326744L, 4298393L, 45770407L)),
-    valueAsNumber = list("8876" = c(70, 120), "908" = c(800, 900)),
+    conceptSet = list("blood_pressure" = c(4326744L, 4298393L, 45770407L)),
+    valueAsNumber = list("high_blood_pressure" = list("8876" = c(70, 120), "908" = c(800, 900))),
     table = "measurement"
   )
   expect_identical(collectCohort(cdm$cohort5, 1), dplyr::tibble(
@@ -198,7 +185,7 @@ test_that("mearurementCohorts works", {
     cohort_start_date = as.Date(c("2000-07-01")),
     cohort_end_date = as.Date(c("2000-07-01"))
   ))
-  expect_true(settings(cdm$cohort5)$cohort_name == "normal_blood_pressure")
+  expect_true(settings(cdm$cohort5)$cohort_name == "high_blood_pressure")
   codes <- attr(cdm$cohort5, "cohort_codelist") |> dplyr::collect()
   expect_true(all(codes$concept_id  |> sort() == c(4298393, 4326744, 45770407)))
 
@@ -206,8 +193,8 @@ test_that("mearurementCohorts works", {
   cdm$cohort6 <- measurementCohort(
     cdm = cdm,
     name = "cohort6",
-    conceptSet = list("normal_blood_pressure" = c(4326744L, 4298393L, 45770407L)),
-    valueAsConcept = c(4124457, 999999, 12345),
+    conceptSet = list("blood_pressure" = c(4326744L, 4298393L, 45770407L)),
+    valueAsConcept = list("normal_blood_pressure" = c(4124457, 999999, 12345)),
     table = "measurement"
   )
   expect_identical(collectCohort(cdm$cohort6, 1), dplyr::tibble(
@@ -219,29 +206,31 @@ test_that("mearurementCohorts works", {
   codes <- attr(cdm$cohort6, "cohort_codelist") |> dplyr::collect()
   expect_true(all(codes$concept_id  |> sort() == c(4298393, 4326744, 45770407)))
 
-  # more than 1 cohort ----
+  # more than 1 filter ----
   cdm$cohort7 <- measurementCohort(
     cdm = cdm,
     name = "cohort7",
-    conceptSet = list("c1" = c(4326744L), "c2" = c(4298393L, 45770407L)),
+    conceptSet = list("blood_pressure" = c(4326744L, 4298393L, 45770407L)),
+    valueAsConcept = list("c1" = c(4124457, 999999, 12345)),
+    valueAsNumber = list("c2" = list("8876" = c(70, 120), "908" = c(800, 900))),
     table = "measurement"
   )
-  expect_identical(collectCohort(cdm$cohort7, 1), dplyr::tibble(
+  expect_identical(collectCohort(cdm$cohort7, 2), dplyr::tibble(
     subject_id = c(1L),
     cohort_start_date = as.Date(c("2000-07-01")),
     cohort_end_date = as.Date(c("2000-07-01"))
   ))
-  expect_identical(collectCohort(cdm$cohort7, 2), dplyr::tibble(
-    subject_id = as.integer(c(1, 2, 3, 3)),
-    cohort_start_date = as.Date(c("2000-12-11", "2002-09-08", "2015-02-19","2015-02-20")),
-    cohort_end_date = as.Date(c("2000-12-11", "2002-09-08", "2015-02-19", "2015-02-20"))
+  expect_identical(collectCohort(cdm$cohort7, 1), dplyr::tibble(
+    subject_id = as.integer(c(3, 3)),
+    cohort_start_date = as.Date(c("2015-02-19","2015-02-20")),
+    cohort_end_date = as.Date(c("2015-02-19", "2015-02-20"))
   ))
   expect_identical(
     attrition(cdm$cohort7) |> dplyr::as_tibble(),
     dplyr::tibble(
       "cohort_definition_id" = c(rep(1L, 6), rep(2L, 6)),
-      "number_records" = c(rep(1L, 6), rep(4L, 6)),
-      "number_subjects" = c(rep(1L, 6), rep(3L, 6)),
+      "number_records" = c(rep(2L, 6), rep(1L, 6)),
+      "number_subjects" = c(rep(1L, 6), rep(1L, 6)),
       "reason_id" = rep(1:6L, 2),
       "reason" = c(
         "Initial qualifying events",
@@ -249,13 +238,13 @@ test_that("mearurementCohorts works", {
         "Not missing record date",
         "Non-missing sex",
         "Non-missing year of birth",
-        "Distinct measurement records",
+        "Drop duplicate records",
         "Initial qualifying events",
         "Record in observation",
         "Not missing record date",
         "Non-missing sex",
         "Non-missing year of birth",
-        "Distinct measurement records"
+        "Drop duplicate records"
       ),
       "excluded_records" = 0L,
       "excluded_subjects" = 0L
@@ -263,14 +252,48 @@ test_that("mearurementCohorts works", {
   )
   expect_true(all(all(settings(cdm$cohort7)$cohort_name == c("c1", "c2"))))
   codes <- attr(cdm$cohort7, "cohort_codelist") |> dplyr::collect()
-  expect_true(all(codes$concept_id[codes$codelist_name == "c1"] == c(4326744)))
-  expect_true(all(codes$concept_id[codes$codelist_name == "c2"] == c(4298393, 45770407)))
+  expect_true(codes$codelist_name |> unique() == "blood_pressure")
+  expect_true(all(codes$cohort_definition_id |> unique() == 1:2))
 
+  cdm$cohort7 <- measurementCohort(
+    cdm = cdm,
+    name = "cohort7",
+    conceptSet = list("blood_pressure" = c(4326744L, 4298393L, 45770407L)),
+    valueAsConcept = list("c1" = c(4124457, 999999, 12345), "c2" = c(4124457, 999999, 12345)),
+    valueAsNumber = list("c2" = list("8876" = c(70, 120), "908" = c(800, 900)), "c3" = list(c(0,100))),
+    table = "measurement"
+  )
+  expect_equal(settings(cdm$cohort7)$cohort_name, paste0("c", 1:3))
+  expect_equal(
+    collectCohort(cdm$cohort7, 1),
+    dplyr::tibble(
+      subject_id = 3L,
+      cohort_start_date = as.Date(c("2015-02-19", "2015-02-20")),
+      cohort_end_date = cohort_start_date
+    )
+  )
+  expect_equal(
+    collectCohort(cdm$cohort7, 2),
+    dplyr::tibble(
+      subject_id = c(1L, 3L,3L),
+      cohort_start_date = as.Date(c("2000-07-01", "2015-02-19", "2015-02-20")),
+      cohort_end_date = cohort_start_date
+    )
+  )
+  expect_equal(
+    collectCohort(cdm$cohort7, 3),
+    dplyr::tibble(
+      subject_id = c(1L),
+      cohort_start_date = as.Date(c("2000-07-01")),
+      cohort_end_date = cohort_start_date
+    )
+  )
   # out of obs ----
   cdm$cohort8 <- measurementCohort(
     cdm = cdm,
     name = "cohort8",
     conceptSet = list("c1" = c(123456L)),
+    valueAsConcept = list("c1" = c(0)),
     table = "measurement"
   )
   expect_true(all(colnames(cdm$cohort8) ==
@@ -293,36 +316,27 @@ test_that("mearurementCohorts works", {
     cdm = cdm,
     name = "cohort9",
     conceptSet = list("c1" = c(1234567L)),
+    valueAsConcept = list("c1" = c(1111)),
     table = "measurement"
   )
   expect_true(cdm$cohort9 |> dplyr::tally() |> dplyr::pull("n") == 0)
   expect_true(settings(cdm$cohort9)$cohort_name == "c1")
   expect_identical(colnames(settings(cdm$cohort9)) |> sort(), c("cdm_version", "cohort_definition_id", "cohort_name", "vocabulary_version"))
+  codes <- attr(cdm$cohort9, "cohort_codelist") |> dplyr::collect()
+  expect_true(nrow(codes) == 1)
 
   # empty cohort and empty codelist ----
   cdm$cohort10 <- measurementCohort(
     cdm = cdm,
     name = "cohort10",
     conceptSet = list(),
+    valueAsConcept = list("c1" = c(1111)),
     table = "measurement"
   )
   expect_true(cdm$cohort10 |> dplyr::tally() |> dplyr::pull("n") == 0)
   expect_true(cdm$cohort10 |> attrition() |> nrow() == 0)
-  expect_true(cdm$cohort10 |> settings() |> nrow() == 0)
+  expect_true(cdm$cohort10 |> settings() |> nrow() == 1)
   expect_identical(colnames(settings(cdm$cohort10)) |> sort(), c("cdm_version", "cohort_definition_id", "cohort_name", "vocabulary_version"))
-
-  # test no concept unit specified ----
-  cdm$cohort11 <- measurementCohort(
-    cdm = cdm,
-    name = "cohort11",
-    conceptSet = list("blood_pressure_measurement" = c(4326744L, 4298393L, 45770407L)),
-    valueAsNumber = list(c(0, 100)),
-    table = "measurement"
-  )
-  expect_identical(
-    collectCohort(cdm$cohort11, 1),
-    dplyr::tibble(subject_id = 1L, cohort_start_date = as.Date("2000-07-01"), cohort_end_date = as.Date("2000-07-01"))
-  )
 
   # Expected behaviour ----
   # simple example
@@ -352,171 +366,7 @@ test_that("mearurementCohorts works", {
   dropCreatedTables(cdm = cdm)
 })
 
-test_that("valueAsNumber without unit concept", {
-  skip_on_cran()
-
-  person <- dplyr::tibble(person_id = c(1, 2, 3),
-                          gender_concept_id = NA_integer_,
-                          year_of_birth = 1990L,
-                          race_concept_id = NA_integer_,
-                          ethnicity_concept_id = NA_integer_ )
-
-  obs <- dplyr::tibble(observation_period_id = c(1, 2, 3),
-                       person_id =  c(1, 2, 3),
-                       observation_period_start_date = as.Date("2000-01-01"),
-                       observation_period_end_date  = as.Date("2020-01-01"),
-                       period_type_concept_id  = NA_integer_ )
-
-  concept <-  dplyr::tibble(
-    concept_id = c(4326744,  8876),
-    concept_name = c("Blood pressure", "my_unit"),
-    domain_id = c("Measurement", "Unit"),
-    vocabulary_id = c("SNOMED", "UCUM"),
-    standard_concept = "S",
-    concept_class_id = c("Observable Entity"),
-    concept_code = NA,
-    valid_start_date = NA,
-    valid_end_date = NA,
-    invalid_reason = NA
-  )
-
-  measurement <- dplyr::tibble(
-    measurement_id = 1:3L,
-    person_id = as.integer(c(1, 2, 3)),
-    measurement_concept_id = c(4326744),
-    measurement_date = as.Date(c("2000-07-01", "2000-12-11", "2002-09-08")),
-    measurement_type_concept_id = NA_integer_,
-    value_as_number = c(100, 105, 110),
-    value_as_concept_id = c(0, 0, 0) ,
-    unit_concept_id = c(8876, 8876, 0)
-  )
-
-  observation <- dplyr::tibble(
-    observation_id = 1:3L,
-    person_id = as.integer(c(1, 2, 3)),
-    observation_concept_id = c(4326744),
-    observation_date = as.Date(c("2005-07-01", "2010-12-11", "2019-09-08")),
-    observation_type_concept_id = NA_integer_,
-    value_as_number = c(100, 105, 110),
-    value_as_concept_id = c(0, 0, 0) ,
-    unit_concept_id = c(8876, 8876, 0)
-  )
-
-  cdm <- omopgenerics::cdmFromTables(
-    tables = list(
-      person = person, observation_period = obs, measurement = measurement,
-      observation = observation
-    ),
-    cdmName = "mock"
-  ) |>
-    omock::mockVocabularyTables(concept = concept) |>
-    copyCdm()
-
-  cohort_1 <- measurementCohort(
-    cdm = cdm,
-    name = "cohort",
-    conceptSet = list("normal_blood_pressure" = c(4326744L)),
-    valueAsNumber = list("8876" = c(70L, 120L)),
-    table = "measurement"
-  )
-  expect_true(all(sort(cohort_1 |>
-                         dplyr::pull("subject_id")) == c(1, 2)))
-
-
-  # removing unit_concept_id 8876 - should mean any value between 70 and 120 would be included
-  # and we should now get person 3 included
-  cohort_2 <- measurementCohort(
-    cdm = cdm,
-    name = "cohort",
-    conceptSet = list("normal_blood_pressure" = c(4326744L)),
-    valueAsNumber = list(c(70L, 120L)),
-    table = "measurement"
-  )
-
-  # empty gener in person --> empty cohort
-  expect_true(dplyr::tally(cohort_2) |> dplyr::pull() == 0)
-
-  # add gender component
-  cdm <- omopgenerics::insertTable(cdm, "person",
-                                   dplyr::tibble(person_id = c(1, 2, 3),
-                                                 gender_concept_id = 8532,
-                                                 year_of_birth = 1990L,
-                                                 race_concept_id = NA_integer_,
-                                                 ethnicity_concept_id = NA_integer_ ))
-  cohort_2 <- measurementCohort(
-    cdm = cdm,
-    name = "cohort",
-    conceptSet = list("normal_blood_pressure" = c(4326744L)),
-    valueAsNumber = list(c(70L, 120L)),
-    table = "measurement"
-  )
-  expect_equal(
-    collectCohort(cohort_2, 1),
-    dplyr::tibble(
-      subject_id = 1:3,
-      cohort_start_date = as.Date(c("2000-07-01", "2000-12-11", "2002-09-08")),
-      cohort_end_date = as.Date(c("2000-07-01", "2000-12-11", "2002-09-08"))
-    )
-  )
-
-  # observation
-  cohort_3 <- measurementCohort(
-    cdm = cdm,
-    name = "cohort",
-    conceptSet = list("normal_blood_pressure" = c(4326744L)),
-    valueAsNumber = list(c(70L, 120L)),
-    table = "observation"
-  )
-  expect_equal(
-    collectCohort(cohort_3, 1),
-    dplyr::tibble(
-      subject_id = 1:3,
-      cohort_start_date = as.Date(c("2005-07-01", "2010-12-11", "2019-09-08")),
-      cohort_end_date = as.Date(c("2005-07-01", "2010-12-11", "2019-09-08"))
-    )
-  )
-
-  # observation + measurement
-  cohort_4 <- measurementCohort(
-    cdm = cdm,
-    name = "cohort",
-    conceptSet = list("normal_blood_pressure" = c(4326744L)),
-    valueAsNumber = list(c(70L, 120L)),
-    table = c("measurement", "observation")
-  )
-  expect_equal(
-    collectCohort(cohort_4, 1),
-    dplyr::tibble(
-      subject_id = c(1, 1, 2, 2, 3, 3),
-      cohort_start_date = as.Date(c("2000-07-01", "2005-07-01", "2000-12-11", "2010-12-11", "2002-09-08", "2019-09-08")),
-      cohort_end_date = as.Date(c("2000-07-01", "2005-07-01", "2000-12-11", "2010-12-11", "2002-09-08", "2019-09-08"))
-    )
-  )
-
-  # don't allow some with unit concept id and others without
-  expect_error(measurementCohort(
-    cdm = cdm,
-    name = "cohort",
-    conceptSet = list("normal_blood_pressure" = c(4326744L)),
-    valueAsNumber = list("8876" = c(70L, 120L),
-                         c(70L, 120L)),
-    table = "measurement"))
-
-  # don't allow some with unit concept id and others without
-  expect_error(measurementCohort(
-    cdm = cdm,
-    name = "cohort",
-    conceptSet = list("normal_blood_pressure" = c(4326744L)),
-    valueAsNumber = list(c(70L, 120L),
-                         c(100L, 150L)),
-    table = "measurement"))
-
-  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-
-  dropCreatedTables(cdm = cdm)
-})
-
-test_that("useRecordsBeforeObservation TRUE", {
+test_that("useRecordsBeforeObservation TRUE + edge cases", {
   cdm <- omopgenerics::cdmFromTables(
     tables = list(
       person = dplyr::tibble(
@@ -544,11 +394,11 @@ test_that("useRecordsBeforeObservation TRUE", {
       "concept_id" = 1L,
       "concept_name" = "concept 1",
       "domain_id" = "measurement",
-      "vocabulary_id" = NA,
-      "concept_class_id" = NA,
-      "concept_code" = NA,
-      "valid_start_date" = NA,
-      "valid_end_date" = NA
+      "vocabulary_id" = NA_character_,
+      "concept_class_id" = NA_character_,
+      "concept_code" = NA_character_,
+      "valid_start_date" = as.Date(NA),
+      "valid_end_date" = as.Date(NA)
     )) |>
     # person 1 - out before, out after, in, in
     # person 2 - out before
@@ -561,15 +411,16 @@ test_that("useRecordsBeforeObservation TRUE", {
         "measurement_date" = as.Date(c(
           "2000-01-01", "2001-08-01", "2000-03-01", "2000-11-01", "2000-02-01", "1999-11-01"
         )),
-        "measurement_type_concept_id" = 1,
-        "value_as_number" = as.integer(1),
+        "measurement_type_concept_id" = 1L,
+        "value_as_number" = 1,
         "value_as_concept_id" = as.integer(1),
         "unit_concept_id" = as.integer(1)
       )
     ) |>
     copyCdm()
 
-  cdm$cohort <- measurementCohort(cdm, list(a = 1L), name = "cohort", useRecordsBeforeObservation = TRUE)
+  # Record outside observation ----
+  cdm$cohort <- measurementCohort(cdm, conceptSet = list(a = 1L), valueAsConcept = list("a" = 1L), name = "cohort", useRecordsBeforeObservation = TRUE)
   expect_equal(
     dplyr::tibble(
       subject_id = c(1L, 1L, 1L, 2L),
@@ -579,59 +430,8 @@ test_that("useRecordsBeforeObservation TRUE", {
     collectCohort(cdm$cohort, 1)
   )
 
-  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
-
-  dropCreatedTables(cdm = cdm)
-})
-
-test_that("edge cases", {
-  # measurement table has zero rows
-  cdm <- omock::mockPerson(nPerson = 3) |>
-    omopgenerics::insertTable(
-      name = "observation_period",
-      table = dplyr::tibble(
-        "observation_period_id" = c(1L, 2L, 3L),
-        "person_id" = c(1L, 1L, 2L),
-        "observation_period_start_date" = as.Date(c(
-          "2000-02-01", "2000-10-01", "2000-01-01"
-        )),
-        "observation_period_end_date" = as.Date(c(
-          "2000-05-01", "2000-12-01", "2000-12-01"
-        )),
-        "period_type_concept_id" = NA_integer_
-      )
-    ) |>
-    omopgenerics::insertTable(
-      name = "concept",
-      table = dplyr::tibble(
-        "concept_id" = 1L,
-        "concept_name" = "concept 1",
-        "domain_id" = "measurement",
-        "vocabulary_id" = NA,
-        "concept_class_id" = NA,
-        "concept_code" = NA,
-        "valid_start_date" = NA,
-        "valid_end_date" = NA
-      )
-    ) |>
-    # person 1 - out before, out after, in, in
-    # person 2 - out before
-    omopgenerics::insertTable(
-      name = "measurement",
-      table = dplyr::tibble(
-        "measurement_id" = as.integer(),
-        "person_id" = as.integer(),
-        "measurement_concept_id" = as.integer(),
-        "measurement_date" = as.Date(NA),
-        "measurement_type_concept_id" = as.integer(),
-        "value_as_number" = as.integer(),
-        "value_as_concept_id" = as.integer(),
-        "unit_concept_id" = as.integer()
-      )
-    ) |>
-    copyCdm()
-
-  cdm$cohort <- measurementCohort(cdm, list(a = 1L), name = "cohort")
+  # No record outside observation
+  cdm$cohort <- measurementCohort(cdm, list(a = 2L), valueAsConcept = list("a" = 1L), name = "cohort")
   attrition <- attrition(cdm$cohort)
   class(attrition) <- c("tbl_df", "tbl", "data.frame")
   expect_equal(
@@ -647,68 +447,11 @@ test_that("edge cases", {
     )
   )
 
-  # measurement table once subsetted to concepts of interest has zero rows
-  cdm <- omock::mockPerson(nPerson = 3) |>
-    omopgenerics::insertTable(
-      name = "observation_period",
-      table = dplyr::tibble(
-        "observation_period_id" = c(1L, 2L, 3L),
-        "person_id" = c(1L, 1L, 2L),
-        "observation_period_start_date" = as.Date(c(
-          "2000-02-01", "2000-10-01", "2000-01-01"
-        )),
-        "observation_period_end_date" = as.Date(c(
-          "2000-05-01", "2000-12-01", "2000-12-01"
-        )),
-        "period_type_concept_id" = NA_integer_
-      )
-    ) |>
-    omopgenerics::insertTable(
-      name = "concept", table = dplyr::tibble(
-        "concept_id" = 1L,
-        "concept_name" = "concept 1",
-        "domain_id" = "measurement",
-        "vocabulary_id" = NA,
-        "concept_class_id" = NA,
-        "concept_code" = NA,
-        "valid_start_date" = NA,
-        "valid_end_date" = NA
-      )
-    ) |>
-    omopgenerics::insertTable(
-      name = "measurement",
-      table = dplyr::tibble(
-        "measurement_id" = 1:6 |> as.integer(),
-        "person_id" = c(1, 1, 1, 1, 1, 2) |> as.integer(),
-        "measurement_concept_id" = 1L,
-        "measurement_date" = as.Date(c(
-          "2000-01-01", "2001-08-01", "2000-03-01", "2000-11-01", "2000-02-01", "1999-11-01"
-        )),
-        "measurement_type_concept_id" = 1,
-        "value_as_number" = as.integer(1),
-        "value_as_concept_id" = as.integer(1),
-        "unit_concept_id" = as.integer(1)
-      )
-    ) |>
-    copyCdm()
-
-  cdm$cohort <- measurementCohort(cdm, list(a = 2L), name = "cohort")
-  attrition <- attrition(cdm$cohort)
-  class(attrition) <- c("tbl_df", "tbl", "data.frame")
-  expect_equal(
-    attrition,
-    dplyr::tibble(
-      cohort_definition_id = 1L,
-      number_records = 0L,
-      number_subjects = 0L,
-      reason_id = 1L,
-      reason = "Initial qualifying events",
-      excluded_records = 0L,
-      excluded_subjects = 0L
-    )
+  # Edge cases ----
+  # empty table after filtering
+  expect_warning(
+    cdm$cohort2 <- measurementCohort(cdm, list(a = 1L), name = "cohort2", valueAsConcept = list(a = 0))
   )
-
-  cdm$cohort2 <- measurementCohort(cdm, list(a = 1L), name = "cohort2", valueAsConcept = 0)
   attrition <- attrition(cdm$cohort2)
   class(attrition) <- c("tbl_df", "tbl", "data.frame")
   expect_equal(
@@ -723,6 +466,39 @@ test_that("edge cases", {
       excluded_subjects = 0L
     )
   )
+
+  # empty measurement table
+  cdm <- omopgenerics::insertTable(
+    cdm = cdm,
+    name = "measurement",
+    table = dplyr::tibble(
+      "measurement_id" = as.integer(),
+      "person_id" = as.integer(),
+      "measurement_concept_id" = as.integer(),
+      "measurement_date" = as.Date(NA),
+      "measurement_type_concept_id" = as.integer(),
+      "value_as_number" = as.integer(),
+      "value_as_concept_id" = as.integer(),
+      "unit_concept_id" = as.integer()
+    )
+  )
+  cdm$cohort <- measurementCohort(cdm, list(a = 1L), valueAsConcept = list("a" = 1L), name = "cohort")
+  attrition <- attrition(cdm$cohort)
+  class(attrition) <- c("tbl_df", "tbl", "data.frame")
+  expect_equal(
+    attrition,
+    dplyr::tibble(
+      cohort_definition_id = 1L,
+      number_records = 0L,
+      number_subjects = 0L,
+      reason_id = 1L,
+      reason = "Initial qualifying events",
+      excluded_records = 0L,
+      excluded_subjects = 0L
+    )
+  )
+
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
 
   dropCreatedTables(cdm = cdm)
 })

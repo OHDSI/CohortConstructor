@@ -22,49 +22,60 @@ or a conceptSetExpression.}
 
 \item{name}{Name of the new cohort table created in the cdm object.}
 
-\item{valueAsConcept}{A vector of cohort IDs used to filter measurements.
-Only measurements with these values in the \code{value_as_concept_id} column of
-the measurement table will be included. If NULL all entries independent of
-their value as concept will be considered.}
+\item{valueAsConcept}{A named list defining cohorts based on measurement
+values as concept IDs. Each element name defines the name of cohort to
+create, and its value is a vector of concept IDs used to filter measurements
+by \code{value_as_concept_id.}
+If NULL, all records will be included regardless of \code{value_as_concept_id.}
 
-\item{valueAsNumber}{A list indicating the range of values and the unit
-they correspond to, as follows:
-list("unit_concept_id" = c(rangeValue1, rangeValue2)). If no name is supplied
-in the list, no requirement on unit concept id will be applied. If NULL, all
-entries independent of their value as number will be included.}
+For instance, to create two bmi cohorts from a bmi \code{conceptSet} we can do the
+following:
+\code{valueAsConcept = list(high_bmi = c(4328749, 35819253), low_bmi = c(4267416, 45881666))}
 
-\item{table}{Name of OMOP tables to search for records of the concepts
-provided. Options are "measurement" and/or "observation".}
+See more examples in the function examples.}
 
-\item{useRecordsBeforeObservation}{If FALSE, only records in observation will
-be used. If FALSE, records before the start of observation period will be
-considered, with cohort start date set to the start of their next observation
-period.}
+\item{valueAsNumber}{A named list defining cohorts based on numeric
+measurement ranges.
+Each list element should contain one or more numeric vectors of length two,
+specifying the allowed range(s) for the measurement value.
+If the numeric vector is named, the name should correspond to the
+\code{unit_concept_id} that will be used for that range.
+
+For example, the following creates a cohort named "low_weight" based on
+measurements recorded in kilograms (unit_concept_id = 9529) and stones
+(unit_concept_id = 21498905):
+\code{valueAsNumber = list("low_weight" = list("9529" = c(30, 40), "21498905" = c(4.7, 6.3))) }
+
+See the examples below for how to define multiple cohorts based on different measurement filters.}
+
+\item{table}{Character vector specifying which OMOP tables to use.
+Accepts "measurement", "observation", or both.}
+
+\item{useRecordsBeforeObservation}{Logical.
+If FALSE, only records within the observation period are used.
+If TRUE, records prior to the observation period are included, with their cohort start date set to the start of the next observation period.}
 }
 \value{
-A cohort table
+A cohort table.
 }
 \description{
-\code{measurementCohort()} creates cohorts based on patient records contained
-in the measurement table. This function extends the \code{conceptCohort()} as it
-allows for measurement values associated with the records to be specified.
-The function supports the measurement and observation tables.
+\code{measurementCohort()} creates cohorts based on patient records from the
+measurement or observation tables. It extends the function \code{conceptCohort()}
+by allowing users to specify measurement values associated with those records.
+
+This function supports both concept-based and value-based filtering:
 \itemize{
-\item If \code{valueAsConcept} and \code{valueAsNumber} are NULL then no requirements on
-of the values associated with measurement records and using
-\code{measurementCohort()} will lead to the same result as using \code{conceptCohort()}
-(so long as all concepts are from the measurement domain).
-\item If one of \code{valueAsConcept} and \code{valueAsNumber} is not NULL then records
-will be required to have values that satisfy the requirement specified.
-\item If both \code{valueAsConcept} and \code{valueAsNumber} are not NULL, records will
-be required to have values that fulfill \emph{either} of the requirements
+\item Either \code{valueAsConcept} or \code{valueAsNumber} must be provided.
+\item If one of them is specified (not NULL), only records that satisfy the other
+filter will be included.
+\item If both are provided, records that meet \emph{either} filter will be included.
 }
 }
 \examples{
 \donttest{
 library(CohortConstructor)
-library(dplyr)
 library(omock)
+library(dplyr)
 
 cdm <- mockVocabularyTables(concept = tibble(
   concept_id = c(4326744, 4298393, 45770407, 8876, 4124457),
@@ -94,32 +105,37 @@ cdm <- mockVocabularyTables(concept = tibble(
    )
  ))
 
+# create one cohort of blood pressure measurements indicating normal levels
 cdm$cohort <- measurementCohort(
   cdm = cdm,
   name = "cohort",
-  conceptSet = list("normal_blood_pressure" = c(4326744, 4298393, 45770407)),
-  valueAsConcept = c(4124457),
-  valueAsNumber = list("8876" = c(70, 120)),
+  conceptSet = list("blood_pressure" = c(4326744, 4298393, 45770407)),
+  valueAsConcept = list("normal_blood_preassure" = c(4124457)),
+  valueAsNumber = list("normal_blood_preassure" = list("8876" = c(70, 120))),
   useRecordsBeforeObservation = FALSE
 )
 
 cdm$cohort
 
-# You can also create multiple measurement cohorts, and include records
-# outside the observation period.
+# create two cohorts of blood preassure measurements, one with results
+# indicating normal blood pressure and the other inidcating high
 
 cdm$cohort2 <- measurementCohort(
   cdm = cdm,
   name = "cohort2",
-  conceptSet = list("normal_blood_pressure" = c(4326744, 4298393, 45770407),
-                  "high_blood_pressure" = c(4326744, 4298393, 45770407)),
-  valueAsConcept = c(4124457),
-  valueAsNumber = list("8876" = c(70, 120),
-                       "8876" = c(121, 200)),
-  useRecordsBeforeObservation = FALSE
+  conceptSet = list("blood_pressure" = c(4326744, 4298393, 45770407)),
+  valueAsConcept = list(
+    "normal_blood_pressure" = 4124457,
+    "high_blood_pressure" = 4328749
+  ),
+  valueAsNumber = list(
+    "normal_blood_pressure" = list("8876" = c(70, 120)),
+    "high_blood_pressure" = list("8876" = c(121, 200))
+  ),
+  useRecordsBeforeObservation = TRUE
 )
 
-cdm$cohort2
+cdm$cohort2 |> settings()
 
 }
 }

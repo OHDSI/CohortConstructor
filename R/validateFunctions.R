@@ -115,31 +115,36 @@ validateStrata <- function(strata, cohort) {
 }
 
 validateValueAsNumber <- function(valueAsNumber) {
+  # a named list of lists: out list name indicates cohort name
+  # inner list name indicates unit concept id (optional) and value
+  # must be a length-2 numeric vector indicating a range
 
-  omopgenerics::assertList(valueAsNumber,
-                           class = c("integer", "numeric"),
-                           null = TRUE
-  )
+  omopgenerics::assertList(valueAsNumber, null = TRUE, named = TRUE)
 
-  # if any is named all must be
-  if(is.null(names(valueAsNumber)) || any(nchar(names(valueAsNumber)) == 0)){
-    omopgenerics::assertList(valueAsNumber,
-                             length = 1,
-                             null = TRUE,
-                             msg = "If any valueAsNumber has no unit specified, only one range should be specified"
+  for (innerList in names(valueAsNumber)) {
+    # check inner lists are well defined:
+    omopgenerics::assertList(
+      valueAsNumber[[innerList]], class = c("integer", "numeric"), null = TRUE,
+      msg = "`valueAsNumber` must be indicate by a length-2 numeric vecor indicating a range. See examples."
     )
+    for (i in seq_along(valueAsNumber[[innerList]])) {
+      if (length(valueAsNumber[[innerList]][[i]]) != 2) {
+        cli::cli_abort("Each numeric vector in `valueAsNumber` list must be of length 2.")
+      }
+      if (valueAsNumber[[innerList]][[i]][1] > valueAsNumber[[innerList]][[i]][2]) {
+        cli::cli_abort(
+          "Upper `valueAsNumber` value must be equal or higher than lower `valueAsNumber` value."
+        )
+      }
+    }
   }
+}
 
-  for (i in seq_along(valueAsNumber)) {
-    if (length(valueAsNumber[[i]]) != 2) {
-      cli::cli_abort("Each numeric vector in `valueAsNumber` list must be of length 2.")
-    }
-    if (valueAsNumber[[i]][1] > valueAsNumber[[i]][2]) {
-      cli::cli_abort(
-        "Upper `valueAsNumber` value must be equal or higher than lower `valueAsNumber` value."
-      )
-    }
-  }
+validateValueAsConcept <- function(valueAsConcept) {
+  omopgenerics::assertList(
+    valueAsConcept, null = TRUE, named = TRUE, class = c("integer", "numeric"),
+    msg = "`valueAsConcept` must be a named list of concepts ids, names indicating the cohort name, and the numeric vector indicating concepts ids to use as value."
+  )
 }
 
 validateN <- function(n) {
