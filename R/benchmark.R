@@ -310,13 +310,13 @@ getCovid <- function(cdm, codes, pref, name = "cc1_covid", base = FALSE) {
     cdm = cdm,
     conceptSet = codes["sars_cov_2_test"],
     name = paste0(pref, "temp_cc1_covid_test_positive"),
-    valueAsConcept = c(4126681, 45877985, 9191, 45884084, 4181412, 45879438)
+    valueAsConcept = list("sars_cov_2_test" = c(4126681, 45877985, 9191, 45884084, 4181412, 45879438))
   )
   cdm[[paste0(pref, "temp_cc1_covid_test_negative")]] <- measurementCohort(
     cdm = cdm,
     conceptSet = codes["sars_cov_2_test"],
     name = paste0(pref, "temp_cc1_covid_test_negative"),
-    valueAsConcept = c(9189, 9190, 9191, 4132135, 3661867, 45878583, 45880296, 45884086)
+    valueAsConcept = list("sars_cov_2_test" = c(9189, 9190, 9191, 4132135, 3661867, 45878583, 45880296, 45884086))
   )
   cdm[[paste0(pref, name)]] <- cdm[[paste0(pref, name)]] |>
     requireCohortIntersect(
@@ -434,21 +434,21 @@ getNeutropeniaLeukopenia <- function(cdm, codes, pref, name = NULL) {
     cdm = cdm,
     conceptSet = codes["neutrophil_absolute_count"],
     name = paste0(pref, "temp_cc1_neutrophil_absolute_count"),
-    valueAsNumber = list(
+    valueAsNumber = list("neutrophil_absolute_count" = list(
       "9444" = c(0.01, 1.499), "8848" = c(0.01, 1.499), "8816" = c(0.01, 1.499),
       "8961" = c(0.01, 1.499), "44777588" = c(0.01, 1.499),
       "8784" = c(10, 1499), "8647" = c(10, 1499)
-    )
+    ))
   )
   cdm[[paste0(pref, "temp_cc1_normal_neutrophil")]] <- measurementCohort(
     cdm = cdm,
     conceptSet = codes["neutrophil_absolute_count"],
     name = paste0(pref, "temp_cc1_normal_neutrophil"),
-    valueAsNumber = list(
+    valueAsNumber = list("neutrophil_absolute_count" = list(
       "9444" = c(4, 8.25), "8848" = c(4, 8.25), "8816" = c(4, 8.25),
       "8961" = c(4, 8.25), "44777588" = c(4, 8.25),
       "8784" = c(4000, 8250), "8647" = c(4000, 8250)
-    )
+    ))
   )
   cdm <- omopgenerics::bind(
     cdm[[paste0(pref, name)]],
