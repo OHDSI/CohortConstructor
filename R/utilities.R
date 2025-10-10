@@ -21,6 +21,17 @@ filterCohortInternal <- function(cdm, cohort, cohortId, tmpNewCohort, tmpUnchang
       dplyr::compute(name = tmpNewCohort, temporary = FALSE,
                      logPrefix = "CohortConstructor_utilities_newCohort2_")
   }
+  useIndexes <- getOption("CohortConstructor.use_indexes")
+  if (!isFALSE(useIndexes)) {
+    addIndex(
+      cohort = cdm[[tmpUnchanged]],
+      cols = c("subject_id", "cohort_start_date")
+    )
+    addIndex(
+      cohort = cdm[[tmpNewCohort]],
+      cols = c("subject_id", "cohort_start_date")
+    )
+  }
   return(cdm)
 }
 
