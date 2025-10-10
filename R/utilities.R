@@ -5,13 +5,13 @@ needsIdFilter <- function(cohort, cohortId){
 }
 
 filterCohortInternal <- function(cdm, cohort, cohortId, tmpNewCohort, tmpUnchanged) {
+  useIndexes <- getOption("CohortConstructor.use_indexes")
   if (isFALSE(needsIdFilter(cohort = cohort, cohortId = cohortId))){
     cdm[[tmpNewCohort]] <- cohort |>
       dplyr::compute(name = tmpNewCohort, temporary = FALSE,
                      logPrefix = "CohortConstructor_utilities_newCohort1_") |>
       omopgenerics::newCohortTable(.softValidation = TRUE)
   } else {
-
     cdm[[tmpUnchanged]] <- cohort |>
       dplyr::filter(!.data$cohort_definition_id %in% .env$cohortId) |>
       dplyr::compute(name = tmpUnchanged, temporary = FALSE,
@@ -20,13 +20,14 @@ filterCohortInternal <- function(cdm, cohort, cohortId, tmpNewCohort, tmpUnchang
       dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>
       dplyr::compute(name = tmpNewCohort, temporary = FALSE,
                      logPrefix = "CohortConstructor_utilities_newCohort2_")
+    if (!isFALSE(useIndexes)) {
+      addIndex(
+        cohort = cdm[[tmpUnchanged]],
+        cols = c("subject_id", "cohort_start_date")
+      )
+    }
   }
-  useIndexes <- getOption("CohortConstructor.use_indexes")
   if (!isFALSE(useIndexes)) {
-    addIndex(
-      cohort = cdm[[tmpUnchanged]],
-      cols = c("subject_id", "cohort_start_date")
-    )
     addIndex(
       cohort = cdm[[tmpNewCohort]],
       cols = c("subject_id", "cohort_start_date")
