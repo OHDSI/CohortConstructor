@@ -41,7 +41,7 @@ requireCohortIntersect <- function(cohort,
   # checks
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cohort <- omopgenerics::validateCohortArgument(cohort)
-  validateCohortColumn(indexDate, cohort, class = "Date")
+  validateCohortColumn(indexDate, cohort, class = "date")
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   omopgenerics::validateCohortArgument(cdm[[targetCohortTable]])
   window <- omopgenerics::validateWindowArgument(window)
