@@ -19,10 +19,13 @@
 #' }
 mockCohortConstructor <- function(source = "local") {
   rlang::check_installed("omock")
+  if(isFALSE(omock::isMockDatasetDownloaded("synthea-breast_cancer-10k"))){
+    cli::cli_abort(c("Synthetic GiBleed dataset must already be downloaded to use mockCohortConstructor()",
+                     i = "Use {.code omock::downloadMockDataset(datasetName = 'GiBleed')} to download"))
+  }
   omopgenerics::assertChoice(source, c("local", "duckdb"), length = 1)
 
   cdm <- omock::mockVocabularySet(vocabularySet = "GiBleed") |>
-    suppressMessages() |>
     omock::mockPerson(nPerson = 100) |>
     omock::mockObservationPeriod() |>
     omock::mockDrugExposure() |>
