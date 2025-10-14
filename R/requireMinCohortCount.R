@@ -22,11 +22,12 @@
 #' @examples
 #' \donttest{
 #' library(CohortConstructor)
-#'
+#' if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 #' cdm <- mockCohortConstructor()
 #'
 #' cdm$cohort1 |>
 #' requireMinCohortCount(5)
+#' }
 #' }
 requireMinCohortCount <- function(cohort,
                                   minCohortCount,

@@ -17,12 +17,14 @@
 #' @examples
 #' \donttest{
 #' library(CohortConstructor)
+#' if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 #' cdm <- mockCohortConstructor()
 #' cdm$cohort1 |>
 #'   padCohortDate(
 #'     cohortDate = "cohort_end_date",
 #'     indexDate = "cohort_start_date",
 #'     days = 10)
+#' }
 #' }
 padCohortDate <- function(cohort,
                           days,
@@ -73,10 +75,12 @@ padCohortDate <- function(cohort,
 #' @examples
 #' \donttest{
 #' library(CohortConstructor)
+#' if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 #' cdm <- mockCohortConstructor()
 #' # add 10 days to each cohort exit
 #' cdm$cohort1 |>
 #'   padCohortEnd(days = 10)
+#' }
 #' }
 padCohortEnd <- function(cohort,
                          days,
@@ -122,10 +126,12 @@ padCohortEnd <- function(cohort,
 #' @examples
 #' \donttest{
 #' library(CohortConstructor)
+#' if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 #' cdm <- mockCohortConstructor()
 #' # add 10 days to each cohort entry
 #' cdm$cohort1 |>
 #'   padCohortStart(days = 10)
+#' }
 #' }
 padCohortStart <- function(cohort,
                            days,

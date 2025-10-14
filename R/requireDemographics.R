@@ -17,7 +17,7 @@
 #' @examples
 #' \donttest{
 #' library(CohortConstructor)
-#'
+#' if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 #' cdm <- mockCohortConstructor()
 #'
 #' cdm$cohort1 |>
@@ -25,6 +25,7 @@
 #'                       ageRange = list(c(18, 65)),
 #'                       sex = "Female",
 #'                       minPriorObservation = 365)
+#' }
 #' }
 requireDemographics <- function(cohort,
                                 cohortId = NULL,
@@ -69,10 +70,12 @@ requireDemographics <- function(cohort,
 #' @examples
 #' \donttest{
 #' library(CohortConstructor)
+#' if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 #' cdm <- mockCohortConstructor()
 #' cdm$cohort1 |>
 #'   requireAge(indexDate = "cohort_start_date",
 #'              ageRange = list(c(18, 65)))
+#' }
 #' }
 requireAge <- function(cohort,
                        ageRange,
@@ -114,9 +117,11 @@ requireAge <- function(cohort,
 #' @examples
 #' \donttest{
 #' library(CohortConstructor)
+#' if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 #' cdm <- mockCohortConstructor()
 #' cdm$cohort1 |>
 #'   requireSex(sex = "Female")
+#' }
 #' }
 requireSex <- function(cohort,
                        sex,
@@ -157,10 +162,12 @@ requireSex <- function(cohort,
 #' @examples
 #' \donttest{
 #' library(CohortConstructor)
+#' if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 #' cdm <- mockCohortConstructor()
 #' cdm$cohort1 |>
 #'   requirePriorObservation(indexDate = "cohort_start_date",
 #'                           minPriorObservation = 365)
+#' }
 #' }
 requirePriorObservation <- function(cohort,
                                     minPriorObservation,
@@ -203,10 +210,12 @@ requirePriorObservation <- function(cohort,
 #' @examples
 #' \donttest{
 #' library(CohortConstructor)
+#' if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 #' cdm <- mockCohortConstructor()
 #' cdm$cohort1 |>
 #'   requireFutureObservation(indexDate = "cohort_start_date",
 #'                            minFutureObservation = 30)
+#' }
 #' }
 requireFutureObservation <- function(cohort,
                                      minFutureObservation,
