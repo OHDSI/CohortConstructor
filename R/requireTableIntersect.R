@@ -42,7 +42,7 @@ requireTableIntersect <- function(cohort,
   # checks
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cohort <- omopgenerics::validateCohortArgument(cohort)
-  validateCohortColumn(indexDate, cohort, class = "Date")
+  validateCohortColumn(indexDate, cohort, class = "date")
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   window <- omopgenerics::validateWindowArgument(window)
   cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")

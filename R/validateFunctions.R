@@ -5,14 +5,7 @@ validateCohortColumn <- function(columns, cohort, class = NULL) {
       cli::cli_abort("{column} must be a column in the cohort table.")
     }
     if (!is.null(class)) {
-      colClass <- cohort |>
-        dplyr::pull(!!column) |>
-        class() |>
-        unique()
-      if (!any(colClass %in% class)) {
-        cli::cli_abort(c("{column} must be a column of class {class} in the cohort table.",
-                       "i" = "current class: {colClass}"))
-      }
+      omopgenerics::validateColumn(column = column, x = cohort, type = class)
     }
   }
   return(invisible(columns))
