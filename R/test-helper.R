@@ -1,4 +1,19 @@
 
+time_test <- function(test_name, code) {
+
+  time_taken <- system.time({
+    result <- force(code)
+  })
+
+  total_secs <- round(time_taken['elapsed'], 1)
+  cli::cli_h3(
+    "Finished test '{test_name}' in: {total_secs} second{?s}"
+  )
+
+  return(invisible(result))
+}
+
+
 test_reporter <- function() {
 
   MultiReporter$new(
@@ -95,13 +110,13 @@ PerformanceReporter <- R6::R6Class("PerformanceReporter",
                                          dplyr::mutate(time = format(time, digits = "3", scientific = F)) |>
                                          dplyr::pull()
 
-                                       cat("\n")
-                                       cat("--- Performance Summary  ----\n\n")
-                                       print(as.data.frame(summary), row.names = FALSE)
-
-                                       cat(paste0("\nTotal: ", total, "s\n"))
-
-                                       cat("\n")
+                                       # cat("\n")
+                                       # cat("--- Performance Summary  ----\n\n")
+                                       # print(as.data.frame(summary), row.names = FALSE)
+                                       #
+                                       # cat(paste0("\nTotal: ", total, "s\n"))
+                                       #
+                                       # cat("\n")
                                        cat("------- Tests Summary -------\n\n")
                                        self$cat_line("OK:       ", format(self$n_ok, width = 5))
                                        self$cat_line("Failed:   ", format(self$n_fail, width = 5))
