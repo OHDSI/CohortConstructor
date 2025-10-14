@@ -5,11 +5,13 @@ validateCohortColumn <- function(columns, cohort, class = NULL) {
       cli::cli_abort("{column} must be a column in the cohort table.")
     }
     if (!is.null(class)) {
-      if (!any(cohort |>
-               dplyr::pull(!!column) |>
-               class() |>
-               unique() %in% class)) {
-        cli::cli_abort("{column} must be a column of class {class} in the cohort table.")
+      colClass <- cohort |>
+        dplyr::pull(!!column) |>
+        class() |>
+        unique()
+      if (!any(colClass %in% class)) {
+        cli::cli_abort(c("{column} must be a column of class {class} in the cohort table.",
+                       "i" = "current class: {colClass}"))
       }
     }
   }
