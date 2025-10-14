@@ -17,7 +17,7 @@ test_reporter <- function() {
 
   MultiReporter$new(
     reporters = list(
-      SummaryReporter$new(),
+      ProgressReporter$new(),
       PerformanceReporter$new()
     )
   )
