@@ -37,6 +37,7 @@ jobs:
 
       - name: Run tests on duckdb
         run: |
+          devtools::load_all()
           Sys.setenv("DB_TO_TEST" = "duckdb CDMConnector")
           devtools::test(reporter = test_reporter())
         shell: Rscript {0}
