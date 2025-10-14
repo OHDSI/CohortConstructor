@@ -6,10 +6,9 @@ time_test <- function(test_name, code) {
   })
 
   total_secs <- round(time_taken['elapsed'], 1)
-  cli::cli_alert(
-    "Finished test '{test_name}' in: {total_secs} second{?s}"
+  cat(paste0(c("\nFinished test", test_name, "in", total_secs, "\n")),
+    file = stderr()
   )
-
   return(invisible(result))
 }
 
