@@ -49,8 +49,9 @@ overlapping records in the cohort, overlapping entries will be merged.
 \examples{
 \donttest{
 library(CohortConstructor)
-
+if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 cdm <- mockCohortConstructor()
 cdm$cohort1 |> exitAtObservationEnd()
+}
 }
 }

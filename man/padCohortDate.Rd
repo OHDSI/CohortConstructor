@@ -57,11 +57,13 @@ Set cohort start or cohort end
 \examples{
 \donttest{
 library(CohortConstructor)
+if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 cdm <- mockCohortConstructor()
 cdm$cohort1 |>
   padCohortDate(
     cohortDate = "cohort_end_date",
     indexDate = "cohort_start_date",
     days = 10)
+}
 }
 }

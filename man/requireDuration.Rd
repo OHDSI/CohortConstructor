@@ -42,8 +42,9 @@ for the specified amount of days
 library(CohortConstructor)
 
 cdm <- mockCohortConstructor()
-
+if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 cdm$cohort1 |>
   requireDuration(daysInCohort = c(2, Inf))
+}
 }
 }

@@ -53,7 +53,7 @@ individuals satisfy the specified demographic criteria.
 \examples{
 \donttest{
 library(CohortConstructor)
-
+if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 cdm <- mockCohortConstructor()
 
 cdm$cohort1 |>
@@ -61,5 +61,6 @@ cdm$cohort1 |>
                       ageRange = list(c(18, 65)),
                       sex = "Female",
                       minPriorObservation = 365)
+}
 }
 }

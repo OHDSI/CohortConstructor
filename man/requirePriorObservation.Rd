@@ -43,9 +43,11 @@ where individuals satisfy the specified prior observation criteria.
 \examples{
 \donttest{
 library(CohortConstructor)
+if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 cdm <- mockCohortConstructor()
 cdm$cohort1 |>
   requirePriorObservation(indexDate = "cohort_start_date",
                           minPriorObservation = 365)
+}
 }
 }

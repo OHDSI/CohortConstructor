@@ -27,6 +27,7 @@ Create cohort based on the death table
 }
 \examples{
 \donttest{
+if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 library(CohortConstructor)
 
 cdm <- mockCohortConstructor()
@@ -43,6 +44,6 @@ cdm$my_cohort <- demographicsCohort(cdm, "my_cohort", ageRange = c(50,100), sex 
 # Generate a death cohort, restricted to individuals in 'my_cohort'
 death_cohort <- deathCohort(cdm, name = "death_cohort", subsetCohort = "my_cohort")
 death_cohort |> attrition()
-
+}
 }
 }

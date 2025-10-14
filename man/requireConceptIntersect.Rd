@@ -69,7 +69,7 @@ list in some time window around an index date.
 \examples{
 \donttest{
 library(CohortConstructor)
-
+if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 cdm <- mockCohortConstructor()
 
 cdm$cohort2 <-  requireConceptIntersect(
@@ -77,5 +77,6 @@ cdm$cohort2 <-  requireConceptIntersect(
   conceptSet = list(a = 194152),
   window = c(-Inf, 0),
   name = "cohort2")
+  }
   }
 }

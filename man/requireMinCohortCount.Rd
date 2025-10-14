@@ -40,10 +40,11 @@ records from cohorts with a minimum number of individuals
 \examples{
 \donttest{
 library(CohortConstructor)
-
+if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 cdm <- mockCohortConstructor()
 
 cdm$cohort1 |>
 requireMinCohortCount(5)
+}
 }
 }

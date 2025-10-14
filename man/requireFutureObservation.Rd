@@ -43,9 +43,11 @@ where individuals satisfy the specified future observation criteria.
 \examples{
 \donttest{
 library(CohortConstructor)
+if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 cdm <- mockCohortConstructor()
 cdm$cohort1 |>
   requireFutureObservation(indexDate = "cohort_start_date",
                            minFutureObservation = 30)
+}
 }
 }
