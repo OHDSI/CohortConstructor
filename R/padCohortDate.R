@@ -308,8 +308,10 @@ solveOverlap <- function(x, collapse, intermediate) {
 solveObservation <- function(x, requireFullContribution, intermediate, cohortDate) {
   idcol <- omopgenerics::uniqueId(exclude = colnames(x))
   tablePrefix <- omopgenerics::tmpPrefix()
+  cdm <- omopgenerics::cdmReference(x)
+
   if (cohortDate == "cohort_start_date") {
-    x <- x |>
+    newX <- x |>
       PatientProfiles::addPriorObservation(
         indexDate = "cohort_end_date",
         priorObservationName = idcol,
@@ -317,18 +319,18 @@ solveObservation <- function(x, requireFullContribution, intermediate, cohortDat
         name = omopgenerics::uniqueTableName(prefix = tablePrefix)
       )
     if (isFALSE(requireFullContribution)) {
-      x <- x |>
+      newX <- newX |>
         dplyr::mutate("cohort_start_date" = dplyr::if_else(
           .data$cohort_start_date < .data[[idcol]],
           .data[[idcol]],
           .data$cohort_start_date
         ))
     } else {
-      x <- x |>
+      newX <- newX |>
         dplyr::filter(.data$cohort_start_date >= .data[[idcol]])
     }
   } else {
-    x <- x |>
+    newX <- x |>
       PatientProfiles::addFutureObservation(
         indexDate = "cohort_start_date",
         futureObservationName = idcol,
@@ -336,18 +338,18 @@ solveObservation <- function(x, requireFullContribution, intermediate, cohortDat
         name = omopgenerics::uniqueTableName(prefix = tablePrefix)
       )
     if (isFALSE(requireFullContribution)) {
-      x <- x |>
+      newX <- newX |>
         dplyr::mutate("cohort_end_date" = dplyr::if_else(
           .data$cohort_end_date > .data[[idcol]],
           .data[[idcol]],
           .data$cohort_end_date
         ))
     } else {
-      x <- x |>
+      newX <- newX |>
         dplyr::filter(.data$cohort_end_date <= .data[[idcol]])
     }
   }
-  x <- x |>
+  newX <- newX |>
     dplyr::select(!dplyr::all_of(idcol)) |>
     dplyr::compute(name = intermediate, temporary = FALSE,
                    logPrefix = "CohortConstructor_solveObservation_")
@@ -356,5 +358,5 @@ solveObservation <- function(x, requireFullContribution, intermediate, cohortDat
     cdm = cdm, name = dplyr::starts_with(tablePrefix)
   )
 
-  x
+  newX
 }
