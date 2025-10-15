@@ -15,8 +15,10 @@
 #' @examples
 #' \donttest{
 #' library(CohortConstructor)
+#' if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 #' cdm <- mockCohortConstructor()
 #' cdm$cohort1 <- requireIsEntry(cdm$cohort1, c(1, Inf))
+#' }
 #' }
 #'
 requireIsEntry <- function(cohort,
@@ -137,10 +139,11 @@ requireIsEntry <- function(cohort,
 #' @examples
 #' \donttest{
 #' library(CohortConstructor)
+#' if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 #' cdm <- mockCohortConstructor()
 #' cdm$cohort1 <- requireIsFirstEntry(cdm$cohort1)
 #' }
-#'
+#' }
 requireIsFirstEntry <- function(cohort,
                                 cohortId = NULL,
                                 name = tableName(cohort)) {
@@ -210,8 +213,10 @@ requireIsFirstEntry <- function(cohort,
 #' @examples
 #' \donttest{
 #' library(CohortConstructor)
+#' if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 #' cdm <- mockCohortConstructor()
 #' cdm$cohort1 <- requireIsLastEntry(cdm$cohort1)
+#' }
 #' }
 #'
 requireIsLastEntry <- function(cohort,

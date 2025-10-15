@@ -28,9 +28,10 @@ people. All records of these individuals are preserved.
 \examples{
 \donttest{
 library(CohortConstructor)
-
+if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 cdm <- mockCohortConstructor()
 
 cdm$cohort2 |> sampleCohorts(cohortId = 1, n = 10)
+}
 }
 }

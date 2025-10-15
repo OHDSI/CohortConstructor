@@ -91,7 +91,7 @@ as to end at the preceding observation period end date.
 \examples{
 \donttest{
 library(CohortConstructor)
-
+if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 cdm <- mockCohortConstructor()
 
 cdm$cohort <- conceptCohort(cdm = cdm, conceptSet = list(a = 444074), name = "cohort")
@@ -117,5 +117,6 @@ cdm$study_cohort <- conceptCohort(cdm = cdm,
 
 cdm$study_cohort |>
   attrition()
+}
 }
 }

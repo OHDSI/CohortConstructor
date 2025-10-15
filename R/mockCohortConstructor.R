@@ -12,17 +12,21 @@
 #' @examples
 #' \donttest{
 #' library(CohortConstructor)
-#'
+#' if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 #' cdm <- mockCohortConstructor()
 #'
 #' cdm
 #' }
+#' }
 mockCohortConstructor <- function(source = "local") {
   rlang::check_installed("omock")
+  if(isFALSE(omock::isMockDatasetDownloaded("GiBleed"))){
+    cli::cli_abort(c("Synthetic GiBleed dataset must already be downloaded to use mockCohortConstructor()",
+                     i = "Use {.code omock::downloadMockDataset(datasetName = 'GiBleed')} to download"))
+  }
   omopgenerics::assertChoice(source, c("local", "duckdb"), length = 1)
 
   cdm <- omock::mockVocabularySet(vocabularySet = "GiBleed") |>
-    suppressMessages() |>
     omock::mockPerson(nPerson = 100) |>
     omock::mockObservationPeriod() |>
     omock::mockDrugExposure() |>

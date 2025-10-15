@@ -60,7 +60,7 @@
 #' @examples
 #' \donttest{
 #' library(CohortConstructor)
-#'
+#' if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 #' cdm <- mockCohortConstructor()
 #'
 #' cdm$cohort <- conceptCohort(cdm = cdm, conceptSet = list(a = 444074), name = "cohort")
@@ -86,6 +86,7 @@
 #'
 #' cdm$study_cohort |>
 #'   attrition()
+#' }
 #' }
 conceptCohort <- function(cdm,
                           conceptSet,

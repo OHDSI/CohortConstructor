@@ -40,10 +40,10 @@ for the specified amount of days
 \examples{
 \donttest{
 library(CohortConstructor)
-
+if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 cdm <- mockCohortConstructor()
-
 cdm$cohort1 |>
   requireDuration(daysInCohort = c(2, Inf))
+}
 }
 }

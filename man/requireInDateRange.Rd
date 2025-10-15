@@ -43,11 +43,12 @@ which the index date is within the specified date range.
 \examples{
 \donttest{
 library(CohortConstructor)
-
+if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 cdm <- mockCohortConstructor()
 
 cdm$cohort1 |>
   requireInDateRange(indexDate = "cohort_start_date",
                      dateRange = as.Date(c("2010-01-01", "2019-01-01")))
+}
 }
 }

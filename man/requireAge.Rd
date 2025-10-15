@@ -42,9 +42,11 @@ satisfy the specified age criteria.
 \examples{
 \donttest{
 library(CohortConstructor)
+if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 cdm <- mockCohortConstructor()
 cdm$cohort1 |>
   requireAge(indexDate = "cohort_start_date",
              ageRange = list(c(18, 65)))
+}
 }
 }

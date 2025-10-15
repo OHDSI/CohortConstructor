@@ -19,7 +19,7 @@
 #' \donttest{
 #' library(CohortConstructor)
 #' library(PatientProfiles)
-#'
+#' if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 #' cdm <- mockCohortConstructor()
 #'
 #' cdm$cohort1 <- cdm$cohort1 |>
@@ -33,6 +33,7 @@
 #'
 #' cdm$cohort1 |>
 #'   entryAtFirstDate(dateColumns = c("prior_drug", "prior_observation"))
+#' }
 #' }
 entryAtFirstDate <- function(cohort,
                              dateColumns,
@@ -74,6 +75,7 @@ entryAtFirstDate <- function(cohort,
 #'
 #' @examples
 #' \donttest{
+#' if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 #' library(CohortConstructor)
 #' library(PatientProfiles)
 #'
@@ -90,6 +92,7 @@ entryAtFirstDate <- function(cohort,
 #'
 #' cdm$cohort1 |>
 #'   entryAtLastDate(dateColumns = c("prior_drug", "prior_observation"))
+#' }
 #' }
 entryAtLastDate <- function(cohort,
                             dateColumns,

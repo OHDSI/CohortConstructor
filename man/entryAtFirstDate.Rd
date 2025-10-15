@@ -51,7 +51,7 @@ column dates. The first date that occurs is chosen.
 \donttest{
 library(CohortConstructor)
 library(PatientProfiles)
-
+if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 cdm <- mockCohortConstructor()
 
 cdm$cohort1 <- cdm$cohort1 |>
@@ -65,5 +65,6 @@ cdm$cohort1 <- cdm$cohort1 |>
 
 cdm$cohort1 |>
   entryAtFirstDate(dateColumns = c("prior_drug", "prior_observation"))
+}
 }
 }

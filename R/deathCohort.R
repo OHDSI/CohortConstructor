@@ -14,6 +14,7 @@
 #'
 #' @examples
 #' \donttest{
+#' if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 #' library(CohortConstructor)
 #'
 #' cdm <- mockCohortConstructor()
@@ -30,7 +31,7 @@
 #' # Generate a death cohort, restricted to individuals in 'my_cohort'
 #' death_cohort <- deathCohort(cdm, name = "death_cohort", subsetCohort = "my_cohort")
 #' death_cohort |> attrition()
-#'
+#' }
 #' }
 deathCohort <- function(
     cdm,

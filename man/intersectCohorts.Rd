@@ -51,12 +51,12 @@ that overlap combined and kept. Cohort entries are when an individual was in
 \examples{
 \donttest{
 library(CohortConstructor)
-
+if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 cdm <- mockCohortConstructor()
 
 cdm$cohort3 <- intersectCohorts(cohort = cdm$cohort2, name = "cohort3")
 
 settings(cdm$cohort3)
-
+}
 }
 }

@@ -20,7 +20,7 @@
 #' @examples
 #' \donttest{
 #' library(CohortConstructor)
-#'
+#' if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 #' cdm <- mockCohortConstructor()
 #'
 #' cdm$cohort2 <- cdm$cohort2 |>
@@ -28,6 +28,7 @@
 #'
 #' settings(cdm$cohort2)
 #'
+#' }
 #' }
 unionCohorts <- function(cohort,
                          cohortId = NULL,
