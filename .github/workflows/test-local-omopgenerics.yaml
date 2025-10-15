@@ -37,9 +37,7 @@ jobs:
 
       - name: Run tests with local source
         run: |
+          devtools::load_all()
           Sys.setenv("DB_TO_TEST" = "local omopgenerics")
-          x <- devtools::test()
-          error <- sum(as.numeric(dplyr::as_tibble(x)$error))
-          failed <- sum(as.numeric(dplyr::as_tibble(x)$failed))
-          if (error + failed > 0) cli::cli_abort(c(x = "Tests failed"))
+          devtools::test(reporter = test_reporter())
         shell: Rscript {0}
