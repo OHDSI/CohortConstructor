@@ -23,9 +23,8 @@
 #' @examples
 #' \donttest{
 #' library(CohortConstructor)
-#'
-#' cdm <- mockCohortConstructor()
 #' if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
+#' cdm <- mockCohortConstructor()
 #' cdm$cohort1 |>
 #'   requireDuration(daysInCohort = c(2, Inf))
 #' }
