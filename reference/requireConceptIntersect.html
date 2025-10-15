@@ -157,7 +157,7 @@ TRUE, it will only be required for the first entry of each subject.</p></dd>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ohdsi.github.io/CohortConstructor/">CohortConstructor</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Logic.html" class="external-link">isTRUE</a></span><span class="op">(</span><span class="fu">omock</span><span class="fu">::</span><span class="fu"><a href="https://ohdsi.github.io/omock/reference/isMockDatasetDownloaded.html" class="external-link">isMockDatasetDownloaded</a></span><span class="op">(</span><span class="st">"GiBleed"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span></span>
 <span class="r-in"><span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="mockCohortConstructor.html">mockCohortConstructor</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">cdm</span><span class="op">$</span><span class="va">cohort2</span> <span class="op">&lt;-</span>  <span class="fu">requireConceptIntersect</span><span class="op">(</span></span></span>
@@ -165,10 +165,7 @@ TRUE, it will only be required for the first entry of each subject.</p></dd>
 <span class="r-in"><span>  conceptSet <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>a <span class="op">=</span> <span class="fl">194152</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  window <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="cn">Inf</span>, <span class="fl">0</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  name <span class="op">=</span> <span class="st">"cohort2"</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #BBBB00;">!</span> `codelist` casted to integers.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> 1 concept(s) from domain <span style="color: #0000BB;">NA</span> eliminated as it is not supported.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Supported domains are: <span style="color: #0000BB;">device</span>, <span style="color: #0000BB;">specimen</span>, <span style="color: #0000BB;">measurement</span>, <span style="color: #0000BB;">drug</span>, <span style="color: #0000BB;">condition</span>,</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">observation</span>, <span style="color: #0000BB;">procedure</span>, <span style="color: #0000BB;">episode</span>, and <span style="color: #0000BB;">visit</span>.</span>
+<span class="r-in"><span>  <span class="op">}</span></span></span>
 <span class="r-in"><span>  <span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
