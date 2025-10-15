@@ -259,7 +259,6 @@ padCohortStart <- function(cohort,
 
   return(newCohort)
 }
-
 validateColumn <- function(col, x, call) {
   if (!col %in% colnames(x)) {
     cli::cli_abort(c("{.var {col}} column does not exist."), call = call)
@@ -308,12 +307,14 @@ solveOverlap <- function(x, collapse, intermediate) {
 }
 solveObservation <- function(x, requireFullContribution, intermediate, cohortDate) {
   idcol <- omopgenerics::uniqueId(exclude = colnames(x))
+  tablePrefix <- omopgenerics::tmpPrefix()
   if (cohortDate == "cohort_start_date") {
     x <- x |>
-      PatientProfiles::addPriorObservationQuery(
+      PatientProfiles::addPriorObservation(
         indexDate = "cohort_end_date",
         priorObservationName = idcol,
-        priorObservationType = "date"
+        priorObservationType = "date",
+        name = omopgenerics::uniqueTableName(prefix = tablePrefix)
       )
     if (isFALSE(requireFullContribution)) {
       x <- x |>
@@ -328,10 +329,11 @@ solveObservation <- function(x, requireFullContribution, intermediate, cohortDat
     }
   } else {
     x <- x |>
-      PatientProfiles::addFutureObservationQuery(
+      PatientProfiles::addFutureObservation(
         indexDate = "cohort_start_date",
         futureObservationName = idcol,
-        futureObservationType = "date"
+        futureObservationType = "date",
+        name = omopgenerics::uniqueTableName(prefix = tablePrefix)
       )
     if (isFALSE(requireFullContribution)) {
       x <- x |>
@@ -345,8 +347,14 @@ solveObservation <- function(x, requireFullContribution, intermediate, cohortDat
         dplyr::filter(.data$cohort_end_date <= .data[[idcol]])
     }
   }
-  x |>
+  x <- x |>
     dplyr::select(!dplyr::all_of(idcol)) |>
     dplyr::compute(name = intermediate, temporary = FALSE,
                    logPrefix = "CohortConstructor_solveObservation_")
+
+  omopgenerics::dropSourceTable(
+    cdm = cdm, name = dplyr::starts_with(tablePrefix)
+  )
+
+  x
 }
