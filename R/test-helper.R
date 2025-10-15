@@ -1,20 +1,5 @@
 
-time_test <- function(test_name, code) {
-
-  time_taken <- system.time({
-    result <- force(code)
-  })
-
-  total_secs <- round(time_taken['elapsed'], 1)
-  cat(paste0(c("\nFinished test", test_name, "in", total_secs, "\n")),
-    file = stderr()
-  )
-  return(invisible(result))
-}
-
-
 test_reporter <- function() {
-
   MultiReporter$new(
     reporters = list(
       ProgressReporter$new(),
@@ -23,15 +8,19 @@ test_reporter <- function() {
   )
 }
 
+# note for timings it is just based on time since start
+# so timings won't be sensible if tests are running in parallel
 PerformanceReporter <- R6::R6Class("PerformanceReporter",
                                    inherit = Reporter,
                                    public = list(
                                      results = list(
                                        context = character(0),
+                                       test =  character(0),
                                        time = numeric(0)
                                      ),
                                      last_context = NA_character_,
                                      last_test = NA_character_,
+                                     start_time = Sys.time(),
                                      last_time = Sys.time(),
                                      last_test_time = 0,
                                      n_ok = 0,
@@ -63,8 +52,7 @@ PerformanceReporter <- R6::R6Class("PerformanceReporter",
                                        self$last_time <- Sys.time()
                                      },
                                      add_result = function(context, test, result) {
-                                       elapsed_time <- as.numeric(Sys.time()) - as.numeric(self$last_time)
-
+                                       time_since_start <- as.numeric(Sys.time()) - as.numeric(self$start_time)
                                        is_error <- inherits(result, "expectation_failure") ||
                                          inherits(result, "expectation_error")
 
@@ -78,44 +66,43 @@ PerformanceReporter <- R6::R6Class("PerformanceReporter",
                                        } else {
                                          self$n_ok <- self$n_ok + 1
                                        }
-
-                                       if (identical(self$last_test, test)) {
-                                         elapsed_time <- self$last_test_time + elapsed_time
-                                         self$results$time[length(self$results$time)] <- elapsed_time
-                                         self$last_test_time <- elapsed_time
-                                       } else {
                                          self$results$context[length(self$results$context) + 1] <- self$last_context
-                                         self$results$time[length(self$results$time) + 1] <- elapsed_time
-                                         self$last_test_time <- elapsed_time
-                                       }
+                                         self$results$time[length(self$results$time) + 1] <- time_since_start
+                                         self$results$test[length(self$results$test) + 1] <- test
 
                                        self$last_test <- test
                                        self$last_time <- Sys.time()
                                      },
                                      end_reporter = function() {
                                        cat("\n")
-                                       data <- data.frame(
+                                       timing <- data.frame(
                                          context = self$results$context,
+                                         test = self$results$test,
                                          time = self$results$time
                                        )
+                                       timing$time_taken <- c(NA, diff(timing$time))
 
-                                       summary <- data |>
+                                       timing_summary <- timing |>
                                          dplyr::group_by(context) |>
-                                         dplyr::summarise(time = sum(time)) |>
-                                         dplyr::mutate(time = format(time, width = "9", digits = "3", scientific = F))
+                                         dplyr::summarise(time_taken = sum(time_taken)) |>
+                                         dplyr::mutate(time_taken = dplyr::if_else(is.na(time_taken), 0, time_taken)) |>
+                                         dplyr::arrange(desc(time_taken)) |>
+                                         dplyr::mutate(time_taken = format(time_taken,
+                                                                           width = "9",
+                                                                           digits = "2",
+                                                                           scientific = F))
 
-                                       total <- data |>
-                                         dplyr::summarise(time = sum(time)) |>
-                                         dplyr::mutate(time = format(time, digits = "3", scientific = F)) |>
-                                         dplyr::pull()
+                                       cat("\n")
+                                       cat("--- Test timings (seconds)  ----\n\n")
+                                       print(as.data.frame(timing_summary), row.names = FALSE)
 
-                                       # cat("\n")
-                                       # cat("--- Performance Summary  ----\n\n")
-                                       # print(as.data.frame(summary), row.names = FALSE)
-                                       #
-                                       # cat(paste0("\nTotal: ", total, "s\n"))
-                                       #
-                                       # cat("\n")
+                                       cat(paste0("\nTotal: ",
+                                                  print(round(as.numeric(
+                                                    self$last_time -  self$start_time,
+                                                    units = "secs"), 1)),
+                                                  "s\n"))
+
+                                       cat("\n")
                                        cat("------- Tests Summary -------\n\n")
                                        self$cat_line("OK:       ", format(self$n_ok, width = 5))
                                        self$cat_line("Failed:   ", format(self$n_fail, width = 5))

@@ -1,8 +1,6 @@
 test_that("basic example", {
   skip_on_cran()
 
-  time_test("basic example", {
-
   observation_period <- dplyr::tibble(
     observation_period_id = c(1, 2, 3, 4, 5,6) |> as.integer(),
     person_id = c(1, 2, 3, 4, 5,6)|> as.integer(),
@@ -60,12 +58,9 @@ test_that("basic example", {
 
   dropCreatedTables(cdm = cdm)
 })
-})
 
 test_that("first death record per person", {
   skip_on_cran()
-
-  time_test("first death record per person", {
 
   observation_period <- dplyr::tibble(
     observation_period_id = c(1, 2, 3, 4, 5,6) |> as.integer(),
@@ -131,12 +126,9 @@ test_that("first death record per person", {
 
   dropCreatedTables(cdm = cdm)
 })
-})
 
 test_that("test death in observation criteria", {
   skip_on_cran()
-
-  time_test("test death in observation criteria", {
 
   observation_period <- dplyr::tibble(
     observation_period_id = c(1, 2) |> as.integer(),
@@ -193,12 +185,9 @@ test_that("test death in observation criteria", {
 
   dropCreatedTables(cdm = cdm)
 })
-})
 
 test_that("test different cohort table name", {
   skip_on_cran()
-
-  time_test("test different cohort table name", {
 
   observation_period <- dplyr::tibble(
     observation_period_id = c(1, 2, 3) |> as.integer(),
@@ -253,12 +242,9 @@ test_that("test different cohort table name", {
 
   dropCreatedTables(cdm = cdm)
 })
-})
 
 test_that("test subsetting death table by a cohort table", {
   skip_on_cran()
-
-  time_test("test subsetting death table by a cohort table", {
 
   observation_period <- dplyr::tibble(
     observation_period_id = c(1, 2, 3) |> as.integer(),
@@ -336,12 +322,9 @@ test_that("test subsetting death table by a cohort table", {
 
   dropCreatedTables(cdm = cdm)
 })
-})
 
 test_that("test expected errors", {
   skip_on_cran()
-
-  time_test("test expected errors", {
 
   observation_period <- dplyr::tibble(
     observation_period_id = c(1, 2, 3) |> as.integer(),
@@ -428,12 +411,9 @@ test_that("test expected errors", {
 
   dropCreatedTables(cdm = cdm)
 })
-})
 
 test_that("test single permanent table created", {
   skip_on_cran()
-
-  time_test("test single permanent table created", {
 
   observation_period <- dplyr::tibble(
     observation_period_id = c(1, 2, 3) |> as.integer(),
@@ -489,5 +469,4 @@ test_that("test single permanent table created", {
     sort(c(start_tables, "my_death_cohort")))
 
   dropCreatedTables(cdm = cdm)
-})
 })
