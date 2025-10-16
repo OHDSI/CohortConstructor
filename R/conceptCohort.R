@@ -639,6 +639,7 @@ getDomainCohort <- function(cdm,
                             name,
                             subsetIndividuals,
                             source = FALSE) {
+
   if (source) {
     name = paste0(name, "_source")
   }
@@ -653,27 +654,83 @@ getDomainCohort <- function(cdm,
     cli::cli_abort("{end} not found in {table} table")
   }
 
-  tempCohort <- cdm[[table]] |>
-    dplyr::select(
-      "subject_id" = "person_id",
-      "concept_id" = dplyr::all_of(.env$concept),
-      "cohort_start_date" = dplyr::all_of(.env$start),
-      "cohort_end_date" = dplyr::all_of(.env$end),
-      dplyr::any_of(extraCols)
+
+  tablePrefix <- omopgenerics::tmpPrefix()
+  on.exit(
+    omopgenerics::dropSourceTable(
+      cdm = cdm, name = dplyr::starts_with(tablePrefix)
     )
-  if (!is.null(subsetIndividuals)) {
-    tempCohort <- tempCohort |>
+  )
+  # codelist + cohort filtered to domain
+  cdm[[paste0(tablePrefix, "temp_codelist_cohort_id")]] <- cdm[[tableCohortCodelist]] |>
+    dplyr::filter(.data$domain_id %in% .env$domain) |>
+    dplyr::select("cohort_definition_id", "concept_id") |>
+    dplyr::distinct() |>
+    dplyr::compute(temporary = FALSE,
+                   name = paste0(tablePrefix, "temp_codelist_cohort_id"),
+                   logPrefix = "CohortConstructor_tempCodelistCohortId_")
+  # codelist only (will use for main join)
+  cdm[[paste0(tablePrefix, "temp_codelist")]] <-cdm[[paste0(tablePrefix, "temp_codelist_cohort_id")]] |>
+    dplyr::select("concept_id") |>
+    dplyr::distinct() |>
+    dplyr::compute(temporary = FALSE,
+                   name = paste0(tablePrefix, "temp_codelist"),
+                   logPrefix = "CohortConstructor_tempCodelist_")
+
+  useIndexes <- getOption("CohortConstructor.use_indexes")
+  if (!isFALSE(useIndexes)) {
+    addIndex(
+      cohort = cdm[[paste0(tablePrefix, "temp_codelist_cohort_id")]],
+      cols = c("cohort_definition_id", "concept_id")
+    )
+    addIndex(
+      cohort = cdm[[paste0(tablePrefix, "temp_codelist")]],
+      cols = "concept_id"
+    )
+  }
+  if (is.null(subsetIndividuals)) {
+    tempCohort <- cdm[[table]] |>
+      dplyr::select(
+        "subject_id" = "person_id",
+        "concept_id" = dplyr::all_of(.env$concept),
+        "cohort_start_date" = dplyr::all_of(.env$start),
+        "cohort_end_date" = dplyr::all_of(.env$end),
+        dplyr::any_of(extraCols)) |>
+      dplyr::inner_join(
+        cdm[[paste0(tablePrefix, "temp_codelist")]],
+        by = "concept_id"
+      ) |>
+      dplyr::compute(temporary = FALSE, name = name,
+                     logPrefix = "CohortConstructor_tempCohort_")
+
+  } else {
+    tempCohort <- cdm[[table]] |>
+      dplyr::select(
+        "subject_id" = "person_id",
+        "concept_id" = dplyr::all_of(.env$concept),
+        "cohort_start_date" = dplyr::all_of(.env$start),
+        "cohort_end_date" = dplyr::all_of(.env$end),
+        dplyr::any_of(extraCols)) |>
       dplyr::inner_join(subsetIndividuals,  by = "subject_id") |>
       dplyr::compute(temporary = FALSE, name = name,
                      logPrefix = "CohortConstructor_subsetIndividuals_")
+
+    tempCohort <- tempCohort |>
+      dplyr::inner_join(
+        cdm[[paste0(tablePrefix, "temp_codelist")]],
+        by = "concept_id"
+      ) |>
+      dplyr::compute(temporary = FALSE, name = name,
+                     logPrefix = "CohortConstructor_tempCohort_")
   }
-  tempCohort <- tempCohort  |>
+ tempCohort <- tempCohort |>
     dplyr::inner_join(
-      cdm[[tableCohortCodelist]] |>
-        dplyr::filter(.data$domain_id %in% .env$domain) |>
-        dplyr::select("concept_id", "cohort_definition_id"),
-      by = "concept_id"
-    ) |>
+      cdm[[paste0(tablePrefix, "temp_codelist_cohort_id")]],
+      by = "concept_id") |>
+    dplyr::select("cohort_definition_id",
+                  "subject_id",
+                  "cohort_start_date",
+                  "cohort_end_date") |>
     dplyr::compute(temporary = FALSE, name = name,
                    logPrefix = "CohortConstructor_tempCohort_")
 }
