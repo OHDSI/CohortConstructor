@@ -270,12 +270,12 @@ getAsthma <- function(cdm, codes, pref, name = NULL) {
 
 getBetaBlockers <- function(cdm, codes, pref, name = NULL) {
   if (is.null(name)) {
-    cdm[[paste0(pref, "cc1_beta_blockers_hypertension")]] <- conceptCohort(
+    cdm[[paste0(pref, "cc1_bb_hyp")]] <- conceptCohort(
       cdm = cdm,
       conceptSet = codes["beta_blockers"],
-      name = paste0(pref, "cc1_beta_blockers_hypertension")
+      name = paste0(pref, "cc1_bb_hyp")
     )
-    name <- "cc1_beta_blockers_hypertension"
+    name <- "cc1_bb_hyp"
   }
   cdm[[paste0(pref, name)]] <- cdm[[paste0(pref, name)]] |>
     collapseCohorts(gap = 90) |>
@@ -306,21 +306,21 @@ getCovid <- function(cdm, codes, pref, name = "cc1_covid", base = FALSE) {
       name = paste0(pref, name)
     )
   }
-  cdm[[paste0(pref, "temp_cc1_covid_test_positive")]] <- measurementCohort(
+  cdm[[paste0(pref, "temp_cc1_covid_tp")]] <- measurementCohort(
     cdm = cdm,
     conceptSet = codes["sars_cov_2_test"],
-    name = paste0(pref, "temp_cc1_covid_test_positive"),
+    name = paste0(pref, "temp_cc1_covid_tp"),
     valueAsConcept = list("sars_cov_2_test" = c(4126681, 45877985, 9191, 45884084, 4181412, 45879438))
   )
-  cdm[[paste0(pref, "temp_cc1_covid_test_negative")]] <- measurementCohort(
+  cdm[[paste0(pref, "temp_cc1_covid_tn")]] <- measurementCohort(
     cdm = cdm,
     conceptSet = codes["sars_cov_2_test"],
-    name = paste0(pref, "temp_cc1_covid_test_negative"),
+    name = paste0(pref, "temp_cc1_covid_tn"),
     valueAsConcept = list("sars_cov_2_test" = c(9189, 9190, 9191, 4132135, 3661867, 45878583, 45880296, 45884086))
   )
   cdm[[paste0(pref, name)]] <- cdm[[paste0(pref, name)]] |>
     requireCohortIntersect(
-      targetCohortTable = paste0(pref, "temp_cc1_covid_test_negative"),
+      targetCohortTable = paste0(pref, "temp_cc1_covid_tn"),
       targetCohortId = 1,
       targetEndDate = NULL,
       window = list(c(-3,3)),
@@ -328,7 +328,7 @@ getCovid <- function(cdm, codes, pref, name = "cc1_covid", base = FALSE) {
     )
   cdm <- omopgenerics::bind(
     cdm[[paste0(pref, name)]],
-    cdm[[paste0(pref, "temp_cc1_covid_test_positive")]],
+    cdm[[paste0(pref, "temp_cc1_covid_tp")]],
     name = paste0(pref, name)
   )
   cdm[[paste0(pref, name)]] <-  cdm[[paste0(pref, name)]] |>
@@ -349,12 +349,12 @@ getCovidStrata <- function(cdm, codes, sex, ageRange, name, pref) {
 
 getEndometriosisProcedure <- function(cdm, codes, pref, name = NULL) {
   if (is.null(name)) {
-    cdm[[paste0(pref, "cc1_endometriosis_procedure")]] <- conceptCohort(
+    cdm[[paste0(pref, "cc1_endo_proc")]] <- conceptCohort(
       cdm = cdm,
       conceptSet = codes["endometriosis_related_laproscopic_procedures"],
-      name = paste0(pref, "cc1_endometriosis_procedure")
+      name = paste0(pref, "cc1_endo_proc")
     )
-    name <- "cc1_endometriosis_procedure"
+    name <- "cc1_endo_proc"
   }
   cdm[[paste0(pref, name)]] <- cdm[[paste0(pref, name)]] |>
     requireConceptIntersect(
@@ -409,11 +409,11 @@ getHospitalisation <- function(cdm, codes, pref, name = NULL) {
 
 getMajorNonCardiacSurgery <- function(cdm, codes, pref) {
   codesMNCS <- codes[grepl("mncs_", names(codes))] |> unlist(use.names = FALSE)
-  codesMNCS <- list("cc1_major_non_cardiac_surgery" = codesMNCS)
-  cdm[[paste0(pref, "cc1_major_non_cardiac_surgery")]] <- conceptCohort(
+  codesMNCS <- list("cc1_major_nc_surgery" = codesMNCS)
+  cdm[[paste0(pref, "cc1_major_nc_surgery")]] <- conceptCohort(
     cdm = cdm,
     conceptSet = codesMNCS,
-    name = paste0(pref, "cc1_major_non_cardiac_surgery")
+    name = paste0(pref, "cc1_major_nc_surgery")
   ) |>
     exitAtObservationEnd() |>
     requireAge(ageRange = list(c(18, 150)))
@@ -423,12 +423,12 @@ getMajorNonCardiacSurgery <- function(cdm, codes, pref) {
 getNeutropeniaLeukopenia <- function(cdm, codes, pref, name = NULL) {
   # entry
   if (is.null(name)) {
-    cdm[[paste0(pref, "cc1_neutropenia_leukopenia")]] <- conceptCohort(
+    cdm[[paste0(pref, "cc1_neut_leukopenia")]] <- conceptCohort(
       cdm = cdm,
       conceptSet = codes["neutropenia_agranulocytosis_or_unspecified_leukopenia"],
-      name = paste0(pref, "cc1_neutropenia_leukopenia")
+      name = paste0(pref, "cc1_neut_leukopenia")
     )
-    name <- "cc1_neutropenia_leukopenia"
+    name <- "cc1_neut_leukopenia"
   }
   cdm[[paste0(pref, "temp_cc1_neutrophil_absolute_count")]] <- measurementCohort(
     cdm = cdm,
@@ -489,7 +489,7 @@ getNeutropeniaLeukopenia <- function(cdm, codes, pref, name = NULL) {
 
 getNewFluoroquinolone <- function(cdm, codes, pref, name = NULL) {
   if (is.null(name)) {
-    name <- "cc1_new_fluoroquinolone"
+    name <- "cc1_new_fluoro"
     cdm[[paste0(pref, name)]] <- conceptCohort(
       cdm = cdm,
       conceptSet = codes["fluoroquinolone_systemic"],
