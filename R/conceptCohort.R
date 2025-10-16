@@ -730,7 +730,8 @@ getDomainCohort <- function(cdm,
     dplyr::select("cohort_definition_id",
                   "subject_id",
                   "cohort_start_date",
-                  "cohort_end_date") |>
+                  "cohort_end_date",
+                  dplyr::any_of(extraCols)) |>
     dplyr::compute(temporary = FALSE, name = name,
                    logPrefix = "CohortConstructor_tempCohort_")
 }
