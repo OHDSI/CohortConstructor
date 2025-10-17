@@ -347,7 +347,7 @@ test_that("mearurementCohorts works", {
     valueAsConcept = list("c1" = 0),
     table = "measurement"
   )
-  expect_true(nrow(collapseCohorts(cdm$cohort11, 1)) == 0)
+  expect_true(nrow(collectCohort(cdm$cohort11, 1)) == 0)
   cdm$cohort12 <- measurementCohort(
     cdm = cdm,
     name = "cohort12",
@@ -356,7 +356,7 @@ test_that("mearurementCohorts works", {
     table = "measurement",
     useSourceFields = TRUE
   )
-  expect_true(nrow(collapseCohorts(cdm$cohort12, 1)) == 2)
+  expect_true(nrow(collectCohort(cdm$cohort12, 1)) == 2)
   cdm$cohort13 <- measurementCohort(
     cdm = cdm,
     name = "cohort13",
@@ -367,7 +367,7 @@ test_that("mearurementCohorts works", {
     subsetCohort = "cohort7",
     subsetCohortId = 1
   )
-  expect_true(nrow(collapseCohorts(cdm$cohort13, 1)) == 0)
+  expect_true(nrow(collectCohort(cdm$cohort13, 1)) == 0)
 
   # Expected behaviour ----
   # simple example
