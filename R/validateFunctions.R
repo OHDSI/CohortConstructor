@@ -148,23 +148,23 @@ validateN <- function(n) {
   )
 }
 
-validateIntersections <- function(intersections) {
+validateIntersections <- function(intersections, name = "intersections") {
   if (length(intersections) == 1) {
     intersections <- c(intersections, intersections)
   }
   if (length(intersections) != 2) {
-    cli::cli_abort("intersections must be of length 1 or 2, but is length {length(intersections)}")
+    cli::cli_abort("`{name}` must be of length 1 or 2, but is length {length(intersections)}")
   }
   if (intersections[1] < 0) {
     cli::cli_abort(
-      "intersections lower limit must be equal or greater than zero but is {intersections[[1]]}"
+      "`{name}` lower limit must be equal or greater than zero but is {intersections[[1]]}"
     )
   }
   if (intersections[1] > intersections[2]) {
-    cli::cli_abort("Second value for intersections must be equal or greater than the first")
+    cli::cli_abort("Second value for `{name}` must be equal or greater than the first")
   }
   if (intersections[1] == Inf) {
-    cli::cli_abort("First value for intersections cannot be Inf")
+    cli::cli_abort("First value for `{name}` cannot be Inf")
   }
 
   return(invisible(intersections))
