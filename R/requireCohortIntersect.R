@@ -55,7 +55,7 @@ requireCohortIntersect <- function(cohort,
     {{targetCohortId}}, cdm[[targetCohortTable]], validation = "error"
   )
   intersections <- validateIntersections(intersections)
-  cohortCombinationRange <- validateIntersections(cohortCombinationRange, "cohortCombinationRange")
+  cohortCombinationRange <- validateIntersections(cohortCombinationRange, name = "cohortCombinationRange")
   omopgenerics::assertLogical(atFirst, length = 1)
 
   if (length(cohortId) == 0) {
@@ -223,7 +223,7 @@ applyCohortRequirement <- function(cdm, newCohort, tmpNewCohort, atFirst, lower_
                      logPrefix = "CohortConstructor_applyCohortRequirement_subset_first_")
     newCohort <- newCohort |>
       dplyr::inner_join(newCohortFirst, by = c("cohort_definition_id", "subject_id")) |>
-      dplyr::select(!dplyr::all_of(intersectCol)) |>
+      dplyr::select(!dplyr::all_of(c(intersectCols, "cc_requirement_sum"))) |>
       dplyr::compute(name = tmpNewCohort, temporary = FALSE,
                      logPrefix = "CohortConstructor_applyCohortRequirement_requirement_first_")
     omopgenerics::dropSourceTable(cdm = cdm, name = tmpNewCohortFirst)
@@ -231,7 +231,7 @@ applyCohortRequirement <- function(cdm, newCohort, tmpNewCohort, atFirst, lower_
     newCohort <- newCohort |>
       dplyr::mutate(!!!mutateExpr) |>
       dplyr::filter(.data$cc_requirement_sum >= .env$combinations_lower_limit & .data$cc_requirement_sum <= .env$combinations_upper_limit) |>
-      dplyr::select(!dplyr::all_of(intersectCol)) |>
+      dplyr::select(!dplyr::all_of(c(intersectCols, "cc_requirement_sum"))) |>
       dplyr::compute(name = tmpNewCohort, temporary = FALSE,
                      logPrefix = "CohortConstructor_applyCohortRequirement_subset_")
   }

@@ -32,6 +32,7 @@ test_that("requiring presence in another cohort", {
   ) |>
     copyCdm()
 
+  # simple examples ----
   start_cols <- colnames(cdm$cohort1)
   cdm$cohort3 <-  requireCohortIntersect(cohort = cdm$cohort1,
                                          targetCohortTable = "cohort2",
@@ -40,16 +41,20 @@ test_that("requiring presence in another cohort", {
                                          name = "cohort3")
   expect_identical(colnames(cdm$cohort3), colnames(cdm$cohort1))
 
-  expect_true(all(cdm$cohort3  |>
-                    dplyr::distinct(subject_id) |>
-                    dplyr::pull() %in%
-                    intersect(cdm$cohort1 |>
-                                dplyr::distinct(subject_id) |>
-                                dplyr::pull(),
-                              cdm$cohort2 |>
-                                dplyr::filter(cohort_definition_id == 1) |>
-                                dplyr::distinct(subject_id) |>
-                                dplyr::pull())))
+  expect_true(all(
+    cdm$cohort3  |>
+      dplyr::distinct(subject_id) |>
+      dplyr::pull() %in%
+      intersect(
+        cdm$cohort1 |>
+          dplyr::distinct(subject_id) |>
+          dplyr::pull(),
+        cdm$cohort2 |>
+          dplyr::filter(cohort_definition_id == 1) |>
+          dplyr::distinct(subject_id) |>
+          dplyr::pull()
+      )
+  ))
   expect_true(all(omopgenerics::attrition(cdm$cohort3)$reason ==
                     c("Initial qualifying events",
                       "In cohort cohort_1 between -Inf & Inf days relative to cohort_start_date between 1 and Inf times",
@@ -139,7 +144,9 @@ test_that("requiring presence in another cohort", {
                       "Initial qualifying events",
                       "Not in cohort cohort_1 between 0 & Inf days relative to cohort_start_date, censoring at cohort_end_date")))
 
-  # expected errors
+
+
+  # expected errors ----
   # only support one target id
   expect_error(requireCohortIntersect(cohort = cdm$cohort1,
                                       targetCohortTable = "cohort2",
