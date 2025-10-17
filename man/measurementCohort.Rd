@@ -11,7 +11,10 @@ measurementCohort(
   valueAsConcept = NULL,
   valueAsNumber = NULL,
   table = NULL,
-  useRecordsBeforeObservation = FALSE
+  useRecordsBeforeObservation = FALSE,
+  useSourceFields = FALSE,
+  subsetCohort = NULL,
+  subsetCohortId = NULL
 )
 }
 \arguments{
@@ -51,9 +54,23 @@ See the examples below for how to define multiple cohorts based on different mea
 \item{table}{Character vector specifying which OMOP tables to use.
 Accepts "measurement", "observation", or both.}
 
-\item{useRecordsBeforeObservation}{Logical.
-If FALSE, only records within the observation period are used.
-If TRUE, records prior to the observation period are included, with their cohort start date set to the start of the next observation period.}
+\item{useRecordsBeforeObservation}{If FALSE, only records in observation will
+be used. If TRUE, records before the start of observation period will be
+considered, with cohort start date set as the start date of the
+individuals next observation period (as cohort records must be within
+observation).}
+
+\item{useSourceFields}{If TRUE, the source concept_id fields will also be
+used when identifying relevant clinical records. If FALSE, only the standard
+concept_id fields will be used.}
+
+\item{subsetCohort}{A character refering to a cohort table containing
+individuals for whom cohorts will be generated. Only individuals in this
+table will appear in the generated cohort.}
+
+\item{subsetCohortId}{Optional. Specifies cohort IDs from the \code{subsetCohort}
+table to include. If none are provided, all cohorts from the \code{subsetCohort}
+are included.}
 }
 \value{
 A cohort table.
