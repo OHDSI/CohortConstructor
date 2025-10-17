@@ -91,7 +91,10 @@ filter will be included.</p></li>
 <span>  valueAsConcept <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  valueAsNumber <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  table <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  useRecordsBeforeObservation <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  useRecordsBeforeObservation <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  useSourceFields <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  subsetCohort <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  subsetCohortId <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -144,9 +147,29 @@ Accepts "measurement", "observation", or both.</p></dd>
 
 
 <dt id="arg-userecordsbeforeobservation">useRecordsBeforeObservation<a class="anchor" aria-label="anchor" href="#arg-userecordsbeforeobservation"></a></dt>
-<dd><p>Logical.
-If FALSE, only records within the observation period are used.
-If TRUE, records prior to the observation period are included, with their cohort start date set to the start of the next observation period.</p></dd>
+<dd><p>If FALSE, only records in observation will
+be used. If TRUE, records before the start of observation period will be
+considered, with cohort start date set as the start date of the
+individuals next observation period (as cohort records must be within
+observation).</p></dd>
+
+
+<dt id="arg-usesourcefields">useSourceFields<a class="anchor" aria-label="anchor" href="#arg-usesourcefields"></a></dt>
+<dd><p>If TRUE, the source concept_id fields will also be
+used when identifying relevant clinical records. If FALSE, only the standard
+concept_id fields will be used.</p></dd>
+
+
+<dt id="arg-subsetcohort">subsetCohort<a class="anchor" aria-label="anchor" href="#arg-subsetcohort"></a></dt>
+<dd><p>A character refering to a cohort table containing
+individuals for whom cohorts will be generated. Only individuals in this
+table will appear in the generated cohort.</p></dd>
+
+
+<dt id="arg-subsetcohortid">subsetCohortId<a class="anchor" aria-label="anchor" href="#arg-subsetcohortid"></a></dt>
+<dd><p>Optional. Specifies cohort IDs from the <code>subsetCohort</code>
+table to include. If none are provided, all cohorts from the <code>subsetCohort</code>
+are included.</p></dd>
 
 </dl></div>
     <div class="section level2">
