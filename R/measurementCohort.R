@@ -15,6 +15,7 @@
 #' @inheritParams cdmDoc
 #' @inheritParams conceptSetDoc
 #' @inheritParams nameDoc
+#' @inheritParams baseCohortDoc
 #'
 #' @param valueAsConcept A named list defining cohorts based on measurement
 #' values as concept IDs. Each element name defines the name of cohort to
@@ -44,10 +45,6 @@
 #'
 #' @param table Character vector specifying which OMOP tables to use.
 #' Accepts "measurement", "observation", or both.
-#'
-#' @param useRecordsBeforeObservation Logical.
-#' If FALSE, only records within the observation period are used.
-#' If TRUE, records prior to the observation period are included, with their cohort start date set to the start of the next observation period.
 #'
 #' @return A cohort table.
 #'
@@ -126,7 +123,10 @@ measurementCohort <- function(cdm,
                               valueAsConcept = NULL,
                               valueAsNumber = NULL,
                               table = NULL,
-                              useRecordsBeforeObservation = FALSE) {
+                              useRecordsBeforeObservation = FALSE,
+                              useSourceFields = FALSE,
+                              subsetCohort = NULL,
+                              subsetCohortId = NULL) {
   # initial input validation
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cdm <- omopgenerics::validateCdmArgument(cdm)
@@ -137,7 +137,13 @@ measurementCohort <- function(cdm,
   }
   validateValueAsConcept(valueAsConcept)
   validateValueAsNumber(valueAsNumber)
+  omopgenerics::assertLogical(useSourceFields, length = 1)
   omopgenerics::assertLogical(useRecordsBeforeObservation, length = 1)
+  omopgenerics::assertCharacter(subsetCohort, length = 1, null = TRUE)
+  if (!is.null(subsetCohort)) {
+    subsetCohort <- omopgenerics::validateCohortArgument(cdm[[subsetCohort]])
+    subsetCohortId <- omopgenerics::validateCohortIdArgument({{subsetCohortId}}, subsetCohort, validation = "warning")
+  }
   omopgenerics::assertChoice(table, choices = c("measurement", "observation"), null = TRUE)
   table <- validateTable(table)
 
@@ -179,6 +185,40 @@ measurementCohort <- function(cdm,
     )
   }
 
+  # subsetCohort
+  if (!is.null(subsetCohort)) {
+    subsetName <- omopgenerics::uniqueTableName(prefix = tablePref)
+    subsetIndividuals <- subsetCohort |>
+      dplyr::filter(.data$cohort_definition_id %in% .env$subsetCohortId) |>
+      dplyr::distinct(.data$subject_id) |>
+      dplyr::compute(name = subsetName, temporary = FALSE,
+                     logPrefix = "CohortConstructor_conceptCohort_subsetCohort_")
+    if (omopgenerics::isTableEmpty(subsetIndividuals)) {
+      omopgenerics::dropSourceTable(cdm = cdm, name = subsetName)
+      cli::cli_warn("There are no individuals in the `subsetCohort` and `subsetCohortId` provided. Returning empty cohort.")
+      cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name)
+      cdm[[name]] <- cdm[[name]] |>
+        omopgenerics::newCohortTable(
+          cohortSetRef = cohortSet,
+          cohortAttritionRef = dplyr::tibble(
+            "cohort_definition_id" = cohortSet$cohort_definition_id,
+            "number_records" = 0L, "number_subjects" = 0L,
+            "reason_id" = 1L, "reason" = "Qualifying initial events",
+            "excluded_records" = NA_integer_, "excluded_subjects" = NA_integer_
+          )
+        )
+      return(cdm[[name]])
+    }
+    if (!isFALSE(useIndexes)) {
+      addIndex(
+        cohort = subsetIndividuals,
+        cols = "subject_id"
+      )
+    }
+  } else {
+    subsetIndividuals <- NULL
+  }
+
   # get cohort entries from omop records
   cdm[[name]] <- unerafiedConceptCohort(
     cdm = cdm,
@@ -189,8 +229,8 @@ measurementCohort <- function(cdm,
     name = name,
     extraCols = c("value_as_number", "value_as_concept_id", "unit_concept_id"),
     exit = "event_start_date",
-    useSourceFields = FALSE,
-    subsetIndividuals = NULL
+    useSourceFields = useSourceFields,
+    subsetIndividuals = subsetIndividuals
   )
 
   if (cdm[[name]] |> dplyr::tally() |> dplyr::pull("n") == 0) {

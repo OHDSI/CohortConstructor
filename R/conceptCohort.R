@@ -28,6 +28,7 @@
 #' @inheritParams cdmDoc
 #' @inheritParams conceptSetDoc
 #' @inheritParams nameDoc
+#' @inheritParams baseCohortDoc
 #' @param exit How the cohort end date is defined. Can be either
 #' "event_end_date" or "event_start_date".
 #' @param overlap How to deal with overlapping records. In all
@@ -38,20 +39,6 @@
 #' @param table Name of OMOP tables to search for records of the concepts
 #' provided. If NULL, each concept will be search at the assigned domain in
 #' the concept table.
-#' @param useRecordsBeforeObservation If FALSE, only records in observation will
-#' be used. If TRUE, records before the start of observation period will be
-#' considered, with cohort start date set as the start date of the
-#' individuals next observation period (as cohort records must be within
-#' observation).
-#' @param useSourceFields If TRUE, the source concept_id fields will also be
-#' used when identifying relevant clinical records. If FALSE, only the standard
-#' concept_id fields will be used.
-#' @param subsetCohort  A character refering to a cohort table containing
-#' individuals for whom cohorts will be generated. Only individuals in this
-#' table will appear in the generated cohort.
-#' @param subsetCohortId Optional. Specifies cohort IDs from the `subsetCohort`
-#' table to include. If none are provided, all cohorts from the `subsetCohort`
-#' are included.
 #'
 #' @export
 #'

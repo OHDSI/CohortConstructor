@@ -60,7 +60,8 @@ test_that("mearurementCohorts works", {
       measurement_type_concept_id = NA_integer_,
       value_as_number = c(100, 125, NA, NA, NA, NA, NA),
       value_as_concept_id = c(0, 0, 0, 4124457, 999999, 0, 0) |> as.integer(),
-      unit_concept_id = c(8876, 8876, 0, 0, 0, 0, 0) |> as.integer()
+      unit_concept_id = c(8876, 8876, 0, 0, 0, 0, 0) |> as.integer(),
+      measurement_source_concept_id = c(99L, 99L, rep(NA_integer_, 5))
     ))
   cdm <- omopgenerics::insertTable(
     cdm = cdm, name = "concept", table = dplyr::tibble(
@@ -337,6 +338,36 @@ test_that("mearurementCohorts works", {
   expect_true(cdm$cohort10 |> attrition() |> nrow() == 0)
   expect_true(cdm$cohort10 |> settings() |> nrow() == 1)
   expect_identical(colnames(settings(cdm$cohort10)) |> sort(), c("cdm_version", "cohort_definition_id", "cohort_name", "vocabulary_version"))
+
+  # Source concepts + subset cohort ----
+  cdm$cohort11 <- measurementCohort(
+    cdm = cdm,
+    name = "cohort11",
+    conceptSet = list("source" = 99L),
+    valueAsConcept = list("c1" = 0),
+    table = "measurement"
+  )
+  expect_true(nrow(collapseCohorts(cdm$cohort11, 1)) == 0)
+  cdm$cohort12 <- measurementCohort(
+    cdm = cdm,
+    name = "cohort12",
+    conceptSet = list("source" = 99L),
+    valueAsConcept = list("c1" = 0),
+    table = "measurement",
+    useSourceFields = TRUE
+  )
+  expect_true(nrow(collapseCohorts(cdm$cohort12, 1)) == 2)
+  cdm$cohort13 <- measurementCohort(
+    cdm = cdm,
+    name = "cohort13",
+    conceptSet = list("source" = 99L),
+    valueAsConcept = list("c1" = 0),
+    table = "measurement",
+    useSourceFields = TRUE,
+    subsetCohort = "cohort7",
+    subsetCohortId = 1
+  )
+  expect_true(nrow(collapseCohorts(cdm$cohort13, 1)) == 0)
 
   # Expected behaviour ----
   # simple example
