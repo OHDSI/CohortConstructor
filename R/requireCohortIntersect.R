@@ -34,6 +34,7 @@ requireCohortIntersect <- function(cohort,
                                    intersections = c(1, Inf),
                                    cohortId = NULL,
                                    targetCohortId = NULL,
+                                   cohortCombinationRange = c(1, Inf),
                                    indexDate = "cohort_start_date",
                                    targetStartDate = "cohort_start_date",
                                    targetEndDate = "cohort_end_date",
@@ -54,7 +55,7 @@ requireCohortIntersect <- function(cohort,
     {{targetCohortId}}, cdm[[targetCohortTable]], validation = "error"
   )
   intersections <- validateIntersections(intersections)
-  lower_limit <- as.integer(intersections[[1]])
+  cohortCombinationRange <- validateIntersections(cohortCombinationRange, "cohortCombinationRange")
   omopgenerics::assertLogical(atFirst, length = 1)
 
   if (length(cohortId) == 0) {
@@ -86,10 +87,16 @@ requireCohortIntersect <- function(cohort,
                      "i" = "Use targetCohortId argument to specify just one cohort for intersection"))
   }
 
+  # Fix ranges
   lower_limit <- as.integer(intersections[[1]])
   upper_limit <- intersections[[2]]
   upper_limit[is.infinite(upper_limit)] <- 999999L
   upper_limit <- as.integer(upper_limit)
+
+  combinations_lower_limit <- as.integer(cohortCombinationRange[[1]])
+  combinations_upper_limit <- cohortCombinationRange[[2]]
+  combinations_upper_limit[is.infinite(upper_limit)] <- 999999L
+  combinations_upper_limit <- as.integer(upper_limit)
 
   window_start <- window[[1]][1]
   window_end <- window[[1]][2]
@@ -101,10 +108,6 @@ requireCohortIntersect <- function(cohort,
   if (is.null(targetCohortId)) {
     targetCohortId <- omopgenerics::settings(cdm[[targetCohortTable]]) |>
       dplyr::pull("cohort_definition_id")
-  }
-
-  if (length(targetCohortId) > 1) {
-    cli::cli_abort("Only one target cohort ID is currently supported")
   }
 
   target_name <- cdm[[targetCohortTable]] |>
@@ -120,7 +123,6 @@ requireCohortIntersect <- function(cohort,
   newCohort <- cdm[[tmpNewCohort]]
 
   # requirement
-  intersectCol <- uniqueColumnName(newCohort)
   newCohort <- newCohort |>
     PatientProfiles::addCohortIntersectCount(
       targetCohortTable = targetCohortTable,
@@ -130,12 +132,17 @@ requireCohortIntersect <- function(cohort,
       targetEndDate = targetEndDate,
       window = window,
       censorDate = censorDate,
-      nameStyle = intersectCol,
+      nameStyle = "intersect_{cohort_name}",
       name = tmpNewCohort
     )
 
-  newCohort <- applyRequirement(
-    newCohort, atFirst, tmpNewCohort, intersectCol, lower_limit, upper_limit, cdm
+  intersectCols <- settings(cdm[[targetCohortTable]]) |>
+    dplyr::filter(.data$cohort_definition_id %in% .env$targetCohortId) |>
+    dplyr::pull("cohort_name")
+  intersectCols <- paste0("intersect_", intersectCols)
+
+  newCohort <- applyCohortRequirement(
+    cdm, newCohort, tmpNewCohort, atFirst, lower_limit, upper_limit, intersectCols, combinations_lower_limit, combinations_upper_limit
   )
 
   # attrition reason
@@ -199,7 +206,8 @@ requireCohortIntersect <- function(cohort,
   return(newCohort)
 }
 
-applyRequirement <- function(newCohort, atFirst, tmpNewCohort, intersectCol, lower_limit, upper_limit, cdm) {
+applyCohortRequirement <- function(cdm, newCohort, tmpNewCohort, atFirst, lower_limit, upper_limit, intersectCols, combinations_lower_limit, combinations_upper_limit) {
+  mutateExpr <- getMutateFilterExpression(lower_limit, upper_limit, intersectCols)
   if (atFirst) {
     tmpNewCohortFirst <- paste0(tmpNewCohort, "_1")
     newCohortFirst <- newCohort |>
@@ -207,27 +215,25 @@ applyRequirement <- function(newCohort, atFirst, tmpNewCohort, intersectCol, low
       dplyr::filter(.data$cohort_start_date == base::min(.data$cohort_start_date)) |>
       dplyr::ungroup() |>
       dplyr::compute(name = tmpNewCohortFirst, temporary = FALSE,
-                     logPrefix = "CohortConstructor_applyRequirement_subset_arrange_") |>
-      dplyr::filter(
-        .data$rec_id_1234 == 1 & .data[[intersectCol]] >= .env$lower_limit & .data[[intersectCol]] <= .env$upper_limit
-        ) |>
+                     logPrefix = "CohortConstructor_applyCohortRequirement_subset_arrange_") |>
+      dplyr::mutate(!!!mutateExpr) |>
+      dplyr::filter(.data$cc_requirement_sum >= .env$combinations_lower_limit & .data$cc_requirement_sum <= .env$combinations_upper_limit) |>
       dplyr::select(dplyr::all_of(c("cohort_definition_id", "subject_id"))) |>
       dplyr::compute(name = tmpNewCohortFirst, temporary = FALSE,
-                     logPrefix = "CohortConstructor_applyRequirement_subset_first_")
+                     logPrefix = "CohortConstructor_applyCohortRequirement_subset_first_")
     newCohort <- newCohort |>
       dplyr::inner_join(newCohortFirst, by = c("cohort_definition_id", "subject_id")) |>
       dplyr::select(!dplyr::all_of(intersectCol)) |>
       dplyr::compute(name = tmpNewCohort, temporary = FALSE,
-                     logPrefix = "CohortConstructor_applyRequirement_requirement_first_")
+                     logPrefix = "CohortConstructor_applyCohortRequirement_requirement_first_")
     omopgenerics::dropSourceTable(cdm = cdm, name = tmpNewCohortFirst)
   } else {
     newCohort <- newCohort |>
-      dplyr::filter(
-        .data[[intersectCol]] >= .env$lower_limit & .data[[intersectCol]] <= .env$upper_limit
-      ) |>
+      dplyr::mutate(!!!mutateExpr) |>
+      dplyr::filter(.data$cc_requirement_sum >= .env$combinations_lower_limit & .data$cc_requirement_sum <= .env$combinations_upper_limit) |>
       dplyr::select(!dplyr::all_of(intersectCol)) |>
       dplyr::compute(name = tmpNewCohort, temporary = FALSE,
-                     logPrefix = "CohortConstructor_applyRequirement_subset_")
+                     logPrefix = "CohortConstructor_applyCohortRequirement_subset_")
   }
   return(newCohort)
 }
@@ -241,3 +247,13 @@ completeAttritionReason <- function(reason, censorDate, atFirst) {
   }
   return(reason)
 }
+
+getMutateFilterExpression <- function(lower_limit, upper_limit, intersectCols) {
+  mutateExpr <- NULL
+  for (col in intersectCols) {
+    mutateExpr <- c(mutateExpr, glue::glue("dplyr::if_else(.data${col} >= {lower_limit} & .data${col} <= {upper_limit}, 1L, 0L)"))
+  }
+  mutateExpr <- c(mutateExpr, glue::glue("{paste0('.data$', intersectCols, collapse = ' + ')}"))
+  mutateExpr |> rlang::parse_exprs() |> rlang::set_names(c(intersectCols, "cc_requirement_sum"))
+}
+
