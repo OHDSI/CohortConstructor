@@ -384,7 +384,7 @@ test_that("requiring presence in another cohort", {
   cdm$cohort5 <- cdm$cohort4 |>
     requireCohortIntersect(
       targetCohortTable = "cohort_intersect",
-      window = c(-Inf, -1),
+      window = c(-Inf, -5),
       intersections = c(1, Inf),
       cohortCombinationRange = c(1, Inf),
       name = "cohort5"
@@ -399,7 +399,7 @@ test_that("requiring presence in another cohort", {
   )
   expect_equal(
     attrition(cdm$cohort5)$reason[2],
-    "Require 1 or more intersections for 1 or more of the cohorts: cohort_1, cohort_2 and cohort_3. Intersection window: -Inf to -1 days relative to cohort_start_date"
+    "Require 1 or more intersections for 1 or more of the cohorts: cohort_1, cohort_2 and cohort_3. Intersection window: -Inf to -5 days relative to cohort_start_date"
   )
 
   # all, >=2 intersecttion
@@ -407,7 +407,7 @@ test_that("requiring presence in another cohort", {
     dplyr::mutate(new_date = cohort_end_date) |>
     requireCohortIntersect(
       targetCohortTable = "cohort_intersect",
-      window = c(-Inf, -1),
+      window = c(-Inf, -5),
       intersections = c(1, Inf),
       targetCohortId = NULL,
       cohortCombinationRange = 3,
@@ -424,7 +424,7 @@ test_that("requiring presence in another cohort", {
   )
   expect_equal(
     attrition(cdm$cohort5)$reason[2],
-    "Require 1 or more intersections for all 3 cohorts: cohort_1, cohort_2 and cohort_3. Intersection window: -Inf to -1 days relative to cohort_start_date, censoring at new_date"
+    "Require 1 or more intersections for all 3 cohorts: cohort_1, cohort_2 and cohort_3. Intersection window: -Inf to -5 days relative to cohort_start_date, censoring at new_date"
   )
 
   # at first
@@ -452,14 +452,6 @@ test_that("requiring presence in another cohort", {
   )
 
   # expected errors ----
-  # only support one target id
-  expect_error(requireCohortIntersect(cohort = cdm$cohort1,
-                                      targetCohortTable = "cohort2",
-                                      targetCohortId = c(1,2),
-                                      window = c(-Inf, Inf)))
-  expect_error(requireCohortIntersect(cohort = cdm$cohort1,
-                                      targetCohortTable = "cohort2",
-                                      window = c(-Inf, Inf)))
   expect_error(requireCohortIntersect(cohort = cdm$cohort1,
                                       targetCohortTable = "cohort22", # does not exist
                                       targetCohortId = 1,
@@ -467,10 +459,6 @@ test_that("requiring presence in another cohort", {
   expect_error(requireCohortIntersect(cohort = cdm$cohort1,
                                       targetCohortTable = "cohort2",
                                       targetCohortId = 10, # does not exist
-                                      window = c(-Inf, Inf)))
-  expect_error(requireCohortIntersect(cohort = cdm$cohort1,
-                                      targetCohortTable = "cohort2",
-                                      targetCohortId = NULL, # only one id supported
                                       window = c(-Inf, Inf)))
   expect_error(requireCohortIntersect(cohort = cdm$cohort1,
                                       targetCohortTable = c("not_a_cohort", "lala"),
