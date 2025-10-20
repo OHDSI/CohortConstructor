@@ -78,9 +78,9 @@ test_that("requiring presence in another cohort", {
   ))
   expect_true(all(omopgenerics::attrition(cdm$cohort3)$reason ==
                     c("Initial qualifying events",
-                      "In cohort cohort_1 between -Inf & Inf days relative to cohort_start_date between 1 and Inf times",
+                      "Require 1 or more intersections with cohort cohort_1. Intersection window: -Inf to Inf days relative to cohort_start_date",
                       "Initial qualifying events",
-                      "In cohort cohort_1 between -Inf & Inf days relative to cohort_start_date between 1 and Inf times")))
+                      "Require 1 or more intersections with cohort cohort_1. Intersection window: -Inf to Inf days relative to cohort_start_date")))
 
   cdm$cohort4 <-  requireCohortIntersect(cohort = cdm$cohort1,
                                          targetCohortTable = "cohort2",
@@ -99,9 +99,9 @@ test_that("requiring presence in another cohort", {
                                 dplyr::pull())))
   expect_true(all(omopgenerics::attrition(cdm$cohort4)$reason ==
                     c("Initial qualifying events",
-                      "In cohort cohort_2 between -Inf & Inf days relative to cohort_start_date between 1 and Inf times",
+                      "Require 1 or more intersections with cohort cohort_2. Intersection window: -Inf to Inf days relative to cohort_start_date",
                       "Initial qualifying events",
-                      "In cohort cohort_2 between -Inf & Inf days relative to cohort_start_date between 1 and Inf times")))
+                      "Require 1 or more intersections with cohort cohort_2. Intersection window: -Inf to Inf days relative to cohort_start_date")))
 
   # name
   cdm$cohort1 <-  requireCohortIntersect(cohort = cdm$cohort1,
@@ -110,9 +110,9 @@ test_that("requiring presence in another cohort", {
                                          window = c(-Inf, Inf))
   expect_true(all(omopgenerics::attrition(cdm$cohort1)$reason ==
                     c("Initial qualifying events",
-                      "In cohort cohort_2 between -Inf & Inf days relative to cohort_start_date between 1 and Inf times",
+                      "Require 1 or more intersections with cohort cohort_2. Intersection window: -Inf to Inf days relative to cohort_start_date",
                       "Initial qualifying events",
-                      "In cohort cohort_2 between -Inf & Inf days relative to cohort_start_date between 1 and Inf times")))
+                      "Require 1 or more intersections with cohort cohort_2. Intersection window: -Inf to Inf days relative to cohort_start_date")))
 
   # censor date
   cdm$cohort5 <- requireCohortIntersect(cohort = cdm$cohort2,
@@ -126,9 +126,9 @@ test_that("requiring presence in another cohort", {
   expect_true(all(cdm$cohort5 |> dplyr::pull("cohort_definition_id") == c("1", "2", "2")))
   expect_true(all(omopgenerics::attrition(cdm$cohort5)$reason ==
                     c("Initial qualifying events",
-                      "In cohort cohort_2 between 0 & Inf days relative to cohort_start_date between 1 and Inf times, censoring at cohort_end_date",
+                      "Require 1 or more intersections with cohort cohort_2. Intersection window: 0 to Inf days relative to cohort_start_date, censoring at cohort_end_date",
                       "Initial qualifying events",
-                      "In cohort cohort_2 between 0 & Inf days relative to cohort_start_date between 1 and Inf times, censoring at cohort_end_date")))
+                      "Require 1 or more intersections with cohort cohort_2. Intersection window: 0 to Inf days relative to cohort_start_date, censoring at cohort_end_date")))
 
   # cohort Id
   cdm$cohort6 <- requireCohortIntersect(cohort = cdm$cohort2,
@@ -146,7 +146,7 @@ test_that("requiring presence in another cohort", {
   expect_true(all(omopgenerics::attrition(cdm$cohort6)$reason ==
                     c("Initial qualifying events",
                       "Initial qualifying events",
-                      "In cohort cohort_1 between 0 & Inf days relative to cohort_start_date between 1 and Inf times, censoring at cohort_end_date")))
+                      "Require 1 or more intersections with cohort cohort_1. Intersection window: 0 to Inf days relative to cohort_start_date, censoring at cohort_end_date")))
 
   cdm$cohort7 <- requireCohortIntersect(cohort = cdm$cohort2,
                                         intersections = c(0,0),
@@ -163,7 +163,7 @@ test_that("requiring presence in another cohort", {
   expect_true(all(omopgenerics::attrition(cdm$cohort7)$reason ==
                     c("Initial qualifying events",
                       "Initial qualifying events",
-                      "Not in cohort cohort_1 between 0 & Inf days relative to cohort_start_date, censoring at cohort_end_date")))
+                      "Require 0 intersections with cohort cohort_1. Intersection window: 0 to Inf days relative to cohort_start_date, censoring at cohort_end_date")))
 
   # Indexes ----
   if (dbToTest == "postgres CDMConnector" & testIndexes) {
@@ -194,11 +194,11 @@ test_that("requiring presence in another cohort", {
   expect_true(length(in_both) == 0)
   expect_true(all(omopgenerics::attrition(cdm$cohort3_exclusion)$reason ==
                     c("Initial qualifying events",
-                      "In cohort cohort_2 between -Inf & Inf days relative to cohort_start_date between 1 and Inf times",
-                      "Not in cohort cohort_1 between -Inf & Inf days relative to cohort_start_date",
+                      "Require 1 or more intersections with cohort cohort_2. Intersection window: -Inf to Inf days relative to cohort_start_date",
+                      "Require 0 intersections with cohort cohort_1. Intersection window: -Inf to Inf days relative to cohort_start_date",
                       "Initial qualifying events",
-                      "In cohort cohort_2 between -Inf & Inf days relative to cohort_start_date between 1 and Inf times",
-                      "Not in cohort cohort_1 between -Inf & Inf days relative to cohort_start_date")))
+                      "Require 1 or more intersections with cohort cohort_2. Intersection window: -Inf to Inf days relative to cohort_start_date",
+                      "Require 0 intersections with cohort cohort_1. Intersection window: -Inf to Inf days relative to cohort_start_date")))
 
   # empty target cohort
   expect_message(
@@ -327,7 +327,7 @@ test_that("requiring presence in another cohort", {
   )
   expect_true(cdm$cohort_res_1 |> dplyr::tally() |> dplyr::pull("n") == 0)
   expect_true(
-    "In cohort a between -Inf & Inf days relative to cohort_start_date between 1 and Inf times" %in%
+    "Require 1 or more intersections with cohort a. Intersection window: -Inf to Inf days relative to cohort_start_date" %in%
       (omopgenerics::attrition(cdm$cohort_res_1) |> dplyr::pull(reason))
   )
 
@@ -346,7 +346,7 @@ test_that("requiring presence in another cohort", {
     cdm$cohort_res_2 |> dplyr::tally() |> dplyr::pull("n")
   )
   expect_true(
-    "Not in cohort a between -Inf & Inf days relative to cohort_start_date" %in%
+    "Require 0 intersections with cohort a. Intersection window: -Inf to Inf days relative to cohort_start_date" %in%
       (omopgenerics::attrition(cdm$cohort_res_2) |> dplyr::pull(reason))
   )
 
@@ -363,7 +363,7 @@ test_that("requiring presence in another cohort", {
   # With default intersections = c(1, Inf), all subjects should be excluded when target is empty
   expect_true(cdm$cohort_res_3 |> dplyr::tally() |> dplyr::pull("n") == 0)
   expect_true(
-    "In cohort a between -Inf & Inf days relative to cohort_start_date between 1 and Inf times" %in%
+    "Require 1 or more intersections with cohort a. Intersection window: -Inf to Inf days relative to cohort_start_date" %in%
       (omopgenerics::attrition(cdm$cohort_res_3) |> dplyr::pull(reason))
   )
 

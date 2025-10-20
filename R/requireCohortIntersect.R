@@ -143,34 +143,10 @@ requireCohortIntersect <- function(cohort,
   )
 
   # attrition reason
-  if (length(targetCohortId) == 1) {
-    if (all(intersections == 0)) {
-      reason <- glue::glue(
-        "Not in cohort {target_name} between {window_start} & ",
-        "{window_end} days relative to {indexDate}"
-      )
-    } else if (intersections[[1]] != intersections[[2]]) {
-      reason <- glue::glue(
-        "In cohort {target_name} between {window_start} & ",
-        "{window_end} days relative to {indexDate} between ",
-        "{intersections[[1]]} and {intersections[[2]]} times"
-      )
-    } else {
-      reason <- glue::glue(
-        "In cohort {target_name} between {window_start} & ",
-        "{window_end} days relative to {indexDate} ",
-        "{intersections[[1]]} times"
-      )
-    }
-
-    reason <- completeAttritionReason(reason, censorDate, atFirst)
-
-  } else {
-    reason <- createAttritionReason(
-      intersections, cohortCombinationRange, target_name, window_start, window_end,
-      indexDate, censorDate, atFirst
-    )
-  }
+  reason <- createAttritionReason(
+    intersections, cohortCombinationRange, target_name, window_start, window_end,
+    indexDate, censorDate, atFirst
+  )
 
   # codelist
   targetCodelist <- attr(cdm[[targetCohortTable]], "cohort_codelist") |>
@@ -284,13 +260,23 @@ createAttritionReason <- function(intersections,
                                   indexDate,
                                   censorDate,
                                   atFirst) {
-  reason <- paste0(
-    "Require ", formatRange(intersections),
-    " for ", formatCohortCombo(cohortCombinationRange, length(targetName)),
-    ": ", glue::glue_collapse(targetName, sep = ", ", last = " and "),
-    ". Intersection window: ", windowStart, " to ",
-    windowEnd, " days relative to ", indexDate
-  )
+  if (length(targetName) > 1) {
+    reason <- paste0(
+      "Require ", formatRange(intersections),
+      " for ", formatCohortCombo(cohortCombinationRange, length(targetName)),
+      ": ", glue::glue_collapse(targetName, sep = ", ", last = " and "),
+      ". Intersection window: ", windowStart, " to ",
+      windowEnd, " days relative to ", indexDate
+    )
+  } else {
+    reason <- paste0(
+      "Require ", formatRange(intersections),
+      " with cohort ", targetName,
+      ". Intersection window: ", windowStart, " to ",
+      windowEnd, " days relative to ", indexDate
+    )
+  }
+
 
   if (!is.null(censorDate)) {
     reason <- glue::glue("{reason}, censoring at {censorDate}")
