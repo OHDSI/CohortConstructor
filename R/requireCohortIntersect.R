@@ -66,12 +66,23 @@ requireCohortIntersect <- function(cohort,
     return(cdm[[name]])
   }
 
+  # Fix ranges
+  lower_limit <- as.integer(intersections[[1]])
+  upper_limit <- intersections[[2]]
+  upper_limit[is.infinite(upper_limit)] <- 999999L
+
+  combinations_lower_limit <- as.integer(cohortCombinationRange[[1]])
+  combinations_upper_limit <- cohortCombinationRange[[2]]
+  combinations_upper_limit[is.infinite(combinations_upper_limit)] <- 999999L
+
+  window_start <- window[[1]][1]
+  window_end <- window[[1]][2]
+
   # Check if the target cohort is empty for the specified targetCohortId
   targetCohortCount <- cdm[[targetCohortTable]] |>
     dplyr::filter(.data$cohort_definition_id %in% .env$targetCohortId) |>
     dplyr::tally() |>
     dplyr::pull("n")
-
   if (targetCohortCount == 0) {
     if (lower_limit == 0) {
       cli::cli_inform("Target cohort is empty. No subjects will be excluded from the result.")
@@ -87,19 +98,6 @@ requireCohortIntersect <- function(cohort,
                      "i" = "Use targetCohortId argument to specify just one cohort for intersection"))
   }
 
-  # Fix ranges
-  lower_limit <- as.integer(intersections[[1]])
-  upper_limit <- intersections[[2]]
-  upper_limit[is.infinite(upper_limit)] <- 999999L
-  upper_limit <- as.integer(upper_limit)
-
-  combinations_lower_limit <- as.integer(cohortCombinationRange[[1]])
-  combinations_upper_limit <- cohortCombinationRange[[2]]
-  combinations_upper_limit[is.infinite(upper_limit)] <- 999999L
-  combinations_upper_limit <- as.integer(upper_limit)
-
-  window_start <- window[[1]][1]
-  window_end <- window[[1]][2]
 
   if (length(targetCohortTable) > 1) {
     cli::cli_abort("Only one target cohort table is currently supported")
