@@ -105,6 +105,11 @@ conceptCohort <- function(cdm,
 
   # prefix for names
   tmpPref <- omopgenerics::tmpPrefix()
+  on.exit(
+    omopgenerics::dropSourceTable(
+      cdm = cdm, name = dplyr::starts_with(tmpPref)
+    )
+  )
 
   # empty concept set
   cohortSet <- conceptSetToCohortSet(conceptSet, cdm)
@@ -142,7 +147,7 @@ conceptCohort <- function(cdm,
       dplyr::compute(name = subsetName, temporary = FALSE,
                      logPrefix = "CohortConstructor_conceptCohort_subsetCohort_")
     if (omopgenerics::isTableEmpty(subsetIndividuals)) {
-      omopgenerics::dropSourceTable(cdm = cdm, name = subsetName)
+      # omopgenerics::dropSourceTable(cdm = cdm, name = subsetName)
       cli::cli_warn("There are no individuals in the `subsetCohort` and `subsetCohortId` provided. Returning empty cohort.")
       cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name)
       cdm[[name]] <- cdm[[name]] |>
@@ -184,10 +189,11 @@ conceptCohort <- function(cdm,
     extraCols = NULL,
     exit = exit,
     useSourceFields = useSourceFields,
-    subsetIndividuals = subsetIndividuals
+    subsetIndividuals = subsetIndividuals,
+    tablePrefix = tmpPref
   )
 
-  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(tmpPref))
+  # omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(tmpPref))
   cdm[[tableCohortCodelist]] <- NULL
 
   if (cdm[[name]] |>
@@ -284,7 +290,8 @@ unerafiedConceptCohort <- function(cdm,
                                    extraCols,
                                    exit,
                                    useSourceFields,
-                                   subsetIndividuals) {
+                                   subsetIndividuals,
+                                   tablePrefix) {
 
   domains <- sort(cdm[[tableCohortCodelist]] |>
                     dplyr::select("domain_id") |>
@@ -296,6 +303,7 @@ unerafiedConceptCohort <- function(cdm,
 
   cohorts <- list()
   workingTblNames <- paste0(
+    tablePrefix,
     omopgenerics::uniqueTableName(),
     "_",
     seq_along(tableRef$domain_id)
@@ -325,7 +333,7 @@ unerafiedConceptCohort <- function(cdm,
       concept <- tableRef$concept[k]
       tempCohort <- getDomainCohort(
         cdm, table, concept, start, end, extraCols, tableCohortCodelist,
-        domain, nameK, subsetIndividuals
+        domain, nameK, subsetIndividuals, tablePrefix = tablePrefix
       )
       ## Get source
       if (isTRUE(useSourceFields)) {
@@ -334,7 +342,7 @@ unerafiedConceptCohort <- function(cdm,
           dplyr::union_all(
             getDomainCohort(
               cdm, table, concept, start, end, extraCols,
-              tableCohortCodelist, domain, nameK, subsetIndividuals, TRUE
+              tableCohortCodelist, domain, nameK, subsetIndividuals, tablePrefix, TRUE
             )
           ) |>
           dplyr::compute(name = nameK, temporary = FALSE,
@@ -358,7 +366,7 @@ unerafiedConceptCohort <- function(cdm,
     purrr::discard(is.null)
 
   if (length(cohorts) == 0) {
-    omopgenerics::dropSourceTable(cdm, name = dplyr::starts_with(workingTblNames))
+    # omopgenerics::dropSourceTable(cdm, name = dplyr::starts_with(workingTblNames))
     cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name)
     return(cdm[[name]])
   }
@@ -376,7 +384,7 @@ unerafiedConceptCohort <- function(cdm,
     dplyr::compute(name = name, temporary = FALSE,
                    logPrefix = "CohortConstructor_conceptCohort_reduce_")
 
-  omopgenerics::dropSourceTable(cdm, name = dplyr::starts_with(workingTblNames))
+  # omopgenerics::dropSourceTable(cdm, name = dplyr::starts_with(workingTblNames))
 
   return(cohort)
 }
@@ -599,6 +607,7 @@ getDomainCohort <- function(cdm,
                             domain,
                             name,
                             subsetIndividuals,
+                            tablePrefix,
                             source = FALSE) {
 
   if (source) {
@@ -615,13 +624,6 @@ getDomainCohort <- function(cdm,
     cli::cli_abort("{end} not found in {table} table")
   }
 
-
-  tablePrefix <- omopgenerics::tmpPrefix()
-  on.exit(
-    omopgenerics::dropSourceTable(
-      cdm = cdm, name = dplyr::starts_with(tablePrefix)
-    )
-  )
   # codelist + cohort filtered to domain
   cdm[[paste0(tablePrefix, "temp_codelist_cohort_id")]] <- cdm[[tableCohortCodelist]] |>
     dplyr::filter(.data$domain_id %in% .env$domain) |>
@@ -684,7 +686,7 @@ getDomainCohort <- function(cdm,
       dplyr::compute(temporary = FALSE, name = name,
                      logPrefix = "CohortConstructor_tempCohort_")
   }
- tempCohort <- tempCohort |>
+  tempCohort <- tempCohort |>
     dplyr::inner_join(
       cdm[[paste0(tablePrefix, "temp_codelist_cohort_id")]],
       by = "concept_id") |>
@@ -763,7 +765,9 @@ extendOverlap  <- function(cohort,
     cohort <- dplyr::union_all(cohort_overlap, cohort_no_overlap) |>
       dplyr::compute(name = name, temporary = FALSE)
 
-    omopgenerics::dropSourceTable(cdm = cdm, name = workingTblNames)
+    omopgenerics::dropSourceTable(
+      cdm = cdm, name = dplyr::starts_with(workingTblNames)
+    )
   }
 
   cohort
@@ -790,3 +794,10 @@ hasOverlap <- function(cohort){
 
 }
 
+cleanTempTables <- function(prefix) {
+  tryCatch({
+    omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(prefix))
+  }, error = function(e) {
+    cli::cli_warn("Warning: failed to drop temporary tables with prefix '", prefix, "': ", e$message)
+  })
+}

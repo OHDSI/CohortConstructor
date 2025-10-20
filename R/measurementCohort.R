@@ -230,7 +230,8 @@ measurementCohort <- function(cdm,
     extraCols = c("value_as_number", "value_as_concept_id", "unit_concept_id"),
     exit = "event_start_date",
     useSourceFields = useSourceFields,
-    subsetIndividuals = subsetIndividuals
+    subsetIndividuals = subsetIndividuals,
+    tablePrefix = tablePref
   )
 
   if (cdm[[name]] |> dplyr::tally() |> dplyr::pull("n") == 0) {
