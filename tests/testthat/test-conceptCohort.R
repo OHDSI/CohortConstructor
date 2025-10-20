@@ -596,19 +596,21 @@ test_that("overlap option", {
                                                 exit = "event_end_date",
                                                 overlap = "merge"))
   expect_true(nrow(cdm$cohort_1 |>
-                     dplyr::collect()) == 3)
+                     dplyr::collect()) == 4)
   expect_true(all(sort(cdm$cohort_1 |>
                          dplyr::pull("cohort_start_date")) ==
                     as.Date(c("2020-01-01",
+                              "2020-01-01",
                               "2020-01-02",
                               "2020-01-20"))))
   expect_true(all(sort(cdm$cohort_1 |>
                          dplyr::pull("cohort_end_date")) ==
                     as.Date(c("2020-01-03",
                               "2020-01-08",
+                              "2020-01-21",
                               "2020-01-21"))))
   expect_true(
-    attrition(cdm$cohort_1) |> dplyr::filter(reason_id == 4 & cohort_definition_id == 1) |> dplyr::pull(excluded_records) == 1
+    attrition(cdm$cohort_1) |> dplyr::filter(reason_id == 4 & cohort_definition_id == 1) |> dplyr::pull(excluded_records) == 2
   )
 
   expect_no_error(cdm$cohort_2 <- conceptCohort(cdm = cdm,
@@ -620,12 +622,14 @@ test_that("overlap option", {
   expect_true(all(sort(cdm$cohort_2 |>
                          dplyr::pull("cohort_start_date")) ==
                     as.Date(c("2020-01-01",
+                              "2020-01-01",
                               "2020-01-02",
                               "2020-01-20"))))
   expect_true(all(sort(cdm$cohort_2 |>
                          dplyr::pull("cohort_end_date")) ==
                     as.Date(c("2020-01-03",
                               "2020-01-11", # now 11 instead of 8 (3 days overlap)
+                              "2020-01-21",
                               "2020-01-21"))))
 
 
