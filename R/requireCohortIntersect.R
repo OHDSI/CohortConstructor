@@ -11,6 +11,13 @@
 #' @inheritParams windowDoc
 #' @inheritParams nameDoc
 #' @inheritParams atFirstDoc
+#' @param cohortCombinationRange Numeric vector (length 1 or 2) that specifies
+#' how many of the target cohorts must meet the intersection requirement.
+#'
+#' Examples:
+#' - Single value: e.g., `4`, exactly 4 cohorts must meet the criteria.
+#' - Range: e.g., `c(1, 3)`, between 1 and 3 cohorts must meet the criteria, or
+#'  `c(1, Inf)`, at least one cohort must meet it.
 #'
 #' @return Cohort table with only those entries satisfying the criteria
 #'
@@ -91,16 +98,8 @@ requireCohortIntersect <- function(cohort,
     }
   }
 
-  # targetCohortId must be singular
-  if (length(targetCohortId) > 1) {
-    cli::cli_abort(c("requireCohortIntersect can only be use with one target cohort at a time.",
-                     "i" = "Cohort IDs {targetCohortId} found in targetCohortTable {targetCohortTable}",
-                     "i" = "Use targetCohortId argument to specify just one cohort for intersection"))
-  }
-
-
   if (length(targetCohortTable) > 1) {
-    cli::cli_abort("Only one target cohort table is currently supported")
+    cli::cli_abort("Only one target cohort table is supported")
   }
 
   if (is.null(targetCohortId)) {
@@ -110,7 +109,7 @@ requireCohortIntersect <- function(cohort,
 
   target_name <- cdm[[targetCohortTable]] |>
     omopgenerics::settings() |>
-    dplyr::filter(.data$cohort_definition_id == .env$targetCohortId) |>
+    dplyr::filter(.data$cohort_definition_id %in% .env$targetCohortId) |>
     dplyr::pull("cohort_name")
 
   # temp tables
@@ -144,25 +143,34 @@ requireCohortIntersect <- function(cohort,
   )
 
   # attrition reason
-  if (all(intersections == 0)) {
-    reason <- glue::glue(
-      "Not in cohort {target_name} between {window_start} & ",
-      "{window_end} days relative to {indexDate}"
-    )
-  } else if (intersections[[1]] != intersections[[2]]) {
-    reason <- glue::glue(
-      "In cohort {target_name} between {window_start} & ",
-      "{window_end} days relative to {indexDate} between ",
-      "{intersections[[1]]} and {intersections[[2]]} times"
-    )
+  if (length(targetCohortId) == 1) {
+    if (all(intersections == 0)) {
+      reason <- glue::glue(
+        "Not in cohort {target_name} between {window_start} & ",
+        "{window_end} days relative to {indexDate}"
+      )
+    } else if (intersections[[1]] != intersections[[2]]) {
+      reason <- glue::glue(
+        "In cohort {target_name} between {window_start} & ",
+        "{window_end} days relative to {indexDate} between ",
+        "{intersections[[1]]} and {intersections[[2]]} times"
+      )
+    } else {
+      reason <- glue::glue(
+        "In cohort {target_name} between {window_start} & ",
+        "{window_end} days relative to {indexDate} ",
+        "{intersections[[1]]} times"
+      )
+    }
+
+    reason <- completeAttritionReason(reason, censorDate, atFirst)
+
   } else {
-    reason <- glue::glue(
-      "In cohort {target_name} between {window_start} & ",
-      "{window_end} days relative to {indexDate} ",
-      "{intersections[[1]]} times"
+    reason <- createAttritionReason(
+      intersections, cohortCombinationRange, target_name, window_start, window_end,
+      indexDate, censorDate, atFirst
     )
   }
-  reason <- completeAttritionReason(reason, censorDate, atFirst)
 
   # codelist
   targetCodelist <- attr(cdm[[targetCohortTable]], "cohort_codelist") |>
@@ -221,7 +229,7 @@ applyCohortRequirement <- function(cdm, newCohort, tmpNewCohort, atFirst, lower_
                      logPrefix = "CohortConstructor_applyCohortRequirement_subset_first_")
     newCohort <- newCohort |>
       dplyr::inner_join(newCohortFirst, by = c("cohort_definition_id", "subject_id")) |>
-      dplyr::select(!dplyr::all_of(c(intersectCols, "cc_requirement_sum"))) |>
+      dplyr::select(!dplyr::all_of(c(intersectCols))) |>
       dplyr::compute(name = tmpNewCohort, temporary = FALSE,
                      logPrefix = "CohortConstructor_applyCohortRequirement_requirement_first_")
     omopgenerics::dropSourceTable(cdm = cdm, name = tmpNewCohortFirst)
@@ -236,16 +244,6 @@ applyCohortRequirement <- function(cdm, newCohort, tmpNewCohort, atFirst, lower_
   return(newCohort)
 }
 
-completeAttritionReason <- function(reason, censorDate, atFirst) {
-  if (!is.null(censorDate)) {
-    reason <- glue::glue("{reason}, censoring at {censorDate}")
-  }
-  if (atFirst) {
-    reason <- glue::glue("{reason}. Requirement applied to the first entry")
-  }
-  return(reason)
-}
-
 getMutateFilterExpression <- function(lower_limit, upper_limit, intersectCols) {
   mutateExpr <- NULL
   for (col in intersectCols) {
@@ -255,3 +253,50 @@ getMutateFilterExpression <- function(lower_limit, upper_limit, intersectCols) {
   mutateExpr |> rlang::parse_exprs() |> rlang::set_names(c(intersectCols, "cc_requirement_sum"))
 }
 
+formatRange <- function(x) {
+  x <- unique(x)
+  if (length(x) == 1) {
+    if (is.infinite(x)) return(paste0("any number of intersections"))
+    if (x == 1) return(paste0("1 intersection"))
+    return(paste0(x, " intersections"))
+  }
+  if (is.infinite(x[2])) return(paste0(x[1], " or more intersections"))
+  if (x[1] == x[2]) return(paste0(x[1], " intersections"))
+  paste0(x[1], " to ", x[2], " intersections")
+}
+
+formatCohortCombo <- function(x, n) {
+  x <- unique(x)
+  if (length(x) == 1) {
+    if (is.infinite(x)) return("any of the cohorts")
+    if (x == n) return(paste0("all ", n, " cohorts"))
+    return(paste0(x, " of the cohorts"))
+  }
+  if (is.infinite(x[2])) return(paste0(x[1], " or more of the cohorts"))
+  paste0(x[1], " to ", x[2], " of the cohorts")
+}
+
+createAttritionReason <- function(intersections,
+                                  cohortCombinationRange,
+                                  targetName,
+                                  windowStart,
+                                  windowEnd,
+                                  indexDate,
+                                  censorDate,
+                                  atFirst) {
+  reason <- paste0(
+    "Require ", formatRange(intersections),
+    " for ", formatCohortCombo(cohortCombinationRange, length(targetName)),
+    ": ", glue::glue_collapse(targetName, sep = ", ", last = " and "),
+    ". Intersection window: ", windowStart, " to ",
+    windowEnd, " days relative to ", indexDate
+  )
+
+  if (!is.null(censorDate)) {
+    reason <- glue::glue("{reason}, censoring at {censorDate}")
+  }
+  if (atFirst) {
+    reason <- glue::glue("{reason}. Requirement applied to the first entry")
+  }
+  return(reason)
+}

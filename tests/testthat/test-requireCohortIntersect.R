@@ -360,6 +360,96 @@ test_that("requiring presence in another cohort", {
   )
 
   # >1 cohort ----
+  # subject 1: 1 record in cohorts 1 2 3, before cohort 4 entries
+  # subject 2: 3 records in 1, 2 in 2, 0 in 3, before cohort 4 entries
+  # subject 3: 2 records in 1, 2 in 2, before and after cohort 4
+  cohort_intersect <- dplyr::tibble(
+    cohort_definition_id = c(1, 2, 3, 1, 1, 1, 2, 2, 1, 1, 2, 2) |> as.integer(),
+    subject_id = c(1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3) |> as.integer(),
+    cohort_start_date = c(
+      "2018-01-01", "2018-01-01", "2018-01-01", "2018-01-01", "2018-05-01",
+      "2018-06-01", "2018-01-01", "2018-05-01", "2019-01-04", "2019-01-05",
+      "2019-01-06", "2019-01-07"
+    ) |> as.Date(),
+    cohort_end_date = c(
+      "2018-01-01", "2018-01-01", "2018-01-01", "2018-01-01", "2018-05-01",
+      "2018-06-01", "2018-01-01", "2018-05-01", "2019-01-04", "2019-01-05",
+      "2019-01-06", "2019-01-07"
+    ) |> as.Date()
+  )
+  cdm <- omopgenerics::insertTable(cdm = cdm, name = "cohort_intersect", table = cohort_intersect)
+  cdm$cohort_intersect <- cdm$cohort_intersect |> omopgenerics::newCohortTable()
+
+  # any - >=1 intersecction
+  cdm$cohort5 <- cdm$cohort4 |>
+    requireCohortIntersect(
+      targetCohortTable = "cohort_intersect",
+      window = c(-Inf, -1),
+      intersections = c(1, Inf),
+      cohortCombinationRange = c(1, Inf),
+      name = "cohort5"
+    )
+  expect_equal(
+    collectCohort(cdm$cohort5, 1),
+    dplyr::tibble(
+      subject_id = c(1, 2, 2) |> as.integer(),
+      cohort_start_date = c("2019-01-01", "2019-01-02", "2019-01-03") |> as.Date(),
+      cohort_end_date = c("2019-01-01", "2019-01-02", "2019-01-03") |> as.Date()
+    )
+  )
+  expect_equal(
+    attrition(cdm$cohort5)$reason[2],
+    "Require 1 or more intersections for 1 or more of the cohorts: cohort_1, cohort_2 and cohort_3. Intersection window: -Inf to -1 days relative to cohort_start_date"
+  )
+
+  # all, >=2 intersecttion
+  cdm$cohort5 <- cdm$cohort4 |>
+    dplyr::mutate(new_date = cohort_end_date) |>
+    requireCohortIntersect(
+      targetCohortTable = "cohort_intersect",
+      window = c(-Inf, -1),
+      intersections = c(1, Inf),
+      targetCohortId = NULL,
+      cohortCombinationRange = 3,
+      censorDate = "new_date",
+      name = "cohort5"
+    )
+  expect_equal(
+    collectCohort(cdm$cohort5, 1),
+    dplyr::tibble(
+      subject_id = c(1) |> as.integer(),
+      cohort_start_date = c("2019-01-01") |> as.Date(),
+      cohort_end_date = c("2019-01-01") |> as.Date()
+    )
+  )
+  expect_equal(
+    attrition(cdm$cohort5)$reason[2],
+    "Require 1 or more intersections for all 3 cohorts: cohort_1, cohort_2 and cohort_3. Intersection window: -Inf to -1 days relative to cohort_start_date, censoring at new_date"
+  )
+
+  # at first
+  cdm$cohort5 <- cdm$cohort4 |>
+    requireCohortIntersect(
+      targetCohortTable = "cohort_intersect",
+      window = c(0, Inf),
+      intersections = 0,
+      targetCohortId = NULL,
+      cohortCombinationRange = 3,
+      atFirst = TRUE,
+      name = "cohort5"
+    )
+  expect_equal(
+    collectCohort(cdm$cohort5, 1),
+    dplyr::tibble(
+      subject_id = c(1, 2, 2) |> as.integer(),
+      cohort_start_date = c("2019-01-01", "2019-01-02", "2019-01-03") |> as.Date(),
+      cohort_end_date = c("2019-01-01", "2019-01-02", "2019-01-03") |> as.Date()
+    )
+  )
+  expect_equal(
+    attrition(cdm$cohort5)$reason[2],
+    "Require 0 intersections for all 3 cohorts: cohort_1, cohort_2 and cohort_3. Intersection window: 0 to Inf days relative to cohort_start_date. Requirement applied to the first entry"
+  )
 
   # expected errors ----
   # only support one target id

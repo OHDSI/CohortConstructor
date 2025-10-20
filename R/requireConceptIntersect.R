@@ -229,3 +229,13 @@ applyRequirement <- function(newCohort, atFirst, tmpNewCohort, intersectCol, low
   }
   return(newCohort)
 }
+
+completeAttritionReason <- function(reason, censorDate, atFirst) {
+  if (!is.null(censorDate)) {
+    reason <- glue::glue("{reason}, censoring at {censorDate}")
+  }
+  if (atFirst) {
+    reason <- glue::glue("{reason}. Requirement applied to the first entry")
+  }
+  return(reason)
+}

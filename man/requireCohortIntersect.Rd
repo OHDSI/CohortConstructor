@@ -11,6 +11,7 @@ requireCohortIntersect(
   intersections = c(1, Inf),
   cohortId = NULL,
   targetCohortId = NULL,
+  cohortCombinationRange = c(1, Inf),
   indexDate = "cohort_start_date",
   targetStartDate = "cohort_start_date",
   targetEndDate = "cohort_end_date",
@@ -38,6 +39,16 @@ used; otherwise, only the specified cohorts will be modified, and the
 rest will remain unchanged.}
 
 \item{targetCohortId}{Vector of cohort definition ids to include.}
+
+\item{cohortCombinationRange}{Numeric vector (length 1 or 2) that specifies
+how many of the target cohorts must meet the intersection requirement.
+
+Examples:
+\itemize{
+\item Single value: e.g., \code{4}, exactly 4 cohorts must meet the criteria.
+\item Range: e.g., \code{c(1, 3)}, between 1 and 3 cohorts must meet the criteria, or
+\code{c(1, Inf)}, at least one cohort must meet it.
+}}
 
 \item{indexDate}{Name of the column in the cohort that contains the date to
 compute the intersection.}
