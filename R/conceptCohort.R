@@ -105,11 +105,7 @@ conceptCohort <- function(cdm,
 
   # prefix for names
   tmpPref <- omopgenerics::tmpPrefix()
-  on.exit(
-    omopgenerics::dropSourceTable(
-      cdm = cdm, name = dplyr::starts_with(tmpPref)
-    )
-  )
+  on.exit(omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(tmpPref)))
 
   # empty concept set
   cohortSet <- conceptSetToCohortSet(conceptSet, cdm)
@@ -147,7 +143,6 @@ conceptCohort <- function(cdm,
       dplyr::compute(name = subsetName, temporary = FALSE,
                      logPrefix = "CohortConstructor_conceptCohort_subsetCohort_")
     if (omopgenerics::isTableEmpty(subsetIndividuals)) {
-      # omopgenerics::dropSourceTable(cdm = cdm, name = subsetName)
       cli::cli_warn("There are no individuals in the `subsetCohort` and `subsetCohortId` provided. Returning empty cohort.")
       cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name)
       cdm[[name]] <- cdm[[name]] |>
@@ -193,7 +188,6 @@ conceptCohort <- function(cdm,
     tablePrefix = tmpPref
   )
 
-  # omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(tmpPref))
   cdm[[tableCohortCodelist]] <- NULL
 
   if (cdm[[name]] |>
@@ -366,7 +360,6 @@ unerafiedConceptCohort <- function(cdm,
     purrr::discard(is.null)
 
   if (length(cohorts) == 0) {
-    # omopgenerics::dropSourceTable(cdm, name = dplyr::starts_with(workingTblNames))
     cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name)
     return(cdm[[name]])
   }
@@ -383,8 +376,6 @@ unerafiedConceptCohort <- function(cdm,
     dplyr::mutate(cohort_end_date = dplyr::coalesce(.data$cohort_end_date, .data$cohort_start_date)) |>
     dplyr::compute(name = name, temporary = FALSE,
                    logPrefix = "CohortConstructor_conceptCohort_reduce_")
-
-  # omopgenerics::dropSourceTable(cdm, name = dplyr::starts_with(workingTblNames))
 
   return(cohort)
 }
@@ -764,10 +755,6 @@ extendOverlap  <- function(cohort,
 
     cohort <- dplyr::union_all(cohort_overlap, cohort_no_overlap) |>
       dplyr::compute(name = name, temporary = FALSE)
-
-    omopgenerics::dropSourceTable(
-      cdm = cdm, name = dplyr::starts_with(workingTblNames)
-    )
   }
 
   cohort
@@ -792,12 +779,4 @@ hasOverlap <- function(cohort){
     return(FALSE)
   }
 
-}
-
-cleanTempTables <- function(prefix) {
-  tryCatch({
-    omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(prefix))
-  }, error = function(e) {
-    cli::cli_warn("Warning: failed to drop temporary tables with prefix '", prefix, "': ", e$message)
-  })
 }

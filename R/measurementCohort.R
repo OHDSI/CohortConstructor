@@ -160,6 +160,7 @@ measurementCohort <- function(cdm,
 
   # attributes
   tablePref <- omopgenerics::tmpPrefix()
+  on.exit(omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(tablePref)))
   tableCohortCodelist <- omopgenerics::uniqueTableName(prefix = tablePref)
   tableCohortSet <- omopgenerics::uniqueTableName(prefix = tablePref)
   tempCodelist <- conceptSetToCohortCodelist(conceptSet)
@@ -194,7 +195,6 @@ measurementCohort <- function(cdm,
       dplyr::compute(name = subsetName, temporary = FALSE,
                      logPrefix = "CohortConstructor_conceptCohort_subsetCohort_")
     if (omopgenerics::isTableEmpty(subsetIndividuals)) {
-      omopgenerics::dropSourceTable(cdm = cdm, name = subsetName)
       cli::cli_warn("There are no individuals in the `subsetCohort` and `subsetCohortId` provided. Returning empty cohort.")
       cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name)
       cdm[[name]] <- cdm[[name]] |>
@@ -244,7 +244,6 @@ measurementCohort <- function(cdm,
         cohortAttritionRef = NULL,
         cohortCodelistRef = cohortCodelist
       )
-    omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(tablePref))
     return(cdm[[name]])
   }
 
@@ -287,7 +286,6 @@ measurementCohort <- function(cdm,
         cohortAttritionRef = cohortAttrition,
         cohortCodelistRef = cohortCodelist
       )
-    omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(tablePref))
     return(cdm[[name]])
   }
 
@@ -321,8 +319,6 @@ measurementCohort <- function(cdm,
   cdm[[name]] <- cdm[[name]] |> omopgenerics::newCohortTable()
 
   cli::cli_inform(c("v" = "Cohort {.strong {name}} created."))
-
-  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(tablePref))
 
   if (!isFALSE(useIndexes)) {
     addIndex(
@@ -369,25 +365,6 @@ getMutateExpression <- function(cohortSet, valueAsConcept, valueAsNumber) {
   }
 
   return(exprMutate |> rlang::parse_exprs() |> rlang::set_names(cohortSet$cohort_name))
-}
-
-addDomains <- function(cohortCodelist, cdm, name) {
-  # insert table as temporary
-  tmpName <- omopgenerics::uniqueTableName()
-  cdm <- omopgenerics::insertTable(cdm = cdm,
-                                   name = tmpName,
-                                   table = cohortCodelist)
-
-  cohortCodelist <- cdm[["concept"]] |>
-    dplyr::select("concept_id", "domain_id") |>
-    dplyr::right_join(cdm[[tmpName]], by = "concept_id") |>
-    dplyr::mutate("domain_id" = tolower(.data$domain_id)) |>
-    dplyr::compute(name = name, temporary = FALSE,
-                   logPrefix = "CohortConstructor_addDomains_")
-
-  omopgenerics::dropSourceTable(cdm = cdm, name = tmpName)
-
-  return(cohortCodelist)
 }
 
 measurementConceptSet <- function(valueAsNumber, valueAsConcept, cdm) {
