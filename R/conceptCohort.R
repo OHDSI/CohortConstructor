@@ -488,33 +488,7 @@ fulfillCohortReqs <- function(cdm, name, useRecordsBeforeObservation, type = "st
       )
   }
 
-  # remove missing sex or date of birth
-  if (!isFALSE(useIndexes)) {
-    addIndex(
-      cohort = cdm[[name]],
-      cols = c("subject_id")
-    )
-  }
-  cdm[[name]] <- cdm[[name]] |>
-    dplyr::inner_join(
-      cdm$person |>
-        dplyr::select("subject_id" = "person_id", "gender_concept_id", "year_of_birth"),
-      by = "subject_id"
-    ) |>
-    dplyr::filter(!is.na(.data$gender_concept_id)) |>
-    dplyr::compute(temporary = FALSE, name = name,
-                   logPrefix = "CohortConstructor_fulfillCohortReqs_sex_") |>
-    omopgenerics::recordCohortAttrition(reason = "Non-missing sex") |>
-    dplyr::filter(!is.na(.data$year_of_birth)) |>
-    dplyr::select(
-      "cohort_definition_id",
-      "subject_id",
-      "cohort_start_date",
-      "cohort_end_date"
-    ) |>
-    dplyr::compute(temporary = FALSE, name = name,
-                   logPrefix = "CohortConstructor_fulfillCohortReqs_birth_year_") |>
-    omopgenerics::recordCohortAttrition(reason = "Non-missing year of birth")
+  return(cdm[[name]])
 }
 
 
