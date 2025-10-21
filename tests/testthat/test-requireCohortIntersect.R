@@ -394,7 +394,7 @@ test_that("requiring presence in another cohort", {
       targetCohortTable = "cohort_intersect",
       window = c(-Inf, -5),
       intersections = c(1, Inf),
-      cohortCombinationRange = c(1, Inf),
+      cohortCombinationCriteria = c(1, Inf),
       name = "cohort5"
     )
   expect_equal(
@@ -410,6 +410,17 @@ test_that("requiring presence in another cohort", {
     "Require 1 or more intersections for 1 or more of the cohorts: cohort_1, cohort_2 and cohort_3. Intersection window: -Inf to -5 days relative to cohort_start_date"
   )
 
+  cdm$cohort5b <- cdm$cohort4 |>
+    requireCohortIntersect(
+      targetCohortTable = "cohort_intersect",
+      window = c(-Inf, -5),
+      intersections = c(1, Inf),
+      cohortCombinationCriteria = "any",
+      name = "cohort5b"
+    )
+  expect_identical(cdm$cohort5 |> dplyr::collect(),
+                   cdm$cohort5b |> dplyr::collect())
+
   # all, >=2 intersecttion
   cdm$cohort5 <- cdm$cohort4 |>
     dplyr::mutate(new_date = cohort_end_date) |>
@@ -418,7 +429,7 @@ test_that("requiring presence in another cohort", {
       window = c(-Inf, -5),
       intersections = c(1, Inf),
       targetCohortId = NULL,
-      cohortCombinationRange = 3,
+      cohortCombinationCriteria = 3,
       censorDate = "new_date",
       name = "cohort5"
     )
@@ -435,6 +446,22 @@ test_that("requiring presence in another cohort", {
     "Require 1 or more intersections for all 3 cohorts: cohort_1, cohort_2 and cohort_3. Intersection window: -Inf to -5 days relative to cohort_start_date, censoring at new_date"
   )
 
+  cdm$cohort5b <- cdm$cohort4 |>
+    dplyr::mutate(new_date = cohort_end_date) |>
+    requireCohortIntersect(
+      targetCohortTable = "cohort_intersect",
+      window = c(-Inf, -5),
+      intersections = c(1, Inf),
+      targetCohortId = NULL,
+      cohortCombinationCriteria = "all",
+      censorDate = "new_date",
+      name = "cohort5b"
+    )
+  expect_identical(cdm$cohort5 |> dplyr::collect(),
+                   cdm$cohort5b |> dplyr::collect())
+
+
+
   # at first
   cdm$cohort5 <- cdm$cohort4 |>
     requireCohortIntersect(
@@ -442,7 +469,7 @@ test_that("requiring presence in another cohort", {
       window = c(0, Inf),
       intersections = 0,
       targetCohortId = NULL,
-      cohortCombinationRange = 3,
+      cohortCombinationCriteria = 3,
       atFirst = TRUE,
       name = "cohort5"
     )
