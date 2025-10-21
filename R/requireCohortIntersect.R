@@ -66,7 +66,10 @@ requireCohortIntersect <- function(cohort,
     {{targetCohortId}}, cdm[[targetCohortTable]], validation = "error"
   )
   intersections <- validateIntersections(intersections)
-  cohortCombinationCriteria <- validateIntersections(cohortCombinationCriteria, name = "cohortCombinationCriteria", targetCohort = cdm[[targetCohortTable]])
+  cohortCombinationCriteria <- validateIntersections(cohortCombinationCriteria,
+                                                     name = "cohortCombinationCriteria",
+                                                     targetCohort = cdm[[targetCohortTable]],
+                                                     targetCohortId = targetCohortId)
   omopgenerics::assertLogical(atFirst, length = 1)
 
   if (length(cohortId) == 0) {
