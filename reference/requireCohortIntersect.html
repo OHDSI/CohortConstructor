@@ -73,6 +73,7 @@ window around an index date.</p>
 <span>  intersections <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="cn">Inf</span><span class="op">)</span>,</span>
 <span>  cohortId <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  targetCohortId <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  cohortCombinationRange <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="cn">Inf</span><span class="op">)</span>,</span>
 <span>  indexDate <span class="op">=</span> <span class="st">"cohort_start_date"</span>,</span>
 <span>  targetStartDate <span class="op">=</span> <span class="st">"cohort_start_date"</span>,</span>
 <span>  targetEndDate <span class="op">=</span> <span class="st">"cohort_end_date"</span>,</span>
@@ -115,6 +116,15 @@ rest will remain unchanged.</p></dd>
 
 <dt id="arg-targetcohortid">targetCohortId<a class="anchor" aria-label="anchor" href="#arg-targetcohortid"></a></dt>
 <dd><p>Vector of cohort definition ids to include.</p></dd>
+
+
+<dt id="arg-cohortcombinationrange">cohortCombinationRange<a class="anchor" aria-label="anchor" href="#arg-cohortcombinationrange"></a></dt>
+<dd><p>Numeric vector (length 1 or 2) that specifies
+how many of the target cohorts must meet the intersection requirement.</p>
+<p>Examples:</p><ul><li><p>Single value: e.g., <code>4</code>, exactly 4 cohorts must meet the criteria.</p></li>
+<li><p>Range: e.g., <code>c(1, 3)</code>, between 1 and 3 cohorts must meet the criteria, or
+<code>c(1, Inf)</code>, at least one cohort must meet it.</p></li>
+</ul></dd>
 
 
 <dt id="arg-indexdate">indexDate<a class="anchor" aria-label="anchor" href="#arg-indexdate"></a></dt>
