@@ -148,7 +148,22 @@ validateN <- function(n) {
   )
 }
 
-validateIntersections <- function(intersections, name = "intersections") {
+validateIntersections <- function(intersections, name = "intersections", targetCohort = NULL, targetCohortId = NULL) {
+
+  if(name == "cohortCombinationCriteria" & is.character(intersections)){
+    omopgenerics::assertChoice(intersections, choices = c("any", "all"), length = 1)
+      if(intersections == "any"){
+        intersections <- c(1, Inf)
+      } else if(intersections == "all"){
+      intersections <- omopgenerics::settings(targetCohort) |>
+        dplyr::filter(.data$cohort_definition_id %in% .env$targetCohortId) |>
+        dplyr::pull("cohort_definition_id") |>
+        length()
+      } else {
+      cli::cli_abort("Only supported character inputs are 'all' and 'any' but {intersections} supplied")
+    }
+    }
+
   if (length(intersections) == 1) {
     intersections <- c(intersections, intersections)
   }

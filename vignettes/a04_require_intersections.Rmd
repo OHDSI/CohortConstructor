@@ -88,6 +88,61 @@ summary_attrition <- summariseCohortAttrition(cdm$warfarin_no_gi_bleed)
 plotCohortAttrition(summary_attrition)
 ```
 
+We can also apply restrictions related to multiple cohorts at the same time. Here, for example, we require individuals to be in one of our injury cohorts in the prior year.  
+```{r}
+cdm$injuries <- conceptCohort(
+  cdm = cdm,
+  name = "injuries",
+  conceptSet = list(
+    "ankle_sprain" = 81151,
+    "ankle_fracture" = 4059173,
+    "forearm_fracture" = 4278672,
+    "hip_fracture" = 4230399
+  ),
+  exit = "event_start_date"
+)
+
+
+cdm$warfarin_any_injury <- cdm$warfarin |>
+  requireCohortIntersect(intersections = c(1, Inf),
+                         cohortCombinationCriteria = "any",
+                         targetCohortTable = "injuries", 
+                         indexDate = "cohort_start_date", 
+                         window = c(-Inf, 0), 
+                         name = "warfarin_any_injury") 
+
+summary_attrition <- summariseCohortAttrition(cdm$warfarin_any_injury)
+plotCohortAttrition(summary_attrition)
+```
+
+We could instead require them to be in all of our injury cohorts
+```{r}
+cdm$warfarin_any_injury <- cdm$warfarin |>
+  requireCohortIntersect(intersections = c(1, Inf),
+                         cohortCombinationCriteria = "all",
+                         targetCohortTable = "injuries", 
+                         indexDate = "cohort_start_date", 
+                         window = c(-Inf, 0), 
+                         name = "warfarin_any_injury") 
+
+summary_attrition <- summariseCohortAttrition(cdm$warfarin_any_injury)
+plotCohortAttrition(summary_attrition)
+```
+
+Or, we could require them to be in at least 2 of our injury cohorts
+```{r}
+cdm$warfarin_any_injury <- cdm$warfarin |>
+  requireCohortIntersect(intersections = c(1, Inf),
+                         cohortCombinationCriteria = c(2, Inf),
+                         targetCohortTable = "injuries", 
+                         indexDate = "cohort_start_date", 
+                         window = c(-Inf, 0), 
+                         name = "warfarin_any_injury") 
+
+summary_attrition <- summariseCohortAttrition(cdm$warfarin_any_injury)
+plotCohortAttrition(summary_attrition)
+```
+
 ## Restrictions on concept presence
 
 We could require that individuals in our medication cohorts have been seen (or not seen) to have events related to a concept list. To do this we can use the `requireConceptIntersect()` function, allowing us to filter our cohort based on whether they have or have not had events of GI bleeding before they entered the cohort.
