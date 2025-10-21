@@ -196,3 +196,46 @@ getIntersectionCodelist <- function(cohort, cohortId, codelist) {
     dplyr::arrange(.data$cohort_definition_id)
   return(newCodelist)
 }
+
+applyRequirement <- function(newCohort, atFirst, tmpNewCohort, intersectCol, lower_limit, upper_limit, cdm) {
+  if (atFirst) {
+    tmpNewCohortFirst <- paste0(tmpNewCohort, "_1")
+    newCohortFirst <- newCohort |>
+      dplyr::group_by(.data$cohort_definition_id, .data$subject_id) |>
+      dplyr::filter(.data$cohort_start_date == base::min(.data$cohort_start_date)) |>
+      dplyr::ungroup() |>
+      dplyr::compute(name = tmpNewCohortFirst, temporary = FALSE,
+                     logPrefix = "CohortConstructor_applyRequirement_subset_arrange_") |>
+      dplyr::filter(
+        .data$rec_id_1234 == 1 & .data[[intersectCol]] >= .env$lower_limit & .data[[intersectCol]] <= .env$upper_limit
+      ) |>
+      dplyr::select(dplyr::all_of(c("cohort_definition_id", "subject_id"))) |>
+      dplyr::compute(name = tmpNewCohortFirst, temporary = FALSE,
+                     logPrefix = "CohortConstructor_applyRequirement_subset_first_")
+    newCohort <- newCohort |>
+      dplyr::inner_join(newCohortFirst, by = c("cohort_definition_id", "subject_id")) |>
+      dplyr::select(!dplyr::all_of(intersectCol)) |>
+      dplyr::compute(name = tmpNewCohort, temporary = FALSE,
+                     logPrefix = "CohortConstructor_applyRequirement_requirement_first_")
+    omopgenerics::dropSourceTable(cdm = cdm, name = tmpNewCohortFirst)
+  } else {
+    newCohort <- newCohort |>
+      dplyr::filter(
+        .data[[intersectCol]] >= .env$lower_limit & .data[[intersectCol]] <= .env$upper_limit
+      ) |>
+      dplyr::select(!dplyr::all_of(intersectCol)) |>
+      dplyr::compute(name = tmpNewCohort, temporary = FALSE,
+                     logPrefix = "CohortConstructor_applyRequirement_subset_")
+  }
+  return(newCohort)
+}
+
+completeAttritionReason <- function(reason, censorDate, atFirst) {
+  if (!is.null(censorDate)) {
+    reason <- glue::glue("{reason}, censoring at {censorDate}")
+  }
+  if (atFirst) {
+    reason <- glue::glue("{reason}. Requirement applied to the first entry")
+  }
+  return(reason)
+}
