@@ -131,11 +131,11 @@ cohorts at once using CohortConstructor.</p>
 <span>  runCohortConstructorDefinition <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  runCohortConstructorDomain <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; cc_set_no_strata: 112.103 sec elapsed</span></span>
-<span><span class="co">#&gt; cc_set_strata: 1.722 sec elapsed</span></span>
+<span><span class="co">#&gt; cc_set_no_strata: 112.655 sec elapsed</span></span>
+<span><span class="co">#&gt; cc_set_strata: 1.858 sec elapsed</span></span>
 <span><span class="va">benchmark_results</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Rows: 297</span></span>
+<span><span class="co">#&gt; Rows: 257</span></span>
 <span><span class="co">#&gt; Columns: 13</span></span>
 <span><span class="co">#&gt; $ result_id        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> 1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>2<span style="color: #949494;">, </span>2<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>5<span style="color: #949494;">, </span>5<span style="color: #949494;">, </span>6<span style="color: #949494;">, </span>6<span style="color: #949494;">, </span>7<span style="color: #949494;">, </span>7<span style="color: #949494;">, </span>8<span style="color: #949494;">, </span>8<span style="color: #949494;">, </span>9<span style="color: #949494;">, </span>9<span style="color: #949494;">,</span>…</span></span>
 <span><span class="co">#&gt; $ cdm_name         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "GiBleed"<span style="color: #949494;">, </span>"GiBleed"<span style="color: #949494;">, </span>"GiBleed"<span style="color: #949494;">, </span>"GiBleed"<span style="color: #949494;">, </span>"GiBleed"…</span></span>
@@ -175,23 +175,23 @@ provided by OHDSI, hosted on SQL Server.</p></li>
 <p>The table below presents the number of records in the OMOP tables
 used in the benchmark script for each of the participating
 databases.</p>
-<div id="kaausiwtlq" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#kaausiwtlq table {
+<div id="krqvcwypgs" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#krqvcwypgs table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#kaausiwtlq thead, #kaausiwtlq tbody, #kaausiwtlq tfoot, #kaausiwtlq tr, #kaausiwtlq td, #kaausiwtlq th {
+#krqvcwypgs thead, #krqvcwypgs tbody, #krqvcwypgs tfoot, #krqvcwypgs tr, #krqvcwypgs td, #krqvcwypgs th {
   border-style: none;
 }
 
-#kaausiwtlq p {
+#krqvcwypgs p {
   margin: 0;
   padding: 0;
 }
 
-#kaausiwtlq .gt_table {
+#krqvcwypgs .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -217,12 +217,12 @@ databases.</p>
   border-left-color: #C8C8C8;
 }
 
-#kaausiwtlq .gt_caption {
+#krqvcwypgs .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#kaausiwtlq .gt_title {
+#krqvcwypgs .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -234,7 +234,7 @@ databases.</p>
   border-bottom-width: 0;
 }
 
-#kaausiwtlq .gt_subtitle {
+#krqvcwypgs .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -246,7 +246,7 @@ databases.</p>
   border-top-width: 0;
 }
 
-#kaausiwtlq .gt_heading {
+#krqvcwypgs .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -258,13 +258,13 @@ databases.</p>
   border-right-color: #D3D3D3;
 }
 
-#kaausiwtlq .gt_bottom_border {
+#krqvcwypgs .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#kaausiwtlq .gt_col_headings {
+#krqvcwypgs .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -279,7 +279,7 @@ databases.</p>
   border-right-color: #D3D3D3;
 }
 
-#kaausiwtlq .gt_col_heading {
+#krqvcwypgs .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -299,7 +299,7 @@ databases.</p>
   overflow-x: hidden;
 }
 
-#kaausiwtlq .gt_column_spanner_outer {
+#krqvcwypgs .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -311,15 +311,15 @@ databases.</p>
   padding-right: 4px;
 }
 
-#kaausiwtlq .gt_column_spanner_outer:first-child {
+#krqvcwypgs .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#kaausiwtlq .gt_column_spanner_outer:last-child {
+#krqvcwypgs .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#kaausiwtlq .gt_column_spanner {
+#krqvcwypgs .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -331,11 +331,11 @@ databases.</p>
   width: 100%;
 }
 
-#kaausiwtlq .gt_spanner_row {
+#krqvcwypgs .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#kaausiwtlq .gt_group_heading {
+#krqvcwypgs .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -361,7 +361,7 @@ databases.</p>
   text-align: left;
 }
 
-#kaausiwtlq .gt_empty_group_heading {
+#krqvcwypgs .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -376,15 +376,15 @@ databases.</p>
   vertical-align: middle;
 }
 
-#kaausiwtlq .gt_from_md > :first-child {
+#krqvcwypgs .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#kaausiwtlq .gt_from_md > :last-child {
+#krqvcwypgs .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#kaausiwtlq .gt_row {
+#krqvcwypgs .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -403,7 +403,7 @@ databases.</p>
   overflow-x: hidden;
 }
 
-#kaausiwtlq .gt_stub {
+#krqvcwypgs .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -416,7 +416,7 @@ databases.</p>
   padding-right: 5px;
 }
 
-#kaausiwtlq .gt_stub_row_group {
+#krqvcwypgs .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -430,15 +430,15 @@ databases.</p>
   vertical-align: top;
 }
 
-#kaausiwtlq .gt_row_group_first td {
+#krqvcwypgs .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#kaausiwtlq .gt_row_group_first th {
+#krqvcwypgs .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#kaausiwtlq .gt_summary_row {
+#krqvcwypgs .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -448,16 +448,16 @@ databases.</p>
   padding-right: 5px;
 }
 
-#kaausiwtlq .gt_first_summary_row {
+#krqvcwypgs .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#kaausiwtlq .gt_first_summary_row.thick {
+#krqvcwypgs .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#kaausiwtlq .gt_last_summary_row {
+#krqvcwypgs .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -467,7 +467,7 @@ databases.</p>
   border-bottom-color: #D3D3D3;
 }
 
-#kaausiwtlq .gt_grand_summary_row {
+#krqvcwypgs .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -477,7 +477,7 @@ databases.</p>
   padding-right: 5px;
 }
 
-#kaausiwtlq .gt_first_grand_summary_row {
+#krqvcwypgs .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -487,7 +487,7 @@ databases.</p>
   border-top-color: #D3D3D3;
 }
 
-#kaausiwtlq .gt_last_grand_summary_row_top {
+#krqvcwypgs .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -497,11 +497,11 @@ databases.</p>
   border-bottom-color: #D3D3D3;
 }
 
-#kaausiwtlq .gt_striped {
+#krqvcwypgs .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#kaausiwtlq .gt_table_body {
+#krqvcwypgs .gt_table_body {
   border-top-style: solid;
   border-top-width: 3px;
   border-top-color: #C8C8C8;
@@ -510,7 +510,7 @@ databases.</p>
   border-bottom-color: #D3D3D3;
 }
 
-#kaausiwtlq .gt_footnotes {
+#krqvcwypgs .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -524,7 +524,7 @@ databases.</p>
   border-right-color: #D3D3D3;
 }
 
-#kaausiwtlq .gt_footnote {
+#krqvcwypgs .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -533,7 +533,7 @@ databases.</p>
   padding-right: 5px;
 }
 
-#kaausiwtlq .gt_sourcenotes {
+#krqvcwypgs .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -547,7 +547,7 @@ databases.</p>
   border-right-color: #D3D3D3;
 }
 
-#kaausiwtlq .gt_sourcenote {
+#krqvcwypgs .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -555,72 +555,72 @@ databases.</p>
   padding-right: 5px;
 }
 
-#kaausiwtlq .gt_left {
+#krqvcwypgs .gt_left {
   text-align: left;
 }
 
-#kaausiwtlq .gt_center {
+#krqvcwypgs .gt_center {
   text-align: center;
 }
 
-#kaausiwtlq .gt_right {
+#krqvcwypgs .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#kaausiwtlq .gt_font_normal {
+#krqvcwypgs .gt_font_normal {
   font-weight: normal;
 }
 
-#kaausiwtlq .gt_font_bold {
+#krqvcwypgs .gt_font_bold {
   font-weight: bold;
 }
 
-#kaausiwtlq .gt_font_italic {
+#krqvcwypgs .gt_font_italic {
   font-style: italic;
 }
 
-#kaausiwtlq .gt_super {
+#krqvcwypgs .gt_super {
   font-size: 65%;
 }
 
-#kaausiwtlq .gt_footnote_marks {
+#krqvcwypgs .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#kaausiwtlq .gt_asterisk {
+#krqvcwypgs .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#kaausiwtlq .gt_indent_1 {
+#krqvcwypgs .gt_indent_1 {
   text-indent: 5px;
 }
 
-#kaausiwtlq .gt_indent_2 {
+#krqvcwypgs .gt_indent_2 {
   text-indent: 10px;
 }
 
-#kaausiwtlq .gt_indent_3 {
+#krqvcwypgs .gt_indent_3 {
   text-indent: 15px;
 }
 
-#kaausiwtlq .gt_indent_4 {
+#krqvcwypgs .gt_indent_4 {
   text-indent: 20px;
 }
 
-#kaausiwtlq .gt_indent_5 {
+#krqvcwypgs .gt_indent_5 {
   text-indent: 25px;
 }
 
-#kaausiwtlq .katex-display {
+#krqvcwypgs .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#kaausiwtlq div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#krqvcwypgs div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -804,23 +804,23 @@ GitHub repository</a> with the benchmark code.</p>
 </h3>
 <p>The following table displays the number of records and subjects for
 each cohort across the participating databases:</p>
-<div id="ccymqpfhii" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#ccymqpfhii table {
+<div id="ggalwpktoi" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#ggalwpktoi table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#ccymqpfhii thead, #ccymqpfhii tbody, #ccymqpfhii tfoot, #ccymqpfhii tr, #ccymqpfhii td, #ccymqpfhii th {
+#ggalwpktoi thead, #ggalwpktoi tbody, #ggalwpktoi tfoot, #ggalwpktoi tr, #ggalwpktoi td, #ggalwpktoi th {
   border-style: none;
 }
 
-#ccymqpfhii p {
+#ggalwpktoi p {
   margin: 0;
   padding: 0;
 }
 
-#ccymqpfhii .gt_table {
+#ggalwpktoi .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -846,12 +846,12 @@ each cohort across the participating databases:</p>
   border-left-color: #C8C8C8;
 }
 
-#ccymqpfhii .gt_caption {
+#ggalwpktoi .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#ccymqpfhii .gt_title {
+#ggalwpktoi .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -863,7 +863,7 @@ each cohort across the participating databases:</p>
   border-bottom-width: 0;
 }
 
-#ccymqpfhii .gt_subtitle {
+#ggalwpktoi .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -875,7 +875,7 @@ each cohort across the participating databases:</p>
   border-top-width: 0;
 }
 
-#ccymqpfhii .gt_heading {
+#ggalwpktoi .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -887,13 +887,13 @@ each cohort across the participating databases:</p>
   border-right-color: #D3D3D3;
 }
 
-#ccymqpfhii .gt_bottom_border {
+#ggalwpktoi .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#ccymqpfhii .gt_col_headings {
+#ggalwpktoi .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -908,7 +908,7 @@ each cohort across the participating databases:</p>
   border-right-color: #D3D3D3;
 }
 
-#ccymqpfhii .gt_col_heading {
+#ggalwpktoi .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -928,7 +928,7 @@ each cohort across the participating databases:</p>
   overflow-x: hidden;
 }
 
-#ccymqpfhii .gt_column_spanner_outer {
+#ggalwpktoi .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -940,15 +940,15 @@ each cohort across the participating databases:</p>
   padding-right: 4px;
 }
 
-#ccymqpfhii .gt_column_spanner_outer:first-child {
+#ggalwpktoi .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#ccymqpfhii .gt_column_spanner_outer:last-child {
+#ggalwpktoi .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#ccymqpfhii .gt_column_spanner {
+#ggalwpktoi .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -960,11 +960,11 @@ each cohort across the participating databases:</p>
   width: 100%;
 }
 
-#ccymqpfhii .gt_spanner_row {
+#ggalwpktoi .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#ccymqpfhii .gt_group_heading {
+#ggalwpktoi .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -990,7 +990,7 @@ each cohort across the participating databases:</p>
   text-align: left;
 }
 
-#ccymqpfhii .gt_empty_group_heading {
+#ggalwpktoi .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1005,15 +1005,15 @@ each cohort across the participating databases:</p>
   vertical-align: middle;
 }
 
-#ccymqpfhii .gt_from_md > :first-child {
+#ggalwpktoi .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#ccymqpfhii .gt_from_md > :last-child {
+#ggalwpktoi .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#ccymqpfhii .gt_row {
+#ggalwpktoi .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1032,7 +1032,7 @@ each cohort across the participating databases:</p>
   overflow-x: hidden;
 }
 
-#ccymqpfhii .gt_stub {
+#ggalwpktoi .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1045,7 +1045,7 @@ each cohort across the participating databases:</p>
   padding-right: 5px;
 }
 
-#ccymqpfhii .gt_stub_row_group {
+#ggalwpktoi .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1059,15 +1059,15 @@ each cohort across the participating databases:</p>
   vertical-align: top;
 }
 
-#ccymqpfhii .gt_row_group_first td {
+#ggalwpktoi .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#ccymqpfhii .gt_row_group_first th {
+#ggalwpktoi .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#ccymqpfhii .gt_summary_row {
+#ggalwpktoi .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1077,16 +1077,16 @@ each cohort across the participating databases:</p>
   padding-right: 5px;
 }
 
-#ccymqpfhii .gt_first_summary_row {
+#ggalwpktoi .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#ccymqpfhii .gt_first_summary_row.thick {
+#ggalwpktoi .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#ccymqpfhii .gt_last_summary_row {
+#ggalwpktoi .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1096,7 +1096,7 @@ each cohort across the participating databases:</p>
   border-bottom-color: #D3D3D3;
 }
 
-#ccymqpfhii .gt_grand_summary_row {
+#ggalwpktoi .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1106,7 +1106,7 @@ each cohort across the participating databases:</p>
   padding-right: 5px;
 }
 
-#ccymqpfhii .gt_first_grand_summary_row {
+#ggalwpktoi .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1116,7 +1116,7 @@ each cohort across the participating databases:</p>
   border-top-color: #D3D3D3;
 }
 
-#ccymqpfhii .gt_last_grand_summary_row_top {
+#ggalwpktoi .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1126,11 +1126,11 @@ each cohort across the participating databases:</p>
   border-bottom-color: #D3D3D3;
 }
 
-#ccymqpfhii .gt_striped {
+#ggalwpktoi .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#ccymqpfhii .gt_table_body {
+#ggalwpktoi .gt_table_body {
   border-top-style: solid;
   border-top-width: 3px;
   border-top-color: #C8C8C8;
@@ -1139,7 +1139,7 @@ each cohort across the participating databases:</p>
   border-bottom-color: #D3D3D3;
 }
 
-#ccymqpfhii .gt_footnotes {
+#ggalwpktoi .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1153,7 +1153,7 @@ each cohort across the participating databases:</p>
   border-right-color: #D3D3D3;
 }
 
-#ccymqpfhii .gt_footnote {
+#ggalwpktoi .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1162,7 +1162,7 @@ each cohort across the participating databases:</p>
   padding-right: 5px;
 }
 
-#ccymqpfhii .gt_sourcenotes {
+#ggalwpktoi .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1176,7 +1176,7 @@ each cohort across the participating databases:</p>
   border-right-color: #D3D3D3;
 }
 
-#ccymqpfhii .gt_sourcenote {
+#ggalwpktoi .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1184,72 +1184,72 @@ each cohort across the participating databases:</p>
   padding-right: 5px;
 }
 
-#ccymqpfhii .gt_left {
+#ggalwpktoi .gt_left {
   text-align: left;
 }
 
-#ccymqpfhii .gt_center {
+#ggalwpktoi .gt_center {
   text-align: center;
 }
 
-#ccymqpfhii .gt_right {
+#ggalwpktoi .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#ccymqpfhii .gt_font_normal {
+#ggalwpktoi .gt_font_normal {
   font-weight: normal;
 }
 
-#ccymqpfhii .gt_font_bold {
+#ggalwpktoi .gt_font_bold {
   font-weight: bold;
 }
 
-#ccymqpfhii .gt_font_italic {
+#ggalwpktoi .gt_font_italic {
   font-style: italic;
 }
 
-#ccymqpfhii .gt_super {
+#ggalwpktoi .gt_super {
   font-size: 65%;
 }
 
-#ccymqpfhii .gt_footnote_marks {
+#ggalwpktoi .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#ccymqpfhii .gt_asterisk {
+#ggalwpktoi .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#ccymqpfhii .gt_indent_1 {
+#ggalwpktoi .gt_indent_1 {
   text-indent: 5px;
 }
 
-#ccymqpfhii .gt_indent_2 {
+#ggalwpktoi .gt_indent_2 {
   text-indent: 10px;
 }
 
-#ccymqpfhii .gt_indent_3 {
+#ggalwpktoi .gt_indent_3 {
   text-indent: 15px;
 }
 
-#ccymqpfhii .gt_indent_4 {
+#ggalwpktoi .gt_indent_4 {
   text-indent: 20px;
 }
 
-#ccymqpfhii .gt_indent_5 {
+#ggalwpktoi .gt_indent_5 {
   text-indent: 25px;
 }
 
-#ccymqpfhii .katex-display {
+#ggalwpktoi .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#ccymqpfhii div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#ggalwpktoi div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -2915,23 +2915,23 @@ separately.</p>
 <p>The table below depicts the total time it took to create the nine
 cohorts when using the <em>by domain</em> approach for
 CohortConstructor.</p>
-<div id="cwennpazkv" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#cwennpazkv table {
+<div id="btlwrmclog" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#btlwrmclog table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#cwennpazkv thead, #cwennpazkv tbody, #cwennpazkv tfoot, #cwennpazkv tr, #cwennpazkv td, #cwennpazkv th {
+#btlwrmclog thead, #btlwrmclog tbody, #btlwrmclog tfoot, #btlwrmclog tr, #btlwrmclog td, #btlwrmclog th {
   border-style: none;
 }
 
-#cwennpazkv p {
+#btlwrmclog p {
   margin: 0;
   padding: 0;
 }
 
-#cwennpazkv .gt_table {
+#btlwrmclog .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -2957,12 +2957,12 @@ CohortConstructor.</p>
   border-left-color: #C8C8C8;
 }
 
-#cwennpazkv .gt_caption {
+#btlwrmclog .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#cwennpazkv .gt_title {
+#btlwrmclog .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -2974,7 +2974,7 @@ CohortConstructor.</p>
   border-bottom-width: 0;
 }
 
-#cwennpazkv .gt_subtitle {
+#btlwrmclog .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -2986,7 +2986,7 @@ CohortConstructor.</p>
   border-top-width: 0;
 }
 
-#cwennpazkv .gt_heading {
+#btlwrmclog .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -2998,13 +2998,13 @@ CohortConstructor.</p>
   border-right-color: #D3D3D3;
 }
 
-#cwennpazkv .gt_bottom_border {
+#btlwrmclog .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#cwennpazkv .gt_col_headings {
+#btlwrmclog .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3019,7 +3019,7 @@ CohortConstructor.</p>
   border-right-color: #D3D3D3;
 }
 
-#cwennpazkv .gt_col_heading {
+#btlwrmclog .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3039,7 +3039,7 @@ CohortConstructor.</p>
   overflow-x: hidden;
 }
 
-#cwennpazkv .gt_column_spanner_outer {
+#btlwrmclog .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3051,15 +3051,15 @@ CohortConstructor.</p>
   padding-right: 4px;
 }
 
-#cwennpazkv .gt_column_spanner_outer:first-child {
+#btlwrmclog .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#cwennpazkv .gt_column_spanner_outer:last-child {
+#btlwrmclog .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#cwennpazkv .gt_column_spanner {
+#btlwrmclog .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -3071,11 +3071,11 @@ CohortConstructor.</p>
   width: 100%;
 }
 
-#cwennpazkv .gt_spanner_row {
+#btlwrmclog .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#cwennpazkv .gt_group_heading {
+#btlwrmclog .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3101,7 +3101,7 @@ CohortConstructor.</p>
   text-align: left;
 }
 
-#cwennpazkv .gt_empty_group_heading {
+#btlwrmclog .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -3116,15 +3116,15 @@ CohortConstructor.</p>
   vertical-align: middle;
 }
 
-#cwennpazkv .gt_from_md > :first-child {
+#btlwrmclog .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#cwennpazkv .gt_from_md > :last-child {
+#btlwrmclog .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#cwennpazkv .gt_row {
+#btlwrmclog .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3143,7 +3143,7 @@ CohortConstructor.</p>
   overflow-x: hidden;
 }
 
-#cwennpazkv .gt_stub {
+#btlwrmclog .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3156,7 +3156,7 @@ CohortConstructor.</p>
   padding-right: 5px;
 }
 
-#cwennpazkv .gt_stub_row_group {
+#btlwrmclog .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3170,15 +3170,15 @@ CohortConstructor.</p>
   vertical-align: top;
 }
 
-#cwennpazkv .gt_row_group_first td {
+#btlwrmclog .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#cwennpazkv .gt_row_group_first th {
+#btlwrmclog .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#cwennpazkv .gt_summary_row {
+#btlwrmclog .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3188,16 +3188,16 @@ CohortConstructor.</p>
   padding-right: 5px;
 }
 
-#cwennpazkv .gt_first_summary_row {
+#btlwrmclog .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#cwennpazkv .gt_first_summary_row.thick {
+#btlwrmclog .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#cwennpazkv .gt_last_summary_row {
+#btlwrmclog .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3207,7 +3207,7 @@ CohortConstructor.</p>
   border-bottom-color: #D3D3D3;
 }
 
-#cwennpazkv .gt_grand_summary_row {
+#btlwrmclog .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3217,7 +3217,7 @@ CohortConstructor.</p>
   padding-right: 5px;
 }
 
-#cwennpazkv .gt_first_grand_summary_row {
+#btlwrmclog .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3227,7 +3227,7 @@ CohortConstructor.</p>
   border-top-color: #D3D3D3;
 }
 
-#cwennpazkv .gt_last_grand_summary_row_top {
+#btlwrmclog .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3237,11 +3237,11 @@ CohortConstructor.</p>
   border-bottom-color: #D3D3D3;
 }
 
-#cwennpazkv .gt_striped {
+#btlwrmclog .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#cwennpazkv .gt_table_body {
+#btlwrmclog .gt_table_body {
   border-top-style: solid;
   border-top-width: 3px;
   border-top-color: #C8C8C8;
@@ -3250,7 +3250,7 @@ CohortConstructor.</p>
   border-bottom-color: #D3D3D3;
 }
 
-#cwennpazkv .gt_footnotes {
+#btlwrmclog .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3264,7 +3264,7 @@ CohortConstructor.</p>
   border-right-color: #D3D3D3;
 }
 
-#cwennpazkv .gt_footnote {
+#btlwrmclog .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -3273,7 +3273,7 @@ CohortConstructor.</p>
   padding-right: 5px;
 }
 
-#cwennpazkv .gt_sourcenotes {
+#btlwrmclog .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3287,7 +3287,7 @@ CohortConstructor.</p>
   border-right-color: #D3D3D3;
 }
 
-#cwennpazkv .gt_sourcenote {
+#btlwrmclog .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -3295,72 +3295,72 @@ CohortConstructor.</p>
   padding-right: 5px;
 }
 
-#cwennpazkv .gt_left {
+#btlwrmclog .gt_left {
   text-align: left;
 }
 
-#cwennpazkv .gt_center {
+#btlwrmclog .gt_center {
   text-align: center;
 }
 
-#cwennpazkv .gt_right {
+#btlwrmclog .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#cwennpazkv .gt_font_normal {
+#btlwrmclog .gt_font_normal {
   font-weight: normal;
 }
 
-#cwennpazkv .gt_font_bold {
+#btlwrmclog .gt_font_bold {
   font-weight: bold;
 }
 
-#cwennpazkv .gt_font_italic {
+#btlwrmclog .gt_font_italic {
   font-style: italic;
 }
 
-#cwennpazkv .gt_super {
+#btlwrmclog .gt_super {
   font-size: 65%;
 }
 
-#cwennpazkv .gt_footnote_marks {
+#btlwrmclog .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#cwennpazkv .gt_asterisk {
+#btlwrmclog .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#cwennpazkv .gt_indent_1 {
+#btlwrmclog .gt_indent_1 {
   text-indent: 5px;
 }
 
-#cwennpazkv .gt_indent_2 {
+#btlwrmclog .gt_indent_2 {
   text-indent: 10px;
 }
 
-#cwennpazkv .gt_indent_3 {
+#btlwrmclog .gt_indent_3 {
   text-indent: 15px;
 }
 
-#cwennpazkv .gt_indent_4 {
+#btlwrmclog .gt_indent_4 {
   text-indent: 20px;
 }
 
-#cwennpazkv .gt_indent_5 {
+#btlwrmclog .gt_indent_5 {
   text-indent: 25px;
 }
 
-#cwennpazkv .katex-display {
+#btlwrmclog .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#cwennpazkv div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#btlwrmclog div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -3441,23 +3441,23 @@ while CohortConstructor allows stratifications to be generated from an
 overall cohort. The following table shows the time taken to create age
 and sex stratifications for the COVID-19 cohort with both CIRCE and
 CohortConstructor.</p>
-<div id="mmlmskqcpg" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#mmlmskqcpg table {
+<div id="hswkejdxqp" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#hswkejdxqp table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#mmlmskqcpg thead, #mmlmskqcpg tbody, #mmlmskqcpg tfoot, #mmlmskqcpg tr, #mmlmskqcpg td, #mmlmskqcpg th {
+#hswkejdxqp thead, #hswkejdxqp tbody, #hswkejdxqp tfoot, #hswkejdxqp tr, #hswkejdxqp td, #hswkejdxqp th {
   border-style: none;
 }
 
-#mmlmskqcpg p {
+#hswkejdxqp p {
   margin: 0;
   padding: 0;
 }
 
-#mmlmskqcpg .gt_table {
+#hswkejdxqp .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -3483,12 +3483,12 @@ CohortConstructor.</p>
   border-left-color: #C8C8C8;
 }
 
-#mmlmskqcpg .gt_caption {
+#hswkejdxqp .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#mmlmskqcpg .gt_title {
+#hswkejdxqp .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -3500,7 +3500,7 @@ CohortConstructor.</p>
   border-bottom-width: 0;
 }
 
-#mmlmskqcpg .gt_subtitle {
+#hswkejdxqp .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -3512,7 +3512,7 @@ CohortConstructor.</p>
   border-top-width: 0;
 }
 
-#mmlmskqcpg .gt_heading {
+#hswkejdxqp .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -3524,13 +3524,13 @@ CohortConstructor.</p>
   border-right-color: #D3D3D3;
 }
 
-#mmlmskqcpg .gt_bottom_border {
+#hswkejdxqp .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#mmlmskqcpg .gt_col_headings {
+#hswkejdxqp .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3545,7 +3545,7 @@ CohortConstructor.</p>
   border-right-color: #D3D3D3;
 }
 
-#mmlmskqcpg .gt_col_heading {
+#hswkejdxqp .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3565,7 +3565,7 @@ CohortConstructor.</p>
   overflow-x: hidden;
 }
 
-#mmlmskqcpg .gt_column_spanner_outer {
+#hswkejdxqp .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3577,15 +3577,15 @@ CohortConstructor.</p>
   padding-right: 4px;
 }
 
-#mmlmskqcpg .gt_column_spanner_outer:first-child {
+#hswkejdxqp .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#mmlmskqcpg .gt_column_spanner_outer:last-child {
+#hswkejdxqp .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#mmlmskqcpg .gt_column_spanner {
+#hswkejdxqp .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -3597,11 +3597,11 @@ CohortConstructor.</p>
   width: 100%;
 }
 
-#mmlmskqcpg .gt_spanner_row {
+#hswkejdxqp .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#mmlmskqcpg .gt_group_heading {
+#hswkejdxqp .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3627,7 +3627,7 @@ CohortConstructor.</p>
   text-align: left;
 }
 
-#mmlmskqcpg .gt_empty_group_heading {
+#hswkejdxqp .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -3642,15 +3642,15 @@ CohortConstructor.</p>
   vertical-align: middle;
 }
 
-#mmlmskqcpg .gt_from_md > :first-child {
+#hswkejdxqp .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#mmlmskqcpg .gt_from_md > :last-child {
+#hswkejdxqp .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#mmlmskqcpg .gt_row {
+#hswkejdxqp .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3669,7 +3669,7 @@ CohortConstructor.</p>
   overflow-x: hidden;
 }
 
-#mmlmskqcpg .gt_stub {
+#hswkejdxqp .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3682,7 +3682,7 @@ CohortConstructor.</p>
   padding-right: 5px;
 }
 
-#mmlmskqcpg .gt_stub_row_group {
+#hswkejdxqp .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3696,15 +3696,15 @@ CohortConstructor.</p>
   vertical-align: top;
 }
 
-#mmlmskqcpg .gt_row_group_first td {
+#hswkejdxqp .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#mmlmskqcpg .gt_row_group_first th {
+#hswkejdxqp .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#mmlmskqcpg .gt_summary_row {
+#hswkejdxqp .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3714,16 +3714,16 @@ CohortConstructor.</p>
   padding-right: 5px;
 }
 
-#mmlmskqcpg .gt_first_summary_row {
+#hswkejdxqp .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#mmlmskqcpg .gt_first_summary_row.thick {
+#hswkejdxqp .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#mmlmskqcpg .gt_last_summary_row {
+#hswkejdxqp .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3733,7 +3733,7 @@ CohortConstructor.</p>
   border-bottom-color: #D3D3D3;
 }
 
-#mmlmskqcpg .gt_grand_summary_row {
+#hswkejdxqp .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3743,7 +3743,7 @@ CohortConstructor.</p>
   padding-right: 5px;
 }
 
-#mmlmskqcpg .gt_first_grand_summary_row {
+#hswkejdxqp .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3753,7 +3753,7 @@ CohortConstructor.</p>
   border-top-color: #D3D3D3;
 }
 
-#mmlmskqcpg .gt_last_grand_summary_row_top {
+#hswkejdxqp .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3763,11 +3763,11 @@ CohortConstructor.</p>
   border-bottom-color: #D3D3D3;
 }
 
-#mmlmskqcpg .gt_striped {
+#hswkejdxqp .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#mmlmskqcpg .gt_table_body {
+#hswkejdxqp .gt_table_body {
   border-top-style: solid;
   border-top-width: 3px;
   border-top-color: #C8C8C8;
@@ -3776,7 +3776,7 @@ CohortConstructor.</p>
   border-bottom-color: #D3D3D3;
 }
 
-#mmlmskqcpg .gt_footnotes {
+#hswkejdxqp .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3790,7 +3790,7 @@ CohortConstructor.</p>
   border-right-color: #D3D3D3;
 }
 
-#mmlmskqcpg .gt_footnote {
+#hswkejdxqp .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -3799,7 +3799,7 @@ CohortConstructor.</p>
   padding-right: 5px;
 }
 
-#mmlmskqcpg .gt_sourcenotes {
+#hswkejdxqp .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3813,7 +3813,7 @@ CohortConstructor.</p>
   border-right-color: #D3D3D3;
 }
 
-#mmlmskqcpg .gt_sourcenote {
+#hswkejdxqp .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -3821,72 +3821,72 @@ CohortConstructor.</p>
   padding-right: 5px;
 }
 
-#mmlmskqcpg .gt_left {
+#hswkejdxqp .gt_left {
   text-align: left;
 }
 
-#mmlmskqcpg .gt_center {
+#hswkejdxqp .gt_center {
   text-align: center;
 }
 
-#mmlmskqcpg .gt_right {
+#hswkejdxqp .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#mmlmskqcpg .gt_font_normal {
+#hswkejdxqp .gt_font_normal {
   font-weight: normal;
 }
 
-#mmlmskqcpg .gt_font_bold {
+#hswkejdxqp .gt_font_bold {
   font-weight: bold;
 }
 
-#mmlmskqcpg .gt_font_italic {
+#hswkejdxqp .gt_font_italic {
   font-style: italic;
 }
 
-#mmlmskqcpg .gt_super {
+#hswkejdxqp .gt_super {
   font-size: 65%;
 }
 
-#mmlmskqcpg .gt_footnote_marks {
+#hswkejdxqp .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#mmlmskqcpg .gt_asterisk {
+#hswkejdxqp .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#mmlmskqcpg .gt_indent_1 {
+#hswkejdxqp .gt_indent_1 {
   text-indent: 5px;
 }
 
-#mmlmskqcpg .gt_indent_2 {
+#hswkejdxqp .gt_indent_2 {
   text-indent: 10px;
 }
 
-#mmlmskqcpg .gt_indent_3 {
+#hswkejdxqp .gt_indent_3 {
   text-indent: 15px;
 }
 
-#mmlmskqcpg .gt_indent_4 {
+#hswkejdxqp .gt_indent_4 {
   text-indent: 20px;
 }
 
-#mmlmskqcpg .gt_indent_5 {
+#hswkejdxqp .gt_indent_5 {
   text-indent: 25px;
 }
 
-#mmlmskqcpg .katex-display {
+#hswkejdxqp .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#mmlmskqcpg div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#hswkejdxqp div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
