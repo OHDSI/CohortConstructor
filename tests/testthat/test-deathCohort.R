@@ -52,8 +52,6 @@ test_that("basic example", {
   c("Initial qualifying events",
     "Record in observation",
     "Not missing record date",
-    "Non-missing sex",
-    "Non-missing year of birth",
     "First death record"))
 
   dropCreatedTables(cdm = cdm)

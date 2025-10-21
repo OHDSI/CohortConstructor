@@ -159,15 +159,14 @@ test_that("initial tests", {
     attrition(cohort) |> dplyr::as_tibble(),
     dplyr::tibble(
       "cohort_definition_id" = 1L,
-      "number_records" = c(5L, 5L, 5L, 5L, 5L, 4L),
+      "number_records" = c(5L, 5L, 5L, 4L),
       "number_subjects" = 2L,
-      "reason_id" = 1:6L,
+      "reason_id" = 1:4L,
       "reason" = c(
         "Initial qualifying events", "Record in observation", "Not missing record date",
-        "Non-missing sex", "Non-missing year of birth",
         "Merge overlapping records"
       ),
-      "excluded_records" = c(0L, 0L, 0L, 0L, 0L, 1L),
+      "excluded_records" = c(0L, 0L, 0L, 1L),
       "excluded_subjects" = 0L
     )
   )
@@ -176,8 +175,6 @@ test_that("initial tests", {
     dplyr::collect() |>
     dplyr::as_tibble() |>
     dplyr::arrange(subject_id, cohort_start_date)
-
-  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
 
   # Concepts from >1 table  + subset cohort ----
   # warning: concept 4 from a table not present in the cdm
@@ -246,7 +243,7 @@ test_that("initial tests", {
   )
   expect_equal(
     attrition(cohort)$reason,
-    c('Initial qualifying events', 'Record in observation', 'Not missing record date', 'Non-missing sex', 'Non-missing year of birth', 'Drop duplicate records')
+    c('Initial qualifying events', 'Record in observation', 'Not missing record date', 'Drop duplicate records')
   )
   expect_warning(cohort <- conceptCohort(
     cdm = cdm,
@@ -327,7 +324,6 @@ test_that("initial tests", {
     )
   )
 
-
   # error if missing columns
   cdm$drug_exposure <- cdm$drug_exposure |>
     dplyr::select(!"drug_source_concept_id")
@@ -339,6 +335,7 @@ test_that("initial tests", {
                 name = "cohort",
                 table = "drug_exposure"))
 
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   dropCreatedTables(cdm = cdm)
 })
 
@@ -599,19 +596,21 @@ test_that("overlap option", {
                                                 exit = "event_end_date",
                                                 overlap = "merge"))
   expect_true(nrow(cdm$cohort_1 |>
-                     dplyr::collect()) == 3)
+                     dplyr::collect()) == 4)
   expect_true(all(sort(cdm$cohort_1 |>
                          dplyr::pull("cohort_start_date")) ==
                     as.Date(c("2020-01-01",
+                              "2020-01-01",
                               "2020-01-02",
                               "2020-01-20"))))
   expect_true(all(sort(cdm$cohort_1 |>
                          dplyr::pull("cohort_end_date")) ==
                     as.Date(c("2020-01-03",
                               "2020-01-08",
+                              "2020-01-21",
                               "2020-01-21"))))
   expect_true(
-    attrition(cdm$cohort_1) |> dplyr::filter(reason_id == 4 & cohort_definition_id == 1) |> dplyr::pull(excluded_records) == 1
+    attrition(cdm$cohort_1) |> dplyr::filter(reason_id == 4 & cohort_definition_id == 1) |> dplyr::pull(excluded_records) == 2
   )
 
   expect_no_error(cdm$cohort_2 <- conceptCohort(cdm = cdm,
@@ -623,12 +622,14 @@ test_that("overlap option", {
   expect_true(all(sort(cdm$cohort_2 |>
                          dplyr::pull("cohort_start_date")) ==
                     as.Date(c("2020-01-01",
+                              "2020-01-01",
                               "2020-01-02",
                               "2020-01-20"))))
   expect_true(all(sort(cdm$cohort_2 |>
                          dplyr::pull("cohort_end_date")) ==
                     as.Date(c("2020-01-03",
                               "2020-01-11", # now 11 instead of 8 (3 days overlap)
+                              "2020-01-21",
                               "2020-01-21"))))
 
 
