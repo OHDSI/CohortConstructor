@@ -226,6 +226,14 @@ padCohortStart <- function(cohort,
     dplyr::compute(name = tmpNewCohort, temporary = FALSE,
                    logPrefix = "CohortConstructor_.padCohortDate_intermediate_")
 
+  useIndexes <- getOption("CohortConstructor.use_indexes")
+  if (!isFALSE(useIndexes)) {
+    addIndex(
+      cohort = newCohort,
+      cols = c("subject_id", "cohort_start_date")
+    )
+  }
+
   # solve observation
   newCohort <- newCohort |>
     solveObservation(requireFullContribution, tmpNewCohort, cohortDate)

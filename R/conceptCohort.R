@@ -160,7 +160,8 @@ conceptCohort <- function(cdm,
     if (!isFALSE(useIndexes)) {
       addIndex(
         cohort = subsetIndividuals,
-        cols = "subject_id"
+        cols = "subject_id",
+        unique = TRUE
       )
     }
   } else {
@@ -639,7 +640,8 @@ getDomainCohort <- function(cdm,
     )
     addIndex(
       cohort = cdm[[paste0(tablePrefix, "temp_codelist")]],
-      cols = "concept_id"
+      cols = "concept_id",
+      unique = TRUE
     )
   }
   if (is.null(subsetIndividuals)) {
