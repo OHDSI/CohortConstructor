@@ -78,6 +78,14 @@ addIndex <- function(cohort, cols, unique = FALSE) {
     }
 
     suppressMessages(DBI::dbExecute(con, query))
+
+    # lastly, update statistics
+    query <- paste0(
+      "ANALYZE ",
+      paste0(schema, ".", prefix, name)
+    )
+    suppressMessages(DBI::dbExecute(con, query))
+
   }
 
   return(invisible(NULL))
