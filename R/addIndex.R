@@ -20,7 +20,7 @@ addCohortTableIndex <-  function(cohort) {
 }
 
 
-addIndex <- function(cohort, cols) {
+addIndex <- function(cohort, cols, unique = FALSE) {
   cdm <- omopgenerics::cdmReference(cohort)
   name <- omopgenerics::tableName(cohort)
 
@@ -59,14 +59,34 @@ addIndex <- function(cohort, cols) {
 
     cols <- paste0(cols, collapse = ",")
 
+    if(isFALSE(unique)){
+      query <- paste0(
+        "CREATE INDEX ON ",
+        paste0(schema, ".", prefix, name),
+        " (",
+        cols,
+        ");"
+      )
+    } else {
     query <- paste0(
-      "CREATE INDEX ON ",
+      "CREATE UNIQUE INDEX ON ",
       paste0(schema, ".", prefix, name),
       " (",
       cols,
       ");"
     )
+    }
+
     suppressMessages(DBI::dbExecute(con, query))
+
+    # lastly, update statistics
+    cli::cli_inform("Update statistics")
+    query <- paste0(
+      "ANALYZE ",
+      paste0(schema, ".", prefix, name)
+    )
+    suppressMessages(DBI::dbExecute(con, query))
+
   }
 
   return(invisible(NULL))
