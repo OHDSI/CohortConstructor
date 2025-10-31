@@ -2,8 +2,8 @@
 test_reporter <- function() {
   MultiReporter$new(
     reporters = list(
-      ProgressReporter$new(),
-      PerformanceReporter$new()
+      testthat::ProgressReporter$new(),
+      testthat::PerformanceReporter$new()
     )
   )
 }
