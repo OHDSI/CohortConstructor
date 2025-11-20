@@ -39,3 +39,16 @@ A cohort table
 \code{collapseCohorts()} concatenates cohort records, allowing for some number
 of days between one finishing and the next starting.
 }
+\examples{
+\donttest{
+library(CohortConstructor)
+cdm <- mockCohortConstructor()
+# collapse just cohort 1, with a gap of 7 days
+cdm$cohort1 <- cdm$cohort1 |>
+  collapseCohorts(cohortId = 1, gap = 7)
+
+# collapse both cohorts with a gap of 1 year, and change table name
+cdm$collapsed_cohort <- cdm$cohort1 |>
+  collapseCohorts(gap = 365, name = "collapsed_cohort")
+}
+}

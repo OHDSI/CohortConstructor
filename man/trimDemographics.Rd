@@ -45,11 +45,9 @@ specified demographic criteria is satisfied.
 \examples{
 \donttest{
 library(CohortConstructor)
-if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 cdm <- mockCohortConstructor()
 
 cdm$cohort1 |>
   trimDemographics(ageRange = list(c(10, 30)))
-}
 }
 }

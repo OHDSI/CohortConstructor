@@ -11,7 +11,6 @@
 #' @examples
 #' \donttest{
 #' library(CohortConstructor)
-#' if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 #' cdm <- mockCohortConstructor()
 #'
 #' settings(cdm$cohort1)
@@ -20,7 +19,6 @@
 #'   renameCohort(newCohortName = "new_name")
 #'
 #' settings(cdm$cohort1)
-#' }
 #' }
 renameCohort <- function(cohort,
                          newCohortName,

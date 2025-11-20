@@ -16,7 +16,6 @@
 #'
 #' @examples
 #' \donttest{
-#' if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 #' library(CohortConstructor)
 #'
 #' cdm <- mockCohortConstructor()
@@ -36,7 +35,6 @@
 #'
 #'attrition(cohort)
 #'}
-#' }
 demographicsCohort <- function(cdm,
                                name,
                                ageRange = NULL,

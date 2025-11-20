@@ -26,9 +26,7 @@ A new cohort table containing cohorts from the original cohort table.
 \examples{
 \donttest{
 library(CohortConstructor)
-if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 cdm <- mockCohortConstructor()
 cdm$cohort3 <- copyCohorts(cdm$cohort1, n = 2, cohortId = 1, name = "cohort3")
-}
 }
 }

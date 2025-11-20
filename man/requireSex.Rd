@@ -38,10 +38,8 @@ satisfy the specified sex criteria.
 \examples{
 \donttest{
 library(CohortConstructor)
-if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 cdm <- mockCohortConstructor()
 cdm$cohort1 |>
   requireSex(sex = "Female")
-}
 }
 }

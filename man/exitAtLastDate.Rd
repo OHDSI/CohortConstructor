@@ -51,7 +51,6 @@ column dates. The last date that occurs is chosen.
 \donttest{
 library(CohortConstructor)
 library(PatientProfiles)
-if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 cdm <- mockCohortConstructor()
 
 cdm$cohort1 <- cdm$cohort1 |>
@@ -60,6 +59,5 @@ cdm$cohort1 <- cdm$cohort1 |>
 
 cdm$cohort1 |>
   exitAtLastDate(dateColumns = c("next_obs", "future_observation"))
-}
 }
 }

@@ -19,7 +19,6 @@
 #' \donttest{
 #' library(CohortConstructor)
 #' library(PatientProfiles)
-#' if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 #' cdm <- mockCohortConstructor()
 #'
 #' cdm$cohort1 <- cdm$cohort1 |>
@@ -28,7 +27,6 @@
 #'
 #' cdm$cohort1 |>
 #'   exitAtFirstDate(dateColumns = c("next_obs", "future_observation"))
-#' }
 #' }
 exitAtFirstDate <- function(cohort,
                             dateColumns,
@@ -72,7 +70,6 @@ exitAtFirstDate <- function(cohort,
 #' \donttest{
 #' library(CohortConstructor)
 #' library(PatientProfiles)
-#' if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 #' cdm <- mockCohortConstructor()
 #'
 #' cdm$cohort1 <- cdm$cohort1 |>
@@ -81,7 +78,6 @@ exitAtFirstDate <- function(cohort,
 #'
 #' cdm$cohort1 |>
 #'   exitAtLastDate(dateColumns = c("next_obs", "future_observation"))
-#' }
 #' }
 exitAtLastDate <- function(cohort,
                            dateColumns,

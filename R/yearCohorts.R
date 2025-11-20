@@ -16,14 +16,12 @@
 #' @examples
 #' \donttest{
 #' library(CohortConstructor)
-#' if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 #' cdm <- mockCohortConstructor()
 #'
 #' cdm$cohort1 <- cdm$cohort1 |>
 #'   yearCohorts(years = 2000:2002)
 #'
 #' settings(cdm$cohort1)
-#' }
 #' }
 yearCohorts <- function(cohort,
                         years,

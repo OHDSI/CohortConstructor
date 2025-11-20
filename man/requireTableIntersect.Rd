@@ -68,13 +68,11 @@ a clinical table in some time window around an index date.
 \examples{
 \donttest{
 library(CohortConstructor)
-if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 cdm <- mockCohortConstructor()
 
 cdm$cohort1 |>
   requireTableIntersect(tableName = "drug_exposure",
                             indexDate = "cohort_start_date",
                             window = c(-Inf, 0))
-}
 }
 }
