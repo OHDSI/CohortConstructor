@@ -62,15 +62,18 @@ test_that("splitCohortTime works", {
       subject_id = c(1L, 1L, 2L),
       cohort_start_date = as.Date(c("2020-01-01", "2020-07-01", "2020-01-02")),
       cohort_end_date = as.Date(c("2020-01-31", "2020-07-23", "2020-02-01"))
-    )
+    ),
+    ignore_attr = TRUE
   )
   expect_equal(
     collectCohort(cdm$cohort1, 1),
-    collectCohort(cdm$cohort2, 3)
+    collectCohort(cdm$cohort2, 3),
+    ignore_attr = TRUE
   )
   expect_equal(
     collectCohort(cdm$cohort1, 1),
-    collectCohort(cdm$cohort2, 10)
+    collectCohort(cdm$cohort2, 10),
+    ignore_attr = TRUE
   )
 
   # check 1 day in split cohort, cohortId and keepOriginalCohorts ----
@@ -82,7 +85,8 @@ test_that("splitCohortTime works", {
       subject_id = c(1L, 1L, 2L),
       cohort_start_date = as.Date(c("2020-01-02", "2020-07-02", "2020-01-03")),
       cohort_end_date = as.Date(c("2020-01-23", "2020-07-23", "2020-01-24"))
-    )
+    ),
+    ignore_attr = TRUE
   )
   expect_equal(
     collectCohort(cdm$cohort3, 2),
@@ -90,7 +94,8 @@ test_that("splitCohortTime works", {
       subject_id = c(1L, 1L, 2L),
       cohort_start_date = as.Date(c("2020-01-23", "2020-07-23", "2020-01-24")),
       cohort_end_date = as.Date(c("2020-01-24", "2020-07-23", "2020-01-25"))
-    )
+    ),
+    ignore_attr = TRUE
   )
   expect_true(nrow(settings(cdm$cohort3)) == 2)
   expect_true(nrow(attrition(cdm$cohort3)) == 4)
@@ -114,7 +119,8 @@ test_that("splitCohortTime works", {
       cohort_name = c("cohort_1_1_to_22", paste0("cohort_", 1:3)),
       window = c("[1, 22]", NA, NA, NA),
       target_cohort_name = c("cohort_1", rep(NA, 3))
-    )
+    ),
+    ignore_attr = TRUE
   )
   expect_equal(
     attr(cdm$cohort1, "cohort_codelist") |> dplyr::collect(),
@@ -123,6 +129,7 @@ test_that("splitCohortTime works", {
       codelist_name = "a",
       "concept_id" = 1L,
       "codelist_type" = "index event"
-    )
+    ),
+    ignore_attr = TRUE
   )
 })
