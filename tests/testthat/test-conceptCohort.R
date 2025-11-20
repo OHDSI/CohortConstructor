@@ -298,7 +298,7 @@ test_that("initial tests", {
   )
   expect_true(nrow(cohort |> dplyr::collect()) == 1)
 
-  # merge and expand whene exit = start ----
+  # merge and expand when exit = start ----
   cdm$cohort1 <- conceptCohort(
     cdm = cdm, conceptSet = list(a = 43157344L), name = "cohort1", exit = "event_start_date", overlap = "merge"
   )
