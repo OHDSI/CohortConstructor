@@ -333,9 +333,9 @@ test_that("initial tests", {
   expect_equal(
     collectCohort(cdm$cohort, 2),
     dplyr::tibble(
-      subject_id = 1,
-      cohort_start_date = as.Date(c("2000-02-01")),
-      cohort_end_date = as.Date(c("2001-02-01"))
+      subject_id = 1:2,
+      cohort_start_date = as.Date(c("2000-02-01", "2000-02-01")),
+      cohort_end_date = as.Date(c("2001-02-01", "2000-04-02"))
     )
   )
 
