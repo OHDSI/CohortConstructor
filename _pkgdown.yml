@@ -58,6 +58,7 @@ reference:
 - contents:
   - yearCohorts
   - stratifyCohorts
+  - splitCohortTime
 - subtitle: Combine cohorts
 - contents:
   - intersectCohorts
