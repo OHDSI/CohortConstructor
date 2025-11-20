@@ -44,6 +44,7 @@ splitCohortTime <- function (cohort,
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
   window <- omopgenerics::validateWindowArgument(window)
+  omopgenerics::assertLogical(keepOriginalCohorts, length = 1)
 
   if (length(cohortId) == 0) {
     cli::cli_inform("Returning empty cohort as `cohortId` is not valid.")
@@ -82,18 +83,22 @@ splitCohortTime <- function (cohort,
     ) |>
     dplyr::cross_join(
       dplyr::tibble(
-        cohort_name = names(windows),
-        window_1 = purrr::map_chr(windows, ~ as.character(.x[1])),
-        window_2 = purrr::map_chr(windows, ~ as.character(.x[2]))
+        cohort_name = names(window),
+        window_1 = purrr::map_dbl(window, ~ .x[1]),
+        window_2 = purrr::map_dbl(window, ~ {if (is.infinite(.x[2])) NA_real_ else .x[2]})
       )
     ) |>
     dplyr::mutate(
       cohort_definition_id = dplyr::row_number(),
       cohort_name = paste0(.data$target_cohort_name, "_", .data$cohort_name),
-      window = paste0("[", .data$window_1, ", ", .data$window_2, "]")
+      window = dplyr::if_else(
+        is.na(.data$window_2),
+        paste0("[", .data$window_1, ", Inf]"),
+        paste0("[", .data$window_1, ", ", .data$window_2, "]")
+      )
     )
   cdm <- omopgenerics::insertTable(
-    cdm = cdm, name = newSetName, table = newSettings
+    cdm = cdm, name = newSetName, table = newSet
   )
   if (!isFALSE(useIndexes)) {
     addIndex(
@@ -106,7 +111,7 @@ splitCohortTime <- function (cohort,
   newAttrition <- attrition(cohort) |>
     dplyr::rename("target_cohort_id" = "cohort_definition_id") |>
     dplyr::inner_join(
-      newSettings |>
+      newSet |>
         dplyr::select(dplyr::all_of(c("cohort_definition_id", "target_cohort_id"))),
       by = "target_cohort_id"
     ) |>
@@ -114,9 +119,9 @@ splitCohortTime <- function (cohort,
   # New cohort codelist
   newCodelist <- attr(cohort, "cohort_codelist") |>
     dplyr::rename("target_cohort_id" = "cohort_definition_id") |>
-    dplyr::collact() |>
+    dplyr::collect() |>
     dplyr::inner_join(
-      newSettings |>
+      newSet |>
         dplyr::select(dplyr::all_of(c("cohort_definition_id", "target_cohort_id"))),
       by = "target_cohort_id"
     ) |>
@@ -124,9 +129,11 @@ splitCohortTime <- function (cohort,
 
   # cohort
   newCohortName <- omopgenerics::uniqueTableName(prefix = prefix)
+  colsDrop <- colnames(newSet)
+  colsDrop <- colsDrop[colsDrop != "target_cohort_id"]
   newCohort <- cohort |>
-    dplyr::select(!dplyr::any_of(colnames(newSet))) |>
-    PatientProfiles::addCohortName() |>
+    dplyr::rename("target_cohort_id" = "cohort_definition_id") |>
+    dplyr::select(!dplyr::any_of(colsDrop)) |>
     dplyr::compute(name = newCohortName, temporary = FALSE)
   if (!isFALSE(useIndexes)) {
     addIndex(
@@ -135,8 +142,8 @@ splitCohortTime <- function (cohort,
     )
   }
   newCohort <- newCohort |>
-    dplyr::inner_join(cdm[[newSetName]], by = "cohort_name") |>
-    dplyr::compute(name = newCohortName, temporary = FALSE) |>
+    dplyr::inner_join(cdm[[newSetName]], by = "target_cohort_id") |>
+    # dplyr::compute(name = newCohortName, temporary = FALSE) |>
     omopgenerics::newCohortTable(
       cohortSetRef = newSet |>
         dplyr::select(dplyr::all_of(c(
@@ -147,24 +154,25 @@ splitCohortTime <- function (cohort,
       cohortCodelistRef = newCodelist
     ) |>
     dplyr::mutate(
-      date_1 = clock::add_days(.data$cohort_start_date, .data$window_1),
+      date_1 = as.Date(clock::add_days(.data$cohort_start_date, .data$window_1)),
       date_2 = dplyr::if_else(
-        is.infinite(window_2),
+        is.na(.data$window_2),
         .data$cohort_end_date,
-        clock::add_days(.data$cohort_start_date, .data$window_2)
+        as.Date(clock::add_days(.data$cohort_start_date, .data$window_2))
       )
     ) |>
     # drop if start after cohort end
     dplyr::filter(.data$date_1 <= .data$cohort_end_date) |>
     # correct end date if > cohort end
     dplyr::mutate(
-      date_2 = dplyr::if_else(
-        .data$cohort_end_date > .data$date_2,
+      cohort_start_date = .data$date_1,
+      cohort_end_date = dplyr::if_else(
+        .data$cohort_end_date < .data$date_2,
         .data$cohort_end_date,
         .data$date_2
       )
     ) |>
-    dplyr::select(dplyr::all_of(omopgenerics::cohortColumns("cohort"))) |>
+    dplyr::select(dplyr::all_of(colnames(cohort))) |>
     dplyr::compute(name = newCohortName, temporary = FALSE)
 
   # Add reasons
