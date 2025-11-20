@@ -52,11 +52,13 @@ mockCohortConstructor <- function(source = "local") {
 
 checkGiBleed <- function() {
   if (!omock::isMockDatasetDownloaded("GiBleed")) {
+    # Non interactive --> download
     if (!interactive()) {
       omock::downloadMockDataset("GiBleed")
+      return(invisible(TRUE))
     }
 
-    # Ask user
+    # Interactive --> ask user
     cli::cli_inform("Synthetic GiBleed dataset not found. Download now?")
     download_now <- utils::menu(c("Yes", "No"))
 
