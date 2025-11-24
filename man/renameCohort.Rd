@@ -25,7 +25,6 @@ Utility function to change the name of a cohort.
 \examples{
 \donttest{
 library(CohortConstructor)
-if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 cdm <- mockCohortConstructor()
 
 settings(cdm$cohort1)
@@ -34,6 +33,5 @@ cdm$cohort1 <- cdm$cohort1 |>
   renameCohort(newCohortName = "new_name")
 
 settings(cdm$cohort1)
-}
 }
 }

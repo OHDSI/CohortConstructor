@@ -36,7 +36,6 @@ on specified columns on which to stratify on.
 \donttest{
 library(CohortConstructor)
 library(PatientProfiles)
-if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 cdm <- mockCohortConstructor()
 
 cdm$my_cohort <- cdm$cohort1 |>
@@ -51,6 +50,5 @@ cdm$my_cohort
 settings(cdm$my_cohort)
 
 attrition(cdm$my_cohort)
-}
 }
 }

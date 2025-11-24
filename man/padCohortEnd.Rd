@@ -61,11 +61,9 @@ the cohort entry will be dropped.
 \examples{
 \donttest{
 library(CohortConstructor)
-if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 cdm <- mockCohortConstructor()
 # add 10 days to each cohort exit
 cdm$cohort1 |>
   padCohortEnd(days = 10)
-}
 }
 }

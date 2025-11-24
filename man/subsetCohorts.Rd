@@ -25,11 +25,9 @@ from cohorts that are specified.
 \examples{
 \donttest{
 library(CohortConstructor)
-if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 cdm <- mockCohortConstructor()
 
 cdm$cohort1 |>
   subsetCohorts(cohortId = 1)
-}
 }
 }

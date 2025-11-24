@@ -42,7 +42,6 @@ that overlap combined and kept. Cohort entries are when an individual was in
 \examples{
 \donttest{
 library(CohortConstructor)
-if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 cdm <- mockCohortConstructor()
 
 cdm$cohort2 <- cdm$cohort2 |>
@@ -50,6 +49,5 @@ cdm$cohort2 <- cdm$cohort2 |>
 
 settings(cdm$cohort2)
 
-}
 }
 }

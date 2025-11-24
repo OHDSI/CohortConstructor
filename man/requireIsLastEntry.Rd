@@ -26,10 +26,8 @@ cohort entry per person.
 \examples{
 \donttest{
 library(CohortConstructor)
-if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 cdm <- mockCohortConstructor()
 cdm$cohort1 <- requireIsLastEntry(cdm$cohort1)
-}
 }
 
 }

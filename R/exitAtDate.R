@@ -27,10 +27,8 @@
 #' @examples
 #' \donttest{
 #' library(CohortConstructor)
-#' if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 #' cdm <- mockCohortConstructor()
 #' cdm$cohort1 |> exitAtObservationEnd()
-#' }
 #'}
 exitAtObservationEnd <- function(cohort,
                                  cohortId = NULL,
@@ -159,10 +157,8 @@ exitAtObservationEnd <- function(cohort,
 #' \donttest{
 #' library(PatientProfiles)
 #' library(CohortConstructor)
-#' if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 #' cdm <- mockPatientProfiles()
 #' cdm$cohort1 |> exitAtDeath()
-#' }
 #' }
 exitAtDeath <- function(cohort,
                         cohortId = NULL,

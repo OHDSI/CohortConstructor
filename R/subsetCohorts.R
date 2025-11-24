@@ -15,12 +15,10 @@
 #' @examples
 #' \donttest{
 #' library(CohortConstructor)
-#' if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 #' cdm <- mockCohortConstructor()
 #'
 #' cdm$cohort1 |>
 #'   subsetCohorts(cohortId = 1)
-#' }
 #' }
 subsetCohorts <- function(cohort,
                           cohortId,

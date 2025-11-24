@@ -44,9 +44,7 @@ entries will be merged.
 \donttest{
 library(PatientProfiles)
 library(CohortConstructor)
-if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 cdm <- mockPatientProfiles()
 cdm$cohort1 |> exitAtDeath()
-}
 }
 }

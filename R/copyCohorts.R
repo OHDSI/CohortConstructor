@@ -14,10 +14,8 @@
 #' @examples
 #' \donttest{
 #' library(CohortConstructor)
-#' if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 #' cdm <- mockCohortConstructor()
 #' cdm$cohort3 <- copyCohorts(cdm$cohort1, n = 2, cohortId = 1, name = "cohort3")
-#' }
 #' }
 copyCohorts <- function(cohort, name, n = 1, cohortId = NULL) {
   omopgenerics::validateCohortArgument(cohort)

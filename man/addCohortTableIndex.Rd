@@ -16,3 +16,10 @@ The cohort table
 Adds an index on subject_id and cohort_start_date to a cohort table. Note,
 currently only indexes will be added if the table is in a postgres database.
 }
+\examples{
+\donttest{
+library(CohortConstructor)
+cdm <- mockCohortConstructor()
+cdm$cohort1 <- addCohortTableIndex(cdm$cohort1)
+}
+}
