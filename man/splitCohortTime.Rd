@@ -45,7 +45,7 @@ cdm <- mockCohortConstructor()
 # cohorts with this function
 cdm$pregnancy_trimesters <- splitCohortTime(
   cohort = cdm$cohort1,
-  windows = list(
+  window = list(
     "trimester_1" = c(0, 90),
     "trimester_2" = c(91,180),
     "trimester_3" = c(181, Inf)
