@@ -52,7 +52,7 @@ records from cohorts with a minimum number of individuals"><meta property="og:im
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Filter cohorts to keep only records for those with a minimum amount of subjects</h1>
-      <small class="dont-index">Source: <a href="https://github.com/OHDSI/CohortConstructor/blob/v0.6.0/R/requireMinCohortCount.R" class="external-link"><code>R/requireMinCohortCount.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/OHDSI/CohortConstructor/blob/main/R/requireMinCohortCount.R" class="external-link"><code>R/requireMinCohortCount.R</code></a></small>
       <div class="d-none name"><code>requireMinCohortCount.Rd</code></div>
     </div>
 
@@ -112,12 +112,25 @@ that the affected cohorts have been suppressed.</p></dd>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ohdsi.github.io/CohortConstructor/">CohortConstructor</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Logic.html" class="external-link">isTRUE</a></span><span class="op">(</span><span class="fu">omock</span><span class="fu">::</span><span class="fu"><a href="https://ohdsi.github.io/omock/reference/isMockDatasetDownloaded.html" class="external-link">isMockDatasetDownloaded</a></span><span class="op">(</span><span class="st">"GiBleed"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span></span>
 <span class="r-in"><span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="mockCohortConstructor.html">mockCohortConstructor</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Reading <span style="color: #0000BB;">GiBleed</span> tables.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">cdm</span><span class="op">$</span><span class="va">cohort1</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span><span class="fu">requireMinCohortCount</span><span class="op">(</span><span class="fl">5</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 63 × 4</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    cohort_definition_id subject_id cohort_start_date cohort_end_date</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  <span style="color: #BCBCBC;">*</span>                <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>         </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>                    1          1 2016-08-11        2016-08-21     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>                    1          2 2010-08-06        2010-08-24     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>                    1          3 1997-04-17        1998-07-22     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>                    1          4 2000-04-09        2003-06-04     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>                    1          5 2003-04-19        2004-03-28     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>                    1          6 2014-12-15        2017-03-11     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>                    1          7 2013-10-09        2015-06-13     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>                    1          8 2012-11-26        2016-01-09     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>                    1          9 2005-06-01        2006-10-26     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>                    1         10 2013-03-29        2013-04-21     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 53 more rows</span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
@@ -130,7 +143,7 @@ that the affected cohorts have been suppressed.</p></dd>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

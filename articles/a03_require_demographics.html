@@ -84,7 +84,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Applying demographic requirements to a cohort</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/OHDSI/CohortConstructor/blob/v0.6.0/vignettes/a03_require_demographics.Rmd" class="external-link"><code>vignettes/a03_require_demographics.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/OHDSI/CohortConstructor/blob/main/vignettes/a03_require_demographics.Rmd" class="external-link"><code>vignettes/a03_require_demographics.Rmd</code></a></small>
       <div class="d-none name"><code>a03_require_demographics.Rmd</code></div>
     </div>
 
@@ -111,7 +111,9 @@ synthetic data.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ohdsi.github.io/omock/reference/mockCdmFromDataset.html" class="external-link">mockCdmFromDataset</a></span><span class="op">(</span>datasetName <span class="op">=</span> <span class="st">"GiBleed"</span>, source <span class="op">=</span> <span class="st">"duckdb"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Reading <span style="color: #0000BB;">GiBleed</span> tables.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Adding <span style="color: #0000BB;">drug_strength</span> table.</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Adding <span style="color: #0000BB;">drug_strength</span> table.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Creating local <span style="color: #0000BB;">&lt;cdm_reference&gt;</span> object.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Inserting <span style="color: #0000BB;">&lt;cdm_reference&gt;</span> into <span style="color: #0000BB;">duckdb</span>.</span></span></code></pre></div>
 <p>Let’s start by creating a cohort of people with a fracture. We’ll
 first look for codes that might represent a fracture and the build a
 cohort using these codes, setting cohort exit to 180 days after the
@@ -230,7 +232,7 @@ function.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

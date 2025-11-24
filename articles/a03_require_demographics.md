@@ -1,0 +1,143 @@
+# Applying demographic requirements to a cohort
+
+``` r
+library(CodelistGenerator)
+library(CohortConstructor)
+library(CohortCharacteristics)
+library(ggplot2)
+library(omock)
+library(dplyr)
+#> 
+#> Attaching package: 'dplyr'
+#> The following objects are masked from 'package:stats':
+#> 
+#>     filter, lag
+#> The following objects are masked from 'package:base':
+#> 
+#>     intersect, setdiff, setequal, union
+```
+
+In this vignette we’ll show how requirements related to patient
+demographics can be applied to a cohort. Again we’ll use the Eunomia
+synthetic data.
+
+``` r
+cdm <- mockCdmFromDataset(datasetName = "GiBleed", source = "duckdb")
+#> ℹ Reading GiBleed tables.
+#> ℹ Adding drug_strength table.
+#> ℹ Creating local <cdm_reference> object.
+#> ℹ Inserting <cdm_reference> into duckdb.
+```
+
+Let’s start by creating a cohort of people with a fracture. We’ll first
+look for codes that might represent a fracture and the build a cohort
+using these codes, setting cohort exit to 180 days after the fracture.
+
+``` r
+fracture_codes <- getCandidateCodes(cdm, "fracture")
+#> Limiting to domains of interest
+#> Getting concepts to include
+#> Adding descendants
+#> Search completed. Finishing up.
+#> ✔ 9 candidate concepts identified
+#> 
+#> Time taken: 0 minutes and 0 seconds
+fracture_codes <- list("fracture" = fracture_codes$concept_id)
+cdm$fracture <- conceptCohort(cdm = cdm, 
+                                 conceptSet = fracture_codes, 
+                                 name = "fracture")
+#> ℹ Subsetting table condition_occurrence using 9 concepts with domain:
+#>   condition.
+#> ℹ Combining tables.
+#> ℹ Creating cohort attributes.
+#> ℹ Applying cohort requirements.
+#> ℹ Merging overlapping records.
+#> ✔ Cohort fracture created.
+
+summary_attrition <- summariseCohortAttrition(cdm$fracture)
+plotCohortAttrition(summary_attrition)
+```
+
+## Restrict cohort by age
+
+We can choose a specific age range for individuals in our cohort using
+[`requireAge()`](https://ohdsi.github.io/CohortConstructor/reference/requireAge.md)
+from CohortConstructor.
+
+``` r
+cdm$fracture <- cdm$fracture |> 
+  requireAge(indexDate = "cohort_start_date",
+             ageRange = list(c(18, 100)))
+
+summary_attrition <- summariseCohortAttrition(cdm$fracture)
+plotCohortAttrition(summary_attrition)
+```
+
+Note that by default individuals are filtered based on the age they were
+when they entered the cohort.
+
+## Restrict cohort by sex
+
+We can also specify a sex criteria for individuals in our cohort using
+[`requireSex()`](https://ohdsi.github.io/CohortConstructor/reference/requireSex.md)
+from CohortConstructor.
+
+``` r
+cdm$fracture <- cdm$fracture |> 
+  requireSex(sex = "Female")
+
+summary_attrition <- summariseCohortAttrition(cdm$fracture)
+plotCohortAttrition(summary_attrition)
+```
+
+## Restrict cohort by number of prior observations
+
+We can also specify a minimum number of days of prior observations for
+each individual using
+[`requirePriorObservation()`](https://ohdsi.github.io/CohortConstructor/reference/requirePriorObservation.md)
+from CohortConstructor.
+
+``` r
+cdm$fracture <- cdm$fracture |> 
+  requirePriorObservation(indexDate = "cohort_start_date",
+                          minPriorObservation = 365)
+
+summary_attrition <- summariseCohortAttrition(cdm$fracture)
+#> `min_prior_observation` casted to character.
+plotCohortAttrition(summary_attrition)
+```
+
+As well as specifying a minimum amount of prior observation, we can
+require some mimimum amount of follow-up by using
+[`requireFutureObservation()`](https://ohdsi.github.io/CohortConstructor/reference/requireFutureObservation.md)
+in a similar way.
+
+## Applying multiple demographic requirements to a cohort
+
+We can implement multiple demographic requirements at the same time by
+using the more general
+[`requireDemographics()`](https://ohdsi.github.io/CohortConstructor/reference/requireDemographics.md)
+function.
+
+``` r
+cdm$fracture <- conceptCohort(cdm = cdm, 
+                                 conceptSet = fracture_codes, 
+                                 name = "fracture") |> 
+  requireDemographics(indexDate = "cohort_start_date",
+                      ageRange = c(18,100),
+                      sex = "Female",
+                      minPriorObservation = 365, 
+                      minFutureObservation = 30)
+#> ℹ Subsetting table condition_occurrence using 9 concepts with domain:
+#>   condition.
+#> ℹ Combining tables.
+#> ℹ Creating cohort attributes.
+#> ℹ Applying cohort requirements.
+#> ℹ Merging overlapping records.
+#> ✔ Cohort fracture created.
+
+summary_attrition <- summariseCohortAttrition(cdm$fracture)
+#> `min_prior_observation` and `min_future_observation` casted to
+#> character.
+plotCohortAttrition(summary_attrition)
+```

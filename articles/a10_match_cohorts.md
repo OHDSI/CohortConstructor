@@ -1,0 +1,142 @@
+# Generating a matched cohort
+
+## Introduction
+
+CohortConstructor packages includes a function to obtain an age and sex
+matched cohort, the
+[`matchCohorts()`](https://ohdsi.github.io/CohortConstructor/reference/matchCohorts.md)
+function. In this vignette, we will explore the usage of this function.
+
+### Create mock data
+
+We will first use `mockDrugUtilisation()` function from DrugUtilisation
+package to create mock data.
+
+``` r
+library(CohortConstructor)
+library(dplyr)
+
+cdm <- mockCohortConstructor(nPerson = 1000)
+```
+
+As we will use `cohort1` to explore
+[`matchCohorts()`](https://ohdsi.github.io/CohortConstructor/reference/matchCohorts.md),
+let us first use
+[`settings()`](https://darwin-eu.github.io/omopgenerics/reference/settings.html)
+from omopgenerics package to explore this cohort:
+
+``` r
+settings(cdm$cohort1)
+```
+
+## Use matchCohorts() to create an age-sex matched cohort
+
+Let us first see an example of how this function works. For its usage,
+we need to provide a `cdm` object, the `targetCohortName`, which is the
+name of the table containing the cohort of interest, and the `name` of
+the new generated tibble containing the cohort and the matched cohort.
+We will also use the argument `targetCohortId` to specify that we only
+want a matched cohort for `cohort_definition_id = 1`.
+
+``` r
+cdm$matched_cohort1 <- matchCohorts(
+  cohort = cdm$cohort1,
+  cohortId = 1,
+  name = "matched_cohort1")
+
+settings(cdm$matched_cohort1)
+```
+
+Notice that in the generated tibble, there are two cohorts:
+`cohort_definition_id = 1` (original cohort), and
+`cohort_definition_id = 4` (matched cohort). *target_cohort_name* column
+indicates which is the original cohort. *match_sex* and
+*match_year_of_birth* adopt boolean values (`TRUE`/`FALSE`) indicating
+if we have matched for sex and age, or not. *match_status* indicate if
+it is the original cohort (`target`) or if it is the matched cohort
+(`matched`). *target_cohort_id* indicates which is the cohort_id of the
+original cohort.
+
+Check the exclusion criteria applied to generate the new cohorts by
+using
+[`attrition()`](https://darwin-eu.github.io/omopgenerics/reference/attrition.html)
+from omopgenerics package:
+
+``` r
+# Original cohort
+attrition(cdm$matched_cohort1) |> filter(cohort_definition_id == 1)
+
+# Matched cohort
+attrition(cdm$matched_cohort1) |> filter(cohort_definition_id == 4)
+```
+
+Briefly, from the original cohort, we exclude first those individuals
+that do not have a match, and then individuals that their matching pair
+is not in observation during the assigned *cohort_start_date*. From the
+matched cohort, we start from the whole database and we first exclude
+individuals that are in the original cohort. Afterwards, we exclude
+individuals that do not have a match, then individuals that are not in
+observation during the assigned *cohort_start_date*, and finally we
+remove as many individuals as required to fulfill the ratio.
+
+Notice that matching pairs are randomly assigned, so it is probable that
+every time you execute this function, the generated cohorts change. Use
+[`set.seed()`](https://rdrr.io/r/base/Random.html) to avoid this.
+
+### matchSex parameter
+
+`matchSex` is a boolean parameter (`TRUE`/`FALSE`) indicating if we want
+to match by sex (`TRUE`) or we do not want to (`FALSE`).
+
+### matchYear parameter
+
+`matchYear` is another boolean parameter (`TRUE`/`FALSE`) indicating if
+we want to match by age (`TRUE`) or we do not want (`FALSE`).
+
+Notice that if `matchSex = FALSE` and `matchYear = FALSE`, we will
+obtain an unmatched comparator cohort.
+
+### ratio parameter
+
+The default matching ratio is 1:1 (`ratio = 1`). Use
+[`cohortCount()`](https://darwin-eu.github.io/omopgenerics/reference/cohortCount.html)
+to check if the matching has been done as desired.
+
+``` r
+cohortCount(cdm$matched_cohort1)
+```
+
+You can modify the `ratio` parameter to tailor your matched cohort.
+`ratio` can adopt values from 1 to Inf.
+
+``` r
+cdm$matched_cohort2 <- matchCohorts(
+  cohort = cdm$cohort1,
+  cohortId = 1,
+  name = "matched_cohort2",
+  ratio = Inf)
+
+cohortCount(cdm$matched_cohort2)
+```
+
+### Generate matched cohorts simultaneously across multiple cohorts
+
+All these functionalities can be implemented across multiple cohorts
+simultaneously. Specify in `targetCohortId` parameter which are the
+cohorts of interest. If set to NULL, all the cohorts present in
+`targetCohortName` will be matched.
+
+``` r
+cdm$matched_cohort3 <- matchCohorts(
+  cohort = cdm$cohort1,
+  cohortId = c(1,3),
+  name = "matched_cohort3",
+  ratio = 2)
+
+settings(cdm$matched_cohort3) |> arrange(cohort_definition_id)
+
+cohortCount(cdm$matched_cohort3) |> arrange(cohort_definition_id)
+```
+
+Notice that each cohort has their own (and independent of other cohorts)
+matched cohort.

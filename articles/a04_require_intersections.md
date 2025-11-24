@@ -1,0 +1,211 @@
+# Applying requirements related to other cohorts, concept sets, or tables
+
+``` r
+library(omock)
+library(dplyr)
+library(CodelistGenerator)
+library(CohortConstructor)
+library(CohortCharacteristics)
+library(visOmopResults)
+library(ggplot2)
+```
+
+For this example we’ll use the Eunomia synthetic data from the
+[omock](https://ohdsi.github.io/omock/) package.
+
+``` r
+cdm <- mockCdmFromDataset(datasetName = "GiBleed", source = "duckdb")
+```
+
+Let’s start by creating a cohort of warfarin users.
+
+``` r
+warfarin_codes <- getDrugIngredientCodes(cdm, "warfarin")
+cdm$warfarin <- conceptCohort(cdm = cdm, 
+                                 conceptSet = warfarin_codes, 
+                                 name = "warfarin")
+cohortCount(cdm$warfarin)
+#> # A tibble: 1 × 3
+#>   cohort_definition_id number_records number_subjects
+#>                  <int>          <int>           <int>
+#> 1                    1            137             137
+```
+
+As well as our warfarin cohort, let’s also make another cohort
+containing individuals with a record of a GI bleed. Later we’ll use this
+cohort when specifying inclusion/ exclusion criteria.
+
+``` r
+cdm$gi_bleed <- conceptCohort(cdm = cdm,  
+                              conceptSet = list("gi_bleed" = 192671L),
+                              name = "gi_bleed")
+```
+
+## Restrictions on cohort presence
+
+We could require that individuals in our medication cohorts are seen (or
+not seen) in another cohort. To do this we can use the
+[`requireCohortIntersect()`](https://ohdsi.github.io/CohortConstructor/reference/requireCohortIntersect.md)
+function. Here, for example, we require that individuals have one or
+more intersections with the GI bleed cohort.
+
+``` r
+cdm$warfarin_gi_bleed <- cdm$warfarin  |>
+  requireCohortIntersect(intersections = c(1,Inf),
+                         targetCohortTable = "gi_bleed", 
+                         targetCohortId = 1,
+                         indexDate = "cohort_start_date", 
+                         window = c(-Inf, 0), 
+                         name = "warfarin_gi_bleed")
+
+summary_attrition <- summariseCohortAttrition(cdm$warfarin_gi_bleed)
+plotCohortAttrition(summary_attrition)
+```
+
+The flow chart above illustrates the changes to the cohort of users of
+acetaminophen when restricted to only include individuals who have at
+least one record in the GI bleed cohort before their start date for
+acetaminophen.
+
+Instead of requiring that individuals have a record in the GI bleed
+cohort, we could instead require that they don’t. In this case we can
+again use the
+[`requireCohortIntersect()`](https://ohdsi.github.io/CohortConstructor/reference/requireCohortIntersect.md)
+function, but this time we set the intersections argument to 0 so as to
+require individuals’ absence in this other cohort.
+
+``` r
+cdm$warfarin_no_gi_bleed <- cdm$warfarin |>
+  requireCohortIntersect(intersections = 0,
+                         targetCohortTable = "gi_bleed", 
+                         targetCohortId = 1,
+                         indexDate = "cohort_start_date", 
+                         window = c(-Inf, 0), 
+                         name = "warfarin_no_gi_bleed") 
+
+summary_attrition <- summariseCohortAttrition(cdm$warfarin_no_gi_bleed)
+plotCohortAttrition(summary_attrition)
+```
+
+We can also apply restrictions related to multiple cohorts at the same
+time. Here, for example, we require individuals to be in one of our
+injury cohorts in the prior year.
+
+``` r
+cdm$injuries <- conceptCohort(
+  cdm = cdm,
+  name = "injuries",
+  conceptSet = list(
+    "ankle_sprain" = 81151,
+    "ankle_fracture" = 4059173,
+    "forearm_fracture" = 4278672,
+    "hip_fracture" = 4230399
+  ),
+  exit = "event_start_date"
+)
+
+
+cdm$warfarin_any_injury <- cdm$warfarin |>
+  requireCohortIntersect(intersections = c(1, Inf),
+                         cohortCombinationCriteria = "any",
+                         targetCohortTable = "injuries", 
+                         indexDate = "cohort_start_date", 
+                         window = c(-Inf, 0), 
+                         name = "warfarin_any_injury") 
+
+summary_attrition <- summariseCohortAttrition(cdm$warfarin_any_injury)
+plotCohortAttrition(summary_attrition)
+```
+
+We could instead require them to be in all of our injury cohorts
+
+``` r
+cdm$warfarin_any_injury <- cdm$warfarin |>
+  requireCohortIntersect(intersections = c(1, Inf),
+                         cohortCombinationCriteria = "all",
+                         targetCohortTable = "injuries", 
+                         indexDate = "cohort_start_date", 
+                         window = c(-Inf, 0), 
+                         name = "warfarin_any_injury") 
+
+summary_attrition <- summariseCohortAttrition(cdm$warfarin_any_injury)
+plotCohortAttrition(summary_attrition)
+```
+
+Or, we could require them to be in at least 2 of our injury cohorts
+
+``` r
+cdm$warfarin_any_injury <- cdm$warfarin |>
+  requireCohortIntersect(intersections = c(1, Inf),
+                         cohortCombinationCriteria = c(2, Inf),
+                         targetCohortTable = "injuries", 
+                         indexDate = "cohort_start_date", 
+                         window = c(-Inf, 0), 
+                         name = "warfarin_any_injury") 
+
+summary_attrition <- summariseCohortAttrition(cdm$warfarin_any_injury)
+plotCohortAttrition(summary_attrition)
+```
+
+## Restrictions on concept presence
+
+We could require that individuals in our medication cohorts have been
+seen (or not seen) to have events related to a concept list. To do this
+we can use the
+[`requireConceptIntersect()`](https://ohdsi.github.io/CohortConstructor/reference/requireConceptIntersect.md)
+function, allowing us to filter our cohort based on whether they have or
+have not had events of GI bleeding before they entered the cohort.
+
+``` r
+cdm$warfarin_gi_bleed <- cdm$warfarin  |>
+  requireConceptIntersect(conceptSet = list("gi_bleed" = 192671), 
+                         indexDate = "cohort_start_date", 
+                         window = c(-Inf, 0), 
+                         name = "warfarin_gi_bleed")
+
+summary_attrition <- summariseCohortAttrition(cdm$warfarin_gi_bleed)
+plotCohortAttrition(summary_attrition)
+```
+
+The flow chart above illustrates the changes to cohort 1 when restricted
+to only include individuals who have had events of GI bleeding at least
+once before the cohort start date. 2,296 individuals and 8,765 records
+were excluded.
+
+Instead of requiring that individuals have events of GI bleeding, we
+could instead require that they don’t have any events of it. In this
+case we can again use the
+[`requireConceptIntersect()`](https://ohdsi.github.io/CohortConstructor/reference/requireConceptIntersect.md)
+function, but this time set the intersections argument to 0 to require
+individuals without past events of GI bleeding.
+
+``` r
+cdm$warfarin_no_gi_bleed <- cdm$warfarin  |>
+  requireConceptIntersect(intersections = 0,
+                         conceptSet = list("gi_bleed" = 192671), 
+                         indexDate = "cohort_start_date", 
+                         window = c(-Inf, 0), 
+                         name = "warfarin_no_gi_bleed")
+
+summary_attrition <- summariseCohortAttrition(cdm$warfarin_no_gi_bleed)
+plotCohortAttrition(summary_attrition)
+```
+
+## Restrictions on presence in clinical tables
+
+We can also impose requirements around individuals presence (or absence)
+in clinical tables in the OMOP CDM using the
+[`requireTableIntersect()`](https://ohdsi.github.io/CohortConstructor/reference/requireTableIntersect.md)
+function. Here for example we reuire that individuals in our warfarin
+cohort have at least one prior record in the visit occurrence table.
+
+``` r
+cdm$warfarin_visit <- cdm$warfarin  |>
+  requireTableIntersect(tableName = "visit_occurrence",
+                         indexDate = "cohort_start_date", 
+                         window = c(-Inf, -1), 
+                         name = "warfarin_visit")
+
+summary_attrition <- summariseCohortAttrition(cdm$warfarin_visit)
+plotCohortAttrition(summary_attrition)
+```
