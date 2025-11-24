@@ -30,14 +30,12 @@
 #' @examples
 #' \donttest{
 #' library(CohortConstructor)
-#' if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 #' cdm <- mockCohortConstructor()
 #' cdm$cohort1 |>
 #'   requireCohortIntersect(targetCohortTable = "cohort2",
 #'                          targetCohortId = 1,
 #'                          indexDate = "cohort_start_date",
 #'                          window = c(-Inf, 0))
-#' }
 #' }
 requireCohortIntersect <- function(cohort,
                                    targetCohortTable,

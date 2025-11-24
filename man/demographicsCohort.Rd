@@ -35,7 +35,6 @@ cohort entry ends.
 }
 \examples{
 \donttest{
-if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 library(CohortConstructor)
 
 cdm <- mockCohortConstructor()
@@ -54,6 +53,5 @@ cohort <- cdm |>
     minPriorObservation = 365)
 
 attrition(cohort)
-}
 }
 }

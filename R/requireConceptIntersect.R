@@ -20,7 +20,6 @@
 #' @examples
 #' \donttest{
 #' library(CohortConstructor)
-#' if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 #' cdm <- mockCohortConstructor()
 #'
 #' cdm$cohort2 <-  requireConceptIntersect(
@@ -28,8 +27,7 @@
 #'   conceptSet = list(a = 194152),
 #'   window = c(-Inf, 0),
 #'   name = "cohort2")
-#'   }
-#'   }
+#' }
 requireConceptIntersect <- function(cohort,
                                     conceptSet,
                                     window,

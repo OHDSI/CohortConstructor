@@ -20,13 +20,11 @@
 #' @examples
 #' \donttest{
 #' library(CohortConstructor)
-#' if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 #' cdm <- mockCohortConstructor()
 #'
 #' cdm$cohort1 |>
 #'   requireInDateRange(indexDate = "cohort_start_date",
 #'                      dateRange = as.Date(c("2010-01-01", "2019-01-01")))
-#' }
 #' }
 requireInDateRange <- function(cohort,
                                dateRange,
@@ -182,14 +180,12 @@ requireInDateRange <- function(cohort,
 #' @examples
 #' \donttest{
 #' library(CohortConstructor)
-#' if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 #' cdm <- mockCohortConstructor()
 #' cdm$cohort1 |>
 #'   trimToDateRange(startDate = "cohort_start_date",
 #'                   endDate = "cohort_end_date",
 #'                   dateRange = as.Date(c("2015-01-01",
 #'                                         "2015-12-31")))
-#' }
 #' }
 trimToDateRange <- function(cohort,
                             dateRange,

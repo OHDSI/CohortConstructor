@@ -19,10 +19,8 @@ demonstrating and testing the package
 \examples{
 \donttest{
 library(CohortConstructor)
-if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 cdm <- mockCohortConstructor()
 
 cdm
-}
 }
 }

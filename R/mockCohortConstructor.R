@@ -12,18 +12,13 @@
 #' @examples
 #' \donttest{
 #' library(CohortConstructor)
-#' if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 #' cdm <- mockCohortConstructor()
 #'
 #' cdm
 #' }
-#' }
 mockCohortConstructor <- function(source = "local") {
   rlang::check_installed("omock")
-  if(isFALSE(omock::isMockDatasetDownloaded("GiBleed"))){
-    cli::cli_abort(c("Synthetic GiBleed dataset must already be downloaded to use mockCohortConstructor()",
-                     i = "Use {.code omock::downloadMockDataset(datasetName = 'GiBleed')} to download"))
-  }
+  checkGiBleed()
   omopgenerics::assertChoice(source, c("local", "duckdb"), length = 1)
 
   cdm <- omock::mockVocabularySet(vocabularySet = "GiBleed") |>
@@ -53,4 +48,28 @@ mockCohortConstructor <- function(source = "local") {
   }
 
   return(cdm)
+}
+
+checkGiBleed <- function() {
+  if (!omock::isMockDatasetDownloaded("GiBleed")) {
+    # Non interactive --> download
+    if (!interactive()) {
+      omock::downloadMockDataset("GiBleed")
+      return(invisible(TRUE))
+    }
+
+    # Interactive --> ask user
+    cli::cli_inform("Synthetic GiBleed dataset not found. Download now?")
+    download_now <- utils::menu(c("Yes", "No"))
+
+    if (download_now == 1) {
+      omock::downloadMockDataset("GiBleed")
+      cli::cli_alert_success("GiBleed dataset downloaded.")
+    } else {
+      cli::cli_abort(c(
+        "Synthetic GiBleed dataset must be downloaded.",
+        i = "Run {.code omock::downloadMockDataset('GiBleed')}."
+      ))
+    }
+  }
 }

@@ -9,6 +9,12 @@
 #' @return The cohort table
 #' @export
 #'
+#' @examples
+#' \donttest{
+#' library(CohortConstructor)
+#' cdm <- mockCohortConstructor()
+#' cdm$cohort1 <- addCohortTableIndex(cdm$cohort1)
+#' }
 addCohortTableIndex <-  function(cohort) {
 
   cohort <- omopgenerics::validateCohortArgument(cohort)

@@ -49,7 +49,6 @@ column dates. The last date is chosen.
 }
 \examples{
 \donttest{
-if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 library(CohortConstructor)
 library(PatientProfiles)
 
@@ -66,6 +65,5 @@ cdm$cohort1 <- cdm$cohort1 |>
 
 cdm$cohort1 |>
   entryAtLastDate(dateColumns = c("prior_drug", "prior_observation"))
-}
 }
 }

@@ -27,21 +27,23 @@ test_that("initial tests", {
   cdm <- omopgenerics::insertTable(
     cdm = cdm, name = "drug_exposure",
     table = dplyr::tibble(
-      "drug_exposure_id" = 1:15 |> as.integer(),
-      "person_id" = c(1, 1, 1, 2, 2, 3, 1, 2, 3, 1, 1, 1, 1, 1, 2) |> as.integer(),
-      "drug_concept_id" = c(1, 1,  1, 1, 1, 2, 3, 3, 5, 1177480L, 1177480L, 1177480L, 43157344L, 43157344L, 43157344L) |> as.integer(),
+      "drug_exposure_id" = 1:17 |> as.integer(),
+      "person_id" = c(1, 1, 1, 2, 2, 3, 1, 2, 3, 1, 1, 1, 1, 1, 2, 2, 2) |> as.integer(),
+      "drug_concept_id" = c(1, 1,  1, 1, 1, 2, 3, 3, 5, 1177480L, 1177480L, 1177480L, 43157344L, 43157344L, 43157344L, 43157344L, 43157344L) |> as.integer(),
       "drug_exposure_start_date" = as.Date(c(
         "2020-07-11", "2020-10-27", "2024-02-09", "2022-01-20", "2023-01-11",
         "2022-03-11", "2020-01-01", "2020-01-04", "2005-01-04", "2000-01-01",
-        "2001-08-01", "2000-03-01", "2000-11-01", "2000-02-01", "1999-11-01"
+        "2001-08-01", "2000-03-01", "2000-11-01", "2000-02-01", "1999-11-01",
+        "2000-02-01", "2000-02-02"
       )),
       "drug_exposure_end_date" = as.Date(c(
         "2020-11-11", "2020-10-29", "2024-02-10", "2022-01-21", "2023-01-12",
         "2022-03-12", "2020-01-10", "2020-01-14", "2005-01-04", "2000-10-02",
-        "2001-08-03", "2000-03-01", "2000-11-01", "2001-02-01", "2001-02-01"
+        "2001-08-03", "2000-03-01", "2000-11-01", "2001-02-01", "2001-02-01",
+        "2000-03-01", "2000-04-02"
       )),
       "drug_type_concept_id" = 1L,
-      "drug_source_concept_id" = c(rep(NA_integer_, 7), 99L, rep(NA_integer_, 7))
+      "drug_source_concept_id" = c(rep(NA_integer_, 7), 99L, rep(NA_integer_, 9))
     )
   )
   # end date < start date
@@ -296,6 +298,19 @@ test_that("initial tests", {
   )
   expect_true(nrow(cohort |> dplyr::collect()) == 1)
 
+  # merge and expand when exit = start ----
+  cdm$cohort1 <- conceptCohort(
+    cdm = cdm, conceptSet = list(a = 43157344L), name = "cohort1", exit = "event_start_date", overlap = "merge"
+  )
+  cdm$cohort2 <- conceptCohort(
+    cdm = cdm, conceptSet = list(a = 43157344L), name = "cohort2", exit = "event_start_date", overlap = "extend"
+  )
+  expect_equal(collectCohort(cdm$cohort1, 1), collectCohort(cdm$cohort2, 1))
+  expect_equal(
+    collectCohort(cdm$cohort1, 1)$cohort_start_date |> sort(),
+    as.Date(c("2000-02-01", "2000-02-01", "2000-02-02", "2000-11-01"))
+  )
+
   # Concept set expression ----
   codes <- CodelistGenerator::codesFromConceptSet(
     cdm = cdm,
@@ -318,9 +333,9 @@ test_that("initial tests", {
   expect_equal(
     collectCohort(cdm$cohort, 2),
     dplyr::tibble(
-      subject_id = 1,
-      cohort_start_date = as.Date(c("2000-02-01")),
-      cohort_end_date = as.Date(c("2001-02-01"))
+      subject_id = 1:2,
+      cohort_start_date = as.Date(c("2000-02-01", "2000-02-01")),
+      cohort_end_date = as.Date(c("2001-02-01", "2000-04-02"))
     )
   )
 

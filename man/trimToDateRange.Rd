@@ -50,13 +50,11 @@ specified date range.
 \examples{
 \donttest{
 library(CohortConstructor)
-if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 cdm <- mockCohortConstructor()
 cdm$cohort1 |>
   trimToDateRange(startDate = "cohort_start_date",
                   endDate = "cohort_end_date",
                   dateRange = as.Date(c("2015-01-01",
                                         "2015-12-31")))
-}
 }
 }

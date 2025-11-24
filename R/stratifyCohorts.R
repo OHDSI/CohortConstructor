@@ -18,7 +18,6 @@
 #' \donttest{
 #' library(CohortConstructor)
 #' library(PatientProfiles)
-#' if(isTRUE(omock::isMockDatasetDownloaded("GiBleed"))){
 #' cdm <- mockCohortConstructor()
 #'
 #' cdm$my_cohort <- cdm$cohort1 |>
@@ -33,7 +32,6 @@
 #' settings(cdm$my_cohort)
 #'
 #' attrition(cdm$my_cohort)
-#'}
 #'}
 stratifyCohorts <- function(cohort,
                             strata,
