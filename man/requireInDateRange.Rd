@@ -45,8 +45,18 @@ which the index date is within the specified date range.
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
 
-cdm$cohort1 |>
-  requireInDateRange(indexDate = "cohort_start_date",
-                     dateRange = as.Date(c("2010-01-01", "2019-01-01")))
+cdm$cohort2 <- cdm$cohort1 |>
+  requireInDateRange(
+    indexDate = "cohort_start_date",
+    dateRange = as.Date(c("2010-01-01", "2019-01-01")),
+    name = "cohort2"
+  )
+
+# modify same input cohort table to start between 2010 until end of data
+cdm$cohort1 <- cdm$cohort1 |>
+  requireInDateRange(
+    indexDate = "cohort_start_date",
+    dateRange = as.Date(c("2010-01-01", NA))
+  )
 }
 }

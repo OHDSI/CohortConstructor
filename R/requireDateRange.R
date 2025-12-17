@@ -22,9 +22,19 @@
 #' library(CohortConstructor)
 #' cdm <- mockCohortConstructor()
 #'
-#' cdm$cohort1 |>
-#'   requireInDateRange(indexDate = "cohort_start_date",
-#'                      dateRange = as.Date(c("2010-01-01", "2019-01-01")))
+#' cdm$cohort2 <- cdm$cohort1 |>
+#'   requireInDateRange(
+#'     indexDate = "cohort_start_date",
+#'     dateRange = as.Date(c("2010-01-01", "2019-01-01")),
+#'     name = "cohort2"
+#'   )
+#'
+#' # modify same input cohort table to start between 2010 until end of data
+#' cdm$cohort1 <- cdm$cohort1 |>
+#'   requireInDateRange(
+#'     indexDate = "cohort_start_date",
+#'     dateRange = as.Date(c("2010-01-01", NA))
+#'   )
 #' }
 requireInDateRange <- function(cohort,
                                dateRange,
@@ -181,11 +191,19 @@ requireInDateRange <- function(cohort,
 #' \donttest{
 #' library(CohortConstructor)
 #' cdm <- mockCohortConstructor()
-#' cdm$cohort1 |>
-#'   trimToDateRange(startDate = "cohort_start_date",
-#'                   endDate = "cohort_end_date",
-#'                   dateRange = as.Date(c("2015-01-01",
-#'                                         "2015-12-31")))
+#'
+#' cdm$cohort2 <- cdm$cohort1 |>
+#'   trimToDateRange(
+#'     startDate = "cohort_start_date",
+#'     endDate = "cohort_end_date",
+#'     dateRange = as.Date(c("2015-01-01", "2015-12-31")),
+#'     name = "cohort2"
+#'   )
+#'
+#' cdm$cohort1 <- cdm$cohort1 |>
+#'   trimToDateRange(
+#'     dateRange = as.Date(c(NA, "2015-12-31"))
+#'   )
 #' }
 trimToDateRange <- function(cohort,
                             dateRange,
