@@ -242,72 +242,74 @@ intersectCohorts <- function(cohort,
 #' @return Table in the cdm with start, end and by as columns. Periods are not
 #' going to overlap between each other.
 #'
-splitOverlap <- function(x,
-                         name,
-                         tmp,
-                         start = "cohort_start_date",
-                         end = "cohort_end_date",
-                         by = c("cohort_definition_id", "subject_id")) {
-  # initial checks
-  omopgenerics::assertCharacter(start, length = 1, minNumCharacter = 1)
-  omopgenerics::assertCharacter(end, length = 1, minNumCharacter = 1)
-  omopgenerics::assertCharacter(by, length = 1, minNumCharacter = 1)
-  omopgenerics::assertTable(x, class = "tbl", columns = c(start, end, by))
+splitOverlap <- function(x, cdm) {
+  # add settings flags
+  set <- omopgenerics::settings(x)
+  cohorts <- set$cohort_name
+  insertSet <- function(cdm, set, val, nm) {
+    set <- set |>
+      dplyr::select("cohort_definition_id", "cohort_name") |>
+      dplyr::mutate(value = .env$val) |>
+      tidyr::pivot_wider(names_from = "cohort_name", values_from = "value") |>
+      dplyr::mutate(dplyr::across(dplyr::everything(), \(x) dplyr::coalesce(x, 0L)))
+    omopgenerics::insertTable(cdm = cdm, name = nm, table = set)
+  }
+  nmp <- omopgenerics::uniqueTableName()
+  nmn <- omopgenerics::uniqueTableName()
+  cdm <- insertSet(cdm = cdm, set = set, val = 1, nm = nmp) |>
+    insertSet(set = set, val = -1, nm = nmn)
 
-  ids <- getIdentifier(x, 3)
-  id <- ids[1]
-  is <- ids[2]
-  ie <- ids[3]
+  # add cohort names
+  addAllNames <- function(x, cohorts) {
+    missCol <- cohorts[!cohorts %in% colnames(x)]
+    if (length(missCol) > 0) {
+      q <- rep("0L", length(missCol)) |>
+        rlang::parse_exprs() |>
+        rlang::set_names(nm = missCol)
+      x <- x |>
+        dplyr::mutate(!!!q)
+    }
+    return(x)
+  }
 
-  tmpTable_1 <- paste0(tmp, "_1")
-  x_a <- x |>
-    dplyr::select(dplyr::all_of(by), !!is := dplyr::all_of(start)) |>
+  x |>
+    PatientProfiles::addCohortName() |>
+    dplyr::select("subject_id", "date" = "cohort_start_date", "cohort_name") |>
+    dplyr::mutate(value = 1L) |>
+    tidyr::pivot_wider(names_from = "cohort_name", values_from = "value", values_fill = 0L) |>
+    addAllNames(cohorts = cohorts) |>
     dplyr::union_all(
       x |>
-        dplyr::select(dplyr::all_of(by), !!is := dplyr::all_of(end)) |>
-        dplyr::mutate(!!is := as.Date(clock::add_days(.data[[is]], 1L)))
+        PatientProfiles::addCohortName() |>
+        dplyr::select("subject_id", "date" = "cohort_end_date", "cohort_name") |>
+        dplyr::distinct() |>
+        dplyr::mutate(
+          date = as.Date(clock::add_days(x = .data$date, n = -1L))
+        ) |>
+        addAllNames(cohorts = cohorts)
     ) |>
-    dplyr::distinct() |>
-    dplyr::compute(temporary = FALSE, name = tmpTable_1,
-                   logPrefix = "CohortConstructor_intersectCohorts_tmpTable_1_")
-
-  tmpTable_2 <- paste0(tmp, "_2")
-  x_a <-  x_a |>
-    dplyr::group_by(dplyr::across(dplyr::all_of(by))) |>
-    dplyr::arrange(.data[[is]]) |>
-    dplyr::mutate(!!id := dplyr::row_number()) |>
-    dplyr::arrange() |>
-    dplyr::ungroup() |>
-    dplyr::compute(temporary = FALSE, name = tmpTable_2,
-                   logPrefix = "CohortConstructor_intersectCohorts_tmpTable_2_")
-
-  tmpTable_3 <- paste0(tmp, "_3")
-  x_b <- x |>
-    dplyr::select(dplyr::all_of(by), !!ie := dplyr::all_of(end)) |>
     dplyr::union_all(
       x |>
-        dplyr::select(dplyr::all_of(by), !!ie := dplyr::all_of(start)) |>
-        dplyr::mutate(!!ie := as.Date(clock::add_days(.data[[ie]], -1L)))
+        PatientProfiles::addCohortName() |>
+        dplyr::select("subject_id", "date" = "cohort_end_date", "cohort_name") |>
+        dplyr::distinct() |>
+        addAllNames(cohorts = cohorts)
     ) |>
-    dplyr::distinct() |>
-    dplyr::group_by(dplyr::across(dplyr::all_of(by))) |>
-    dplyr::arrange(.data[[ie]]) |>
-    dplyr::mutate(!!id := dplyr::row_number() - 1) |>
-    dplyr::arrange() |>
-    dplyr::ungroup() |>
-    dplyr::compute(temporary = FALSE, name = tmpTable_3,
-                   logPrefix = "CohortConstructor_intersectCohorts_tmpTable_3_")
-
-  x <-  x_a |>
-    dplyr::inner_join(
-      x_b,
-      by = c(by, id)
+    dplyr::union_all(
+      x |>
+        PatientProfiles::addCohortName() |>
+        dplyr::select("subject_id", "date" = "cohort_end_date", "cohort_name") |>
+        dplyr::mutate(
+          value = 1L,
+          date = as.Date(clock::add_days(x = .data$date, n = 1L))
+        ) |>
+        tidyr::pivot_wider(names_from = "cohort_name", values_from = "value", values_fill = 0L) |>
+        addAllNames(cohorts = cohorts)
     ) |>
-    dplyr::select(dplyr::all_of(by),
-                  !!start := dplyr::all_of(is),
-                  !!end := dplyr::all_of(ie)) |>
-    dplyr::compute(temporary = FALSE, name = name,
-                   logPrefix = "CohortConstructor_intersectCohorts_inner_join_")
+    dplyr::group_by(.data$subject_id) |>
+    dplyr::arrange(.data$date) |>
+    dplyr::mutate(dplyr::across(dplyr::all_of(cohorts), \(x) cumsum(dplyr::coalesce(x, 0L)))) |>
+    dplyr::compute(name = nm)
 }
 
 #' Join overlapping periods in single periods using gap.
