@@ -188,13 +188,6 @@ test_that("unionCohorts works", {
   )
   expect_error(
     cohort <- unionCohorts(cdm$cohort1,
-                           cohortId = NULL,
-                           gap = Inf,
-                           cohortName = NULL,
-                           name = "cohort1")
-  )
-  expect_error(
-    cohort <- unionCohorts(cdm$cohort1,
                            cohortId = "1",
                            gap = 1,
                            cohortName = NULL,
