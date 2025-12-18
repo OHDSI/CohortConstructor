@@ -128,7 +128,7 @@ test_that("unionCohorts works", {
 
   # test gap and keep original cohorts ----
   cdm$cohort7 <- unionCohorts(
-    cdm$cohort1, name = "cohort7", gap = 10000, keepOriginalCohorts = TRUE, cohortId = c(1:3, 5)
+    cdm$cohort1, name = "cohort7", gap = Inf, keepOriginalCohorts = TRUE, cohortId = c(1:3, 5)
   )
   expect_equal(collectCohort(cdm$cohort1, 1), collectCohort(cdm$cohort7, 1))
   expect_equal(collectCohort(cdm$cohort1, 2), collectCohort(cdm$cohort7, 2))
@@ -140,6 +140,14 @@ test_that("unionCohorts works", {
       subject_id = 1:3L,
       cohort_start_date = as.Date(c("2001-03-24", "1999-05-03", "2015-01-22")),
       cohort_end_date = as.Date(c("2011-01-01", "2002-06-07", "2015-06-01"))
+    )
+  )
+  expect_equal(
+    settings(cdm$cohort7) |> dplyr::filter(cohort_definition_id == 6),
+    dplyr::tibble(
+      cohort_definition_id = 6L,
+      cohort_name = "cohort_1_cohort_2_cohort_3_cohort_5",
+      gap = Inf
     )
   )
 
@@ -175,13 +183,6 @@ test_that("unionCohorts works", {
     cohort <- unionCohorts(cdm$cohort1,
                            cohortId = NULL,
                            gap = NA,
-                           cohortName = NULL,
-                           name = "cohort1")
-  )
-  expect_error(
-    cohort <- unionCohorts(cdm$cohort1,
-                           cohortId = NULL,
-                           gap = Inf,
                            cohortName = NULL,
                            name = "cohort1")
   )

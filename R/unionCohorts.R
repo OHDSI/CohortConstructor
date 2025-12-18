@@ -43,9 +43,6 @@ unionCohorts <- function(cohort,
   omopgenerics::assertCharacter(cohortName, length = 1, null = TRUE)
   omopgenerics::assertLogical(keepOriginalCohorts, length = 1)
 
-  if (is.infinite(gap)) {
-    cli::cli_abort("`gap` can't be infinite")
-  }
   if (length(cohortId) < 2) {
     cli::cli_abort("Settings of cohort table must contain at least two cohorts.")
   }
@@ -61,6 +58,9 @@ unionCohorts <- function(cohort,
     cohort_name = cohortName,
     gap = gap
   )
+  if (is.infinite(gap)) {
+    gap <- 99999
+  }
 
   if (keepOriginalCohorts) {
     if (any(cohortName %in% omopgenerics::settings(cohort)$cohort_name)) {
