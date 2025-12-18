@@ -90,20 +90,20 @@ already created so let’s first add a column sex to my existent cohort:
 cdm$medications <- cdm$medications |>
   addSex()
 cdm$medications
-#> # Source:   table<og_011_1766045444> [?? x 5]
-#> # Database: DuckDB 1.4.3 [unknown@Linux 6.11.0-1018-azure:R 4.5.2//tmp/Rtmp14YvWb/file28122967c45a.duckdb]
+#> # Source:   table<og_011_1766046460> [?? x 5]
+#> # Database: DuckDB 1.4.3 [unknown@Linux 6.11.0-1018-azure:R 4.5.2//tmp/Rtmp1xa7bP/file27ba22db8d12.duckdb]
 #>    cohort_definition_id subject_id cohort_start_date cohort_end_date sex   
 #>                   <int>      <int> <date>            <date>          <chr> 
-#>  1                    1        727 1991-04-23        1991-06-22      Male  
-#>  2                    1       1099 1968-05-05        1968-05-12      Male  
-#>  3                    1       1101 1974-10-19        1974-11-02      Male  
-#>  4                    1       1101 2014-10-06        2014-10-20      Male  
-#>  5                    1       1314 1977-07-01        1977-07-15      Male  
-#>  6                    1       1846 1975-10-24        1975-11-07      Male  
-#>  7                    1       1846 1979-09-29        1979-10-13      Male  
-#>  8                    1       2025 2012-10-26        2012-11-02      Female
-#>  9                    1       2175 1992-02-06        1992-02-13      Female
-#> 10                    1       2409 2008-06-14        2008-06-21      Female
+#>  1                    1         78 2009-04-14        2009-04-21      Male  
+#>  2                    1        141 1987-03-16        1987-03-30      Female
+#>  3                    1        300 2005-06-16        2005-06-30      Female
+#>  4                    1        300 2007-08-21        2007-08-28      Female
+#>  5                    1        352 1991-09-11        1991-09-18      Male  
+#>  6                    1        842 1970-10-20        1970-11-10      Male  
+#>  7                    1        921 1983-03-25        1983-06-23      Female
+#>  8                    1       1099 2005-09-06        2005-09-20      Male  
+#>  9                    1       1169 1937-12-03        1937-12-17      Female
+#> 10                    1       1808 2014-04-27        2014-05-04      Female
 #> # ℹ more rows
 ```
 
@@ -254,13 +254,13 @@ records:
 cdm$medications |> 
   filter(subject_id == 4383)
 #> # Source:   SQL [?? x 5]
-#> # Database: DuckDB 1.4.3 [unknown@Linux 6.11.0-1018-azure:R 4.5.2//tmp/Rtmp14YvWb/file28122967c45a.duckdb]
+#> # Database: DuckDB 1.4.3 [unknown@Linux 6.11.0-1018-azure:R 4.5.2//tmp/Rtmp1xa7bP/file27ba22db8d12.duckdb]
 #>   cohort_definition_id subject_id cohort_start_date cohort_end_date sex  
 #>                  <int>      <int> <date>            <date>          <chr>
-#> 1                    1       4383 1992-07-18        1992-08-22      Male 
-#> 2                    1       4383 1990-10-13        1990-10-27      Male 
-#> 3                    1       4383 2000-03-12        2000-03-19      Male 
-#> 4                    1       4383 1971-02-06        1971-02-13      Male 
+#> 1                    1       4383 1990-10-13        1990-10-27      Male 
+#> 2                    1       4383 2000-03-12        2000-03-19      Male 
+#> 3                    1       4383 1971-02-06        1971-02-13      Male 
+#> 4                    1       4383 1992-07-18        1992-08-22      Male 
 #> 5                    1       4383 1990-12-20        1991-01-03      Male 
 #> 6                    1       4383 2004-05-21        2004-06-11      Male
 ```
@@ -277,7 +277,7 @@ to see 4 cohort contributions for this subject (2 in 1990, 1 in 1991 and
 cdm$medications_year |>
   filter(subject_id == 4383)
 #> # Source:   SQL [?? x 5]
-#> # Database: DuckDB 1.4.3 [unknown@Linux 6.11.0-1018-azure:R 4.5.2//tmp/Rtmp14YvWb/file28122967c45a.duckdb]
+#> # Database: DuckDB 1.4.3 [unknown@Linux 6.11.0-1018-azure:R 4.5.2//tmp/Rtmp1xa7bP/file27ba22db8d12.duckdb]
 #>   cohort_definition_id subject_id cohort_start_date cohort_end_date sex  
 #>                  <int>      <int> <date>            <date>          <chr>
 #> 1                    1       4383 1990-10-13        1990-10-27      Male 
