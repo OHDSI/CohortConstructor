@@ -21,7 +21,7 @@
 #' cdm <- mockCohortConstructor()
 #' # if "cohort1" contained pregnancy episodes, we can generate trimester-specific
 #' # cohorts with this function
-#' cdm$pregnancy_trimesters <- splitCohortTime(
+#' cdm$pregnancy_trimesters <- timeWindowCohorts(
 #'   cohort = cdm$cohort1,
 #'   window = list(
 #'     "trimester_1" = c(0, 90),
@@ -33,7 +33,7 @@
 #'   name = "pregnancy_trimesters"
 #' )
 #' }
-splitCohortTime <- function (cohort,
+timeWindowCohorts <- function (cohort,
                              window,
                              cohortId = NULL,
                              keepOriginalCohorts = TRUE,
@@ -143,7 +143,7 @@ splitCohortTime <- function (cohort,
   }
   newCohort <- newCohort |>
     dplyr::inner_join(cdm[[newSetName]], by = "target_cohort_id") |>
-    # dplyr::compute(name = newCohortName, temporary = FALSE) |>
+    dplyr::compute(name = newCohortName, temporary = FALSE) |>
     omopgenerics::newCohortTable(
       cohortSetRef = newSet |>
         dplyr::select(dplyr::all_of(c(

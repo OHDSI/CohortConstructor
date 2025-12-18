@@ -1,4 +1,4 @@
-test_that("splitCohortTime works", {
+test_that("timeWindowCohorts works", {
   cdm <- omopgenerics::cdmFromTables(
     tables = list(
       "person" = dplyr::tibble(
@@ -39,7 +39,7 @@ test_that("splitCohortTime works", {
 
   # test it works ----
   cdm$cohort2 <- cdm$cohort1 |>
-    splitCohortTime(window = list("m1" = c(0, 30), "m2" = c(31, 60), c(0, Inf)), name = "cohort2")
+    timeWindowCohorts(window = list("m1" = c(0, 30), "m2" = c(31, 60), c(0, Inf)), name = "cohort2")
   expect_equal(
     settings(cdm$cohort2),
     dplyr::tibble(
@@ -78,7 +78,7 @@ test_that("splitCohortTime works", {
 
   # check 1 day in split cohort, cohortId and keepOriginalCohorts ----
   cdm$cohort3 <- cdm$cohort1 |>
-    splitCohortTime(window = list("m1" = c(1, 22), "m2" = c(22, 23)), name = "cohort3", keepOriginalCohorts = FALSE, cohortId = 1)
+    timeWindowCohorts(window = list("m1" = c(1, 22), "m2" = c(22, 23)), name = "cohort3", keepOriginalCohorts = FALSE, cohortId = 1)
   expect_equal(
     collectCohort(cdm$cohort3, 1),
     dplyr::tibble(
@@ -111,7 +111,7 @@ test_that("splitCohortTime works", {
       )
     )
   cdm$cohort1 <- cdm$cohort1 |>
-    splitCohortTime(window = list( c(1, 22)), keepOriginalCohorts = TRUE, cohortId = 1)
+    timeWindowCohorts(window = list( c(1, 22)), keepOriginalCohorts = TRUE, cohortId = 1)
   expect_equal(
     settings(cdm$cohort1),
     dplyr::tibble(
