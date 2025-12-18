@@ -8,10 +8,15 @@ vignette: >
 ---
 
 
-```{r setup, include=FALSE}
+```{r, include = FALSE}
+NOT_CRAN <- identical(tolower(Sys.getenv("NOT_CRAN")), "true")
+
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
+  collapse = TRUE, 
+  warning = FALSE, 
+  message = FALSE,
+  comment = "#>",
+  eval = NOT_CRAN
 )
 ```
 
