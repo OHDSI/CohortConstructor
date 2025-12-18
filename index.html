@@ -92,10 +92,10 @@
 </h2>
 <table class="table">
 <colgroup>
-<col width="25%">
-<col width="25%">
-<col width="25%">
-<col width="25%">
+<col width="9%">
+<col width="6%">
+<col width="11%">
+<col width="72%">
 </colgroup>
 <thead><tr class="header">
 <th>Source</th>
@@ -166,12 +166,12 @@
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ohdsi.github.io/CohortConstructor/">CohortConstructor</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://darwin-eu.github.io/CohortCharacteristics/" class="external-link">CohortCharacteristics</a></span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ohdsi.github.io/omock/reference/mockCdmFromDataset.html" class="external-link">mockCdmFromDataset</a></span><span class="op">(</span>datasetName <span class="op">=</span> <span class="st">"GiBleed"</span>, source <span class="op">=</span> <span class="st">"duckdb"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ohdsi.github.io/omock/reference/mockCdmFromDataset.html" class="external-link">mockCdmFromDataset</a></span><span class="op">(</span>datasetName <span class="op">=</span> <span class="st">"GiBleed"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; ℹ Reading GiBleed tables.</span></span>
 <span><span class="co">#&gt; ℹ Adding drug_strength table.</span></span>
 <span><span class="va">cdm</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── # OMOP CDM reference (duckdb) of GiBleed ────────────────────────────────────</span></span>
+<span><span class="co">#&gt; ── # OMOP CDM reference (local) of GiBleed ─────────────────────────────────────</span></span>
 <span><span class="co">#&gt; • omop tables: care_site, cdm_source, concept, concept_ancestor, concept_class,</span></span>
 <span><span class="co">#&gt; concept_relationship, concept_synonym, condition_era, condition_occurrence,</span></span>
 <span><span class="co">#&gt; cost, death, device_exposure, domain, dose_era, drug_era, drug_exposure,</span></span>
@@ -219,14 +219,7 @@
 <code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span> <span class="op">&lt;-</span> <span class="va">cdm</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="reference/conceptCohort.html">conceptCohort</a></span><span class="op">(</span>conceptSet <span class="op">=</span> <span class="va">fx_codes</span>, </span>
 <span>                exit <span class="op">=</span> <span class="st">"event_start_date"</span>, </span>
-<span>                name <span class="op">=</span> <span class="st">"fractures"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: There was 1 warning in `dplyr::mutate()`.</span></span>
-<span><span class="co">#&gt; ℹ In argument: `vocabulary_version = CodelistGenerator::getVocabVersion(cdm)`.</span></span>
-<span><span class="co">#&gt; Caused by warning:</span></span>
-<span><span class="co">#&gt; ! The `cdm` argument of `vocabularyVersion()` is deprecated as of</span></span>
-<span><span class="co">#&gt;   CodelistGenerator 4.0.0.</span></span>
-<span><span class="co">#&gt; ℹ The deprecated feature was likely used in the CohortConstructor package.</span></span>
-<span><span class="co">#&gt;   Please report the issue to the authors.</span></span></code></pre></div>
+<span>                name <span class="op">=</span> <span class="st">"fractures"</span><span class="op">)</span></span></code></pre></div>
 <p>After creating our initial cohort we will update it so that exit is set at up to 180 days after start (so long as individuals’ observation end date is on or after this - if not, exit will be at observation period end).</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span> <span class="op">&lt;-</span> <span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span> <span class="op">|&gt;</span> </span>
@@ -247,15 +240,15 @@
 <span><span class="co">#&gt; $ number_records       &lt;int&gt; 569, 138</span></span>
 <span><span class="co">#&gt; $ number_subjects      &lt;int&gt; 510, 132</span></span>
 <span><span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/attrition.html" class="external-link">attrition</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Rows: 14</span></span>
+<span><span class="co">#&gt; Rows: 10</span></span>
 <span><span class="co">#&gt; Columns: 7</span></span>
-<span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2</span></span>
-<span><span class="co">#&gt; $ number_records       &lt;int&gt; 569, 569, 569, 569, 569, 569, 569, 138, 138, 138,…</span></span>
-<span><span class="co">#&gt; $ number_subjects      &lt;int&gt; 510, 510, 510, 510, 510, 510, 510, 132, 132, 132,…</span></span>
-<span><span class="co">#&gt; $ reason_id            &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 1, 2, 3, 4, 5, 6, 7</span></span>
+<span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 1, 1, 1, 1, 1, 2, 2, 2, 2, 2</span></span>
+<span><span class="co">#&gt; $ number_records       &lt;int&gt; 569, 569, 569, 569, 569, 138, 138, 138, 138, 138</span></span>
+<span><span class="co">#&gt; $ number_subjects      &lt;int&gt; 510, 510, 510, 510, 510, 132, 132, 132, 132, 132</span></span>
+<span><span class="co">#&gt; $ reason_id            &lt;int&gt; 1, 2, 3, 4, 5, 1, 2, 3, 4, 5</span></span>
 <span><span class="co">#&gt; $ reason               &lt;chr&gt; "Initial qualifying events", "Record in observati…</span></span>
-<span><span class="co">#&gt; $ excluded_records     &lt;int&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0</span></span>
-<span><span class="co">#&gt; $ excluded_subjects    &lt;int&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0</span></span></code></pre></div>
+<span><span class="co">#&gt; $ excluded_records     &lt;int&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0</span></span>
+<span><span class="co">#&gt; $ excluded_subjects    &lt;int&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="create-an-overall-fracture-cohort">Create an overall fracture cohort<a class="anchor" aria-label="anchor" href="#create-an-overall-fracture-cohort"></a>
@@ -328,7 +321,7 @@
 <span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 1, 2, 3</span></span>
 <span><span class="co">#&gt; $ number_records       &lt;int&gt; 64, 22, 86</span></span>
 <span><span class="co">#&gt; $ number_subjects      &lt;int&gt; 62, 22, 83</span></span>
-<span><span class="co">#&gt; $ reason_id            &lt;int&gt; 10, 10, 4</span></span>
+<span><span class="co">#&gt; $ reason_id            &lt;int&gt; 8, 8, 4</span></span>
 <span><span class="co">#&gt; $ reason               &lt;chr&gt; "Age requirement: 40 to 65", "Age requirement: 40…</span></span>
 <span><span class="co">#&gt; $ excluded_records     &lt;int&gt; 88, 40, 128</span></span>
 <span><span class="co">#&gt; $ excluded_subjects    &lt;int&gt; 81, 38, 113</span></span>
@@ -341,7 +334,7 @@
 <span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 1, 2, 3</span></span>
 <span><span class="co">#&gt; $ number_records       &lt;int&gt; 37, 12, 49</span></span>
 <span><span class="co">#&gt; $ number_subjects      &lt;int&gt; 36, 12, 48</span></span>
-<span><span class="co">#&gt; $ reason_id            &lt;int&gt; 11, 11, 5</span></span>
+<span><span class="co">#&gt; $ reason_id            &lt;int&gt; 9, 9, 5</span></span>
 <span><span class="co">#&gt; $ reason               &lt;chr&gt; "Sex requirement: Female", "Sex requirement: Fema…</span></span>
 <span><span class="co">#&gt; $ excluded_records     &lt;int&gt; 27, 10, 37</span></span>
 <span><span class="co">#&gt; $ excluded_subjects    &lt;int&gt; 26, 10, 35</span></span></code></pre></div>
@@ -363,15 +356,15 @@
 <code class="sourceCode R"><span><span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/attrition.html" class="external-link">attrition</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">fractures</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">reason</span> <span class="op">==</span> <span class="st">"Not in cohort gibleed between -Inf &amp; 0 days relative to cohort_start_date"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Rows: 3</span></span>
+<span><span class="co">#&gt; Rows: 0</span></span>
 <span><span class="co">#&gt; Columns: 7</span></span>
-<span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; 1, 2, 3</span></span>
-<span><span class="co">#&gt; $ number_records       &lt;int&gt; 30, 10, 40</span></span>
-<span><span class="co">#&gt; $ number_subjects      &lt;int&gt; 30, 10, 40</span></span>
-<span><span class="co">#&gt; $ reason_id            &lt;int&gt; 14, 14, 8</span></span>
-<span><span class="co">#&gt; $ reason               &lt;chr&gt; "Not in cohort gibleed between -Inf &amp; 0 days rela…</span></span>
-<span><span class="co">#&gt; $ excluded_records     &lt;int&gt; 7, 2, 9</span></span>
-<span><span class="co">#&gt; $ excluded_subjects    &lt;int&gt; 6, 2, 8</span></span></code></pre></div>
+<span><span class="co">#&gt; $ cohort_definition_id &lt;int&gt; </span></span>
+<span><span class="co">#&gt; $ number_records       &lt;int&gt; </span></span>
+<span><span class="co">#&gt; $ number_subjects      &lt;int&gt; </span></span>
+<span><span class="co">#&gt; $ reason_id            &lt;int&gt; </span></span>
+<span><span class="co">#&gt; $ reason               &lt;chr&gt; </span></span>
+<span><span class="co">#&gt; $ excluded_records     &lt;int&gt; </span></span>
+<span><span class="co">#&gt; $ excluded_subjects    &lt;int&gt;</span></span></code></pre></div>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/cdmDisconnect.html" class="external-link">cdmDisconnect</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">)</span></span></code></pre></div>
 </div>
