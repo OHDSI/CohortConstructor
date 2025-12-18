@@ -105,6 +105,8 @@
   years
 - [`stratifyCohorts()`](https://ohdsi.github.io/CohortConstructor/reference/stratifyCohorts.md)
   : Create a new cohort table from stratifying an existing one
+- [`timeWindowCohorts()`](https://ohdsi.github.io/CohortConstructor/reference/timeWindowCohorts.md)
+  : Split cohorts based on time-windows
 
 ### Combine cohorts
 
