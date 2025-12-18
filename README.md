@@ -19,14 +19,14 @@ manipulation of study cohorts in data mapped to the OMOP CDM.
 
 ## Tested sources
 
-| Source | Driver | CDM reference | Status |
-|----|----|----|----|
-| Local R dataframe | N/A | `omopgenerics::cdmFromTables()` | [![](https://github.com/OHDSI/CohortConstructor/actions/workflows/test-local-omopgenerics.yaml/badge.svg?branch=main)](https://github.com/OHDSI/CohortConstructor/actions/workflows/test-local-omopgenerics.yaml) |
-| In-memory duckdb datatabase | duckdb | `CDMConnector::cdmFromCon()` | [![](https://github.com/OHDSI/CohortConstructor/actions/workflows/test-duckdb-CDMConnector.yaml/badge.svg?branch=main)](https://github.com/OHDSI/CohortConstructor/actions/workflows/test-duckdb-CDMConnector.yaml) |
-| Postgres database | RPostgres | `CDMConnector::cdmFromCon()` |  |
-| Postgres database | DatabaseConnector | `CDMConnector::cdmFromCon()` |  |
-| SQL Server database | odbc | `CDMConnector::cdmFromCon()` |  |
-| SQL Server database | DatabaseConnector | `CDMConnector::cdmFromCon()` |  |
+| Source                      | Driver            | CDM reference                   | Status                                                                                                                                                                                                              |
+|-----------------------------|-------------------|---------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Local R dataframe           | N/A               | `omopgenerics::cdmFromTables()` | [![](https://github.com/OHDSI/CohortConstructor/actions/workflows/test-local-omopgenerics.yaml/badge.svg?branch=main)](https://github.com/OHDSI/CohortConstructor/actions/workflows/test-local-omopgenerics.yaml)   |
+| In-memory duckdb datatabase | duckdb            | `CDMConnector::cdmFromCon()`    | [![](https://github.com/OHDSI/CohortConstructor/actions/workflows/test-duckdb-CDMConnector.yaml/badge.svg?branch=main)](https://github.com/OHDSI/CohortConstructor/actions/workflows/test-duckdb-CDMConnector.yaml) |
+| Postgres database           | RPostgres         | `CDMConnector::cdmFromCon()`    |                                                                                                                                                                                                                     |
+| Postgres database           | DatabaseConnector | `CDMConnector::cdmFromCon()`    |                                                                                                                                                                                                                     |
+| SQL Server database         | odbc              | `CDMConnector::cdmFromCon()`    |                                                                                                                                                                                                                     |
+| SQL Server database         | DatabaseConnector | `CDMConnector::cdmFromCon()`    |                                                                                                                                                                                                                     |
 
 ## Installation
 
@@ -60,12 +60,12 @@ library(CohortCharacteristics)
 ```
 
 ``` r
-cdm <- mockCdmFromDataset(datasetName = "GiBleed", source = "duckdb")
+cdm <- mockCdmFromDataset(datasetName = "GiBleed")
 #> ℹ Reading GiBleed tables.
 #> ℹ Adding drug_strength table.
 cdm
 #> 
-#> ── # OMOP CDM reference (duckdb) of GiBleed ────────────────────────────────────
+#> ── # OMOP CDM reference (local) of GiBleed ─────────────────────────────────────
 #> • omop tables: care_site, cdm_source, concept, concept_ancestor, concept_class,
 #> concept_relationship, concept_synonym, condition_era, condition_occurrence,
 #> cost, death, device_exposure, domain, dose_era, drug_era, drug_exposure,
@@ -125,13 +125,6 @@ cdm$fractures <- cdm |>
   conceptCohort(conceptSet = fx_codes, 
                 exit = "event_start_date", 
                 name = "fractures")
-#> Warning: There was 1 warning in `dplyr::mutate()`.
-#> ℹ In argument: `vocabulary_version = CodelistGenerator::getVocabVersion(cdm)`.
-#> Caused by warning:
-#> ! The `cdm` argument of `vocabularyVersion()` is deprecated as of
-#>   CodelistGenerator 4.0.0.
-#> ℹ The deprecated feature was likely used in the CohortConstructor package.
-#>   Please report the issue to the authors.
 ```
 
 After creating our initial cohort we will update it so that exit is set
@@ -163,15 +156,15 @@ cohortCount(cdm$fractures) |> glimpse()
 #> $ number_records       <int> 569, 138
 #> $ number_subjects      <int> 510, 132
 attrition(cdm$fractures) |> glimpse()
-#> Rows: 14
+#> Rows: 10
 #> Columns: 7
-#> $ cohort_definition_id <int> 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2
-#> $ number_records       <int> 569, 569, 569, 569, 569, 569, 569, 138, 138, 138,…
-#> $ number_subjects      <int> 510, 510, 510, 510, 510, 510, 510, 132, 132, 132,…
-#> $ reason_id            <int> 1, 2, 3, 4, 5, 6, 7, 1, 2, 3, 4, 5, 6, 7
+#> $ cohort_definition_id <int> 1, 1, 1, 1, 1, 2, 2, 2, 2, 2
+#> $ number_records       <int> 569, 569, 569, 569, 569, 138, 138, 138, 138, 138
+#> $ number_subjects      <int> 510, 510, 510, 510, 510, 132, 132, 132, 132, 132
+#> $ reason_id            <int> 1, 2, 3, 4, 5, 1, 2, 3, 4, 5
 #> $ reason               <chr> "Initial qualifying events", "Record in observati…
-#> $ excluded_records     <int> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-#> $ excluded_subjects    <int> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+#> $ excluded_records     <int> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+#> $ excluded_subjects    <int> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 ```
 
 ### Create an overall fracture cohort
@@ -263,7 +256,7 @@ attrition(cdm$fractures) |>
 #> $ cohort_definition_id <int> 1, 2, 3
 #> $ number_records       <int> 64, 22, 86
 #> $ number_subjects      <int> 62, 22, 83
-#> $ reason_id            <int> 10, 10, 4
+#> $ reason_id            <int> 8, 8, 4
 #> $ reason               <chr> "Age requirement: 40 to 65", "Age requirement: 40…
 #> $ excluded_records     <int> 88, 40, 128
 #> $ excluded_subjects    <int> 81, 38, 113
@@ -276,7 +269,7 @@ attrition(cdm$fractures) |>
 #> $ cohort_definition_id <int> 1, 2, 3
 #> $ number_records       <int> 37, 12, 49
 #> $ number_subjects      <int> 36, 12, 48
-#> $ reason_id            <int> 11, 11, 5
+#> $ reason_id            <int> 9, 9, 5
 #> $ reason               <chr> "Sex requirement: Female", "Sex requirement: Fema…
 #> $ excluded_records     <int> 27, 10, 37
 #> $ excluded_subjects    <int> 26, 10, 35
@@ -304,15 +297,15 @@ cdm$fractures <- cdm$fractures |>
 attrition(cdm$fractures) |> 
   filter(reason == "Not in cohort gibleed between -Inf & 0 days relative to cohort_start_date") |> 
   glimpse()
-#> Rows: 3
+#> Rows: 0
 #> Columns: 7
-#> $ cohort_definition_id <int> 1, 2, 3
-#> $ number_records       <int> 30, 10, 40
-#> $ number_subjects      <int> 30, 10, 40
-#> $ reason_id            <int> 14, 14, 8
-#> $ reason               <chr> "Not in cohort gibleed between -Inf & 0 days rela…
-#> $ excluded_records     <int> 7, 2, 9
-#> $ excluded_subjects    <int> 6, 2, 8
+#> $ cohort_definition_id <int> 
+#> $ number_records       <int> 
+#> $ number_subjects      <int> 
+#> $ reason_id            <int> 
+#> $ reason               <chr> 
+#> $ excluded_records     <int> 
+#> $ excluded_subjects    <int>
 ```
 
 ``` r

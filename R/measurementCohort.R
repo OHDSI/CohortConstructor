@@ -373,6 +373,6 @@ measurementConceptSet <- function(valueAsNumber, valueAsConcept, cdm) {
     "cohort_definition_id" = as.integer(1:length(cohortNames)),
     "cohort_name" = cohortNames,
     "cdm_version" = attr(cdm, "cdm_version"),
-    "vocabulary_version" = vocabVersion(cdm)
+    "vocabulary_version" = CodelistGenerator::vocabularyVersion(cdm)
   )
 }

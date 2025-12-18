@@ -63,7 +63,7 @@ library(CohortCharacteristics)
 ```
 
 ```{r, message=TRUE, warning=FALSE}
-cdm <- mockCdmFromDataset(datasetName = "GiBleed", source = "duckdb")
+cdm <- mockCdmFromDataset(datasetName = "GiBleed")
 cdm
 ```
 
