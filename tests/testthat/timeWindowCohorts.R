@@ -1,4 +1,5 @@
 test_that("timeWindowCohorts works", {
+  skip_on_cran()
   cdm <- omopgenerics::cdmFromTables(
     tables = list(
       "person" = dplyr::tibble(
