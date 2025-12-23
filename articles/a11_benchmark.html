@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">CohortConstructor</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -131,8 +131,8 @@ cohorts at once using CohortConstructor.</p>
 <span>  runCohortConstructorDefinition <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  runCohortConstructorDomain <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; cc_set_no_strata: 109.037 sec elapsed</span></span>
-<span><span class="co">#&gt; cc_set_strata: 1.74 sec elapsed</span></span>
+<span><span class="co">#&gt; cc_set_no_strata: 111.595 sec elapsed</span></span>
+<span><span class="co">#&gt; cc_set_strata: 1.748 sec elapsed</span></span>
 <span><span class="va">benchmark_results</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Rows: 257</span></span>
@@ -2883,7 +2883,7 @@ each cohort across the participating databases:</p>
 </div>
 <p>We also computed the overlap between patients in CIRCE and
 CohortConstructor cohorts, with results shown in the plot below:</p>
-<p><img src="a11_benchmark_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" width="960"></p>
+<p><img src="a11_benchmark_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="960"></p>
 </div>
 </div>
 <div class="section level2">
@@ -2907,7 +2907,7 @@ at once, requiring only one call to each involved OMOP table.</p></li>
 <p>The following plot shows the times taken to create each cohort using
 CIRCE and CohortConstructor when each cohorts were created
 separately.</p>
-<p><img src="a11_benchmark_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" width="960"></p>
+<p><img src="a11_benchmark_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="" width="960"></p>
 </div>
 <div class="section level3">
 <h3 id="by-domain">By domain<a class="anchor" aria-label="anchor" href="#by-domain"></a>

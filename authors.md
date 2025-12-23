@@ -31,12 +31,12 @@ Source:
 Burn E, Català M, Mercade-Besora N, Alcalde-Herraiz M, Du M, Guo Y, Chen
 X, Lopez-Guell K, Rowlands E (2025). *CohortConstructor: Build and
 Manipulate Study Cohorts Using a Common Data Model*. R package version
-0.6.0, <https://ohdsi.github.io/CohortConstructor/>.
+0.6.1, <https://ohdsi.github.io/CohortConstructor/>.
 
     @Manual{,
       title = {CohortConstructor: Build and Manipulate Study Cohorts Using a Common Data Model},
       author = {Edward Burn and Martí Català and Nuria Mercade-Besora and Marta Alcalde-Herraiz and Mike Du and Yuchen Guo and Xihang Chen and Kim Lopez-Guell and Elin Rowlands},
       year = {2025},
-      note = {R package version 0.6.0},
+      note = {R package version 0.6.1},
       url = {https://ohdsi.github.io/CohortConstructor/},
     }

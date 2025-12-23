@@ -74,7 +74,7 @@ demographic requirements
 # \donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
-#> Warning: '/tmp/Rtmp2zartE/id_qvh' already exists
+#> Warning: '/tmp/RtmpKMMHtp/id_qvh' already exists
 #> ℹ Reading GiBleed tables.
 
 cdm$cohort1 |>

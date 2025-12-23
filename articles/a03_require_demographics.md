@@ -7,14 +7,6 @@ library(CohortCharacteristics)
 library(ggplot2)
 library(omock)
 library(dplyr)
-#> 
-#> Attaching package: 'dplyr'
-#> The following objects are masked from 'package:stats':
-#> 
-#>     filter, lag
-#> The following objects are masked from 'package:base':
-#> 
-#>     intersect, setdiff, setequal, union
 ```
 
 In this vignette we’ll show how requirements related to patient
@@ -23,10 +15,6 @@ synthetic data.
 
 ``` r
 cdm <- mockCdmFromDataset(datasetName = "GiBleed", source = "duckdb")
-#> ℹ Reading GiBleed tables.
-#> ℹ Adding drug_strength table.
-#> ℹ Creating local <cdm_reference> object.
-#> ℹ Inserting <cdm_reference> into duckdb.
 ```
 
 Let’s start by creating a cohort of people with a fracture. We’ll first
@@ -35,24 +23,10 @@ using these codes, setting cohort exit to 180 days after the fracture.
 
 ``` r
 fracture_codes <- getCandidateCodes(cdm, "fracture")
-#> Limiting to domains of interest
-#> Getting concepts to include
-#> Adding descendants
-#> Search completed. Finishing up.
-#> ✔ 9 candidate concepts identified
-#> 
-#> Time taken: 0 minutes and 0 seconds
 fracture_codes <- list("fracture" = fracture_codes$concept_id)
 cdm$fracture <- conceptCohort(cdm = cdm, 
                                  conceptSet = fracture_codes, 
                                  name = "fracture")
-#> ℹ Subsetting table condition_occurrence using 9 concepts with domain:
-#>   condition.
-#> ℹ Combining tables.
-#> ℹ Creating cohort attributes.
-#> ℹ Applying cohort requirements.
-#> ℹ Merging overlapping records.
-#> ✔ Cohort fracture created.
 
 summary_attrition <- summariseCohortAttrition(cdm$fracture)
 plotCohortAttrition(summary_attrition)
@@ -103,7 +77,6 @@ cdm$fracture <- cdm$fracture |>
                           minPriorObservation = 365)
 
 summary_attrition <- summariseCohortAttrition(cdm$fracture)
-#> `min_prior_observation` casted to character.
 plotCohortAttrition(summary_attrition)
 ```
 
@@ -128,16 +101,7 @@ cdm$fracture <- conceptCohort(cdm = cdm,
                       sex = "Female",
                       minPriorObservation = 365, 
                       minFutureObservation = 30)
-#> ℹ Subsetting table condition_occurrence using 9 concepts with domain:
-#>   condition.
-#> ℹ Combining tables.
-#> ℹ Creating cohort attributes.
-#> ℹ Applying cohort requirements.
-#> ℹ Merging overlapping records.
-#> ✔ Cohort fracture created.
 
 summary_attrition <- summariseCohortAttrition(cdm$fracture)
-#> `min_prior_observation` and `min_future_observation` casted to
-#> character.
 plotCohortAttrition(summary_attrition)
 ```
