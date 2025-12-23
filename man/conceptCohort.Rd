@@ -38,11 +38,13 @@ from each of the overlapping records.}
 provided. If NULL, each concept will be search at the assigned domain in
 the concept table.}
 
-\item{useRecordsBeforeObservation}{If FALSE, only records in observation will
-be used. If TRUE, records before the start of observation period will be
-considered, with cohort start date set as the start date of the
-individuals next observation period (as cohort records must be within
-observation).}
+\item{useRecordsBeforeObservation}{If FALSE, only records that fall entirely
+(start and end) within an observation period are used.
+If TRUE, records that start before an observation period are included by
+shifting their start date to the beginning of the individual's subsequent
+observation period, and records that start or end outside an observation
+period are trimmed so that cohort records fall entirely within the
+corresponding observation period.}
 
 \item{useSourceFields}{If TRUE, the source concept_id fields will also be
 used when identifying relevant clinical records. If FALSE, only the standard
