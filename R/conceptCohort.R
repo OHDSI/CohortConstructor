@@ -406,14 +406,16 @@ fulfillCohortReqs <- function(cdm, name, useRecordsBeforeObservation, type = "st
           end = .data$observation_period_start_date,
           precision = "day"
         ),
-        days_start_obs = dplyr::if_else(.data$days_start_obs < 0, NA, .data$days_start_obs)
+        days_start_obs = dplyr::if_else(.data$days_start_obs < 0, NA, .data$days_start_obs),
+        in_observation_start_flag = dplyr::if_else(in_observation_start == FALSE, 1, 0)
       ) |>
       dplyr::group_by(.data$cohort_definition_id, .data$subject_id, .data$cohort_start_date, .data$cohort_end_date) |>
       # which records to trim
       dplyr::mutate(
+        in_observation_start_flag = sum(.data$in_observation_start_flag, na.rm = TRUE) == dplyr::n(),
         trim_record =
-          sum(.data$in_observation_start == FALSE, na.rm = TRUE) == dplyr::n() &
-          .data$days_start_obs == min(.data$days_start_obs[!is.na(.data$days_start_obs)]) &
+          .data$in_observation_start_flag &
+          .data$days_start_obs == min(.data$days_start_obs[!is.na(.data$days_start_obs)], na.rm = TRUE) &
           !is.na(.data$days_start_obs)
       ) |>
       dplyr::ungroup() |>
@@ -433,7 +435,7 @@ fulfillCohortReqs <- function(cdm, name, useRecordsBeforeObservation, type = "st
           .data$cohort_end_date
         )
       ) |>
-      dplyr::select(!dplyr::any_of(c("in_observation_start", "in_observation_end", "days_start_obs", "trim_record"))) |>
+      dplyr::select(!dplyr::any_of(c("in_observation_start", "in_observation_start_flag", "in_observation_end", "days_start_obs", "trim_record"))) |>
       dplyr::compute(
         temporary = FALSE, name = name,
         logPrefix = "CohortConstructor_fulfillCohortReqs_trimRecords_"
