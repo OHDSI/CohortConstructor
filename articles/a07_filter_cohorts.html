@@ -83,7 +83,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Filtering cohorts</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/OHDSI/CohortConstructor/blob/v0.6.1/vignettes/a07_filter_cohorts.Rmd" class="external-link"><code>vignettes/a07_filter_cohorts.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/OHDSI/CohortConstructor/blob/main/vignettes/a07_filter_cohorts.Rmd" class="external-link"><code>vignettes/a07_filter_cohorts.Rmd</code></a></small>
       <div class="d-none name"><code>a07_filter_cohorts.Rmd</code></div>
     </div>
 
@@ -117,26 +117,26 @@ individuals in each cohort.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">medications</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/sampleCohorts.html">sampleCohorts</a></span><span class="op">(</span>cohortId <span class="op">=</span> <span class="cn">NULL</span>, n <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Source:   table&lt;results.test_medications&gt; [?? x 4]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB 1.4.3 [unknown@Linux 6.11.0-1018-azure:R 4.5.2//tmp/RtmpkMfWsP/file27945598270.duckdb]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB 1.4.3 [unknown@Linux 6.11.0-1018-azure:R 4.5.2//tmp/Rtmp4yU9Aa/file27cc33b22ba0.duckdb]</span></span></span>
 <span><span class="co">#&gt;    cohort_definition_id subject_id cohort_start_date cohort_end_date</span></span>
 <span><span class="co">#&gt;                   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>         </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>                    1       <span style="text-decoration: underline;">4</span>563 2005-01-04        2005-02-01     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>                    2       <span style="text-decoration: underline;">4</span>521 1958-10-11        1958-10-11     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>                    1       <span style="text-decoration: underline;">2</span>456 1998-10-10        1998-10-17     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>                    1       <span style="text-decoration: underline;">3</span>957 2006-08-22        2006-09-05     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>                    1       <span style="text-decoration: underline;">5</span>195 1980-03-05        1980-03-19     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>                    1       <span style="text-decoration: underline;">2</span>213 2003-04-05        2003-04-12     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>                    1       <span style="text-decoration: underline;">2</span>485 1920-04-28        1920-05-12     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>                    1        695 1974-10-21        1974-11-04     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>                    1        695 2011-10-31        2011-11-07     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>                    1       <span style="text-decoration: underline;">4</span>116 2006-01-28        2006-02-11     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>                    1        883 1975-09-30        1975-10-14     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>                    1       <span style="text-decoration: underline;">2</span>387 2012-08-30        2012-09-13     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>                    1       <span style="text-decoration: underline;">4</span>418 2010-01-20        2010-01-27     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>                    1        492 2006-09-02        2006-09-09     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>                    1       <span style="text-decoration: underline;">2</span>459 2008-09-06        2008-09-13     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>                    1       <span style="text-decoration: underline;">3</span>277 1990-03-06        1990-03-13     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>                    2       <span style="text-decoration: underline;">3</span>654 2004-10-17        2004-10-17     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>                    1        940 1987-05-02        1987-05-23     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>                    1       <span style="text-decoration: underline;">3</span>215 1981-09-24        1981-10-01     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>                    1       <span style="text-decoration: underline;">3</span>920 1989-01-29        1989-02-28     </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ more rows</span></span></span>
 <span></span>
 <span><span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/cohortCount.html" class="external-link">cohortCount</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">medications</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 3</span></span></span>
 <span><span class="co">#&gt;   cohort_definition_id number_records number_subjects</span></span>
 <span><span class="co">#&gt;                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1            375             100</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1            342             100</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                    2            100             100</span></span></code></pre></div>
 <p>When cohortId = NULL all cohorts in the table are used. Note that
 this function does not reduced the number of records in each cohort,
