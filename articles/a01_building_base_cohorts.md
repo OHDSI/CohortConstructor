@@ -183,7 +183,10 @@ cdm$drugs_merge |>
 ```
 
 Alternatively, if we set `overlap = "extend"`, the cohort end date will
-be extended by summing the durations of each overlapping record.
+be extended by summing the durations of each overlapping record, as
+depicted in the image below.
+
+![](images/overlap.png)
 
 ``` r
 cdm$drugs_extend <- conceptCohort(cdm, 
@@ -210,11 +213,18 @@ cdm$drugs_extend |>
 #> # ℹ 2 more variables: excluded_records <int>, excluded_subjects <int>
 ```
 
-To create a cohort from a concept set and include records outside of the
-observation period, we can set `useRecordsBeforeObservation = TRUE`. If
-we also want to search for the given concepts in the source concept_id
-fields, rather than only the standard concept_id fields, we can set
-`useSourceFields = TRUE`.
+To create a cohort from a concept set and include records outside the
+observation period, we can set `useRecordsBeforeObservation = TRUE`.
+This option shifts records that start before the observation period to
+the start of the corresponding observation period, and trims records
+that start or end after the observation period so they fall within that
+observation period. This behavior is shown in the image below.
+
+![](images/useRecordsBeforeObservation.png)
+
+If we also want to search for the given concepts in the source
+concept_id fields, rather than only the standard concept_id fields, we
+can set `useSourceFields = TRUE`.
 
 ``` r
 
@@ -227,11 +237,11 @@ cdm$celecoxib |>
   glimpse()
 #> Rows: ??
 #> Columns: 4
-#> Database: DuckDB 1.4.3 [unknown@Linux 6.11.0-1018-azure:R 4.5.2//tmp/RtmpQVKZWM/file260e69bec351.duckdb]
+#> Database: DuckDB 1.4.3 [unknown@Linux 6.11.0-1018-azure:R 4.5.2//tmp/RtmpbBgPpy/file25ba3c204a99.duckdb]
 #> $ cohort_definition_id <int> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1…
-#> $ subject_id           <int> 318, 850, 1322, 1418, 4276, 4474, 830, 1744, 2243…
-#> $ cohort_start_date    <date> 1994-12-10, 1990-01-23, 1958-09-01, 2014-08-08, …
-#> $ cohort_end_date      <date> 1994-12-10, 1990-01-23, 1958-09-01, 2014-08-08, …
+#> $ subject_id           <int> 412, 1144, 1636, 1778, 2622, 3230, 4932, 5023, 43…
+#> $ cohort_start_date    <date> 1993-09-22, 2014-09-14, 2000-06-13, 2017-09-25, …
+#> $ cohort_end_date      <date> 1993-09-22, 2014-09-14, 2000-06-13, 2017-09-25, …
 ```
 
 ## Demographic based cohort creation

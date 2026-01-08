@@ -262,7 +262,8 @@ latest end date of the overlapping records.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2 more variables: excluded_records &lt;int&gt;, excluded_subjects &lt;int&gt;</span></span></span></code></pre></div>
 <p>Alternatively, if we set <code>overlap = "extend"</code>, the cohort
 end date will be extended by summing the durations of each overlapping
-record.</p>
+record, as depicted in the image below.</p>
+<p><img src="images/overlap.png"></p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">drugs_extend</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/conceptCohort.html">conceptCohort</a></span><span class="op">(</span><span class="va">cdm</span>, </span>
 <span>                           conceptSet <span class="op">=</span> <span class="va">drug_codes</span>,</span>
@@ -286,12 +287,17 @@ record.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>                    2          <span style="text-decoration: underline;">13</span>905            <span style="text-decoration: underline;">2</span>679         4 Add overlappin…</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 20 more rows</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2 more variables: excluded_records &lt;int&gt;, excluded_subjects &lt;int&gt;</span></span></span></code></pre></div>
-<p>To create a cohort from a concept set and include records outside of
-the observation period, we can set
-<code>useRecordsBeforeObservation = TRUE</code>. If we also want to
-search for the given concepts in the source concept_id fields, rather
-than only the standard concept_id fields, we can set
-<code>useSourceFields = TRUE</code>.</p>
+<p>To create a cohort from a concept set and include records outside the
+observation period, we can set
+<code>useRecordsBeforeObservation = TRUE</code>. This option shifts
+records that start before the observation period to the start of the
+corresponding observation period, and trims records that start or end
+after the observation period so they fall within that observation
+period. This behavior is shown in the image below.</p>
+<p><img src="images/useRecordsBeforeObservation.png"></p>
+<p>If we also want to search for the given concepts in the source
+concept_id fields, rather than only the standard concept_id fields, we
+can set <code>useSourceFields = TRUE</code>.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">cdm</span><span class="op">$</span><span class="va">celecoxib</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/conceptCohort.html">conceptCohort</a></span><span class="op">(</span><span class="va">cdm</span>, </span>
@@ -303,11 +309,11 @@ than only the standard concept_id fields, we can set
 <span>  <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Rows: ??</span></span>
 <span><span class="co">#&gt; Columns: 4</span></span>
-<span><span class="co">#&gt; Database: DuckDB 1.4.3 [unknown@Linux 6.11.0-1018-azure:R 4.5.2//tmp/RtmpQVKZWM/file260e69bec351.duckdb]</span></span>
+<span><span class="co">#&gt; Database: DuckDB 1.4.3 [unknown@Linux 6.11.0-1018-azure:R 4.5.2//tmp/RtmpbBgPpy/file25ba3c204a99.duckdb]</span></span>
 <span><span class="co">#&gt; $ cohort_definition_id <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> 1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1…</span></span>
-<span><span class="co">#&gt; $ subject_id           <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> 318<span style="color: #949494;">, </span>850<span style="color: #949494;">, </span>1322<span style="color: #949494;">, </span>1418<span style="color: #949494;">, </span>4276<span style="color: #949494;">, </span>4474<span style="color: #949494;">, </span>830<span style="color: #949494;">, </span>1744<span style="color: #949494;">, </span>2243…</span></span>
-<span><span class="co">#&gt; $ cohort_start_date    <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 1994-12-10<span style="color: #949494;">, </span>1990-01-23<span style="color: #949494;">, </span>1958-09-01<span style="color: #949494;">, </span>2014-08-08<span style="color: #949494;">, </span>…</span></span>
-<span><span class="co">#&gt; $ cohort_end_date      <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 1994-12-10<span style="color: #949494;">, </span>1990-01-23<span style="color: #949494;">, </span>1958-09-01<span style="color: #949494;">, </span>2014-08-08<span style="color: #949494;">, </span>…</span></span></code></pre></div>
+<span><span class="co">#&gt; $ subject_id           <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> 412<span style="color: #949494;">, </span>1144<span style="color: #949494;">, </span>1636<span style="color: #949494;">, </span>1778<span style="color: #949494;">, </span>2622<span style="color: #949494;">, </span>3230<span style="color: #949494;">, </span>4932<span style="color: #949494;">, </span>5023<span style="color: #949494;">, </span>43…</span></span>
+<span><span class="co">#&gt; $ cohort_start_date    <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 1993-09-22<span style="color: #949494;">, </span>2014-09-14<span style="color: #949494;">, </span>2000-06-13<span style="color: #949494;">, </span>2017-09-25<span style="color: #949494;">, </span>…</span></span>
+<span><span class="co">#&gt; $ cohort_end_date      <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 1993-09-22<span style="color: #949494;">, </span>2014-09-14<span style="color: #949494;">, </span>2000-06-13<span style="color: #949494;">, </span>2017-09-25<span style="color: #949494;">, </span>…</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="demographic-based-cohort-creation">Demographic based cohort creation<a class="anchor" aria-label="anchor" href="#demographic-based-cohort-creation"></a>
