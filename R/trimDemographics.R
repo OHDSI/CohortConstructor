@@ -381,7 +381,7 @@ datesAgeRange <- function(ageRange) {
     unique()
   values <- values[!is.infinite(values)]
   values <- values[values != 0] |> as.integer()
-  glue::glue("as.Date(clock::add_years(.data$date_0, {values}))") |>
+  glue::glue("as.Date(clock::add_years(.data$date_0, {values}, invalid = 'previous'))") |>
     rlang::parse_exprs() |>
     rlang::set_names(glue::glue("date_{values}"))
 }
