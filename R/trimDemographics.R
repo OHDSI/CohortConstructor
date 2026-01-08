@@ -191,7 +191,7 @@ trimDemographics <- function(cohort,
         logPrefix = "CohortConstructor_trimDemographics_year_"
       ) |>
       omopgenerics::recordCohortAttrition(reason = "Non-missing year of birth", cohortId = newChangeIds) |>
-      dplyr::mutate(!!!datesAgeRange(ageRange)) |>
+      dplyr::mutate(!!!datesAgeRange(ageRange, cohort = newCohort)) |>
       dplyr::mutate(
         !!!caseAge(ageRange),
         "cohort_start_date" = dplyr::if_else(
@@ -371,7 +371,7 @@ trimDemographics <- function(cohort,
   return(newCohort)
 }
 
-datesAgeRange <- function(ageRange) {
+datesAgeRange <- function(ageRange, cohort) {
   qA <- list()
   values <- lapply(ageRange, function(x) {
     x[2] <- x[2] + 1
@@ -381,10 +381,26 @@ datesAgeRange <- function(ageRange) {
     unique()
   values <- values[!is.infinite(values)]
   values <- values[values != 0] |> as.integer()
-  glue::glue("as.Date(clock::add_years(.data$date_0, {values}, invalid = 'previous'))") |>
-    rlang::parse_exprs() |>
-    rlang::set_names(glue::glue("date_{values}"))
+
+  if ("tbl_sql" %in% class(cohort)) {
+    glue::glue(
+      "dplyr::if_else(
+  clock::get_month(.data$date_0) == 2 & clock::get_day(.data$date_0) == 29 & {!isLeap(values)},
+  as.Date(paste0(as.character(as.integer(clock::get_year(.data$date_0) + {values})), '-03-01')),
+  as.Date(clock::add_years(.data$date_0, {values})))"
+    ) |>
+      rlang::parse_exprs() |>
+      rlang::set_names(glue::glue("date_{values}"))
+  } else {
+    glue::glue("as.Date(clock::add_years(.data$date_0, {values}, invalid = 'next'))"
+    ) |>
+      rlang::parse_exprs() |>
+      rlang::set_names(glue::glue("date_{values}"))
+  }
 }
+
+
+
 
 caseAge <- function(age) {
   ageMin <- lapply(age, function(x) {
@@ -437,4 +453,8 @@ prepareColEnd <- function(x, col) {
     rlang::parse_exprs() |>
     rlang::set_names("new_cohort_end_date")
   return(x)
+}
+
+isLeap <- function(year) {
+  (year %% 4 == 0 & year %% 100 != 0) | (year %% 400 == 0)
 }
