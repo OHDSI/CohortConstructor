@@ -427,7 +427,7 @@ fulfillCohortReqs <- function(cdm, name, useRecordsBeforeObservation, type = "st
           .data$cohort_start_date
         ),
         cohort_end_date = dplyr::if_else(
-          .data$trim_record == TRUE & !.data$in_observation_end,
+          .data$trim_record == TRUE & .data$in_observation_end != TRUE,
           dplyr::if_else(
             .data$cohort_end_date > .data$observation_period_end_date,
             .data$observation_period_end_date,
