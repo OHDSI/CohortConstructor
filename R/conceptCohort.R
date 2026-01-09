@@ -415,7 +415,7 @@ fulfillCohortReqs <- function(cdm, name, useRecordsBeforeObservation, type = "st
         outside_observation = (sum(.data$in_observation_start_flag, na.rm = TRUE) == dplyr::n()),
         min_days_start = min(.data$days_start_obs, na.rm = TRUE),
         trim_record =
-          .data$outside_observation &
+          .data$outside_observation == TRUE &
           .data$days_start_obs == .data$min_days_start &
           !is.na(.data$days_start_obs)
       ) |>
