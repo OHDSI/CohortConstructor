@@ -199,7 +199,7 @@ cdm$cohort2 <- measurementCohort(
 #> ℹ Getting records in observation.
 #> Warning: There were 3 warnings in `dplyr::mutate()`.
 #> The first warning was:
-#> ℹ In argument: `trim_record = &...`.
+#> ℹ In argument: `min_days_start = min(.data$days_start_obs, na.rm = TRUE)`.
 #> ℹ In group 1: `cohort_definition_id = 1`, `subject_id = 1`, `cohort_start_date
 #>   = 2000-12-11`, `cohort_end_date = 2000-12-11`.
 #> Caused by warning in `min()`:

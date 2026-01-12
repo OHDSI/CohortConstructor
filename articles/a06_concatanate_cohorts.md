@@ -52,22 +52,22 @@ individual.
 cdm$medications |>
   filter(subject_id == 1)
 #> # Source:   SQL [?? x 4]
-#> # Database: DuckDB 1.4.3 [unknown@Linux 6.11.0-1018-azure:R 4.5.2//tmp/Rtmp8YbmMf/file278575ffedf7.duckdb]
-#>   cohort_definition_id subject_id cohort_start_date cohort_end_date
-#>                  <int>      <int> <date>            <date>         
-#> 1                    1          1 1980-03-15        1980-03-29     
-#> 2                    1          1 1971-01-04        1971-01-18     
-#> 3                    1          1 1982-09-11        1982-10-02     
-#> 4                    1          1 1976-10-20        1976-11-03
-cdm$medications_collapsed |>
-  filter(subject_id == 1)
-#> # Source:   SQL [?? x 4]
-#> # Database: DuckDB 1.4.3 [unknown@Linux 6.11.0-1018-azure:R 4.5.2//tmp/Rtmp8YbmMf/file278575ffedf7.duckdb]
+#> # Database: DuckDB 1.4.3 [unknown@Linux 6.11.0-1018-azure:R 4.5.2//tmp/Rtmpae4Bi8/file275b2a42ab92.duckdb]
 #>   cohort_definition_id subject_id cohort_start_date cohort_end_date
 #>                  <int>      <int> <date>            <date>         
 #> 1                    1          1 1976-10-20        1976-11-03     
+#> 2                    1          1 1980-03-15        1980-03-29     
+#> 3                    1          1 1971-01-04        1971-01-18     
+#> 4                    1          1 1982-09-11        1982-10-02
+cdm$medications_collapsed |>
+  filter(subject_id == 1)
+#> # Source:   SQL [?? x 4]
+#> # Database: DuckDB 1.4.3 [unknown@Linux 6.11.0-1018-azure:R 4.5.2//tmp/Rtmpae4Bi8/file275b2a42ab92.duckdb]
+#>   cohort_definition_id subject_id cohort_start_date cohort_end_date
+#>                  <int>      <int> <date>            <date>         
+#> 1                    1          1 1971-01-04        1971-01-18     
 #> 2                    1          1 1980-03-15        1982-10-02     
-#> 3                    1          1 1971-01-04        1971-01-18
+#> 3                    1          1 1976-10-20        1976-11-03
 ```
 
 Subject 1 initially had 4 records between 1971 and 1982. After
