@@ -26,6 +26,7 @@ The cohort table
 # \donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
+#> ℹ Attempting download with timeout = 120 seconds.
 #> ℹ Reading GiBleed tables.
 cdm$cohort1 <- addCohortTableIndex(cdm$cohort1)
 # }
