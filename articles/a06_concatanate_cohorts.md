@@ -52,7 +52,7 @@ individual.
 cdm$medications |>
   filter(subject_id == 1)
 #> # Source:   SQL [?? x 4]
-#> # Database: DuckDB 1.4.4 [unknown@Linux 6.14.0-1017-azure:R 4.5.2//tmp/Rtmp6bv2jA/file25aa5e1e8c98.duckdb]
+#> # Database: DuckDB 1.4.4 [unknown@Linux 6.14.0-1017-azure:R 4.5.2//tmp/RtmpFbAmN6/file25da9f5036e.duckdb]
 #>   cohort_definition_id subject_id cohort_start_date cohort_end_date
 #>                  <int>      <int> <date>            <date>         
 #> 1                    1          1 1980-03-15        1980-03-29     
@@ -62,12 +62,12 @@ cdm$medications |>
 cdm$medications_collapsed |>
   filter(subject_id == 1)
 #> # Source:   SQL [?? x 4]
-#> # Database: DuckDB 1.4.4 [unknown@Linux 6.14.0-1017-azure:R 4.5.2//tmp/Rtmp6bv2jA/file25aa5e1e8c98.duckdb]
+#> # Database: DuckDB 1.4.4 [unknown@Linux 6.14.0-1017-azure:R 4.5.2//tmp/RtmpFbAmN6/file25da9f5036e.duckdb]
 #>   cohort_definition_id subject_id cohort_start_date cohort_end_date
 #>                  <int>      <int> <date>            <date>         
-#> 1                    1          1 1971-01-04        1971-01-18     
+#> 1                    1          1 1980-03-15        1982-10-02     
 #> 2                    1          1 1976-10-20        1976-11-03     
-#> 3                    1          1 1980-03-15        1982-10-02
+#> 3                    1          1 1971-01-04        1971-01-18
 ```
 
 Subject 1 initially had 4 records between 1971 and 1982. After
