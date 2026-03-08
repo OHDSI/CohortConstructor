@@ -108,10 +108,14 @@ cdm$new_matched_cohort <- cdm$cohort2 |>
 #> Binding cohorts
 #> ✔ Done
 cdm$new_matched_cohort
-#> # A tibble: 2 × 5
+#> # A tibble: 6 × 5
 #>   cohort_definition_id subject_id cohort_start_date cohort_end_date cluster_id
 #> *                <int>      <int> <date>            <date>               <int>
-#> 1                    1          2 2005-01-05        2006-06-24              11
-#> 2                    2         86 2005-01-05        2009-12-25              11
+#> 1                    1         53 2012-12-19        2012-12-25              12
+#> 2                    1         55 2007-11-08        2010-06-26               6
+#> 3                    1          2 2009-04-25        2010-04-06              25
+#> 4                    2         30 2012-12-19        2019-04-02              12
+#> 5                    2         79 2007-11-08        2009-02-15               6
+#> 6                    2         96 2009-04-25        2019-03-23              25
 # }
 ```

@@ -51,16 +51,16 @@ death_cohort
 #> # A tibble: 10 × 4
 #>    cohort_definition_id subject_id cohort_start_date cohort_end_date
 #>                   <int>      <int> <date>            <date>         
-#>  1                    1         34 1980-12-16        1980-12-16     
-#>  2                    1         83 2006-01-25        2006-01-25     
-#>  3                    1         54 2016-02-02        2016-02-02     
-#>  4                    1         38 2016-11-18        2016-11-18     
-#>  5                    1         57 2018-03-11        2018-03-11     
-#>  6                    1         52 2018-05-24        2018-05-24     
-#>  7                    1         25 2018-07-07        2018-07-07     
-#>  8                    1         89 2019-07-15        2019-07-15     
-#>  9                    1         51 2019-07-31        2019-07-31     
-#> 10                    1        100 2019-12-09        2019-12-09     
+#>  1                    1         34 1997-03-24        1997-03-24     
+#>  2                    1         25 2005-12-07        2005-12-07     
+#>  3                    1        100 2007-03-18        2007-03-18     
+#>  4                    1         83 2014-01-18        2014-01-18     
+#>  5                    1         38 2016-12-21        2016-12-21     
+#>  6                    1         57 2018-10-28        2018-10-28     
+#>  7                    1         54 2019-04-13        2019-04-13     
+#>  8                    1         89 2019-10-29        2019-10-29     
+#>  9                    1         52 2019-11-24        2019-11-24     
+#> 10                    1         51 2020-01-01        2020-01-01     
 
 # Create a demographics cohort with age range and sex filters
 cdm$my_cohort <- demographicsCohort(cdm, "my_cohort", ageRange = c(50,100), sex = "Female")
@@ -81,8 +81,8 @@ death_cohort |> attrition()
 #> 1                    1             10              10         1 Initial qualify…
 #> 2                    1             10              10         2 Record in obser…
 #> 3                    1             10              10         3 Not missing rec…
-#> 4                    1              0               0         4 In subset cohort
-#> 5                    1              0               0         5 First death rec…
+#> 4                    1              1               1         4 In subset cohort
+#> 5                    1              1               1         5 First death rec…
 #> # ℹ 2 more variables: excluded_records <int>, excluded_subjects <int>
 # }
 ```

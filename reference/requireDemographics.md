@@ -74,7 +74,6 @@ demographic requirements
 # \donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
-#> Warning: '/tmp/RtmpGSfDUb/id_qvh' already exists
 #> ℹ Reading GiBleed tables.
 
 cdm$cohort1 |>
@@ -82,19 +81,16 @@ cdm$cohort1 |>
                       ageRange = list(c(18, 65)),
                       sex = "Female",
                       minPriorObservation = 365)
-#> # A tibble: 11 × 4
-#>    cohort_definition_id subject_id cohort_start_date cohort_end_date
-#>  *                <int>      <int> <date>            <date>         
-#>  1                    1          2 2016-10-22        2017-09-09     
-#>  2                    1          9 2016-01-11        2017-12-06     
-#>  3                    1         23 1998-08-13        1998-11-14     
-#>  4                    1         50 2013-03-26        2016-11-30     
-#>  5                    1         51 2015-09-24        2015-10-30     
-#>  6                    1         54 2004-03-03        2005-12-19     
-#>  7                    1         58 1999-03-08        2002-10-02     
-#>  8                    1         60 2012-02-11        2014-01-26     
-#>  9                    1         65 2019-01-01        2019-08-24     
-#> 10                    1         70 1997-11-14        1998-01-15     
-#> 11                    1         72 2016-07-23        2017-09-13     
+#> # A tibble: 8 × 4
+#>   cohort_definition_id subject_id cohort_start_date cohort_end_date
+#> *                <int>      <int> <date>            <date>         
+#> 1                    1          5 1995-01-28        1997-01-25     
+#> 2                    1          8 2005-09-13        2016-06-01     
+#> 3                    1         12 2009-03-30        2015-06-20     
+#> 4                    1         16 1976-05-06        1978-02-02     
+#> 5                    1         17 2004-10-23        2011-02-26     
+#> 6                    1         58 1987-09-20        1988-02-03     
+#> 7                    1         60 2001-06-21        2007-02-05     
+#> 8                    1         74 1996-10-05        2000-10-20     
 # }
 ```

@@ -11,6 +11,8 @@ Useful links:
 
 - <https://github.com/OHDSI/CohortConstructor>
 
+- Report bugs at <https://github.com/OHDSI/CohortConstructor/issues>
+
 ## Author
 
 **Maintainer**: Edward Burn <edward.burn@ndorms.ox.ac.uk>

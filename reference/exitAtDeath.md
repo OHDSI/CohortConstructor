@@ -59,18 +59,22 @@ library(PatientProfiles)
 library(CohortConstructor)
 cdm <- mockPatientProfiles()
 cdm$cohort1 |> exitAtDeath()
+#> Warning: There was 1 warning in `dplyr::summarise()`.
+#> ℹ In argument: `days = min(.data$start, na.rm = TRUE)`.
+#> Caused by warning in `min()`:
+#> ! no non-missing arguments to min; returning Inf
 #> # A tibble: 10 × 4
 #>    cohort_definition_id subject_id cohort_start_date cohort_end_date
 #>  *                <int>      <int> <date>            <date>         
-#>  1                    2          6 1932-11-21        1932-12-03     
-#>  2                    1          8 1939-05-11        1962-05-06     
-#>  3                    1          4 1950-02-12        1958-09-14     
-#>  4                    3         10 1963-03-24        1988-02-01     
-#>  5                    2          5 1967-05-02        1981-09-01     
-#>  6                    3          7 1974-03-26        1980-10-31     
-#>  7                    2          2 1976-08-14        1988-07-02     
-#>  8                    2          9 1980-11-25        2009-03-01     
-#>  9                    2          1 1984-04-12        1985-02-17     
-#> 10                    2          3 2000-10-01        2005-07-13     
+#>  1                    2          5 1922-05-02        1936-09-01     
+#>  2                    3          7 1931-03-26        1937-10-31     
+#>  3                    2          9 1949-11-26        1972-02-22     
+#>  4                    1          8 1968-05-10        1991-05-06     
+#>  5                    3         10 1969-03-23        1994-01-31     
+#>  6                    2          6 1973-11-21        1973-12-03     
+#>  7                    2          2 1974-08-15        1986-07-03     
+#>  8                    2          3 1993-10-01        1998-07-13     
+#>  9                    2          1 1995-04-12        1996-02-17     
+#> 10                    1          4 2005-02-12        2013-09-14     
 # }
 ```
