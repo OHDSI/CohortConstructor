@@ -26,7 +26,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/OHDSI/CohortConstructor/blob/main/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/OHDSI/CohortConstructor/blob/v0.6.2/DESCRIPTION)
 
 Burn E, Català M, Mercade-Besora N, Alcalde-Herraiz M, Du M, Guo Y, Chen
 X, Lopez-Guell K, Rowlands E (2026). *CohortConstructor: Build and

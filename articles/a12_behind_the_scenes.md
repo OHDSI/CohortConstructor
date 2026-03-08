@@ -50,7 +50,7 @@ for(i in seq_along(sorted_files)) {
   sql_with_quotes <- paste0('"', paste(readLines(sorted_files[i]), collapse = '\n'), '"')
   cat(sql_with_quotes, "\n```\n\n")
 }
-#> ### /tmp/RtmpRZXUF1/sql_folder/logged_query_00001_on_2026_03_08_at_15_51_20.txt
+#> ### /tmp/RtmpGxBNte/sql_folder/logged_query_00001_on_2026_03_08_at_16_08_11.txt
 #> 
 #> "type: collect
 #> schema: results
@@ -62,30 +62,30 @@ for(i in seq_along(sorted_files)) {
 #>   WHERE (vocabulary_id = 'None')" 
 #> ```
 #> 
-#> ### /tmp/RtmpRZXUF1/sql_folder/logged_query_00002_on_2026_03_08_at_15_51_20.txt
+#> ### /tmp/RtmpGxBNte/sql_folder/logged_query_00002_on_2026_03_08_at_16_08_11.txt
 #> 
 #> "type: compute
 #> schema: results
 #> prefix: test_
-#> name: tmp_001_og_003_1772985080
+#> name: tmp_001_og_003_1772986092
 #> temporary: FALSE
 #> overwrite: TRUE
 #> log_prefix: CohortConstructor_uploadCohortCodelist
-#> time_taken: 0.159 seconds
+#> time_taken: 0.171 seconds
 #> sql: <SQL>
 #>   SELECT
 #>     cohort_definition_id,
 #>     CAST(concept_id AS INTEGER) AS concept_id,
 #>     LOWER(domain_id) AS domain_id
 #>   FROM (
-#>     SELECT test_tmp_001_og_003_1772985080.*, domain_id
-#>     FROM results.test_tmp_001_og_003_1772985080
+#>     SELECT test_tmp_001_og_003_1772986092.*, domain_id
+#>     FROM results.test_tmp_001_og_003_1772986092
 #>     LEFT JOIN concept
-#>       ON (test_tmp_001_og_003_1772985080.concept_id = concept.concept_id)
+#>       ON (test_tmp_001_og_003_1772986092.concept_id = concept.concept_id)
 #>   ) q01" 
 #> ```
 #> 
-#> ### /tmp/RtmpRZXUF1/sql_folder/logged_query_00003_on_2026_03_08_at_15_51_20.txt
+#> ### /tmp/RtmpGxBNte/sql_folder/logged_query_00003_on_2026_03_08_at_16_08_12.txt
 #> 
 #> "type: collect
 #> schema: results
@@ -93,11 +93,11 @@ for(i in seq_along(sorted_files)) {
 #> time_taken: 0.036 seconds
 #> sql: <SQL>
 #>   SELECT domain_id, COUNT(*) AS n
-#>   FROM results.test_tmp_001_og_003_1772985080
+#>   FROM results.test_tmp_001_og_003_1772986092
 #>   GROUP BY domain_id" 
 #> ```
 #> 
-#> ### /tmp/RtmpRZXUF1/sql_folder/logged_query_00004_on_2026_03_08_at_15_51_20.txt
+#> ### /tmp/RtmpGxBNte/sql_folder/logged_query_00004_on_2026_03_08_at_16_08_12.txt
 #> 
 #> "type: collect
 #> schema: results
@@ -105,25 +105,25 @@ for(i in seq_along(sorted_files)) {
 #> time_taken: 0.030 seconds
 #> sql: <SQL>
 #>   SELECT DISTINCT domain_id
-#>   FROM results.test_tmp_001_og_003_1772985080" 
+#>   FROM results.test_tmp_001_og_003_1772986092" 
 #> ```
 #> 
-#> ### /tmp/RtmpRZXUF1/sql_folder/logged_query_00005_on_2026_03_08_at_15_51_20.txt
+#> ### /tmp/RtmpGxBNte/sql_folder/logged_query_00005_on_2026_03_08_at_16_08_12.txt
 #> 
 #> "type: collect
 #> schema: results
 #> prefix: test_
-#> time_taken: 0.047 seconds
+#> time_taken: 0.048 seconds
 #> sql: <SQL>
 #>   SELECT COUNT(*) AS n
 #>   FROM (
-#>     SELECT test_tmp_001_og_003_1772985080.*
-#>     FROM results.test_tmp_001_og_003_1772985080
+#>     SELECT test_tmp_001_og_003_1772986092.*
+#>     FROM results.test_tmp_001_og_003_1772986092
 #>     WHERE (domain_id IN ('drug'))
 #>   ) q01" 
 #> ```
 #> 
-#> ### /tmp/RtmpRZXUF1/sql_folder/logged_query_00006_on_2026_03_08_at_15_51_20.txt
+#> ### /tmp/RtmpGxBNte/sql_folder/logged_query_00006_on_2026_03_08_at_16_08_12.txt
 #> 
 #> "type: compute
 #> schema: results
@@ -132,14 +132,14 @@ for(i in seq_along(sorted_files)) {
 #> temporary: FALSE
 #> overwrite: TRUE
 #> log_prefix: CohortConstructor_tempCodelistCohortId_
-#> time_taken: 0.070 seconds
+#> time_taken: 0.072 seconds
 #> sql: <SQL>
 #>   SELECT DISTINCT cohort_definition_id, concept_id
-#>   FROM results.test_tmp_001_og_003_1772985080
+#>   FROM results.test_tmp_001_og_003_1772986092
 #>   WHERE (domain_id IN ('drug'))" 
 #> ```
 #> 
-#> ### /tmp/RtmpRZXUF1/sql_folder/logged_query_00007_on_2026_03_08_at_15_51_20.txt
+#> ### /tmp/RtmpGxBNte/sql_folder/logged_query_00007_on_2026_03_08_at_16_08_12.txt
 #> 
 #> "type: compute
 #> schema: results
@@ -148,22 +148,22 @@ for(i in seq_along(sorted_files)) {
 #> temporary: FALSE
 #> overwrite: TRUE
 #> log_prefix: CohortConstructor_tempCodelist_
-#> time_taken: 0.053 seconds
+#> time_taken: 0.052 seconds
 #> sql: <SQL>
 #>   SELECT DISTINCT concept_id
 #>   FROM results.test_tmp_001_temp_codelist_cohort_id" 
 #> ```
 #> 
-#> ### /tmp/RtmpRZXUF1/sql_folder/logged_query_00008_on_2026_03_08_at_15_51_20.txt
+#> ### /tmp/RtmpGxBNte/sql_folder/logged_query_00008_on_2026_03_08_at_16_08_12.txt
 #> 
 #> "type: compute
 #> schema: results
 #> prefix: test_
-#> name: tmp_001_og_004_1772985081_1
+#> name: tmp_001_og_004_1772986092_1
 #> temporary: FALSE
 #> overwrite: TRUE
 #> log_prefix: CohortConstructor_tempCohort_
-#> time_taken: 0.078 seconds
+#> time_taken: 0.074 seconds
 #> sql: <SQL>
 #>   SELECT
 #>     person_id AS subject_id,
@@ -175,39 +175,39 @@ for(i in seq_along(sorted_files)) {
 #>     ON (drug_exposure.drug_concept_id = test_tmp_001_temp_codelist.concept_id)" 
 #> ```
 #> 
-#> ### /tmp/RtmpRZXUF1/sql_folder/logged_query_00009_on_2026_03_08_at_15_51_20.txt
+#> ### /tmp/RtmpGxBNte/sql_folder/logged_query_00009_on_2026_03_08_at_16_08_12.txt
 #> 
 #> "type: compute
 #> schema: results
 #> prefix: test_
-#> name: tmp_001_og_004_1772985081_1
+#> name: tmp_001_og_004_1772986092_1
 #> temporary: FALSE
 #> overwrite: TRUE
 #> log_prefix: CohortConstructor_tempCohort_
-#> time_taken: 0.107 seconds
+#> time_taken: 0.103 seconds
 #> sql: <SQL>
 #>   SELECT cohort_definition_id, subject_id, cohort_start_date, cohort_end_date
-#>   FROM results.test_tmp_001_og_004_1772985081_1
+#>   FROM results.test_tmp_001_og_004_1772986092_1
 #>   INNER JOIN results.test_tmp_001_temp_codelist_cohort_id
-#>     ON (test_tmp_001_og_004_1772985081_1.concept_id = test_tmp_001_temp_codelist_cohort_id.concept_id)" 
+#>     ON (test_tmp_001_og_004_1772986092_1.concept_id = test_tmp_001_temp_codelist_cohort_id.concept_id)" 
 #> ```
 #> 
-#> ### /tmp/RtmpRZXUF1/sql_folder/logged_query_00010_on_2026_03_08_at_15_51_21.txt
+#> ### /tmp/RtmpGxBNte/sql_folder/logged_query_00010_on_2026_03_08_at_16_08_12.txt
 #> 
 #> "type: collect
 #> schema: results
 #> prefix: test_
-#> time_taken: 0.040 seconds
+#> time_taken: 0.039 seconds
 #> sql: <SQL>
 #>   SELECT COUNT(*) AS n
 #>   FROM (
-#>     SELECT test_tmp_001_og_004_1772985081_1.*
-#>     FROM results.test_tmp_001_og_004_1772985081_1
+#>     SELECT test_tmp_001_og_004_1772986092_1.*
+#>     FROM results.test_tmp_001_og_004_1772986092_1
 #>     LIMIT 1
 #>   ) q01" 
 #> ```
 #> 
-#> ### /tmp/RtmpRZXUF1/sql_folder/logged_query_00011_on_2026_03_08_at_15_51_21.txt
+#> ### /tmp/RtmpGxBNte/sql_folder/logged_query_00011_on_2026_03_08_at_16_08_12.txt
 #> 
 #> "type: compute
 #> schema: results
@@ -216,17 +216,17 @@ for(i in seq_along(sorted_files)) {
 #> temporary: FALSE
 #> overwrite: TRUE
 #> log_prefix: CohortConstructor_conceptCohort_reduce_
-#> time_taken: 0.090 seconds
+#> time_taken: 0.089 seconds
 #> sql: <SQL>
 #>   SELECT
 #>     cohort_definition_id,
 #>     subject_id,
 #>     cohort_start_date,
 #>     COALESCE(cohort_end_date, cohort_start_date) AS cohort_end_date
-#>   FROM results.test_tmp_001_og_004_1772985081_1" 
+#>   FROM results.test_tmp_001_og_004_1772986092_1" 
 #> ```
 #> 
-#> ### /tmp/RtmpRZXUF1/sql_folder/logged_query_00012_on_2026_03_08_at_15_51_21.txt
+#> ### /tmp/RtmpGxBNte/sql_folder/logged_query_00012_on_2026_03_08_at_16_08_12.txt
 #> 
 #> "type: collect
 #> schema: results
@@ -241,7 +241,7 @@ for(i in seq_along(sorted_files)) {
 #>   ) q01" 
 #> ```
 #> 
-#> ### /tmp/RtmpRZXUF1/sql_folder/logged_query_00013_on_2026_03_08_at_15_51_21.txt
+#> ### /tmp/RtmpGxBNte/sql_folder/logged_query_00013_on_2026_03_08_at_16_08_13.txt
 #> 
 #> "type: collect
 #> schema: results
@@ -256,19 +256,19 @@ for(i in seq_along(sorted_files)) {
 #>   GROUP BY cohort_definition_id" 
 #> ```
 #> 
-#> ### /tmp/RtmpRZXUF1/sql_folder/logged_query_00014_on_2026_03_08_at_15_51_21.txt
+#> ### /tmp/RtmpGxBNte/sql_folder/logged_query_00014_on_2026_03_08_at_16_08_13.txt
 #> 
 #> "type: collect
 #> schema: results
 #> prefix: test_
-#> time_taken: 0.025 seconds
+#> time_taken: 0.024 seconds
 #> sql: <SQL>
 #>   SELECT test_drugs.*
 #>   FROM results.test_drugs
 #>   LIMIT 1" 
 #> ```
 #> 
-#> ### /tmp/RtmpRZXUF1/sql_folder/logged_query_00015_on_2026_03_08_at_15_51_21.txt
+#> ### /tmp/RtmpGxBNte/sql_folder/logged_query_00015_on_2026_03_08_at_16_08_13.txt
 #> 
 #> "type: collect
 #> schema: results
@@ -279,7 +279,7 @@ for(i in seq_along(sorted_files)) {
 #>   FROM results.test_drugs" 
 #> ```
 #> 
-#> ### /tmp/RtmpRZXUF1/sql_folder/logged_query_00016_on_2026_03_08_at_15_51_21.txt
+#> ### /tmp/RtmpGxBNte/sql_folder/logged_query_00016_on_2026_03_08_at_16_08_13.txt
 #> 
 #> "type: compute
 #> schema: results
@@ -300,7 +300,7 @@ for(i in seq_along(sorted_files)) {
 #>     ON (test_drugs.subject_id = observation_period.person_id)" 
 #> ```
 #> 
-#> ### /tmp/RtmpRZXUF1/sql_folder/logged_query_00017_on_2026_03_08_at_15_51_22.txt
+#> ### /tmp/RtmpGxBNte/sql_folder/logged_query_00017_on_2026_03_08_at_16_08_13.txt
 #> 
 #> "type: compute
 #> schema: results
@@ -309,7 +309,7 @@ for(i in seq_along(sorted_files)) {
 #> temporary: FALSE
 #> overwrite: TRUE
 #> log_prefix: CohortConstructor_fulfillCohortReqs_useRecordsBeforeObservation_
-#> time_taken: 0.165 seconds
+#> time_taken: 0.164 seconds
 #> sql: <SQL>
 #>   SELECT
 #>     cohort_definition_id,
@@ -322,12 +322,12 @@ for(i in seq_along(sorted_files)) {
 #>     (cohort_start_date <= observation_period_end_date)" 
 #> ```
 #> 
-#> ### /tmp/RtmpRZXUF1/sql_folder/logged_query_00018_on_2026_03_08_at_15_51_22.txt
+#> ### /tmp/RtmpGxBNte/sql_folder/logged_query_00018_on_2026_03_08_at_16_08_13.txt
 #> 
 #> "type: collect
 #> schema: results
 #> prefix: test_
-#> time_taken: 0.070 seconds
+#> time_taken: 0.072 seconds
 #> sql: <SQL>
 #>   SELECT
 #>     cohort_definition_id,
@@ -341,19 +341,19 @@ for(i in seq_along(sorted_files)) {
 #>   GROUP BY cohort_definition_id" 
 #> ```
 #> 
-#> ### /tmp/RtmpRZXUF1/sql_folder/logged_query_00019_on_2026_03_08_at_15_51_22.txt
+#> ### /tmp/RtmpGxBNte/sql_folder/logged_query_00019_on_2026_03_08_at_16_08_14.txt
 #> 
 #> "type: collect
 #> schema: results
 #> prefix: test_
-#> time_taken: 0.025 seconds
+#> time_taken: 0.024 seconds
 #> sql: <SQL>
 #>   SELECT test_drugs.*
 #>   FROM results.test_drugs
 #>   LIMIT 1" 
 #> ```
 #> 
-#> ### /tmp/RtmpRZXUF1/sql_folder/logged_query_00020_on_2026_03_08_at_15_51_22.txt
+#> ### /tmp/RtmpGxBNte/sql_folder/logged_query_00020_on_2026_03_08_at_16_08_14.txt
 #> 
 #> "type: collect
 #> schema: results
@@ -364,7 +364,7 @@ for(i in seq_along(sorted_files)) {
 #>   FROM results.test_drugs" 
 #> ```
 #> 
-#> ### /tmp/RtmpRZXUF1/sql_folder/logged_query_00021_on_2026_03_08_at_15_51_22.txt
+#> ### /tmp/RtmpGxBNte/sql_folder/logged_query_00021_on_2026_03_08_at_16_08_14.txt
 #> 
 #> "type: compute
 #> schema: results
@@ -373,19 +373,19 @@ for(i in seq_along(sorted_files)) {
 #> temporary: FALSE
 #> overwrite: TRUE
 #> log_prefix: CohortConstructor_fulfillCohortReqs_filterStart_
-#> time_taken: 0.094 seconds
+#> time_taken: 0.098 seconds
 #> sql: <SQL>
 #>   SELECT test_drugs.*
 #>   FROM results.test_drugs
 #>   WHERE (NOT((cohort_start_date IS NULL)))" 
 #> ```
 #> 
-#> ### /tmp/RtmpRZXUF1/sql_folder/logged_query_00022_on_2026_03_08_at_15_51_23.txt
+#> ### /tmp/RtmpGxBNte/sql_folder/logged_query_00022_on_2026_03_08_at_16_08_14.txt
 #> 
 #> "type: collect
 #> schema: results
 #> prefix: test_
-#> time_taken: 0.066 seconds
+#> time_taken: 0.067 seconds
 #> sql: <SQL>
 #>   SELECT
 #>     cohort_definition_id,
@@ -399,30 +399,30 @@ for(i in seq_along(sorted_files)) {
 #>   GROUP BY cohort_definition_id" 
 #> ```
 #> 
-#> ### /tmp/RtmpRZXUF1/sql_folder/logged_query_00023_on_2026_03_08_at_15_51_23.txt
+#> ### /tmp/RtmpGxBNte/sql_folder/logged_query_00023_on_2026_03_08_at_16_08_15.txt
 #> 
 #> "type: collect
 #> schema: results
 #> prefix: test_
-#> time_taken: 0.030 seconds
+#> time_taken: 0.029 seconds
 #> sql: <SQL>
 #>   SELECT test_drugs.*
 #>   FROM results.test_drugs
 #>   LIMIT 1" 
 #> ```
 #> 
-#> ### /tmp/RtmpRZXUF1/sql_folder/logged_query_00024_on_2026_03_08_at_15_51_23.txt
+#> ### /tmp/RtmpGxBNte/sql_folder/logged_query_00024_on_2026_03_08_at_16_08_15.txt
 #> 
 #> "type: collect
 #> schema: results
 #> prefix: test_
-#> time_taken: 0.028 seconds
+#> time_taken: 0.029 seconds
 #> sql: <SQL>
 #>   SELECT DISTINCT cohort_definition_id
 #>   FROM results.test_drugs" 
 #> ```
 #> 
-#> ### /tmp/RtmpRZXUF1/sql_folder/logged_query_00025_on_2026_03_08_at_15_51_23.txt
+#> ### /tmp/RtmpGxBNte/sql_folder/logged_query_00025_on_2026_03_08_at_16_08_15.txt
 #> 
 #> "type: compute
 #> schema: results
@@ -431,7 +431,7 @@ for(i in seq_along(sorted_files)) {
 #> temporary: FALSE
 #> overwrite: TRUE
 #> log_prefix: CohortConstructor_fulfillCohortReqs_filterStartEnd_
-#> time_taken: 0.126 seconds
+#> time_taken: 0.136 seconds
 #> sql: <SQL>
 #>   SELECT
 #>     cohort_definition_id,
@@ -441,27 +441,27 @@ for(i in seq_along(sorted_files)) {
 #>   FROM results.test_drugs" 
 #> ```
 #> 
-#> ### /tmp/RtmpRZXUF1/sql_folder/logged_query_00026_on_2026_03_08_at_15_51_23.txt
+#> ### /tmp/RtmpGxBNte/sql_folder/logged_query_00026_on_2026_03_08_at_16_08_15.txt
 #> 
 #> "type: collect
 #> schema: results
 #> prefix: test_
-#> time_taken: 0.025 seconds
+#> time_taken: 0.028 seconds
 #> sql: <SQL>
 #>   SELECT COUNT(*) AS n
 #>   FROM results.test_drugs" 
 #> ```
 #> 
-#> ### /tmp/RtmpRZXUF1/sql_folder/logged_query_00027_on_2026_03_08_at_15_51_23.txt
+#> ### /tmp/RtmpGxBNte/sql_folder/logged_query_00027_on_2026_03_08_at_16_08_15.txt
 #> 
 #> "type: compute
 #> schema: results
 #> prefix: test_
-#> name: og_005_1772985084
+#> name: og_005_1772986095
 #> temporary: FALSE
 #> overwrite: TRUE
 #> log_prefix: CohortConstructor_joinOverlap_workingTbl_
-#> time_taken: 0.159 seconds
+#> time_taken: 0.166 seconds
 #> sql: <SQL>
 #>   SELECT q01.*, -1.0 AS date_id
 #>   FROM (
@@ -478,16 +478,16 @@ for(i in seq_along(sorted_files)) {
 #>   ) q01" 
 #> ```
 #> 
-#> ### /tmp/RtmpRZXUF1/sql_folder/logged_query_00028_on_2026_03_08_at_15_51_24.txt
+#> ### /tmp/RtmpGxBNte/sql_folder/logged_query_00028_on_2026_03_08_at_16_08_15.txt
 #> 
 #> "type: compute
 #> schema: results
 #> prefix: test_
-#> name: og_005_1772985084
+#> name: og_005_1772986095
 #> temporary: FALSE
 #> overwrite: TRUE
 #> log_prefix: CohortConstructor_joinOverlap_ids_
-#> time_taken: 0.494 seconds
+#> time_taken: 0.497 seconds
 #> sql: <SQL>
 #>   SELECT
 #>     cohort_definition_id,
@@ -497,36 +497,36 @@ for(i in seq_along(sorted_files)) {
 #>     date
 #>   FROM (
 #>     SELECT
-#>       test_og_005_1772985084.*,
+#>       test_og_005_1772986095.*,
 #>       SUM(date_id) OVER (PARTITION BY cohort_definition_id, subject_id ORDER BY date, date_id ROWS UNBOUNDED PRECEDING) AS cum_id,
 #>       CASE WHEN (date_id = -1.0) THEN 'cohort_start_date' WHEN NOT (date_id = -1.0) THEN 'cohort_end_date' END AS "name",
 #>       CASE WHEN (date_id = -1.0) THEN 1.0 WHEN NOT (date_id = -1.0) THEN 0.0 END AS era_id
-#>     FROM results.test_og_005_1772985084
+#>     FROM results.test_og_005_1772986095
 #>   ) q01
 #>   WHERE (cum_id = 0.0 OR (cum_id = -1.0 AND date_id = -1.0))" 
 #> ```
 #> 
-#> ### /tmp/RtmpRZXUF1/sql_folder/logged_query_00029_on_2026_03_08_at_15_51_24.txt
+#> ### /tmp/RtmpGxBNte/sql_folder/logged_query_00029_on_2026_03_08_at_16_08_16.txt
 #> 
 #> "type: compute
 #> schema: results
 #> prefix: test_
-#> name: og_005_1772985084
+#> name: og_005_1772986095
 #> temporary: FALSE
 #> overwrite: TRUE
 #> log_prefix: CohortConstructor_joinOverlap_pivot_wider_
-#> time_taken: 0.163 seconds
+#> time_taken: 0.161 seconds
 #> sql: <SQL>
 #>   SELECT
 #>     cohort_definition_id,
 #>     subject_id,
-#>     MAX(CASE WHEN ("name" = 'cohort_end_date') THEN date END) AS cohort_end_date,
-#>     MAX(CASE WHEN ("name" = 'cohort_start_date') THEN date END) AS cohort_start_date
-#>   FROM results.test_og_005_1772985084
+#>     MAX(CASE WHEN ("name" = 'cohort_start_date') THEN date END) AS cohort_start_date,
+#>     MAX(CASE WHEN ("name" = 'cohort_end_date') THEN date END) AS cohort_end_date
+#>   FROM results.test_og_005_1772986095
 #>   GROUP BY cohort_definition_id, subject_id, era_id" 
 #> ```
 #> 
-#> ### /tmp/RtmpRZXUF1/sql_folder/logged_query_00030_on_2026_03_08_at_15_51_24.txt
+#> ### /tmp/RtmpGxBNte/sql_folder/logged_query_00030_on_2026_03_08_at_16_08_16.txt
 #> 
 #> "type: compute
 #> schema: results
@@ -535,22 +535,18 @@ for(i in seq_along(sorted_files)) {
 #> temporary: FALSE
 #> overwrite: TRUE
 #> log_prefix: CohortConstructor_joinOverlap_relocate_
-#> time_taken: 0.184 seconds
+#> time_taken: 0.157 seconds
 #> sql: <SQL>
-#>   SELECT DISTINCT
-#>     cohort_definition_id,
-#>     subject_id,
-#>     cohort_start_date,
-#>     cohort_end_date
-#>   FROM results.test_og_005_1772985084" 
+#>   SELECT DISTINCT test_og_005_1772986095.*
+#>   FROM results.test_og_005_1772986095" 
 #> ```
 #> 
-#> ### /tmp/RtmpRZXUF1/sql_folder/logged_query_00031_on_2026_03_08_at_15_51_24.txt
+#> ### /tmp/RtmpGxBNte/sql_folder/logged_query_00031_on_2026_03_08_at_16_08_16.txt
 #> 
 #> "type: collect
 #> schema: results
 #> prefix: test_
-#> time_taken: 0.068 seconds
+#> time_taken: 0.071 seconds
 #> sql: <SQL>
 #>   SELECT
 #>     cohort_definition_id,
@@ -564,58 +560,58 @@ for(i in seq_along(sorted_files)) {
 #>   GROUP BY cohort_definition_id" 
 #> ```
 #> 
-#> ### /tmp/RtmpRZXUF1/sql_folder/logged_query_00032_on_2026_03_08_at_15_51_25.txt
+#> ### /tmp/RtmpGxBNte/sql_folder/logged_query_00032_on_2026_03_08_at_16_08_17.txt
+#> 
+#> "type: collect
+#> schema: results
+#> prefix: test_
+#> time_taken: 0.026 seconds
+#> sql: <SQL>
+#>   SELECT test_drugs.*
+#>   FROM results.test_drugs
+#>   LIMIT 1" 
+#> ```
+#> 
+#> ### /tmp/RtmpGxBNte/sql_folder/logged_query_00033_on_2026_03_08_at_16_08_17.txt
 #> 
 #> "type: collect
 #> schema: results
 #> prefix: test_
 #> time_taken: 0.030 seconds
 #> sql: <SQL>
-#>   SELECT test_drugs.*
-#>   FROM results.test_drugs
-#>   LIMIT 1" 
-#> ```
-#> 
-#> ### /tmp/RtmpRZXUF1/sql_folder/logged_query_00033_on_2026_03_08_at_15_51_25.txt
-#> 
-#> "type: collect
-#> schema: results
-#> prefix: test_
-#> time_taken: 0.029 seconds
-#> sql: <SQL>
 #>   SELECT DISTINCT cohort_definition_id
 #>   FROM results.test_drugs" 
 #> ```
 #> 
-#> ### /tmp/RtmpRZXUF1/sql_folder/logged_query_00034_on_2026_03_08_at_15_51_25.txt
+#> ### /tmp/RtmpGxBNte/sql_folder/logged_query_00034_on_2026_03_08_at_16_08_17.txt
 #> 
 #> "type: collect
 #> schema: results
 #> prefix: test_
-#> time_taken: 0.025 seconds
+#> time_taken: 0.031 seconds
 #> sql: <SQL>
 #>   SELECT test_drugs.*
 #>   FROM results.test_drugs
 #>   LIMIT 1" 
 #> ```
 #> 
-#> ### /tmp/RtmpRZXUF1/sql_folder/logged_query_00035_on_2026_03_08_at_15_51_25.txt
+#> ### /tmp/RtmpGxBNte/sql_folder/logged_query_00035_on_2026_03_08_at_16_08_17.txt
 #> 
 #> "type: collect
 #> schema: results
 #> prefix: test_
-#> time_taken: 0.028 seconds
+#> time_taken: 0.031 seconds
 #> sql: <SQL>
 #>   SELECT DISTINCT cohort_definition_id
 #>   FROM results.test_drugs" 
 #> ```
 #> 
-#> ### /tmp/RtmpRZXUF1/sql_folder/logged_query_00036_on_2026_03_08_at_15_51_26.txt
+#> ### /tmp/RtmpGxBNte/sql_folder/logged_query_00036_on_2026_03_08_at_16_08_17.txt
 #> 
 #> "type: collect
 #> schema: results
 #> prefix: test_
-#> time_taken: 0.070 seconds
+#> time_taken: 0.075 seconds
 #> sql: <SQL>
 #>   SELECT q01.*
 #>   FROM (
@@ -627,12 +623,12 @@ for(i in seq_along(sorted_files)) {
 #>   WHERE (end_before_start = 1)" 
 #> ```
 #> 
-#> ### /tmp/RtmpRZXUF1/sql_folder/logged_query_00037_on_2026_03_08_at_15_51_26.txt
+#> ### /tmp/RtmpGxBNte/sql_folder/logged_query_00037_on_2026_03_08_at_16_08_17.txt
 #> 
 #> "type: collect
 #> schema: results
 #> prefix: test_
-#> time_taken: 0.147 seconds
+#> time_taken: 0.153 seconds
 #> sql: <SQL>
 #>   SELECT q01.*
 #>   FROM (
@@ -649,12 +645,12 @@ for(i in seq_along(sorted_files)) {
 #>   WHERE (overlap = 1)" 
 #> ```
 #> 
-#> ### /tmp/RtmpRZXUF1/sql_folder/logged_query_00038_on_2026_03_08_at_15_51_26.txt
+#> ### /tmp/RtmpGxBNte/sql_folder/logged_query_00038_on_2026_03_08_at_16_08_18.txt
 #> 
 #> "type: collect
 #> schema: results
 #> prefix: test_
-#> time_taken: 0.086 seconds
+#> time_taken: 0.090 seconds
 #> sql: <SQL>
 #>   SELECT q01.*
 #>   FROM (
@@ -666,7 +662,7 @@ for(i in seq_along(sorted_files)) {
 #>   WHERE (missing = 1)" 
 #> ```
 #> 
-#> ### /tmp/RtmpRZXUF1/sql_folder/logged_query_00039_on_2026_03_08_at_15_51_26.txt
+#> ### /tmp/RtmpGxBNte/sql_folder/logged_query_00039_on_2026_03_08_at_16_08_18.txt
 #> 
 #> "type: collect
 #> schema: results
