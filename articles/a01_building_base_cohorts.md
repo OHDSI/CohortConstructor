@@ -237,11 +237,11 @@ cdm$celecoxib |>
   glimpse()
 #> Rows: ??
 #> Columns: 4
-#> Database: DuckDB 1.4.4 [unknown@Linux 6.14.0-1017-azure:R 4.5.2//tmp/Rtmpx4qP56/file245cde41149.duckdb]
+#> Database: DuckDB 1.5.0 [unknown@Linux 6.14.0-1017-azure:R 4.5.3//tmp/RtmphQ1Cbr/file26bb70e38c9.duckdb]
 #> $ cohort_definition_id <int> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1…
-#> $ subject_id           <int> 727, 1116, 1146, 1189, 1292, 1535, 3041, 3278, 50…
-#> $ cohort_start_date    <date> 1947-05-12, 2007-01-19, 1998-04-25, 2005-05-10, …
-#> $ cohort_end_date      <date> 1947-05-12, 2007-01-19, 1998-04-25, 2005-05-10, …
+#> $ subject_id           <int> 78, 929, 1099, 2677, 3817, 4348, 4580, 5046, 754,…
+#> $ cohort_start_date    <date> 2003-02-15, 1961-08-13, 1990-07-27, 2006-11-27, …
+#> $ cohort_end_date      <date> 2003-02-15, 1961-08-13, 1990-07-27, 2006-11-27, …
 ```
 
 ## Demographic based cohort creation
@@ -427,7 +427,7 @@ settings(cdm$cohort)
 #> 2                    2 bmi_overweight 5.3         mock
 cdm$cohort
 #> # Source:   table<cohort> [?? x 4]
-#> # Database: DuckDB 1.4.4 [unknown@Linux 6.14.0-1017-azure:R 4.5.2/:memory:]
+#> # Database: DuckDB 1.5.0 [unknown@Linux 6.14.0-1017-azure:R 4.5.3/:memory:]
 #> # ℹ 4 variables: cohort_definition_id <int>, subject_id <int>,
 #> #   cohort_start_date <date>, cohort_end_date <date>
 ```
@@ -465,7 +465,7 @@ settings(cdm$cohort)
 #> 1                    1 bmi_normal  5.3         mock
 cdm$cohort
 #> # Source:   table<cohort> [?? x 4]
-#> # Database: DuckDB 1.4.4 [unknown@Linux 6.14.0-1017-azure:R 4.5.2/:memory:]
+#> # Database: DuckDB 1.5.0 [unknown@Linux 6.14.0-1017-azure:R 4.5.3/:memory:]
 #> # ℹ 4 variables: cohort_definition_id <int>, subject_id <int>,
 #> #   cohort_start_date <date>, cohort_end_date <date>
 ```
