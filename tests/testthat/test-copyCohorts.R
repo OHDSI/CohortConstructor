@@ -30,6 +30,24 @@ test_that("simple example", {
   expect_identical(omopgenerics::settings(cdm$original_cohort),
                    start_settings)
 
+
+  cdm$new_cohort_2 <- copyCohorts(cdm$original_cohort,
+                                  name = "new_cohort_2")
+  expect_true(attr(cdm$new_cohort_2, "cohort_attrition") |>
+    omopgenerics::tableName() == "new_cohort_2_attrition")
+  expect_true(attr(cdm$new_cohort_2, "cohort_set") |>
+                omopgenerics::tableName() == "new_cohort_2_set")
+  expect_true(attr(cdm$new_cohort_2, "cohort_codelist") |>
+                omopgenerics::tableName() == "new_cohort_2_codelist")
+
+  expect_true(attr(cdm$original_cohort, "cohort_attrition") |>
+                omopgenerics::tableName() == "original_cohort_attrition")
+  expect_true(attr(cdm$original_cohort, "cohort_set") |>
+                omopgenerics::tableName() == "original_cohort_set")
+  expect_true(attr(cdm$original_cohort, "cohort_codelist") |>
+                omopgenerics::tableName() == "original_cohort_codelist")
+
+
   # warning if the new cohort table already exists
   expect_warning(cdm$copy_cohort <- copyCohorts(cdm$original_cohort,
                                                 n = 1,
