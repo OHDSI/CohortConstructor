@@ -142,6 +142,15 @@ test_that("mearurementCohorts works", {
     "cdm_version" = attr(cdm, "cdm_version"), "vocabulary_version" = "mock"
   ))
 
+  # inf support
+  cdm$cohort_inf <- measurementCohort(
+    cdm = cdm,
+    name = "cohort_inf",
+    conceptSet = list("normal_blood_pressure" = c(4326744L, 4298393L, 45770407L)),
+    valueAsNumber = list("normal_blood_pressure" = list("8876" = c(70L, Inf))),
+    table = "measurement"
+  )
+
   # non valid concept ----
   cdm$cohort3 <- measurementCohort(
     cdm = cdm,

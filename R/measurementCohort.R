@@ -341,16 +341,29 @@ getMutateExpression <- function(cohortSet, valueAsConcept, valueAsNumber) {
     if (!is.null(numberFilter)) {
       for (ii in seq_along(numberFilter)) {
         if(!is.null(names(numberFilter)[ii])){
-          cohortFilter[ii] <- glue::glue(
-            "(.data$unit_concept_id %in% {as.integer(names(numberFilter)[ii])} &
+          if(is.infinite(numberFilter[[ii]][2])){
+            cohortFilter[ii] <- glue::glue(
+              "(.data$unit_concept_id %in% {as.integer(names(numberFilter)[ii])} &
+      .data$value_as_number >= {numberFilter[[ii]][1]})"
+            )
+          } else {
+            cohortFilter[ii] <- glue::glue(
+              "(.data$unit_concept_id %in% {as.integer(names(numberFilter)[ii])} &
       .data$value_as_number >= {numberFilter[[ii]][1]} &
       .data$value_as_number <= {numberFilter[[ii]][2]})"
-          )
+            )
+          }
         } else {
+          if(is.infinite(numberFilter[[ii]][2])){
           cohortFilter[ii] <- glue::glue(
-            "(.data$value_as_number >= {numberFilter[[ii]][1]} &
-          .data$value_as_number <= {numberFilter[[ii]][2]})"
+            "(.data$value_as_number >= {numberFilter[[ii]][1]})"
           )
+          } else {
+            cohortFilter[ii] <- glue::glue(
+              "(.data$value_as_number >= {numberFilter[[ii]][1]} &
+          .data$value_as_number <= {numberFilter[[ii]][2]})"
+            )
+        }
         }
       }
     } else {
