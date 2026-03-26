@@ -1,7 +1,7 @@
 # Restrict cohort to specific entry
 
-[`requireIsFirstEntry()`](https://ohdsi.github.io/CohortConstructor/reference/requireIsFirstEntry.md)
-filters cohort records, keeping only the first cohort entry per person.
+`requireIsEntry()` filters cohort records, keeping only a range a
+specified cohort entries per person.
 
 ## Usage
 
