@@ -1,8 +1,8 @@
 #' Restrict cohort to specific entry
 #'
 #' @description
-#' `requireIsFirstEntry()` filters cohort records, keeping only the first
-#' cohort entry per person.
+#' `requireIsEntry()` filters cohort records, keeping only a range a specified
+#' cohort entries per person.
 #'
 #' @inheritParams cohortDoc
 #' @inheritParams cohortIdModifyDoc
