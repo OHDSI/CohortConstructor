@@ -39,7 +39,7 @@ deathCohort <- function(
   omopgenerics::assertCharacter(subsetCohort, length = 1, null = TRUE)
   if (!is.null(subsetCohort)) {
     omopgenerics::validateCohortArgument(cdm[[subsetCohort]])
-    omopgenerics::validateCohortIdArgument(subsetCohortId,
+    subsetCohortId <- omopgenerics::validateCohortIdArgument(subsetCohortId,
                                            cdm[[subsetCohort]],
                                            validation = "error")
   }
@@ -57,7 +57,7 @@ deathCohort <- function(
     "cohort_definition_id" = 1L,
     "cohort_name" = "death_cohort",
     "subset_cohort_table" = subsetCohort,
-    "subset_cohort_id" = subsetCohortId
+    "subset_cohort_id" = paste0(subsetCohortId, collapse = "; ")
   )
 
   cdm[[name]] <-  cdm$death |>
@@ -86,7 +86,11 @@ deathCohort <- function(
                                    useIndexes)
 
   if (!is.na(subsetCohort)){
-    if (!is.na(subsetCohortId)){
+    if (any(!is.na(subsetCohortId))){
+      subsetCohortName <- omopgenerics::settings(cdm[[subsetCohort]]) |>
+        dplyr::filter(cohort_definition_id %in% subsetCohortId) |>
+        dplyr::pull("cohort_name")
+      subsetCohortName <- paste0(subsetCohortName, collapse = "; ")
       cdm[[name]] <- cdm[[name]] |>
         dplyr::inner_join(cdm[[subsetCohort]] |>
                             dplyr::filter(.data$cohort_definition_id %in% subsetCohortId) |>
@@ -96,7 +100,7 @@ deathCohort <- function(
           name = name,
           temporary = FALSE,
           overwrite = TRUE) |>
-        omopgenerics::recordCohortAttrition("In subset cohort")
+        omopgenerics::recordCohortAttrition(glue::glue("In subset cohort ({subsetCohortName})"))
     }else{
       cdm[[name]] <- cdm[[name]] |>
         dplyr::inner_join(cdm[[subsetCohort]] |>
