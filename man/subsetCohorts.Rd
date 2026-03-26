@@ -4,7 +4,7 @@
 \alias{subsetCohorts}
 \title{Generate a cohort table keeping a subset of cohorts.}
 \usage{
-subsetCohorts(cohort, cohortId, name = tableName(cohort))
+subsetCohorts(cohort, cohortId, name = tableName(cohort), negate = FALSE)
 }
 \arguments{
 \item{cohort}{A cohort table in a cdm reference.}
@@ -14,6 +14,9 @@ subsetCohorts(cohort, cohortId, name = tableName(cohort))
 removed from the cohort set.}
 
 \item{name}{Name of the new cohort table created in the cdm object.}
+
+\item{negate}{If TRUE, the cohorts specified in cohortId will be excluded
+and the remaining cohorts kept.}
 }
 \value{
 Cohort table with only cohorts in cohortId.
