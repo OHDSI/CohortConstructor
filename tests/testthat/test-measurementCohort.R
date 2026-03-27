@@ -101,6 +101,9 @@ test_that("mearurementCohorts works", {
     all(colnames(attr(cdm$cohort, "cohort_codelist")) == c("cohort_definition_id", "codelist_name", "concept_id", "codelist_type"))
   )
 
+  expect_true("measurement_value_as_concept" %in% colnames(omopgenerics::settings(cdm$cohort)))
+  expect_true("measurement_value_as_number" %in% colnames(omopgenerics::settings(cdm$cohort)))
+
   if (dbToTest == "duckdb CDMConnector") {
     endTempTables <- countDuckdbTempTables(con = CDMConnector::cdmCon(cdm))
     endPermanentTables <- countDuckdbPermanentTables(con = CDMConnector::cdmCon(cdm))
@@ -139,7 +142,9 @@ test_that("mearurementCohorts works", {
   expect_true(all(codes$concept_id |> sort() == c(4298393, 4326744, 45770407)))
   expect_identical(settings(cdm$cohort), dplyr::tibble(
     "cohort_definition_id" = 1L, "cohort_name" = "normal_blood_pressure",
-    "cdm_version" = attr(cdm, "cdm_version"), "vocabulary_version" = "mock"
+    "cdm_version" = attr(cdm, "cdm_version"), "vocabulary_version" = "mock",
+    measurement_value_as_number = "Concept ID 8876: 70 to 120",
+    measurement_value_as_concept = "4124457"
   ))
 
   # inf support
@@ -325,7 +330,8 @@ test_that("mearurementCohorts works", {
   )
   expect_true(cdm$cohort9 |> dplyr::tally() |> dplyr::pull("n") == 0)
   expect_true(settings(cdm$cohort9)$cohort_name == "c1")
-  expect_identical(colnames(settings(cdm$cohort9)) |> sort(), c("cdm_version", "cohort_definition_id", "cohort_name", "vocabulary_version"))
+  expect_identical(colnames(settings(cdm$cohort9)) |> sort(),
+                   c("cdm_version", "cohort_definition_id", "cohort_name", "measurement_value_as_concept", "vocabulary_version"))
   codes <- attr(cdm$cohort9, "cohort_codelist") |> dplyr::collect()
   expect_true(nrow(codes) == 1)
 
@@ -340,7 +346,7 @@ test_that("mearurementCohorts works", {
   expect_true(cdm$cohort10 |> dplyr::tally() |> dplyr::pull("n") == 0)
   expect_true(cdm$cohort10 |> attrition() |> nrow() == 0)
   expect_true(cdm$cohort10 |> settings() |> nrow() == 1)
-  expect_identical(colnames(settings(cdm$cohort10)) |> sort(), c("cdm_version", "cohort_definition_id", "cohort_name", "vocabulary_version"))
+  expect_identical(colnames(settings(cdm$cohort10)) |> sort(), c("cdm_version", "cohort_definition_id", "cohort_name", "measurement_value_as_concept", "vocabulary_version"))
 
   # Source concepts + subset cohort ----
   cdm$cohort11 <- measurementCohort(
