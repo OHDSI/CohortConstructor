@@ -48,8 +48,8 @@ benchmark_results <- benchmarkCohortConstructor(
   runCohortConstructorDefinition = FALSE,
   runCohortConstructorDomain = TRUE
 )
-#> cc_set_no_strata: 114.613 sec elapsed
-#> cc_set_strata: 1.836 sec elapsed
+#> cc_set_no_strata: 107.802 sec elapsed
+#> cc_set_strata: 1.681 sec elapsed
 benchmark_results |> 
   glimpse()
 #> Rows: 257
