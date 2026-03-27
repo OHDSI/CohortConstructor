@@ -7,6 +7,8 @@
 #' @inheritParams cohortDoc
 #' @inheritParams cohortIdSubsetDoc
 #' @inheritParams nameDoc
+#' @param negate If TRUE, the cohorts specified in cohortId will be excluded
+#' and the remaining cohorts kept.
 #'
 #' @return Cohort table with only cohorts in cohortId.
 #'
@@ -22,12 +24,14 @@
 #' }
 subsetCohorts <- function(cohort,
                           cohortId,
-                          name = tableName(cohort)) {
+                          name = tableName(cohort),
+                          negate = FALSE) {
   # checks
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   cohort <- omopgenerics::validateCohortArgument(cohort)
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
+  omopgenerics::assertLogical(negate, length = 1)
 
   if (length(cohortId) == 0) {
     cli::cli_inform("Returning empty cohort as `cohortId` is not valid.")
@@ -35,11 +39,11 @@ subsetCohorts <- function(cohort,
     return(cdm[[name]])
   }
 
+  if(isFALSE(negate)){
   cdm[[name]] <- cohort |>
     dplyr::filter(.data$cohort_definition_id %in% .env$cohortId) |>
     dplyr::compute(name = name, temporary = FALSE,
                    logPrefix = "CohortConstructor_subsetCohorts_filter_")
-
   cdm[[name]] <- cdm[[name]] |>
     omopgenerics::newCohortTable(
       cohortSetRef = settings(cohort) |>
@@ -50,6 +54,24 @@ subsetCohorts <- function(cohort,
         dplyr::filter(.data$cohort_definition_id %in% .env$cohortId),
       .softValidation = TRUE
     )
+  } else {
+    cdm[[name]] <- cohort |>
+      dplyr::filter(!.data$cohort_definition_id %in% .env$cohortId) |>
+      dplyr::compute(name = name, temporary = FALSE,
+                     logPrefix = "CohortConstructor_subsetCohorts_filter_")
+    cdm[[name]] <- cdm[[name]] |>
+      omopgenerics::newCohortTable(
+        cohortSetRef = settings(cohort) |>
+          dplyr::filter(!.data$cohort_definition_id %in% .env$cohortId),
+        cohortAttritionRef = attrition(cohort) |>
+          dplyr::filter(!.data$cohort_definition_id %in% .env$cohortId),
+        cohortCodelistRef = attr(cohort, "cohort_codelist") |>
+          dplyr::filter(!.data$cohort_definition_id %in% .env$cohortId),
+        .softValidation = TRUE
+      )
+  }
+
+
 
   useIndexes <- getOption("CohortConstructor.use_indexes")
   if (!isFALSE(useIndexes)) {

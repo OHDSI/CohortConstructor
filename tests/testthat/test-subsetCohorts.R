@@ -69,6 +69,22 @@ test_that("subsetCohort works", {
   ))
   expect_identical(attrition(cohort) |> dplyr::filter(.data$cohort_definition_id %in% 3:5), attrition(cdm$cohort1))
 
+
+  cdm$cohort4 <- subsetCohorts(cdm$cohort1,
+                               cohortId = c(4,5),
+                               name = "cohort4",
+                               negate = TRUE)
+  expect_true(all(unique(cdm$cohort4 |> dplyr::pull("cohort_definition_id")) == 3))
+
+  expect_error(subsetCohorts(cdm$cohort1,
+                             cohortId = 5,
+                             name = "cohort4",
+                             negate = "a"))
+  expect_error(subsetCohorts(cdm$cohort1,
+                             cohortId = 5,
+                             name = "cohort4",
+                             negate = c(TRUE, FALSE)))
+
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
 
   dropCreatedTables(cdm = cdm)
