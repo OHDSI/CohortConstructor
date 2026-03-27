@@ -26,6 +26,11 @@ test_that("input validation", {
       demographicsCohort(name = "cohort3", ageRange = c(18,40), sex = "Male", minPriorObservation = 15)
   )
 
+  expect_no_error(
+    cohort <- cdm |>
+      demographicsCohort(name = "cohort3", ageRange = c(18,Inf), sex = "Male", minPriorObservation = 15)
+  )
+
   expect_error(
     cohort <- cdm |>
       demographicsCohort(name = "cohort3", minPriorObservation = -15)
