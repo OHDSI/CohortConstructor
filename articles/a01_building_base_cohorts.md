@@ -237,9 +237,9 @@ cdm$celecoxib |>
   glimpse()
 #> Rows: ??
 #> Columns: 4
-#> Database: DuckDB 1.5.0 [unknown@Linux 6.17.0-1008-azure:R 4.5.3//tmp/RtmpkSOuEa/file2612227c2c3.duckdb]
+#> Database: DuckDB 1.5.0 [unknown@Linux 6.17.0-1008-azure:R 4.5.3//tmp/RtmpZRowi8/file2610220dab56.duckdb]
 #> $ cohort_definition_id <int> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1…
-#> $ subject_id           <int> 57, 187, 211, 1194, 2233, 2438, 2975, 4700, 196, …
+#> $ subject_id           <int> 57, 187, 211, 1194, 2233, 2438, 2975, 4700, 1231,…
 #> $ cohort_start_date    <date> 1997-04-01, 1984-11-29, 2009-02-13, 2001-05-27, …
 #> $ cohort_end_date      <date> 1997-04-01, 1984-11-29, 2009-02-13, 2001-05-27, …
 ```
@@ -420,11 +420,13 @@ attrition(cdm$cohort)
 #> 2                    2              0               0         1 Initial qualify…
 #> # ℹ 2 more variables: excluded_records <int>, excluded_subjects <int>
 settings(cdm$cohort)
-#> # A tibble: 2 × 4
+#> # A tibble: 2 × 6
 #>   cohort_definition_id cohort_name    cdm_version vocabulary_version
 #>                  <int> <chr>          <chr>       <chr>             
 #> 1                    1 bmi_normal     5.3         mock              
-#> 2                    2 bmi_overweight 5.3         mock
+#> 2                    2 bmi_overweight 5.3         mock              
+#> # ℹ 2 more variables: measurement_value_as_number <chr>,
+#> #   measurement_value_as_concept <chr>
 cdm$cohort
 #> # Source:   table<cohort> [?? x 4]
 #> # Database: DuckDB 1.5.0 [unknown@Linux 6.17.0-1008-azure:R 4.5.3/:memory:]
@@ -459,10 +461,12 @@ attrition(cdm$cohort)
 #> 1                    1              0               0         1 Initial qualify…
 #> # ℹ 2 more variables: excluded_records <int>, excluded_subjects <int>
 settings(cdm$cohort)
-#> # A tibble: 1 × 4
+#> # A tibble: 1 × 6
 #>   cohort_definition_id cohort_name cdm_version vocabulary_version
 #>                  <int> <chr>       <chr>       <chr>             
-#> 1                    1 bmi_normal  5.3         mock
+#> 1                    1 bmi_normal  5.3         mock              
+#> # ℹ 2 more variables: measurement_value_as_number <chr>,
+#> #   measurement_value_as_concept <chr>
 cdm$cohort
 #> # Source:   table<cohort> [?? x 4]
 #> # Database: DuckDB 1.5.0 [unknown@Linux 6.17.0-1008-azure:R 4.5.3/:memory:]

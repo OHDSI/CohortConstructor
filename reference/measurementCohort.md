@@ -209,11 +209,13 @@ cdm$cohort2 <- measurementCohort(
 #> ✔ Cohort cohort2 created.
 
 cdm$cohort2 |> settings()
-#> # A tibble: 2 × 4
+#> # A tibble: 2 × 6
 #>   cohort_definition_id cohort_name           cdm_version vocabulary_version
 #>                  <int> <chr>                 <chr>       <chr>             
 #> 1                    1 high_blood_pressure   5.3         mock              
 #> 2                    2 normal_blood_pressure 5.3         mock              
+#> # ℹ 2 more variables: measurement_value_as_number <chr>,
+#> #   measurement_value_as_concept <chr>
 
 # }
 ```
