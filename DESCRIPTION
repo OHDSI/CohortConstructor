@@ -36,6 +36,7 @@ Imports:
     CodelistGenerator (>= 4.0.0),
     purrr,
     rlang,
+    tibble,
     tidyr,
     utils
 Suggests: 
