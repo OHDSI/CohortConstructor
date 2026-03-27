@@ -6,7 +6,7 @@ records from cohorts that are specified.
 ## Usage
 
 ``` r
-subsetCohorts(cohort, cohortId, name = tableName(cohort))
+subsetCohorts(cohort, cohortId, name = tableName(cohort), negate = FALSE)
 ```
 
 ## Arguments
@@ -24,6 +24,11 @@ subsetCohorts(cohort, cohortId, name = tableName(cohort))
 - name:
 
   Name of the new cohort table created in the cdm object.
+
+- negate:
+
+  If TRUE, the cohorts specified in cohortId will be excluded and the
+  remaining cohorts kept.
 
 ## Value
 

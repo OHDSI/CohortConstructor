@@ -90,20 +90,20 @@ already created so let’s first add a column sex to my existent cohort:
 cdm$medications <- cdm$medications |>
   addSex()
 cdm$medications
-#> # Source:   table<og_011_1774515851> [?? x 5]
-#> # Database: DuckDB 1.5.0 [unknown@Linux 6.14.0-1017-azure:R 4.5.3//tmp/RtmpYNPCNi/file285274aed67a.duckdb]
+#> # Source:   table<og_011_1774597163> [?? x 5]
+#> # Database: DuckDB 1.5.0 [unknown@Linux 6.14.0-1017-azure:R 4.5.3//tmp/Rtmp656Ok1/file28cf3b4153af.duckdb]
 #>    cohort_definition_id subject_id cohort_start_date cohort_end_date sex   
 #>                   <int>      <int> <date>            <date>          <chr> 
-#>  1                    1        140 2015-11-09        2015-11-23      Female
-#>  2                    1        209 1958-10-15        1958-10-22      Female
-#>  3                    1        673 2005-11-22        2005-12-29      Female
-#>  4                    1        850 1978-04-06        1978-04-20      Male  
-#>  5                    1        959 1992-04-17        1992-04-24      Male  
-#>  6                    1       1322 1963-05-09        1963-05-30      Male  
-#>  7                    1       1322 1989-05-17        1989-05-24      Male  
-#>  8                    1       1418 2016-01-18        2016-01-25      Female
-#>  9                    1       1508 1967-09-13        1967-09-27      Female
-#> 10                    1       1623 1968-01-14        1968-02-04      Male  
+#>  1                    1         99 1994-04-02        1994-04-16      Female
+#>  2                    1        219 1991-11-27        1991-12-11      Male  
+#>  3                    1        245 1961-07-08        1961-07-15      Male  
+#>  4                    1        744 1996-07-22        1996-08-05      Male  
+#>  5                    1        932 2017-05-25        2017-08-23      Male  
+#>  6                    1       1015 1994-11-25        1994-12-09      Male  
+#>  7                    1       1046 1988-06-13        1988-07-18      Female
+#>  8                    1       1079 1983-02-06        1983-02-20      Female
+#>  9                    1       1232 1969-08-21        1969-09-04      Male  
+#> 10                    1       1611 1991-07-28        1991-10-26      Male  
 #> # ℹ more rows
 ```
 
@@ -254,15 +254,15 @@ records:
 cdm$medications |> 
   filter(subject_id == 4383)
 #> # Source:   SQL [?? x 5]
-#> # Database: DuckDB 1.5.0 [unknown@Linux 6.14.0-1017-azure:R 4.5.3//tmp/RtmpYNPCNi/file285274aed67a.duckdb]
+#> # Database: DuckDB 1.5.0 [unknown@Linux 6.14.0-1017-azure:R 4.5.3//tmp/Rtmp656Ok1/file28cf3b4153af.duckdb]
 #>   cohort_definition_id subject_id cohort_start_date cohort_end_date sex  
 #>                  <int>      <int> <date>            <date>          <chr>
-#> 1                    1       4383 1990-10-13        1990-10-27      Male 
-#> 2                    1       4383 2000-03-12        2000-03-19      Male 
-#> 3                    1       4383 1990-12-20        1991-01-03      Male 
-#> 4                    1       4383 2004-05-21        2004-06-11      Male 
-#> 5                    1       4383 1971-02-06        1971-02-13      Male 
-#> 6                    1       4383 1992-07-18        1992-08-22      Male
+#> 1                    1       4383 1971-02-06        1971-02-13      Male 
+#> 2                    1       4383 1990-12-20        1991-01-03      Male 
+#> 3                    1       4383 2004-05-21        2004-06-11      Male 
+#> 4                    1       4383 1992-07-18        1992-08-22      Male 
+#> 5                    1       4383 1990-10-13        1990-10-27      Male 
+#> 6                    1       4383 2000-03-12        2000-03-19      Male
 ```
 
 From the 6 records only 3 are within our period of interest `1990-1993`,
@@ -277,11 +277,11 @@ to see 4 cohort contributions for this subject (2 in 1990, 1 in 1991 and
 cdm$medications_year |>
   filter(subject_id == 4383)
 #> # Source:   SQL [?? x 5]
-#> # Database: DuckDB 1.5.0 [unknown@Linux 6.14.0-1017-azure:R 4.5.3//tmp/RtmpYNPCNi/file285274aed67a.duckdb]
+#> # Database: DuckDB 1.5.0 [unknown@Linux 6.14.0-1017-azure:R 4.5.3//tmp/Rtmp656Ok1/file28cf3b4153af.duckdb]
 #>   cohort_definition_id subject_id cohort_start_date cohort_end_date sex  
 #>                  <int>      <int> <date>            <date>          <chr>
-#> 1                    1       4383 1990-10-13        1990-10-27      Male 
-#> 2                    1       4383 1990-12-20        1990-12-31      Male 
+#> 1                    1       4383 1990-12-20        1990-12-31      Male 
+#> 2                    1       4383 1990-10-13        1990-10-27      Male 
 #> 3                    3       4383 1991-01-01        1991-01-03      Male 
 #> 4                    5       4383 1992-07-18        1992-08-22      Male
 ```
