@@ -401,7 +401,7 @@ if(!is.null(valueAsNumber)){
                     value = "measurement_value_as_number") |>
       dplyr::mutate(
         measurement_value_as_number = purrr::map_chr(
-          measurement_value_as_number,
+          .data$measurement_value_as_number,
           ~ {
             purrr::imap_chr(.x, ~ paste0("Concept ID ", .y, ": ",
                                          paste(.x, collapse = " to "))) |>
@@ -414,17 +414,17 @@ if(!is.null(valueAsNumber)){
                                        name = "cohort_name",
                                        value = "measurement_value_as_number") |>
                          dplyr::mutate(measurement_value_as_number = purrr::map_chr(
-                           measurement_value_as_number, ~ paste(.x, collapse = "; "))) |>
+                           .data$measurement_value_as_number, ~ paste(.x, collapse = "; "))) |>
     dplyr::mutate(
-      measurement_value_as_number = stringr::str_remove_all(measurement_value_as_number, "c\\(|\\)"),
-      measurement_value_as_number = stringr::str_replace_all(measurement_value_as_number, ",\\s*", " to ")
+      measurement_value_as_number = stringr::str_remove_all(.data$measurement_value_as_number, "c\\(|\\)"),
+      measurement_value_as_number = stringr::str_replace_all(.data$measurement_value_as_number, ",\\s*", " to ")
     )
   }
   settingsValueAsNumber <- dplyr::bind_rows(settingsValueAsNumber)
 
   cohortSettings <- cohortSettings |>
     dplyr::left_join(settingsValueAsNumber,
-                     by = dplyr::join_by(cohort_name))
+                     by = "cohort_name")
 }
 
   if(!is.null(valueAsConcept)){
@@ -433,8 +433,8 @@ if(!is.null(valueAsNumber)){
                                      name = "cohort_name",
                                      value = "measurement_value_as_concept") |>
                        dplyr::mutate(measurement_value_as_concept = purrr::map_chr(
-                         measurement_value_as_concept, ~ paste(.x, collapse = "; "))),
-                     by = dplyr::join_by(cohort_name))
+                         .data$measurement_value_as_concept, ~ paste(.x, collapse = "; "))),
+                     by = "cohort_name")
   }
 
   cohortSettings

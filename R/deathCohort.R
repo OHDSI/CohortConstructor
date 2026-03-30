@@ -88,12 +88,12 @@ deathCohort <- function(
   if (!is.na(subsetCohort)){
     if (any(!is.na(subsetCohortId))){
       subsetCohortName <- omopgenerics::settings(cdm[[subsetCohort]]) |>
-        dplyr::filter(cohort_definition_id %in% subsetCohortId) |>
+        dplyr::filter(.data$cohort_definition_id %in% .env$subsetCohortId) |>
         dplyr::pull("cohort_name")
       subsetCohortName <- paste0(subsetCohortName, collapse = "; ")
       cdm[[name]] <- cdm[[name]] |>
         dplyr::inner_join(cdm[[subsetCohort]] |>
-                            dplyr::filter(.data$cohort_definition_id %in% subsetCohortId) |>
+                            dplyr::filter(.data$cohort_definition_id %in% .env$subsetCohortId) |>
                             dplyr::select("subject_id"),
                           by = c("subject_id")) |>
         dplyr::compute(
