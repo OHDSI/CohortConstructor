@@ -424,7 +424,7 @@ if(!is.null(valueAsNumber)){
 
   cohortSettings <- cohortSettings |>
     dplyr::left_join(settingsValueAsNumber,
-                     by = dplyr::join_by(cohort_name))
+                     by = "cohort_name")
 }
 
   if(!is.null(valueAsConcept)){
@@ -434,7 +434,7 @@ if(!is.null(valueAsNumber)){
                                      value = "measurement_value_as_concept") |>
                        dplyr::mutate(measurement_value_as_concept = purrr::map_chr(
                          .data$measurement_value_as_concept, ~ paste(.x, collapse = "; "))),
-                     by = dplyr::join_by(cohort_name))
+                     by = "cohort_name")
   }
 
   cohortSettings
