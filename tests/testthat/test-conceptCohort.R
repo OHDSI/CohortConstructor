@@ -352,7 +352,6 @@ test_that("initial tests", {
   dropCreatedTables(cdm = cdm)
 })
 
-
 test_that("out of observation", {
   skip_on_cran()
 
@@ -897,6 +896,55 @@ test_that("useRecordsBeforeObservation TRUE", {
   )
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
+
+  dropCreatedTables(cdm = cdm)
+})
+
+test_that("typeConceptId", {
+  skip_on_cran()
+  cdm <- omock::mockVocabularySet() |>
+    omock::mockCdmFromTables(tables = list(
+    condition_occurrence = dplyr::tibble(
+      condition_occurrence_id = 1:5L,
+      person_id = 1:5L,
+      condition_concept_id = 35208414L,
+      condition_start_date = as.Date("2020-01-01"),
+      condition_end_date = condition_start_date,
+      condition_type_concept_id = c(rep(32817L, 3L), rep(32879L, 2L))
+    )
+  )) |>
+    copyCdm()
+
+  codelist <- list(my_concept = 35208414L)
+
+  expect_no_error(cdm$my_cohort <- conceptCohort(
+    cdm = cdm, conceptSet = codelist, name = "my_cohort"
+  ))
+  expect_true(cohortCount(cdm$my_cohort)$number_subjects == 5L)
+
+  expect_no_error(cdm$my_cohort <- conceptCohort(
+    cdm = cdm, conceptSet = codelist, name = "my_cohort",
+    typeConceptId = c(32817L, 32879L)
+  ))
+  expect_true(cohortCount(cdm$my_cohort)$number_subjects == 5L)
+
+  expect_no_error(cdm$my_cohort <- conceptCohort(
+    cdm = cdm, conceptSet = codelist, name = "my_cohort",
+    typeConceptId = 32817L
+  ))
+  expect_true(cohortCount(cdm$my_cohort)$number_subjects == 3L)
+
+  expect_no_error(cdm$my_cohort <- conceptCohort(
+    cdm = cdm, conceptSet = codelist, name = "my_cohort",
+    typeConceptId = 32879L
+  ))
+  expect_true(cohortCount(cdm$my_cohort)$number_subjects == 2L)
+
+  expect_no_error(cdm$my_cohort <- conceptCohort(
+    cdm = cdm, conceptSet = codelist, name = "my_cohort",
+    typeConceptId = 0L
+  ))
+  expect_true(cohortCount(cdm$my_cohort)$number_subjects == 0L)
 
   dropCreatedTables(cdm = cdm)
 })

@@ -4,6 +4,10 @@
 \alias{baseCohortDoc}
 \title{Helper for consistent documentation of \code{conceptCohort} and \code{measurementCohort}.}
 \arguments{
+\item{typeConceptId}{Type concept id used to subset tables. See:
+https://athena.ohdsi.org/search-terms/terms?conceptClass=Type+Concept. If
+\code{NULL} no filtering is applied.}
+
 \item{useRecordsBeforeObservation}{If FALSE, only records that fall entirely
 (start and end) within an observation period are used.
 If TRUE, records that start before an observation period are included by

@@ -79,6 +79,7 @@ conceptCohort <- function(cdm,
                           exit = "event_end_date",
                           overlap = "merge",
                           table = NULL,
+                          typeConceptId = NULL,
                           useRecordsBeforeObservation = FALSE,
                           useSourceFields = FALSE,
                           subsetCohort = NULL,
@@ -93,6 +94,7 @@ conceptCohort <- function(cdm,
   omopgenerics::assertLogical(useSourceFields, length = 1)
   omopgenerics::assertLogical(useRecordsBeforeObservation, length = 1)
   omopgenerics::assertCharacter(subsetCohort, length = 1, null = TRUE)
+  omopgenerics::assertNumeric(typeConceptId, integerish = TRUE, null = TRUE)
   if (!is.null(subsetCohort)) {
     subsetCohort <- omopgenerics::validateCohortArgument(cdm[[subsetCohort]])
     subsetCohortId <- omopgenerics::validateCohortIdArgument({{subsetCohortId}}, subsetCohort, validation = "warning")
@@ -109,10 +111,13 @@ conceptCohort <- function(cdm,
   cohortSet <- conceptSetToCohortSet(conceptSet, cdm)
   if (length(conceptSet) == 0) {
     cli::cli_inform(c("i" = "Empty codelist provided, returning empty cohort"))
-    cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name)
-    cdm[[name]] <- cdm[[name]] |>
-      omopgenerics::newCohortTable(cohortSetRef = cohortSet)
-    return(cdm[[name]])
+    return(internalEmptyCohort(cdm = cdm, name = name, cohortSetRef = cohortSet))
+  }
+
+  # empty typeConceptId
+  if (length(typeConceptId) == 0 & !is.null(typeConceptId)) {
+    cli::cli_inform(c("i" = "Empty `typeConceptId` provided, returning empty cohort"))
+    return(internalEmptyCohort(cdm = cdm, name = name, cohortSetRef = cohortSet))
   }
 
   # codelist attribute
@@ -142,18 +147,9 @@ conceptCohort <- function(cdm,
                      logPrefix = "CohortConstructor_conceptCohort_subsetCohort_")
     if (omopgenerics::isTableEmpty(subsetIndividuals)) {
       cli::cli_warn("There are no individuals in the `subsetCohort` and `subsetCohortId` provided. Returning empty cohort.")
-      cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name)
-      cdm[[name]] <- cdm[[name]] |>
-        omopgenerics::newCohortTable(
-          cohortSetRef = cohortSet,
-          cohortAttritionRef = dplyr::tibble(
-            "cohort_definition_id" = cohortSet$cohort_definition_id,
-            "number_records" = 0L, "number_subjects" = 0L,
-            "reason_id" = 1L, "reason" = "Qualifying initial events",
-            "excluded_records" = NA_integer_, "excluded_subjects" = NA_integer_
-          )
-        )
-      return(cdm[[name]])
+      return(internalEmptyCohort(
+        cdm = cdm, name = name, cohortSetRef = cohortSet
+      ))
     }
     if (!isFALSE(useIndexes)) {
       addIndex(
@@ -182,6 +178,7 @@ conceptCohort <- function(cdm,
     name = name,
     extraCols = NULL,
     exit = exit,
+    typeConceptId = typeConceptId,
     useSourceFields = useSourceFields,
     subsetIndividuals = subsetIndividuals,
     tablePrefix = tmpPref
@@ -282,6 +279,7 @@ unerafiedConceptCohort <- function(cdm,
                                    name,
                                    extraCols,
                                    exit,
+                                   typeConceptId,
                                    useSourceFields,
                                    subsetIndividuals,
                                    tablePrefix) {
@@ -326,7 +324,7 @@ unerafiedConceptCohort <- function(cdm,
       concept <- tableRef$concept[k]
       tempCohort <- getDomainCohort(
         cdm, table, concept, start, end, extraCols, tableCohortCodelist,
-        domain, nameK, subsetIndividuals, tablePrefix = tablePrefix
+        domain, nameK, typeConceptId, subsetIndividuals, tablePrefix
       )
       ## Get source
       if (isTRUE(useSourceFields)) {
@@ -334,8 +332,8 @@ unerafiedConceptCohort <- function(cdm,
         tempCohort <- tempCohort |>
           dplyr::union_all(
             getDomainCohort(
-              cdm, table, concept, start, end, extraCols,
-              tableCohortCodelist, domain, nameK, subsetIndividuals, tablePrefix, TRUE
+              cdm, table, concept, start, end, extraCols, tableCohortCodelist,
+              domain, nameK, typeConceptId, subsetIndividuals, tablePrefix, TRUE
             )
           ) |>
           dplyr::compute(name = nameK, temporary = FALSE,
@@ -359,8 +357,7 @@ unerafiedConceptCohort <- function(cdm,
     purrr::discard(is.null)
 
   if (length(cohorts) == 0) {
-    cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name)
-    return(cdm[[name]])
+    return(internalEmptyCohort(cdm = cdm, name = name, cohortSetRef = cohortSet))
   }
 
   cli::cli_inform(c("i" = "Combining tables."))
@@ -601,6 +598,7 @@ getDomainCohort <- function(cdm,
                             tableCohortCodelist,
                             domain,
                             name,
+                            typeConceptId,
                             subsetIndividuals,
                             tablePrefix,
                             source = FALSE) {
@@ -619,6 +617,12 @@ getDomainCohort <- function(cdm,
     cli::cli_abort("{end} not found in {table} table")
   }
 
+  if (!is.null(typeConceptId)) {
+    col <- omopgenerics::omopColumns(table = table, field = "type_concept")
+    cdm[[table]] <- cdm[[table]] |>
+      dplyr::filter(.data[[col]] %in% .env$typeConceptId)
+  }
+
   # codelist + cohort filtered to domain
   cdm[[paste0(tablePrefix, "temp_codelist_cohort_id")]] <- cdm[[tableCohortCodelist]] |>
     dplyr::filter(.data$domain_id %in% .env$domain) |>
@@ -628,7 +632,7 @@ getDomainCohort <- function(cdm,
                    name = paste0(tablePrefix, "temp_codelist_cohort_id"),
                    logPrefix = "CohortConstructor_tempCodelistCohortId_")
   # codelist only (will use for main join)
-  cdm[[paste0(tablePrefix, "temp_codelist")]] <-cdm[[paste0(tablePrefix, "temp_codelist_cohort_id")]] |>
+  cdm[[paste0(tablePrefix, "temp_codelist")]] <- cdm[[paste0(tablePrefix, "temp_codelist_cohort_id")]] |>
     dplyr::select("concept_id") |>
     dplyr::distinct() |>
     dplyr::compute(temporary = FALSE,
@@ -784,4 +788,24 @@ hasOverlap <- function(cohort){
     return(FALSE)
   }
 
+}
+
+internalEmptyCohort <- function(cdm, name, cohortSetRef = NULL, cohortAttritionRef = NULL) {
+  cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name)
+  if (!is.null(cohortSetRef)) {
+    cdm[[name]] <- cdm[[name]] |>
+      omopgenerics::newCohortTable(
+        cohortSetRef = cohortSet,
+        cohortAttritionRef = dplyr::tibble(
+          "cohort_definition_id" = cohortSet$cohort_definition_id,
+          "number_records" = 0L,
+          "number_subjects" = 0L,
+          "reason_id" = 1L,
+          "reason" = "Qualifying initial events",
+          "excluded_records" = NA_integer_,
+          "excluded_subjects" = NA_integer_
+        )
+      )
+  }
+  cdm[[name]]
 }
