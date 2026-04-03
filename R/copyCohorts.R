@@ -30,6 +30,13 @@ copyCohorts <- function(cohort, name, n = 1, cohortId = NULL) {
     newCohort <- cohort |>
       dplyr::compute(name = name, temporary = FALSE, overwrite = TRUE,
                      logPrefix = "CohortConstructor_copyCohors_subset_")
+    newCohort <- newCohort |>
+      omopgenerics::newCohortTable(
+        cohortSetRef = attr(cohort, "cohort_set"),
+        cohortAttritionRef = attr(cohort, "cohort_attrition"),
+        cohortCodelistRef = attr(cohort, "cohort_codelist"),
+        .softValidation = TRUE
+      )
   } else {
     newCohort <- cohort |>
       CohortConstructor::subsetCohorts(cohortId = cohortId, name = name)

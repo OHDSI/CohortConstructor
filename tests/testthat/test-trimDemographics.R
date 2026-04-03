@@ -5,22 +5,22 @@ test_that("simple duckdb checks", {
   cdm <- omopgenerics::cdmFromTables(
     tables = list(
       "person" = dplyr::tibble(
-        "person_id" = as.integer(c(1, 2, 3)),
-        "gender_concept_id" = as.integer(c(8507, 8532, 8532)),
-        "year_of_birth" = as.integer(c(1993, 2000, 2005)),
-        "month_of_birth" = as.integer(c(4, 1, 8)),
-        "day_of_birth" = as.integer(c(19, 15, 20)),
+        "person_id" = as.integer(c(1, 2, 3, 4)),
+        "gender_concept_id" = as.integer(c(8507, 8532, 8532, 8532)),
+        "year_of_birth" = as.integer(c(1993, 2000, 2005, 2000)),
+        "month_of_birth" = as.integer(c(4, 1, 8, 2)),
+        "day_of_birth" = as.integer(c(19, 15, 20, 29)),
         "race_concept_id" = 0L,
         "ethnicity_concept_id" = 0L
       ),
       "observation_period" = dplyr::tibble(
-        "observation_period_id" = as.integer(1:4),
-        "person_id" = as.integer(c(1, 2, 2, 3)),
+        "observation_period_id" = as.integer(1:5),
+        "person_id" = as.integer(c(1, 2, 2, 3, 4)),
         "observation_period_start_date" = as.Date(c(
-          "1993-04-19", "2010-03-12", "2017-08-23", "2020-10-06"
+          "1993-04-19", "2010-03-12", "2017-08-23", "2020-10-06", "2001-10-06"
         )),
         "observation_period_end_date" = as.Date(c(
-          "2023-10-11", "2017-01-01", "2023-03-12", "2024-01-01"
+          "2023-10-11", "2017-01-01", "2023-03-12", "2024-01-01", "2020-10-06"
         )),
         "period_type_concept_id" = 0L
       )
@@ -36,6 +36,12 @@ test_that("simple duckdb checks", {
         "cohort_end_date" = as.Date(c(
           "2023-10-11", "2015-01-12", "2024-01-01", "2010-05-25"
         ))
+      ),
+      "cohort2" = dplyr::tibble(
+        "cohort_definition_id" = as.integer(c(1)),
+        "subject_id" = as.integer(c(4)),
+        "cohort_start_date" = as.Date(c("2012-01-19")),
+        "cohort_end_date" = as.Date(c("2019-10-11"))
       )
     )
   ) |>
@@ -155,9 +161,9 @@ test_that("simple duckdb checks", {
   expect_identical(
     x,
     dplyr::tibble(
-      "subject_id" = as.integer(c(1, 2, 2, 3)),
-      "cohort_start_date" = as.Date(c("1993-04-19", "2010-03-12", "2017-08-23", "2020-10-06")),
-      "cohort_end_date" = as.Date(c("2013-04-18", "2017-01-01", "2020-01-14", "2024-01-01"))
+      "subject_id" = as.integer(c(1, 2, 2, 3, 4)),
+      "cohort_start_date" = as.Date(c("1993-04-19", "2010-03-12", "2017-08-23", "2020-10-06", "2001-10-06")),
+      "cohort_end_date" = as.Date(c("2013-04-18", "2017-01-01", "2020-01-14", "2024-01-01", "2020-02-28"))
     )
   )
   id <- settings(cdm$obs1) |>
@@ -171,9 +177,9 @@ test_that("simple duckdb checks", {
   expect_identical(
     x,
     dplyr::tibble(
-      "subject_id" = c(1L, 2L, 2L, 3L),
-      "cohort_start_date" = as.Date(c("1994-04-19", "2011-03-12", "2018-08-23", "2021-10-06")),
-      "cohort_end_date" = as.Date(c("2013-04-18", "2017-01-01", "2020-01-14", "2024-01-01"))
+      "subject_id" = c(1L, 2L, 2L, 3L, 4L),
+      "cohort_start_date" = as.Date(c("1994-04-19", "2011-03-12", "2018-08-23", "2021-10-06", "2002-10-06")),
+      "cohort_end_date" = as.Date(c("2013-04-18", "2017-01-01", "2020-01-14", "2024-01-01", "2020-02-28"))
     )
   )
 
@@ -289,9 +295,9 @@ test_that("simple duckdb checks", {
   expect_identical(
     x,
     dplyr::tibble(
-      "subject_id" = c(1L, 2L, 2L, 3L),
-      "cohort_start_date" = as.Date(c("1993-04-19", "2010-03-12", "2017-08-23", "2020-10-06")),
-      "cohort_end_date" = as.Date(c("2013-04-18", "2017-01-01", "2020-01-14", "2024-01-01"))
+      "subject_id" = c(1L, 2L, 2L, 3L, 4L),
+      "cohort_start_date" = as.Date(c("1993-04-19", "2010-03-12", "2017-08-23", "2020-10-06", "2001-10-06")),
+      "cohort_end_date" = as.Date(c("2013-04-18", "2017-01-01", "2020-01-14", "2024-01-01", "2020-02-28"))
     )
   )
   id <- settings(cdm$obs_new) |>
@@ -301,9 +307,9 @@ test_that("simple duckdb checks", {
   expect_identical(
     x,
     dplyr::tibble(
-      "subject_id" = c(1L, 2L),
-      "cohort_start_date" = as.Date(c("1998-04-18", "2015-03-11")),
-      "cohort_end_date" = as.Date(c("2013-04-18", "2017-01-01"))
+      "subject_id" = c(1L, 2L, 4L),
+      "cohort_start_date" = as.Date(c("1998-04-18", "2015-03-11", "2006-10-05")),
+      "cohort_end_date" = as.Date(c("2013-04-18", "2017-01-01", "2020-02-28"))
     )
   )
   id <- settings(cdm$obs_new) |>
@@ -313,9 +319,9 @@ test_that("simple duckdb checks", {
   expect_identical(
     x,
     dplyr::tibble(
-      "subject_id" = 1L,
-      "cohort_start_date" = as.Date(c("2001-07-06")),
-      "cohort_end_date" = as.Date(c("2013-04-18"))
+      "subject_id" = c(1L, 4L),
+      "cohort_start_date" = as.Date(c("2001-07-06", "2009-12-23")),
+      "cohort_end_date" = as.Date(c("2013-04-18", "2020-02-28"))
     )
   )
 
@@ -475,3 +481,4 @@ test_that("test indexes - postgres", {
     dropCreatedTables(cdm = cdm)
   }
 })
+

@@ -57,6 +57,36 @@ test_that("sampleCohort subsetting multiple cohorts", {
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
 
+
+  # retaining settings and attrition
+  cdm$cohort2a <- cdm$cohort1 |>
+    requireInDateRange(dateRange = c(as.Date("1900-01-01"),
+                                     as.Date("2026-01-01")),
+                       name = "cohort2a") |>
+    sampleCohorts(n = 4,
+                  independent = TRUE)
+  expect_true("cohort_start_date after 1900-01-01" %in%
+    (omopgenerics::attrition(cdm$cohort2a) |>
+    dplyr::pull("reason") |>
+    unique()))
+
+  # joint sampling
+  cdm$cohort2b <- cdm$cohort1 |>
+    requireInDateRange(dateRange = c(as.Date("1900-01-01"),
+                                     as.Date("2026-01-01")),
+                       name = "cohort2b") |>
+    sampleCohorts(n = 4,
+                  name = "cohort2b",
+                  independent = FALSE)
+  expect_true(length(cdm$cohort2b |>
+    dplyr::pull("subject_id") |>
+    unique()) <= 4)
+  expect_true("cohort_start_date after 1900-01-01" %in%
+                (omopgenerics::attrition(cdm$cohort2b) |>
+                   dplyr::pull("reason") |>
+                   unique()))
+
+
   dropCreatedTables(cdm = cdm)
 })
 

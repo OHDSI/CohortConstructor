@@ -51,10 +51,18 @@ specified date range.
 \donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
-cdm$cohort1 |>
-  trimToDateRange(startDate = "cohort_start_date",
-                  endDate = "cohort_end_date",
-                  dateRange = as.Date(c("2015-01-01",
-                                        "2015-12-31")))
+
+cdm$cohort2 <- cdm$cohort1 |>
+  trimToDateRange(
+    startDate = "cohort_start_date",
+    endDate = "cohort_end_date",
+    dateRange = as.Date(c("2015-01-01", "2015-12-31")),
+    name = "cohort2"
+  )
+
+cdm$cohort1 <- cdm$cohort1 |>
+  trimToDateRange(
+    dateRange = as.Date(c(NA, "2015-12-31"))
+  )
 }
 }

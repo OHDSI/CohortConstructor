@@ -245,19 +245,21 @@ test_that("test subsetting death table by a cohort table", {
   skip_on_cran()
 
   observation_period <- dplyr::tibble(
-    observation_period_id = c(1, 2, 3) |> as.integer(),
-    person_id = c(1,2, 3) |> as.integer(),
+    observation_period_id = c(1, 2, 3, 4) |> as.integer(),
+    person_id = c(1,2, 3, 4) |> as.integer(),
     observation_period_start_date = c(
       as.Date("2000-01-01"),
       as.Date("2010-01-01"),
+      as.Date("2000-01-01"),
       as.Date("2000-01-01")
     ),
     observation_period_end_date = c(
       as.Date("2021-01-01"),
       as.Date("2021-01-01"),
+      as.Date("2022-01-01"),
       as.Date("2022-01-01")
     ),
-    period_type_concept_id = c(rep(0,3)) |> as.integer()
+    period_type_concept_id = c(rep(0,4)) |> as.integer()
   )
 
   deathTable <- dplyr::tibble(
@@ -275,8 +277,8 @@ test_that("test subsetting death table by a cohort table", {
   )
 
   cohort1 <- dplyr::tibble(
-    cohort_definition_id = c(1,1,2) |> as.integer(),
-    subject_id = c(1,2,3) |> as.integer(),
+    cohort_definition_id = c(1,1,2, 3) |> as.integer(),
+    subject_id = c(1,2,3, 4) |> as.integer(),
     cohort_start_date = as.Date(c("2012-02-01")),
     cohort_end_date = as.Date(c("2013-02-01"))
   )
@@ -299,11 +301,11 @@ test_that("test subsetting death table by a cohort table", {
                                  name = "death_cohort",
                                  subsetCohort = "cohort1")
 
-  expect_true(nrow(cdm2$death_cohort |> dplyr::collect()) == 3)
+  expect_true(nrow(cdm2$death_cohort |> dplyr::collect()) == 4)
 
   expect_true(all(cdm2$death_cohort |>
                     dplyr::select(subject_id) |>
-                    dplyr::pull() %in%  c(1,2,3)
+                    dplyr::pull() %in%  c(1,2,3, 4)
   ))
   # with subsetCohortId
   cdm2$death_cohort <-  deathCohort(cdm=cdm2,
@@ -317,6 +319,16 @@ test_that("test subsetting death table by a cohort table", {
                     dplyr::select(subject_id) |>
                     dplyr::pull() %in%  c(1,2)
   ))
+
+  expect_no_error(cdm2$death_cohort <-  deathCohort(cdm=cdm2,
+                                    name = "death_cohort",
+                                    subsetCohort = "cohort1",
+                                    subsetCohortId = "cohort_1"))
+  expect_no_error(cdm2$death_cohort <-  deathCohort(cdm=cdm2,
+                                                    name = "death_cohort",
+                                                    subsetCohort = "cohort1",
+                                                    subsetCohortId = c("cohort_1",
+                                                                       "cohort_2")))
 
   dropCreatedTables(cdm = cdm)
 })

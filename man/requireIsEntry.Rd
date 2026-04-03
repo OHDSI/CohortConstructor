@@ -22,8 +22,8 @@ rest will remain unchanged.}
 A cohort table in a cdm reference.
 }
 \description{
-\code{requireIsFirstEntry()} filters cohort records, keeping only the first
-cohort entry per person.
+\code{requireIsEntry()} filters cohort records, keeping only a range a specified
+cohort entries per person.
 }
 \examples{
 \donttest{

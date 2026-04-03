@@ -4,12 +4,22 @@
 \alias{sampleCohorts}
 \title{Sample a cohort table for a given number of individuals.}
 \usage{
-sampleCohorts(cohort, n, cohortId = NULL, name = tableName(cohort))
+sampleCohorts(
+  cohort,
+  n,
+  independent = TRUE,
+  cohortId = NULL,
+  name = tableName(cohort)
+)
 }
 \arguments{
 \item{cohort}{A cohort table in a cdm reference.}
 
-\item{n}{Number of people to be sampled for each included cohort.}
+\item{n}{Number of people to be sampled.}
+
+\item{independent}{If TRUE, cohorts will be sampled independently with each
+cohort randomly sampled for n. If FALSE, cohorts will be jointly sampled for
+n across all cohorts.}
 
 \item{cohortId}{Vector identifying which cohorts to modify
 (cohort_definition_id or cohort_name). If NULL, all cohorts will be

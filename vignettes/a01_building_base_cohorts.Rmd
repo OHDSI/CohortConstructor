@@ -97,7 +97,9 @@ cdm$drugs_merge |>
 
 ```
 
-Alternatively, if we set `overlap = "extend"`, the cohort end date will be extended by summing the durations of each overlapping record.
+Alternatively, if we set `overlap = "extend"`, the cohort end date will be extended by summing the durations of each overlapping record, as depicted in the image below.
+
+![](images/overlap.png)
 
 ```{r}
 cdm$drugs_extend <- conceptCohort(cdm, 
@@ -109,7 +111,12 @@ cdm$drugs_extend |>
   attrition()
 ```
 
-To create a cohort from a concept set and include records outside of the observation period, we can set `useRecordsBeforeObservation = TRUE`. If we also want to search for the given concepts in the source concept_id fields, rather than only the standard concept_id fields, we can set `useSourceFields = TRUE`.
+To create a cohort from a concept set and include records outside the observation period, we can set `useRecordsBeforeObservation = TRUE`. This option shifts records that start before the observation period to the start of the corresponding observation period, and trims records that start or end after the observation period so they fall within that observation period. This behavior is shown in the image below.
+
+![](images/useRecordsBeforeObservation.png)
+
+
+If we also want to search for the given concepts in the source concept_id fields, rather than only the standard concept_id fields, we can set `useSourceFields = TRUE`.
 
 ```{r}
 

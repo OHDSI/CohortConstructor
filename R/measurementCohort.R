@@ -341,16 +341,29 @@ getMutateExpression <- function(cohortSet, valueAsConcept, valueAsNumber) {
     if (!is.null(numberFilter)) {
       for (ii in seq_along(numberFilter)) {
         if(!is.null(names(numberFilter)[ii])){
-          cohortFilter[ii] <- glue::glue(
-            "(.data$unit_concept_id %in% {as.integer(names(numberFilter)[ii])} &
+          if(is.infinite(numberFilter[[ii]][2])){
+            cohortFilter[ii] <- glue::glue(
+              "(.data$unit_concept_id %in% {as.integer(names(numberFilter)[ii])} &
+      .data$value_as_number >= {numberFilter[[ii]][1]})"
+            )
+          } else {
+            cohortFilter[ii] <- glue::glue(
+              "(.data$unit_concept_id %in% {as.integer(names(numberFilter)[ii])} &
       .data$value_as_number >= {numberFilter[[ii]][1]} &
       .data$value_as_number <= {numberFilter[[ii]][2]})"
-          )
+            )
+          }
         } else {
+          if(is.infinite(numberFilter[[ii]][2])){
           cohortFilter[ii] <- glue::glue(
-            "(.data$value_as_number >= {numberFilter[[ii]][1]} &
-          .data$value_as_number <= {numberFilter[[ii]][2]})"
+            "(.data$value_as_number >= {numberFilter[[ii]][1]})"
           )
+          } else {
+            cohortFilter[ii] <- glue::glue(
+              "(.data$value_as_number >= {numberFilter[[ii]][1]} &
+          .data$value_as_number <= {numberFilter[[ii]][2]})"
+            )
+        }
         }
       }
     } else {
@@ -369,10 +382,65 @@ getMutateExpression <- function(cohortSet, valueAsConcept, valueAsNumber) {
 
 measurementConceptSet <- function(valueAsNumber, valueAsConcept, cdm) {
   cohortNames <- unique(c(names(valueAsNumber), names(valueAsConcept))) |> sort()
-  dplyr::tibble(
+  cohortSettings <- dplyr::tibble(
     "cohort_definition_id" = as.integer(1:length(cohortNames)),
     "cohort_name" = cohortNames,
     "cdm_version" = attr(cdm, "cdm_version"),
-    "vocabulary_version" = vocabVersion(cdm)
+    "vocabulary_version" = CodelistGenerator::vocabularyVersion(cdm)
   )
+
+if(!is.null(valueAsNumber)){
+
+  valueAsNumberNamed <- purrr::keep(valueAsNumber, is_named)
+  valueAsNumberUnamed <- purrr::discard(valueAsNumber, is_named)
+
+  settingsValueAsNumber <- list()
+  if(!is.null(valueAsNumberNamed)){
+    settingsValueAsNumber[["named"]] <- tibble::enframe(valueAsNumberNamed,
+                    name = "cohort_name",
+                    value = "measurement_value_as_number") |>
+      dplyr::mutate(
+        measurement_value_as_number = purrr::map_chr(
+          .data$measurement_value_as_number,
+          ~ {
+            purrr::imap_chr(.x, ~ paste0("Concept ID ", .y, ": ",
+                                         paste(.x, collapse = " to "))) |>
+              paste(collapse = "; ")
+          }
+        ))
+  }
+  if(!is.null(valueAsNumberUnamed)){
+  settingsValueAsNumber[["unnamed"]] <- tibble::enframe(valueAsNumberUnamed,
+                                       name = "cohort_name",
+                                       value = "measurement_value_as_number") |>
+                         dplyr::mutate(measurement_value_as_number = purrr::map_chr(
+                           .data$measurement_value_as_number, ~ paste(.x, collapse = "; "))) |>
+    dplyr::mutate(
+      measurement_value_as_number = stringr::str_remove_all(.data$measurement_value_as_number, "c\\(|\\)"),
+      measurement_value_as_number = stringr::str_replace_all(.data$measurement_value_as_number, ",\\s*", " to ")
+    )
+  }
+  settingsValueAsNumber <- dplyr::bind_rows(settingsValueAsNumber)
+
+  cohortSettings <- cohortSettings |>
+    dplyr::left_join(settingsValueAsNumber,
+                     by = "cohort_name")
 }
+
+  if(!is.null(valueAsConcept)){
+  cohortSettings <- cohortSettings |>
+    dplyr::left_join(tibble::enframe(valueAsConcept,
+                                     name = "cohort_name",
+                                     value = "measurement_value_as_concept") |>
+                       dplyr::mutate(measurement_value_as_concept = purrr::map_chr(
+                         .data$measurement_value_as_concept, ~ paste(.x, collapse = "; "))),
+                     by = "cohort_name")
+  }
+
+  cohortSettings
+}
+
+is_named <- function(x) {
+  !is.null(names(x)) && any(names(x) != "")
+}
+

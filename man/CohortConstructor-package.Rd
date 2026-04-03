@@ -15,6 +15,7 @@ Useful links:
 \itemize{
   \item \url{https://ohdsi.github.io/CohortConstructor/}
   \item \url{https://github.com/OHDSI/CohortConstructor}
+  \item Report bugs at \url{https://github.com/OHDSI/CohortConstructor/issues}
 }
 
 }

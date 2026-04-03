@@ -7,7 +7,10 @@
 #' @inheritParams cohortDoc
 #' @inheritParams cohortIdModifyDoc
 #' @inheritParams nameDoc
-#' @param n Number of people to be sampled for each included cohort.
+#' @param n Number of people to be sampled.
+#' @param independent If TRUE, cohorts will be sampled independently with each
+#' cohort randomly sampled for n. If FALSE, cohorts will be jointly sampled for
+#' n across all cohorts.
 #'
 #' @return Cohort table with the specified cohorts sampled.
 #'
@@ -22,6 +25,7 @@
 #' }
 sampleCohorts <- function(cohort,
                           n,
+                          independent = TRUE,
                           cohortId = NULL,
                           name = tableName(cohort)) {
   # checks
@@ -30,6 +34,7 @@ sampleCohorts <- function(cohort,
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
   n <- validateN(n)
+  omopgenerics::assertLogical(independent, length = 1)
 
   if (length(cohortId) == 0) {
     cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
@@ -73,7 +78,8 @@ sampleCohorts <- function(cohort,
   cdm <- filterCohortInternal(cdm, cohort, cohortId, tmpNewCohort, tmpUnchanged)
   newCohort <- cdm[[tmpNewCohort]]
 
-  newCohort<- newCohort |>
+  if(isTRUE(independent)){
+  newCohort <- newCohort |>
     dplyr::group_by(.data$cohort_definition_id) |>
     dplyr::select("subject_id", "cohort_definition_id") |>
     dplyr::distinct() |>
@@ -85,6 +91,20 @@ sampleCohorts <- function(cohort,
       name = tmpNewCohort, temporary = FALSE,
       logPrefix = "CohortConstructor_sampleCohorts_sample_"
     )
+  } else {
+    newCohort <- newCohort |>
+      dplyr::select("subject_id") |>
+      dplyr::distinct() |>
+      dplyr::slice_sample(n = n) |>
+      dplyr::left_join(cohort, by = c("subject_id")) |>
+      dplyr::relocate(dplyr::all_of(omopgenerics::cohortColumns("cohort")))  |>
+      dplyr::compute(
+        name = tmpNewCohort, temporary = FALSE,
+        logPrefix = "CohortConstructor_sampleCohorts_sample_"
+      )
+    newCohort <- newCohort |>
+      omopgenerics::newCohortTable()
+  }
 
   if (isTRUE(needsIdFilter(cohort, cohortId))) {
     newCohort <- newCohort |>
