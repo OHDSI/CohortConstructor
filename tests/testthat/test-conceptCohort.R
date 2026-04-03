@@ -314,7 +314,7 @@ test_that("initial tests", {
   # Concept set expression ----
   codes <- CodelistGenerator::codesFromConceptSet(
     cdm = cdm,
-    path = here::here("extras", "concept_set"),
+    path = system.file("concept_set", package = "CohortConstructor"),
     type = "concept_set_expression"
   )
   cdm$cohort <- conceptCohort(
