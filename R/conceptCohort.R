@@ -795,9 +795,9 @@ internalEmptyCohort <- function(cdm, name, cohortSetRef = NULL, cohortAttritionR
   if (!is.null(cohortSetRef)) {
     cdm[[name]] <- cdm[[name]] |>
       omopgenerics::newCohortTable(
-        cohortSetRef = cohortSet,
+        cohortSetRef = cohortSetRef,
         cohortAttritionRef = dplyr::tibble(
-          "cohort_definition_id" = cohortSet$cohort_definition_id,
+          "cohort_definition_id" = cohortSetRef$cohort_definition_id,
           "number_records" = 0L,
           "number_subjects" = 0L,
           "reason_id" = 1L,
