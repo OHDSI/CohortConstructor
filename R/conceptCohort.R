@@ -247,6 +247,7 @@ conceptCohort <- function(cdm,
           .data$cohort_definition_id, .data$subject_id, .data$cohort_start_date,
           .data$cohort_end_date
         ) |>
+        dplyr::compute(name = name) |>
         omopgenerics::recordCohortAttrition(reason = reason)
     }
   }
