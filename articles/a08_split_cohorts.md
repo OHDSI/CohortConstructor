@@ -90,8 +90,8 @@ already created so let’s first add a column sex to my existent cohort:
 cdm$medications <- cdm$medications |>
   addSex()
 cdm$medications
-#> # Source:   table<og_011_1774860096> [?? x 5]
-#> # Database: DuckDB 1.5.1 [unknown@Linux 6.17.0-1008-azure:R 4.5.3//tmp/Rtmp87KC30/file286f5190594e.duckdb]
+#> # Source:   table<og_011_1775547477> [?? x 5]
+#> # Database: DuckDB 1.5.1 [unknown@Linux 6.17.0-1008-azure:R 4.5.3//tmp/RtmpmzvnLt/file28101fcc73ed.duckdb]
 #>    cohort_definition_id subject_id cohort_start_date cohort_end_date sex   
 #>                   <int>      <int> <date>            <date>          <chr> 
 #>  1                    1        123 1954-01-10        1954-01-24      Male  
@@ -254,15 +254,15 @@ records:
 cdm$medications |> 
   filter(subject_id == 4383)
 #> # Source:   SQL [?? x 5]
-#> # Database: DuckDB 1.5.1 [unknown@Linux 6.17.0-1008-azure:R 4.5.3//tmp/Rtmp87KC30/file286f5190594e.duckdb]
+#> # Database: DuckDB 1.5.1 [unknown@Linux 6.17.0-1008-azure:R 4.5.3//tmp/RtmpmzvnLt/file28101fcc73ed.duckdb]
 #>   cohort_definition_id subject_id cohort_start_date cohort_end_date sex  
 #>                  <int>      <int> <date>            <date>          <chr>
 #> 1                    1       4383 1971-02-06        1971-02-13      Male 
 #> 2                    1       4383 1990-10-13        1990-10-27      Male 
 #> 3                    1       4383 2000-03-12        2000-03-19      Male 
-#> 4                    1       4383 1990-12-20        1991-01-03      Male 
-#> 5                    1       4383 2004-05-21        2004-06-11      Male 
-#> 6                    1       4383 1992-07-18        1992-08-22      Male
+#> 4                    1       4383 1992-07-18        1992-08-22      Male 
+#> 5                    1       4383 1990-12-20        1991-01-03      Male 
+#> 6                    1       4383 2004-05-21        2004-06-11      Male
 ```
 
 From the 6 records only 3 are within our period of interest `1990-1993`,
@@ -277,7 +277,7 @@ to see 4 cohort contributions for this subject (2 in 1990, 1 in 1991 and
 cdm$medications_year |>
   filter(subject_id == 4383)
 #> # Source:   SQL [?? x 5]
-#> # Database: DuckDB 1.5.1 [unknown@Linux 6.17.0-1008-azure:R 4.5.3//tmp/Rtmp87KC30/file286f5190594e.duckdb]
+#> # Database: DuckDB 1.5.1 [unknown@Linux 6.17.0-1008-azure:R 4.5.3//tmp/RtmpmzvnLt/file28101fcc73ed.duckdb]
 #>   cohort_definition_id subject_id cohort_start_date cohort_end_date sex  
 #>                  <int>      <int> <date>            <date>          <chr>
 #> 1                    1       4383 1990-10-13        1990-10-27      Male 
