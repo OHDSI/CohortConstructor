@@ -142,11 +142,8 @@ exitAtColumnDate <- function(cohort,
     reason <- "entry_reason"
   }
 
-  if (reason %in% colnames(cohort) & returnReason) {
-    cli::cli_inform("Column {reason} will be overwritten.")
-    cohort <- cohort |> dplyr::select(!dplyr::all_of(reason))
-  } else if (reason %in% colnames(cohort) & !returnReason) {
-    reason <- "date_column_name_1234"
+  if (reason %in% colnames(cohort)) {
+    cli::cli_inform("Column {reason} will be overwritten for cohort ID: {cohortId}.")
   }
 
   # check NA
@@ -161,13 +158,13 @@ exitAtColumnDate <- function(cohort,
     cli::cli_abort("All cohort records must have at least one non-empty date in the `dateColumns`")
   }
 
-
   # temp tables
   tablePrefix <- omopgenerics::tmpPrefix()
   tmpNewCohort <- omopgenerics::uniqueTableName(tablePrefix)
   tmpUnchanged <- omopgenerics::uniqueTableName(tablePrefix)
   cdm <- filterCohortInternal(cdm, cohort, cohortId, tmpNewCohort, tmpUnchanged)
   newCohort <- cdm[[tmpNewCohort]] |>
+    dplyr::select(!dplyr::any_of(reason)) |>
     dplyr::mutate(
       "cohort_start_date_0123456789" = .data$cohort_start_date,
       "cohort_end_date_0123456789" = .data$cohort_end_date
@@ -241,11 +238,16 @@ exitAtColumnDate <- function(cohort,
 
   if (isTRUE(needsIdFilter(cohort, cohortId))) {
     dateColumns <- dateColumns[!dateColumns %in% c("cohort_end_date", "cohort_start_date")]
+
+    if (!reason %in% colnames(cdm[[tmpUnchanged]])) {
+      cdm[[tmpUnchanged]] <- cdm[[tmpUnchanged]] |>
+        dplyr::mutate(!!reason := !!newDate)
+    }
+
     newCohort <- newCohort |>
       # join non modified cohorts
       dplyr::union_all(
         cdm[[tmpUnchanged]]  |>
-          dplyr::mutate(!!reason := !!newDate) |>
           dplyr::select(!dplyr::all_of(c(dateColumns, excludeReason)))
       ) |>
       dplyr::compute(name = tmpNewCohort, temporary = FALSE,
@@ -259,7 +261,8 @@ exitAtColumnDate <- function(cohort,
           dplyr::select(dplyr::any_of(c(
             "cohort_definition_id", "subject_id", keptDate, dateColumns
           ))) |>
-          dplyr::select(!dplyr::any_of(newDate))
+          dplyr::select(!dplyr::any_of(newDate)),
+        by = c("cohort_definition_id", "subject_id", keptDate)
       ) |>
       dplyr::compute(
         name = tmpNewCohort, temporary = FALSE,

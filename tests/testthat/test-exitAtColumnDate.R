@@ -269,3 +269,110 @@ test_that("exit at first date", {
 
   dropCreatedTables(cdm = cdm)
 })
+
+test_that("multiple exit calls", {
+  skip_on_cran()
+
+  cdm <- omock::mockCdmFromDataset(datasetName = "GiBleed") |>
+    copyCdm()
+
+  codelist <- list(cohort1 = 40481087L, cohort2 = 4112343L)
+  cdm$my_cohort <- conceptCohort(
+    cdm = cdm,
+    conceptSet = codelist,
+    name = "my_cohort",
+    exit = "event_start_date"
+  ) |>
+    PatientProfiles::addCohortIntersectDate(
+      name = "my_cohort",
+      targetCohortTable = "my_cohort",
+      order = "first",
+      nameStyle = "next_{cohort_name}"
+    ) |>
+    PatientProfiles::addFutureObservation(
+      futureObservationType = "date",
+      name = "my_cohort"
+    ) |>
+    requireIsFirstEntry()
+
+  # only exit for cohort 1
+  expect_no_error(
+    cdm$test1 <- cdm$my_cohort |>
+      exitAtFirstDate(
+        cohortId = 1L,
+        dateColumns = c("next_cohort2", "future_observation"),
+        returnReason = TRUE,
+        name = "test1"
+      )
+  )
+  expect_no_error(
+    summary1 <- cdm$test1 |>
+      dplyr::group_by(.data$cohort_definition_id, .data$exit_reason) |>
+      dplyr::tally() |>
+      dplyr::collect() |>
+      dplyr::ungroup()
+  )
+  expect_identical(
+    unique(summary1$exit_reason[summary1$cohort_definition_id == 2]),
+    "cohort_end_date"
+  )
+
+  # only exit for cohort 2
+  expect_no_error(
+    cdm$test2 <- cdm$my_cohort |>
+      exitAtFirstDate(
+        cohortId = 2L,
+        dateColumns = c("next_cohort1", "future_observation"),
+        returnReason = TRUE,
+        name = "test2"
+      )
+  )
+  expect_no_error(
+    summary2 <- cdm$test2 |>
+      dplyr::group_by(.data$cohort_definition_id, .data$exit_reason) |>
+      dplyr::tally() |>
+      dplyr::collect() |>
+      dplyr::ungroup()
+  )
+  expect_identical(
+    unique(summary2$exit_reason[summary2$cohort_definition_id == 1]),
+    "cohort_end_date"
+  )
+
+  # run both exits
+  expect_no_error(
+    cdm$test3 <- cdm$my_cohort |>
+      exitAtFirstDate(
+        cohortId = 1L,
+        dateColumns = c("next_cohort2", "future_observation"),
+        returnReason = TRUE,
+        name = "test3"
+      ) |>
+      exitAtFirstDate(
+        cohortId = 2L,
+        dateColumns = c("next_cohort1", "future_observation"),
+        returnReason = TRUE,
+        name = "test3"
+      )
+  )
+  expect_no_error(
+    summary3 <- cdm$test3 |>
+      dplyr::group_by(.data$cohort_definition_id, .data$exit_reason) |>
+      dplyr::tally() |>
+      dplyr::collect() |>
+      dplyr::ungroup()
+  )
+  expect_identical(
+    summary1 |>
+      dplyr::filter(.data$cohort_definition_id == 1) |>
+      dplyr::union_all(
+        summary2 |>
+          dplyr::filter(.data$cohort_definition_id == 2)
+      ) |>
+      dplyr::arrange(.data$cohort_definition_id, .data$exit_reason),
+    summary3 |>
+      dplyr::arrange(.data$cohort_definition_id, .data$exit_reason)
+  )
+
+  dropCreatedTables(cdm = cdm)
+})
