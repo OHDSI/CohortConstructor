@@ -76,8 +76,6 @@ cdm$cohort1 <- cdm$cohort1 |>
 
 cdm$cohort1 |>
   exitAtFirstDate(dateColumns = c("next_obs", "future_observation"))
-#> Joining with `by = join_by(cohort_definition_id, subject_id,
-#> cohort_start_date)`
 #> # A tibble: 63 × 6
 #>    cohort_definition_id subject_id cohort_start_date cohort_end_date next_obs  
 #>                   <int>      <int> <date>            <date>          <date>    

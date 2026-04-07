@@ -82,7 +82,6 @@ cdm$cohort1 <- cdm$cohort1 |>
 
 cdm$cohort1 |>
   entryAtLastDate(dateColumns = c("prior_drug", "prior_observation"))
-#> Joining with `by = join_by(cohort_definition_id, subject_id, cohort_end_date)`
 #> # A tibble: 64 × 6
 #>    cohort_definition_id subject_id cohort_start_date cohort_end_date prior_drug
 #>                   <int>      <int> <date>            <date>          <date>    
