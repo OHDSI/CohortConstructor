@@ -313,7 +313,7 @@ test_that("initial tests", {
 
   # Concept set expression ----
   codes <- CodelistGenerator::importConceptSetExpression(
-    path = here::here("extras", "concept_set")
+    path = system.file("concept_set", package = "CohortConstructor")
   )
   cdm$cohort <- conceptCohort(
     cdm = cdm,

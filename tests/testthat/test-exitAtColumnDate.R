@@ -1,5 +1,6 @@
 test_that("exit at first date", {
   skip_on_cran()
+
   cdm <- omock::mockCdmFromTables(
     tables = list(
       "cohort_1" = dplyr::tibble(

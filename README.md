@@ -4,14 +4,10 @@
 # CohortConstructor <img src="man/figures/logo.png" align="right" height="180"/>
 
 <!-- badges: start -->
-
-[![CRAN
-status](https://www.r-pkg.org/badges/version/CohortConstructor)](https://CRAN.R-project.org/package=CohortConstructor)
+[![CRAN status](https://www.r-pkg.org/badges/version/CohortConstructor)](https://CRAN.R-project.org/package=CohortConstructor)
 [![R-CMD-check](https://github.com/OHDSI/CohortConstructor/workflows/R-CMD-check/badge.svg)](https://github.com/OHDSI/CohortConstructor/actions)
-[![Codecov test
-coverage](https://codecov.io/gh/OHDSI/CohortConstructor/branch/main/graph/badge.svg)](https://app.codecov.io/gh/OHDSI/CohortConstructor?branch=main)
+[![Codecov test coverage](https://codecov.io/gh/OHDSI/CohortConstructor/graph/badge.svg)](https://app.codecov.io/gh/OHDSI/CohortConstructor)
 [![Lifecycle:Experimental](https://img.shields.io/badge/Lifecycle-Experimental-339999)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-
 <!-- badges: end -->
 
 The goal of CohortConstructor is to support the creation and
