@@ -377,3 +377,121 @@ test_that("multiple exit calls", {
 
   dropCreatedTables(cdm = cdm)
 })
+
+test_that("multiple reasons", {
+  skip_on_cran()
+
+  cdm <- omock::mockCdmFromDataset(datasetName = "GiBleed") |>
+    copyCdm()
+
+  codelist <- list(cohort1 = 40481087L, cohort2 = 4112343L)
+  cdm$my_cohort <- conceptCohort(
+    cdm = cdm,
+    conceptSet = codelist,
+    name = "my_cohort",
+    exit = "event_start_date"
+  ) |>
+    PatientProfiles::addCohortIntersectDate(
+      name = "my_cohort",
+      targetCohortTable = "my_cohort",
+      order = "first",
+      nameStyle = "next_{cohort_name}"
+    ) |>
+    PatientProfiles::addFutureObservation(
+      futureObservationType = "date",
+      name = "my_cohort"
+    ) |>
+    requireIsFirstEntry()
+
+  cdm$onlyfirst <- cdm$my_cohort |>
+    subsetCohorts(cohortId = 1, name = "onlyfirst")
+
+  expect_no_error(
+    cdm$multiple <- cdm$onlyfirst |>
+      exitAtFirstDate(
+        dateColumns = c("next_cohort2", "future_observation"),
+        returnReason = TRUE,
+        multipleReasons = TRUE,
+        name = "multiple"
+      )
+  )
+  expect_identical(
+    cdm$multiple |>
+      dplyr::distinct(.data$exit_reason) |>
+      dplyr::pull() |>
+      sort(),
+    c("future_observation", "next_cohort2", "next_cohort2; future_observation")
+  )
+  expect_no_error(
+    cdm$not_multiple <- cdm$onlyfirst |>
+      exitAtFirstDate(
+        dateColumns = c("next_cohort2", "future_observation"),
+        returnReason = TRUE,
+        multipleReasons = FALSE,
+        name = "not_multiple"
+      )
+  )
+  expect_identical(
+    cdm$not_multiple |>
+      dplyr::distinct(.data$exit_reason) |>
+      dplyr::pull() |>
+      sort(),
+    c("future_observation", "next_cohort2")
+  )
+  x <- cdm$not_multiple |>
+    dplyr::select("subject_id", "exit_reason_not_multiple" = "exit_reason") |>
+    dplyr::inner_join(
+      cdm$multiple |>
+        dplyr::select("subject_id", "exit_reason_multiple" = "exit_reason"),
+      by = "subject_id"
+    ) |>
+    dplyr::select(!"subject_id") |>
+    dplyr::distinct() |>
+    dplyr::collect() |>
+    dplyr::arrange(.data$exit_reason_multiple)
+  expect_identical(
+    x,
+    dplyr::tibble(
+      exit_reason_not_multiple = c('future_observation', 'next_cohort2', 'next_cohort2'),
+      exit_reason_multiple = c('future_observation', 'next_cohort2', 'next_cohort2; future_observation')
+    )
+  )
+
+  # change order
+  expect_no_error(
+    cdm$not_multiple2 <- cdm$onlyfirst |>
+      exitAtFirstDate(
+        dateColumns = c("future_observation", "next_cohort2"),
+        returnReason = TRUE,
+        multipleReasons = FALSE,
+        name = "not_multiple2"
+      )
+  )
+  expect_identical(
+    cdm$not_multiple2 |>
+      dplyr::distinct(.data$exit_reason) |>
+      dplyr::pull() |>
+      sort(),
+    c("future_observation", "next_cohort2")
+  )
+  x <- cdm$not_multiple2 |>
+    dplyr::select("subject_id", "exit_reason_not_multiple" = "exit_reason") |>
+    dplyr::inner_join(
+      cdm$multiple |>
+        dplyr::select("subject_id", "exit_reason_multiple" = "exit_reason"),
+      by = "subject_id"
+    ) |>
+    dplyr::select(!"subject_id") |>
+    dplyr::distinct() |>
+    dplyr::collect() |>
+    dplyr::arrange(.data$exit_reason_multiple)
+  expect_identical(
+    x,
+    dplyr::tibble(
+      exit_reason_not_multiple = c('future_observation', 'next_cohort2', 'future_observation'),
+      exit_reason_multiple = c('future_observation', 'next_cohort2', 'next_cohort2; future_observation')
+    )
+  )
+
+  dropCreatedTables(cdm = cdm)
+})
