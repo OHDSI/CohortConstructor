@@ -381,6 +381,13 @@ test_that("multiple exit calls", {
 test_that("multiple reasons", {
   skip_on_cran()
 
+  uncohort <- function(x) {
+    attr(x, "cohort_attrition") <- NULL
+    attr(x, "cohort_codelist") <- NULL
+    attr(x, "cohort_set") <- NULL
+    dplyr::as_tibble(x)
+  }
+
   cdm <- omock::mockCdmFromDataset(datasetName = "GiBleed") |>
     copyCdm()
 
@@ -448,6 +455,7 @@ test_that("multiple reasons", {
     dplyr::select(!"subject_id") |>
     dplyr::distinct() |>
     dplyr::collect() |>
+    uncohort() |>
     dplyr::arrange(.data$exit_reason_multiple)
   expect_identical(
     x,
@@ -484,6 +492,7 @@ test_that("multiple reasons", {
     dplyr::select(!"subject_id") |>
     dplyr::distinct() |>
     dplyr::collect() |>
+    uncohort() |>
     dplyr::arrange(.data$exit_reason_multiple)
   expect_identical(
     x,
