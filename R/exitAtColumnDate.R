@@ -173,7 +173,6 @@ exitAtColumnDate <- function(cohort,
     rlang::parse_exprs() |>
     rlang::set_names(id)
   newCohort <- cdm[[tmpNewCohort]] |>
-    dplyr::select(!dplyr::any_of(reason)) |>
     dplyr::mutate(!!!q) |>
     dplyr::compute(
       name = tmpNewCohort,
@@ -181,45 +180,51 @@ exitAtColumnDate <- function(cohort,
     )
 
   if (returnReason) {
+    newCohort <- newCohort |>
+      dplyr::select(!dplyr::any_of(reason))
     if (multipleReasons) {
       newCohort <- newCohort |>
         dplyr::mutate(dplyr::across(
           dplyr::all_of(dateColumns),
-          \(x) dplyr::case_when(
-            is.na(x) ~ 0,
-            x == .data[[id]] ~ 1,
-            .default = 0
-          )
+          \(x) dplyr::coalesce(dplyr::if_else(x == !!rlang::sym(id), 1L, 0L), 0L),
+          .names = "xyz_{.col}"
         )) |>
         dplyr::compute(
           name = tmpNewCohort,
           logPrefix = "CohortConstructor_exitAtColumnDate_newDate_2_"
         )
+      newCols <- paste0("xyz_", dateColumns)
       createReasons <- newCohort |>
-        dplyr::select(dplyr::all_of(dateColumns)) |>
+        dplyr::select(dplyr::all_of(newCols)) |>
         dplyr::distinct() |>
         dplyr::collect() |>
         dplyr::mutate(!!reason := "")
-      for (col in dateColumns) {
+      for (k in seq_along(dateColumns)) {
+        col <- paste0("xyz_", dateColumns[k])
         createReasons <- createReasons |>
           dplyr::mutate(!!reason := dplyr::case_when(
-            .data[[col]] == 1 & .data[[reason]] == "" ~ col,
-            .data[[col]] == 1 ~ paste0(.data[[reason]], "; ", col),
+            .data[[col]] == 1 & .data[[reason]] == "" ~ dateColumns[k],
+            .data[[col]] == 1 ~ paste0(.data[[reason]], "; ", dateColumns[k]),
             .default = .data[[reason]]
           ))
       }
       nm <- omopgenerics::uniqueTableName()
       cdm <- omopgenerics::insertTable(cdm = cdm, name = nm, table = createReasons)
       newCohort <- newCohort |>
-        dplyr::inner_join(cdm[[nm]], by = dateColumns) |>
+        dplyr::inner_join(cdm[[nm]], by = newCols) |>
+        dplyr::select(!dplyr::all_of(newCols)) |>
         dplyr::compute(
           name = tmpNewCohort,
           logPrefix = "CohortConstructor_exitAtColumnDate_newDate_3_"
         )
+      omopgenerics::dropSourceTable(cdm = cdm, name = nm)
     } else {
       q <- paste0(
         "dplyr::case_when(",
-        paste0(".data[['", dateColumns, "']] == .data[[id]] ~ '", dateColumns, "'", collapse = ", "),
+        paste0(
+          ".data[['", dateColumns, "']] == .data[[id]] ~ '", dateColumns, "'",
+          collapse = ", "
+        ),
         ")"
       ) |>
         rlang::parse_exprs() |>
@@ -234,8 +239,8 @@ exitAtColumnDate <- function(cohort,
   }
 
   newCohort <- newCohort |>
-    dplyr::mutate(!!newDate := .data[[id]]) |>
-    dplyr::select(!dplyr::all_of(id)) |>
+    dplyr::select(!dplyr::any_of(newDate)) |>
+    dplyr::rename(rlang::set_names(id, newDate)) |>
     dplyr::compute(
       name = tmpNewCohort,
       logPrefix = "CohortConstructor_exitAtColumnDate_newDate_4_"
@@ -247,7 +252,7 @@ exitAtColumnDate <- function(cohort,
   }
 
   if (isTRUE(needsIdFilter(cohort, cohortId))) {
-    if (!reason %in% colnames(cdm[[tmpUnchanged]])) {
+    if (!reason %in% colnames(cdm[[tmpUnchanged]]) & returnReason) {
       cdm[[tmpUnchanged]] <- cdm[[tmpUnchanged]] |>
         dplyr::mutate(!!reason := !!newDate)
     }
@@ -261,13 +266,16 @@ exitAtColumnDate <- function(cohort,
       )
   }
 
+  cohortCols <- omopgenerics::cohortColumns("cohort")
+
   if (!keepDateColumns) {
+    dateColumns <- dateColumns[!dateColumns %in% cohortCols]
     newCohort <- newCohort |>
-      dplyr::select(!dplyr::all_of(keepDateColumns))
+      dplyr::select(!dplyr::all_of(dateColumns))
   }
 
   newCohort <- newCohort |>
-    dplyr::relocate(dplyr::all_of(omopgenerics::cohortColumns("cohort"))) |>
+    dplyr::relocate(dplyr::all_of(cohortCols)) |>
     dplyr::compute(
       name = name,
       logPrefix = "CohortConstructor_exitAtColumnDate_relocate_"
