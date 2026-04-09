@@ -76,9 +76,6 @@ NULL
 #' table to consider.
 #' @param returnReason If TRUE it will return a column indicating which of the
 #' `dateColumns` was used.
-#' @param multipleReasons If TRUE multiple reasons can be returned (reasons will
-#' appear in the order of `dateColumns` separated by `; `), if FALSE only the
-#' first reason based on the order of `dateColumns` will be returned.
 #' @param keepDateColumns If TRUE the returned cohort will keep columns in
 #' `dateColumns`.
 #'

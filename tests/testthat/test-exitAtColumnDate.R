@@ -415,11 +415,16 @@ test_that("multiple reasons", {
 
   expect_no_error(
     cdm$multiple <- cdm$onlyfirst |>
-      exitAtFirstDate(
-        dateColumns = c("next_cohort2", "future_observation"),
+      exitAtColumnDate(
+        dateColumns = c("next_cohort2", "future_observation"),,
+        cohortId = NULL,
         returnReason = TRUE,
+        name = "multiple",
         multipleReasons = TRUE,
-        name = "multiple"
+        order = "first",
+        exit = TRUE,
+        keepDateColumns = FALSE,
+        .softValidation = FALSE
       )
   )
   expect_identical(
@@ -431,11 +436,16 @@ test_that("multiple reasons", {
   )
   expect_no_error(
     cdm$not_multiple <- cdm$onlyfirst |>
-      exitAtFirstDate(
-        dateColumns = c("next_cohort2", "future_observation"),
+      exitAtColumnDate(
+        dateColumns = c("next_cohort2", "future_observation"),,
+        cohortId = NULL,
         returnReason = TRUE,
+        name = "not_multiple",
         multipleReasons = FALSE,
-        name = "not_multiple"
+        order = "first",
+        exit = TRUE,
+        keepDateColumns = FALSE,
+        .softValidation = FALSE
       )
   )
   expect_identical(
@@ -468,11 +478,16 @@ test_that("multiple reasons", {
   # change order
   expect_no_error(
     cdm$not_multiple2 <- cdm$onlyfirst |>
-      exitAtFirstDate(
+      exitAtColumnDate(
         dateColumns = c("future_observation", "next_cohort2"),
+        cohortId = NULL,
         returnReason = TRUE,
+        name = "not_multiple2",
         multipleReasons = FALSE,
-        name = "not_multiple2"
+        order = "first",
+        exit = TRUE,
+        keepDateColumns = FALSE,
+        .softValidation = FALSE
       )
   )
   expect_identical(
