@@ -40,7 +40,6 @@ exitAtFirstDate <- function(cohort,
     dateColumns = dateColumns,
     cohortId = cohortId,
     returnReason = returnReason,
-    multipleReasons = FALSE,
     name = name,
     order = "first",
     exit = TRUE,
@@ -92,7 +91,6 @@ exitAtLastDate <- function(cohort,
     dateColumns = dateColumns,
     cohortId = cohortId,
     returnReason = returnReason,
-    multipleReasons = FALSE,
     name = name,
     order = "last",
     exit = TRUE,
@@ -105,7 +103,6 @@ exitAtColumnDate <- function(cohort,
                              dateColumns,
                              cohortId,
                              returnReason,
-                             multipleReasons,
                              order,
                              name,
                              exit,
@@ -121,7 +118,6 @@ exitAtColumnDate <- function(cohort,
   omopgenerics::assertLogical(returnReason, length = 1, call = call)
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
   omopgenerics::assertLogical(.softValidation, length = 1, call = call)
-  omopgenerics::assertLogical(multipleReasons, length = 1, call = call)
 
   if (length(cohortId) == 0) {
     cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
@@ -180,60 +176,18 @@ exitAtColumnDate <- function(cohort,
   if (returnReason) {
     newCohort <- newCohort |>
       dplyr::select(!dplyr::any_of(reason))
-    if (multipleReasons) {
-      newCohort <- newCohort |>
-        dplyr::mutate(dplyr::across(
-          dplyr::all_of(dateColumns),
-          \(x) dplyr::coalesce(dplyr::if_else(x == !!rlang::sym(id), 1L, 0L), 0L),
-          .names = "xyz_{.col}"
-        )) |>
-        dplyr::compute(
-          name = tmpNewCohort,
-          logPrefix = "CohortConstructor_exitAtColumnDate_newDate_2_"
-        )
-      newCols <- paste0("xyz_", dateColumns)
-      createReasons <- newCohort |>
-        dplyr::select(dplyr::all_of(newCols)) |>
-        dplyr::distinct() |>
-        dplyr::collect() |>
-        dplyr::mutate(!!reason := "")
-      for (k in seq_along(dateColumns)) {
-        col <- paste0("xyz_", dateColumns[k])
-        createReasons <- createReasons |>
-          dplyr::mutate(!!reason := dplyr::case_when(
-            .data[[col]] == 1 & .data[[reason]] == "" ~ dateColumns[k],
-            .data[[col]] == 1 ~ paste0(.data[[reason]], "; ", dateColumns[k]),
-            .default = .data[[reason]]
-          ))
-      }
-      nm <- omopgenerics::uniqueTableName()
-      cdm <- omopgenerics::insertTable(cdm = cdm, name = nm, table = createReasons)
-      newCohort <- newCohort |>
-        dplyr::inner_join(cdm[[nm]], by = newCols) |>
-        dplyr::select(!dplyr::all_of(newCols)) |>
-        dplyr::compute(
-          name = tmpNewCohort,
-          logPrefix = "CohortConstructor_exitAtColumnDate_newDate_3_"
-        )
-      omopgenerics::dropSourceTable(cdm = cdm, name = nm)
-    } else {
-      q <- paste0(
-        "dplyr::case_when(",
-        paste0(
-          ".data[['", dateColumns, "']] == .data[[id]] ~ '", dateColumns, "'",
-          collapse = ", "
-        ),
-        ")"
-      ) |>
-        rlang::parse_exprs() |>
-        rlang::set_names(reason)
-      newCohort <- newCohort |>
-        dplyr::mutate(!!!q) |>
-        dplyr::compute(
-          name = tmpNewCohort,
-          logPrefix = "CohortConstructor_exitAtColumnDate_newDate_2_"
-        )
-    }
+    q <- paste0(
+      "dplyr::case_when(",
+      paste0(
+        ".data[['", dateColumns, "']] == .data[[id]] ~ '", dateColumns, "'",
+        collapse = ", "
+      ),
+      ")"
+    ) |>
+      rlang::parse_exprs() |>
+      rlang::set_names(reason)
+    newCohort <- newCohort |>
+      dplyr::mutate(!!!q)
   }
 
   newCohort <- newCohort |>
@@ -241,7 +195,7 @@ exitAtColumnDate <- function(cohort,
     dplyr::rename(rlang::set_names(id, newDate)) |>
     dplyr::compute(
       name = tmpNewCohort,
-      logPrefix = "CohortConstructor_exitAtColumnDate_newDate_4_"
+      logPrefix = "CohortConstructor_exitAtColumnDate_newDate_2_"
     )
 
   # checks with informative errors
@@ -257,11 +211,7 @@ exitAtColumnDate <- function(cohort,
 
     newCohort <- newCohort |>
       # join non modified cohorts
-      dplyr::union_all(cdm[[tmpUnchanged]]) |>
-      dplyr::compute(
-        name = tmpNewCohort,
-        logPrefix = "CohortConstructor_exitAtColumnDate_union_"
-      )
+      dplyr::union_all(cdm[[tmpUnchanged]])
   }
 
   cohortCols <- omopgenerics::cohortColumns("cohort")

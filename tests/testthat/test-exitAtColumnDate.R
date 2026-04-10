@@ -401,6 +401,7 @@ test_that("multiple reasons", {
     PatientProfiles::addCohortIntersectDate(
       name = "my_cohort",
       targetCohortTable = "my_cohort",
+      targetCohortId = 2,
       order = "first",
       nameStyle = "next_{cohort_name}"
     ) |>
@@ -414,107 +415,96 @@ test_that("multiple reasons", {
     subsetCohorts(cohortId = 1, name = "onlyfirst")
 
   expect_no_error(
-    cdm$multiple <- cdm$onlyfirst |>
-      exitAtColumnDate(
-        dateColumns = c("next_cohort2", "future_observation"),,
+    cdm$order1 <- cdm$onlyfirst |>
+      exitAtFirstDate(
+        dateColumns = c("next_cohort2", "future_observation"),
         cohortId = NULL,
         returnReason = TRUE,
-        name = "multiple",
-        multipleReasons = TRUE,
-        order = "first",
-        exit = TRUE,
-        keepDateColumns = FALSE,
-        .softValidation = FALSE
+        name = "order1"
       )
   )
   expect_identical(
-    cdm$multiple |>
-      dplyr::distinct(.data$exit_reason) |>
-      dplyr::pull() |>
-      sort(),
-    c("future_observation", "next_cohort2", "next_cohort2; future_observation")
-  )
-  expect_no_error(
-    cdm$not_multiple <- cdm$onlyfirst |>
-      exitAtColumnDate(
-        dateColumns = c("next_cohort2", "future_observation"),,
-        cohortId = NULL,
-        returnReason = TRUE,
-        name = "not_multiple",
-        multipleReasons = FALSE,
-        order = "first",
-        exit = TRUE,
-        keepDateColumns = FALSE,
-        .softValidation = FALSE
-      )
-  )
-  expect_identical(
-    cdm$not_multiple |>
+    cdm$order1 |>
       dplyr::distinct(.data$exit_reason) |>
       dplyr::pull() |>
       sort(),
     c("future_observation", "next_cohort2")
   )
-  x <- cdm$not_multiple |>
-    dplyr::select("subject_id", "exit_reason_not_multiple" = "exit_reason") |>
-    dplyr::inner_join(
-      cdm$multiple |>
-        dplyr::select("subject_id", "exit_reason_multiple" = "exit_reason"),
-      by = "subject_id"
-    ) |>
-    dplyr::select(!"subject_id") |>
-    dplyr::distinct() |>
-    dplyr::collect() |>
-    uncohort() |>
-    dplyr::arrange(.data$exit_reason_multiple)
+
   expect_identical(
-    x,
-    dplyr::tibble(
-      exit_reason_not_multiple = c('future_observation', 'next_cohort2', 'next_cohort2'),
-      exit_reason_multiple = c('future_observation', 'next_cohort2', 'next_cohort2; future_observation')
-    )
+    cdm$order1 |>
+      dplyr::filter(.data$future_observation < .data$next_cohort2 | is.na(.data$next_cohort2)) |>
+      dplyr::distinct(.data$exit_reason) |>
+      dplyr::pull(),
+    "future_observation"
+  )
+  expect_identical(
+    cdm$order1 |>
+      dplyr::filter(.data$next_cohort2 <= .data$future_observation) |>
+      dplyr::distinct(.data$exit_reason) |>
+      dplyr::pull(),
+    "next_cohort2"
   )
 
   # change order
   expect_no_error(
-    cdm$not_multiple2 <- cdm$onlyfirst |>
-      exitAtColumnDate(
+    cdm$order2 <- cdm$onlyfirst |>
+      exitAtFirstDate(
         dateColumns = c("future_observation", "next_cohort2"),
         cohortId = NULL,
         returnReason = TRUE,
-        name = "not_multiple2",
-        multipleReasons = FALSE,
-        order = "first",
-        exit = TRUE,
-        keepDateColumns = FALSE,
-        .softValidation = FALSE
+        name = "order2"
       )
   )
   expect_identical(
-    cdm$not_multiple2 |>
+    cdm$order2 |>
+      dplyr::filter(.data$future_observation <= .data$next_cohort2 | is.na(.data$next_cohort2)) |>
       dplyr::distinct(.data$exit_reason) |>
-      dplyr::pull() |>
-      sort(),
-    c("future_observation", "next_cohort2")
+      dplyr::pull(),
+    "future_observation"
   )
-  x <- cdm$not_multiple2 |>
-    dplyr::select("subject_id", "exit_reason_not_multiple" = "exit_reason") |>
-    dplyr::inner_join(
-      cdm$multiple |>
-        dplyr::select("subject_id", "exit_reason_multiple" = "exit_reason"),
-      by = "subject_id"
-    ) |>
-    dplyr::select(!"subject_id") |>
-    dplyr::distinct() |>
-    dplyr::collect() |>
-    uncohort() |>
-    dplyr::arrange(.data$exit_reason_multiple)
   expect_identical(
-    x,
-    dplyr::tibble(
-      exit_reason_not_multiple = c('future_observation', 'next_cohort2', 'future_observation'),
-      exit_reason_multiple = c('future_observation', 'next_cohort2', 'next_cohort2; future_observation')
-    )
+    cdm$order2 |>
+      dplyr::filter(.data$next_cohort2 < .data$future_observation) |>
+      dplyr::distinct(.data$exit_reason) |>
+      dplyr::pull(),
+    "next_cohort2"
+  )
+
+  x <- cdm$order1 |>
+    dplyr::select(
+      "subject_id", "cohort_start_date", "exit_reason1" = "exit_reason",
+      "next_cohort2", "future_observation"
+    ) |>
+    dplyr::inner_join(
+      cdm$order2 |>
+        dplyr::select(
+          "subject_id", "cohort_start_date", "exit_reason2" = "exit_reason"
+        ),
+      by = c("subject_id", "cohort_start_date")
+    ) |>
+    dplyr::collect()
+
+  # expect same reason are different
+  expect_true(
+    x |>
+      dplyr::filter(.data$exit_reason1 == .data$exit_reason2) |>
+      dplyr::mutate(equal = dplyr::if_else(
+        .data$next_cohort2 == .data$future_observation, 1, 0, 0
+      )) |>
+      dplyr::distinct(.data$equal) |>
+      dplyr::pull() == 0
+  )
+
+  # expect different reason are equal
+  expect_true(
+    x |>
+      dplyr::filter(.data$exit_reason1 != .data$exit_reason2) |>
+      dplyr::mutate(equal = dplyr::if_else(
+        .data$next_cohort2 == .data$future_observation, 1, 0, 0
+      )) |>
+      dplyr::distinct(.data$equal) |>
+      dplyr::pull() == 1
   )
 
   dropCreatedTables(cdm = cdm)
