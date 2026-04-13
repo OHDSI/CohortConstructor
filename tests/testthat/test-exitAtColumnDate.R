@@ -377,3 +377,135 @@ test_that("multiple exit calls", {
 
   dropCreatedTables(cdm = cdm)
 })
+
+test_that("multiple reasons", {
+  skip_on_cran()
+
+  uncohort <- function(x) {
+    attr(x, "cohort_attrition") <- NULL
+    attr(x, "cohort_codelist") <- NULL
+    attr(x, "cohort_set") <- NULL
+    dplyr::as_tibble(x)
+  }
+
+  cdm <- omock::mockCdmFromDataset(datasetName = "GiBleed") |>
+    copyCdm()
+
+  codelist <- list(cohort1 = 40481087L, cohort2 = 4112343L)
+  cdm$my_cohort <- conceptCohort(
+    cdm = cdm,
+    conceptSet = codelist,
+    name = "my_cohort",
+    exit = "event_start_date"
+  ) |>
+    PatientProfiles::addCohortIntersectDate(
+      name = "my_cohort",
+      targetCohortTable = "my_cohort",
+      targetCohortId = 2,
+      order = "first",
+      nameStyle = "next_{cohort_name}"
+    ) |>
+    PatientProfiles::addFutureObservation(
+      futureObservationType = "date",
+      name = "my_cohort"
+    ) |>
+    requireIsFirstEntry()
+
+  cdm$onlyfirst <- cdm$my_cohort |>
+    subsetCohorts(cohortId = 1, name = "onlyfirst")
+
+  expect_no_error(
+    cdm$order1 <- cdm$onlyfirst |>
+      exitAtFirstDate(
+        dateColumns = c("next_cohort2", "future_observation"),
+        cohortId = NULL,
+        returnReason = TRUE,
+        name = "order1"
+      )
+  )
+  expect_identical(
+    cdm$order1 |>
+      dplyr::distinct(.data$exit_reason) |>
+      dplyr::pull() |>
+      sort(),
+    c("future_observation", "next_cohort2")
+  )
+
+  expect_identical(
+    cdm$order1 |>
+      dplyr::filter(.data$future_observation < .data$next_cohort2 | is.na(.data$next_cohort2)) |>
+      dplyr::distinct(.data$exit_reason) |>
+      dplyr::pull(),
+    "future_observation"
+  )
+  expect_identical(
+    cdm$order1 |>
+      dplyr::filter(.data$next_cohort2 <= .data$future_observation) |>
+      dplyr::distinct(.data$exit_reason) |>
+      dplyr::pull(),
+    "next_cohort2"
+  )
+
+  # change order
+  expect_no_error(
+    cdm$order2 <- cdm$onlyfirst |>
+      exitAtFirstDate(
+        dateColumns = c("future_observation", "next_cohort2"),
+        cohortId = NULL,
+        returnReason = TRUE,
+        name = "order2"
+      )
+  )
+  expect_identical(
+    cdm$order2 |>
+      dplyr::filter(.data$future_observation <= .data$next_cohort2 | is.na(.data$next_cohort2)) |>
+      dplyr::distinct(.data$exit_reason) |>
+      dplyr::pull(),
+    "future_observation"
+  )
+  expect_identical(
+    cdm$order2 |>
+      dplyr::filter(.data$next_cohort2 < .data$future_observation) |>
+      dplyr::distinct(.data$exit_reason) |>
+      dplyr::pull(),
+    "next_cohort2"
+  )
+
+  x <- cdm$order1 |>
+    dplyr::select(
+      "subject_id", "cohort_start_date", "exit_reason1" = "exit_reason",
+      "next_cohort2", "future_observation"
+    ) |>
+    dplyr::inner_join(
+      cdm$order2 |>
+        dplyr::select(
+          "subject_id", "cohort_start_date", "exit_reason2" = "exit_reason"
+        ),
+      by = c("subject_id", "cohort_start_date")
+    ) |>
+    dplyr::collect()
+
+  # expect same reason are different
+  expect_true(
+    x |>
+      dplyr::filter(.data$exit_reason1 == .data$exit_reason2) |>
+      dplyr::mutate(equal = dplyr::if_else(
+        .data$next_cohort2 == .data$future_observation, 1, 0, 0
+      )) |>
+      dplyr::distinct(.data$equal) |>
+      dplyr::pull() == 0
+  )
+
+  # expect different reason are equal
+  expect_true(
+    x |>
+      dplyr::filter(.data$exit_reason1 != .data$exit_reason2) |>
+      dplyr::mutate(equal = dplyr::if_else(
+        .data$next_cohort2 == .data$future_observation, 1, 0, 0
+      )) |>
+      dplyr::distinct(.data$equal) |>
+      dplyr::pull() == 1
+  )
+
+  dropCreatedTables(cdm = cdm)
+})

@@ -29,7 +29,7 @@ test_that("entry at first date", {
       c("1990-12-09", "2001-01-12", "2001-09-01", "2002-12-09", "2015-02-15")
   ))
   expect_true(all(grepl("cohort_start_date", cdm$cohort1 |> dplyr::pull("entry_reason"))))
-  expect_true(sum(grepl("other_date_1", cdm$cohort1 |> dplyr::pull("entry_reason"))) == 1)
+  expect_true(!all(grepl("other_date_1", cdm$cohort1 |> dplyr::pull("entry_reason"))))
   expect_true(all(colnames(cdm$cohort1) ==
                     c("cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date", "entry_reason")))
 

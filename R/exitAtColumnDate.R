@@ -107,16 +107,17 @@ exitAtColumnDate <- function(cohort,
                              name,
                              exit,
                              keepDateColumns,
-                             .softValidation) {
+                             .softValidation,
+                             call = parent.frame()) {
   # checks
-  name <- omopgenerics::validateNameArgument(name, validation = "warning")
-  cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
-  cohort <- omopgenerics::validateCohortArgument(cohort)
-  cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
+  name <- omopgenerics::validateNameArgument(name, validation = "warning", call = call)
+  cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort), call = call)
+  cohort <- omopgenerics::validateCohortArgument(cohort, call = call)
+  cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning", call = call)
   validateCohortColumn(dateColumns, cohort, "date")
-  omopgenerics::assertLogical(returnReason, length = 1)
+  omopgenerics::assertLogical(returnReason, length = 1, call = call)
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
-  omopgenerics::assertLogical(.softValidation)
+  omopgenerics::assertLogical(.softValidation, length = 1, call = call)
 
   if (length(cohortId) == 0) {
     cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
@@ -126,19 +127,11 @@ exitAtColumnDate <- function(cohort,
     return(cdm[[name]])
   }
 
-  if (order == "first") {
-    atDateFunction <- rlang::expr(min(.data$new_date_0123456789, na.rm = TRUE)) # NA always removed in SQL
-  } else if (order == "last") {
-    atDateFunction <- rlang::expr(max(.data$new_date_0123456789, na.rm = TRUE)) # NA always removed in SQL
-  }
-
   if (exit) {
     newDate <- "cohort_end_date"
-    keptDate <- "cohort_start_date"
     reason <- "exit_reason"
   } else {
     newDate <- "cohort_start_date"
-    keptDate <- "cohort_end_date"
     reason <- "entry_reason"
   }
 
@@ -163,72 +156,46 @@ exitAtColumnDate <- function(cohort,
   tmpNewCohort <- omopgenerics::uniqueTableName(tablePrefix)
   tmpUnchanged <- omopgenerics::uniqueTableName(tablePrefix)
   cdm <- filterCohortInternal(cdm, cohort, cohortId, tmpNewCohort, tmpUnchanged)
-  newCohort <- cdm[[tmpNewCohort]] |>
-    dplyr::select(!dplyr::any_of(reason)) |>
-    dplyr::mutate(
-      "cohort_start_date_0123456789" = .data$cohort_start_date,
-      "cohort_end_date_0123456789" = .data$cohort_end_date
-    )
 
-  newCohort <- newCohort |>
-    tidyr::pivot_longer(
-      cols = dplyr::all_of(dateColumns),
-      names_to = reason,
-      values_to = "new_date_0123456789"
-    ) |>
-    dplyr::group_by(
-      .data$cohort_definition_id,
-      .data$subject_id,
-      .data$cohort_start_date_0123456789,
-      .data$cohort_end_date_0123456789
-    ) |>
-    dplyr::filter(.data$new_date_0123456789 == !!atDateFunction) |>
-    dplyr::ungroup() |>
+  # add min/max column
+  id <- omopgenerics::uniqueId(exclude = colnames(cdm[[tmpNewCohort]]))
+  q <- paste0(
+    ifelse(order == "first", "pmin(", "pmax("),
+    paste0(".data[['", dateColumns, "']]", collapse = ", "),
+    ", na.rm = TRUE)"
+  ) |>
+    rlang::parse_exprs() |>
+    rlang::set_names(id)
+  newCohort <- cdm[[tmpNewCohort]] |>
+    dplyr::mutate(!!!q) |>
     dplyr::compute(
-      name = tmpNewCohort, temporary = FALSE,
+      name = tmpNewCohort,
       logPrefix = "CohortConstructor_exitAtColumnDate_newDate_1_"
     )
 
   if (returnReason) {
-    if (omopgenerics::sourceType(cdm) == "spark") {
-      newCohort <- newCohort |>
-        dplyr::group_by(dplyr::across(!dplyr::all_of(reason))) |>
-        dplyr::arrange(.data[[reason]]) |>
-        dplyr::summarise(
-          !!reason := dplyr::sql(paste0("CONCAT_WS(', ', COLLECT_LIST(", reason, "))")),
-          .groups = "drop"
-        ) |>
-        dplyr::compute(
-          name = tmpNewCohort, temporary = FALSE,
-          logPrefix = "CohortConstructor_exitAtColumnDate_newDate_1_"
-        )
-    } else {
-      newCohort <- newCohort |>
-        dplyr::group_by(dplyr::across(!dplyr::all_of(reason))) |>
-        dplyr::arrange(.data[[reason]]) |>
-        dplyr::summarise(
-          !!reason := stringr::str_flatten(.data[[reason]], collapse = '; '),
-          .groups = "drop"
-        ) |>
-        dplyr::compute(
-          name = tmpNewCohort, temporary = FALSE,
-          logPrefix = "CohortConstructor_exitAtColumnDate_newDate_1_"
-        )
-    }
-    excludeReason <- NULL
-  } else {
-    excludeReason <- reason
+    newCohort <- newCohort |>
+      dplyr::select(!dplyr::any_of(reason))
+    q <- paste0(
+      "dplyr::case_when(",
+      paste0(
+        ".data[['", dateColumns, "']] == .data[[id]] ~ '", dateColumns, "'",
+        collapse = ", "
+      ),
+      ")"
+    ) |>
+      rlang::parse_exprs() |>
+      rlang::set_names(reason)
+    newCohort <- newCohort |>
+      dplyr::mutate(!!!q)
   }
 
   newCohort <- newCohort |>
-    dplyr::mutate(!!newDate := .data$new_date_0123456789, !!keptDate := .data[[paste0(keptDate, "_0123456789")]]) |>
-    dplyr::select(!dplyr::all_of(c(
-      "new_date_0123456789", "cohort_end_date_0123456789", "cohort_start_date_0123456789", excludeReason
-    ))) |>
-    dplyr::distinct() |>
+    dplyr::select(!dplyr::any_of(newDate)) |>
+    dplyr::rename(rlang::set_names(id, newDate)) |>
     dplyr::compute(
-      name = tmpNewCohort, temporary = FALSE,
-      logPrefix = "CohortConstructor_exitAtColumnDate_newDate_1_"
+      name = tmpNewCohort,
+      logPrefix = "CohortConstructor_exitAtColumnDate_newDate_2_"
     )
 
   # checks with informative errors
@@ -237,43 +204,28 @@ exitAtColumnDate <- function(cohort,
   }
 
   if (isTRUE(needsIdFilter(cohort, cohortId))) {
-    dateColumns <- dateColumns[!dateColumns %in% c("cohort_end_date", "cohort_start_date")]
-
-    if (!reason %in% colnames(cdm[[tmpUnchanged]])) {
+    if (!reason %in% colnames(cdm[[tmpUnchanged]]) & returnReason) {
       cdm[[tmpUnchanged]] <- cdm[[tmpUnchanged]] |>
         dplyr::mutate(!!reason := !!newDate)
     }
 
     newCohort <- newCohort |>
       # join non modified cohorts
-      dplyr::union_all(
-        cdm[[tmpUnchanged]]  |>
-          dplyr::select(!dplyr::all_of(c(dateColumns, excludeReason)))
-      ) |>
-      dplyr::compute(name = tmpNewCohort, temporary = FALSE,
-                     logPrefix = "CohortConstructor_exitAtColumnDate_union_")
+      dplyr::union_all(cdm[[tmpUnchanged]])
   }
 
-  if (keepDateColumns) {
+  cohortCols <- omopgenerics::cohortColumns("cohort")
+
+  if (!keepDateColumns) {
+    dateColumns <- dateColumns[!dateColumns %in% cohortCols]
     newCohort <- newCohort |>
-      dplyr::inner_join(
-        cohort |>
-          dplyr::select(dplyr::any_of(c(
-            "cohort_definition_id", "subject_id", keptDate, dateColumns
-          ))) |>
-          dplyr::select(!dplyr::any_of(newDate)),
-        by = c("cohort_definition_id", "subject_id", keptDate)
-      ) |>
-      dplyr::compute(
-        name = tmpNewCohort, temporary = FALSE,
-        logPrefix = "CohortConstructor_exitAtColumnDate_keepDates_"
-      )
+      dplyr::select(!dplyr::all_of(dateColumns))
   }
 
   newCohort <- newCohort |>
-    dplyr::relocate(dplyr::all_of(omopgenerics::cohortColumns("cohort"))) |>
+    dplyr::relocate(dplyr::all_of(cohortCols)) |>
     dplyr::compute(
-      name = name, temporary = FALSE,
+      name = name,
       logPrefix = "CohortConstructor_exitAtColumnDate_relocate_"
     ) |>
     omopgenerics::newCohortTable(.softValidation = .softValidation)
