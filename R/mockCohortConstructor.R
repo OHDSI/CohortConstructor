@@ -22,15 +22,15 @@ mockCohortConstructor <- function(source = "local") {
   omopgenerics::assertChoice(source, c("local", "duckdb"), length = 1)
 
   cdm <- omock::mockVocabularySet(vocabularySet = "GiBleed") |>
-    omock::mockPerson(nPerson = 100) |>
-    omock::mockObservationPeriod() |>
-    omock::mockDrugExposure() |>
-    omock::mockConditionOccurrence() |>
-    omock::mockObservation() |>
-    omock::mockMeasurement() |>
-    omock::mockDeath(recordPerson = 0.1) |>
-    omock::mockCohort(name = "cohort1") |>
-    omock::mockCohort(name = "cohort2", numberCohorts = 2)
+    omock::mockPerson(nPerson = 100, seed = 1) |>
+    omock::mockObservationPeriod(seed = 1) |>
+    omock::mockDrugExposure(seed = 1) |>
+    omock::mockConditionOccurrence(seed = 1) |>
+    omock::mockObservation(seed = 1) |>
+    omock::mockMeasurement(seed = 1) |>
+    omock::mockDeath(recordPerson = 0.1, seed = 1) |>
+    omock::mockCohort(name = "cohort1", seed = 1) |>
+    omock::mockCohort(name = "cohort2", numberCohorts = 2, seed = 1)
 
   cdm$cohort1 <- cdm$cohort1 |>
     dplyr::group_by(.data$subject_id, .data$cohort_definition_id) |>
