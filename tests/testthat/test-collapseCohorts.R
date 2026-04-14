@@ -80,15 +80,15 @@ test_that("simple example", {
   )
 
   # expected behaviour
-  expect_warning(cdm$cohort |> collapseCohorts(cohortId = c("a", "n")))
+  expect_warning(expect_warning(expect_warning(cdm$cohort |> collapseCohorts(cohortId = c("a", "n")))))
   cdm$cohort <- cdm$cohort |> dplyr::mutate(extra_column_1 = 1,
                                             extra_column_2 = 2)
-  expect_warning(cdm$cohort |> collapseCohorts())
-  expect_error(cdm$cohort |> collapseCohorts(gap = NA))
-  expect_error(cdm$cohort |> collapseCohorts(gap = NULL))
-  expect_error(cdm$cohort |> collapseCohorts(gap = -1))
-  expect_error(cdm$cohort |> collapseCohorts(gap = -Inf))
-  expect_error(cdm$cohort |> collapseCohorts(gap = "not a number"))
+  expect_warning(expect_warning(cdm$cohort |> collapseCohorts()))
+  expect_warning(expect_warning(expect_error(cdm$cohort |> collapseCohorts(gap = NA))))
+  expect_warning(expect_warning(expect_error(cdm$cohort |> collapseCohorts(gap = NULL))))
+  expect_warning(expect_warning(expect_error(cdm$cohort |> collapseCohorts(gap = -1))))
+  expect_warning(expect_warning(expect_error(cdm$cohort |> collapseCohorts(gap = -Inf))))
+  expect_warning(expect_warning(expect_error(cdm$cohort |> collapseCohorts(gap = "not a number"))))
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
 
@@ -127,14 +127,14 @@ test_that("infitine", {
   # for each person and each cohort id we should go from
   # first cohort start to last cohort entry
   cdm$cohort_collapsed <- cdm$cohort |>
-                  collapseCohorts(gap = Inf,
-                                  name = "cohort_collapsed")
+    collapseCohorts(gap = Inf,
+                    name = "cohort_collapsed")
   expect_true(nrow(cdm$cohort_collapsed |>
-    dplyr::collect()) == 4)
+                     dplyr::collect()) == 4)
   expect_true(all(cdm$cohort_collapsed |>
-                     dplyr::filter(cohort_definition_id == 1) |>
-                     dplyr::pull("cohort_start_date") ==
-                as.Date("2020-01-01")))
+                    dplyr::filter(cohort_definition_id == 1) |>
+                    dplyr::pull("cohort_start_date") ==
+                    as.Date("2020-01-01")))
   expect_true(all(cdm$cohort_collapsed |>
                     dplyr::filter(cohort_definition_id == 2) |>
                     dplyr::pull("cohort_start_date") ==
@@ -150,11 +150,11 @@ test_that("infitine", {
                     as.Date("2023-01-01")))
 
   # test Id
-  cdm$cohort_collapsed2 <- cdm$cohort |>
+  expect_warning(cdm$cohort_collapsed2 <- cdm$cohort |>
     dplyr::mutate("extra_col" = 1) |>
     collapseCohorts(gap = Inf,
                     name = "cohort_collapsed2",
-                    cohortId = 2)
+                    cohortId = 2))
   expect_equal(collectCohort(cdm$cohort, 1), collectCohort(cdm$cohort_collapsed2, 1))
   expect_true(
     cdm$cohort_collapsed2 |>
@@ -169,7 +169,7 @@ test_that("infitine", {
 })
 
 test_that("multiple observation periods", {
-# collapse should respect observation end dates
+  # collapse should respect observation end dates
   skip_on_cran()
 
   cdm <- omopgenerics::cdmFromTables(
@@ -221,14 +221,14 @@ test_that("multiple observation periods", {
     copyCdm()
 
   expect_no_error(cdm$cohort_1 <- conceptCohort(cdm = cdm,
-                                          conceptSet = list(a = 1L),
-                                          name = "cohort_1"))
+                                                conceptSet = list(a = 1L),
+                                                name = "cohort_1"))
 
   # should not have been combined as they are in different observation periods
   expect_no_error(cdm$cohort_1  <- cdm$cohort_1  |>
                     collapseCohorts(gap = 500, name = "cohort_1"))
   expect_true(nrow(cdm$cohort_1 |>
-         dplyr::collect()) == 2)
+                     dplyr::collect()) == 2)
 
   expect_no_error(cdm$cohort_1 <- conceptCohort(cdm = cdm,
                                                 conceptSet = list(a = 1L),
@@ -284,19 +284,7 @@ test_that("overlapping input cohort", {
     ))
   cdm$cohort <- omopgenerics::newCohortTable(cdm$cohort, .softValidation = TRUE)
 
-  expect_no_error(cdm$collapsed_cohort <- cdm$cohort |>
-                    collapseCohorts(gap = 0,
-                                    name = "collapsed_cohort"))
-  expect_true(cdm$collapsed_cohort |>
-    dplyr::filter(subject_id == 1) |>
-    dplyr::pull(cohort_start_date) == "2020-01-01")
-  expect_true(cdm$collapsed_cohort |>
-    dplyr::filter(subject_id == 1) |>
-    dplyr::pull(cohort_end_date) == "2020-01-15")
-
-  expect_no_error(cdm$collapsed_cohort <- cdm$cohort |>
-                    collapseCohorts(gap = 1,
-                                    name = "collapsed_cohort"))
+  cdm$collapsed_cohort <- cdm$cohort |> collapseCohorts(gap = 0, name = "collapsed_cohort")
   expect_true(cdm$collapsed_cohort |>
                 dplyr::filter(subject_id == 1) |>
                 dplyr::pull(cohort_start_date) == "2020-01-01")
@@ -304,9 +292,8 @@ test_that("overlapping input cohort", {
                 dplyr::filter(subject_id == 1) |>
                 dplyr::pull(cohort_end_date) == "2020-01-15")
 
-  expect_no_error(cdm$collapsed_cohort <- cdm$cohort |>
-                    collapseCohorts(gap = Inf,
-                                    name = "collapsed_cohort"))
+  cdm$collapsed_cohort <- cdm$cohort |>
+    collapseCohorts(gap = 1, name = "collapsed_cohort")
   expect_true(cdm$collapsed_cohort |>
                 dplyr::filter(subject_id == 1) |>
                 dplyr::pull(cohort_start_date) == "2020-01-01")
@@ -314,5 +301,14 @@ test_that("overlapping input cohort", {
                 dplyr::filter(subject_id == 1) |>
                 dplyr::pull(cohort_end_date) == "2020-01-15")
 
- dropCreatedTables(cdm = cdm)
+  cdm$collapsed_cohort <- cdm$cohort |>
+    collapseCohorts(gap = Inf, name = "collapsed_cohort")
+  expect_true(cdm$collapsed_cohort |>
+                dplyr::filter(subject_id == 1) |>
+                dplyr::pull(cohort_start_date) == "2020-01-01")
+  expect_true(cdm$collapsed_cohort |>
+                dplyr::filter(subject_id == 1) |>
+                dplyr::pull(cohort_end_date) == "2020-01-15")
+
+  dropCreatedTables(cdm = cdm)
 })

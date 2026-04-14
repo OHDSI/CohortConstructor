@@ -77,10 +77,10 @@ test_that("matchCohorts, no duplicated people within a cohort", {
     copyCdm()
 
   # one record per person
-  cdm$cohort1 <- cdm$cohort1 |>
-    CohortConstructor::requireIsFirstEntry()
-  cdm$cohort2 <- cdm$cohort2 |>
-    CohortConstructor::requireIsFirstEntry()
+  expect_warning(cdm$cohort1 <- cdm$cohort1 |>
+    CohortConstructor::requireIsFirstEntry())
+  expect_warning(cdm$cohort2 <- cdm$cohort2 |>
+    CohortConstructor::requireIsFirstEntry())
 
   cdm$new_cohort <- matchCohorts(cohort = cdm$cohort1,
                                  name = "new_cohort",
@@ -201,7 +201,7 @@ test_that("test exactMatchingCohort with a ratio bigger than 1", {
       condition_occurrence = dplyr::tibble(
         condition_occurrence_id = 1:10L,
         person_id = 1:10L,
-        "condition_concept_id" = c(317009,317009,4266367,4266367,rep(1,6)),
+        "condition_concept_id" = as.integer(c(317009,317009,4266367,4266367,rep(1,6))),
         "condition_start_date" = as.Date(c("2017-10-30","2003-01-04","2014-12-15",
                                            "2010-09-09","2004-08-26","1985-03-31",
                                            "1985-03-13","1985-07-11","1983-11-07","2020-01-13")),
@@ -214,8 +214,8 @@ test_that("test exactMatchingCohort with a ratio bigger than 1", {
     cdmName = "mock",
     cohortTables = list(
       cohort = dplyr::tibble(
-        cohort_definition_id = c(1,1,2,2),
-        subject_id = c(1,2,3,4),
+        cohort_definition_id = as.integer(c(1,1,2,2)),
+        subject_id = as.integer(c(1,2,3,4)),
         cohort_start_date = as.Date(c("2017-10-30","2003-01-04","2014-12-15","2010-09-09")),
         cohort_end_date = rep(as.Date("2021-01-01"),4)
       )
@@ -295,7 +295,7 @@ test_that("keepOriginalCohorts works" , {
       match_year_of_birth = c(NA, rep(TRUE, 2)),
       match_status = c(NA, "target", "control")
     ))
-  cohort <- cdm$cohort2 |> matchCohorts(keepOriginalCohorts = TRUE)
+  expect_warning(cohort <- cdm$cohort2 |> matchCohorts(keepOriginalCohorts = TRUE))
   expect_identical(settings(cohort), dplyr::tibble(
       cohort_definition_id = as.integer(1:6),
       cohort_name = c("cohort_1", "cohort_2", "cohort_1_sampled", "cohort_2_sampled", "cohort_1_matched", "cohort_2_matched"),
@@ -330,7 +330,7 @@ test_that("test indexes - postgres", {
 
     con <- CDMConnector::cdmCon(cdm = cdm)
 
-    cdm$my_cohort <- matchCohorts(cdm$my_cohort)
+    expect_warning(cdm$my_cohort <- matchCohorts(cdm$my_cohort))
 
     expect_true(
       DBI::dbGetQuery(con, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==

@@ -443,15 +443,19 @@ test_that("attrition and cohortId", {
     omopgenerics::insertTable(name = "person", table = person) |>
     copyCdm()
 
-  cdm$cohort1 <- cdm$cohort1 |>
-    requireInDateRange(dateRange = as.Date(c("1990-01-01", "2025-01-01"))) |>
-    requireSex(sex = "Female") |>
-    requireAge(ageRange = list(c(0,40)))
+  expect_warning(
+    cdm$cohort1 <- cdm$cohort1 |>
+      requireInDateRange(dateRange = as.Date(c("1990-01-01", "2025-01-01"))) |>
+      requireSex(sex = "Female") |>
+      requireAge(ageRange = list(c(0,40)))
+  )
 
-  cdm$cohort1 <- intersectCohorts(
-    cohort = cdm$cohort1, cohortId = c("cohort_1", "cohort_2"),
-    name = "cohort1", returnNonOverlappingCohorts = TRUE,
-    keepOriginalCohorts = FALSE
+  expect_warning(
+    cdm$cohort1 <- intersectCohorts(
+      cohort = cdm$cohort1, cohortId = c("cohort_1", "cohort_2"),
+      name = "cohort1", returnNonOverlappingCohorts = TRUE,
+      keepOriginalCohorts = FALSE
+    )
   )
   expect_true(nrow(settings(cdm$cohort1)) == 3)
   expect_identical(settings(cdm$cohort1)$non_overlapping, c(NA, TRUE, TRUE))
@@ -707,7 +711,7 @@ test_that("multiple observation periods", {
   ) |>
     copyCdm()
 
-  cdm$cohort1 <- cdm$cohort1 |> intersectCohorts(gap = 9999)
+  expect_warning(cdm$cohort1 <- cdm$cohort1 |> intersectCohorts(gap = 9999))
   expect_identical(collectCohort(cdm$cohort1, 1), dplyr::tibble(
     "subject_id" = as.integer(c(1, 1)),
     "cohort_start_date" = as.Date(c("2000-01-01", "2001-01-01")),
@@ -739,7 +743,7 @@ test_that("test indexes - postgres", {
 
     omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::contains("og_"))
 
-    cdm$my_cohort <- intersectCohorts(cdm$my_cohort)
+    expect_warning(cdm$my_cohort <- intersectCohorts(cdm$my_cohort))
 
     expect_true(
       DBI::dbGetQuery(con, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==

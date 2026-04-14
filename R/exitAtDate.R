@@ -37,7 +37,7 @@ exitAtObservationEnd <- function(cohort,
                                  .softValidation = FALSE) {
   # checks
   cohort <- omopgenerics::validateCohortArgument(cohort, dropExtraColumns = TRUE)
-  name <- omopgenerics::validateNameArgument(name, validation = "warning")
+  name <- validateNameArgumentInternal(missing(name), name, tableName(cohort))
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
   omopgenerics::assertLogical(persistAcrossObservationPeriods, length = 1)
@@ -166,7 +166,7 @@ exitAtDeath <- function(cohort,
                         name = tableName(cohort),
                         .softValidation = FALSE) {
   # checks
-  name <- omopgenerics::validateNameArgument(name, validation = "warning")
+  name <- validateNameArgumentInternal(missing(name), name, tableName(cohort))
   cohort <- omopgenerics::validateCohortArgument(cohort, dropExtraColumns = TRUE)
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
