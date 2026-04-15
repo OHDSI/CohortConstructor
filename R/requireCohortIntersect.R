@@ -56,7 +56,7 @@ requireCohortIntersect <- function(cohort,
   cohortCombinationCriteria <- validateIntersections(
     cohortCombinationCriteria,
     name = "cohortCombinationCriteria",
-    maxCombinations = omopgenerics::settings(targetCohort) |>
+    maxCombinations = omopgenerics::settings(cdm[[targetCohortTable]]) |>
       dplyr::filter(.data$cohort_definition_id %in% .env$targetCohortId) |>
       dplyr::pull("cohort_definition_id") |>
       length()
