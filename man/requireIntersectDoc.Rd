@@ -31,6 +31,19 @@ intersect.}
 
 \item{inObservation}{If TRUE only records inside an observation period will
 be considered}
+
+\item{cohortCombinationCriteria}{Can be 'all', 'any', or a numeric vector
+(length 1 or 2) that specifies how many of the target cohorts must meet the
+intersection requirement.
+Examples:
+\itemize{
+\item 'all': must meet criteria for each of the target cohorts.
+\item 'any': must meet criteria for only one of the target cohorts.
+\item Single value: e.g., \code{4}, exactly 4 cohorts must meet the criteria. If
+there were 4 target cohorts, this would be the same as 'all'.
+\item Range: e.g., \code{c(2, Inf)}, must meet criteria at last 2 of the
+target cohorts. Note, \code{c(1, Inf)} is equivalent to 'any'.
+}}
 }
 \description{
 Helper for consistent documentation of arguments in \code{requireIntersect}

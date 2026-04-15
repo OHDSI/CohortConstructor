@@ -40,10 +40,9 @@ rest will remain unchanged.}
 
 \item{targetCohortId}{Vector of cohort definition ids to include.}
 
-\item{cohortCombinationCriteria}{Can be 'all', 'any, or a numeric vector
+\item{cohortCombinationCriteria}{Can be 'all', 'any', or a numeric vector
 (length 1 or 2) that specifies how many of the target cohorts must meet the
 intersection requirement.
-
 Examples:
 \itemize{
 \item 'all': must meet criteria for each of the target cohorts.
