@@ -53,8 +53,10 @@ test_that("requireDateRange", {
     copyCdm()
 
   # empty result
-  cdm$cohort1 <- cdm$cohort1 |>
-    requireInDateRange(dateRange = as.Date(c("2010-01-01", "2011-01-01")))
+  expect_warning(
+    cdm$cohort1 <- cdm$cohort1 |>
+      requireInDateRange(dateRange = as.Date(c("2010-01-01", "2011-01-01")))
+  )
   expect_true(all(cohortCount(cdm$cohort1)$number_records == c(0, 0)))
   expect_true(all(cohortCount(cdm$cohort1)$number_subjects == c(0, 0)))
   expect_true(cdm$cohort1 |> dplyr::tally() |> dplyr::pull("n") == 0)
@@ -122,22 +124,28 @@ test_that("requireDateRange", {
   expect_identical(cdm$cohort7 |> dplyr::collect(), cdm$cohort2 |> dplyr::collect())
 
   # expect error
-  expect_error(requireInDateRange(cohort = "a"))
-  expect_error(cdm$cohort1 |>
-                 requireInDateRange(dateRange = as.Date(c("2010-01-01"))))
-  expect_error(cdm$cohort1 |>
-                 requireInDateRange(dateRange = as.Date(c("2010-01-01", "2010-01-01",
-                                                          "2009-01-01"))))
-  expect_error(cdm$cohort1 |>
-                 requireInDateRange(dateRange = c("a", "b")))
-  expect_error(
+  expect_error(expect_warning(requireInDateRange(cohort = "a")))
+  expect_error(expect_warning(
+    cdm$cohort1 |>
+      requireInDateRange(dateRange = as.Date(c("2010-01-01")))
+  ))
+  expect_error(expect_warning(
+    cdm$cohort1 |>
+      requireInDateRange(dateRange = as.Date(c("2010-01-01", "2010-01-01",
+                                               "2009-01-01")))
+  ))
+  expect_error(expect_warning(
+    cdm$cohort1 |>
+      requireInDateRange(dateRange = c("a", "b"))
+  ))
+  expect_error(expect_warning(
     cdm$cohort1 |>
       requireInDateRange(dateRange = as.Date(c("2010-01-01", "2010-01-01")), indexDate = "subject_id")
-  )
-  expect_error(
+  ))
+  expect_error(expect_warning(
     cdm$cohort1 |>
       requireInDateRange(dateRange = as.Date(c("2011-01-01", "2010-01-01")))
-  )
+  ))
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
 
@@ -198,8 +206,8 @@ test_that("trim cohort dates", {
     omopgenerics::insertTable(name = "person", table = person) |>
     copyCdm()
 
-  cdm$cohort1 <- cdm$cohort1 |>
-    trimToDateRange(dateRange = as.Date(c("2001-01-01", "2005-01-01")))
+  expect_warning(cdm$cohort1 <- cdm$cohort1 |>
+    trimToDateRange(dateRange = as.Date(c("2001-01-01", "2005-01-01"))))
 
   expect_identical(sort(cdm$cohort1 |>
                           dplyr::pull("subject_id")), as.integer(c(1, 1, 1, 1, 1, 1, 2)))

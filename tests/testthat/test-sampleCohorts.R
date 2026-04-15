@@ -7,7 +7,7 @@ test_that("sampleCohort subsetting one cohort", {
     omock::mockCohort(name = c("cohort1"), numberCohorts = 5, seed = 2) |>
     copyCdm()
 
-  cdm$cohort1 <- sampleCohorts(cdm$cohort1, n = 2, cohortId = 1)
+ expect_warning(cdm$cohort1 <- sampleCohorts(cdm$cohort1, n = 2, cohortId = 1))
   expect_true(cdm$cohort1 |>
                 dplyr::filter(cohort_definition_id == 1) |>
                 dplyr::pull("subject_id") |>
@@ -17,7 +17,7 @@ test_that("sampleCohort subsetting one cohort", {
                 dplyr::pull("cohort_definition_id") == 1)
 
   # Subset it again should yield the same cohort
-  test_cohort1 <- sampleCohorts(cdm$cohort1, n = 2, cohortId = 1)
+  expect_warning(test_cohort1 <- sampleCohorts(cdm$cohort1, n = 2, cohortId = 1))
   expect_equal(collectCohort(test_cohort1, 1), collectCohort(cdm$cohort1, 1))
   expect_equal(
     attrition(test_cohort1) |> dplyr::pull("reason"), attrition(cdm$cohort1) |> dplyr::pull("reason")
@@ -59,12 +59,14 @@ test_that("sampleCohort subsetting multiple cohorts", {
 
 
   # retaining settings and attrition
-  cdm$cohort2a <- cdm$cohort1 |>
+  expect_warning(
+    cdm$cohort2a <- cdm$cohort1 |>
     requireInDateRange(dateRange = c(as.Date("1900-01-01"),
                                      as.Date("2026-01-01")),
                        name = "cohort2a") |>
     sampleCohorts(n = 4,
                   independent = TRUE)
+  )
   expect_true("cohort_start_date after 1900-01-01" %in%
     (omopgenerics::attrition(cdm$cohort2a) |>
     dplyr::pull("reason") |>
@@ -124,11 +126,11 @@ test_that("expected errors", {
     copyCdm()
 
   expect_error(sampleCohorts(cdm$cohort2, n = 10))
-  expect_warning(sampleCohorts(cdm$cohort1, cohortId = 4, n = 10))
-  expect_warning(sampleCohorts(cdm$cohort1, cohortId = "1", n = 10))
-  expect_error(sampleCohorts(cdm$cohort1, n = -1))
-  expect_error(sampleCohorts(cdm$cohort1))
-  expect_error(sampleCohorts(cdm$cohort1, n = c(1,2)))
+  expect_warning(expect_warning(expect_warning(sampleCohorts(cdm$cohort1, cohortId = 4, n = 10))))
+  expect_warning(expect_warning(expect_warning(sampleCohorts(cdm$cohort1, cohortId = "1", n = 10))))
+  expect_warning(expect_error(sampleCohorts(cdm$cohort1, n = -1)))
+  expect_error(sampleCohorts(cdm$cohort1, name = "hi"))
+  expect_error(sampleCohorts(cdm$cohort1, n = c(1,2), name = "hi"))
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
 
@@ -176,7 +178,7 @@ test_that("test indexes - postgres", {
 
     omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::contains("og_"))
 
-    cdm$my_cohort <- sampleCohorts(cdm$my_cohort, n = 1)
+    expect_warning(cdm$my_cohort <- sampleCohorts(cdm$my_cohort, n = 1))
     expect_true(
       DBI::dbGetQuery(con, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
         "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"

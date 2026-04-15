@@ -41,7 +41,7 @@ test_that("simple stratification", {
   ) |>
     copyCdm()
 
-  expect_no_error(cdm$cohort1 <- stratifyCohorts(cdm$cohort1, strata = list()))
+  expect_warning(cdm$cohort1 <- stratifyCohorts(cdm$cohort1, strata = list()))
   expect_no_error(
     cdm$new_cohort <- stratifyCohorts(cdm$cohort1, name = "new_cohort", strata = list())
   )
@@ -132,7 +132,7 @@ test_that("simple stratification", {
   # empty cohort
   cdm <- omopgenerics::emptyCohortTable(cdm, "empty_cohort")
   cdm$empty_cohort <- cdm$empty_cohort|> PatientProfiles::addSex(name = "empty_cohort")
-  expect_no_error(cdm$empty_cohort <- stratifyCohorts(cdm$empty_cohort, strata = list("sex")))
+  expect_warning(expect_warning(cdm$empty_cohort <- stratifyCohorts(cdm$empty_cohort, strata = list("sex"))))
   expect_true(cdm$empty_cohort |> dplyr::tally() |>dplyr::pull("n") == 0)
 
   # extra columns in settings and strata
@@ -141,7 +141,7 @@ test_that("simple stratification", {
   expect_true(all(settings(cdm$extracols)$sex |> unique() == c("Female", "Male")))
 
   # no column in the cohort
-  expect_error(cdm$new_cohort <- stratifyCohorts(cdm$cohort1, strata = list("not_a_column")))
+  expect_error(cdm$new_cohort <- stratifyCohorts(cdm$cohort1, strata = list("not_a_column"), name = "hi"))
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
 

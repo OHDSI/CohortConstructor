@@ -33,7 +33,7 @@ collapseCohorts <- function(cohort,
                             .softValidation = FALSE) {
   # input validation
   cohort <- omopgenerics::validateCohortArgument(cohort, dropExtraColumns = TRUE)
-  name <- omopgenerics::validateNameArgument(name, validation = "warning")
+  name <- validateNameArgumentInternal(missing(name), name, tableName(cohort))
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
   omopgenerics::assertNumeric(gap, integerish = TRUE, min = 0, length = 1)

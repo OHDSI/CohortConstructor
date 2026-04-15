@@ -149,9 +149,9 @@ test_that("yearCohorts - keep name", {
     copyCdm()
 
   # simple example
-  cdm$cohort <- yearCohorts(cohort = cdm$cohort,
+  expect_warning(cdm$cohort <- yearCohorts(cohort = cdm$cohort,
                              years = 1997:2002,
-                             cohortId = settings(cdm$cohort)$cohort_name)
+                             cohortId = settings(cdm$cohort)$cohort_name))
   expect_identical(settings(cdm$cohort) |> dplyr::arrange(.data$cohort_definition_id), dplyr::tibble(
                  cohort_definition_id = as.integer(1:6),
                  cohort_name = paste0("cohort_1_", 1997:2002),
@@ -194,9 +194,9 @@ test_that("yearCohorts - keep name", {
     copyCdm()
 
   # just 1 cohort
-  cdm$cohort <- yearCohorts(cohort = cdm$cohort,
+  expect_warning(cdm$cohort <- yearCohorts(cohort = cdm$cohort,
                              years = 2005:2008,
-                             cohortId = 1)
+                             cohortId = 1))
   expect_identical(settings(cdm$cohort) |> dplyr::arrange(.data$cohort_definition_id), dplyr::tibble(
                  cohort_definition_id = as.integer(1:4),
                  cohort_name = c(

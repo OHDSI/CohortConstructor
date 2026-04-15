@@ -32,7 +32,7 @@ requireDuration <- function(cohort,
                             cohortId = NULL,
                             name = tableName(cohort)) {
 
-  name <- omopgenerics::validateNameArgument(name, validation = "warning")
+  name <- validateNameArgumentInternal(missing(name), name, tableName(cohort))
   cohort <- omopgenerics::validateCohortArgument(cohort)
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
@@ -151,7 +151,7 @@ trimDuration <- function(cohort,
                          cohortId = NULL,
                          name = tableName(cohort)) {
 
-  name <- omopgenerics::validateNameArgument(name, validation = "warning")
+  name <- validateNameArgumentInternal(missing(name), name, tableName(cohort))
   cohort <- omopgenerics::validateCohortArgument(cohort)
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")

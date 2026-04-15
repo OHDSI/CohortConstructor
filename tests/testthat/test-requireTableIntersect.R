@@ -15,10 +15,10 @@ test_that("requiring presence in another table", {
 
   person <- dplyr::tibble(
     person_id = as.integer(c(1, 2, 3, 4)),
-    gender_concept_id = c(8532, 8507, 8507, 8507),
-    year_of_birth = c(1997, 1963, 1986, 1978),
-    month_of_birth = c(8, 1, 3, 11),
-    day_of_birth = c(22, 27, 10, 8),
+    gender_concept_id = as.integer(c(8532, 8507, 8507, 8507)),
+    year_of_birth = as.integer(c(1997, 1963, 1986, 1978)),
+    month_of_birth = as.integer(c(8, 1, 3, 11)),
+    day_of_birth = as.integer(c(22, 27, 10, 8)),
     race_concept_id = NA_integer_,
     ethnicity_concept_id = NA_integer_
   )
@@ -127,21 +127,21 @@ test_that("requiring presence in another table", {
 
   # expected errors
   # currently just 1 table suported´
-  expect_error(
+  expect_error(expect_warning(
     requireTableIntersect(cohort = cdm$cohort1,
                           tableName = c("table", "observation_period"),
                           window = c(-Inf, Inf))
-  )
-  expect_error(
+  ))
+  expect_error(expect_warning(
     requireTableIntersect(cohort = cdm$cohort1,
                           tableName = cdm$table,
                           window = c(-Inf, Inf))
-  )
-  expect_error(
+  ))
+  expect_error(expect_warning(
     requireTableIntersect(cohort = cdm$cohort1,
                           tableName = "not_a_table",
                           window = c(-Inf, Inf))
-  )
+  ))
 
   dropCreatedTables(cdm = cdm)
 })
@@ -150,8 +150,8 @@ test_that("requiring absence in another table", {
   skip_on_cran()
 
   obs <- dplyr::tibble(
-    observation_period_id = c(1, 2, 3, 4),
-    person_id = c(1, 2, 3, 4),
+    observation_period_id = as.integer(c(1, 2, 3, 4)),
+    person_id = as.integer(c(1, 2, 3, 4)),
     observation_period_start_date = as.Date(c(
       "2000-06-03", "1999-04-05", "2015-01-15", "1989-12-09"
     )),
@@ -162,11 +162,11 @@ test_that("requiring absence in another table", {
   )
 
   person <- dplyr::tibble(
-    person_id = c(1, 2, 3, 4),
-    gender_concept_id = c(8532, 8507, 8507, 8507),
-    year_of_birth = c(1997, 1963, 1986, 1978),
-    month_of_birth = c(8, 1, 3, 11),
-    day_of_birth = c(22, 27, 10, 8),
+    person_id = as.integer(c(1, 2, 3, 4)),
+    gender_concept_id = as.integer(c(8532, 8507, 8507, 8507)),
+    year_of_birth = as.integer(c(1997, 1963, 1986, 1978)),
+    month_of_birth = as.integer(c(8, 1, 3, 11)),
+    day_of_birth = as.integer(c(22, 27, 10, 8)),
     race_concept_id = NA_integer_,
     ethnicity_concept_id = NA_integer_
   )
@@ -241,6 +241,7 @@ test_that("requiring absence in another table", {
                                                                   "Not in table table between -Inf & 0 days relative to cohort_start_date, censoring at cohort_end_date"))
 
   # cohort Id and name
+  expect_warning(
   cdm$cohort1 <-  requireTableIntersect(cohort = cdm$cohort1,
                                         intersections = 0,
                                         cohortId = "cohort_1",
@@ -249,6 +250,7 @@ test_that("requiring absence in another table", {
                                         targetEndDate = "date_end",
                                         window = c(0, Inf),
                                         censorDate = NULL)
+  )
   expect_true(all(cdm$cohort1 |> dplyr::pull("subject_id") |> sort() == c(1, 1, 1, 1, 1, 1, 2)))
   expect_true(all((cdm$cohort1 |> dplyr::pull("cohort_start_date") |> sort() ==
                      c("1999-05-03", "2001-03-24", "2001-11-28", "2002-01-30", "2002-06-13",
@@ -269,7 +271,7 @@ test_that("different intersection count requirements", {
     subject_id = 1:10,
     cohort_definition_id = 1L,
     cohort_start_date = as.Date('2020-01-01'),
-    cohort_end_date = as.Date('2020-01-01'))
+      cohort_end_date = as.Date('2020-01-01'))
 
   cdm <- omock::mockCdmReference() |>
     omock::mockCdmFromTables(tables = list("cohort1" = cohort1)) |>
@@ -284,12 +286,12 @@ test_that("different intersection count requirements", {
       "valid_end_date" = NA
     )) |>
     omopgenerics::insertTable(name = "drug_exposure", table = dplyr::tibble(
-      "drug_exposure_id" = 1:6,
+      "drug_exposure_id" = 1:6L,
       "person_id" = as.integer(c(1,2,2,3,3,3)),
-      "drug_concept_id" = 1,
+      "drug_concept_id" = 1L,
       "drug_exposure_start_date" = as.Date('2019-01-01'),
       "drug_exposure_end_date" = as.Date('2019-01-01'),
-      "drug_type_concept_id" = 1
+      "drug_type_concept_id" = 1L
     ))
   cdm$observation_period <- cdm$observation_period |>
     dplyr::mutate(
@@ -360,19 +362,23 @@ test_that("different intersection count requirements", {
   expect_error(requireTableIntersect(cohort = cdm$cohort1,
                                      intersections = c(-10, 10),
                                      tableName = "drug_exposure",
-                                     window = c(-Inf, Inf)))
+                                     window = c(-Inf, Inf),
+                                     name = "cohort1_test"))
   expect_error(requireTableIntersect(cohort = cdm$cohort1,
                                      intersections = c(11, 10),
                                      tableName = "drug_exposure",
-                                     window = c(-Inf, Inf)))
+                                     window = c(-Inf, Inf),
+                                     name = "cohort1_test"))
   expect_error(requireTableIntersect(cohort = cdm$cohort1,
                                      intersections = c(Inf, Inf),
                                      tableName = "drug_exposure",
-                                     window = c(-Inf, Inf)))
+                                     window = c(-Inf, Inf),
+                                     name = "cohort1_test"))
   expect_error(requireTableIntersect(cohort = cdm$cohort1,
                                      intersections = c(1, 2, 3),
                                      tableName = "drug_exposure",
-                                     window = c(-Inf, Inf)))
+                                     window = c(-Inf, Inf),
+                                     name = "cohort1_test"))
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
 
