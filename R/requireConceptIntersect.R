@@ -33,6 +33,7 @@ requireConceptIntersect <- function(cohort,
                                     window,
                                     intersections = c(1, Inf),
                                     cohortId = NULL,
+                                    cohortCombinationCriteria = "all",
                                     indexDate = "cohort_start_date",
                                     targetStartDate = "event_start_date",
                                     targetEndDate = "event_end_date",
@@ -47,8 +48,13 @@ requireConceptIntersect <- function(cohort,
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   window <- omopgenerics::validateWindowArgument(window)
   cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
-  intersections <- validateIntersections(intersections)
   conceptSet <- omopgenerics::validateConceptSetArgument(conceptSet, cdm)
+  intersections <- validateIntersections(intersections)
+  cohortCombinationCriteria <- validateIntersections(
+    cohortCombinationCriteria,
+    name = "cohortCombinationCriteria",
+    maxCombinations = length(conceptSet)
+  )
   omopgenerics::assertLogical(atFirst, length = 1)
 
   if (length(cohortId) == 0) {
@@ -71,6 +77,10 @@ requireConceptIntersect <- function(cohort,
   upper_limit <- intersections[[2]]
   upper_limit[is.infinite(upper_limit)] <- 999999L
   upper_limit <- as.integer(upper_limit)
+
+  combinations_lower_limit <- as.integer(cohortCombinationCriteria[[1]])
+  combinations_upper_limit <- cohortCombinationCriteria[[2]]
+  combinations_upper_limit[is.infinite(combinations_upper_limit)] <- 999999L
 
   window_start <- window[[1]][1]
   window_end <- window[[1]][2]
@@ -107,34 +117,23 @@ requireConceptIntersect <- function(cohort,
       window = window,
       censorDate = censorDate,
       inObservation = inObservation,
-      nameStyle = intersectCol,
+      nameStyle = "intersect_{concept_name}",
       name = tmpNewCohort
     )
 
-  newCohort <- applyRequirement(
-    newCohort, atFirst, tmpNewCohort, intersectCol, lower_limit, upper_limit, cdm
+  intersectCols <- names(conceptSet)
+  intersectCols <- paste0("intersect_", intersectCols)
+
+  newCohort <- applyCohortRequirement(
+    cdm, newCohort, tmpNewCohort, atFirst, lower_limit, upper_limit,
+    intersectCols, combinations_lower_limit, combinations_upper_limit
   )
 
-  # attrition reason
-  if (all(intersections == 0)) {
-    reason <- glue::glue(
-      "Not in concept {names(conceptSet)} between {window_start} & ",
-      "{window_end} days relative to {indexDate}"
-    )
-  } else if (intersections[[1]] != intersections[[2]]) {
-    reason <- glue::glue(
-      "Concept {names(conceptSet)} between {window_start} & ",
-      "{window_end} days relative to {indexDate} between ",
-      "{intersections[[1]]} and {intersections[[2]]}"
-    )
-  } else {
-    reason <- glue::glue(
-      "Concept {names(conceptSet)} between {window_start} & ",
-      "{window_end} days relative to {indexDate} ",
-      "{intersections[[1]]} times"
-    )
-  }
-  reason <- completeAttritionReason(reason, censorDate, atFirst)
+  # attrition
+  reason <- intersectConceptAttritionReason(
+    intersections, cohortCombinationCriteria, names(conceptSet), window_start, window_end,
+    indexDate, censorDate, atFirst
+  )
 
   # codelist
   newCodelist <- getIntersectionCodelist(
@@ -195,39 +194,6 @@ getIntersectionCodelist <- function(cohort, cohortId, codelist) {
   return(newCodelist)
 }
 
-applyRequirement <- function(newCohort, atFirst, tmpNewCohort, intersectCol, lower_limit, upper_limit, cdm) {
-  if (atFirst) {
-    tmpNewCohortFirst <- paste0(tmpNewCohort, "_1")
-    newCohortFirst <- newCohort |>
-      dplyr::group_by(.data$cohort_definition_id, .data$subject_id) |>
-      dplyr::filter(.data$cohort_start_date == base::min(.data$cohort_start_date)) |>
-      dplyr::ungroup() |>
-      dplyr::compute(name = tmpNewCohortFirst, temporary = FALSE,
-                     logPrefix = "CohortConstructor_applyRequirement_subset_arrange_") |>
-      dplyr::filter(
-        .data$rec_id_1234 == 1 & .data[[intersectCol]] >= .env$lower_limit & .data[[intersectCol]] <= .env$upper_limit
-      ) |>
-      dplyr::select(dplyr::all_of(c("cohort_definition_id", "subject_id"))) |>
-      dplyr::compute(name = tmpNewCohortFirst, temporary = FALSE,
-                     logPrefix = "CohortConstructor_applyRequirement_subset_first_")
-    newCohort <- newCohort |>
-      dplyr::inner_join(newCohortFirst, by = c("cohort_definition_id", "subject_id")) |>
-      dplyr::select(!dplyr::all_of(intersectCol)) |>
-      dplyr::compute(name = tmpNewCohort, temporary = FALSE,
-                     logPrefix = "CohortConstructor_applyRequirement_requirement_first_")
-    omopgenerics::dropSourceTable(cdm = cdm, name = tmpNewCohortFirst)
-  } else {
-    newCohort <- newCohort |>
-      dplyr::filter(
-        .data[[intersectCol]] >= .env$lower_limit & .data[[intersectCol]] <= .env$upper_limit
-      ) |>
-      dplyr::select(!dplyr::all_of(intersectCol)) |>
-      dplyr::compute(name = tmpNewCohort, temporary = FALSE,
-                     logPrefix = "CohortConstructor_applyRequirement_subset_")
-  }
-  return(newCohort)
-}
-
 completeAttritionReason <- function(reason, censorDate, atFirst) {
   if (!is.null(censorDate)) {
     reason <- glue::glue("{reason}, censoring at {censorDate}")
@@ -235,5 +201,34 @@ completeAttritionReason <- function(reason, censorDate, atFirst) {
   if (atFirst) {
     reason <- glue::glue("{reason}. Requirement applied to the first entry")
   }
+  return(reason)
+}
+
+intersectConceptAttritionReason <- function(intersections,
+                                            cohortCombinationCriteria,
+                                            targetName,
+                                            windowStart,
+                                            windowEnd,
+                                            indexDate,
+                                            censorDate,
+                                            atFirst) {
+  if (length(targetName) > 1) {
+    reason <- paste0(
+      "Require ", formatRange(intersections),
+      " for ", formatCombo(cohortCombinationCriteria, length(targetName)),
+      "concept sets: ", glue::glue_collapse(targetName, sep = ", ", last = " and "),
+      ". Intersection window: ", windowStart, " to ",
+      windowEnd, " days relative to ", indexDate
+    )
+  } else {
+    reason <- paste0(
+      "Require ", formatRange(intersections),
+      " with concept set ", targetName,
+      ". Intersection window: ", windowStart, " to ",
+      windowEnd, " days relative to ", indexDate
+    )
+  }
+  reason <- completeAttritionReason(reason, censorDate, atFirst)
+
   return(reason)
 }

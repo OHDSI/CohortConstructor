@@ -27,13 +27,13 @@ validateDateRange <- function(dateRange) {
 }
 
 validateDaysInCohort <- function(daysInCohort) {
-omopgenerics::assertNumeric(daysInCohort, length = 2)
-omopgenerics::assertNumeric(daysInCohort[1], min = 1)
-omopgenerics::assertNumeric(daysInCohort[2], min = 1)
-if(daysInCohort[1] > daysInCohort[2]){
-cli::cli_abort("First value for daysInCohort cannot be larger than second")
-}
-daysInCohort
+  omopgenerics::assertNumeric(daysInCohort, length = 2)
+  omopgenerics::assertNumeric(daysInCohort[1], min = 1)
+  omopgenerics::assertNumeric(daysInCohort[2], min = 1)
+  if(daysInCohort[1] > daysInCohort[2]){
+    cli::cli_abort("First value for daysInCohort cannot be larger than second")
+  }
+  daysInCohort
 }
 
 validateDemographicRequirements <- function(ageRange,
@@ -148,21 +148,18 @@ validateN <- function(n) {
   )
 }
 
-validateIntersections <- function(intersections, name = "intersections", targetCohort = NULL, targetCohortId = NULL) {
+validateIntersections <- function(intersections, name = "intersections", maxCombinations = NULL) {
 
   if(name == "cohortCombinationCriteria" & is.character(intersections)){
     omopgenerics::assertChoice(intersections, choices = c("any", "all"), length = 1)
-      if(intersections == "any"){
-        intersections <- c(1, Inf)
-      } else if(intersections == "all"){
-      intersections <- omopgenerics::settings(targetCohort) |>
-        dplyr::filter(.data$cohort_definition_id %in% .env$targetCohortId) |>
-        dplyr::pull("cohort_definition_id") |>
-        length()
-      } else {
+    if(intersections == "any"){
+      intersections <- c(1, Inf)
+    } else if(intersections == "all"){
+      intersections <- maxCombinations
+    } else {
       cli::cli_abort("Only supported character inputs are 'all' and 'any' but {intersections} supplied")
     }
-    }
+  }
 
   if (length(intersections) == 1) {
     intersections <- c(intersections, intersections)
