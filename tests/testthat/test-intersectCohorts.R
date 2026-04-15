@@ -443,12 +443,12 @@ test_that("attrition and cohortId", {
     omopgenerics::insertTable(name = "person", table = person) |>
     copyCdm()
 
-  expect_warning(
+
     cdm$cohort1 <- cdm$cohort1 |>
-      requireInDateRange(dateRange = as.Date(c("1990-01-01", "2025-01-01"))) |>
-      requireSex(sex = "Female") |>
-      requireAge(ageRange = list(c(0,40)))
-  )
+      requireInDateRange(dateRange = as.Date(c("1990-01-01", "2025-01-01")), name = "cohort1") |>
+      requireSex(sex = "Female", name = "cohort1") |>
+      requireAge(ageRange = list(c(0,40)), name = "cohort1")
+
 
   cdm$cohort1 <- intersectCohorts(
     cohort = cdm$cohort1, cohortId = c("cohort_1", "cohort_2"),
