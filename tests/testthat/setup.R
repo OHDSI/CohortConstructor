@@ -45,7 +45,7 @@ copyCdm <- function(cdm) {
         Database = "CDMV5",
         UID = Sys.getenv("CDM5_SQL_SERVER_USER"),
         PWD = Sys.getenv("CDM5_SQL_SERVER_PASSWORD"),
-        TrustServerCertificate="yes",
+        TrustServerCertificate = "yes",
         Port = 1433
       ),
       writeSchema = c(catalog = "ohdsi", schema = "dbo", prefix = prefix)
