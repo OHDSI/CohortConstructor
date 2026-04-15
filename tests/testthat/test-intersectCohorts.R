@@ -450,12 +450,10 @@ test_that("attrition and cohortId", {
       requireAge(ageRange = list(c(0,40)))
   )
 
-  expect_warning(
-    cdm$cohort1 <- intersectCohorts(
-      cohort = cdm$cohort1, cohortId = c("cohort_1", "cohort_2"),
-      name = "cohort1", returnNonOverlappingCohorts = TRUE,
-      keepOriginalCohorts = FALSE
-    )
+  cdm$cohort1 <- intersectCohorts(
+    cohort = cdm$cohort1, cohortId = c("cohort_1", "cohort_2"),
+    name = "cohort1", returnNonOverlappingCohorts = TRUE,
+    keepOriginalCohorts = FALSE
   )
   expect_true(nrow(settings(cdm$cohort1)) == 3)
   expect_identical(settings(cdm$cohort1)$non_overlapping, c(NA, TRUE, TRUE))
