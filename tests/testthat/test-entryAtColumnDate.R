@@ -13,6 +13,7 @@ test_that("entry at first date", {
     copyCdm()
 
   # works
+
   cdm$cohort1 <- cdm$cohort |>
     entryAtFirstDate(
       dateColumns = c("cohort_start_date", "cohort_end_date", "other_date_1", "other_date_2"),
@@ -62,22 +63,26 @@ test_that("entry at first date", {
     dplyr::compute(name = "cohort_new", temporary = FALSE) |>
     omopgenerics::newCohortTable()
 
-  cdm$cohort_new <- cdm$cohort_new |>
-    entryAtFirstDate(
-      dateColumns = c("cohort_start_date", "cohort_end_date", "other_date_1", "other_date_2"),
-      returnReason = TRUE,
-      keepDateColumns = TRUE
-    )
+  expect_warning(
+    cdm$cohort_new <- cdm$cohort_new |>
+      entryAtFirstDate(
+        dateColumns = c("cohort_start_date", "cohort_end_date", "other_date_1", "other_date_2"),
+        returnReason = TRUE,
+        keepDateColumns = TRUE
+      )
+  )
   expect_true(all(c("other_date_1", "other_date_2", "entry_reason") %in% colnames(cdm$cohort_new)))
   expect_equal(collectCohort(cdm$cohort1, 1), collectCohort(cdm$cohort_new, 1))
 
   # works with == name and cohort ID
-  cdm$cohort <- cdm$cohort |>
-    entryAtFirstDate(
-      dateColumns = c("cohort_end_date", "other_date_1", "other_date_2"),
-      keepDateColumns = FALSE,
-      returnReason = FALSE
-    )
+  expect_warning(
+    cdm$cohort <- cdm$cohort |>
+      entryAtFirstDate(
+        dateColumns = c("cohort_end_date", "other_date_1", "other_date_2"),
+        keepDateColumns = FALSE,
+        returnReason = FALSE
+      )
+  )
   expect_true(all(
     cdm$cohort |> dplyr::pull("cohort_start_date") |> sort() ==
       c("1990-11-09", "2001-01-01", "2001-08-01", "2002-12-09", "2015-01-15")
@@ -160,12 +165,14 @@ test_that("entry at last date", {
     dplyr::compute(name = "cohort_new", temporary = FALSE) |>
     omopgenerics::newCohortTable()
 
-  cdm$cohort_new <- cdm$cohort_new |>
-    entryAtLastDate(
-      dateColumns = c("cohort_end_date", "other_date_1", "other_date_2"),
-      returnReason = TRUE,
-      keepDateColumns = TRUE
-    )
+  expect_warning(
+    cdm$cohort_new <- cdm$cohort_new |>
+      entryAtLastDate(
+        dateColumns = c("cohort_end_date", "other_date_1", "other_date_2"),
+        returnReason = TRUE,
+        keepDateColumns = TRUE
+      )
+  )
   expect_true(all(c("other_date_1", "other_date_2", "entry_reason") %in% colnames(cdm$cohort_new)))
   expect_equal(collectCohort(cdm$cohort1, 1), collectCohort(cdm$cohort_new, 1))
 
@@ -189,12 +196,14 @@ test_that("entry at last date", {
   ))
 
   # test not cohort end as columns working
-  cdm$cohort <- cdm$cohort |>
-    entryAtLastDate(
-      dateColumns = c("other_date_1", "other_date_2"),
-      keepDateColumns = FALSE,
-      returnReason = FALSE
-    )
+  expect_warning(
+    cdm$cohort <- cdm$cohort |>
+      entryAtLastDate(
+        dateColumns = c("other_date_1", "other_date_2"),
+        keepDateColumns = FALSE,
+        returnReason = FALSE
+      )
+  )
   expect_true(all(
     cdm$cohort |> dplyr::pull("cohort_start_date") |> sort() ==
       c("1990-11-09", "2001-01-01", "2001-09-02", "2002-12-09", "2015-02-15")
@@ -229,7 +238,9 @@ test_that("test indexes - postgres", {
                                                         cohort_end_date = as.Date("2009-01-03"),
                                                         other_date = as.Date("2009-01-01")))
     cdm$my_cohort <- omopgenerics::newCohortTable(cdm$my_cohort)
-    cdm$my_cohort <- entryAtFirstDate(cdm$my_cohort, dateColumns = c("cohort_end_date", "other_date"), returnReason = TRUE)
+    expect_warning(
+      cdm$my_cohort <- entryAtFirstDate(cdm$my_cohort, dateColumns = c("cohort_end_date", "other_date"), returnReason = TRUE)
+    )
 
     expect_true(
       DBI::dbGetQuery(con, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==

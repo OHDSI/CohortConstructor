@@ -61,13 +61,13 @@ test_that("test it works and expected errors", {
   expect_true(all(cdm$cohort1 |> dplyr::pull("cohort_start_date") |> sort() ==
                     c("1996-06-30", "2001-05-30", "2003-05-02", "2015-01-27")))
   expect_identical(settings(cdm$cohort1), dplyr::tibble(
-      cohort_definition_id = 1L,
-      cohort_name = "cohort_1",
-      age_range = "0_35",
-      sex = "Both",
-      min_prior_observation = 10,
-      min_future_observation = 40
-    ))
+    cohort_definition_id = 1L,
+    cohort_name = "cohort_1",
+    age_range = "0_35",
+    sex = "Both",
+    min_prior_observation = 10,
+    min_future_observation = 40
+  ))
   expect_true(all(
     attrition(cdm$cohort1)$reason ==
       c('Initial qualifying events', 'Age requirement: 0 to 35',
@@ -75,11 +75,13 @@ test_that("test it works and expected errors", {
         'Future observation requirement: 40 days')
   ))
 
-  cdm$cohort <- cdm$cohort |>
-    requireAge(ageRange = list(c(0, 35))) |>
-    requireSex(sex = "Both") |>
-    requirePriorObservation(minPriorObservation = 10) |>
-    requireFutureObservation(minFutureObservation = 40)
+  expect_warning(expect_warning(expect_warning(expect_warning(
+    cdm$cohort <- cdm$cohort |>
+      requireAge(ageRange = list(c(0, 35))) |>
+      requireSex(sex = "Both") |>
+      requirePriorObservation(minPriorObservation = 10) |>
+      requireFutureObservation(minFutureObservation = 40)
+  ))))
 
   expect_true(inherits(cdm$cohort, "cohort_table"))
   expect_identical(omopgenerics::attrition(cdm$cohort), omopgenerics::attrition(cdm$cohort1))
@@ -87,13 +89,13 @@ test_that("test it works and expected errors", {
   expect_true(all(cdm$cohort |> dplyr::pull("cohort_start_date") |> sort() ==
                     c("1996-06-30", "2001-05-30", "2003-05-02", "2015-01-27")))
   expect_identical(settings(cdm$cohort), dplyr::tibble(
-      cohort_definition_id = 1L,
-      cohort_name = "cohort_1",
-      age_range = "0_35",
-      sex = "Both",
-      min_prior_observation = 10,
-      min_future_observation = 40
-    ))
+    cohort_definition_id = 1L,
+    cohort_name = "cohort_1",
+    age_range = "0_35",
+    sex = "Both",
+    min_prior_observation = 10,
+    min_future_observation = 40
+  ))
   expect_true(all(
     attrition(cdm$cohort)$reason ==
       c('Initial qualifying events', 'Age requirement: 0 to 35',
@@ -102,56 +104,68 @@ test_that("test it works and expected errors", {
   ))
 
   # expect errors
-  expect_error(requireDemographics(cohort = "cohort"))
-  expect_error(requireDemographics(cohort = cdm$person))
+  expect_error(expect_warning(requireDemographics(cohort = "cohort")))
+  expect_error(expect_warning(requireDemographics(cohort = cdm$person)))
   expect_error(requireDemographics(
     cohort = cdm$cohort,
-    indexDate = "aaa"
+    indexDate = "aaa",
+    name = "hi"
   ))
   expect_error(requireDemographics(
     cohort = cdm$cohort2,
-    ageRange = c(0, 50)
+    ageRange = c(0, 50),
+    name = "hi"
   ))
   expect_error(requireDemographics(
     cohort = cdm$cohort,
-    ageRange = list(c(0, 50, 100))
+    ageRange = list(c(0, 50, 100)),
+    name = "hi"
   ))
   expect_error(requireDemographics(
     cohort = cdm$cohort,
-    ageRange = list(c(50, 0))
+    ageRange = list(c(50, 0)),
+    name = "hi"
   ))
   expect_error(requireDemographics(
     cohort = cdm$cohort,
-    sex = "all"
+    sex = "all",
+    name = "hi"
   ))
   expect_error(requireDemographics(
     cohort = cdm$cohort,
-    ageRange = list(c(-10, 40))
+    ageRange = list(c(-10, 40)),
+    name = "hi"
   ))
   expect_error(requireDemographics(
     cohort = cdm$cohort,
-    ageRange = list(c(0, "a"))
+    ageRange = list(c(0, "a")),
+    name = "hi"
   ))
   expect_error(requireDemographics(
     cohort = cdm$cohort,
-    sex = "a"
+    sex = "a",
+    name = "hi"
   ))
 
   expect_error(requireDemographics(
     cohort = cdm$cohort,
-    minPriorObservation = -10
+    minPriorObservation = -10,
+    name = "hi"
   ))
   expect_error(requireDemographics(
     cohort = cdm$cohort2,
-    minPriorObservation = "a"
+    minPriorObservation = "a",
+    name = "hi"
   ))
   expect_error(requireDemographics(
     cohort = cdm$cohort,
-    minFutureObservation = -10
+    minFutureObservation = -10,
+    name = "hi"
   ))
   expect_error(requireDemographics(
     cohort = cdm$cohort,
-    minFutureObservation = "a"
+    minFutureObservation = "a",
+    name = "hi"
   ))
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
@@ -243,8 +257,10 @@ test_that("ignore existing cohort extra variables", {
     PatientProfiles::addDemographics() |>
     dplyr::compute(name = "cohort", temporary = FALSE)
 
-  cdm$cohort <- cdm$cohort |>
-    requirePriorObservation(minPriorObservation = 450)
+  expect_warning(
+    cdm$cohort <- cdm$cohort |>
+      requirePriorObservation(minPriorObservation = 450)
+  )
   expect_true(all(colnames(cdm$cohort) ==
                     c("cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date",
                       "age", "sex", "prior_observation", "future_observation")))
@@ -253,8 +269,10 @@ test_that("ignore existing cohort extra variables", {
                     omopgenerics::attrition(cdm$cohort)$reason))
   expect_true(all(colnames(settings(cdm$cohort)) == c("cohort_definition_id", "cohort_name", "min_prior_observation")))
 
-  cdm$new_cohort <- cdm$cohort |>
-    requirePriorObservation(minPriorObservation = 450, name = "new_cohort")
+  expect_warning(
+    cdm$new_cohort <- cdm$cohort |>
+      requirePriorObservation(minPriorObservation = 450, name = "new_cohort")
+  )
   expect_true(all(colnames(cdm$new_cohort) ==
                     c("cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date",
                       "age", "sex", "prior_observation", "future_observation")))
@@ -284,8 +302,10 @@ test_that("external columns kept after requireDemographics", {
     )
   cdm <- cdm |> copyCdm()
 
-  cdm$cohort <- cdm$cohort |>
-    requireDemographics(indexDate = "new_index_date", ageRange = list(c(0,5)))
+  expect_warning(
+    cdm$cohort <- cdm$cohort |>
+      requireDemographics(indexDate = "new_index_date", ageRange = list(c(0,5)))
+  )
 
   expect_true(all(c("col_extra1", "col_extra2", "new_index_date") %in% colnames(cdm$cohort)))
 
@@ -363,15 +383,15 @@ test_that("settings with extra columns", {
     omopgenerics::newCohortTable(
       cohortSetRef = settings(cdm$cohort) |>
         dplyr::mutate(sex = "Both", extra1 = 1, extra2 = "hi")
-      )
-  cdm$cohort <- cdm$cohort |> requireSex(sex = c("Both"))
+    )
+  expect_warning(expect_warning(cdm$cohort <- cdm$cohort |> requireSex(sex = c("Both"))))
   expect_identical(cdm$cohort |> settings() |> dplyr::arrange(.data$cohort_definition_id), dplyr::tibble(
-      cohort_definition_id = as.integer(1:3),
-      cohort_name = c("cohort_1", "cohort_2", "cohort_3"),
-      extra1 = 1,
-      extra2 = "hi",
-      sex = c(rep("Both", 3))
-    ))
+    cohort_definition_id = as.integer(1:3),
+    cohort_name = c("cohort_1", "cohort_2", "cohort_3"),
+    extra1 = 1,
+    extra2 = "hi",
+    sex = c(rep("Both", 3))
+  ))
   expect_true(all(colnames(attrition(cdm$cohort)) ==
                     c("cohort_definition_id", "number_records", "number_subjects", "reason_id", "reason", "excluded_records", "excluded_subjects" )))
 
@@ -390,12 +410,12 @@ test_that("Inf age", {
     copyCdm()
 
   expect_no_error(cdm$cohort1 <- cdm$cohort |>
-    requireDemographics(ageRange = c(0, Inf),
-                        name = "cohort1"))
+                    requireDemographics(ageRange = c(0, Inf),
+                                        name = "cohort1"))
   expect_error(cdm$cohort2 <-cdm$cohort |>
-                    requireDemographics(ageRange = list(c(0, 17),
-                                                        c(18,Inf)),
-                                        name = "cohort2"))
+                 requireDemographics(ageRange = list(c(0, 17),
+                                                     c(18,Inf)),
+                                     name = "cohort2"))
 
   dropCreatedTables(cdm = cdm)
 })
@@ -495,7 +515,7 @@ test_that("test indexes - postgres, and atFirst", {
 
     omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::contains("og_"))
 
-    cdm$my_cohort <- requireDemographics(cdm$my_cohort)
+    expect_warning(cdm$my_cohort <- requireDemographics(cdm$my_cohort))
     expect_true(
       DBI::dbGetQuery(con, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
         "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"

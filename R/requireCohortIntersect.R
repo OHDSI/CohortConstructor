@@ -40,7 +40,7 @@ requireCohortIntersect <- function(cohort,
                                    atFirst = FALSE,
                                    name = tableName(cohort)) {
   # checks
-  name <- omopgenerics::validateNameArgument(name, validation = "warning")
+  name <- validateNameArgumentInternal(missing(name), name, tableName(cohort))
   cohort <- omopgenerics::validateCohortArgument(cohort)
   validateCohortColumn(indexDate, cohort, class = "date")
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
@@ -193,7 +193,7 @@ applyCohortRequirement <- function(cdm, newCohort, tmpNewCohort, atFirst, lower_
     tmpNewCohortFirst <- paste0(tmpNewCohort, "_1")
     newCohortFirst <- newCohort |>
       dplyr::group_by(.data$cohort_definition_id, .data$subject_id) |>
-      dplyr::filter(.data$cohort_start_date == base::min(.data$cohort_start_date)) |>
+      dplyr::filter(.data$cohort_start_date == base::min(.data$cohort_start_date, na.rm = TRUE)) |>
       dplyr::ungroup() |>
       dplyr::compute(name = tmpNewCohortFirst, temporary = FALSE,
                      logPrefix = "CohortConstructor_applyCohortRequirement_subset_arrange_") |>

@@ -437,14 +437,14 @@ test_that("cohort Id, name, additional columns, missing year of birth", {
     min_prior_observation = c(0, 0, 400)
   ))
 
-  expect_no_error(
+  expect_no_error(expect_warning(
     cohort <- trimDemographics(cohort = cdm$cohort2,
                                cohortId = 1,
                                ageRange = NULL,
                                sex = "Male",
                                minPriorObservation = c(0, 400),
                                minFutureObservation = NULL)
-  )
+  ))
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
 

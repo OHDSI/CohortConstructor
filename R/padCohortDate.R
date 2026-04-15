@@ -41,6 +41,7 @@ padCohortDate <- function(cohort,
       collapse = collapse,
       requireFullContribution = requireFullContribution,
       cohortId = cohortId,
+      missingName = missing(name),
       name = name,
       .softValidation = .softValidation
     )
@@ -93,6 +94,7 @@ padCohortEnd <- function(cohort,
       collapse = collapse,
       requireFullContribution = requireFullContribution,
       cohortId = cohortId,
+      missingName = missing(name),
       name = name,
       .softValidation = .softValidation
     )
@@ -142,6 +144,7 @@ padCohortStart <- function(cohort,
       collapse = collapse,
       requireFullContribution = requireFullContribution,
       cohortId = cohortId,
+      missingName = missing(name),
       name = name,
       .softValidation = .softValidation
     )
@@ -154,6 +157,7 @@ padCohortStart <- function(cohort,
                            collapse,
                            requireFullContribution,
                            cohortId,
+                           missingName,
                            name,
                            call = parent.frame(),
                            .softValidation) {
@@ -167,7 +171,7 @@ padCohortStart <- function(cohort,
   validateColumn(indexDate, cohort, call = call)
   omopgenerics::assertLogical(collapse, length = 1)
   cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
-  name <- omopgenerics::validateNameArgument(name, validation = "warning")
+  name <- validateNameArgumentInternal(missingName, name, tableName(cohort))
   cdm <- omopgenerics::cdmReference(cohort)
   omopgenerics::assertLogical(.softValidation)
 
