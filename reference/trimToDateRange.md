@@ -82,5 +82,8 @@ cdm$cohort1 <- cdm$cohort1 |>
   trimToDateRange(
     dateRange = as.Date(c(NA, "2015-12-31"))
   )
+#> Warning: The `name` argument was not provided.
+#> ℹ The original "cohort1" table will be overwritten.
+#> ℹ To avoid this, set `name = '<new_table_name>'` in your function call.
 # }
 ```

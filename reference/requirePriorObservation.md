@@ -62,6 +62,9 @@ cdm <- mockCohortConstructor()
 cdm$cohort1 |>
   requirePriorObservation(indexDate = "cohort_start_date",
                           minPriorObservation = 365)
+#> Warning: The `name` argument was not provided.
+#> ℹ The original "cohort1" table will be overwritten.
+#> ℹ To avoid this, set `name = '<new_table_name>'` in your function call.
 #> # A tibble: 42 × 4
 #>    cohort_definition_id subject_id cohort_start_date cohort_end_date
 #>  *                <int>      <int> <date>            <date>         

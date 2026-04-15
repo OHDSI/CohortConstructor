@@ -58,6 +58,9 @@ cdm <- mockCohortConstructor()
 
 cdm$cohort1 <- cdm$cohort1 |>
   yearCohorts(years = 2000:2002)
+#> Warning: The `name` argument was not provided.
+#> ℹ The original "cohort1" table will be overwritten.
+#> ℹ To avoid this, set `name = '<new_table_name>'` in your function call.
 
 settings(cdm$cohort1)
 #> # A tibble: 3 × 5

@@ -38,5 +38,8 @@ library(CohortConstructor)
 cdm <- mockCohortConstructor()
 #> ℹ Reading GiBleed tables.
 cdm$cohort1 <- requireIsFirstEntry(cdm$cohort1)
+#> Warning: The `name` argument was not provided.
+#> ℹ The original "cohort1" table will be overwritten.
+#> ℹ To avoid this, set `name = '<new_table_name>'` in your function call.
 # }
 ```

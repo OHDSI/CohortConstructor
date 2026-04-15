@@ -62,6 +62,9 @@ cdm <- mockCohortConstructor()
 
 cdm$cohort2 <- cdm$cohort2 |>
   unionCohorts()
+#> Warning: The `name` argument was not provided.
+#> ℹ The original "cohort2" table will be overwritten.
+#> ℹ To avoid this, set `name = '<new_table_name>'` in your function call.
 
 settings(cdm$cohort2)
 #> # A tibble: 1 × 3

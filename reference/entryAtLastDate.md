@@ -82,6 +82,9 @@ cdm$cohort1 <- cdm$cohort1 |>
 
 cdm$cohort1 |>
   entryAtLastDate(dateColumns = c("prior_drug", "prior_observation"))
+#> Warning: The `name` argument was not provided.
+#> ℹ The original "cohort1" table will be overwritten.
+#> ℹ To avoid this, set `name = '<new_table_name>'` in your function call.
 #> # A tibble: 64 × 6
 #>    cohort_definition_id subject_id cohort_start_date cohort_end_date prior_drug
 #>                   <int>      <int> <date>            <date>          <date>    

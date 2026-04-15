@@ -73,5 +73,8 @@ cdm$cohort1 <- cdm$cohort1 |>
     indexDate = "cohort_start_date",
     dateRange = as.Date(c("2010-01-01", NA))
   )
+#> Warning: The `name` argument was not provided.
+#> ℹ The original "cohort1" table will be overwritten.
+#> ℹ To avoid this, set `name = '<new_table_name>'` in your function call.
 # }
 ```

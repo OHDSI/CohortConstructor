@@ -59,6 +59,9 @@ library(PatientProfiles)
 library(CohortConstructor)
 cdm <- mockPatientProfiles()
 cdm$cohort1 |> exitAtDeath()
+#> Warning: The `name` argument was not provided.
+#> ℹ The original "cohort1" table will be overwritten.
+#> ℹ To avoid this, set `name = '<new_table_name>'` in your function call.
 #> Warning: There was 1 warning in `dplyr::summarise()`.
 #> ℹ In argument: `days = min(.data$start, na.rm = TRUE)`.
 #> Caused by warning in `min()`:
