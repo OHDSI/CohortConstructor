@@ -186,13 +186,13 @@ test_that("unionCohorts works", {
                            cohortName = NULL,
                            name = "cohort1")
   )
-  expect_error(
+  expect_error(expect_warning(expect_warning(
     cohort <- unionCohorts(cdm$cohort1,
                            cohortId = "1",
                            gap = 1,
                            cohortName = NULL,
                            name = "cohort1")
-  )
+  )))
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
 
@@ -239,7 +239,7 @@ test_that("multiple observation periods", {
     )) |>
     copyCdm()
 
-  cdm$cohort <- cdm$cohort |> omopgenerics::newCohortTable() |> unionCohorts(gap = 99999)
+  expect_warning(cdm$cohort <- cdm$cohort |> omopgenerics::newCohortTable() |> unionCohorts(gap = 99999))
   expect_identical(collectCohort(cdm$cohort, 1), dplyr::tibble(
     "subject_id" = as.integer(c(1, 1, 1, 2, 2)),
     "cohort_start_date" = as.Date(c("2000-01-01", "2001-01-01", "2003-01-01", "2001-01-01", "2002-01-01")),

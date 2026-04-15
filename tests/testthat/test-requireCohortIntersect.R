@@ -104,10 +104,12 @@ test_that("requiring presence in another cohort", {
                       "Require 1 or more intersections with cohort cohort_2. Intersection window: -Inf to Inf days relative to cohort_start_date")))
 
   # name
-  cdm$cohort1 <-  requireCohortIntersect(cohort = cdm$cohort1,
-                                         targetCohortTable = "cohort2",
-                                         targetCohortId = 2,
-                                         window = c(-Inf, Inf))
+  expect_warning(
+    cdm$cohort1 <-  requireCohortIntersect(cohort = cdm$cohort1,
+                                           targetCohortTable = "cohort2",
+                                           targetCohortId = 2,
+                                           window = c(-Inf, Inf))
+  )
   expect_true(all(omopgenerics::attrition(cdm$cohort1)$reason ==
                     c("Initial qualifying events",
                       "Require 1 or more intersections with cohort cohort_2. Intersection window: -Inf to Inf days relative to cohort_start_date",
@@ -279,7 +281,7 @@ test_that("requiring presence in another cohort", {
 
 
   # codelists ----
-  cdm$cohort2 <- conceptCohort(cdm, list("a" = 194152L, "b" = 4151660L), name = "cohort2")
+  expect_warning(cdm$cohort2 <- conceptCohort(cdm, list("a" = 194152L, "b" = 4151660L), name = "cohort2"))
   # Only inclusion codes
   cdm$cohort5 <-  requireCohortIntersect(cohort = cdm$cohort1,
                                          targetCohortTable = "cohort2",
@@ -487,38 +489,52 @@ test_that("requiring presence in another cohort", {
   )
 
   # expected errors ----
-  expect_error(requireCohortIntersect(cohort = cdm$cohort1,
+  expect_error(expect_warning(
+    requireCohortIntersect(cohort = cdm$cohort1,
                                       targetCohortTable = "cohort22", # does not exist
                                       targetCohortId = 1,
-                                      window = c(-Inf, Inf)))
-  expect_error(requireCohortIntersect(cohort = cdm$cohort1,
+                                      window = c(-Inf, Inf))
+    ))
+  expect_error(expect_warning(
+    requireCohortIntersect(cohort = cdm$cohort1,
                                       targetCohortTable = "cohort2",
                                       targetCohortId = 10, # does not exist
-                                      window = c(-Inf, Inf)))
-  expect_error(requireCohortIntersect(cohort = cdm$cohort1,
+                                      window = c(-Inf, Inf))
+  ))
+  expect_error(expect_warning(
+    requireCohortIntersect(cohort = cdm$cohort1,
                                       targetCohortTable = c("not_a_cohort", "lala"),
                                       targetCohortId = 1,
-                                      window = c(-Inf, Inf)))
-  expect_error(requireCohortIntersect(cohort = cdm$cohort1,
+                                      window = c(-Inf, Inf))
+  ))
+  expect_error(expect_warning(
+    requireCohortIntersect(cohort = cdm$cohort1,
                                       intersections = c(-10, 10),
                                       targetCohortId = 1,
                                       window = c(-Inf, Inf),
-                                      targetCohortTable = "cohort2"))
-  expect_error(requireCohortIntersect(cohort = cdm$cohort1,
+                                      targetCohortTable = "cohort2")
+  ))
+  expect_error(expect_warning(
+    requireCohortIntersect(cohort = cdm$cohort1,
                                       intersections = c(11, 10),
                                       targetCohortId = 1,
                                       window = c(-Inf, Inf),
-                                      targetCohortTable = "cohort2"))
-  expect_error(requireCohortIntersect(cohort = cdm$cohort1,
+                                      targetCohortTable = "cohort2")
+  ))
+  expect_error(expect_warning(
+    requireCohortIntersect(cohort = cdm$cohort1,
                                       intersections = c(Inf, Inf),
                                       targetCohortId = 1,
                                       window = c(-Inf, Inf),
-                                      targetCohortTable = "cohort2"))
-  expect_error(requireCohortIntersect(cohort = cdm$cohort1,
+                                      targetCohortTable = "cohort2")
+  ))
+  expect_error(expect_warning(
+    requireCohortIntersect(cohort = cdm$cohort1,
                                       intersections = c(1, 2, 3),
                                       targetCohortId = 1,
                                       window = c(-Inf, Inf),
-                                      targetCohortTable = "cohort2"))
+                                      targetCohortTable = "cohort2")
+  ))
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
   dropCreatedTables(cdm = cdm)

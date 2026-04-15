@@ -28,24 +28,24 @@ test_that("test restrict to first entry works", {
 
   expect_true(all(
     cdm$cohort1 |>
-      CohortConstructor::requireIsFirstEntry() |>
+      CohortConstructor::requireIsFirstEntry(name = "cohort1") |>
       dplyr::pull(cohort_start_date) |>
       sort() == c("1999-07-30", "2001-05-29", "2015-01-23")
   ))
 
-  expect_true(all(cdm$cohort1 |> CohortConstructor::requireIsFirstEntry() |>
+  expect_true(all(cdm$cohort1 |> CohortConstructor::requireIsFirstEntry(name = "cohort1") |>
                     dplyr::pull(subject_id) %in% 1:3))
 
   expect_true(all(
     cdm$cohort2 |>
-      CohortConstructor::requireIsFirstEntry() |>
+      CohortConstructor::requireIsFirstEntry(name = "cohort2") |>
       dplyr::pull(cohort_start_date) |>
       sort() == c("1999-04-16", "1999-07-30", "2001-05-29", "2002-10-09", "2015-01-23", "2015-02-22")
   ))
 
   expect_true(all(
     cdm$cohort2 |>
-      CohortConstructor::requireIsFirstEntry() |>
+      CohortConstructor::requireIsFirstEntry(name = "cohort2") |>
       dplyr::pull(subject_id) |>
       sort() == c(1, 1, 2, 2, 3, 3)
   ))
@@ -132,11 +132,11 @@ test_that("errors", {
     omock::mockCohort(numberCohorts = 1, recordPerson = 2,seed = 1) |>
     copyCdm()
 
-  expect_error(cdm$cohort |> requireIsFirstEntry(name = 1))
+  expect_error(expect_warning(cdm$cohort |> requireIsFirstEntry(name = 1)))
   expect_error(cdm$cohort1 <- cdm$cohort |> requireIsFirstEntry(name = "cohort2"))
-  expect_warning(cdm$cohort |> requireIsFirstEntry(cohortId = Inf))
-  expect_error(cdm$cohort |> dplyr::collect() |> requireIsFirstEntry())
-  expect_warning(cdm$cohort |> requireIsFirstEntry(cohortId = c(1, 5)))
+  expect_warning(expect_warning(expect_warning(cdm$cohort |> requireIsFirstEntry(cohortId = Inf, name = "cohort2"))))
+  expect_error(cdm$cohort |> dplyr::collect() |> requireIsFirstEntry(name = "cohort2"))
+  expect_warning(cdm$cohort |> requireIsFirstEntry(cohortId = c(1, 5), name = "cohort2"))
 
   dropCreatedTables(cdm = cdm)
 })
@@ -205,9 +205,9 @@ test_that("requireIsLastEntry", {
   # errors
   expect_error(cdm$cohort |> requireIsLastEntry(name = 1))
   expect_error(cdm$cohort1 <- cdm$cohort |> requireIsLastEntry(name = "cohort2"))
-  expect_warning(cdm$cohort |> requireIsLastEntry(cohortId = Inf))
+  expect_warning(expect_warning(expect_warning(cdm$cohort |> requireIsLastEntry(cohortId = Inf, name = "hi"))))
   expect_error(cdm$cohort |> dplyr::collect() |> requireIsLastEntry())
-  expect_warning(cdm$cohort |> requireIsLastEntry(cohortId = c(1, 5)))
+  expect_warning(expect_warning(cdm$cohort |> requireIsLastEntry(cohortId = c(1, 5))))
 
   dropCreatedTables(cdm = cdm)
 })
@@ -295,14 +295,14 @@ test_that("requireEntry", {
   expect_true(nrow(cdm$cohort1_d |> dplyr::collect()) == 0)
 
   # errors
-  expect_error(cdm$cohort1 |> requireIsEntry(entryRange = c(1,2,3)))
-  expect_error(cdm$cohort1 |> requireIsEntry(entryRange = c(1,NA)))
-  expect_error(cdm$cohort1 |> requireIsEntry(entryRange = "a"))
+  expect_warning(expect_error(cdm$cohort1 |> requireIsEntry(entryRange = c(1,2,3))))
+  expect_warning(expect_error(cdm$cohort1 |> requireIsEntry(entryRange = c(1,NA))))
+  expect_error(cdm$cohort1 |> requireIsEntry(entryRange = "a", name = "cohort2"))
   expect_error(cdm$cohort1 |> requireIsEntry(entryRange = c(1, 1), name = 1))
   expect_error(cdm$cohort1 <- cdm$cohort1 |> requireIsEntry(entryRange = c(1, 1), name = "cohort2"))
-  expect_warning(cdm$cohort1 |> requireIsEntry(entryRange = c(1, 1), cohortId = Inf))
-  expect_error(cdm$cohort1 |> dplyr::collect() |> requireIsEntry(entryRange = c(1, 1)))
-  expect_warning(cdm$cohort1 |> requireIsEntry(entryRange = c(1, 1), cohortId = c(1, 5)))
+  expect_warning(expect_warning(expect_warning(cdm$cohort1 |> requireIsEntry(entryRange = c(1, 1), cohortId = Inf, name = "cohort2"))))
+  expect_error(cdm$cohort1 |> dplyr::collect() |> requireIsEntry(entryRange = c(1, 1), name = "cohort2"))
+  expect_warning(cdm$cohort1 |> requireIsEntry(entryRange = c(1, 1), cohortId = c(1, 5), name = "cohort2"))
 
   # mock cohort
   cdm <- omock::mockCdmFromTables(tables = list("my_cohort" = dplyr::tibble(

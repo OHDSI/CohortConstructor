@@ -155,7 +155,7 @@ test_that("test indexes - postgres", {
 
     omopgenerics::dropSourceTable(cdm = cdm, dplyr::starts_with("og"))
 
-    cdm$my_cohort <- padCohortEnd(cdm$my_cohort, days = 1)
+    expect_warning(cdm$my_cohort <- padCohortEnd(cdm$my_cohort, days = 1))
 
     expect_true(
       DBI::dbGetQuery(con, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
@@ -299,18 +299,18 @@ test_that("adding days to cohort start", {
     cohortId = 1,
     name = "my_cohort_1"
   ))
-  expect_warning(padCohortStart(
+  expect_warning(expect_warning(padCohortStart(
     cdm$my_cohort,
     days = 2,
     cohortId = "a",
     name = "my_cohort_1"
-  ))
-  expect_warning(padCohortStart(
+  )))
+  expect_warning(expect_warning(padCohortStart(
     cdm$my_cohort,
     days = 2,
     cohortId = 99,
     name = "my_cohort_1"
-  ))
+  )))
   expect_warning(padCohortStart(
     cdm$my_cohort,
     days = 2,

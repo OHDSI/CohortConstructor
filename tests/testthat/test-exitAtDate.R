@@ -55,13 +55,13 @@ test_that("exit at observation end", {
   expect_true(all(attrition(cdm$cohort2)$reason == c("Initial qualifying events", "Exit at observation period end date, limited to current observation period", "Initial qualifying events")))
 
   # additional columns warning
-  expect_warning(cdm$cohort <- cdm$cohort |> dplyr::mutate(extra_col = 1) |> exitAtObservationEnd())
+  expect_warning(expect_warning(cdm$cohort <- cdm$cohort |> dplyr::mutate(extra_col = 1) |> exitAtObservationEnd()))
   expect_true(all(colnames(cdm$cohort) == c("cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date")))
 
   # expected errors
   expect_error(cdm$cohort |> exitAtObservationEnd(name = 1))
-  expect_warning(cdm$cohort |> exitAtObservationEnd(cohortId = "HI"))
-  expect_error(cdm$person |> exitAtObservationEnd())
+  expect_warning(expect_warning(expect_warning(cdm$cohort |> exitAtObservationEnd(cohortId = "HI"))))
+  expect_error(expect_warning(cdm$person |> exitAtObservationEnd()))
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
 
@@ -193,7 +193,7 @@ test_that("exit at death date", {
     omopgenerics::insertTable(name = "death", table = dplyr::tibble(
       person_id = 1:2,
       death_date = as.Date(c("2013-06-29", "2003-06-15")),
-      death_type_concept_id = NA
+      death_type_concept_id = NA_integer_
     )) |>
     copyCdm()
 
@@ -218,7 +218,7 @@ test_that("exit at death date", {
                     c("Initial qualifying events", "Exit at death", "Initial qualifying events", "Exit at death")))
 
   # cohort ID and name
-  cdm$cohort <- cdm$cohort |> exitAtDeath(cohortId = 1, requireDeath = TRUE)
+  expect_warning(cdm$cohort <- cdm$cohort |> exitAtDeath(cohortId = 1, requireDeath = TRUE))
   expect_true(all(cdm$cohort |> dplyr::pull(cohort_start_date) |> sort() ==
                     c("1999-05-03", "2001-03-24", "2001-11-28", "2002-01-30", "2002-06-13", "2003-05-17")))
   expect_true(all(cdm$cohort |> dplyr::pull(cohort_end_date) |> sort() ==
@@ -228,14 +228,14 @@ test_that("exit at death date", {
                     c("Initial qualifying events", "No death recorded", "Exit at death", "Initial qualifying events")))
 
   # columns warning
-  expect_warning(cdm$cohort <- cdm$cohort |> dplyr::mutate(extra_col = 1) |> exitAtDeath())
+  expect_warning(expect_warning(cdm$cohort <- cdm$cohort |> dplyr::mutate(extra_col = 1) |> exitAtDeath()))
   expect_true(all(colnames(cdm$cohort) == c("cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date")))
 
   # expected errors
   expect_error(cdm$cohort |> exitAtDeath(name = 1))
-  expect_warning(cdm$cohort |> exitAtDeath(cohortId = "HI"))
-  expect_error(cdm$person |> exitAtDeath())
-  expect_error(cdm$person |> exitAtDeath(requireDeath = 1))
+  expect_warning(expect_warning(expect_warning(cdm$cohort |> exitAtDeath(cohortId = "HI"))))
+  expect_error(expect_warning(cdm$person |> exitAtDeath()))
+  expect_error(expect_warning(cdm$person |> exitAtDeath(requireDeath = 1)))
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
 
@@ -264,14 +264,14 @@ test_that("test indexes - postgres", {
 
     con <- CDMConnector::cdmCon(cdm = cdm)
 
-    cdm$my_cohort <- exitAtObservationEnd(cdm$my_cohort)
+    expect_warning(cdm$my_cohort <- exitAtObservationEnd(cdm$my_cohort))
 
     expect_true(
       DBI::dbGetQuery(con, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
         "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
     )
 
-    cdm$my_cohort <- exitAtDeath(cdm$my_cohort)
+    expect_warning(cdm$my_cohort <- exitAtDeath(cdm$my_cohort))
 
     expect_true(
       DBI::dbGetQuery(con, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==

@@ -65,8 +65,23 @@ getObservationPeriodId <- function(x, name) {
         .data[["cohort_start_date"]] >= .data[["observation_period_start_date"]]
     ) |>
     dplyr::select(dplyr::all_of(c(
-     "cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date", "observation_period_id"
+      "cohort_definition_id", "subject_id", "cohort_start_date", "cohort_end_date", "observation_period_id"
     ))) |>
     dplyr::compute(name = name, temporary = FALSE,
                    logPrefix = "CohortConstructor_utilities_observationPeriodId1_")
+}
+
+validateNameArgumentInternal <- function(missingInput, name, cohortName, call = parent.frame()) {
+  if (missingInput) {
+    cli::cli_warn(
+      message = c(
+        "The {.arg name} argument was not provided.",
+        "i" = "The original {.val {cohortName}} table will be overwritten.",
+        "i" = "To avoid this, set {.code name = '<new_table_name>'} in your function call."
+      ),
+      call = call
+    )
+  }
+  name <- omopgenerics::validateNameArgument(name, validation = "warning")
+  return(name)
 }

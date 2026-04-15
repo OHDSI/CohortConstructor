@@ -48,10 +48,10 @@ test_that("require flag in concept", {#need
     omopgenerics::insertTable(name = "drug_exposure", table = dplyr::tibble(
       "drug_exposure_id" = 1:11,
       "person_id" = as.integer(c(1, 1, 1, 1, 2, 2, 3, 1, 1, 1, 1)),
-      "drug_concept_id" = c(1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1),
+      "drug_concept_id" = as.integer(c(1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1)),
       "drug_exposure_start_date" = c(0, 300, 1500, 750, 10, 800, 150, 1800, 1801, 1802, 1803),
       "drug_exposure_end_date" = c(400, 800, 1600, 1550, 2000, 1000, 600, 1801, 1802, 1803, 1804),
-      "drug_type_concept_id" = 1
+      "drug_type_concept_id" = 1L
     ) |>
       dplyr::mutate(
         "drug_exposure_start_date" = as.Date(.data$drug_exposure_start_date, origin = "2010-01-01"),
@@ -113,9 +113,11 @@ test_that("require flag in concept", {#need
                       "Initial qualifying events",
                       "Concept a between -Inf & Inf days relative to cohort_start_date between 1 and Inf, censoring at cohort_end_date")))
   # name
-  cdm$cohort1 <-  requireConceptIntersect(cohort = cdm$cohort1,
-                                          conceptSet = list(a = 1L),
-                                          window = c(-Inf, Inf))
+  expect_warning(
+    cdm$cohort1 <-  requireConceptIntersect(cohort = cdm$cohort1,
+                                            conceptSet = list(a = 1L),
+                                            window = c(-Inf, Inf))
+  )
   expect_true(all(omopgenerics::attrition(cdm$cohort1)$reason ==
                     c("Initial qualifying events",
                       "Concept a between -Inf & Inf days relative to cohort_start_date between 1 and Inf",
@@ -138,11 +140,11 @@ test_that("require flag in concept", {#need
 
   # expected errors
   # only support one concept at the moment
-  expect_error(
+  expect_error(expect_warning(
     requireConceptIntersect(cohort = cdm$cohort1,
                             conceptSet = list(a = 1L, b = 2L),
                             window = c(-Inf, Inf))
-  )
+  ))
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
 
@@ -196,12 +198,12 @@ test_that("requiring absence in another cohort", {
       "valid_end_date" = NA
     )) |>
     omopgenerics::insertTable(name = "drug_exposure", table = dplyr::tibble(
-      "drug_exposure_id" = 1:11,
-      "person_id" = c(1, 1, 1, 1, 2, 2, 3, 1, 1, 1, 1),
-      "drug_concept_id" = c(1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1),
+      "drug_exposure_id" = 1:11L,
+      "person_id" = as.integer(c(1, 1, 1, 1, 2, 2, 3, 1, 1, 1, 1)),
+      "drug_concept_id" = as.integer(c(1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1)),
       "drug_exposure_start_date" = c(0, 300, 1500, 750, 10, 800, 150, 1800, 1801, 1802, 1803),
       "drug_exposure_end_date" = c(400, 800, 1600, 1550, 2000, 1000, 600, 1801, 1802, 1803, 1804),
-      "drug_type_concept_id" = 1
+      "drug_type_concept_id" = 1L
     ) |>
       dplyr::mutate(
         "drug_exposure_start_date" = as.Date(.data$drug_exposure_start_date, origin = "2010-01-01"),
@@ -343,30 +345,45 @@ test_that("different intersection count requirements", {#need
                           dplyr::pull("subject_id")), c(2L, 3L))
 
   # 2 or 3 intersections
-  expect_identical(sort(cdm$cohort1 |>
-                          requireConceptIntersect(intersections = c(2L, 3L),
-                                                  conceptSet = list("a" = 1),
-                                                  window = c(-Inf, Inf),
-                                                  name = "cohort1_test") |>
-                          dplyr::pull("subject_id")), c(2L, 3L))
+  expect_identical(
+    sort(
+      cdm$cohort1 |>
+        requireConceptIntersect(
+          intersections = c(2L, 3L),
+          conceptSet = list("a" = 1L),
+          window = c(-Inf, Inf),
+          name = "cohort1_test"
+        ) |>
+        dplyr::pull("subject_id")
+    ),
+    c(2L, 3L)
+  )
 
   # expected errors
-  expect_error(requireConceptIntersect(cohort = cdm$cohort1,
-                                       intersections = c(-10, 10),
-                                       conceptSet = list("a" = 1),
-                                       window = c(-Inf, Inf)))
-  expect_error(requireConceptIntersect(cohort = cdm$cohort1,
-                                       intersections = c(11, 10),
-                                       conceptSet = list("a" = 1),
-                                       window = c(-Inf, Inf)))
-  expect_error(requireConceptIntersect(cohort = cdm$cohort1,
-                                       intersections = c(Inf, Inf),
-                                       conceptSet = list("a" = 1),
-                                       window = c(-Inf, Inf)))
-  expect_error(requireConceptIntersect(cohort = cdm$cohort1,
-                                       intersections = c(1, 2, 3),
-                                       conceptSet = list("a" = 1),
-                                       window = c(-Inf, Inf)))
+  expect_error(expect_warning(
+    requireConceptIntersect(cohort = cdm$cohort1,
+                            intersections = c(-10, 10),
+                            conceptSet = list("a" = 1),
+                            window = c(-Inf, Inf))
+  ))
+  expect_error(expect_warning(
+    requireConceptIntersect(cohort = cdm$cohort1,
+                            intersections = c(11, 10),
+                            conceptSet = list("a" = 1),
+                            window = c(-Inf, Inf))
+  ))
+  expect_error(expect_warning(
+    requireConceptIntersect(cohort = cdm$cohort1,
+                            intersections = c(Inf, Inf),
+                            conceptSet = list("a" = 1),
+                            window = c(-Inf, Inf))
+  ))
+  expect_error(expect_warning(
+    requireConceptIntersect(cohort = cdm$cohort1,
+                            intersections = c(1, 2, 3),
+                            conceptSet = list("a" = 1),
+                            window = c(-Inf, Inf))
+  ))
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
 
@@ -396,9 +413,11 @@ test_that("test indexes - postgres, atFirst", {
     expect_no_error(cdm$my_cohort |> head(1))
     cdm$my_cohort <- omopgenerics::newCohortTable(cdm$my_cohort)
     expect_no_error(omopgenerics::settings(cdm$my_cohort))
-    cdm$my_cohort <- requireConceptIntersect(cdm$my_cohort,
-                                             conceptSet = list(a = 0),
-                                             window = list(c(0, Inf)))
+    expect_warning(
+      cdm$my_cohort <- requireConceptIntersect(cdm$my_cohort,
+                                               conceptSet = list(a = 0),
+                                               window = list(c(0, Inf)))
+    )
     expect_no_error(cdm$my_cohort |> head(1))
     expect_no_error(omopgenerics::settings(cdm$my_cohort))
     expect_true(

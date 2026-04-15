@@ -40,6 +40,7 @@ exitAtFirstDate <- function(cohort,
     dateColumns = dateColumns,
     cohortId = cohortId,
     returnReason = returnReason,
+    missingName = missing(name),
     name = name,
     order = "first",
     exit = TRUE,
@@ -91,6 +92,7 @@ exitAtLastDate <- function(cohort,
     dateColumns = dateColumns,
     cohortId = cohortId,
     returnReason = returnReason,
+    missingName = missing(name),
     name = name,
     order = "last",
     exit = TRUE,
@@ -104,13 +106,14 @@ exitAtColumnDate <- function(cohort,
                              cohortId,
                              returnReason,
                              order,
+                             missingName,
                              name,
                              exit,
                              keepDateColumns,
                              .softValidation,
                              call = parent.frame()) {
   # checks
-  name <- omopgenerics::validateNameArgument(name, validation = "warning", call = call)
+  name <- validateNameArgumentInternal(missingName, name, tableName(cohort), call = call)
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort), call = call)
   cohort <- omopgenerics::validateCohortArgument(cohort, call = call)
   cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning", call = call)

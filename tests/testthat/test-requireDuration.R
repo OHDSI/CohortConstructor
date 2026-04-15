@@ -57,7 +57,7 @@ test_that("require certain range of days for cohort entries", {
                    unique()))
 
   # keep if not cohort of interest
-  expect_true("2015-02-17" %in% (cdm$cohort |>
+  expect_true("2015-02-17" %in% as.character(cdm$cohort |>
                                    requireDuration(daysInCohort = c(2, Inf),
                                                    cohortId = 1,
                                                    name = "new_cohort") |>
@@ -70,10 +70,10 @@ test_that("require certain range of days for cohort entries", {
                 dplyr::tally() |>
                 dplyr::pull("n") == 1)
 
-  expect_true("2001-05-03" %in%  (cdm$cohort |>
-                                    requireDuration(daysInCohort = c(2, 2),
-                                                    name = "new_cohort") |>
-                                    dplyr::pull("cohort_start_date")))
+  expect_true("2001-05-03" %in%  as.character(cdm$cohort |>
+                                                requireDuration(daysInCohort = c(2, 2),
+                                                                name = "new_cohort") |>
+                                                dplyr::pull("cohort_start_date")))
 
   expect_true(cdm$cohort |>
                 requireDuration(daysInCohort = c(2, 2),
@@ -83,20 +83,20 @@ test_that("require certain range of days for cohort entries", {
                 dplyr::pull("n") == 2)
 
   # expect error
+  expect_error(expect_warning(cdm$cohort |>
+                                requireDuration(daysInCohort = c(20, 1))))
   expect_error(cdm$cohort |>
-                 requireDuration(daysInCohort = c(20, 1)))
+                 requireDuration(daysInCohort = c(1, 2, 3), name = "hi"))
   expect_error(cdm$cohort |>
-                 requireDuration(daysInCohort = c(1, 2, 3)))
+                 requireDuration(daysInCohort = c(NA, 2), name = "hi"))
   expect_error(cdm$cohort |>
-                 requireDuration(daysInCohort = c(NA, 2)))
+                 requireDuration(daysInCohort = c(2, NA), name = "hi"))
   expect_error(cdm$cohort |>
-                 requireDuration(daysInCohort = c(2, NA)))
+                 requireDuration(daysInCohort = c(-1, 2), name = "hi"))
   expect_error(cdm$cohort |>
-                 requireDuration(daysInCohort = c(-1, 2)))
+                 requireDuration(daysInCohort = c(-1), name = "hi"))
   expect_error(cdm$cohort |>
-                 requireDuration(daysInCohort = c(-1)))
-  expect_error(cdm$cohort |>
-                 requireDuration(daysInCohort = c(Inf)))
+                 requireDuration(daysInCohort = c(Inf), name = "hi"))
 
 })
 
@@ -141,25 +141,25 @@ test_that("trim duration", {
 
   # drop last record
   # other records get a day added to cohort start
-  expect_true(!"2015-02-17" %in% (cdm$cohort |>
+  expect_true(!"2015-02-17" %in% as.character(cdm$cohort |>
                                     trimDuration(daysInCohort = c(2, Inf),
                                                  name = "new_cohort") |>
                                     dplyr::pull("cohort_start_date")))
-  expect_true("2001-05-04" %in% (cdm$cohort |>
+  expect_true("2001-05-04" %in% as.character(cdm$cohort |>
                                    trimDuration(daysInCohort = c(2, Inf),
                                                 name = "new_cohort") |>
                                    dplyr::pull("cohort_start_date")))
 
-  expect_true("Trim records to 2 to Inf days following entry" %in%
-                (cdm$cohort |>
-                   trimDuration(daysInCohort = c(2, Inf),
-                                name = "new_cohort") |>
-                   attrition() |>
-                   dplyr::pull("reason") |>
-                   unique()))
+  expect_true(
+    "Trim records to 2 to Inf days following entry" ==
+      unique(cdm$cohort |>
+      trimDuration(daysInCohort = c(2, Inf), name = "new_cohort") |>
+      attrition() |>
+      dplyr::pull("reason"))[2]
+  )
 
   # keep if not cohort of interest
-  expect_true("2015-02-17" %in% (cdm$cohort |>
+  expect_true("2015-02-17" %in% as.character(cdm$cohort |>
                                    trimDuration(daysInCohort = c(2, Inf),
                                                 cohortId = 1,
                                                 name = "new_cohort") |>
@@ -291,19 +291,19 @@ test_that("trim duration", {
 
 
   # expect error
+  expect_error(expect_warning(cdm$cohort |>
+                                trimDuration(daysInCohort = c(20, 1))))
   expect_error(cdm$cohort |>
-                 trimDuration(daysInCohort = c(20, 1)))
+                 trimDuration(daysInCohort = c(1, 2, 3), name = "hi"))
   expect_error(cdm$cohort |>
-                 trimDuration(daysInCohort = c(1, 2, 3)))
+                 trimDuration(daysInCohort = c(NA, 2), name = "hi"))
   expect_error(cdm$cohort |>
-                 trimDuration(daysInCohort = c(NA, 2)))
+                 trimDuration(daysInCohort = c(2, NA), name = "hi"))
   expect_error(cdm$cohort |>
-                 trimDuration(daysInCohort = c(2, NA)))
+                 trimDuration(daysInCohort = c(-1, 2), name = "hi"))
   expect_error(cdm$cohort |>
-                 trimDuration(daysInCohort = c(-1, 2)))
+                 trimDuration(daysInCohort = c(-1), name = "hi"))
   expect_error(cdm$cohort |>
-                 trimDuration(daysInCohort = c(-1)))
-  expect_error(cdm$cohort |>
-                 trimDuration(daysInCohort = c(Inf)))
+                 trimDuration(daysInCohort = c(Inf), name = "hi"))
 
 })
