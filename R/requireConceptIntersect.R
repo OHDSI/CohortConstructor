@@ -85,10 +85,6 @@ requireConceptIntersect <- function(cohort,
   window_start <- window[[1]][1]
   window_end <- window[[1]][2]
 
-  if (length(conceptSet) > 1) {
-    cli::cli_abort("We currently suport 1 concept set.")
-  }
-
   if (length(conceptSet) == 0) {
     cli::cli_inform(c("i" = "Empty codelist provided, returning input cohort"))
     return(
