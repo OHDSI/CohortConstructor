@@ -39,7 +39,7 @@ test_that("test it works", {
     period_type_concept_id = NA_integer_
   )
 
-  cdm <- omock::mockCdmFromTables(tables = list("cohort1" = cohort_1, "cohort2" = cohort_2)) |>
+  cdm <- omock::mockCdmFromTables(tables = list("cohort1" = cohort_1)) |>
     omopgenerics::insertTable(name = "observation_period", table = obs) |>
     omopgenerics::insertTable(name = "person", table = person) |>
     omock::mockVocabularyTables(concept = dplyr::tibble(
@@ -66,6 +66,8 @@ test_that("test it works", {
       )
     ) |>
     copyCdm()
+  cdm <- omopgenerics::insertTable(cdm = cdm, name = "cohort2", table = cohort_2)
+  cdm$cohort2 <- cdm$cohort2 |> omopgenerics::newCohortTable(.softValidation = TRUE)
 
   # require flag in concept ----
   start_cols <- colnames(cdm$cohort1)
