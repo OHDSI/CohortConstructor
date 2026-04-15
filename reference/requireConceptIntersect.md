@@ -96,6 +96,7 @@ Cohort table
 # \donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
+#> Warning: '/tmp/RtmpkyjIPy/id_boq' already exists
 #> ℹ Reading GiBleed tables.
 
 cdm$cohort2 <-  requireConceptIntersect(

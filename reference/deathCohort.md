@@ -41,6 +41,7 @@ A cohort table with a death cohort in cdm
 library(CohortConstructor)
 
 cdm <- mockCohortConstructor()
+#> Warning: '/tmp/RtmpkyjIPy/id_mds' already exists
 #> ℹ Reading GiBleed tables.
 
 # Generate a death cohort
@@ -51,16 +52,16 @@ death_cohort
 #> # A tibble: 10 × 4
 #>    cohort_definition_id subject_id cohort_start_date cohort_end_date
 #>                   <int>      <int> <date>            <date>         
-#>  1                    1         34 1997-03-24        1997-03-24     
-#>  2                    1         25 2005-12-07        2005-12-07     
-#>  3                    1        100 2007-03-18        2007-03-18     
-#>  4                    1         83 2014-01-18        2014-01-18     
-#>  5                    1         38 2016-12-21        2016-12-21     
-#>  6                    1         57 2018-10-28        2018-10-28     
-#>  7                    1         54 2019-04-13        2019-04-13     
-#>  8                    1         89 2019-10-29        2019-10-29     
-#>  9                    1         52 2019-11-24        2019-11-24     
-#> 10                    1         51 2020-01-01        2020-01-01     
+#>  1                    1         14 2005-01-07        2005-01-07     
+#>  2                    1         34 2008-02-07        2008-02-07     
+#>  3                    1         59 2009-05-28        2009-05-28     
+#>  4                    1         51 2009-09-13        2009-09-13     
+#>  5                    1         82 2013-04-17        2013-04-17     
+#>  6                    1          1 2014-05-01        2014-05-01     
+#>  7                    1         43 2014-09-11        2014-09-11     
+#>  8                    1         68 2015-07-03        2015-07-03     
+#>  9                    1         87 2015-10-30        2015-10-30     
+#> 10                    1         39 2019-12-02        2019-12-02     
 
 # Create a demographics cohort with age range and sex filters
 cdm$my_cohort <- demographicsCohort(cdm, "my_cohort", ageRange = c(50,100), sex = "Female")
@@ -81,8 +82,8 @@ death_cohort |> attrition()
 #> 1                    1             10              10         1 Initial qualify…
 #> 2                    1             10              10         2 Record in obser…
 #> 3                    1             10              10         3 Not missing rec…
-#> 4                    1              1               1         4 In subset cohor…
-#> 5                    1              1               1         5 First death rec…
+#> 4                    1              0               0         4 In subset cohor…
+#> 5                    1              0               0         5 First death rec…
 #> # ℹ 2 more variables: excluded_records <int>, excluded_subjects <int>
 # }
 ```

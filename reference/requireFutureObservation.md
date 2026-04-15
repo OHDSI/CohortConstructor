@@ -60,6 +60,7 @@ observation requirement
 # \donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
+#> Warning: '/tmp/RtmpkyjIPy/id_mds' already exists
 #> ℹ Reading GiBleed tables.
 cdm$cohort1 |>
   requireFutureObservation(indexDate = "cohort_start_date",
@@ -67,19 +68,19 @@ cdm$cohort1 |>
 #> Warning: The `name` argument was not provided.
 #> ℹ The original "cohort1" table will be overwritten.
 #> ℹ To avoid this, set `name = '<new_table_name>'` in your function call.
-#> # A tibble: 57 × 4
+#> # A tibble: 53 × 4
 #>    cohort_definition_id subject_id cohort_start_date cohort_end_date
 #>  *                <int>      <int> <date>            <date>         
-#>  1                    1          1 1982-01-21        1987-09-03     
-#>  2                    1          2 1987-02-22        1989-08-15     
-#>  3                    1          4 2013-01-17        2014-08-15     
-#>  4                    1          5 2005-12-12        2006-04-08     
-#>  5                    1          6 2000-05-04        2000-06-23     
-#>  6                    1          8 2014-11-17        2016-09-14     
-#>  7                    1          9 2015-02-03        2016-01-05     
-#>  8                    1         11 1987-05-16        1990-04-14     
-#>  9                    1         12 2013-08-29        2014-05-06     
-#> 10                    1         14 2002-02-13        2002-05-29     
-#> # ℹ 47 more rows
+#>  1                    1          1 2005-05-25        2006-08-20     
+#>  2                    1          2 1987-06-29        1990-01-03     
+#>  3                    1          6 2014-03-30        2015-02-21     
+#>  4                    1          7 2018-04-07        2018-04-25     
+#>  5                    1         10 2008-12-27        2010-04-02     
+#>  6                    1         13 2010-12-10        2011-06-29     
+#>  7                    1         14 1995-02-12        2002-11-12     
+#>  8                    1         15 2009-04-01        2009-11-09     
+#>  9                    1         17 2008-06-28        2008-12-28     
+#> 10                    1         20 2013-05-08        2014-01-08     
+#> # ℹ 43 more rows
 # }
 ```

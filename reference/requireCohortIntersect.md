@@ -113,6 +113,7 @@ Cohort table with only those entries satisfying the criteria
 # \donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
+#> Warning: '/tmp/RtmpkyjIPy/id_boq' already exists
 #> ℹ Reading GiBleed tables.
 cdm$cohort1 |>
   requireCohortIntersect(targetCohortTable = "cohort2",
@@ -122,19 +123,19 @@ cdm$cohort1 |>
 #> Warning: The `name` argument was not provided.
 #> ℹ The original "cohort1" table will be overwritten.
 #> ℹ To avoid this, set `name = '<new_table_name>'` in your function call.
-#> # A tibble: 23 × 4
+#> # A tibble: 54 × 4
 #>    cohort_definition_id subject_id cohort_start_date cohort_end_date
 #>  *                <int>      <int> <date>            <date>         
-#>  1                    1          3 1988-09-07        1988-12-11     
-#>  2                    1          9 2000-05-02        2004-03-29     
-#>  3                    1         14 1983-09-06        1984-08-15     
-#>  4                    1         17 2015-11-04        2015-11-16     
-#>  5                    1         19 1986-12-24        1988-07-08     
-#>  6                    1         21 2006-05-15        2008-05-28     
-#>  7                    1         23 1990-05-12        1990-06-08     
-#>  8                    1         28 1992-03-11        1994-09-05     
-#>  9                    1         33 2019-12-17        2019-12-19     
-#> 10                    1         34 1999-08-28        2003-07-07     
-#> # ℹ 13 more rows
+#>  1                    1          1 2005-05-25        2006-08-20     
+#>  2                    1          2 1987-06-29        1990-01-03     
+#>  3                    1          6 2014-03-30        2015-02-21     
+#>  4                    1          7 2018-04-07        2018-04-25     
+#>  5                    1         10 2008-12-27        2010-04-02     
+#>  6                    1         13 2010-12-10        2011-06-29     
+#>  7                    1         14 1995-02-12        2002-11-12     
+#>  8                    1         15 2009-04-01        2009-11-09     
+#>  9                    1         17 2008-06-28        2008-12-28     
+#> 10                    1         18 2019-08-14        2019-08-15     
+#> # ℹ 44 more rows
 # }
 ```

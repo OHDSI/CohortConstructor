@@ -63,24 +63,25 @@ The cohort table.
 # \donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
+#> Warning: '/tmp/RtmpkyjIPy/id_rek' already exists
 #> ℹ Reading GiBleed tables.
 cdm$cohort1 |> exitAtObservationEnd()
 #> Warning: The `name` argument was not provided.
 #> ℹ The original "cohort1" table will be overwritten.
 #> ℹ To avoid this, set `name = '<new_table_name>'` in your function call.
-#> # A tibble: 61 × 4
+#> # A tibble: 54 × 4
 #>    cohort_definition_id subject_id cohort_start_date cohort_end_date
 #>  *                <int>      <int> <date>            <date>         
-#>  1                    1         42 1970-09-15        1970-12-29     
-#>  2                    1         80 1977-12-07        1983-05-23     
-#>  3                    1         50 1979-03-16        1985-03-23     
-#>  4                    1         51 1980-02-11        1988-05-01     
-#>  5                    1         28 1981-03-25        1986-06-15     
-#>  6                    1         70 1983-06-05        1995-12-27     
-#>  7                    1         79 1987-05-15        2006-07-06     
-#>  8                    1         25 1988-08-10        2015-10-29     
-#>  9                    1          1 1988-11-14        1989-06-21     
-#> 10                    1         61 1991-06-04        2013-10-01     
-#> # ℹ 51 more rows
+#>  1                    1         60 1983-07-12        1988-05-28     
+#>  2                    1         33 1986-12-31        1987-06-11     
+#>  3                    1          2 1987-06-29        1996-11-18     
+#>  4                    1         26 1989-01-15        1998-04-28     
+#>  5                    1         38 1989-05-15        1996-10-17     
+#>  6                    1         34 1992-12-23        2008-02-07     
+#>  7                    1         14 1995-02-12        2005-01-07     
+#>  8                    1         51 1995-06-13        2009-09-13     
+#>  9                    1         74 1996-10-14        1998-10-03     
+#> 10                    1         64 1996-12-05        2014-04-17     
+#> # ℹ 44 more rows
 # }
 ```

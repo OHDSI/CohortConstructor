@@ -52,25 +52,26 @@ required duration dropped
 # \donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
+#> Warning: '/tmp/RtmpkyjIPy/id_boq' already exists
 #> ℹ Reading GiBleed tables.
 cdm$cohort1 |>
   requireDuration(daysInCohort = c(2, Inf))
 #> Warning: The `name` argument was not provided.
 #> ℹ The original "cohort1" table will be overwritten.
 #> ℹ To avoid this, set `name = '<new_table_name>'` in your function call.
-#> # A tibble: 60 × 4
+#> # A tibble: 54 × 4
 #>    cohort_definition_id subject_id cohort_start_date cohort_end_date
 #>  *                <int>      <int> <date>            <date>         
-#>  1                    1          1 2013-05-23        2015-04-13     
-#>  2                    1          2 2007-06-25        2008-10-06     
-#>  3                    1          3 2012-12-13        2012-12-25     
-#>  4                    1          7 2018-04-03        2018-06-04     
-#>  5                    1          8 2013-09-13        2014-01-20     
-#>  6                    1          9 2014-12-21        2015-11-12     
-#>  7                    1         10 2005-03-17        2007-11-03     
-#>  8                    1         11 2015-08-27        2016-06-28     
-#>  9                    1         12 1999-12-20        2001-10-25     
-#> 10                    1         13 2011-09-24        2016-07-13     
-#> # ℹ 50 more rows
+#>  1                    1          1 2005-05-25        2006-08-20     
+#>  2                    1          2 1987-06-29        1990-01-03     
+#>  3                    1          6 2014-03-30        2015-02-21     
+#>  4                    1          7 2018-04-07        2018-04-25     
+#>  5                    1         10 2008-12-27        2010-04-02     
+#>  6                    1         13 2010-12-10        2011-06-29     
+#>  7                    1         14 1995-02-12        2002-11-12     
+#>  8                    1         15 2009-04-01        2009-11-09     
+#>  9                    1         17 2008-06-28        2008-12-28     
+#> 10                    1         18 2019-08-14        2019-08-15     
+#> # ℹ 44 more rows
 # }
 ```

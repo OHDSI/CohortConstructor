@@ -6,7 +6,7 @@ for demonstrating and testing the package
 ## Usage
 
 ``` r
-mockCohortConstructor(source = "local")
+mockCohortConstructor(source = "local", seed = 1)
 ```
 
 ## Arguments
@@ -14,6 +14,14 @@ mockCohortConstructor(source = "local")
 - source:
 
   Source for the mock cdm, it can either be 'local' or 'duckdb'.
+
+- seed:
+
+  An optional integer used to set the seed for random number generation,
+  ensuring reproducibility of the generated data. If provided, this seed
+  allows the function to produce consistent results each time. If
+  'NULL', the seed is not set, which can lead to different outputs on
+  each run.
 
 ## Value
 

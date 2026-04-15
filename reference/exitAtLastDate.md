@@ -68,6 +68,7 @@ The cohort table.
 library(CohortConstructor)
 library(PatientProfiles)
 cdm <- mockCohortConstructor()
+#> Warning: '/tmp/RtmpkyjIPy/id_rek' already exists
 #> ℹ Reading GiBleed tables.
 
 cdm$cohort1 <- cdm$cohort1 |>
@@ -79,20 +80,20 @@ cdm$cohort1 |>
 #> Warning: The `name` argument was not provided.
 #> ℹ The original "cohort1" table will be overwritten.
 #> ℹ To avoid this, set `name = '<new_table_name>'` in your function call.
-#> # A tibble: 58 × 6
+#> # A tibble: 54 × 6
 #>    cohort_definition_id subject_id cohort_start_date cohort_end_date next_obs  
 #>                   <int>      <int> <date>            <date>          <date>    
-#>  1                    1          1 2015-11-01        2016-10-12      2015-11-13
-#>  2                    1          2 2014-05-10        2015-02-21      2014-05-10
-#>  3                    1          3 2004-05-26        2007-06-19      2004-10-11
-#>  4                    1          4 2007-10-10        2017-09-28      2009-04-16
-#>  5                    1          5 1979-12-02        1980-02-29      NA        
-#>  6                    1          6 2018-01-17        2018-04-07      2018-02-18
-#>  7                    1          8 2013-05-08        2017-04-18      2013-11-22
-#>  8                    1          9 2012-07-14        2012-12-21      2012-07-27
-#>  9                    1         10 2014-04-19        2014-05-09      2014-04-21
-#> 10                    1         12 2013-12-13        2016-12-23      2015-05-28
-#> # ℹ 48 more rows
+#>  1                    1          1 2005-05-25        2014-05-01      2005-12-06
+#>  2                    1          2 1987-06-29        1996-11-18      1987-07-09
+#>  3                    1          6 2014-03-30        2015-04-17      2014-05-25
+#>  4                    1          7 2018-04-07        2018-05-30      2018-04-12
+#>  5                    1         10 2008-12-27        2011-11-17      2009-04-27
+#>  6                    1         13 2010-12-10        2013-07-28      2011-02-20
+#>  7                    1         14 1995-02-12        2005-01-07      1995-02-23
+#>  8                    1         15 2009-04-01        2010-09-11      2009-04-07
+#>  9                    1         17 2008-06-28        2014-07-28      2009-01-07
+#> 10                    1         18 2019-08-14        2019-08-15      2019-08-14
+#> # ℹ 44 more rows
 #> # ℹ 1 more variable: future_observation <date>
 # }
 ```

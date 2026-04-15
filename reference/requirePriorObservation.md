@@ -58,6 +58,7 @@ observation requirement
 # \donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
+#> Warning: '/tmp/RtmpkyjIPy/id_mds' already exists
 #> ℹ Reading GiBleed tables.
 cdm$cohort1 |>
   requirePriorObservation(indexDate = "cohort_start_date",
@@ -65,19 +66,19 @@ cdm$cohort1 |>
 #> Warning: The `name` argument was not provided.
 #> ℹ The original "cohort1" table will be overwritten.
 #> ℹ To avoid this, set `name = '<new_table_name>'` in your function call.
-#> # A tibble: 42 × 4
+#> # A tibble: 38 × 4
 #>    cohort_definition_id subject_id cohort_start_date cohort_end_date
 #>  *                <int>      <int> <date>            <date>         
-#>  1                    1          1 1975-07-06        1995-11-10     
-#>  2                    1          2 1988-06-16        1989-04-28     
-#>  3                    1          5 1987-05-04        1998-02-25     
-#>  4                    1          6 1991-08-06        1991-11-30     
-#>  5                    1          7 2004-07-28        2006-12-04     
-#>  6                    1         10 1984-09-04        1985-09-11     
-#>  7                    1         11 1983-05-16        1983-05-29     
-#>  8                    1         12 1995-05-21        1996-07-09     
-#>  9                    1         13 1998-06-20        2007-11-16     
-#> 10                    1         14 1978-07-31        1985-02-16     
-#> # ℹ 32 more rows
+#>  1                    1          1 2005-05-25        2006-08-20     
+#>  2                    1          2 1987-06-29        1990-01-03     
+#>  3                    1         10 2008-12-27        2010-04-02     
+#>  4                    1         14 1995-02-12        2002-11-12     
+#>  5                    1         17 2008-06-28        2008-12-28     
+#>  6                    1         20 2013-05-08        2014-01-08     
+#>  7                    1         21 2018-10-05        2018-12-14     
+#>  8                    1         22 1997-08-22        1999-06-21     
+#>  9                    1         23 2008-07-26        2009-07-16     
+#> 10                    1         24 2004-04-08        2004-08-05     
+#> # ℹ 28 more rows
 # }
 ```

@@ -52,25 +52,26 @@ requirement
 # \donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
+#> Warning: '/tmp/RtmpkyjIPy/id_boq' already exists
 #> ℹ Reading GiBleed tables.
 cdm$cohort1 |>
   requireSex(sex = "Female")
 #> Warning: The `name` argument was not provided.
 #> ℹ The original "cohort1" table will be overwritten.
 #> ℹ To avoid this, set `name = '<new_table_name>'` in your function call.
-#> # A tibble: 31 × 4
+#> # A tibble: 25 × 4
 #>    cohort_definition_id subject_id cohort_start_date cohort_end_date
 #>  *                <int>      <int> <date>            <date>         
-#>  1                    1          3 2010-10-18        2011-02-16     
-#>  2                    1          6 2018-05-30        2018-05-31     
-#>  3                    1          7 2014-06-28        2015-08-04     
-#>  4                    1         10 2006-03-05        2006-07-06     
-#>  5                    1         12 2013-03-03        2013-03-22     
-#>  6                    1         14 2017-12-21        2018-06-10     
-#>  7                    1         16 1997-05-21        1998-10-28     
-#>  8                    1         18 1982-06-23        1989-02-12     
-#>  9                    1         20 2018-01-25        2018-05-22     
-#> 10                    1         23 2017-09-12        2018-01-10     
-#> # ℹ 21 more rows
+#>  1                    1          1 2005-05-25        2006-08-20     
+#>  2                    1          6 2014-03-30        2015-02-21     
+#>  3                    1         10 2008-12-27        2010-04-02     
+#>  4                    1         15 2009-04-01        2009-11-09     
+#>  5                    1         17 2008-06-28        2008-12-28     
+#>  6                    1         21 2018-10-05        2018-12-14     
+#>  7                    1         24 2004-04-08        2004-08-05     
+#>  8                    1         28 2002-11-16        2002-12-26     
+#>  9                    1         31 2002-01-29        2006-07-30     
+#> 10                    1         32 2000-01-08        2000-08-05     
+#> # ℹ 15 more rows
 # }
 ```

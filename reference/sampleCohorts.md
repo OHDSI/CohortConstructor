@@ -52,25 +52,26 @@ Cohort table with the specified cohorts sampled.
 # \donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
+#> Warning: '/tmp/RtmpkyjIPy/id_boq' already exists
 #> ℹ Reading GiBleed tables.
 
 cdm$cohort2 |> sampleCohorts(cohortId = 1, n = 10)
 #> Warning: The `name` argument was not provided.
 #> ℹ The original "cohort2" table will be overwritten.
 #> ℹ To avoid this, set `name = '<new_table_name>'` in your function call.
-#> # A tibble: 116 × 4
+#> # A tibble: 120 × 4
 #>    cohort_definition_id subject_id cohort_start_date cohort_end_date
 #>  *                <int>      <int> <date>            <date>         
-#>  1                    1         44 2015-10-22        2015-10-24     
-#>  2                    1          2 2002-01-08        2002-06-10     
-#>  3                    1          2 2005-10-31        2008-03-11     
-#>  4                    1         34 2000-04-09        2001-04-13     
-#>  5                    1         47 2016-12-11        2017-05-15     
-#>  6                    1         70 2004-04-24        2005-06-05     
-#>  7                    1         70 2005-06-27        2005-08-02     
-#>  8                    1         68 1980-09-27        1982-05-14     
-#>  9                    1         68 1982-05-15        1986-12-23     
-#> 10                    1         68 1986-12-24        1987-04-04     
-#> # ℹ 106 more rows
+#>  1                    1         26 1989-01-15        1991-02-06     
+#>  2                    1         48 1997-08-15        2000-10-06     
+#>  3                    1         48 2000-10-07        2001-01-31     
+#>  4                    1         48 2001-02-01        2005-11-01     
+#>  5                    1         48 2010-01-19        2011-10-18     
+#>  6                    1         64 1996-12-05        2001-09-26     
+#>  7                    1         29 2015-06-07        2015-08-10     
+#>  8                    1         29 2015-09-13        2015-10-25     
+#>  9                    1         29 2015-11-29        2016-05-15     
+#> 10                    1         85 2011-04-02        2012-11-06     
+#> # ℹ 110 more rows
 # }
 ```

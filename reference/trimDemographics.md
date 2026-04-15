@@ -62,6 +62,7 @@ demographic requirements
 # \donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
+#> Warning: '/tmp/RtmpkyjIPy/id_mds' already exists
 #> ℹ Reading GiBleed tables.
 
 cdm$cohort1 |>
@@ -74,19 +75,19 @@ cdm$cohort1 |>
 #> Creating initial cohort
 #> Trim age
 #> ✔ Cohort trimmed
-#> # A tibble: 28 × 4
+#> # A tibble: 30 × 4
 #>    cohort_definition_id subject_id cohort_start_date cohort_end_date
 #>                   <int>      <int> <date>            <date>         
-#>  1                    1          1 2014-12-26        2016-03-26     
-#>  2                    1          3 1988-01-29        1993-11-15     
-#>  3                    1         11 1995-03-25        2005-05-20     
-#>  4                    1         12 1998-03-11        1998-04-15     
-#>  5                    1         13 2003-05-04        2009-04-08     
-#>  6                    1         17 1960-10-17        1968-12-20     
-#>  7                    1         21 2016-08-22        2017-01-13     
-#>  8                    1         22 1985-06-22        1987-05-26     
-#>  9                    1         29 1985-06-30        1990-12-19     
-#> 10                    1         38 2003-01-01        2003-11-10     
-#> # ℹ 18 more rows
+#>  1                    1          2 1987-06-29        1990-01-03     
+#>  2                    1         10 2008-12-27        2010-04-02     
+#>  3                    1         13 2010-12-10        2011-06-29     
+#>  4                    1         14 1995-02-12        2002-11-12     
+#>  5                    1         28 2002-11-16        2002-12-26     
+#>  6                    1         29 2015-06-07        2015-07-30     
+#>  7                    1         34 1992-12-23        2003-03-03     
+#>  8                    1         37 2017-04-30        2017-05-29     
+#>  9                    1         38 1989-05-15        1990-06-02     
+#> 10                    1         39 2015-07-31        2015-08-11     
+#> # ℹ 20 more rows
 # }
 ```
