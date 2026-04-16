@@ -62,6 +62,7 @@ test_that("exit at first date", {
       keepDateColumns = FALSE,
       name = "cohort1"
     )
+
   expect_true(all(
     cdm$cohort1 |> dplyr::pull("cohort_start_date") |> sort() ==
       c("1989-12-09", "2000-01-01", "2000-06-03", "2000-12-09", "2015-01-15")
@@ -252,28 +253,41 @@ test_that("exit at first date", {
       exitAtLastDate(
         dateColumns = c("other_date_1", "other_date_2"),
         returnReason = TRUE
-      )))
-  # overlap
-  expect_error(expect_warning(
-    cdm$cohort_3 <- cdm$cohort_3 |>
-      dplyr::filter(!is.na(.data$other_date_2)) |>
-      exitAtLastDate(
-        dateColumns = c("other_date_1", "other_date_2"),
-        returnReason = TRUE
-      )))
-
-  expect_error(expect_warning(
+      )
+  ))
+  # overlap warn
+  expect_warning(
     cdm$cohort_4 <- cdm$cohort_3 |>
+      dplyr::filter(!is.na(.data$other_date_2)) |>
+      dplyr::compute(name = "cohort3", temporary = FALSE) |>
       exitAtLastDate(
         dateColumns = c("other_date_1", "other_date_2"),
-        returnReason = TRUE
-      )))
+        returnReason = TRUE,
+        name = "cohort_4",
+        .softValidation = TRUE
+      )
+  )
+  # overlap error
+  expect_error(
+    cdm$cohort_4 <- cdm$cohort_3 |>
+      dplyr::filter(!is.na(.data$other_date_2)) |>
+      dplyr::compute(name = "cohort3", temporary = FALSE) |>
+      exitAtLastDate(
+        dateColumns = c("other_date_1", "other_date_2"),
+        returnReason = TRUE,
+        name = "cohort_4",
+        .softValidation = FALSE
+      )
+  )
 
-  expect_error(expect_warning(cdm$cohort_5 <- cdm$cohort_5 |>
-                                exitAtFirstDate(
-                                  dateColumns = c("other_date_1", "other_date_2"),
-                                  returnReason = TRUE
-                                )))
+  # start date before end date: error when soft validation
+  expect_error(cdm$cohort_6 <- cdm$cohort_5 |>
+                 exitAtFirstDate(
+                   dateColumns = c("other_date_1", "other_date_2"),
+                   returnReason = TRUE,
+                   .softValidation = TRUE,
+                   name = "cohort_6"
+                 ))
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
 

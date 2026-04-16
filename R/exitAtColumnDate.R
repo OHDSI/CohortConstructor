@@ -201,9 +201,10 @@ exitAtColumnDate <- function(cohort,
       logPrefix = "CohortConstructor_exitAtColumnDate_newDate_2_"
     )
 
-  # checks with informative errors
-  if (isFALSE(.softValidation)) {
-    cdm <- validateNewCohort(newCohort, cdm, tablePrefix)
+  # check dates (no overlap) with informative errors if .softValidation,
+  # otherwise do omopgenerics validation
+  if (isTRUE(.softValidation)) {
+    cdm <- validateNewCohort(newCohort, cdm, tablePrefix, exit)
   }
 
   if (isTRUE(needsIdFilter(cohort, cohortId))) {
@@ -231,9 +232,14 @@ exitAtColumnDate <- function(cohort,
       name = name,
       logPrefix = "CohortConstructor_exitAtColumnDate_relocate_"
     ) |>
-    omopgenerics::newCohortTable(.softValidation = .softValidation)
+    omopgenerics::newCohortTable(.softValidation = TRUE)
 
+  # drop temp tables before validation
   cdm <- omopgenerics::dropSourceTable(cdm, name = dplyr::starts_with(tablePrefix))
+  if (!.softValidation) {
+    newCohort <- newCohort |>
+      omopgenerics::newCohortTable(.softValidation = .softValidation)
+  }
 
   useIndexes <- getOption("CohortConstructor.use_indexes")
   if (!isFALSE(useIndexes)) {
@@ -246,18 +252,24 @@ exitAtColumnDate <- function(cohort,
   return(newCohort)
 }
 
-validateNewCohort <- function(newCohort, cdm, tmpName) {
+validateNewCohort <- function(newCohort, cdm, tmpName, exit) {
   ## start > end
   checkStart <- newCohort |>
     dplyr::filter(.data$cohort_start_date > .data$cohort_end_date) |>
-    dplyr::tally() |>
-    dplyr::pull("n")
-  if (checkStart > 0) {
+    dplyr::filter(dplyr::row_number() <= 3) |>
+    dplyr::pull("subject_id")
+  if (exit) {
+    suggestion <- "Please ensure all potential exit dates come after current cohort start dates."
+  } else {
+    suggestion <- "Please ensure all potential entry dates come before current cohort end dates."
+  }
+  if (length(checkStart) > 0) {
     cdm <- omopgenerics::dropSourceTable(cdm, name = dplyr::starts_with(tmpName))
-    cli::cli_abort(
-      "There are new cohort end dates smaller than the start date.
-    Please provide valid dates in `dateColumns`"
-    )
+    cli::cli_abort(c(
+      "New cohort dates result in some subjects having cohort end date earlier than cohort start date.",
+      "See for example subject IDs {glue::glue_collapse(checkStart, sep = ', ', last = ', and ')}.",
+      "i" = suggestion
+    ))
   }
   ## Out of observation
   checkObservation <- newCohort |>
@@ -272,8 +284,8 @@ validateNewCohort <- function(newCohort, cdm, tmpName) {
   if (checkObservation > 0) {
     cdm <- omopgenerics::dropSourceTable(cdm, name = dplyr::starts_with(tmpName))
     cli::cli_abort(
-      "There are new cohort end dates outside of the observation period.
-    Please provide dates in observation in `dateColumns`"
+      "There are new cohort dates outside of the observation period.",
+      "i" = suggestion
     )
   }
   ## overlapping
@@ -286,10 +298,9 @@ validateNewCohort <- function(newCohort, cdm, tmpName) {
     dplyr::tally() |>
     dplyr::pull("n")
   if (checkOverlap > 0) {
-    cdm <- omopgenerics::dropSourceTable(cdm, name = dplyr::starts_with(tmpName))
-    cli::cli_abort(
-      "There are new cohort end dates which resulted in overlapping records.
-                   Please check the dates provided in `dateColumns`."
+    cli::cli_warn(
+      "There are new cohort end dates which resulted in overlapping records.",
+      "i" = suggestion
     )
   }
 
