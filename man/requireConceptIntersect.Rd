@@ -10,6 +10,7 @@ requireConceptIntersect(
   window,
   intersections = c(1, Inf),
   cohortId = NULL,
+  cohortCombinationCriteria = "all",
   indexDate = "cohort_start_date",
   targetStartDate = "event_start_date",
   targetEndDate = "event_end_date",
@@ -36,6 +37,19 @@ intersections must match this.}
 (cohort_definition_id or cohort_name). If NULL, all cohorts will be
 used; otherwise, only the specified cohorts will be modified, and the
 rest will remain unchanged.}
+
+\item{cohortCombinationCriteria}{Can be 'all', 'any', or a numeric vector
+(length 1 or 2) that specifies how many of the target cohorts must meet the
+intersection requirement.
+Examples:
+\itemize{
+\item 'all': must meet criteria for each of the target cohorts.
+\item 'any': must meet criteria for only one of the target cohorts.
+\item Single value: e.g., \code{4}, exactly 4 cohorts must meet the criteria. If
+there were 4 target cohorts, this would be the same as 'all'.
+\item Range: e.g., \code{c(2, Inf)}, must meet criteria at last 2 of the
+target cohorts. Note, \code{c(1, Inf)} is equivalent to 'any'.
+}}
 
 \item{indexDate}{Name of the column in the cohort that contains the date to
 compute the intersection.}
