@@ -47,3 +47,19 @@ functions.
 - inObservation:
 
   If TRUE only records inside an observation period will be considered
+
+- cohortCombinationCriteria:
+
+  Can be 'all', 'any', or a numeric vector (length 1 or 2) that
+  specifies how many of the target cohorts must meet the intersection
+  requirement. Examples:
+
+  - 'all': must meet criteria for each of the target cohorts.
+
+  - 'any': must meet criteria for only one of the target cohorts.
+
+  - Single value: e.g., `4`, exactly 4 cohorts must meet the criteria.
+    If there were 4 target cohorts, this would be the same as 'all'.
+
+  - Range: e.g., `c(2, Inf)`, must meet criteria at last 2 of the target
+    cohorts. Note, `c(1, Inf)` is equivalent to 'any'.

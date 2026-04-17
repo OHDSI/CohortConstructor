@@ -58,10 +58,9 @@ requireCohortIntersect(
 
 - cohortCombinationCriteria:
 
-  Can be 'all', 'any, or a numeric vector (length 1 or 2) that specifies
-  how many of the target cohorts must meet the intersection requirement.
-
-  Examples:
+  Can be 'all', 'any', or a numeric vector (length 1 or 2) that
+  specifies how many of the target cohorts must meet the intersection
+  requirement. Examples:
 
   - 'all': must meet criteria for each of the target cohorts.
 
@@ -113,7 +112,7 @@ Cohort table with only those entries satisfying the criteria
 # \donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
-#> Warning: '/tmp/RtmpvzDoGu/id_boq' already exists
+#> Warning: '/tmp/RtmpXh9DRm/id_boq' already exists
 #> ℹ Reading GiBleed tables.
 cdm$cohort1 |>
   requireCohortIntersect(targetCohortTable = "cohort2",

@@ -119,10 +119,10 @@ rest will remain unchanged.</p></dd>
 
 
 <dt id="arg-cohortcombinationcriteria">cohortCombinationCriteria<a class="anchor" aria-label="anchor" href="#arg-cohortcombinationcriteria"></a></dt>
-<dd><p>Can be 'all', 'any, or a numeric vector
+<dd><p>Can be 'all', 'any', or a numeric vector
 (length 1 or 2) that specifies how many of the target cohorts must meet the
-intersection requirement.</p>
-<p>Examples:</p><ul><li><p>'all': must meet criteria for each of the target cohorts.</p></li>
+intersection requirement.
+Examples:</p><ul><li><p>'all': must meet criteria for each of the target cohorts.</p></li>
 <li><p>'any': must meet criteria for only one of the target cohorts.</p></li>
 <li><p>Single value: e.g., <code>4</code>, exactly 4 cohorts must meet the criteria. If
 there were 4 target cohorts, this would be the same as 'all'.</p></li>
@@ -171,7 +171,7 @@ TRUE, it will only be required for the first entry of each subject.</p></dd>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ohdsi.github.io/CohortConstructor/">CohortConstructor</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="mockCohortConstructor.html">mockCohortConstructor</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>'/tmp/RtmpvzDoGu/id_boq' already exists</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>'/tmp/RtmpXh9DRm/id_boq' already exists</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Reading <span style="color: #0000BB;">GiBleed</span> tables.</span>
 <span class="r-in"><span><span class="va">cdm</span><span class="op">$</span><span class="va">cohort1</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu">requireCohortIntersect</span><span class="op">(</span>targetCohortTable <span class="op">=</span> <span class="st">"cohort2"</span>,</span></span>
