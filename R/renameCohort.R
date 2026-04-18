@@ -26,7 +26,7 @@ renameCohort <- function(cohort,
   # check input
   cohort <- omopgenerics::validateCohortArgument(cohort = cohort)
   cohortId <- omopgenerics::validateCohortIdArgument(
-    cohortId = cohortId, cohort = cohort
+    cohortId = {{cohortId}}, cohort = cohort
   )
   omopgenerics::assertCharacter(
     newCohortName, unique = TRUE, minNumCharacter = 1
