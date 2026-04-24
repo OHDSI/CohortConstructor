@@ -84,7 +84,7 @@ duplicateCohort  <- function(cohort, name, cohortId = NULL) {
   if (isFALSE(needsIdFilter(cohort = cohort, cohortId = cohortId))){
 
     if(name == omopgenerics::tableName(cohort)){
-      cli::cli_inform("Returning input cohort as n = 1, 'name' input is same as current table name, and no cohort ID filtering required")
+    # same as input so return as is
     return(cohort)
     } else {
       newCohort <- cohort |>

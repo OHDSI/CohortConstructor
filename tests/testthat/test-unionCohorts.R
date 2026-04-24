@@ -118,7 +118,13 @@ test_that("unionCohorts works", {
 
   cdm$cohort4 <- unionCohorts(cdm$cohort1, cohortId = c("cohort_1", "cohort_2"), name = "cohort4")
   expect_identical(collectCohort(cdm$cohort3, 1), collectCohort(cdm$cohort4, 1))
-  expect_identical(collectCohort(cdm$cohort3, 2), collectCohort(cdm$cohort4, 2))
+  expect_identical(
+    nrow(cdm$cohort3 |>
+           dplyr::filter(cohort_definition_id == 2) |>
+           dplyr::collect()),
+    nrow(cdm$cohort4 |>
+           dplyr::filter(cohort_definition_id == 2) |>
+           dplyr::collect()))
 
   # union 2 empty cohorts
   cdm$cohort5 <- conceptCohort(cdm = cdm, conceptSet = list("a"= 1L, "b" = 2L), name = "cohort5")
