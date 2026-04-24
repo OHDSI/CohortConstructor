@@ -7,6 +7,18 @@ test_that("simple example", {
                       numberCohorts = 2, seed = 1) |>
     copyCdm()
 
+  # duplicate existing cohort to same table
+  start_settings <- omopgenerics::settings(cdm$original_cohort)
+  start_attrition <- omopgenerics::attrition(cdm$original_cohort)
+  expect_warning(cdm$original_cohort <- copyCohorts(cdm$original_cohort,
+                                 n = 1,
+                                 name = "original_cohort"))
+  expect_identical(omopgenerics::settings(cdm$original_cohort),
+                   start_settings)
+  expect_identical(omopgenerics::attrition(cdm$original_cohort),
+                   start_attrition)
+
+
   start_settings <- omopgenerics::settings(cdm$original_cohort)
   start_attrition <- omopgenerics::attrition(cdm$original_cohort)
 
@@ -138,18 +150,25 @@ test_that("multiple copies", {
   expect_equal(collectCohort(cdm$copy_cohort, 1), collectCohort(cdm$copy_cohort, 3))
   expect_equal(collectCohort(cdm$copy_cohort, 1), collectCohort(cdm$copy_cohort, 4))
 
+
+
+
   cdm$copy_cohort2 <- copyCohorts(
     cdm$original_cohort, n = 3, cohortId = c(1, 3), name = "copy_cohort2"
   )
-  expect_equal(collectCohort(cdm$copy_cohort2, 1), collectCohort(cdm$copy_cohort2, 4))
-  expect_equal(collectCohort(cdm$copy_cohort2, 1), collectCohort(cdm$copy_cohort2, 6))
-  expect_equal(collectCohort(cdm$copy_cohort2, 3), collectCohort(cdm$copy_cohort2, 5))
-  expect_equal(collectCohort(cdm$copy_cohort2, 3), collectCohort(cdm$copy_cohort2, 7))
+  expect_equal(collectCohort(cdm$copy_cohort2, "cohort_1"),
+               collectCohort(cdm$copy_cohort2, "cohort_1_1"))
+  expect_equal(collectCohort(cdm$copy_cohort2, "cohort_1"),
+               collectCohort(cdm$copy_cohort2, "cohort_1_2"))
+  expect_equal(collectCohort(cdm$copy_cohort2, "cohort_3"),
+               collectCohort(cdm$copy_cohort2, "cohort_3_1"))
+  expect_equal(collectCohort(cdm$copy_cohort2, "cohort_3"),
+               collectCohort(cdm$copy_cohort2, "cohort_3_2"))
   expect_equal(
     settings(cdm$copy_cohort2),
     dplyr::tibble(
-      cohort_definition_id = c(1, 3, 4:7),
-      cohort_name = c("cohort_1", "cohort_3", "cohort_1_1", "cohort_3_1", "cohort_1_2", "cohort_3_2"),
+      cohort_definition_id = c(1:6),
+      cohort_name = c("cohort_1", "cohort_3","cohort_1_1", "cohort_3_1","cohort_1_2", "cohort_3_2"),
       original_cohort_id = c(NA, NA, 1, 3, 1, 3),
       original_cohort_name = c(NA, NA, "cohort_1", "cohort_3", "cohort_1", "cohort_3")
     )
@@ -157,4 +176,42 @@ test_that("multiple copies", {
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
 
   dropCreatedTables(cdm = cdm)
+})
+
+test_that("multiple copies - no duplicates", {
+  skip_on_cran()
+  cdm <- mockCohortConstructor()
+
+  cdm$cohort2 <- cdm$cohort2 |>
+    dplyr::filter(subject_id == 60,
+                cohort_definition_id == 2)
+
+  start_count <- cdm$cohort2 |>
+    dplyr::group_by(subject_id) |>
+    dplyr::tally() |>
+    dplyr::pull(n)
+
+  cdm$cohort2 <- cdm$cohort2 |>
+  copyCohorts(n = 2, name = "cohort2") |>
+  renameCohort("cohort_1a", 1) |>
+  renameCohort("cohort_2a", 2)
+end_count1 <- cdm$cohort2 |>
+    dplyr::group_by(cohort_definition_id, subject_id)  |>
+    dplyr::tally() |>
+  dplyr::pull(n)
+  expect_true(all(end_count1 == start_count))
+  expect_no_error(omopgenerics::newCohortTable(cdm$cohort2))
+
+
+cdm$cohort2 <- cdm$cohort2 |>
+  copyCohorts(n = 2, name = "cohort2")
+
+end_count2 <- cdm$cohort2 |>
+  dplyr::group_by(cohort_definition_id, subject_id)  |>
+  dplyr::tally() |>
+  dplyr::pull(n)
+expect_true(all(end_count2 == start_count))
+expect_no_error(omopgenerics::newCohortTable(cdm$cohort2))
+
+
 })

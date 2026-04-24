@@ -1,5 +1,6 @@
 dbToTest <- Sys.getenv("DB_TO_TEST", "duckdb CDMConnector")
 collectCohort <- function(cohort, id) {
+  id <- omopgenerics::validateCohortIdArgument(cohortId = id, cohort = cohort)
   x <- cohort |>
     dplyr::filter(.data$cohort_definition_id == .env$id) |>
     dplyr::select("subject_id", "cohort_start_date", "cohort_end_date") |>
