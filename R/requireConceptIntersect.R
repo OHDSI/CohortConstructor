@@ -104,6 +104,8 @@ requireConceptIntersect <- function(cohort,
   newCohort <- cdm[[tmpNewCohort]]
 
   intersectCol <- uniqueColumnName(newCohort)
+  intersectCols <- names(conceptSet)
+  intersectCols <- paste0("intersect_", intersectCols)
   newCohort <- newCohort |>
     PatientProfiles::addConceptIntersectCount(
       conceptSet = conceptSet,
@@ -115,10 +117,8 @@ requireConceptIntersect <- function(cohort,
       inObservation = inObservation,
       nameStyle = "intersect_{concept_name}",
       name = tmpNewCohort
-    )
-
-  intersectCols <- names(conceptSet)
-  intersectCols <- paste0("intersect_", intersectCols)
+    ) |>
+    dplyr::mutate(dplyr::across(dplyr::all_of(intersectCols),  \(x) dplyr::coalesce(x, 0)))
 
   newCohort <- applyCohortRequirement(
     cdm, newCohort, tmpNewCohort, atFirst, lower_limit, upper_limit,

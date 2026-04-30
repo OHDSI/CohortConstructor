@@ -118,6 +118,10 @@ requireCohortIntersect <- function(cohort,
   newCohort <- cdm[[tmpNewCohort]]
 
   # requirement
+  intersectCols <- settings(cdm[[targetCohortTable]]) |>
+    dplyr::filter(.data$cohort_definition_id %in% .env$targetCohortId) |>
+    dplyr::pull("cohort_name")
+  intersectCols <- paste0("intersect_", intersectCols)
   newCohort <- newCohort |>
     PatientProfiles::addCohortIntersectCount(
       targetCohortTable = targetCohortTable,
@@ -129,12 +133,8 @@ requireCohortIntersect <- function(cohort,
       censorDate = censorDate,
       nameStyle = "intersect_{cohort_name}",
       name = tmpNewCohort
-    )
-
-  intersectCols <- settings(cdm[[targetCohortTable]]) |>
-    dplyr::filter(.data$cohort_definition_id %in% .env$targetCohortId) |>
-    dplyr::pull("cohort_name")
-  intersectCols <- paste0("intersect_", intersectCols)
+    ) |>
+    dplyr::mutate(dplyr::across(dplyr::all_of(intersectCols),  \(x) dplyr::coalesce(x, 0)))
 
   newCohort <- applyCohortRequirement(
     cdm, newCohort, tmpNewCohort, atFirst, lower_limit, upper_limit,
