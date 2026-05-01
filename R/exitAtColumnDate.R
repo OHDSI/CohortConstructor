@@ -90,7 +90,7 @@ exitAtLastDate <- function(cohort,
   exitAtColumnDate(
     cohort = cohort,
     dateColumns = dateColumns,
-    cohortId = cohortId,
+    cohortId = {{cohortId}},
     returnReason = returnReason,
     missingName = missing(name),
     name = name,
@@ -116,7 +116,7 @@ exitAtColumnDate <- function(cohort,
   name <- validateNameArgumentInternal(missingName, name, tableName(cohort), call = call)
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort), call = call)
   cohort <- omopgenerics::validateCohortArgument(cohort, call = call)
-  cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning", call = call)
+  cohortId <- omopgenerics::validateCohortIdArgument(cohortId = {{cohortId}}, cohort, validation = "warning", call = call)
   validateCohortColumn(dateColumns, cohort, "date")
   omopgenerics::assertLogical(returnReason, length = 1, call = call)
   ids <- omopgenerics::settings(cohort)$cohort_definition_id

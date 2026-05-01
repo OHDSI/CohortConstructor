@@ -92,7 +92,7 @@ test_that("requiring presence in another table", {
 
   # cohort Id
   cdm$cohort5 <-  requireTableIntersect(cohort = cdm$cohort1,
-                                        cohortId = 1,
+                                        cohortId = dplyr::ends_with("1"),
                                         tableName = "table",
                                         targetStartDate = "date_start",
                                         targetEndDate = "date_end",

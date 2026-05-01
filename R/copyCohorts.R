@@ -23,7 +23,7 @@ copyCohorts <- function(cohort, name, n = 1, cohortId = NULL) {
   omopgenerics::validateNameArgument(name, cdm = cdm, validation = "warning")
   omopgenerics::assertNumeric(x = n, integerish = TRUE, min = 1, length = 1)
   if (is.infinite(n)) cli::cli_abort("`n` cannot be infinite.")
-  cohortId <- omopgenerics::validateCohortIdArgument(cohortId, cohort = cohort)
+  cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort = cohort)
 
   # subset cohort
   if (isFALSE(needsIdFilter(cohort = cohort, cohortId = cohortId))){

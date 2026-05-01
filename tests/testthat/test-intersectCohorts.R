@@ -451,7 +451,7 @@ test_that("attrition and cohortId", {
 
 
   cdm$cohort1 <- intersectCohorts(
-    cohort = cdm$cohort1, cohortId = c("cohort_1", "cohort_2"),
+    cohort = cdm$cohort1, cohortId = dplyr::ends_with(c("_1", "_2")),
     name = "cohort1", returnNonOverlappingCohorts = TRUE,
     keepOriginalCohorts = FALSE
   )

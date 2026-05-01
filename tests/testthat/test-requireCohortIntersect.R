@@ -57,7 +57,7 @@ test_that("requiring presence in another cohort", {
   start_cols <- colnames(cdm$cohort1)
   cdm$cohort3 <-  requireCohortIntersect(cohort = cdm$cohort1,
                                          targetCohortTable = "cohort2",
-                                         targetCohortId = 1,
+                                         targetCohortId = dplyr::ends_with("_1"),
                                          window = c(-Inf, Inf),
                                          name = "cohort3")
   expect_identical(colnames(cdm$cohort3), colnames(cdm$cohort1))
@@ -107,7 +107,7 @@ test_that("requiring presence in another cohort", {
   expect_warning(
     cdm$cohort1 <-  requireCohortIntersect(cohort = cdm$cohort1,
                                            targetCohortTable = "cohort2",
-                                           targetCohortId = 2,
+                                           targetCohortId = dplyr::ends_with("2"),
                                            window = c(-Inf, Inf))
   )
   expect_true(all(omopgenerics::attrition(cdm$cohort1)$reason ==

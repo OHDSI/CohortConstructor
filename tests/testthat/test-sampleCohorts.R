@@ -46,7 +46,7 @@ test_that("sampleCohort subsetting multiple cohorts", {
                     dplyr::pull("number_subjects") == c(4,4,4)))
 
   # Subset it again but only cohorts 1 and 3
-  cdm$cohort1b <- sampleCohorts(cdm$cohort1, cohortId = c(1,3), n = 4, name = "cohort1b")
+  cdm$cohort1b <- sampleCohorts(cdm$cohort1, cohortId = dplyr::ends_with(c("1", "3")), n = 4, name = "cohort1b")
   expect_true(all(attrition(cdm$cohort1b) |>
                     dplyr::filter(reason == "Sample 4 individuals") |>
                     dplyr::arrange(cohort_definition_id) |>
