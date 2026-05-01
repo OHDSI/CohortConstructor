@@ -5,6 +5,7 @@ contained in the cohort table can be applied. For this we’ll use the
 Eunomia synthetic data.
 
 ``` r
+
 library(omock)
 library(CodelistGenerator)
 library(CohortConstructor)
@@ -14,6 +15,7 @@ library(dplyr)
 ```
 
 ``` r
+
 cdm <- mockCdmFromDataset(datasetName = "GiBleed", source = "duckdb")
 ```
 
@@ -23,6 +25,7 @@ acetaminophen with cohort exit based on their drug record end date. Note
 when creating the cohort, any overlapping records will be concatenated.
 
 ``` r
+
 acetaminophen_codes <- getDrugIngredientCodes(cdm, 
                                               name = "acetaminophen", 
                                               nameStyle = "{concept_name}")
@@ -40,6 +43,7 @@ function to summarise attrition and then plot the results using
 [`plotCohortAttrition()`](https://darwin-eu.github.io/CohortCharacteristics/reference/plotCohortAttrition.html).
 
 ``` r
+
 summary_attrition <- summariseCohortAttrition(cdm$acetaminophen)
 plotCohortAttrition(summary_attrition)
 ```
@@ -53,6 +57,7 @@ earliest cohort entry by using
 from CohortConstructor.
 
 ``` r
+
 cdm$acetaminophen <- cdm$acetaminophen |> 
   requireIsFirstEntry()
 
@@ -72,6 +77,7 @@ Here for example we create an acetaminophen cohort and keep only those
 records that last for at least 30 days.
 
 ``` r
+
 cdm$acetaminophen <- conceptCohort(cdm = cdm, 
                                    conceptSet = acetaminophen_codes, 
                                    exit = "event_end_date",
@@ -91,6 +97,7 @@ function. For example, o keep only the first two entries for each
 person, we can set `entryRange = c(1, 2)`.
 
 ``` r
+
 cdm$acetaminophen <- conceptCohort(cdm = cdm, 
                                    conceptSet = acetaminophen_codes, 
                                    exit = "event_end_date",
@@ -109,12 +116,14 @@ can filter out records that fall outside a specified date range using
 the `requireInDateRange` function.
 
 ``` r
+
 cdm$acetaminophen <- conceptCohort(cdm = cdm, 
                                  conceptSet = acetaminophen_codes, 
                                  name = "acetaminophen")
 ```
 
 ``` r
+
 cdm$acetaminophen <- cdm$acetaminophen |> 
   requireInDateRange(dateRange = as.Date(c("2010-01-01", "2015-01-01")))
 
@@ -127,6 +136,7 @@ plotCohortAttrition(summary_attrition)
 Let’s create an acetaminophen cohort again.
 
 ``` r
+
 cdm$acetaminophen <- conceptCohort(cdm = cdm, 
                                  conceptSet = acetaminophen_codes, 
                                  name = "acetaminophen")
@@ -140,6 +150,7 @@ then bind our original and new cohorts so that we can see the impact of
 this requirement.
 
 ``` r
+
 cdm$acetaminophen_one_night <- cdm$acetaminophen |> 
   requireDuration(c(2, Inf), 
                   name = "acetaminophen_one_night") |> 
@@ -154,11 +165,13 @@ Now when summarising days in cohort we can see the difference this
 makes.
 
 ``` r
+
 summary_attrition <- summariseCohortAttrition(cdm$both_cohorts)
 plotCohortAttrition(summary_attrition)
 ```
 
 ``` r
+
 summary_characteristics <- summariseCharacteristics(cdm$both_cohorts)
 tableCharacteristics(summary_characteristics |>
                        filter(variable_name %in% c("Number subjects", "Days in cohort")))
@@ -173,6 +186,7 @@ important to note that the order that requirements are applied will
 often matter.
 
 ``` r
+
 cdm$acetaminophen_1 <- conceptCohort(cdm = cdm, 
                                  conceptSet = acetaminophen_codes, 
                                  name = "acetaminophen_1") |> 
@@ -188,6 +202,7 @@ cdm$acetaminophen_2 <- conceptCohort(cdm = cdm,
 ```
 
 ``` r
+
 cdm <- bind(cdm$acetaminophen_1,
             cdm$acetaminophen_2, 
             name = "both_cohorts")
@@ -202,6 +217,7 @@ record of acetaminophen in the study period, but this will not
 necessarily be their first record ever.
 
 ``` r
+
 plotCohortAttrition(summary_attrition)
 ```
 
@@ -216,6 +232,7 @@ As an example let’s create a cohort for every drug ingredient we see in
 Eunomia. We can first get the drug ingredient codes.
 
 ``` r
+
 medication_codes <- getDrugIngredientCodes(cdm = cdm, nameStyle = "{concept_name}")
 medication_codes
 #> 
@@ -232,6 +249,7 @@ We can see that when we make all these cohorts many have only a small
 number of individuals.
 
 ``` r
+
 cdm$medications <- conceptCohort(cdm = cdm, 
                                  conceptSet = medication_codes,
                                  name = "medications")
@@ -253,6 +271,7 @@ If we apply a minimum cohort count of 500, we end up with far fewer
 cohorts that all have a sufficient number of study participants.
 
 ``` r
+
 cdm$medications <- cdm$medications |> 
   requireMinCohortCount(minCohortCount = 500)
 

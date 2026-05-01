@@ -13,6 +13,7 @@ We will first use `mockDrugUtilisation()` function from DrugUtilisation
 package to create mock data.
 
 ``` r
+
 library(CohortConstructor)
 library(dplyr)
 
@@ -26,6 +27,7 @@ let us first use
 from omopgenerics package to explore this cohort:
 
 ``` r
+
 settings(cdm$cohort1)
 ```
 
@@ -39,6 +41,7 @@ We will also use the argument `targetCohortId` to specify that we only
 want a matched cohort for `cohort_definition_id = 1`.
 
 ``` r
+
 cdm$matched_cohort1 <- matchCohorts(
   cohort = cdm$cohort1,
   cohortId = 1,
@@ -63,6 +66,7 @@ using
 from omopgenerics package:
 
 ``` r
+
 # Original cohort
 attrition(cdm$matched_cohort1) |> filter(cohort_definition_id == 1)
 
@@ -103,6 +107,7 @@ The default matching ratio is 1:1 (`ratio = 1`). Use
 to check if the matching has been done as desired.
 
 ``` r
+
 cohortCount(cdm$matched_cohort1)
 ```
 
@@ -110,6 +115,7 @@ You can modify the `ratio` parameter to tailor your matched cohort.
 `ratio` can adopt values from 1 to Inf.
 
 ``` r
+
 cdm$matched_cohort2 <- matchCohorts(
   cohort = cdm$cohort1,
   cohortId = 1,
@@ -127,6 +133,7 @@ cohorts of interest. If set to NULL, all the cohorts present in
 `targetCohortName` will be matched.
 
 ``` r
+
 cdm$matched_cohort3 <- matchCohorts(
   cohort = cdm$cohort1,
   cohortId = c(1,3),

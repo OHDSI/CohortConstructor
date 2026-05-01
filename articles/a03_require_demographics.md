@@ -1,6 +1,7 @@
 # Applying demographic requirements to a cohort
 
 ``` r
+
 library(CodelistGenerator)
 library(CohortConstructor)
 library(CohortCharacteristics)
@@ -14,6 +15,7 @@ demographics can be applied to a cohort. Again we’ll use the Eunomia
 synthetic data.
 
 ``` r
+
 cdm <- mockCdmFromDataset(datasetName = "GiBleed", source = "duckdb")
 ```
 
@@ -22,6 +24,7 @@ look for codes that might represent a fracture and the build a cohort
 using these codes, setting cohort exit to 180 days after the fracture.
 
 ``` r
+
 fracture_codes <- getCandidateCodes(cdm, "fracture")
 fracture_codes <- list("fracture" = fracture_codes$concept_id)
 cdm$fracture <- conceptCohort(cdm = cdm, 
@@ -39,6 +42,7 @@ We can choose a specific age range for individuals in our cohort using
 from CohortConstructor.
 
 ``` r
+
 cdm$fracture <- cdm$fracture |> 
   requireAge(indexDate = "cohort_start_date",
              ageRange = list(c(18, 100)))
@@ -57,6 +61,7 @@ We can also specify a sex criteria for individuals in our cohort using
 from CohortConstructor.
 
 ``` r
+
 cdm$fracture <- cdm$fracture |> 
   requireSex(sex = "Female")
 
@@ -72,6 +77,7 @@ each individual using
 from CohortConstructor.
 
 ``` r
+
 cdm$fracture <- cdm$fracture |> 
   requirePriorObservation(indexDate = "cohort_start_date",
                           minPriorObservation = 365)
@@ -93,6 +99,7 @@ using the more general
 function.
 
 ``` r
+
 cdm$fracture <- conceptCohort(cdm = cdm, 
                                  conceptSet = fracture_codes, 
                                  name = "fracture") |> 

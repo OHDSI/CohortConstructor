@@ -1,6 +1,7 @@
 # Concatenating cohort records
 
 ``` r
+
 library(omock)
 library(dplyr)
 library(CohortConstructor)
@@ -12,12 +13,14 @@ For this example we’ll use the Eunomia synthetic data from the
 [omock](https://ohdsi.github.io/omock/) package.
 
 ``` r
+
 cdm <- mockCdmFromDataset(datasetName = "GiBleed", source = "duckdb")
 ```
 
 Let’s start by creating a cohort of users of acetaminophen
 
 ``` r
+
 cdm$medications <- conceptCohort(cdm = cdm, 
                                  conceptSet = list("acetaminophen" = 1127433), 
                                  name = "medications")
@@ -38,6 +41,7 @@ Let’s first define a new cohort where records within 1095 days (~ 3
 years) of each other will be merged.
 
 ``` r
+
 cdm$medications_collapsed <- cdm$medications |> 
   collapseCohorts(
   gap = 1095,
@@ -49,25 +53,26 @@ Let’s compare how this function would change the records of a single
 individual.
 
 ``` r
+
 cdm$medications |>
   filter(subject_id == 1)
 #> # Source:   SQL [?? x 4]
-#> # Database: DuckDB 1.5.2 [unknown@Linux 6.17.0-1010-azure:R 4.5.3//tmp/RtmpzE65b3/file25a4634af728.duckdb]
+#> # Database: DuckDB 1.5.2 [unknown@Linux 6.17.0-1010-azure:R 4.6.0//tmp/Rtmph4iiaH/file2509326026e9.duckdb]
 #>   cohort_definition_id subject_id cohort_start_date cohort_end_date
 #>                  <int>      <int> <date>            <date>         
-#> 1                    1          1 1971-01-04        1971-01-18     
-#> 2                    1          1 1982-09-11        1982-10-02     
+#> 1                    1          1 1982-09-11        1982-10-02     
+#> 2                    1          1 1971-01-04        1971-01-18     
 #> 3                    1          1 1980-03-15        1980-03-29     
 #> 4                    1          1 1976-10-20        1976-11-03
 cdm$medications_collapsed |>
   filter(subject_id == 1)
 #> # Source:   SQL [?? x 4]
-#> # Database: DuckDB 1.5.2 [unknown@Linux 6.17.0-1010-azure:R 4.5.3//tmp/RtmpzE65b3/file25a4634af728.duckdb]
+#> # Database: DuckDB 1.5.2 [unknown@Linux 6.17.0-1010-azure:R 4.6.0//tmp/Rtmph4iiaH/file2509326026e9.duckdb]
 #>   cohort_definition_id subject_id cohort_start_date cohort_end_date
 #>                  <int>      <int> <date>            <date>         
-#> 1                    1          1 1980-03-15        1982-10-02     
+#> 1                    1          1 1971-01-04        1971-01-18     
 #> 2                    1          1 1976-10-20        1976-11-03     
-#> 3                    1          1 1971-01-04        1971-01-18
+#> 3                    1          1 1980-03-15        1982-10-02
 ```
 
 Subject 1 initially had 4 records between 1971 and 1982. After
@@ -79,6 +84,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.
 Now let’s look at how the cohorts have been changed.
 
 ``` r
+
 summary_attrition <- summariseCohortAttrition(cdm$medications_collapsed)
 tableCohortAttrition(summary_attrition)
 ```

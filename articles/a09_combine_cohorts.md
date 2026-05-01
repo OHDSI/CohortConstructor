@@ -1,6 +1,7 @@
 # Combining Cohorts
 
 ``` r
+
 library(omock)
 library(CohortConstructor)
 library(CohortCharacteristics)
@@ -11,6 +12,7 @@ For this example we’ll use the Eunomia synthetic data from the
 [omock](https://ohdsi.github.io/omock/) package.
 
 ``` r
+
 cdm <- mockCdmFromDataset(datasetName = "GiBleed", source = "duckdb")
 ```
 
@@ -18,6 +20,7 @@ Let’s start by creating two drug cohorts, one for users of diclofenac
 and another for users of acetaminophen.
 
 ``` r
+
 cdm$medications <- conceptCohort(cdm = cdm, 
                                  conceptSet = list("diclofenac" = 1124300,
                                                    "acetaminophen" = 1127433), 
@@ -35,6 +38,7 @@ using the function
 [`intersectCohorts()`](https://ohdsi.github.io/CohortConstructor/reference/intersectCohorts.md).
 
 ``` r
+
 cdm$medintersect <- intersectCohorts(
   cohort = cdm$medications,
   name = "medintersect"
@@ -54,6 +58,7 @@ We can choose the number of days between cohort entries using the `gap`
 argument.
 
 ``` r
+
 cdm$medintersect <- intersectCohorts(
   cohort = cdm$medications,
   gap = 365,
@@ -74,6 +79,7 @@ We can also combine different cohorts using the function
 [`unionCohorts()`](https://ohdsi.github.io/CohortConstructor/reference/unionCohorts.md).
 
 ``` r
+
 cdm$medunion <- unionCohorts(
   cohort = cdm$medications,
   name = "medunion"
@@ -93,6 +99,7 @@ You can keep the original cohorts in the new table if you use the
 argument `keepOriginalCohorts = TRUE`.
 
 ``` r
+
 cdm$medunion <- unionCohorts(
   cohort = cdm$medications,
   name = "medunion",
@@ -112,6 +119,7 @@ You can also choose the number of days between two subsequent cohort
 entries to be merged using the `gap` argument.
 
 ``` r
+
 cdm$medunion <- unionCohorts(
   cohort = cdm$medications,
   name = "medunion",

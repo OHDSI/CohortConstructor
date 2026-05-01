@@ -33,6 +33,7 @@ options. We replicated these cohorts using CohortConstructor to assess
 computational time and agreement between CIRCE and CohortConstructor.
 
 ``` r
+
 cdm <- mockCdmFromDataset(datasetName = "GiBleed", source = "duckdb")
 ```
 
@@ -42,14 +43,15 @@ tasks. For this example we will just run task of creating all the
 cohorts at once using CohortConstructor.
 
 ``` r
+
 benchmark_results <- benchmarkCohortConstructor(
   cdm,
   runCIRCE = FALSE,
   runCohortConstructorDefinition = FALSE,
   runCohortConstructorDomain = TRUE
 )
-#> cc_set_no_strata: 111.29 sec elapsed
-#> cc_set_strata: 1.674 sec elapsed
+#> cc_set_no_strata: 119.277 sec elapsed
+#> cc_set_strata: 1.855 sec elapsed
 benchmark_results |> 
   glimpse()
 #> Rows: 257

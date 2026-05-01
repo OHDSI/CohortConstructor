@@ -1,6 +1,7 @@
 # Filtering cohorts
 
 ``` r
+
 library(omock)
 library(dplyr)
 library(CohortConstructor)
@@ -12,6 +13,7 @@ For this example we’ll use the Eunomia synthetic data from the
 [omock](https://ohdsi.github.io/omock/) package.
 
 ``` r
+
 cdm <- mockCdmFromDataset(datasetName = "GiBleed", source = "duckdb")
 ```
 
@@ -19,6 +21,7 @@ Let’s start by creating two drug cohorts, one for users of diclofenac
 and another for users of acetaminophen.
 
 ``` r
+
 cdm$medications <- conceptCohort(cdm = cdm, 
                                  conceptSet = list("diclofenac" = 1124300,
                                                    "acetaminophen" = 1127433), 
@@ -36,28 +39,29 @@ We can take a sample from a cohort table using the function
 each cohort.
 
 ``` r
+
 cdm$medications |> sampleCohorts(cohortId = NULL, n = 100)
 #> # Source:   table<results.test_medications> [?? x 4]
-#> # Database: DuckDB 1.5.2 [unknown@Linux 6.17.0-1010-azure:R 4.5.3//tmp/RtmpqttNrG/file25df2171ee72.duckdb]
+#> # Database: DuckDB 1.5.2 [unknown@Linux 6.17.0-1010-azure:R 4.6.0//tmp/Rtmp8BPlMR/file25453c5d7f4f.duckdb]
 #>    cohort_definition_id subject_id cohort_start_date cohort_end_date
 #>                   <int>      <int> <date>            <date>         
-#>  1                    1       3494 1981-04-01        1981-04-15     
-#>  2                    1       3494 2003-07-03        2003-07-17     
-#>  3                    1       3909 1997-12-03        1997-12-10     
-#>  4                    1        380 1986-08-25        1986-10-24     
-#>  5                    1        940 1947-05-05        1947-05-19     
-#>  6                    1        940 1987-05-02        1987-05-23     
-#>  7                    2       4570 1972-08-02        1972-08-02     
-#>  8                    1        183 1983-01-26        1983-02-09     
-#>  9                    1       1088 1988-01-29        1988-02-19     
-#> 10                    1       3272 1987-04-11        1987-05-09     
+#>  1                    1       4452 1970-05-29        1970-06-19     
+#>  2                    1       4452 1977-01-28        1977-02-04     
+#>  3                    2       2540 1975-01-02        1975-01-02     
+#>  4                    1       4732 1982-08-03        1982-08-17     
+#>  5                    1       2917 2016-08-31        2016-09-14     
+#>  6                    1       5067 2002-04-27        2002-05-11     
+#>  7                    1       1793 1947-02-16        1947-03-02     
+#>  8                    1       1793 1972-03-03        1972-03-17     
+#>  9                    1       1793 1977-01-13        1977-01-20     
+#> 10                    1       2133 2009-10-16        2009-10-23     
 #> # ℹ more rows
 
 cohortCount(cdm$medications)
 #> # A tibble: 2 × 3
 #>   cohort_definition_id number_records number_subjects
 #>                  <int>          <int>           <int>
-#> 1                    1            344             100
+#> 1                    1            337             100
 #> 2                    2            100             100
 ```
 
@@ -69,6 +73,7 @@ It is also possible to only sample one cohort within cohort table,
 however the remaining cohorts will still remain.
 
 ``` r
+
 cdm$medications <- cdm$medications |> sampleCohorts(cohortId = 2, n = 100)
 
 cohortCount(cdm$medications)
@@ -88,6 +93,7 @@ records from a specified cohort, you can use the function
 `subsetCohorts`.
 
 ``` r
+
 cdm$medications <- cdm$medications |> subsetCohorts(cohortId = 2)
 cohortCount(cdm$medications)
 #> # A tibble: 1 × 3
@@ -101,6 +107,7 @@ and records from cohort 2. If you want to take a sample of the filtered
 cohort table then you can use the `sampleCohorts` function.
 
 ``` r
+
 cdm$medications <- cdm$medications |> sampleCohorts(cohortId = 2, n = 100)
 
 cohortCount(cdm$medications)

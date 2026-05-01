@@ -11,6 +11,7 @@ so let’s get started.
 Load necessary packages:
 
 ``` r
+
 library(omock)
 library(PatientProfiles)
 library(CohortConstructor)
@@ -21,6 +22,7 @@ library(clock)
 Create `cdm_reference` object from *GiBleed* database:
 
 ``` r
+
 cdm <- mockCdmFromDataset(datasetName = "GiBleed", source = "duckdb")
 ```
 
@@ -28,6 +30,7 @@ Let’s start by creating two drug cohorts, one for users of diclofenac
 and another for users of acetaminophen.
 
 ``` r
+
 cdm$medications <- conceptCohort(cdm = cdm, 
                                  conceptSet = list("diclofenac" = 1124300L,
                                                    "acetaminophen" = 1127433L), 
@@ -52,6 +55,7 @@ If we want to create separate cohorts by sex we could use the function
 [`requireSex()`](https://ohdsi.github.io/CohortConstructor/reference/requireSex.md):
 
 ``` r
+
 cdm$medications_female <- cdm$medications |>
   requireSex(sex = "Female", name = "medications_female") |>
   renameCohort(
@@ -87,23 +91,24 @@ function will produce a similar output but it relies on a column being
 already created so let’s first add a column sex to my existent cohort:
 
 ``` r
+
 cdm$medications <- cdm$medications |>
   addSex()
 cdm$medications
-#> # Source:   table<og_011_1776414786> [?? x 5]
-#> # Database: DuckDB 1.5.2 [unknown@Linux 6.17.0-1010-azure:R 4.5.3//tmp/RtmpAPsfO0/file262643ada7be.duckdb]
+#> # Source:   table<og_011_1777624215> [?? x 5]
+#> # Database: DuckDB 1.5.2 [unknown@Linux 6.17.0-1010-azure:R 4.6.0//tmp/RtmpDlhIzP/file25897bf6de7a.duckdb]
 #>    cohort_definition_id subject_id cohort_start_date cohort_end_date sex   
 #>                   <int>      <int> <date>            <date>          <chr> 
-#>  1                    1         99 2015-09-20        2015-12-19      Female
-#>  2                    1        411 1970-08-03        1970-08-17      Male  
-#>  3                    1        411 1972-08-14        1972-08-21      Male  
-#>  4                    1        759 1957-10-07        1957-10-21      Male  
-#>  5                    1        890 1966-03-25        1966-04-01      Male  
-#>  6                    1        950 1985-06-05        1985-06-12      Female
-#>  7                    1       1281 1984-06-18        1984-08-17      Male  
-#>  8                    1       1281 1997-11-30        1997-12-07      Male  
-#>  9                    1       1376 2004-09-06        2004-09-13      Male  
-#> 10                    1       1443 1983-03-25        1983-04-08      Female
+#>  1                    1         57 1982-07-09        1982-07-23      Male  
+#>  2                    1        380 1986-08-25        1986-10-24      Male  
+#>  3                    1        776 2009-10-11        2009-10-25      Female
+#>  4                    1        841 2017-08-23        2017-09-20      Male  
+#>  5                    1        940 1947-05-05        1947-05-19      Male  
+#>  6                    1        940 1987-05-02        1987-05-23      Male  
+#>  7                    1       1125 1959-11-20        1959-11-27      Male  
+#>  8                    1       1131 1989-05-07        1989-06-04      Male  
+#>  9                    1       1325 1989-12-27        1990-01-10      Male  
+#> 10                    1       1357 1978-04-19        1978-04-26      Male  
 #> # ℹ more rows
 ```
 
@@ -113,6 +118,7 @@ to create a new cohort based on the `sex` column, one new cohort will be
 created for any value of the `sex` column:
 
 ``` r
+
 cdm$medications_sex_2 <- cdm$medications |>
   stratifyCohorts(strata = "sex", name = "medications_sex_2")
 cohortCount(cdm$medications_sex_2)
@@ -147,6 +153,7 @@ go, in this example we will create cohorts by “age and sex” and by
 “year”.
 
 ``` r
+
 cdm$stratified <- cdm$medications |>
   addAge(ageGroup = list("child" = c(0,17), "18_to_65" = c(18,64), "65_and_over" = c(65, Inf))) |>
   addSex() |>
@@ -215,6 +222,7 @@ contributions will be split into three contributions:
 So let’s use it in one example:
 
 ``` r
+
 cdm$medications_year <- cdm$medications |>
   yearCohorts(years = c(1990:1993), name = "medications_year")
 settings(cdm$medications_year)
@@ -251,18 +259,19 @@ look closer to one of the individuals (`person_id = 4383`) that has 6
 records:
 
 ``` r
+
 cdm$medications |> 
   filter(subject_id == 4383)
 #> # Source:   SQL [?? x 5]
-#> # Database: DuckDB 1.5.2 [unknown@Linux 6.17.0-1010-azure:R 4.5.3//tmp/RtmpAPsfO0/file262643ada7be.duckdb]
+#> # Database: DuckDB 1.5.2 [unknown@Linux 6.17.0-1010-azure:R 4.6.0//tmp/RtmpDlhIzP/file25897bf6de7a.duckdb]
 #>   cohort_definition_id subject_id cohort_start_date cohort_end_date sex  
 #>                  <int>      <int> <date>            <date>          <chr>
 #> 1                    1       4383 1971-02-06        1971-02-13      Male 
-#> 2                    1       4383 1992-07-18        1992-08-22      Male 
-#> 3                    1       4383 2004-05-21        2004-06-11      Male 
+#> 2                    1       4383 1990-10-13        1990-10-27      Male 
+#> 3                    1       4383 2000-03-12        2000-03-19      Male 
 #> 4                    1       4383 1990-12-20        1991-01-03      Male 
-#> 5                    1       4383 2000-03-12        2000-03-19      Male 
-#> 6                    1       4383 1990-10-13        1990-10-27      Male
+#> 5                    1       4383 2004-05-21        2004-06-11      Male 
+#> 6                    1       4383 1992-07-18        1992-08-22      Male
 ```
 
 From the 6 records only 3 are within our period of interest `1990-1993`,
@@ -274,14 +283,15 @@ to see 4 cohort contributions for this subject (2 in 1990, 1 in 1991 and
 1 in 1992):
 
 ``` r
+
 cdm$medications_year |>
   filter(subject_id == 4383)
 #> # Source:   SQL [?? x 5]
-#> # Database: DuckDB 1.5.2 [unknown@Linux 6.17.0-1010-azure:R 4.5.3//tmp/RtmpAPsfO0/file262643ada7be.duckdb]
+#> # Database: DuckDB 1.5.2 [unknown@Linux 6.17.0-1010-azure:R 4.6.0//tmp/RtmpDlhIzP/file25897bf6de7a.duckdb]
 #>   cohort_definition_id subject_id cohort_start_date cohort_end_date sex  
 #>                  <int>      <int> <date>            <date>          <chr>
-#> 1                    1       4383 1990-12-20        1990-12-31      Male 
-#> 2                    1       4383 1990-10-13        1990-10-27      Male 
+#> 1                    1       4383 1990-10-13        1990-10-27      Male 
+#> 2                    1       4383 1990-12-20        1990-12-31      Male 
 #> 3                    3       4383 1991-01-01        1991-01-03      Male 
 #> 4                    5       4383 1992-07-18        1992-08-22      Male
 ```

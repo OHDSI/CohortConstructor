@@ -5,6 +5,7 @@
 Let’s first create a cdm reference to the Eunomia synthetic data.
 
 ``` r
+
 library(omock)
 library(CodelistGenerator)
 library(PatientProfiles)
@@ -26,6 +27,7 @@ function from the package **CodelistGenerator** to obtain the codes for
 these drugs.
 
 ``` r
+
 drug_codes <- getDrugIngredientCodes(cdm, 
                                      name = c("acetaminophen",
                                               "amoxicillin", 
@@ -47,6 +49,7 @@ where cohort exit is defined as the event start date (which for these
 will be their drug exposure end date).
 
 ``` r
+
 cdm$drugs <- conceptCohort(cdm, 
                            conceptSet = drug_codes,
                            exit = "event_end_date",
@@ -115,6 +118,7 @@ corresponds to individuals who have been exposed to warfarin).
 
 ``` r
 
+
 bronchitis_codes <- list(bronchitis = c(260139, 256451, 4232302))
 
 cdm$bronchitis <- conceptCohort(cdm, 
@@ -149,6 +153,7 @@ cohort end date will be set to the latest end date of the overlapping
 records.
 
 ``` r
+
 cdm$drugs_merge <- conceptCohort(cdm, 
                            conceptSet = drug_codes,
                            overlap = "merge",
@@ -189,6 +194,7 @@ depicted in the image below.
 ![](images/overlap.png)
 
 ``` r
+
 cdm$drugs_extend <- conceptCohort(cdm, 
                            conceptSet = drug_codes,
                            overlap = "extend",
@@ -228,6 +234,7 @@ can set `useSourceFields = TRUE`.
 
 ``` r
 
+
 cdm$celecoxib <- conceptCohort(cdm, 
                            conceptSet = list(celecoxib = 44923712),
                            name = "celecoxib", 
@@ -237,11 +244,11 @@ cdm$celecoxib |>
   glimpse()
 #> Rows: ??
 #> Columns: 4
-#> Database: DuckDB 1.5.2 [unknown@Linux 6.17.0-1010-azure:R 4.5.3//tmp/Rtmp38U0O3/file244c30bcb66f.duckdb]
+#> Database: DuckDB 1.5.2 [unknown@Linux 6.17.0-1010-azure:R 4.6.0//tmp/RtmpgMRUgc/file23b66586a615.duckdb]
 #> $ cohort_definition_id <int> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1…
-#> $ subject_id           <int> 825, 1936, 2686, 2771, 3132, 3295, 4630, 4867, 83…
-#> $ cohort_start_date    <date> 2011-02-14, 1984-11-03, 1995-02-28, 1946-09-23, …
-#> $ cohort_end_date      <date> 2011-02-14, 1984-11-03, 1995-02-28, 1946-09-23, …
+#> $ subject_id           <int> 57, 187, 211, 1194, 2233, 2438, 2975, 4700, 437, …
+#> $ cohort_start_date    <date> 1997-04-01, 1984-11-29, 2009-02-13, 2001-05-27, …
+#> $ cohort_end_date      <date> 1997-04-01, 1984-11-29, 2009-02-13, 2001-05-27, …
 ```
 
 ## Demographic based cohort creation
@@ -251,6 +258,7 @@ for example we create a cohort where people enter on their 18th birthday
 and leave at on the day before their 66th birthday.
 
 ``` r
+
 cdm$working_age_cohort <- demographicsCohort(cdm = cdm, 
                                              ageRange = c(18, 65), 
                                              name = "working_age_cohort")
@@ -279,6 +287,7 @@ We can also add an additional requirement of only people of working age
 with sex “female”.
 
 ``` r
+
 cdm$female_working_age_cohort <- demographicsCohort(cdm = cdm, 
                                              ageRange = c(18, 65),
                                              sex = "Female",
@@ -310,6 +319,7 @@ We can also use this function to create cohorts for different
 combinations of age groups and sex.
 
 ``` r
+
 cdm$age_sex_cohorts <- demographicsCohort(cdm = cdm, 
                                              ageRange = list(c(0, 17), c(18, 65), c(66,120)),
                                              sex = c("Female", "Male"),
@@ -357,6 +367,7 @@ We can also specify the minimum number of days of prior observation
 required.
 
 ``` r
+
 cdm$working_age_cohort_0_365 <- demographicsCohort(cdm = cdm, 
                                              ageRange = c(18, 65), 
                                              name = "working_age_cohort_0_365",
@@ -404,6 +415,7 @@ overweight, obese etc) is. This means that if a record matches the value
 concept OR has a normal BMI score then it is included in the cohort.
 
 ``` r
+
 cdm$cohort <- measurementCohort(
   cdm = cdm,
   name = "cohort",
@@ -429,7 +441,7 @@ settings(cdm$cohort)
 #> #   measurement_value_as_concept <chr>
 cdm$cohort
 #> # Source:   table<cohort> [?? x 4]
-#> # Database: DuckDB 1.5.2 [unknown@Linux 6.17.0-1010-azure:R 4.5.3/:memory:]
+#> # Database: DuckDB 1.5.2 [unknown@Linux 6.17.0-1010-azure:R 4.6.0/:memory:]
 #> # ℹ 4 variables: cohort_definition_id <int>, subject_id <int>,
 #> #   cohort_start_date <date>, cohort_end_date <date>
 ```
@@ -445,6 +457,7 @@ It is also possible to include records outside of observation by setting
 the `useRecordsBeforeObservation` argument to TRUE.
 
 ``` r
+
 cdm$cohort <- measurementCohort(
   cdm = cdm,
   name = "cohort",
@@ -469,7 +482,7 @@ settings(cdm$cohort)
 #> #   measurement_value_as_concept <chr>
 cdm$cohort
 #> # Source:   table<cohort> [?? x 4]
-#> # Database: DuckDB 1.5.2 [unknown@Linux 6.17.0-1010-azure:R 4.5.3/:memory:]
+#> # Database: DuckDB 1.5.2 [unknown@Linux 6.17.0-1010-azure:R 4.6.0/:memory:]
 #> # ℹ 4 variables: cohort_definition_id <int>, subject_id <int>,
 #> #   cohort_start_date <date>, cohort_end_date <date>
 ```
@@ -481,6 +494,7 @@ For this we’ll simply be finding those people in the OMOP CDM death
 table and creating a cohort with them.
 
 ``` r
+
 cdm$death_cohort <- deathCohort(cdm = cdm,
                                 name = "death_cohort")
 ```
@@ -491,6 +505,7 @@ use `subsetCohort = "drugs"`. This ensures that only individuals from
 the “drugs” cohort are included in the death cohort.
 
 ``` r
+
 cdm$death_drugs <- deathCohort(cdm = cdm,
                                name = "death_drugs",
                                subsetCohort = "drugs")

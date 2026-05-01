@@ -5,26 +5,28 @@ manipulation of study cohorts in data mapped to the OMOP CDM.
 
 ## Tested sources
 
-| Source                      | Driver            | CDM reference                                                                                            | Status                                                                                                                                                                                                              |
-|-----------------------------|-------------------|----------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Local R dataframe           | N/A               | [`omopgenerics::cdmFromTables()`](https://darwin-eu.github.io/omopgenerics/reference/cdmFromTables.html) | [![](https://github.com/OHDSI/CohortConstructor/actions/workflows/test-local-omopgenerics.yaml/badge.svg?branch=main)](https://github.com/OHDSI/CohortConstructor/actions/workflows/test-local-omopgenerics.yaml)   |
-| In-memory duckdb datatabase | duckdb            | [`CDMConnector::cdmFromCon()`](https://darwin-eu.github.io/CDMConnector/reference/cdmFromCon.html)       | [![](https://github.com/OHDSI/CohortConstructor/actions/workflows/test-duckdb-CDMConnector.yaml/badge.svg?branch=main)](https://github.com/OHDSI/CohortConstructor/actions/workflows/test-duckdb-CDMConnector.yaml) |
-| Postgres database           | RPostgres         | [`CDMConnector::cdmFromCon()`](https://darwin-eu.github.io/CDMConnector/reference/cdmFromCon.html)       |                                                                                                                                                                                                                     |
-| Postgres database           | DatabaseConnector | [`CDMConnector::cdmFromCon()`](https://darwin-eu.github.io/CDMConnector/reference/cdmFromCon.html)       |                                                                                                                                                                                                                     |
-| SQL Server database         | odbc              | [`CDMConnector::cdmFromCon()`](https://darwin-eu.github.io/CDMConnector/reference/cdmFromCon.html)       |                                                                                                                                                                                                                     |
-| SQL Server database         | DatabaseConnector | [`CDMConnector::cdmFromCon()`](https://darwin-eu.github.io/CDMConnector/reference/cdmFromCon.html)       |                                                                                                                                                                                                                     |
+| Source | Driver | CDM reference | Status |
+|----|----|----|----|
+| Local R dataframe | N/A | [`omopgenerics::cdmFromTables()`](https://darwin-eu.github.io/omopgenerics/reference/cdmFromTables.html) | [![](https://github.com/OHDSI/CohortConstructor/actions/workflows/test-local-omopgenerics.yaml/badge.svg?branch=main)](https://github.com/OHDSI/CohortConstructor/actions/workflows/test-local-omopgenerics.yaml) |
+| In-memory duckdb datatabase | duckdb | [`CDMConnector::cdmFromCon()`](https://darwin-eu.github.io/CDMConnector/reference/cdmFromCon.html) | [![](https://github.com/OHDSI/CohortConstructor/actions/workflows/test-duckdb-CDMConnector.yaml/badge.svg?branch=main)](https://github.com/OHDSI/CohortConstructor/actions/workflows/test-duckdb-CDMConnector.yaml) |
+| Postgres database | RPostgres | [`CDMConnector::cdmFromCon()`](https://darwin-eu.github.io/CDMConnector/reference/cdmFromCon.html) |  |
+| Postgres database | DatabaseConnector | [`CDMConnector::cdmFromCon()`](https://darwin-eu.github.io/CDMConnector/reference/cdmFromCon.html) |  |
+| SQL Server database | odbc | [`CDMConnector::cdmFromCon()`](https://darwin-eu.github.io/CDMConnector/reference/cdmFromCon.html) |  |
+| SQL Server database | DatabaseConnector | [`CDMConnector::cdmFromCon()`](https://darwin-eu.github.io/CDMConnector/reference/cdmFromCon.html) |  |
 
 ## Installation
 
 The package can be installed from CRAN:
 
 ``` r
+
 install.packages("CohortConstructor")
 ```
 
 Or you can install the development version of the package from GitHub:
 
 ``` r
+
 # install.packages("devtools")
 devtools::install_github("ohdsi/CohortConstructor")
 ```
@@ -37,6 +39,7 @@ We’ll first load required packages and create a cdm reference for the
 data.
 
 ``` r
+
 library(omopgenerics)
 library(omock)
 library(PatientProfiles)
@@ -46,6 +49,7 @@ library(CohortCharacteristics)
 ```
 
 ``` r
+
 cdm <- mockCdmFromDataset(datasetName = "GiBleed")
 #> ℹ Reading GiBleed tables.
 #> ℹ Adding drug_strength table.
@@ -72,6 +76,7 @@ package (note, we will just find a few codes because we are using
 synthetic data with a subset of the full vocabularies).
 
 ``` r
+
 library(CodelistGenerator)
 
 hip_fx_codes <- getCandidateCodes(cdm, "hip fracture")
@@ -107,6 +112,7 @@ by setting cohort exit as the same day as event start (the date of the
 fracture).
 
 ``` r
+
 cdm$fractures <- cdm |> 
   conceptCohort(conceptSet = fx_codes, 
                 exit = "event_start_date", 
@@ -119,6 +125,7 @@ date is on or after this - if not, exit will be at observation period
 end).
 
 ``` r
+
 cdm$fractures <- cdm$fractures |> 
   padCohortEnd(days = 180)
 ```
@@ -128,6 +135,7 @@ restrictions, have the following associated settings, counts, and
 attrition.
 
 ``` r
+
 settings(cdm$fractures) |> glimpse()
 #> Rows: 2
 #> Columns: 4
@@ -160,6 +168,7 @@ also want a cohort of people with any of the fractures. We could union
 our three cohorts to create this overall cohort like so:
 
 ``` r
+
 cdm$fractures <- unionCohorts(cdm$fractures,
                               cohortName = "any_fracture", 
                               keepOriginalCohorts = TRUE,
@@ -167,6 +176,7 @@ cdm$fractures <- unionCohorts(cdm$fractures,
 ```
 
 ``` r
+
 settings(cdm$fractures)
 #> # A tibble: 3 × 5
 #>   cohort_definition_id cohort_name      cdm_version vocabulary_version   gap
@@ -191,6 +201,7 @@ require that individuals’ cohort start date fall within a certain date
 range.
 
 ``` r
+
 cdm$fractures <- cdm$fractures |> 
   requireInDateRange(dateRange = as.Date(c("2000-01-01", "2020-01-01")))
 ```
@@ -199,6 +210,7 @@ Now that we’ve applied this date restriction, we can see that our cohort
 attributes have been updated
 
 ``` r
+
 cohortCount(cdm$fractures) |> glimpse()
 #> Rows: 3
 #> Columns: 3
@@ -225,6 +237,7 @@ We can also add restrictions on patient characteristics such as age (on
 cohort start date by default) and sex.
 
 ``` r
+
 cdm$fractures <- cdm$fractures |> 
   requireDemographics(ageRange = list(c(40, 65)),
                       sex = "Female")
@@ -234,6 +247,7 @@ Again we can see how many individuals we’ve lost after applying these
 criteria.
 
 ``` r
+
 attrition(cdm$fractures) |> 
   filter(reason == "Age requirement: 40 to 65") |> 
   glimpse()
@@ -269,6 +283,7 @@ are in a GI bleed cohort any time prior up to their entry in the
 fractures cohort.
 
 ``` r
+
 cdm$gibleed <- cdm |> 
   conceptCohort(conceptSet = list("gibleed" = 192671L),
   name = "gibleed")
@@ -280,6 +295,7 @@ cdm$fractures <- cdm$fractures |>
 ```
 
 ``` r
+
 attrition(cdm$fractures) |> 
   filter(reason == "Not in cohort gibleed between -Inf & 0 days relative to cohort_start_date") |> 
   glimpse()
@@ -295,6 +311,7 @@ attrition(cdm$fractures) |>
 ```
 
 ``` r
+
 cdmDisconnect(cdm)
 ```
 

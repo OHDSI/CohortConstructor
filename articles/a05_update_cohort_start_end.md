@@ -29,6 +29,7 @@ First, we’ll connect to the Eunomia synthetic data and create a mock
 cohort of women in the database to use as example in the vignette.
 
 ``` r
+
 library(dplyr, warn.conflicts = FALSE)
 library(CohortConstructor)
 library(CohortCharacteristics)
@@ -52,6 +53,7 @@ period for each subject. This ensures that the cohort exit does not
 extend beyond the period during which data is available for the subject.
 
 ``` r
+
 cdm$cohort_observation_end <- cdm$cohort |> 
   exitAtObservationEnd(name = "cohort_observation_end")
 ```
@@ -81,6 +83,7 @@ record unmodified; however, these can be dropped with the argument
 `requireDeath.`
 
 ``` r
+
 cdm$cohort_death <- cdm$cohort |> 
   exitAtDeath(requireDeath = TRUE, name = "cohort_death")
 ```
@@ -98,6 +101,7 @@ Next we want to set the entry date to the first of: diclofenac or
 acetaminophen prescriptions after cohort start, or cohort end date.
 
 ``` r
+
 # create cohort with of drugs diclofenac and acetaminophen 
 cdm$medications <- conceptCohort(
   cdm = cdm, name = "medications",
@@ -120,19 +124,19 @@ cdm$cohort_entry_first <- cdm$cohort_dates |>
   )
 cdm$cohort_entry_first 
 #> # Source:   table<results.test_cohort_entry_first> [?? x 6]
-#> # Database: DuckDB 1.5.2 [unknown@Linux 6.17.0-1010-azure:R 4.5.3//tmp/RtmpyjYyQl/file255f7820651a.duckdb]
+#> # Database: DuckDB 1.5.2 [unknown@Linux 6.17.0-1010-azure:R 4.6.0//tmp/Rtmp1v6v0i/file24c963e2013a.duckdb]
 #>    cohort_definition_id subject_id cohort_start_date cohort_end_date diclofenac
 #>                   <int>      <int> <date>            <date>          <date>    
-#>  1                    1        672 1956-10-25        2019-02-11      NA        
-#>  2                    1       1309 1970-08-25        2018-07-25      NA        
-#>  3                    1       4691 2002-01-12        2019-06-29      2002-01-12
-#>  4                    1       3615 1970-07-13        2019-02-27      NA        
-#>  5                    1       3417 1914-09-20        2019-06-01      1948-12-28
-#>  6                    1       3652 1992-06-01        2019-03-24      NA        
-#>  7                    1       3580 1986-03-13        2018-03-30      2017-07-31
-#>  8                    1        163 1975-07-12        2018-07-10      NA        
-#>  9                    1       4755 1925-06-06        2019-02-01      NA        
-#> 10                    1       4491 1975-05-02        2019-06-23      NA        
+#>  1                    1       5157 1980-08-10        2019-05-16      2000-08-19
+#>  2                    1       1850 1976-09-26        2019-02-15      NA        
+#>  3                    1       2866 2018-10-03        2018-10-03      NA        
+#>  4                    1       4827 1963-08-27        2019-04-04      1991-01-17
+#>  5                    1        412 1960-01-11        2004-06-25      NA        
+#>  6                    1        978 1995-09-29        2018-11-09      NA        
+#>  7                    1       1316 1952-03-18        2019-06-18      NA        
+#>  8                    1       3661 1980-08-02        2018-08-26      NA        
+#>  9                    1       1560 1946-07-16        2019-02-11      NA        
+#> 10                    1       3020 1959-02-23        2019-03-13      NA        
 #> # ℹ more rows
 #> # ℹ 1 more variable: acetaminophen <date>
 ```
@@ -147,6 +151,7 @@ however now the selected column is the latest date among specified
 columns.
 
 ``` r
+
 cdm$cohort_entry_last <- cdm$cohort_dates |>
   entryAtLastDate(
     dateColumns = c("diclofenac", "acetaminophen", "cohort_end_date"), 
@@ -156,19 +161,19 @@ cdm$cohort_entry_last <- cdm$cohort_dates |>
 
 cdm$cohort_entry_last
 #> # Source:   table<results.test_cohort_entry_last> [?? x 4]
-#> # Database: DuckDB 1.5.2 [unknown@Linux 6.17.0-1010-azure:R 4.5.3//tmp/RtmpyjYyQl/file255f7820651a.duckdb]
+#> # Database: DuckDB 1.5.2 [unknown@Linux 6.17.0-1010-azure:R 4.6.0//tmp/Rtmp1v6v0i/file24c963e2013a.duckdb]
 #>    cohort_definition_id subject_id cohort_start_date cohort_end_date
 #>                   <int>      <int> <date>            <date>         
-#>  1                    1        672 2019-02-11        2019-02-11     
-#>  2                    1       1309 2018-07-25        2018-07-25     
-#>  3                    1       4691 2019-06-29        2019-06-29     
-#>  4                    1       3615 2019-02-27        2019-02-27     
-#>  5                    1       3417 2019-06-01        2019-06-01     
-#>  6                    1       3652 2019-03-24        2019-03-24     
-#>  7                    1       3580 2018-03-30        2018-03-30     
-#>  8                    1        163 2018-07-10        2018-07-10     
-#>  9                    1       4755 2019-02-01        2019-02-01     
-#> 10                    1       4491 2019-06-23        2019-06-23     
+#>  1                    1       5157 2019-05-16        2019-05-16     
+#>  2                    1       1850 2019-02-15        2019-02-15     
+#>  3                    1       2866 2018-10-03        2018-10-03     
+#>  4                    1       4827 2019-04-04        2019-04-04     
+#>  5                    1        412 2004-06-25        2004-06-25     
+#>  6                    1        978 2018-11-09        2018-11-09     
+#>  7                    1       1316 2019-06-18        2019-06-18     
+#>  8                    1       3661 2018-08-26        2018-08-26     
+#>  9                    1       1560 2019-02-11        2019-02-11     
+#> 10                    1       3020 2019-03-13        2019-03-13     
 #> # ℹ more rows
 ```
 
@@ -187,6 +192,7 @@ there is a record of diclofenac or acetaminophen, in which case that
 would be the end:
 
 ``` r
+
 cdm$cohort_exit_first <- cdm$cohort_dates |>
   addFutureObservation(futureObservationType = "date", name = "cohort_exit_first") |>
   exitAtFirstDate(
@@ -196,19 +202,19 @@ cdm$cohort_exit_first <- cdm$cohort_dates |>
 
 cdm$cohort_exit_first 
 #> # Source:   table<results.test_cohort_exit_first> [?? x 4]
-#> # Database: DuckDB 1.5.2 [unknown@Linux 6.17.0-1010-azure:R 4.5.3//tmp/RtmpyjYyQl/file255f7820651a.duckdb]
+#> # Database: DuckDB 1.5.2 [unknown@Linux 6.17.0-1010-azure:R 4.6.0//tmp/Rtmp1v6v0i/file24c963e2013a.duckdb]
 #>    cohort_definition_id subject_id cohort_start_date cohort_end_date
 #>                   <int>      <int> <date>            <date>         
-#>  1                    1        672 1955-05-02        1956-10-25     
-#>  2                    1       1309 1955-03-30        1970-08-25     
-#>  3                    1       4691 1960-05-07        2002-01-12     
-#>  4                    1       3615 1949-08-31        1970-07-13     
-#>  5                    1       3417 1909-04-17        1914-09-20     
-#>  6                    1       3652 1973-09-09        1992-06-01     
-#>  7                    1       3580 1972-03-24        1986-03-13     
-#>  8                    1        163 1966-06-28        1975-07-12     
-#>  9                    1       4755 1924-11-07        1925-06-06     
-#> 10                    1       4491 1946-01-13        1975-05-02     
+#>  1                    1       5157 1963-04-11        1980-08-10     
+#>  2                    1       1850 1956-12-14        1976-09-26     
+#>  3                    1       2866 1966-08-07        2018-10-03     
+#>  4                    1       4827 1949-12-08        1963-08-27     
+#>  5                    1        412 1953-05-15        1960-01-11     
+#>  6                    1        978 1975-08-15        1995-09-29     
+#>  7                    1       1316 1948-10-26        1952-03-18     
+#>  8                    1       3661 1978-02-12        1980-08-02     
+#>  9                    1       1560 1935-01-14        1946-07-16     
+#> 10                    1       3020 1957-01-02        1959-02-23     
 #> # ℹ more rows
 ```
 
@@ -220,6 +226,7 @@ function sets the cohort end date to the latest date among specified
 columns.
 
 ``` r
+
 cdm$cohort_exit_last <- cdm$cohort_dates |> 
   exitAtLastDate(
     dateColumns = c("cohort_end_date", "acetaminophen", "diclofenac"),
@@ -229,19 +236,19 @@ cdm$cohort_exit_last <- cdm$cohort_dates |>
   )
 cdm$cohort_exit_last
 #> # Source:   table<results.test_cohort_exit_last> [?? x 4]
-#> # Database: DuckDB 1.5.2 [unknown@Linux 6.17.0-1010-azure:R 4.5.3//tmp/RtmpyjYyQl/file255f7820651a.duckdb]
+#> # Database: DuckDB 1.5.2 [unknown@Linux 6.17.0-1010-azure:R 4.6.0//tmp/Rtmp1v6v0i/file24c963e2013a.duckdb]
 #>    cohort_definition_id subject_id cohort_start_date cohort_end_date
 #>                   <int>      <int> <date>            <date>         
-#>  1                    1        672 1955-05-02        2019-02-11     
-#>  2                    1       1309 1955-03-30        2018-07-25     
-#>  3                    1       4691 1960-05-07        2019-06-29     
-#>  4                    1       3615 1949-08-31        2019-02-27     
-#>  5                    1       3417 1909-04-17        2019-06-01     
-#>  6                    1       3652 1973-09-09        2019-03-24     
-#>  7                    1       3580 1972-03-24        2018-03-30     
-#>  8                    1        163 1966-06-28        2018-07-10     
-#>  9                    1       4755 1924-11-07        2019-02-01     
-#> 10                    1       4491 1946-01-13        2019-06-23     
+#>  1                    1       5157 1963-04-11        2019-05-16     
+#>  2                    1       1850 1956-12-14        2019-02-15     
+#>  3                    1       2866 1966-08-07        2018-10-03     
+#>  4                    1       4827 1949-12-08        2019-04-04     
+#>  5                    1        412 1953-05-15        2004-06-25     
+#>  6                    1        978 1975-08-15        2018-11-09     
+#>  7                    1       1316 1948-10-26        2019-06-18     
+#>  8                    1       3661 1978-02-12        2018-08-26     
+#>  9                    1       1560 1935-01-14        2019-02-11     
+#> 10                    1       3020 1957-01-02        2019-03-13     
 #> # ℹ more rows
 ```
 
@@ -268,6 +275,7 @@ will only contribute in the cohort form the day they are 18 or older, up
 to the day before turning 66 (or before if they leave the database).
 
 ``` r
+
 cdm$cohort_trim <- cdm$cohort |>
   trimDemographics(ageRange = c(18, 65), name = "cohort_trim")
 ```
@@ -285,6 +293,7 @@ For example, to restrict cohort dates to be on or after January 1st,
 2015:
 
 ``` r
+
 # Trim cohort dates to be within the year 2000
 cdm$cohort_trim <- cdm$cohort_trim |> 
   trimToDateRange(dateRange = as.Date(c("2015-01-01", NA)))
@@ -302,6 +311,7 @@ start date.
 For example, to subtract 50 days from the cohort start date:
 
 ``` r
+
 # Substract 50 days to cohort start
 cdm$cohort <- cdm$cohort |> padCohortStart(days = -50, collapse = FALSE)
 ```
@@ -328,6 +338,7 @@ The example below adds 1000 days to cohort end date, while dropping
 records that are outside of observation after adding days.
 
 ``` r
+
 cdm$cohort_pad <- cdm$cohort |> 
   padCohortEnd(days = 1000, requireFullContribution = TRUE, name = "cohort_pad")
 ```
@@ -337,6 +348,7 @@ the cohort, which allows to add a specific number of days for each
 record:
 
 ``` r
+
 cdm$cohort <- cdm$cohort |> 
   dplyr::mutate(days_to_add = date_count_between(start = cohort_start_date, end = cohort_end_date, precision = "day")) |>
   padCohortEnd(days = "days_to_add", requireFullContribution = TRUE)
@@ -355,6 +367,7 @@ For example, to set the cohort end date to be 365 days after the cohort
 start date:
 
 ``` r
+
 cdm$cohort <- cdm$cohort |> 
   padCohortDate(days = 365, cohortDate = "cohort_end_date", indexDate = "cohort_start_date")
 ```
@@ -368,6 +381,7 @@ acetaminophen cohort and 20 days to the diclofenac cohort we can do the
 following:
 
 ``` r
+
 cdm$medications <- cdm$medications |> 
   padCohortDate(days = 10, cohortId = "acetaminophen") |> 
   padCohortDate(days = 20, cohortId = "diclofenac")

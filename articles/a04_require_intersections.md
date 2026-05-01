@@ -1,6 +1,7 @@
 # Applying requirements related to other cohorts, concept sets, or tables
 
 ``` r
+
 library(omock)
 library(dplyr)
 library(CodelistGenerator)
@@ -14,12 +15,14 @@ For this example we’ll use the Eunomia synthetic data from the
 [omock](https://ohdsi.github.io/omock/) package.
 
 ``` r
+
 cdm <- mockCdmFromDataset(datasetName = "GiBleed", source = "duckdb")
 ```
 
 Let’s start by creating a cohort of warfarin users.
 
 ``` r
+
 warfarin_codes <- getDrugIngredientCodes(cdm, "warfarin")
 cdm$warfarin <- conceptCohort(cdm = cdm, 
                                  conceptSet = warfarin_codes, 
@@ -36,6 +39,7 @@ containing individuals with a record of a GI bleed. Later we’ll use this
 cohort when specifying inclusion/ exclusion criteria.
 
 ``` r
+
 cdm$gi_bleed <- conceptCohort(cdm = cdm,  
                               conceptSet = list("gi_bleed" = 192671L),
                               name = "gi_bleed")
@@ -50,6 +54,7 @@ function. Here, for example, we require that individuals have one or
 more intersections with the GI bleed cohort.
 
 ``` r
+
 cdm$warfarin_gi_bleed <- cdm$warfarin  |>
   requireCohortIntersect(intersections = c(1,Inf),
                          targetCohortTable = "gi_bleed", 
@@ -75,6 +80,7 @@ function, but this time we set the intersections argument to 0 so as to
 require individuals’ absence in this other cohort.
 
 ``` r
+
 cdm$warfarin_no_gi_bleed <- cdm$warfarin |>
   requireCohortIntersect(intersections = 0,
                          targetCohortTable = "gi_bleed", 
@@ -92,6 +98,7 @@ time. Here, for example, we require individuals to be in one of our
 injury cohorts in the prior year.
 
 ``` r
+
 cdm$injuries <- conceptCohort(
   cdm = cdm,
   name = "injuries",
@@ -120,6 +127,7 @@ plotCohortAttrition(summary_attrition)
 We could instead require them to be in all of our injury cohorts
 
 ``` r
+
 cdm$warfarin_any_injury <- cdm$warfarin |>
   requireCohortIntersect(intersections = c(1, Inf),
                          cohortCombinationCriteria = "all",
@@ -135,6 +143,7 @@ plotCohortAttrition(summary_attrition)
 Or, we could require them to be in at least 2 of our injury cohorts
 
 ``` r
+
 cdm$warfarin_any_injury <- cdm$warfarin |>
   requireCohortIntersect(intersections = c(1, Inf),
                          cohortCombinationCriteria = c(2, Inf),
@@ -157,6 +166,7 @@ function, allowing us to filter our cohort based on whether they have or
 have not had events of GI bleeding before they entered the cohort.
 
 ``` r
+
 cdm$warfarin_gi_bleed <- cdm$warfarin  |>
   requireConceptIntersect(conceptSet = list("gi_bleed" = 192671), 
                          indexDate = "cohort_start_date", 
@@ -180,6 +190,7 @@ function, but this time set the intersections argument to 0 to require
 individuals without past events of GI bleeding.
 
 ``` r
+
 cdm$warfarin_no_gi_bleed <- cdm$warfarin  |>
   requireConceptIntersect(intersections = 0,
                          conceptSet = list("gi_bleed" = 192671), 
@@ -200,6 +211,7 @@ function. Here for example we reuire that individuals in our warfarin
 cohort have at least one prior record in the visit occurrence table.
 
 ``` r
+
 cdm$warfarin_visit <- cdm$warfarin  |>
   requireTableIntersect(tableName = "visit_occurrence",
                          indexDate = "cohort_start_date", 
