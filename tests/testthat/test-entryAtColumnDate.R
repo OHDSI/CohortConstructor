@@ -117,7 +117,7 @@ test_that("entry at last date", {
     entryAtLastDate(
       dateColumns = c("cohort_end_date", "other_date_1", "other_date_2"),
       returnReason = TRUE,
-      cohortId = 1,
+      cohortId = dplyr::ends_with("_1"),
       keepDateColumns = FALSE,
       name = "cohort1"
     )

@@ -110,7 +110,7 @@ test_that("overlapping entries", {
   cdm$cohort_2 <- padCohortEnd(cdm$cohort,
                                days = 10,
                                name = "cohort_2",
-                               cohortId = 2)
+                               cohortId = dplyr::ends_with("2"))
   expect_true(nrow(cdm$cohort_2 |>
                      dplyr::collect()) == 4)
 

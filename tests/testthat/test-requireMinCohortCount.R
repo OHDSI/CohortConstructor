@@ -29,7 +29,7 @@ test_that("testing requireMinCohortCount", {
   cdm$cohort1_b <- requireMinCohortCount(
     cdm$cohort1,
     minCohortCount = 5,
-    cohortId = c(1, 2),
+    cohortId = dplyr::ends_with(c("1", "2")),
     name = "cohort1_b"
   )
   expect_gt(nrow(cdm$cohort1_b |>

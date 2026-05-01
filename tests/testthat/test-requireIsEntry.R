@@ -77,7 +77,7 @@ test_that("requireIsFirstEntry, cohortIds & name arguments", {
   expect_no_error(
     cdm$new_cohort <- CohortConstructor::requireIsFirstEntry(
       cohort = cdm$cohort,
-      cohortId = 1,
+      cohortId = dplyr::ends_with("1"),
       name = "new_cohort")
   )
 

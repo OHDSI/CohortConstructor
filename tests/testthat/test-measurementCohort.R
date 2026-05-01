@@ -366,6 +366,9 @@ test_that("mearurementCohorts works", {
     useSourceFields = TRUE
   )
   expect_true(nrow(collectCohort(cdm$cohort12, 1)) == 2)
+
+  cohort_name <- omopgenerics::settings(cdm$cohort7) |> dplyr::pull("cohort_name")
+  cohort_name_end <- substr(cohort_name[1], start = nchar(cohort_name[1]), stop = nchar(cohort_name[1]))
   cdm$cohort13 <- measurementCohort(
     cdm = cdm,
     name = "cohort13",
@@ -374,7 +377,7 @@ test_that("mearurementCohorts works", {
     table = "measurement",
     useSourceFields = TRUE,
     subsetCohort = "cohort7",
-    subsetCohortId = 1
+    subsetCohortId =  dplyr::ends_with(cohort_name_end)
   )
   expect_true(nrow(collectCohort(cdm$cohort13, 1)) == 0)
 

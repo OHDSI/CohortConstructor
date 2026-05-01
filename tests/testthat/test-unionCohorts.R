@@ -80,7 +80,7 @@ test_that("unionCohorts works", {
   )
 
   # choose cohort Id and test codelist  ----
-  cdm$cohort3 <- unionCohorts(cdm$cohort1, cohortId = 1:2, name = "cohort3")
+  cdm$cohort3 <- unionCohorts(cdm$cohort1, cohortId = dplyr::ends_with(c("1", "2")), name = "cohort3")
   expect_true(all(
     cdm$cohort3 |> dplyr::pull("cohort_start_date") |> sort() ==
       c("1999-05-03", "2001-03-24", "2001-11-28", "2002-01-30", "2002-06-13", "2015-02-25")

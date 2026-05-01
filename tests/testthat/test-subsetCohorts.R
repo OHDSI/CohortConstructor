@@ -36,7 +36,7 @@ test_that("subsetCohort works", {
     copyCdm()
 
   # Subset 1 cohort
-  cdm$cohort2 <- subsetCohorts(cdm$cohort1, cohortId = 1, name = "cohort2")
+  cdm$cohort2 <- subsetCohorts(cdm$cohort1, cohortId = dplyr::ends_with("1"), name = "cohort2")
   expect_true(unique(cdm$cohort2 |> dplyr::pull("cohort_definition_id")) == 1)
   expect_true(settings(cdm$cohort2) |> dplyr::pull("cohort_definition_id") == 1)
   expect_true(unique(attrition(cdm$cohort2) |> dplyr::pull("cohort_definition_id")) == 1)

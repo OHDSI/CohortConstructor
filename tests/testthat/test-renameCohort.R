@@ -11,7 +11,7 @@ test_that("test renameCohort", {
   # one cohort
   expect_no_error(
     cdm$cohort <- cdm$cohort |>
-      renameCohort(cohortId = 1, newCohortName = "my_cohort")
+      renameCohort(cohortId = dplyr::ends_with("1"), newCohortName = "my_cohort")
   )
   expect_identical(
     omopgenerics::settings(cdm$cohort),
@@ -25,7 +25,7 @@ test_that("test renameCohort", {
   expect_no_error(
     cdm$cohort <- cdm$cohort |>
       renameCohort(
-        cohortId = c(1, 2),
+        cohortId = dplyr::ends_with(c("my_cohort", "2")),
         newCohortName = c("covid", "tb")
       )
   )
