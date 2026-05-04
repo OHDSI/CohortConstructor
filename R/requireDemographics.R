@@ -36,7 +36,7 @@ requireDemographics <- function(cohort,
                                 name = tableName(cohort)) {
   cohort <- demographicsFilter(
     cohort = cohort,
-    cohortId = cohortId,
+    cohortId = {{cohortId}},
     indexDate = indexDate,
     ageRange = ageRange,
     sex = sex,
@@ -82,7 +82,7 @@ requireAge <- function(cohort,
                        name = tableName(cohort)) {
   cohort <- demographicsFilter(
     cohort = cohort,
-    cohortId = cohortId,
+    cohortId = {{cohortId}},
     indexDate = indexDate,
     ageRange = ageRange,
     sex = "Both",
@@ -126,7 +126,7 @@ requireSex <- function(cohort,
                        name = tableName(cohort)) {
   cohort <- demographicsFilter(
     cohort = cohort,
-    cohortId = cohortId,
+    cohortId = {{cohortId}},
     indexDate = "cohort_start_date",
     ageRange = list(c(0, 150)),
     sex = sex,
@@ -172,7 +172,7 @@ requirePriorObservation <- function(cohort,
                                     name = tableName(cohort)) {
   cohort <- demographicsFilter(
     cohort = cohort,
-    cohortId = cohortId,
+    cohortId = {{cohortId}},
     indexDate = indexDate,
     ageRange = list(c(0, 150)),
     sex = "Both",
@@ -219,7 +219,7 @@ requireFutureObservation <- function(cohort,
                                      name = tableName(cohort)) {
   cohort <- demographicsFilter(
     cohort = cohort,
-    cohortId = cohortId,
+    cohortId = {{cohortId}},
     indexDate = indexDate,
     ageRange = list(c(0, 150)),
     sex = "Both",
@@ -252,11 +252,11 @@ demographicsFilter <- function(cohort,
                                reqFutureObservation,
                                atFirst) {
   # checks
-  name <- validateNameArgumentInternal(missingName, name, tableName(cohort))
   cohort <- omopgenerics::validateCohortArgument(cohort)
+  cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
+  name <- validateNameArgumentInternal(missingName, name, tableName(cohort))
   validateCohortColumn(indexDate, cohort, class = "date")
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
-  cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
   ageRange <- validateDemographicRequirements(ageRange, sex, minPriorObservation, minFutureObservation)
   ids <- omopgenerics::settings(cohort)$cohort_definition_id
   omopgenerics::assertLogical(atFirst, length = 1)

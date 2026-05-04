@@ -134,6 +134,67 @@ test_that("copy only specific cohort IDs", {
   dropCreatedTables(cdm = cdm)
 })
 
+test_that("tidyselect for cohort IDs", {
+  skip_on_cran()
+
+  cdm <- omock::mockCdmReference() |>
+    omock::mockPerson(n = 4, seed = 1) |>
+    omock::mockObservationPeriod(seed = 1) |>
+    omock::mockCohort(name = c("original_cohort"),
+                      numberCohorts = 2, seed = 1) |>
+    copyCdm()
+
+  start_settings <- omopgenerics::settings(cdm$original_cohort)
+  start_attrition <- omopgenerics::attrition(cdm$original_cohort)
+
+  cohort_names <- omopgenerics::settings(cdm$original_cohort) |>
+    dplyr::pull("cohort_name")
+  cohort_name_end <- substr(cohort_names[1], start = nchar(cohort_names[1]), stop = nchar(cohort_names[1]))
+
+  # keep just one cohort
+  cdm$copy_cohort_a <- copyCohorts(cdm$original_cohort,
+                                   cohortId = dplyr::ends_with(cohort_name_end),
+                                   n = 1,
+                                   name = "copy_cohort_a")
+  cdm$copy_cohort_b <- copyCohorts(cdm$original_cohort,
+                                   n = 1,
+                                   cohortId = dplyr::ends_with(cohort_name_end),
+                                   name = "copy_cohort_b")
+  expect_identical(
+    omopgenerics::settings(cdm$original_cohort) |>
+      dplyr::filter(cohort_definition_id == 1),
+    omopgenerics::settings(cdm$copy_cohort_a))
+  expect_identical(
+    omopgenerics::settings(cdm$original_cohort) |>
+      dplyr::filter(cohort_name == "cohort_1"),
+    omopgenerics::settings(cdm$copy_cohort_b))
+
+  # keep both cohorts
+  cdm$copy_cohort_c <- copyCohorts(cdm$original_cohort,
+                                   n = 1,
+                                   cohortId = c(1, 2),
+                                   name = "copy_cohort_c")
+  cdm$copy_cohort_d <- copyCohorts(cdm$original_cohort,
+                                   n = 1,
+                                   cohortId = c("cohort_1", "cohort_2"),
+                                   name = "copy_cohort_d")
+
+  # cohort not present
+  expect_error(cdm$copy_cohort <- copyCohorts(cdm$original_cohort,
+                                              n = 1,
+                                              cohortId = c(3),
+                                              name = "copy_cohort"))
+  expect_error(cdm$copy_cohort <- copyCohorts(cdm$original_cohort,
+                                              n = 1,
+                                              cohortId = "not_a_cohort",
+                                              name = "copy_cohort"))
+
+  expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
+
+  dropCreatedTables(cdm = cdm)
+})
+
+
 test_that("multiple copies", {
   skip_on_cran()
   cdm <- omock::mockCdmReference() |>

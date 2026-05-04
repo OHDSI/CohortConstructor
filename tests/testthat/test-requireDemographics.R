@@ -494,6 +494,25 @@ test_that("Missing sex/year of birth", {
 
 })
 
+test_that("use tidyselect verbs", {
+  cdm <- omock::mockPerson() |>
+    omock::mockObservationPeriod() |>
+    omock::mockCohort(numberCohorts = 3, cohortName = c("cohort1", "cohort2_5y", "cohort3_5y"))
+
+  cdm <- copyCdm(cdm)
+
+  expect_true(nrow(attrition(cdm$cohort)) == 3)
+
+  expect_no_error(
+    cdm$cohort <- cdm$cohort |>
+      requirePriorObservation(365, dplyr::ends_with("_5y"))
+  )
+
+  expect_true(nrow(attrition(cdm$cohort)) == 5)
+
+  dropCreatedTables(cdm = cdm)
+})
+
 
 test_that("test indexes - postgres, and atFirst", {
   skip_on_cran()

@@ -53,6 +53,18 @@ test_that("simple example", {
     omopgenerics::tableSource(sameCohort), omopgenerics::tableSource(cdm$cohort)
   )
 
+  # test tidyselect for id works
+  cohort_name <- settings(cdm$cohort) |>
+    dplyr::pull("cohort_name")
+  cohort_name_start <- substr(cohort_name, start = 1, stop = 3)
+  expect_no_error(sameCohort3 <- cdm$cohort |>
+                    collapseCohorts(gap = 0,
+                                    name = "new_cohort",
+                                    cohortId = dplyr::starts_with(cohort_name_start)))
+  expect_identical(settings(sameCohort3), settings(cdm$cohort))
+  expect_identical(cohortCount(sameCohort3), cohortCount(cdm$cohort))
+
+
   expect_no_error(newCohort <- cdm$cohort |>
                     collapseCohorts(gap = 5, name = "my_cohort"))
   expect_identical(settings(newCohort), settings(cdm$cohort))

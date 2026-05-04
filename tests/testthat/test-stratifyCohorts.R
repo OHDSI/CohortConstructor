@@ -123,7 +123,7 @@ test_that("simple stratification", {
 
   cdm$new_cohort3 <- cdm$new_cohort |>
     stratifyCohorts(
-      cohortId = 1,
+      cohortId = dplyr::ends_with("1_a_adult"),
       strata = list(),
       name = "new_cohort3"
     )

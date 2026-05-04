@@ -311,7 +311,7 @@ test_that("test subsetting death table by a cohort table", {
   cdm2$death_cohort <-  deathCohort(cdm=cdm2,
                        name = "death_cohort",
                        subsetCohort = "cohort1",
-                       subsetCohortId = 1)
+                       subsetCohortId = dplyr::ends_with("_1"))
 
   expect_true(nrow(cdm2$death_cohort |> dplyr::collect()) == 2)
 
