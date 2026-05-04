@@ -45,16 +45,28 @@ copyCohorts <- function(cohort, name, n = 1, cohortId = NULL) {
     if (k > 1) {
       newSet[[k]] <- set |>
         dplyr::rename(original_cohort_name = "cohort_name") |>
-        dplyr::mutate(cohort_name = paste0(cohort_name, "_", k - 1))
+        dplyr::mutate(cohort_name = paste0(.data$original_cohort_name, "_", k - 1))
     } else {
       newSet[[k]] <- set |>
-        dplyr::mutate(original_cohort_name = .data$cohort_name)
+        dplyr::mutate(original_cohort_name = NA_character_)
     }
   }
   newSet <- dplyr::bind_rows(newSet) |>
     dplyr::mutate(new_cohort_definition_id = dplyr::row_number())
   joinSet <- newSet |>
     dplyr::select("cohort_definition_id", "new_cohort_definition_id")
+
+  # new settings
+  newSet <- omopgenerics::settings(newCohort) |>
+    dplyr::select(!dplyr::any_of(c("cohort_name", "original_cohort_id", "original_cohort_name"))) |>
+    dplyr::inner_join(newSet, by = "cohort_definition_id", relationship = "many-to-many") |>
+    dplyr::rename(
+      original_cohort_id = "cohort_definition_id",
+      cohort_definition_id = "new_cohort_definition_id"
+    ) |>
+    dplyr::mutate(original_cohort_id = dplyr::if_else(
+      is.na(.data$original_cohort_name), NA_real_, .data$original_cohort_id
+    ))
 
   # create new attrition
   newAttrition <-  omopgenerics::attrition(newCohort) |>
@@ -78,13 +90,6 @@ copyCohorts <- function(cohort, name, n = 1, cohortId = NULL) {
     dplyr::select(!"cohort_definition_id") |>
     dplyr::rename("cohort_definition_id" = "new_cohort_definition_id") |>
     dplyr::compute(name = name)
-
-  # new settings
-  newSet <- newSet |>
-    dplyr::rename(
-      original_cohort_id = "cohort_definition_id",
-      cohort_definition_id = "new_cohort_definition_id"
-    )
 
   cdm[[name]] <- newCohort |>
     omopgenerics::newCohortTable(
