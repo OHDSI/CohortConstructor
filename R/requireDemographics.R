@@ -278,17 +278,25 @@ demographicsFilter <- function(cohort,
   )]
 
   # new settings
-  ind <- reqCols %in% colnames(settings(cohort))
-  if (any(ind)) {
+  presentCols <- reqCols[reqCols %in% colnames(settings(cohort))]
+  if (length(presentCols) > 0) {
     # only if the setting is not NA (eg been applied to a different cohort)
     if(nrow(settings(cohort) |>
-      dplyr::filter(dplyr::if_all(dplyr::any_of(reqCols), ~ !is.na(.))) |>
+      dplyr::filter(dplyr::if_all(dplyr::any_of(presentCols), ~ !is.na(.))) |>
       dplyr::filter(.data$cohort_definition_id %in% cohortId)) > 0){
-      cli::cli_warn("{reqCols[ind]} column{?s} are already in settings and will be overwritten")
+      cli::cli_warn("{presentCols} column{?s} are already in settings and will be overwritten")
     }
   }
-  newSet <- settings(cohort) |>
-    dplyr::select(!dplyr::any_of(reqCols)) |>
+  newSet <- settings(cohort)
+  # https://github.com/darwin-eu-dev/omopgenerics/issues/830
+  if (length(presentCols) > 0) {
+    nms <- omopgenerics::uniqueId(n = length(presentCols), exclude = colnames(newSet))
+  } else {
+    nms <- character()
+  }
+  presentCols <- rlang::set_names(presentCols, nm = nms)
+  newSet <- newSet |>
+    dplyr::rename(dplyr::all_of(presentCols)) |>
     dplyr::left_join(
       dplyr::tibble(
         "cohort_definition_id" = cohortId,
@@ -301,6 +309,15 @@ demographicsFilter <- function(cohort,
         dplyr::select(dplyr::all_of(c("cohort_definition_id", reqCols))),
       by = "cohort_definition_id"
     )
+  q <- presentCols |>
+    purrr::imap_chr(\(x, nm) {
+      paste0("dplyr::coalesce(.data[['", x, "']], .data[['", nm, "']])")
+    }) |>
+    rlang::parse_exprs() |>
+    rlang::set_names(nm = unname(presentCols))
+  newSet <- newSet |>
+    dplyr::mutate(!!!q) |>
+    dplyr::select(!dplyr::all_of(nms))
 
   # cohort table ----
   tablePrefix <- omopgenerics::tmpPrefix()
@@ -311,7 +328,7 @@ demographicsFilter <- function(cohort,
   # because the cohort table passed to the function might have extra columns
   # that would conflict with ones we'll add, we'll take the core table first
   # join later
-  newCols <- uniqueColumnName( cdm[[tmpNewCohort]], n = 4)
+  newCols <- uniqueColumnName(cdm[[tmpNewCohort]], n = 4)
   cdm[[tmpNewCohort]] <- cdm[[tmpNewCohort]] |>
     PatientProfiles::addDemographics(
       indexDate = indexDate,
@@ -406,7 +423,8 @@ demographicsFilter <- function(cohort,
     dplyr::compute(name = name, temporary = FALSE,
                    logPrefix = "CohortConstructor_demographicsFilter_name_") |>
     omopgenerics::newCohortTable(
-      .softValidation = TRUE, cohortSetRef = newSet
+      .softValidation = TRUE,
+      cohortSetRef = newSet
     )
 
   omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(tablePrefix))
