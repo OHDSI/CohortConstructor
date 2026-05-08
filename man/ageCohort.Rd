@@ -20,11 +20,13 @@ ageCohort(
 \item{age}{Age of entry and exit to the cohort. Multiple values can be
 supplied.}
 
-\item{ageUnit}{Unit for the age, it can either be \emph{years} (default),
-\emph{months}, or \emph{days}. Multiple values can be supplied. Its length must be 1 or
-the same than \code{age}.}
+\item{ageUnit}{Unit for the age, it can either be \emph{years} (default), or
+\emph{days}. Multiple values can be supplied. Its length must be 1 or the same
+than \code{age}.}
 
-\item{cohortName}{}
+\item{cohortName}{Names of the created cohort, you can provide glue patterns
+like: \verb{cohort_\{age\}_\{ageUnit\}} or a vector with as many names as cohorts as
+created.}
 }
 \value{
 A cohort table object.
@@ -49,8 +51,8 @@ attrition(cdm$cohort4)
 cdm$cohort5 <- ageCohort(
   cdm = cdm,
   name = "cohort5",
-  age = c(15, 6, 3),
-  ageUnit = c("days", "months", "years")
+  age = c(15, 3),
+  ageUnit = c("days", "years")
 )
 
 attrition(cdm$cohort5)

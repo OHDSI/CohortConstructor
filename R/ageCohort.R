@@ -13,7 +13,9 @@
 #' @param ageUnit Unit for the age, it can either be *years* (default), or
 #' *days*. Multiple values can be supplied. Its length must be 1 or the same
 #' than `age`.
-#' @param cohortName
+#' @param cohortName Names of the created cohort, you can provide glue patterns
+#' like: `cohort_{age}_{ageUnit}` or a vector with as many names as cohorts as
+#' created.
 #'
 #' @return A cohort table object.
 #'
@@ -45,13 +47,14 @@ ageCohort <- function(
     name,
     age = 0,
     ageUnit = "years",
-    cohortName = "birthday_{age}_{ageUnit}" # supporting glue style with {age} or as many elements than in age
+    cohortName = "birthday_{age}_{ageUnit}"
 ) {
   # input check
   cdm <- omopgenerics::validateCdmArgument(cdm = cdm)
   name <- omopgenerics::validateNameArgument(name = name, cdm = cdm, validation = "warning")
   omopgenerics::assertNumeric(age, integerish = TRUE, min = 0)
   omopgenerics::assertChoice(ageUnit, c("days", "years"))
+  omopgenerics::assertCharacter(cohortName)
   # to support months
   # https://github.com/darwin-eu-dev/PatientProfiles/issues/855
   if (length(ageUnit) == 1) {
@@ -60,6 +63,9 @@ ageCohort <- function(
   if (length(ageUnit) != length(age)) {
     cli::cli_abort(c(x = "`ageUnit` should have either lenght 1 or the same length than `age`."))
   }
+
+  # prepare names
+  cohortName <- evalCohortName(cohortName, age, ageUnit)
 
   # empty cohort
   if (length(age) == 0) {
@@ -83,7 +89,7 @@ ageCohort <- function(
     number_subjects = .env$n,
     reason_id = 1:2L,
     reason = c("All individuals in the cdm", "Drop individuals with missing year of birth"),
-    excluded_records = c(0, .env$n[2] - .env$n[1]),
+    excluded_records = c(0, .env$n[1] - .env$n[2]),
     excluded_subjects = .data$excluded_records
   )
 
@@ -104,7 +110,7 @@ ageCohort <- function(
   for (k in seq_along(age)) {
     value <- age[k]
     unit <- ageUnit[k]
-    nm <- as.character(glue::glue(cohortName, age = value, ageUnit = unit))
+    nm <- cohortName[k]
     reasons <- c(
       reasons,
       "In observation {age} {ageUnit} after date of birth" |>
@@ -133,7 +139,7 @@ ageCohort <- function(
         rlang::set_names(c("cohort_definition_id", "cohort_end_date"))
     } else {
       x <- cdm[[name]]
-      q <- c(".env$k", paste0("clock::add_days(.data$date_of_birth, ", value, "L)"), ".data$cohort_start_date") |>
+      q <- c(".env$k", paste0("as.Date(clock::add_days(.data$date_of_birth, ", value, "L))"), ".data$cohort_start_date") |>
         rlang::parse_exprs() |>
         rlang::set_names(c("cohort_definition_id", "cohort_start_date", "cohort_end_date"))
     }
@@ -165,4 +171,25 @@ ageCohort <- function(
     )
 
   return(cdm[[name]])
+}
+evalCohortName <- function(cohortName, age, ageUnit, call = parent.frame()) {
+  cohortName <- cohortName |>
+    stringr::str_replace_all(pattern = "\\{age_unit\\}", replacement = "\\{ageUnit\\}") |>
+    purrr::map(\(x) glue::glue(x, age = age, ageUnit = ageUnit)) |>
+    unlist() |>
+    as.character()
+
+  if (length(cohortName) != length(age)) {
+    vals <- c("{{age}}", "{{ageUnit}}")[c(length(unique(age)) > 1, length(unique(ageUnit)) > 1)]
+    if (length(vals) > 0) {
+      vals <- paste0(" or have ", paste0(vals, collapse = ", "), " in `cohortName`")
+    } else {
+      vals <- ""
+    }
+    cli::cli_abort(c(x = paste0(
+      "`cohortName` should be the same length than `age`", vals, "."
+    )), call = call)
+  }
+
+  return(cohortName)
 }
