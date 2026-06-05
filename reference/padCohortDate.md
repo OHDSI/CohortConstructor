@@ -79,7 +79,7 @@ Cohort table
 # \donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
-#> Warning: '/tmp/Rtmpy2Fm44/id_mds' already exists
+#> Warning: '/tmp/RtmpAaB5Wb/id_mds' already exists
 #> ℹ Reading GiBleed tables.
 cdm$cohort1 |>
   padCohortDate(

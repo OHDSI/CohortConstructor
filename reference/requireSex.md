@@ -52,7 +52,7 @@ requirement
 # \donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
-#> Warning: '/tmp/Rtmpy2Fm44/id_boq' already exists
+#> Warning: '/tmp/RtmpAaB5Wb/id_boq' already exists
 #> ℹ Reading GiBleed tables.
 cdm$cohort1 |>
   requireSex(sex = "Female")

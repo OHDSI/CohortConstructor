@@ -80,7 +80,7 @@ Cohort table
 # \donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
-#> Warning: '/tmp/Rtmpy2Fm44/id_diu' already exists
+#> Warning: '/tmp/RtmpAaB5Wb/id_diu' already exists
 #> ℹ Reading GiBleed tables.
 # add 10 days to each cohort exit
 cdm$cohort1 |>
