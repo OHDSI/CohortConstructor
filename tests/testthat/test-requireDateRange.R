@@ -82,7 +82,7 @@ test_that("requireDateRange", {
   # 1 cohort id
   cdm$cohort4 <- cdm$cohort2 |>
     requireInDateRange(dateRange = as.Date(c("2000-01-01", "2001-01-01")),
-                       cohortId = 1,
+                       cohortId = dplyr::ends_with("1"),
                        name = "cohort4")
   expect_true(all(attrition(cdm$cohort4)$reason ==
                     c("Initial qualifying events",

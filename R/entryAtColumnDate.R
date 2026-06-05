@@ -101,7 +101,7 @@ entryAtLastDate <- function(cohort,
   exitAtColumnDate(
     cohort = cohort,
     dateColumns = dateColumns,
-    cohortId = cohortId,
+    cohortId = {{cohortId}},
     returnReason = returnReason,
     missingName = missing(name),
     name = name,

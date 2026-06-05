@@ -47,7 +47,7 @@ test_that("matchCohorts runs without errors", {
 
   expect_no_error(c <- matchCohorts(cohort = cdm$cohort2,
                                     name = "new_cohort",
-                                    cohortId = c("cohort_1"),
+                                    cohortId =  dplyr::ends_with("_1"),
                                     matchSex = TRUE,
                                     matchYearOfBirth = TRUE,
                                     ratio = 2))

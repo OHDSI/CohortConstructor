@@ -98,7 +98,7 @@ test_that("yearCohorts - change name", {
   # just 1 cohort
   cdm$cohort1 <- yearCohorts(cohort = cdm$cohort,
                              years = 2005:2008,
-                             cohortId = 1,
+                             cohortId = dplyr::ends_with("1"),
                              name = "cohort1")
   expect_identical(settings(cdm$cohort1) |> dplyr::arrange(.data$cohort_definition_id), dplyr::tibble(
                  cohort_definition_id = as.integer(1:4),

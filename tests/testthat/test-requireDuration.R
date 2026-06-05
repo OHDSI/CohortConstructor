@@ -59,7 +59,7 @@ test_that("require certain range of days for cohort entries", {
   # keep if not cohort of interest
   expect_true("2015-02-17" %in% as.character(cdm$cohort |>
                                    requireDuration(daysInCohort = c(2, Inf),
-                                                   cohortId = 1,
+                                                   cohortId = dplyr::ends_with("_1"),
                                                    name = "new_cohort") |>
                                    dplyr::pull("cohort_start_date")))
 

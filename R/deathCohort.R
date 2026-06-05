@@ -39,7 +39,7 @@ deathCohort <- function(
   omopgenerics::assertCharacter(subsetCohort, length = 1, null = TRUE)
   if (!is.null(subsetCohort)) {
     omopgenerics::validateCohortArgument(cdm[[subsetCohort]])
-    subsetCohortId <- omopgenerics::validateCohortIdArgument(subsetCohortId,
+    subsetCohortId <- omopgenerics::validateCohortIdArgument({{subsetCohortId}},
                                            cdm[[subsetCohort]],
                                            validation = "error")
   }
