@@ -365,6 +365,18 @@ test_that("cohortIds", {
   expect_true(all(cdm$new_cohort |> dplyr::pull("cohort_definition_id") == c(2,2,2)))
   expect_true(all(cdm$new_cohort |> dplyr::pull("subject_id") == c(1,1,1)))
 
+  # settings applied correctly
+  expect_identical(settings(cdm$new_cohort)$sex, c("Male", NA, NA))
+  expect_identical(settings(cdm$new_cohort)$min_prior_observation, c(NA, NA, 1000))
+  expect_identical(colnames(settings(cdm$new_cohort)), c("cohort_definition_id", "cohort_name", "sex", "min_prior_observation"))
+
+  cdm$new_cohort <- requireSex(cohort = cdm$new_cohort, cohortId = 2, sex = "Female") |>
+    requireAge(cohortId = c(1, 3), ageRange = c(18, 35))
+  expect_identical(settings(cdm$new_cohort)$sex, c("Male", "Female", NA))
+  expect_identical(settings(cdm$new_cohort)$age_range, c("18_35", NA, "18_35"))
+  expect_identical(settings(cdm$new_cohort)$min_prior_observation, c(NA, NA, 1000))
+  expect_identical(colnames(settings(cdm$new_cohort)), c("cohort_definition_id", "cohort_name", "min_prior_observation", "sex", "age_range"))
+
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
 
   dropCreatedTables(cdm = cdm)
