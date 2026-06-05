@@ -125,6 +125,23 @@ test_that("requiring presence in another table", {
 
   expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
 
+  # only first record
+  cdm$cohort7 <-  requireTableIntersect(cohort = cdm$cohort1,
+                                        tableName = "table",
+                                        targetStartDate = "date_start",
+                                        targetEndDate = "date_end",
+                                        window = c(0, Inf),
+                                        atFirst = TRUE,
+                                        name = "cohort7")
+
+  expect_equal(
+    cdm$cohort7 |>
+      dplyr::filter(cohort_definition_id  == 2) |>
+      dplyr::tally() |>
+      dplyr::pull(),
+   4
+  )
+
   # expected errors
   # currently just 1 table suported´
   expect_error(expect_warning(
