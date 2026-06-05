@@ -38,10 +38,8 @@ A new cohort table containing cohorts from the original cohort table.
 # \donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
-#> Warning: '/tmp/RtmpAaB5Wb/id_mds' already exists
+#> Warning: '/tmp/Rtmpza4ExR/id_mds' already exists
 #> ℹ Reading GiBleed tables.
 cdm$cohort3 <- copyCohorts(cdm$cohort1, n = 2, cohortId = 1, name = "cohort3")
-#> Warning: ! 1 casted column in cohort3 as do not match expected column type:
-#> • `cohort_definition_id` from numeric to integer
 # }
 ```
