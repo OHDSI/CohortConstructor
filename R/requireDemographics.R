@@ -284,7 +284,7 @@ demographicsFilter <- function(cohort,
     if(nrow(settings(cohort) |>
       dplyr::filter(dplyr::if_all(dplyr::any_of(presentCols), ~ !is.na(.))) |>
       dplyr::filter(.data$cohort_definition_id %in% cohortId)) > 0){
-      cli::cli_warn("{presentCols} column{?s} are already in settings and will be overwritten")
+      cli::cli_warn("{presentCols} column{?s} are already in settings and will be updated")
     }
   }
   newSet <- settings(cohort)
