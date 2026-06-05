@@ -231,3 +231,21 @@ NULL
 #' @name baseCohortDoc
 #' @keywords internal
 NULL
+
+reasonParams <- function(nm) {
+  list(
+    in_date_range = list(
+      opt = c("indexDate", "temporality", "date"),
+      len = 2
+    )
+  )[[nm]]
+}
+reasonDoc <- function(nm) {
+  params <- reasonParams(nm)
+  paste0(
+    "Character string of length ", params$len, " or glue expression. ",
+    "Glue statment can contain: ",
+    paste0("`{", params$opt, "}`", collapse = ", "), ". After gluing it must ",
+    "produce a length ", params$len, " character."
+  )
+}
