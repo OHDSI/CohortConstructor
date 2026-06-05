@@ -199,8 +199,9 @@ validateReason <- function(reason, len, def, ..., call = parent.frame()) {
 
   if (is.null(reason)) reason <- def
 
+  dots <- list(...)
   reason <- tryCatch(
-    purrr::map(reason, \(x) glue::glue(x, ...)) |>
+    purrr::map(reason, \(x) glue::glue_data(dots, x)) |>
       purrr::flatten_chr(),
     error = function(e) NULL
   )
@@ -210,7 +211,7 @@ validateReason <- function(reason, len, def, ..., call = parent.frame()) {
   }
 
   if (length(reason) != len) {
-    allowed <- paste0("{", names(list(...)), "}")
+    allowed <- paste0("{", names(dots), "}")
     cli::cli_abort(c(x = "`reason` must be a character or a glue expression. If character it must be length {len}. If glue it can contain: {allowed}. After gluing it must produce a vector of length {len}."), call = call)
   }
 
