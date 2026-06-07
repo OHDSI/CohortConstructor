@@ -338,27 +338,39 @@ joinOverlap <- function(cohort,
   }
   gap <- as.integer(gap)
 
-  # 3 temp ids: previous cohort end, max cohort end, group
-  id <- omopgenerics::uniqueId(n = 3, exclude = c(startDate, endDate, by))
+  # 5 temp ids: start day, end day, previous end day, max end day, group
+  id <- omopgenerics::uniqueId(n = 5, exclude = c(startDate, endDate, by))
 
   if (gap > 0) {
-    q <- ".data[[startDate]] <= clock::add_days(x = .data[[id[2]]], n = .env$gap)"
+    q <- ".data[[id[1]]] <= .data[[id[4]]] + .env$gap"
   } else {
-    q <- ".data[[startDate]] <= .data[[id[2]]]"
+    q <- ".data[[id[1]]] <= .data[[id[4]]]"
   }
   q <- rlang::parse_expr(q)
 
   cohort |>
     dplyr::select(dplyr::all_of(c(startDate, endDate, by))) |>
+    dplyr::mutate(
+      !!id[1] := clock::date_count_between(
+        start = as.Date("1970-01-01"),
+        end = .data[[startDate]],
+        precision = "day"
+      ),
+      !!id[2] := clock::date_count_between(
+        start = as.Date("1970-01-01"),
+        end = .data[[endDate]],
+        precision = "day"
+      )
+    ) |>
     dplyr::group_by(!!!rlang::syms(by)) |>
     dplyr::arrange(!!!rlang::syms(c(startDate, endDate))) |>
-    dplyr::mutate(!!id[1] := dplyr::lag(.data[[endDate]])) |>
+    dplyr::mutate(!!id[3] := dplyr::lag(.data[[id[2]]])) |>
     dplyr::mutate(
-      !!id[2] := cummax(dplyr::coalesce(.data[[id[1]]], .data[[endDate]]))
+      !!id[4] := cummax(dplyr::coalesce(.data[[id[3]]], .data[[id[2]]]))
     ) |>
-    dplyr::mutate(!!id[3] := cumsum(dplyr::if_else(!!q, 0L, 1L, 1L))) |>
+    dplyr::mutate(!!id[5] := cumsum(dplyr::case_when(!!q ~ 0L, TRUE ~ 1L))) |>
     dplyr::ungroup() |>
-    dplyr::group_by(!!!rlang::syms(c(by, id[3]))) |>
+    dplyr::group_by(!!!rlang::syms(c(by, id[5]))) |>
     dplyr::summarise(
       !!startDate := min(.data[[startDate]], na.rm = TRUE),
       !!endDate := max(.data[[endDate]], na.rm = TRUE),
