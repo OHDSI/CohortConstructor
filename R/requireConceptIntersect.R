@@ -47,6 +47,9 @@ requireConceptIntersect <- function(cohort,
   validateCohortColumn(indexDate, cohort, class = "date")
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   window <- omopgenerics::validateWindowArgument(window)
+  if(length(window) > 1){
+    cli::cli_abort("Only one time window can be considered, but more than one has been specified: {window}")
+  }
   cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
   conceptSet <- omopgenerics::validateConceptSetArgument(conceptSet, cdm)
   intersections <- validateIntersections(intersections)
@@ -119,6 +122,32 @@ requireConceptIntersect <- function(cohort,
 
   intersectCols <- names(conceptSet)
   intersectCols <- paste0("intersect_", intersectCols)
+
+  missCount <- newCohort |>
+    dplyr::filter(!!!glue::glue("is.na(.data${intersectCols[1]})") |> rlang::parse_exprs()) |>
+    dplyr::tally() |>
+    dplyr::pull("n")
+  if(missCount > 0){
+    if(window_end < 0) {
+      cli::cli_inform("A total of {missCount} records do not have at least {abs(window_end)} days of prior observation and so will be dropped.")
+      cli::cli_inform("Adding requirement of {abs(window_end)} days of prior observation")
+      newCohort <- newCohort |>
+        requirePriorObservation(minPriorObservation = abs(window_end),
+                                cohortId = cohortId,
+                                indexDate = indexDate,
+                                atFirst = atFirst,
+                                name = tableName(newCohort))
+    } else if (window_start > 0){
+      cli::cli_inform("A total of {missCount} records do not have at least {window_start} days of future observation and so will be dropped.")
+      cli::cli_inform("Adding requirement of {window_start} days of future observation")
+      newCohort <- newCohort |>
+        requireFutureObservation(minFutureObservation = window_start,
+                                 cohortId = cohortId,
+                                 indexDate = indexDate,
+                                 atFirst = atFirst,
+                                 name = tableName(newCohort))
+    }
+  }
 
   newCohort <- applyCohortRequirement(
     cdm, newCohort, tmpNewCohort, atFirst, lower_limit, upper_limit,
