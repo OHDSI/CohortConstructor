@@ -402,72 +402,125 @@ test_that("different intersection count requirements", {
   dropCreatedTables(cdm = cdm)
 })
 
-test_that("test indexes - postgres, and atFirst", {
+test_that("filter on observation requirement", {
   skip_on_cran()
-  skip_if(!testIndexes)
 
-  if (dbToTest == "postgres CDMConnector") {
-    cdm <- omock::mockCdmFromTables(tables = list(
-      my_cohort = dplyr::tibble(
-        cohort_definition_id = 1L,
-        subject_id = 1L,
-        cohort_start_date = as.Date("2009-01-02"),
-        cohort_end_date = as.Date("2009-01-03"),
-        other_date = as.Date("2009-01-01")
-      )
+  obs <- dplyr::tibble(
+    observation_period_id = as.integer(c(1, 2)),
+    person_id = as.integer(c(1, 2)),
+    observation_period_start_date = as.Date(c(
+      "2000-01-01",
+      "2000-01-01"
+    )),
+    observation_period_end_date = as.Date(c(
+      "2001-01-01",
+      "2001-01-01"
+    )),
+    "period_type_concept_id" = NA_integer_
+  )
+
+  person <- dplyr::tibble(
+    person_id = as.integer(c(1, 2)),
+    gender_concept_id = as.integer(c(8532, 8507)),
+    year_of_birth = as.integer(c(1997, 1963)),
+    month_of_birth = as.integer(c(8, 1)),
+    day_of_birth = as.integer(c(22, 27)),
+    race_concept_id = NA_integer_,
+    ethnicity_concept_id = NA_integer_
+  )
+
+  cohort_1 <- dplyr::tibble(
+    cohort_definition_id = c(1, 1, 2),
+    subject_id = as.integer(c(1, 2, 2)),
+    cohort_start_date = as.Date(c(
+      "2000-01-01", # same day as obs start
+      "2001-01-01", # year after day as obs start
+      "2000-01-01" # same day as obs start
+    )),
+    cohort_end_date = as.Date(c(
+      "2000-12-01",
+      "2001-01-01",
+      "2001-01-01"
+    ))
+  )
+
+  cdm <- omock::mockCdmFromTables(tables = list("cohort1" = cohort_1)) |>
+    omopgenerics::insertTable(name = "observation_period", table = obs) |>
+    omopgenerics::insertTable(name = "person", table = person) |>
+    omopgenerics::insertTable(name = "table", table = dplyr::tibble(
+      person_id = as.integer(c(1, 3, 2, 2)),
+      date_start = as.Date(c("2002-01-01", "2015-10-01", "2000-01-01", "1999-01-01")),
+      date_end = as.Date(c("2002-01-01", "2015-10-01", "2000-01-01", "1999-01-01"))
     )) |>
-      copyCdm()
+    copyCdm()
 
-    con <- CDMConnector::cdmCon(cdm = cdm)
 
-    omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::contains("og_"))
+  # if not in obs, we add prior obs requirement
+  cdm$cohort2 <-  requireTableIntersect(cohort = cdm$cohort1,
+                                        tableName = "table",
+                                        targetStartDate = "date_start",
+                                        targetEndDate = "date_end",
+                                        window = list(c(-Inf, -1)),
+                                        name = "cohort2")
 
-    cdm$my_cohort <- requireTableIntersect(cdm$my_cohort, tableName = "visit_occurrence", window = list(c(-Inf, 0)))
-    expect_true(
-      DBI::dbGetQuery(con, paste0("SELECT * FROM pg_indexes WHERE tablename = 'cc_my_cohort';")) |> dplyr::pull("indexdef") ==
-        "CREATE INDEX cc_my_cohort_subject_id_cohort_start_date_idx ON public.cc_my_cohort USING btree (subject_id, cohort_start_date)"
-    )
+ expect_equal((cdm$cohort2 |>
+    attrition() |>
+    dplyr::filter(cohort_definition_id == 1,
+                  stringr::str_detect(reason, "Prior observation")) |>
+    dplyr::pull("excluded_records")),
+  1)
+ expect_equal((cdm$cohort2 |>
+                 attrition() |>
+                 dplyr::filter(cohort_definition_id == 2,
+                               stringr::str_detect(reason, "Prior observation")) |>
+                 dplyr::pull("excluded_records")),
+              1)
 
-    # atFirst
-    cohort <- dplyr::tibble(
-      cohort_definition_id = c(rep(1L, 4), rep(2L, 4)),
-      subject_id = c(1L, 1L, 2L, 3L, rep(1L, 4)),
-      cohort_start_date = as.Date(c(
-        "2008-01-01", "2009-03-11", "2010-05-03", "2010-02-25",
-        "2008-03-24", "2008-11-28", "2010-01-30", "2009-06-13"
-      )),
-      cohort_end_date = as.Date(c(
-        "2009-03-10", "2009-07-19", "2010-06-15", "2010-04-30",
-        "2008-11-27", "2008-01-29", "2010-06-12", "2010-01-15"
-      ))
-    )
-    cdm <- omopgenerics::insertTable(cdm = cdm,
-                                     name = "my_cohort",
-                                     table = cohort)
-    cdm$my_cohort <- omopgenerics::newCohortTable(cdm$my_cohort, .softValidation = TRUE)
-    cdm$my_cohort_1 <- requireTableIntersect(cohort = cdm$my_cohort,
-                                             tableName = "measurement",
-                                             window = list(c(-Inf, 0)),
-                                             atFirst = TRUE,
-                                             name = "my_cohort_1")
-    expect_equal(
-      collectCohort(cdm$my_cohort_1, 2),
-      dplyr::tibble(
-        subject_id = 1L,
-        cohort_start_date = as.Date(NULL),
-        cohort_end_date = as.Date(NULL)
-      )
-    )
-    expect_equal(
-      attrition(cdm$my_cohort_1)$reason,
-      c('Initial qualifying events',
-        'In table measurement between -Inf & 0 days relative to cohort_start_date between 1 and Inf. Requirement applied to the first entry',
-        'Initial qualifying events',
-        'In table measurement between -Inf & 0 days relative to cohort_start_date between 1 and Inf. Requirement applied to the first entry'
-      ))
+  # cohort id argument - won't affect cohort id 2
+  cdm$cohort3 <-  requireTableIntersect(cohort = cdm$cohort1,
+                                       tableName = "table",
+                                       cohortId = 1,
+                                       targetStartDate = "date_start",
+                                       targetEndDate = "date_end",
+                                       window = list(c(-Inf, -1)),
+                                       name = "cohort3")
+  expect_equal(length((cdm$cohort3 |>
+                  attrition() |>
+                  dplyr::filter(cohort_definition_id == 2,
+                                stringr::str_detect(reason, "Prior observation")) |>
+                  dplyr::pull("excluded_records"))),
+               0)
 
-    expect_true(sum(grepl("og", omopgenerics::listSourceTables(cdm))) == 0)
 
-    dropCreatedTables(cdm = cdm)
-  }
+   # relative to cohort end date
+  cdm$cohort4 <-  requireTableIntersect(cohort = cdm$cohort1,
+                                        tableName = "table",
+                                        indexDate = "cohort_end_date",
+                                        targetStartDate = "date_start",
+                                        targetEndDate = "date_end",
+                                        window = list(c(-Inf, -1)),
+                                        name = "cohort4")
+
+  expect_equal(length((cdm$cohort4 |>
+                         attrition() |>
+                         dplyr::filter(cohort_definition_id == 1,
+                                       stringr::str_detect(reason, "Prior observation")) |>
+                         dplyr::pull("excluded_records"))),
+               0)
+
+  # future observation
+  cdm$cohort5 <-  requireTableIntersect(cohort = cdm$cohort1,
+                                        tableName = "table",
+                                        indexDate = "cohort_start_date",
+                                        targetStartDate = "date_start",
+                                        targetEndDate = "date_end",
+                                        window = list(c(1, Inf)),
+                                        name = "cohort5")
+  expect_equal((cdm$cohort5 |>
+                  attrition() |>
+                  dplyr::filter(cohort_definition_id == 1,
+                                stringr::str_detect(reason, "Future observation")) |>
+                  dplyr::pull("excluded_records")),
+               1)
+
 })

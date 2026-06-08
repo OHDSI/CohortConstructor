@@ -90,6 +90,32 @@ requireTableIntersect <- function(cohort,
       name = tmpNewCohort
     )
 
+  missCount <- newCohort |>
+    dplyr::filter(!!!glue::glue("is.na(.data${intersectCol})") |> rlang::parse_exprs()) |>
+    dplyr::tally() |>
+    dplyr::pull("n")
+  if(missCount > 0){
+    if(window_end < 0) {
+      cli::cli_inform("A total of {missCount} records do not have at least {abs(window_end)} days of prior observation and so will be dropped.")
+      cli::cli_inform("Adding requirement of {abs(window_end)} days of prior observation")
+      newCohort <- newCohort |>
+        requirePriorObservation(minPriorObservation = abs(window_end),
+                                cohortId = cohortId,
+                                indexDate = indexDate,
+                                atFirst = atFirst,
+                                name = tableName(newCohort))
+    } else if (window_start > 0){
+      cli::cli_inform("A total of {missCount} records do not have at least {window_start} days of future observation and so will be dropped.")
+      cli::cli_inform("Adding requirement of {window_start} days of future observation")
+      newCohort <- newCohort |>
+        requireFutureObservation(minFutureObservation = window_start,
+                                 cohortId = cohortId,
+                                 indexDate = indexDate,
+                                 atFirst = atFirst,
+                                 name = tableName(newCohort))
+    }
+  }
+
   newCohort <- applyRequirement(
     newCohort, atFirst, tmpNewCohort, intersectCol, lower_limit, upper_limit, cdm
   )
