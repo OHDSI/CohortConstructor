@@ -169,13 +169,14 @@ conceptCohort <- function(cdm,
     supportedDomains = domainsData$domain_id
   )
   # get cohort entries from omop records
-  cdm[[name]] <- unerafiedConceptCohort(
+  unerafiedTblName <- omopgenerics::uniqueTableName()
+  cdm[[unerafiedTblName]] <- unerafiedConceptCohort(
     cdm = cdm,
     conceptSet = conceptSet,
     cohortSet = cohortSet,
     cohortCodelist = cohortCodelist,
     tableCohortCodelist = tableCohortCodelist,
-    name = name,
+    name = unerafiedTblName,
     extraCols = NULL,
     exit = exit,
     typeConceptId = typeConceptId,
@@ -186,12 +187,13 @@ conceptCohort <- function(cdm,
 
   cdm[[tableCohortCodelist]] <- NULL
 
-  if (cdm[[name]] |>
+  if (cdm[[unerafiedTblName]] |>
       utils::head(1) |>
       dplyr::tally() |>
       dplyr::pull("n") == 0) {
     cli::cli_inform(c("i" = "No cohort entries found, returning empty cohort table."))
-    cdm[[name]] <- cdm[[name]] |>
+    cdm[[name]] <- cdm[[unerafiedTblName]]|>
+      dplyr::compute(name = name) |>
       dplyr::select(
         "cohort_definition_id",
         "subject_id",
@@ -204,12 +206,14 @@ conceptCohort <- function(cdm,
         cohortCodelistRef = cohortCodelist,
         .softValidation = TRUE
       )
-
+    omopgenerics::dropSourceTable(cdm, name = c(unerafiedTblName))
+    cdm[[unerafiedTblName]] <- NULL
     return(cdm[[name]])
   }
 
   cli::cli_inform(c("i" = "Creating cohort attributes."))
-  cdm[[name]] <- cdm[[name]] |>
+  cdm[[name]] <- cdm[[unerafiedTblName]] |>
+    dplyr::compute(name = name) |>
     omopgenerics::newCohortTable(
       cohortSetRef = cohortSet,
       cohortAttritionRef = NULL,
@@ -272,6 +276,45 @@ conceptCohort <- function(cdm,
       cols = c("subject_id", "cohort_start_date")
     )
   }
+
+  cli::cli_inform(c("i" = "Summarising cohort code use."))
+  countTblName <- omopgenerics::uniqueTableName()
+  cdm[[countTblName]] <- cdm[[name]] |>
+    dplyr::select("cohort_definition_id",
+                  "subject_id",
+                  "cohort_start_date")|>
+    dplyr::left_join(cdm[[unerafiedTblName]] |>
+                       dplyr::select("cohort_definition_id",
+                                     "subject_id",
+                                     "cohort_start_date",
+                                     "concept_id",
+                                     "record_type"),
+                     by = c("cohort_definition_id",
+                            "subject_id",
+                            "cohort_start_date")) |>
+    dplyr::compute(name = countTblName)
+
+  code_counts <- dplyr::bind_rows(
+    cdm[[countTblName]] |>
+      dplyr::group_by(cohort_definition_id, concept_id, record_type) |>
+      dplyr::tally() |>
+      dplyr::mutate(type = "record_count") |>
+      dplyr::collect(),
+    cdm[[countTblName]] |>
+      dplyr::select(cohort_definition_id, subject_id, concept_id, record_type) |>
+      dplyr::distinct() |>
+      dplyr::group_by(cohort_definition_id, concept_id, record_type) |>
+      dplyr::tally() |>
+      dplyr::mutate(type = "person_count") |>
+      dplyr::collect()) |>
+    dplyr::arrange(cohort_definition_id, desc(n))
+
+  attr(cdm[[name]], "cohort_code_use") <- code_counts
+
+  omopgenerics::dropSourceTable(cdm, name = c(unerafiedTblName,
+                                              countTblName))
+  cdm[[unerafiedTblName]] <- NULL
+  cdm[[countTblName]] <- NULL
 
   cli::cli_inform(c("v" = "Cohort {.strong {name}} created."))
 
@@ -378,9 +421,12 @@ unerafiedConceptCohort <- function(cdm,
       "subject_id",
       "cohort_start_date",
       "cohort_end_date",
+      "concept_id",
+      "record_type",
       extraCols
     ))) |>
-    dplyr::mutate(cohort_end_date = dplyr::coalesce(.data$cohort_end_date, .data$cohort_start_date)) |>
+    dplyr::mutate(cohort_end_date = dplyr::coalesce(.data$cohort_end_date,
+                                                    .data$cohort_start_date)) |>
     dplyr::compute(name = name, temporary = FALSE,
                    logPrefix = "CohortConstructor_conceptCohort_reduce_")
 
@@ -697,17 +743,30 @@ getDomainCohort <- function(cdm,
       dplyr::compute(temporary = FALSE, name = name,
                      logPrefix = "CohortConstructor_tempCohort_")
   }
+
+  if(isFALSE(source)){
+    record_type <- "standard_field"
+  } else {
+    record_type <- "source_field"
+  }
+
   tempCohort <- tempCohort |>
     dplyr::inner_join(
       cdm[[paste0(tablePrefix, "temp_codelist_cohort_id")]],
       by = "concept_id") |>
+    dplyr::mutate(record_type = .env$record_type) |>
     dplyr::select("cohort_definition_id",
                   "subject_id",
                   "cohort_start_date",
                   "cohort_end_date",
+                  "concept_id",
+                  "record_type",
                   dplyr::any_of(extraCols)) |>
     dplyr::compute(temporary = FALSE, name = name,
                    logPrefix = "CohortConstructor_tempCohort_")
+
+  return(tempCohort)
+
 }
 
 extendOverlap  <- function(cohort,
