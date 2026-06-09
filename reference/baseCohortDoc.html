@@ -63,7 +63,13 @@
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
 
 
-<dl><dt id="arg-userecordsbeforeobservation">useRecordsBeforeObservation<a class="anchor" aria-label="anchor" href="#arg-userecordsbeforeobservation"></a></dt>
+<dl><dt id="arg-typeconceptid">typeConceptId<a class="anchor" aria-label="anchor" href="#arg-typeconceptid"></a></dt>
+<dd><p>Type concept id used to subset tables. See:
+https://athena.ohdsi.org/search-terms/terms?conceptClass=Type+Concept. If
+<code>NULL</code> no filtering is applied.</p></dd>
+
+
+<dt id="arg-userecordsbeforeobservation">useRecordsBeforeObservation<a class="anchor" aria-label="anchor" href="#arg-userecordsbeforeobservation"></a></dt>
 <dd><p>If FALSE, only records that fall entirely
 (start and end) within an observation period are used.
 If TRUE, records that start before an observation period are included by

@@ -133,6 +133,7 @@ as to end at the preceding observation period end date.</p></li>
 <span>  exit <span class="op">=</span> <span class="st">"event_end_date"</span>,</span>
 <span>  overlap <span class="op">=</span> <span class="st">"merge"</span>,</span>
 <span>  table <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  typeConceptId <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  useRecordsBeforeObservation <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  useSourceFields <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  subsetCohort <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -176,6 +177,12 @@ provided. If NULL, each concept will be search at the assigned domain in
 the concept table.</p></dd>
 
 
+<dt id="arg-typeconceptid">typeConceptId<a class="anchor" aria-label="anchor" href="#arg-typeconceptid"></a></dt>
+<dd><p>Type concept id used to subset tables. See:
+https://athena.ohdsi.org/search-terms/terms?conceptClass=Type+Concept. If
+<code>NULL</code> no filtering is applied.</p></dd>
+
+
 <dt id="arg-userecordsbeforeobservation">useRecordsBeforeObservation<a class="anchor" aria-label="anchor" href="#arg-userecordsbeforeobservation"></a></dt>
 <dd><p>If FALSE, only records that fall entirely
 (start and end) within an observation period are used.
@@ -214,7 +221,7 @@ are included.</p></dd>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ohdsi.github.io/CohortConstructor/">CohortConstructor</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="mockCohortConstructor.html">mockCohortConstructor</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>'/tmp/RtmpHvlfV7/id_mds' already exists</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>'/tmp/RtmpWLA6Rz/id_mds' already exists</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Reading <span style="color: #0000BB;">GiBleed</span> tables.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">cdm</span><span class="op">$</span><span class="va">cohort</span> <span class="op">&lt;-</span> <span class="fu">conceptCohort</span><span class="op">(</span>cdm <span class="op">=</span> <span class="va">cdm</span>, conceptSet <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>a <span class="op">=</span> <span class="fl">444074</span><span class="op">)</span>, name <span class="op">=</span> <span class="st">"cohort"</span><span class="op">)</span></span></span>

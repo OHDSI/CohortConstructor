@@ -26,6 +26,7 @@ measurementCohort(
   valueAsConcept = NULL,
   valueAsNumber = NULL,
   table = NULL,
+  typeConceptId = NULL,
   useRecordsBeforeObservation = FALSE,
   useSourceFields = FALSE,
   subsetCohort = NULL,
@@ -82,6 +83,12 @@ measurementCohort(
 
   Character vector specifying which OMOP tables to use. Accepts
   "measurement", "observation", or both.
+
+- typeConceptId:
+
+  Type concept id used to subset tables. See:
+  https://athena.ohdsi.org/search-terms/terms?conceptClass=Type+Concept.
+  If `NULL` no filtering is applied.
 
 - useRecordsBeforeObservation:
 

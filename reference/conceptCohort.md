@@ -43,6 +43,7 @@ conceptCohort(
   exit = "event_end_date",
   overlap = "merge",
   table = NULL,
+  typeConceptId = NULL,
   useRecordsBeforeObservation = FALSE,
   useSourceFields = FALSE,
   subsetCohort = NULL,
@@ -83,6 +84,12 @@ conceptCohort(
   NULL, each concept will be search at the assigned domain in the
   concept table.
 
+- typeConceptId:
+
+  Type concept id used to subset tables. See:
+  https://athena.ohdsi.org/search-terms/terms?conceptClass=Type+Concept.
+  If `NULL` no filtering is applied.
+
 - useRecordsBeforeObservation:
 
   If FALSE, only records that fall entirely (start and end) within an
@@ -121,7 +128,7 @@ A cohort table
 # \donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
-#> Warning: '/tmp/RtmpHvlfV7/id_mds' already exists
+#> Warning: '/tmp/RtmpWLA6Rz/id_mds' already exists
 #> ℹ Reading GiBleed tables.
 
 cdm$cohort <- conceptCohort(cdm = cdm, conceptSet = list(a = 444074), name = "cohort")

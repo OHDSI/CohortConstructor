@@ -91,6 +91,7 @@ filter will be included.</p></li>
 <span>  valueAsConcept <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  valueAsNumber <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  table <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  typeConceptId <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  useRecordsBeforeObservation <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  useSourceFields <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  subsetCohort <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -144,6 +145,12 @@ measurements recorded in kilograms (unit_concept_id = 9529) and stones
 <dt id="arg-table">table<a class="anchor" aria-label="anchor" href="#arg-table"></a></dt>
 <dd><p>Character vector specifying which OMOP tables to use.
 Accepts "measurement", "observation", or both.</p></dd>
+
+
+<dt id="arg-typeconceptid">typeConceptId<a class="anchor" aria-label="anchor" href="#arg-typeconceptid"></a></dt>
+<dd><p>Type concept id used to subset tables. See:
+https://athena.ohdsi.org/search-terms/terms?conceptClass=Type+Concept. If
+<code>NULL</code> no filtering is applied.</p></dd>
 
 
 <dt id="arg-userecordsbeforeobservation">useRecordsBeforeObservation<a class="anchor" aria-label="anchor" href="#arg-userecordsbeforeobservation"></a></dt>

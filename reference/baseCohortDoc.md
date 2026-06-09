@@ -5,6 +5,12 @@ Helper for consistent documentation of `conceptCohort` and
 
 ## Arguments
 
+- typeConceptId:
+
+  Type concept id used to subset tables. See:
+  https://athena.ohdsi.org/search-terms/terms?conceptClass=Type+Concept.
+  If `NULL` no filtering is applied.
+
 - useRecordsBeforeObservation:
 
   If FALSE, only records that fall entirely (start and end) within an

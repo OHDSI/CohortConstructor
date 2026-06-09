@@ -95,20 +95,20 @@ already created so let’s first add a column sex to my existent cohort:
 cdm$medications <- cdm$medications |>
   addSex()
 cdm$medications
-#> # Source:   table<og_011_1780927283> [?? x 5]
-#> # Database: DuckDB 1.5.2 [unknown@Linux 6.17.0-1015-azure:R 4.6.0//tmp/RtmpLf2QQX/file26d03c5625af.duckdb]
+#> # Source:   table<og_011_1780991076> [?? x 5]
+#> # Database: DuckDB 1.5.2 [unknown@Linux 6.17.0-1015-azure:R 4.6.0//tmp/Rtmpv3ie0j/file271613f32891.duckdb]
 #>    cohort_definition_id subject_id cohort_start_date cohort_end_date sex   
 #>                   <int>      <int> <date>            <date>          <chr> 
-#>  1                    1        260 1979-02-22        1979-03-08      Male  
-#>  2                    1        743 1991-11-08        1991-12-06      Female
-#>  3                    1        917 1981-02-11        1981-02-25      Female
-#>  4                    1       1099 2007-05-23        2007-06-06      Male  
-#>  5                    1       1310 1953-04-07        1953-04-14      Male  
-#>  6                    1       1314 2012-04-22        2012-05-06      Male  
-#>  7                    1       1605 1992-01-16        1992-02-13      Male  
-#>  8                    1       1635 2005-07-19        2005-08-02      Male  
-#>  9                    1       1846 1963-05-25        1963-06-01      Male  
-#> 10                    1       2164 1979-05-12        1979-05-26      Male  
+#>  1                    1        148 1993-06-12        1993-08-11      Female
+#>  2                    1        399 1972-03-09        1972-03-30      Male  
+#>  3                    1        605 1970-01-31        1970-02-14      Female
+#>  4                    1        759 1962-10-03        1962-10-17      Male  
+#>  5                    1        759 2017-09-07        2017-09-21      Male  
+#>  6                    1       1305 1969-06-14        1969-06-28      Male  
+#>  7                    1       1606 1995-05-04        1995-05-18      Male  
+#>  8                    1       1606 2011-04-13        2011-04-20      Male  
+#>  9                    1       1606 2012-08-14        2012-08-28      Male  
+#> 10                    1       1611 1990-09-07        1990-09-21      Male  
 #> # ℹ more rows
 ```
 
@@ -263,15 +263,15 @@ records:
 cdm$medications |> 
   filter(subject_id == 4383)
 #> # Source:   SQL [?? x 5]
-#> # Database: DuckDB 1.5.2 [unknown@Linux 6.17.0-1015-azure:R 4.6.0//tmp/RtmpLf2QQX/file26d03c5625af.duckdb]
+#> # Database: DuckDB 1.5.2 [unknown@Linux 6.17.0-1015-azure:R 4.6.0//tmp/Rtmpv3ie0j/file271613f32891.duckdb]
 #>   cohort_definition_id subject_id cohort_start_date cohort_end_date sex  
 #>                  <int>      <int> <date>            <date>          <chr>
-#> 1                    1       4383 1971-02-06        1971-02-13      Male 
+#> 1                    1       4383 2004-05-21        2004-06-11      Male 
 #> 2                    1       4383 1990-12-20        1991-01-03      Male 
-#> 3                    1       4383 2004-05-21        2004-06-11      Male 
-#> 4                    1       4383 1990-10-13        1990-10-27      Male 
+#> 3                    1       4383 1992-07-18        1992-08-22      Male 
+#> 4                    1       4383 1971-02-06        1971-02-13      Male 
 #> 5                    1       4383 2000-03-12        2000-03-19      Male 
-#> 6                    1       4383 1992-07-18        1992-08-22      Male
+#> 6                    1       4383 1990-10-13        1990-10-27      Male
 ```
 
 From the 6 records only 3 are within our period of interest `1990-1993`,
@@ -287,7 +287,7 @@ to see 4 cohort contributions for this subject (2 in 1990, 1 in 1991 and
 cdm$medications_year |>
   filter(subject_id == 4383)
 #> # Source:   SQL [?? x 5]
-#> # Database: DuckDB 1.5.2 [unknown@Linux 6.17.0-1015-azure:R 4.6.0//tmp/RtmpLf2QQX/file26d03c5625af.duckdb]
+#> # Database: DuckDB 1.5.2 [unknown@Linux 6.17.0-1015-azure:R 4.6.0//tmp/Rtmpv3ie0j/file271613f32891.duckdb]
 #>   cohort_definition_id subject_id cohort_start_date cohort_end_date sex  
 #>                  <int>      <int> <date>            <date>          <chr>
 #> 1                    1       4383 1990-12-20        1990-12-31      Male 
