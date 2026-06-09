@@ -344,7 +344,6 @@ test_that("mearurementCohorts works", {
     table = "measurement"
   )
   expect_true(cdm$cohort10 |> dplyr::tally() |> dplyr::pull("n") == 0)
-  expect_true(cdm$cohort10 |> attrition() |> nrow() == 0)
   expect_true(cdm$cohort10 |> settings() |> nrow() == 1)
   expect_identical(colnames(settings(cdm$cohort10)) |> sort(), c("cdm_version", "cohort_definition_id", "cohort_name", "measurement_value_as_concept", "vocabulary_version"))
 

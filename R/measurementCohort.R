@@ -123,6 +123,7 @@ measurementCohort <- function(cdm,
                               valueAsConcept = NULL,
                               valueAsNumber = NULL,
                               table = NULL,
+                              typeConceptId = NULL,
                               useRecordsBeforeObservation = FALSE,
                               useSourceFields = FALSE,
                               subsetCohort = NULL,
@@ -140,6 +141,7 @@ measurementCohort <- function(cdm,
   omopgenerics::assertLogical(useSourceFields, length = 1)
   omopgenerics::assertLogical(useRecordsBeforeObservation, length = 1)
   omopgenerics::assertCharacter(subsetCohort, length = 1, null = TRUE)
+  omopgenerics::assertNumeric(typeConceptId, integerish = TRUE, null = TRUE)
   if (!is.null(subsetCohort)) {
     subsetCohort <- omopgenerics::validateCohortArgument(cdm[[subsetCohort]])
     subsetCohortId <- omopgenerics::validateCohortIdArgument({{subsetCohortId}}, subsetCohort, validation = "warning")
@@ -152,10 +154,13 @@ measurementCohort <- function(cdm,
   # empty concept set
   if (length(conceptSet) == 0) {
     cli::cli_inform(c("i" = "Empty codelist provided, returning empty cohort"))
-    cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name)
-    cdm[[name]] <- cdm[[name]] |>
-      omopgenerics::newCohortTable(cohortSetRef = cohortSet)
-    return(cdm[[name]])
+    return(internalEmptyCohort(cdm = cdm, name = name, cohortSetRef = cohortSet))
+  }
+
+  # empty typeConceptId
+  if (length(typeConceptId) == 0 & !is.null(typeConceptId)) {
+    cli::cli_inform(c("i" = "Empty `typeConceptId` provided, returning empty cohort"))
+    return(internalEmptyCohort(cdm = cdm, name = name, cohortSetRef = cohortSet))
   }
 
   # attributes
@@ -196,18 +201,7 @@ measurementCohort <- function(cdm,
                      logPrefix = "CohortConstructor_conceptCohort_subsetCohort_")
     if (omopgenerics::isTableEmpty(subsetIndividuals)) {
       cli::cli_warn("There are no individuals in the `subsetCohort` and `subsetCohortId` provided. Returning empty cohort.")
-      cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name)
-      cdm[[name]] <- cdm[[name]] |>
-        omopgenerics::newCohortTable(
-          cohortSetRef = cohortSet,
-          cohortAttritionRef = dplyr::tibble(
-            "cohort_definition_id" = cohortSet$cohort_definition_id,
-            "number_records" = 0L, "number_subjects" = 0L,
-            "reason_id" = 1L, "reason" = "Qualifying initial events",
-            "excluded_records" = NA_integer_, "excluded_subjects" = NA_integer_
-          )
-        )
-      return(cdm[[name]])
+      return(internalEmptyCohort(cdm = cdm, name = name, cohortSetRef = cohortSet))
     }
     if (!isFALSE(useIndexes)) {
       addIndex(
@@ -229,6 +223,7 @@ measurementCohort <- function(cdm,
     name = name,
     extraCols = c("value_as_number", "value_as_concept_id", "unit_concept_id"),
     exit = "event_start_date",
+    typeConceptId = typeConceptId,
     useSourceFields = useSourceFields,
     subsetIndividuals = subsetIndividuals,
     tablePrefix = tablePref
