@@ -43,7 +43,8 @@ test_that("initial tests", {
         "2000-03-01", "2000-04-02"
       )),
       "drug_type_concept_id" = 1L,
-      "drug_source_concept_id" = c(rep(NA_integer_, 7), 99L, rep(NA_integer_, 9))
+      "drug_source_concept_id" = c(rep(NA_integer_, 7), 99L, rep(NA_integer_, 9)),
+      "drug_source_value" = NA_character_
     )
   )
   # end date < start date
@@ -61,7 +62,8 @@ test_that("initial tests", {
                                        "2017-10-29",
                                        NA)),
       "condition_type_concept_id" = 1L,
-      "condition_source_concept_id" = NA_integer_
+      "condition_source_concept_id" = NA_integer_,
+      "condition_source_value" = NA_character_
     )
   )
   # subset cohort
@@ -143,7 +145,7 @@ test_that("initial tests", {
     # no temp tables will have been created
     expect_true(startTempTables == endTempTables)
     expect_true(
-      startPermanentTables + 4 == endPermanentTables
+      startPermanentTables + 5 == endPermanentTables
     )
   }
 
@@ -340,7 +342,7 @@ test_that("initial tests", {
   # error if missing columns
   cdm$drug_exposure <- cdm$drug_exposure |>
     dplyr::select(!"drug_source_concept_id")
-  expect_no_error(conceptCohort(cdm, conceptSet = list("a" = 5L),
+  expect_warning(conceptCohort(cdm, conceptSet = list("a" = 5L),
                 name = "cohort",
                 table = "drug_exposure"))
   expect_error(conceptCohort(cdm, conceptSet = list("a" = 5L),
@@ -392,7 +394,9 @@ test_that("out of observation", {
       "drug_concept_id" = c(1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 2) |> as.integer(),
       "drug_exposure_start_date" = c(0, 300, 1500, 750, 10, 800, 150, 1800, 1801, 1802, 1803, 430, -10),
       "drug_exposure_end_date" = c(400, 800, 1600, 1550, 2000, 1000, 600, 1801, 1802, 1803, 1804, 400, -100),
-      "drug_type_concept_id" = 1L
+      "drug_type_concept_id" = 1L,
+      "drug_source_concept_id" = NA_integer_,
+      "drug_source_value" = NA_character_
     ) |>
       dplyr::mutate(
         "drug_exposure_start_date" = as.Date(.data$drug_exposure_start_date, origin = "2010-01-01"),
@@ -470,7 +474,9 @@ test_that("out of observation", {
       "drug_concept_id" = 1L,
       "drug_exposure_start_date" = as.Date(c("2004-01-01", "2014-01-01", "2001-01-01", "2000-01-01")),
       "drug_exposure_end_date" = as.Date(c("2015-01-01", "2015-05-01", "2002-01-01", "2000-02-02")),
-      "drug_type_concept_id" = 1L
+      "drug_type_concept_id" = 1L,
+      "drug_source_concept_id" = NA_integer_,
+      "drug_source_value" = NA_character_
     )) |>
     copyCdm()
 
@@ -529,7 +535,9 @@ test_that("out of observation", {
       "drug_concept_id" = c(1, 1, 1, 1, 2, 2) |> as.integer(),
       "drug_exposure_start_date" = as.Date(c("2004-01-01", "2014-01-01", "2015-04-01", "2000-01-01", "2000-01-01", "1999-01-01")),
       "drug_exposure_end_date" = as.Date(c("2003-01-01", "2015-05-01", "2015-07-01", "2000-02-02", "2000-01-01", "2001-01-01")),
-      "drug_type_concept_id" = 1L
+      "drug_type_concept_id" = 1L,
+      "drug_source_concept_id" = NA_integer_,
+      "drug_source_value" = NA_character_
     )) |>
     copyCdm()
 
@@ -584,7 +592,9 @@ test_that("overlap option", {
                                            "2020-01-21",
                                            "2020-01-21",
                                            "2020-01-03")),
-      "drug_type_concept_id" = 1L
+      "drug_type_concept_id" = 1L,
+      "drug_source_concept_id" = NA_integer_,
+      "drug_source_value" = NA_character_
     ) )
   cdm <- omopgenerics::insertTable(
     cdm = cdm, name = "concept", table = dplyr::tibble(
@@ -655,7 +665,9 @@ test_that("overlap option", {
                                              "2020-01-04")),
       "drug_exposure_end_date" = as.Date(c("2020-01-06",
                                            "2020-01-08")),
-      "drug_type_concept_id" = 1L
+      "drug_type_concept_id" = 1L,
+      "drug_source_concept_id" = NA_integer_,
+      "drug_source_value" = NA_character_
     ))
 
   expect_no_error(cdm$cohort_3 <- conceptCohort(cdm = cdm,
@@ -683,7 +695,9 @@ test_that("overlap option", {
                                              "2020-01-05")),
       "drug_exposure_end_date" = as.Date(c("2020-01-03",
                                            "2020-01-10")),
-      "drug_type_concept_id" = 1L
+      "drug_type_concept_id" = 1L,
+      "drug_source_concept_id" = NA_integer_,
+      "drug_source_value" = NA_character_
     ))
 
   expect_no_error(cdm$cohort_4 <- conceptCohort(cdm = cdm,
@@ -718,7 +732,9 @@ test_that("overlap option", {
       "drug_concept_id" = c(1L, 1L, 1L),
       "drug_exposure_start_date" = as.Date(c("2020-01-01", "2020-01-05",  "2020-01-13")),
       "drug_exposure_end_date" = as.Date(c("2020-01-08", "2020-01-11",  "2020-01-15")),
-      "drug_type_concept_id" = 1L
+      "drug_type_concept_id" = 1L,
+      "drug_source_concept_id" = NA_integer_,
+      "drug_source_value" = NA_character_
     ))
   expect_no_error(cdm$cohort_6 <- conceptCohort(cdm = cdm,
                                                 conceptSet = list(a = 1L),
@@ -737,7 +753,9 @@ test_that("overlap option", {
       "drug_concept_id" = c(1L, 1L),
       "drug_exposure_start_date" = as.Date(c("2020-01-15", "2020-01-20")),
       "drug_exposure_end_date" = as.Date(c("2020-01-28", "2020-01-28")),
-      "drug_type_concept_id" = 1L
+      "drug_type_concept_id" = 1L,
+      "drug_source_concept_id" = NA_integer_,
+      "drug_source_value" = NA_character_
     ))
 
   expect_no_error(cdm$cohort_7 <- conceptCohort(cdm = cdm,
@@ -812,7 +830,9 @@ test_that("useRecordsBeforeObservation TRUE", {
       "drug_exposure_end_date" = as.Date(c(
         "2000-10-02", "2001-08-03", "2000-03-01", "2000-11-01", "2001-02-01", "2001-02-01"
       )),
-      "drug_type_concept_id" = 1L
+      "drug_type_concept_id" = 1L,
+      "drug_source_concept_id" = NA_integer_,
+      "drug_source_value" = NA_character_
     )
   )
 
@@ -875,7 +895,9 @@ test_that("useRecordsBeforeObservation TRUE", {
       "drug_exposure_end_date" = as.Date(c(
         "2000-11-01", "2001-08-03", "2001-12-12", "2002-11-01", "2003-02-01", "2004-02-01"
       )),
-      "drug_type_concept_id" = 1L
+      "drug_type_concept_id" = 1L,
+      "drug_source_concept_id" = NA_integer_,
+      "drug_source_value" = NA_character_
     )
   ) |>
     copyCdm()
@@ -910,7 +932,9 @@ test_that("typeConceptId", {
       condition_concept_id = 35208414L,
       condition_start_date = as.Date("2020-01-01"),
       condition_end_date = condition_start_date,
-      condition_type_concept_id = c(rep(32817L, 3L), rep(32879L, 2L))
+      condition_type_concept_id = c(rep(32817L, 3L), rep(32879L, 2L)),
+      condition_source_concept_id = NA_integer_,
+      condition_source_value = NA_character_
     )
   )) |>
     copyCdm()

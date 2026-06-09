@@ -9,7 +9,7 @@ collectCohort <- function(cohort, id) {
   attr(x, "cohort_set") <- NULL
   attr(x, "cohort_attrition") <- NULL
   attr(x, "cohort_codelist") <- NULL
-  attr(x, "cohort_code_use") <- NULL
+  attr(x, "cohort_index_records") <- NULL
   x <- dplyr::as_tibble(x)
   return(x)
 }

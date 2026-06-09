@@ -185,6 +185,13 @@ conceptCohort <- function(cdm,
     tablePrefix = tmpPref
   )
 
+  if (!isFALSE(useIndexes)) {
+    addIndex(
+      cohort = cdm[[unerafiedTblName]],
+      cols = c("subject_id", "cohort_start_date")
+    )
+  }
+
   cdm[[tableCohortCodelist]] <- NULL
 
   if (cdm[[unerafiedTblName]] |>
@@ -277,44 +284,37 @@ conceptCohort <- function(cdm,
     )
   }
 
-  cli::cli_inform(c("i" = "Summarising cohort code use."))
-  countTblName <- omopgenerics::uniqueTableName()
-  cdm[[countTblName]] <- cdm[[name]] |>
+  cli::cli_inform(c("i" = "Creating cohort code use table attribute"))
+  # table with records for cohort entry that would lead to inclusion
+  # note it is possible people have more than one concept id on their start date
+  # some records will be lost when erafying etc
+  cohort_index_records <- cdm[[name]] |>
     dplyr::select("cohort_definition_id",
                   "subject_id",
                   "cohort_start_date")|>
     dplyr::left_join(cdm[[unerafiedTblName]] |>
-                       dplyr::select("cohort_definition_id",
-                                     "subject_id",
-                                     "cohort_start_date",
-                                     "concept_id",
-                                     "record_type"),
+                       dplyr::select(
+                         dplyr::any_of(c("cohort_definition_id",
+                                         "subject_id",
+                                         "cohort_start_date",
+                                         "standard_concept_id",
+                                         "source_concept_id",
+                                         "source_value"))),
                      by = c("cohort_definition_id",
                             "subject_id",
                             "cohort_start_date")) |>
-    dplyr::compute(name = countTblName)
+    dplyr::compute(name = paste0(name, "_cohort_index_records"))
 
-  code_counts <- dplyr::bind_rows(
-    cdm[[countTblName]] |>
-      dplyr::group_by(cohort_definition_id, concept_id, record_type) |>
-      dplyr::tally() |>
-      dplyr::mutate(type = "record_count") |>
-      dplyr::collect(),
-    cdm[[countTblName]] |>
-      dplyr::select(cohort_definition_id, subject_id, concept_id, record_type) |>
-      dplyr::distinct() |>
-      dplyr::group_by(cohort_definition_id, concept_id, record_type) |>
-      dplyr::tally() |>
-      dplyr::mutate(type = "person_count") |>
-      dplyr::collect()) |>
-    dplyr::arrange(cohort_definition_id, desc(n))
+  if (!isFALSE(useIndexes)) {
+    addIndex(
+      cohort = cohort_index_records,
+      cols = c("subject_id", "cohort_start_date")
+    )
+  }
 
-  attr(cdm[[name]], "cohort_code_use") <- code_counts
+  attr(cdm[[name]], "cohort_index_records") <- cohort_index_records
 
-  omopgenerics::dropSourceTable(cdm, name = c(unerafiedTblName,
-                                              countTblName))
-  cdm[[unerafiedTblName]] <- NULL
-  cdm[[countTblName]] <- NULL
+  omopgenerics::dropSourceTable(cdm, unerafiedTblName)
 
   cli::cli_inform(c("v" = "Cohort {.strong {name}} created."))
 
@@ -375,9 +375,13 @@ unerafiedConceptCohort <- function(cdm,
       )
 
       ## Get standard
-      concept <- tableRef$concept[k]
+      standard_concept <- tableRef$concept[k]
+      source_concept <- tableRef$source[k]
+      source_concept_value <- tableRef$source_value[k]
       tempCohort <- getDomainCohort(
-        cdm, table, concept, start, end, extraCols, tableCohortCodelist,
+        cdm, table,
+        standard_concept, source_concept, source_concept_value,
+        start, end, extraCols, tableCohortCodelist,
         domain, nameK, typeConceptId, subsetIndividuals, tablePrefix
       )
       ## Get source
@@ -386,7 +390,9 @@ unerafiedConceptCohort <- function(cdm,
         tempCohort <- tempCohort |>
           dplyr::union_all(
             getDomainCohort(
-              cdm, table, concept, start, end, extraCols, tableCohortCodelist,
+              cdm, table,
+              standard_concept, source_concept, source_concept_value,
+              start, end, extraCols, tableCohortCodelist,
               domain, nameK, typeConceptId, subsetIndividuals, tablePrefix, TRUE
             )
           ) |>
@@ -422,7 +428,9 @@ unerafiedConceptCohort <- function(cdm,
       "cohort_start_date",
       "cohort_end_date",
       "concept_id",
-      "record_type",
+      "standard_concept_id",
+      "source_concept_id",
+      "source_value",
       extraCols
     ))) |>
     dplyr::mutate(cohort_end_date = dplyr::coalesce(.data$cohort_end_date,
@@ -648,7 +656,9 @@ reportConceptsFromUnsopportedDomains <- function(cdm,
 
 getDomainCohort <- function(cdm,
                             table,
-                            concept,
+                            standard_concept,
+                            source_concept,
+                            source_value,
                             start,
                             end,
                             extraCols,
@@ -661,11 +671,25 @@ getDomainCohort <- function(cdm,
                             source = FALSE) {
 
   if (source) {
-    name = paste0(name, "_source")
+    name <- paste0(name, "_source")
+    index_concept <- source_concept
+  } else {
+    index_concept <- standard_concept
   }
-
-  if(!concept %in% colnames(cdm[[table]])){
-    cli::cli_abort("{concept} not found in {table} table")
+  if(!standard_concept %in% colnames(cdm[[table]])){
+    cli::cli_abort("{standard_concept} not found in {table} table")
+  }
+  if(!is.na(source_concept) & (!source_concept %in% colnames(cdm[[table]]))){
+    if (source) {
+      cli::cli_abort("{source_concept} not found in {table} table")
+    } else {
+      cli::cli_warn("{source_concept} not found in {table} table")
+    }
+    source_concept <- NA_character_
+  }
+  if(!is.na(source_value) & (!source_value %in% colnames(cdm[[table]]))){
+    cli::cli_warn("{source_value} not found in {table} table")
+    source_value <- NA_character_
   }
   if(!start %in% colnames(cdm[[table]])){
     cli::cli_abort("{start} not found in {table} table")
@@ -708,13 +732,27 @@ getDomainCohort <- function(cdm,
       unique = TRUE
     )
   }
+
+  conceptCol <- c(
+    "concept_id"  = index_concept,
+    "standard_concept_id" = standard_concept
+  )
+  if (!is.na(source_concept)) {
+    conceptCol <- c(conceptCol,
+                    "source_concept_id" = source_concept)
+  }
+    if (!is.na(source_value)) {
+      conceptCol <- c(conceptCol,
+                      "source_value" = source_value)
+    }
+
   if (is.null(subsetIndividuals)) {
     tempCohort <- cdm[[table]] |>
       dplyr::select(
         "subject_id" = "person_id",
-        "concept_id" = dplyr::all_of(.env$concept),
         "cohort_start_date" = dplyr::all_of(.env$start),
         "cohort_end_date" = dplyr::all_of(.env$end),
+        dplyr::all_of(conceptCol),
         dplyr::any_of(extraCols)) |>
       dplyr::inner_join(
         cdm[[paste0(tablePrefix, "temp_codelist")]],
@@ -727,9 +765,9 @@ getDomainCohort <- function(cdm,
     tempCohort <- cdm[[table]] |>
       dplyr::select(
         "subject_id" = "person_id",
-        "concept_id" = dplyr::all_of(.env$concept),
         "cohort_start_date" = dplyr::all_of(.env$start),
         "cohort_end_date" = dplyr::all_of(.env$end),
+        dplyr::all_of(conceptCol),
         dplyr::any_of(extraCols)) |>
       dplyr::inner_join(subsetIndividuals,  by = "subject_id") |>
       dplyr::compute(temporary = FALSE, name = name,
@@ -744,24 +782,20 @@ getDomainCohort <- function(cdm,
                      logPrefix = "CohortConstructor_tempCohort_")
   }
 
-  if(isFALSE(source)){
-    record_type <- "standard_field"
-  } else {
-    record_type <- "source_field"
-  }
-
   tempCohort <- tempCohort |>
     dplyr::inner_join(
       cdm[[paste0(tablePrefix, "temp_codelist_cohort_id")]],
       by = "concept_id") |>
-    dplyr::mutate(record_type = .env$record_type) |>
-    dplyr::select("cohort_definition_id",
+    dplyr::select(dplyr::any_of(
+                  c("cohort_definition_id",
                   "subject_id",
                   "cohort_start_date",
                   "cohort_end_date",
                   "concept_id",
-                  "record_type",
-                  dplyr::any_of(extraCols)) |>
+                  "standard_concept_id",
+                  "source_concept_id",
+                  "source_value",
+                  extraCols))) |>
     dplyr::compute(temporary = FALSE, name = name,
                    logPrefix = "CohortConstructor_tempCohort_")
 
