@@ -288,10 +288,10 @@ conceptCohort <- function(cdm,
   # table with records for cohort entry that would lead to inclusion
   # note it is possible people have more than one concept id on their start date
   # some records will be lost when erafying etc
-  cohort_index_records <- cdm[[name]] |>
+  cohort_records <- cdm[[name]] |>
     dplyr::select("cohort_definition_id",
                   "subject_id",
-                  "cohort_start_date")|>
+                  "cohort_start_date") |>
     dplyr::left_join(cdm[[unerafiedTblName]] |>
                        dplyr::select(
                          dplyr::any_of(c("cohort_definition_id",
@@ -303,16 +303,25 @@ conceptCohort <- function(cdm,
                      by = c("cohort_definition_id",
                             "subject_id",
                             "cohort_start_date")) |>
-    dplyr::compute(name = paste0(name, "_cohort_index_records"))
+    dplyr::compute(name = paste0(name, "_cohort_records"))
+
+  # strip cohort class
+  lapply(cohort_records, function(x) {
+    attributes(x) <- NULL
+    x
+  })
+  class(cohort_records) <- class(cohort_records)[!class(cohort_records) %in%
+                                                   c("cohort_table",
+                                                     "GeneratedCohortSet")]
 
   if (!isFALSE(useIndexes)) {
     addIndex(
-      cohort = cohort_index_records,
+      cohort = cohort_records,
       cols = c("subject_id", "cohort_start_date")
     )
   }
 
-  attr(cdm[[name]], "cohort_index_records") <- cohort_index_records
+  attr(cdm[[name]], "cohort_records") <- cohort_records
 
   omopgenerics::dropSourceTable(cdm, unerafiedTblName)
 

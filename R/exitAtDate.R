@@ -97,7 +97,6 @@ exitAtObservationEnd <- function(cohort,
       dplyr::compute(name = tmpNewCohort, temporary = FALSE,
                      logPrefix = "CohortConstructor_exitAtObservationEnd_exit_")
   }
-
   newCohort <- newCohort |>
     dplyr::mutate(
       "cohort_end_date" = dplyr::if_else(
@@ -108,17 +107,16 @@ exitAtObservationEnd <- function(cohort,
     ) |>
     # no overlapping periods
     joinOverlap(name = tmpNewCohort)
-
   if (isTRUE(needsIdFilter(cohort = cohort, cohortId = cohortId))) {
     newCohort <- cdm[[tmpUnchanged]] |>
       dplyr::select(dplyr::all_of(omopgenerics::cohortColumns("cohort"))) |>
-      dplyr::union_all(newCohort)
+     dplyr::union_all(newCohort)
   }
-
   newCohort <- newCohort |>
     dplyr::compute(name = name, temporary = FALSE) |>
     omopgenerics::newCohortTable(.softValidation = .softValidation) |>
-    omopgenerics::recordCohortAttrition(reason = reason, cohortId = cohortId)
+    omopgenerics::recordCohortAttrition(reason = reason, cohortId = cohortId) |>
+    updateCohortRecords()
 
   omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(tablePrefix))
 
@@ -230,7 +228,8 @@ exitAtDeath <- function(cohort,
       cohortAttritionRef = attrition(newCohort),
       .softValidation = .softValidation
     ) |>
-    omopgenerics::recordCohortAttrition(reason = "Exit at death", cohortId = cohortId)
+    omopgenerics::recordCohortAttrition(reason = "Exit at death", cohortId = cohortId) |>
+    updateCohortRecords()
 
   omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(tablePrefix))
 

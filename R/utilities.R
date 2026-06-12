@@ -85,3 +85,26 @@ validateNameArgumentInternal <- function(missingInput, name, cohortName, call = 
   name <- omopgenerics::validateNameArgument(name, validation = "warning")
   return(name)
 }
+
+updateCohortRecords <- function(cohort){
+
+  if(!is.null(attr(cohort, "cohort_records"))){
+  attr(cohort, "cohort_records") <- cohort |>
+    dplyr::left_join(attr(cohort, "cohort_records"),
+                     by = c("cohort_definition_id",
+                            "subject_id",
+                            "cohort_start_date")) |>
+    dplyr::compute(name = omopgenerics::tableName(attr(cohort, "cohort_records")))
+
+  useIndexes <- getOption("CohortConstructor.use_indexes")
+  if (!isFALSE(useIndexes)) {
+    addIndex(
+      cohort = attr(cohort, "cohort_records"),
+      cols = c("subject_id", "cohort_start_date")
+    )
+  }
+  }
+
+  return(cohort)
+
+}

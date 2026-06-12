@@ -425,7 +425,8 @@ demographicsFilter <- function(cohort,
     omopgenerics::newCohortTable(
       .softValidation = TRUE,
       cohortSetRef = newSet
-    )
+    ) |>
+    updateCohortRecords()
 
   omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(tablePrefix))
 

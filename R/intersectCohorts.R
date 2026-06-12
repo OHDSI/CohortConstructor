@@ -337,9 +337,11 @@ joinOverlap <- function(cohort,
                        logPrefix = "CohortConstructor_joinOverlap_input_")
     )
   }
-
   gap <- as.integer(gap)
   cdm <- omopgenerics::cdmReference(cohort)
+
+  # below will lose cohort records attribute, so need to add back
+  start_cohort_records_attr <- attr(cohort, "cohort_records")
 
   start <- cohort |>
     dplyr::select(dplyr::all_of(by), "date" := !!startDate) |>
@@ -372,7 +374,9 @@ joinOverlap <- function(cohort,
     dplyr::arrange() |>
     dplyr::select(dplyr::all_of(c(by, "era_id", "name", "date"))) |>
     dplyr::compute(temporary = FALSE, name = workingTbl,
-                   logPrefix = "CohortConstructor_joinOverlap_ids_") |>
+                   logPrefix = "CohortConstructor_joinOverlap_ids_")
+
+  x <- x |>
     tidyr::pivot_wider(names_from = "name", values_from = "date") |>
     dplyr::select(-"era_id") |>
     dplyr::compute(temporary = FALSE, name = workingTbl,
@@ -389,6 +393,8 @@ joinOverlap <- function(cohort,
                    logPrefix = "CohortConstructor_joinOverlap_relocate_")
 
   omopgenerics::dropSourceTable(cdm = cdm, name = workingTbl)
+
+  attr(x, "cohort_records") <- start_cohort_records_attr
 
   return(x)
 }
