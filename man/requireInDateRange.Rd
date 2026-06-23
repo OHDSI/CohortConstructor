@@ -31,7 +31,7 @@ interest.}
 \item{atFirst}{If FALSE the requirement will be applied to all records, if
 TRUE, it will only be required for the first entry of each subject.}
 
-\item{reason}{Character string of length 2 or glue expression. Glue statment can contain: \code{{indexDate}}, \code{{temporality}}, \code{{date}}. After gluing it must produce a length 2 character.}
+\item{reason}{Character string of length 2 or glue expression. Glue statment can contain: \code{{indexDate}}, \code{{temporality}}, \code{{date}}, \code{{atFirst}}. After gluing it must produce a length 2 character.}
 
 \item{name}{Name of the new cohort table created in the cdm object.}
 }

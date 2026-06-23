@@ -235,10 +235,18 @@ NULL
 #' @keywords internal
 NULL
 
+#' Helper for consistent documentation of `reason`.
+#'
+#' @param reason A character vector to populate the reason in the attrition.
+#'
+#' @name simpleReasonDoc
+#' @keywords internal
+NULL
+
 reasonParams <- function(nm) {
   list(
     in_date_range = list(
-      opt = c("indexDate", "temporality", "date"),
+      opt = c("indexDate", "temporality", "date", "atFirst"),
       len = 2
     )
   )[[nm]]

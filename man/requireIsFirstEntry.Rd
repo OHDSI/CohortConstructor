@@ -4,7 +4,12 @@
 \alias{requireIsFirstEntry}
 \title{Restrict cohort to first entry}
 \usage{
-requireIsFirstEntry(cohort, cohortId = NULL, name = tableName(cohort))
+requireIsFirstEntry(
+  cohort,
+  cohortId = NULL,
+  reason = "Restricted to first entry",
+  name = tableName(cohort)
+)
 }
 \arguments{
 \item{cohort}{A cohort table in a cdm reference.}
@@ -13,6 +18,8 @@ requireIsFirstEntry(cohort, cohortId = NULL, name = tableName(cohort))
 (cohort_definition_id or cohort_name). If NULL, all cohorts will be
 used; otherwise, only the specified cohorts will be modified, and the
 rest will remain unchanged.}
+
+\item{reason}{A character vector to populate the reason in the attrition.}
 
 \item{name}{Name of the new cohort table created in the cdm object.}
 }
