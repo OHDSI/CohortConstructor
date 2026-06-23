@@ -61,7 +61,7 @@ matchCohorts <- function(cohort,
   omopgenerics::assertLogical(.softValidation)
 
   if (length(cohortId) == 0) {
-    cli::cli_inform("Returning empty cohort as `cohortId` is not valid.")
+    cli::cli_warn("Returning empty cohort as `cohortId` is not valid.")
     cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name)
     return(cdm[[name]])
   }
