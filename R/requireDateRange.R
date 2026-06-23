@@ -150,7 +150,8 @@ requireInDateRange <- function(cohort,
     dplyr::compute(name = name, temporary = FALSE,
                    logPrefix = "CohortConstructor_requireDateRange_name_") |>
     omopgenerics::newCohortTable(
-      .softValidation = TRUE, cohortAttritionRef = attrition(newCohort)
+      .softValidation = TRUE,
+      cohortAttritionRef = attr(newCohort, "cohort_attrition")
     )
 
   useIndexes <- getOption("CohortConstructor.use_indexes")

@@ -46,9 +46,9 @@ subsetCohorts <- function(cohort,
                    logPrefix = "CohortConstructor_subsetCohorts_filter_")
   cdm[[name]] <- cdm[[name]] |>
     omopgenerics::newCohortTable(
-      cohortSetRef = settings(cohort) |>
+      cohortSetRef = attr(cohort, "cohort_set") |>
         dplyr::filter(.data$cohort_definition_id %in% .env$cohortId),
-      cohortAttritionRef = attrition(cohort) |>
+      cohortAttritionRef = attr(cohort, "cohort_attrition") |>
         dplyr::filter(.data$cohort_definition_id %in% .env$cohortId),
       cohortCodelistRef = attr(cohort, "cohort_codelist") |>
         dplyr::filter(.data$cohort_definition_id %in% .env$cohortId),
@@ -61,9 +61,9 @@ subsetCohorts <- function(cohort,
                      logPrefix = "CohortConstructor_subsetCohorts_filter_")
     cdm[[name]] <- cdm[[name]] |>
       omopgenerics::newCohortTable(
-        cohortSetRef = settings(cohort) |>
+        cohortSetRef = attr(cohort, "cohort_set") |>
           dplyr::filter(!.data$cohort_definition_id %in% .env$cohortId),
-        cohortAttritionRef = attrition(cohort) |>
+        cohortAttritionRef = attr(cohort, "cohort_attrition") |>
           dplyr::filter(!.data$cohort_definition_id %in% .env$cohortId),
         cohortCodelistRef = attr(cohort, "cohort_codelist") |>
           dplyr::filter(!.data$cohort_definition_id %in% .env$cohortId),
