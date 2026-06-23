@@ -11,6 +11,7 @@ measurementCohort(
   valueAsConcept = NULL,
   valueAsNumber = NULL,
   table = NULL,
+  typeConceptId = NULL,
   useRecordsBeforeObservation = FALSE,
   useSourceFields = FALSE,
   subsetCohort = NULL,
@@ -53,6 +54,10 @@ See the examples below for how to define multiple cohorts based on different mea
 
 \item{table}{Character vector specifying which OMOP tables to use.
 Accepts "measurement", "observation", or both.}
+
+\item{typeConceptId}{Type concept id used to subset tables. See:
+https://athena.ohdsi.org/search-terms/terms?conceptClass=Type+Concept. If
+\code{NULL} no filtering is applied.}
 
 \item{useRecordsBeforeObservation}{If FALSE, only records that fall entirely
 (start and end) within an observation period are used.

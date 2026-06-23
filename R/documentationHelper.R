@@ -211,6 +211,9 @@ NULL
 
 #' Helper for consistent documentation of `conceptCohort` and `measurementCohort`.
 #'
+#' @param typeConceptId Type concept id used to subset tables. See:
+#' https://athena.ohdsi.org/search-terms/terms?conceptClass=Type+Concept. If
+#' `NULL` no filtering is applied.
 #' @param useRecordsBeforeObservation If FALSE, only records that fall entirely
 #' (start and end) within an observation period are used.
 #' If TRUE, records that start before an observation period are included by

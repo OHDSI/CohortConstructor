@@ -11,6 +11,7 @@ conceptCohort(
   exit = "event_end_date",
   overlap = "merge",
   table = NULL,
+  typeConceptId = NULL,
   useRecordsBeforeObservation = FALSE,
   useSourceFields = FALSE,
   subsetCohort = NULL,
@@ -37,6 +38,10 @@ from each of the overlapping records.}
 \item{table}{Name of OMOP tables to search for records of the concepts
 provided. If NULL, each concept will be search at the assigned domain in
 the concept table.}
+
+\item{typeConceptId}{Type concept id used to subset tables. See:
+https://athena.ohdsi.org/search-terms/terms?conceptClass=Type+Concept. If
+\code{NULL} no filtering is applied.}
 
 \item{useRecordsBeforeObservation}{If FALSE, only records that fall entirely
 (start and end) within an observation period are used.

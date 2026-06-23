@@ -538,3 +538,117 @@ test_that("test indexes - postgres, atFirst", {
   }
 
 })
+
+test_that("filter on observation requirement", {
+  skip_on_cran()
+
+  obs <- dplyr::tibble(
+    observation_period_id = as.integer(c(1, 2)),
+    person_id = as.integer(c(1, 2)),
+    observation_period_start_date = as.Date(c(
+      "2000-01-01",
+      "2000-01-01"
+    )),
+    observation_period_end_date = as.Date(c(
+      "2001-01-01",
+      "2001-01-01"
+    )),
+    "period_type_concept_id" = NA_integer_
+  )
+
+  person <- dplyr::tibble(
+    person_id = as.integer(c(1, 2)),
+    gender_concept_id = as.integer(c(8532, 8507)),
+    year_of_birth = as.integer(c(1997, 1963)),
+    month_of_birth = as.integer(c(8, 1)),
+    day_of_birth = as.integer(c(22, 27)),
+    race_concept_id = NA_integer_,
+    ethnicity_concept_id = NA_integer_
+  )
+
+  cohort_1 <- dplyr::tibble(
+    cohort_definition_id = c(1, 1, 2),
+    subject_id = as.integer(c(1, 2, 2)),
+    cohort_start_date = as.Date(c(
+      "2000-01-01", # same day as obs start
+      "2001-01-01", # year after day as obs start
+      "2000-01-01" # same day as obs start
+    )),
+    cohort_end_date = as.Date(c(
+      "2000-12-01",
+      "2001-01-01",
+      "2001-01-01"
+    ))
+  )
+
+  cdm <- omock::mockCdmFromTables(tables = list("cohort1" = cohort_1)) |>
+    omopgenerics::insertTable(name = "observation_period", table = obs) |>
+    omopgenerics::insertTable(name = "person", table = person) |>
+    omopgenerics::insertTable(name = "table", table = dplyr::tibble(
+      person_id = as.integer(c(1, 3, 2, 2)),
+      date_start = as.Date(c("2002-01-01", "2015-10-01", "2000-01-01", "1999-01-01")),
+      date_end = as.Date(c("2002-01-01", "2015-10-01", "2000-01-01", "1999-01-01"))
+    )) |>
+    copyCdm()
+
+
+  # if not in obs, we add prior obs requirement
+  cdm$cohort2 <-  cdm$cohort1 |>
+    requireConceptIntersect(list(a = 1L),
+                            window = list(c(-Inf, -1)),
+                            name = "cohort2")
+
+  expect_equal((cdm$cohort2 |>
+                  attrition() |>
+                  dplyr::filter(cohort_definition_id == 1,
+                                stringr::str_detect(reason, "Prior observation")) |>
+                  dplyr::pull("excluded_records")),
+               1)
+  expect_equal((cdm$cohort2 |>
+                  attrition() |>
+                  dplyr::filter(cohort_definition_id == 2,
+                                stringr::str_detect(reason, "Prior observation")) |>
+                  dplyr::pull("excluded_records")),
+               1)
+
+  # cohort id argument - won't affect cohort id 2
+  cdm$cohort3 <-   cdm$cohort1 |>
+    requireConceptIntersect(list(a = 1L),
+                            cohortId = 1,
+                            window = list(c(-Inf, -1)),
+                            name = "cohort3")
+  expect_equal(length((cdm$cohort3 |>
+                         attrition() |>
+                         dplyr::filter(cohort_definition_id == 2,
+                                       stringr::str_detect(reason, "Prior observation")) |>
+                         dplyr::pull("excluded_records"))),
+               0)
+
+
+  # relative to cohort end date
+  cdm$cohort4 <-  cdm$cohort1 |>
+    requireConceptIntersect(list(a = 1L),
+                            indexDate = "cohort_end_date",
+                            window = list(c(-Inf, -1)),
+                            name = "cohort4")
+  expect_equal(length((cdm$cohort4 |>
+                         attrition() |>
+                         dplyr::filter(cohort_definition_id == 1,
+                                       stringr::str_detect(reason, "Prior observation")) |>
+                         dplyr::pull("excluded_records"))),
+               0)
+
+  # future observation
+  cdm$cohort5 <-  cdm$cohort1 |>
+    requireConceptIntersect(list(a = 1L),
+                            indexDate = "cohort_end_date",
+                            window = list(c(1, Inf)),
+                            name = "cohort5")
+  expect_equal((cdm$cohort5 |>
+                  attrition() |>
+                  dplyr::filter(cohort_definition_id == 1,
+                                stringr::str_detect(reason, "Future observation")) |>
+                  dplyr::pull("excluded_records")),
+               1)
+
+})
