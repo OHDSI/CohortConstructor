@@ -10,7 +10,7 @@ requireInDateRange(
   cohortId = NULL,
   indexDate = "cohort_start_date",
   atFirst = FALSE,
-  reason = NULL,
+  reason = "{indexDate} {temporality} {date}; {atFirst}",
   name = tableName(cohort)
 )
 }

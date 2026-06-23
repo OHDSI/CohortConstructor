@@ -42,7 +42,7 @@ requireInDateRange <- function(cohort,
                                cohortId = NULL,
                                indexDate = "cohort_start_date",
                                atFirst = FALSE,
-                               reason = NULL,
+                               reason = "{indexDate} {temporality} {date}; {atFirst}",
                                name = tableName(cohort)) {
   # checks
   name <- validateNameArgumentInternal(missing(name), name, tableName(cohort))
@@ -51,7 +51,7 @@ requireInDateRange <- function(cohort,
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
   dateRange <- validateDateRange(dateRange)
-  omopgenerics::assertCharacter(reason, null = TRUE)
+  omopgenerics::assertCharacter(reason)
   omopgenerics::assertLogical(atFirst, length = 1)
 
   if (length(cohortId) == 0) {
@@ -62,15 +62,10 @@ requireInDateRange <- function(cohort,
     return(cdm[[name]])
   }
 
-  # validate reason
-  def <- "{indexDate} {temporality} {date}"
-  if (atFirst) {
-    def <- paste0(def, ". Requirement applied to the first entry")
-  }
-
+  atFirstReason <- ifelse(atFirst, "Requirement applied to the first entry", "")
   reason <- validateReason(
-    reason = reason, len = 2, def = def, indexDate = indexDate,
-    date = dateRange, temporality = c("after", "before")
+    reason = reason, len = 2, indexDate = indexDate, date = dateRange,
+    temporality = c("after", "before"), atFirst = atFirstReason
   )
 
   # temp tables

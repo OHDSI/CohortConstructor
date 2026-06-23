@@ -194,10 +194,8 @@ validateTable <- function(table) {
   return(invisible(table))
 }
 
-validateReason <- function(reason, len, def, ..., call = parent.frame()) {
-  omopgenerics::assertCharacter(reason, null = TRUE, call = call)
-
-  if (is.null(reason)) reason <- def
+validateReason <- function(reason, len, ..., call = parent.frame()) {
+  omopgenerics::assertCharacter(reason, call = call)
 
   dots <- list(...)
   reason <- tryCatch(
@@ -214,6 +212,9 @@ validateReason <- function(reason, len, def, ..., call = parent.frame()) {
     allowed <- paste0("{", names(dots), "}")
     cli::cli_abort(c(x = "`reason` must be a character or a glue expression. If character it must be length {len}. If glue it can contain: {allowed}. After gluing it must produce a vector of length {len}."), call = call)
   }
+
+  # remove leading or tailing spaces
+  reason <- trimws(reason)
 
   return(reason)
 }
