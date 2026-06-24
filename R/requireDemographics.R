@@ -567,11 +567,11 @@ reqDemographicsCohortSet <- function(set,
 }
 
 newAttribute <- function(newSet, att, cohortId) {
-  newSet |>
-    dplyr::select(c("cohort_definition_id", "target_cohort_rand01")) |>
+  att |>
+    dplyr::rename("target_cohort_rand01" = "cohort_definition_id") |>
     dplyr::inner_join(
-      att |>
-        dplyr::rename("target_cohort_rand01" = "cohort_definition_id"),
+      newSet |>
+        dplyr::select(c("cohort_definition_id", "target_cohort_rand01")),
       by = "target_cohort_rand01",
       relationship = "many-to-many"
     ) |>
