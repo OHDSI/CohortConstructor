@@ -35,7 +35,7 @@ A cohort_table object.
 # \donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
-#> Warning: '/tmp/RtmpWLA6Rz/id_diu' already exists
+#> Warning: '/tmp/RtmpLZ7KDK/id_diu' already exists
 #> ℹ Reading GiBleed tables.
 
 settings(cdm$cohort1)

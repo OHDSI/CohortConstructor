@@ -41,7 +41,7 @@ A cohort table with a death cohort in cdm
 library(CohortConstructor)
 
 cdm <- mockCohortConstructor()
-#> Warning: '/tmp/RtmpWLA6Rz/id_mds' already exists
+#> Warning: '/tmp/RtmpLZ7KDK/id_mds' already exists
 #> ℹ Reading GiBleed tables.
 
 # Generate a death cohort

@@ -113,7 +113,7 @@ Cohort table
 # \donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
-#> Warning: '/tmp/RtmpWLA6Rz/id_boq' already exists
+#> Warning: '/tmp/RtmpLZ7KDK/id_boq' already exists
 #> ℹ Reading GiBleed tables.
 
 cdm$cohort2 <-  requireConceptIntersect(
@@ -121,7 +121,11 @@ cdm$cohort2 <-  requireConceptIntersect(
   conceptSet = list(a = 194152),
   window = c(-Inf, 0),
   name = "cohort2")
-#> Warning: ! `codelist` casted to integers.
+#> Warning: ! `codelist` cast to integers.
+#> Warning: The following codelist concept IDs are not present in `cdm$concept`:
+#> • a: 194152
+#> Warning: The following codelist concept IDs are not present in `cdm$concept`:
+#> • a: 194152
 #> ! 1 concept(s) from domain NA eliminated as it is not supported.
 #> ℹ Supported domains are: device, specimen, measurement, drug, condition,
 #>   observation, procedure, episode, and visit.

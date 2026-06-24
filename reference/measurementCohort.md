@@ -167,7 +167,7 @@ cdm$cohort <- measurementCohort(
   valueAsNumber = list("normal_blood_preassure" = list("8876" = c(70, 120))),
   useRecordsBeforeObservation = FALSE
 )
-#> Warning: ! `codelist` casted to integers.
+#> Warning: ! `codelist` cast to integers.
 #> ℹ Subsetting table measurement using 3 concepts with domain: measurement.
 #> ℹ Combining tables.
 #> ℹ Applying measurement requirements.
@@ -199,7 +199,7 @@ cdm$cohort2 <- measurementCohort(
   ),
   useRecordsBeforeObservation = TRUE
 )
-#> Warning: ! `codelist` casted to integers.
+#> Warning: ! `codelist` cast to integers.
 #> ℹ Subsetting table measurement using 3 concepts with domain: measurement.
 #> ℹ Combining tables.
 #> ℹ Applying measurement requirements.

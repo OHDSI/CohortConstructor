@@ -58,7 +58,7 @@ observation requirement
 # \donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
-#> Warning: '/tmp/RtmpWLA6Rz/id_mds' already exists
+#> Warning: '/tmp/RtmpLZ7KDK/id_mds' already exists
 #> ℹ Reading GiBleed tables.
 cdm$cohort1 |>
   requirePriorObservation(indexDate = "cohort_start_date",

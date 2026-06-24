@@ -128,11 +128,13 @@ A cohort table
 # \donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
-#> Warning: '/tmp/RtmpWLA6Rz/id_mds' already exists
+#> Warning: '/tmp/RtmpLZ7KDK/id_mds' already exists
 #> ℹ Reading GiBleed tables.
 
 cdm$cohort <- conceptCohort(cdm = cdm, conceptSet = list(a = 444074), name = "cohort")
-#> Warning: ! `codelist` casted to integers.
+#> Warning: ! `codelist` cast to integers.
+#> Warning: The following codelist concept IDs are not present in `cdm$concept`:
+#> • a: 444074
 #> ✖ Domain NA (1 concept) excluded because it is not supported.
 #> ℹ No cohort entries found, returning empty cohort table.
 
@@ -159,7 +161,10 @@ cdm$study_cohort <- conceptCohort(cdm = cdm,
                                   exit = "event_start_date",
                                   overlap = "extend",
                                   subsetCohort = "cohort")
-#> Warning: ! `codelist` casted to integers.
+#> Warning: ! `codelist` cast to integers.
+#> Warning: The following codelist concept IDs are not present in `cdm$concept`:
+#> • nitrogen: 35604434, 35604439
+#> • potassium: 40741270, 42899580, 44081436
 #> Warning: There are no individuals in the `subsetCohort` and `subsetCohortId` provided.
 #> Returning empty cohort.
 
