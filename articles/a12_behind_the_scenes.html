@@ -133,19 +133,19 @@ database the SQL would be adapted accordingly.</p>
 <span>  <span class="va">sql_with_quotes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">'"'</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/readLines.html" class="external-link">readLines</a></span><span class="op">(</span><span class="va">sorted_files</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span>, collapse <span class="op">=</span> <span class="st">'\n'</span><span class="op">)</span>, <span class="st">'"'</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">sql_with_quotes</span>, <span class="st">"\n```\n\n"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
-<span><span class="co">#&gt; ### /tmp/Rtmpmw3WHb/sql_folder/logged_query_00001_on_2026_06_24_at_06_35_42.txt</span></span>
+<span><span class="co">#&gt; ### /tmp/RtmptX7j8k/sql_folder/logged_query_00001_on_2026_06_24_at_06_50_08.txt</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "type: collect</span></span>
 <span><span class="co">#&gt; schema: results</span></span>
 <span><span class="co">#&gt; prefix: test_</span></span>
-<span><span class="co">#&gt; time_taken: 0.033 seconds</span></span>
+<span><span class="co">#&gt; time_taken: 0.034 seconds</span></span>
 <span><span class="co">#&gt; sql: &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT DISTINCT</span> concept_id</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> concept</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">WHERE</span> (concept_id IN (1310149, 40163554, 1125315, 1127078, 1127433, 19133768, 40162522, 40229134, 40231925, 1124300, 1539403, 1539411, 1713332, 1713671, 19073183, 19073188))" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/Rtmpmw3WHb/sql_folder/logged_query_00002_on_2026_06_24_at_06_35_42.txt</span></span>
+<span><span class="co">#&gt; ### /tmp/RtmptX7j8k/sql_folder/logged_query_00002_on_2026_06_24_at_06_50_08.txt</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "type: collect</span></span>
 <span><span class="co">#&gt; schema: results</span></span>
@@ -157,65 +157,65 @@ database the SQL would be adapted accordingly.</p>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">WHERE</span> (vocabulary_id = 'None')" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/Rtmpmw3WHb/sql_folder/logged_query_00003_on_2026_06_24_at_06_35_42.txt</span></span>
+<span><span class="co">#&gt; ### /tmp/RtmptX7j8k/sql_folder/logged_query_00003_on_2026_06_24_at_06_50_09.txt</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "type: compute</span></span>
 <span><span class="co">#&gt; schema: results</span></span>
 <span><span class="co">#&gt; prefix: test_</span></span>
-<span><span class="co">#&gt; name: tmp_001_og_003_1782282942</span></span>
+<span><span class="co">#&gt; name: tmp_001_og_003_1782283809</span></span>
 <span><span class="co">#&gt; temporary: FALSE</span></span>
 <span><span class="co">#&gt; overwrite: TRUE</span></span>
 <span><span class="co">#&gt; log_prefix: CohortConstructor_uploadCohortCodelist</span></span>
-<span><span class="co">#&gt; time_taken: 0.125 seconds</span></span>
+<span><span class="co">#&gt; time_taken: 0.141 seconds</span></span>
 <span><span class="co">#&gt; sql: &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span></span></span>
 <span><span class="co">#&gt;     cohort_definition_id,</span></span>
 <span><span class="co">#&gt;     TRY_CAST(concept_id AS INTEGER)<span style="color: #0000BB;"> AS </span>concept_id,</span></span>
 <span><span class="co">#&gt;     LOWER(domain_id)<span style="color: #0000BB;"> AS </span>domain_id</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> (</span></span>
-<span><span class="co">#&gt;     <span style="color: #0000BB;">SELECT</span> test_tmp_001_og_003_1782282942.*, domain_id</span></span>
-<span><span class="co">#&gt;     <span style="color: #0000BB;">FROM</span> results.test_tmp_001_og_003_1782282942</span></span>
+<span><span class="co">#&gt;     <span style="color: #0000BB;">SELECT</span> test_tmp_001_og_003_1782283809.*, domain_id</span></span>
+<span><span class="co">#&gt;     <span style="color: #0000BB;">FROM</span> results.test_tmp_001_og_003_1782283809</span></span>
 <span><span class="co">#&gt;     <span style="color: #0000BB;">LEFT JOIN</span> concept</span></span>
-<span><span class="co">#&gt;       <span style="color: #0000BB;">ON</span> (test_tmp_001_og_003_1782282942.concept_id = concept.concept_id)</span></span>
+<span><span class="co">#&gt;       <span style="color: #0000BB;">ON</span> (test_tmp_001_og_003_1782283809.concept_id = concept.concept_id)</span></span>
 <span><span class="co">#&gt;   ) <span style="color: #0000BB;">AS </span>q01" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/Rtmpmw3WHb/sql_folder/logged_query_00004_on_2026_06_24_at_06_35_42.txt</span></span>
+<span><span class="co">#&gt; ### /tmp/RtmptX7j8k/sql_folder/logged_query_00004_on_2026_06_24_at_06_50_09.txt</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "type: collect</span></span>
 <span><span class="co">#&gt; schema: results</span></span>
 <span><span class="co">#&gt; prefix: test_</span></span>
-<span><span class="co">#&gt; time_taken: 0.028 seconds</span></span>
+<span><span class="co">#&gt; time_taken: 0.055 seconds</span></span>
 <span><span class="co">#&gt; sql: &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> domain_id, COUNT(*)<span style="color: #0000BB;"> AS </span>n</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> results.test_tmp_001_og_003_1782282942</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> results.test_tmp_001_og_003_1782283809</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">GROUP BY</span> domain_id" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/Rtmpmw3WHb/sql_folder/logged_query_00005_on_2026_06_24_at_06_35_42.txt</span></span>
+<span><span class="co">#&gt; ### /tmp/RtmptX7j8k/sql_folder/logged_query_00005_on_2026_06_24_at_06_50_09.txt</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "type: collect</span></span>
 <span><span class="co">#&gt; schema: results</span></span>
 <span><span class="co">#&gt; prefix: test_</span></span>
-<span><span class="co">#&gt; time_taken: 0.024 seconds</span></span>
+<span><span class="co">#&gt; time_taken: 0.038 seconds</span></span>
 <span><span class="co">#&gt; sql: &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT DISTINCT</span> domain_id</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> results.test_tmp_001_og_003_1782282942" </span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> results.test_tmp_001_og_003_1782283809" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/Rtmpmw3WHb/sql_folder/logged_query_00006_on_2026_06_24_at_06_35_42.txt</span></span>
+<span><span class="co">#&gt; ### /tmp/RtmptX7j8k/sql_folder/logged_query_00006_on_2026_06_24_at_06_50_09.txt</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "type: collect</span></span>
 <span><span class="co">#&gt; schema: results</span></span>
 <span><span class="co">#&gt; prefix: test_</span></span>
-<span><span class="co">#&gt; time_taken: 0.032 seconds</span></span>
+<span><span class="co">#&gt; time_taken: 0.034 seconds</span></span>
 <span><span class="co">#&gt; sql: &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> COUNT(*)<span style="color: #0000BB;"> AS </span>n</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> results.test_tmp_001_og_003_1782282942</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> results.test_tmp_001_og_003_1782283809</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">WHERE</span> (domain_id IN ('drug'))" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/Rtmpmw3WHb/sql_folder/logged_query_00007_on_2026_06_24_at_06_35_42.txt</span></span>
+<span><span class="co">#&gt; ### /tmp/RtmptX7j8k/sql_folder/logged_query_00007_on_2026_06_24_at_06_50_09.txt</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "type: compute</span></span>
 <span><span class="co">#&gt; schema: results</span></span>
@@ -224,14 +224,14 @@ database the SQL would be adapted accordingly.</p>
 <span><span class="co">#&gt; temporary: FALSE</span></span>
 <span><span class="co">#&gt; overwrite: TRUE</span></span>
 <span><span class="co">#&gt; log_prefix: CohortConstructor_tempCodelistCohortId_</span></span>
-<span><span class="co">#&gt; time_taken: 0.054 seconds</span></span>
+<span><span class="co">#&gt; time_taken: 0.056 seconds</span></span>
 <span><span class="co">#&gt; sql: &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT DISTINCT</span> cohort_definition_id, concept_id</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> results.test_tmp_001_og_003_1782282942</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> results.test_tmp_001_og_003_1782283809</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">WHERE</span> (domain_id IN ('drug'))" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/Rtmpmw3WHb/sql_folder/logged_query_00008_on_2026_06_24_at_06_35_42.txt</span></span>
+<span><span class="co">#&gt; ### /tmp/RtmptX7j8k/sql_folder/logged_query_00008_on_2026_06_24_at_06_50_09.txt</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "type: compute</span></span>
 <span><span class="co">#&gt; schema: results</span></span>
@@ -240,22 +240,22 @@ database the SQL would be adapted accordingly.</p>
 <span><span class="co">#&gt; temporary: FALSE</span></span>
 <span><span class="co">#&gt; overwrite: TRUE</span></span>
 <span><span class="co">#&gt; log_prefix: CohortConstructor_tempCodelist_</span></span>
-<span><span class="co">#&gt; time_taken: 0.045 seconds</span></span>
+<span><span class="co">#&gt; time_taken: 0.048 seconds</span></span>
 <span><span class="co">#&gt; sql: &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT DISTINCT</span> concept_id</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> results.test_tmp_001_temp_codelist_cohort_id" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/Rtmpmw3WHb/sql_folder/logged_query_00009_on_2026_06_24_at_06_35_42.txt</span></span>
+<span><span class="co">#&gt; ### /tmp/RtmptX7j8k/sql_folder/logged_query_00009_on_2026_06_24_at_06_50_09.txt</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "type: compute</span></span>
 <span><span class="co">#&gt; schema: results</span></span>
 <span><span class="co">#&gt; prefix: test_</span></span>
-<span><span class="co">#&gt; name: tmp_001_og_004_1782282942_1</span></span>
+<span><span class="co">#&gt; name: tmp_001_og_004_1782283809_1</span></span>
 <span><span class="co">#&gt; temporary: FALSE</span></span>
 <span><span class="co">#&gt; overwrite: TRUE</span></span>
 <span><span class="co">#&gt; log_prefix: CohortConstructor_tempCohort_</span></span>
-<span><span class="co">#&gt; time_taken: 0.070 seconds</span></span>
+<span><span class="co">#&gt; time_taken: 0.072 seconds</span></span>
 <span><span class="co">#&gt; sql: &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span></span></span>
 <span><span class="co">#&gt;     person_id<span style="color: #0000BB;"> AS </span>subject_id,</span></span>
@@ -267,39 +267,39 @@ database the SQL would be adapted accordingly.</p>
 <span><span class="co">#&gt;     <span style="color: #0000BB;">ON</span> (drug_exposure.drug_concept_id = test_tmp_001_temp_codelist.concept_id)" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/Rtmpmw3WHb/sql_folder/logged_query_00010_on_2026_06_24_at_06_35_42.txt</span></span>
+<span><span class="co">#&gt; ### /tmp/RtmptX7j8k/sql_folder/logged_query_00010_on_2026_06_24_at_06_50_09.txt</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "type: compute</span></span>
 <span><span class="co">#&gt; schema: results</span></span>
 <span><span class="co">#&gt; prefix: test_</span></span>
-<span><span class="co">#&gt; name: tmp_001_og_004_1782282942_1</span></span>
+<span><span class="co">#&gt; name: tmp_001_og_004_1782283809_1</span></span>
 <span><span class="co">#&gt; temporary: FALSE</span></span>
 <span><span class="co">#&gt; overwrite: TRUE</span></span>
 <span><span class="co">#&gt; log_prefix: CohortConstructor_tempCohort_</span></span>
-<span><span class="co">#&gt; time_taken: 0.101 seconds</span></span>
+<span><span class="co">#&gt; time_taken: 0.105 seconds</span></span>
 <span><span class="co">#&gt; sql: &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> cohort_definition_id, subject_id, cohort_start_date, cohort_end_date</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> results.test_tmp_001_og_004_1782282942_1</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> results.test_tmp_001_og_004_1782283809_1</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">INNER JOIN</span> results.test_tmp_001_temp_codelist_cohort_id</span></span>
-<span><span class="co">#&gt;     <span style="color: #0000BB;">ON</span> (test_tmp_001_og_004_1782282942_1.concept_id = test_tmp_001_temp_codelist_cohort_id.concept_id)" </span></span>
+<span><span class="co">#&gt;     <span style="color: #0000BB;">ON</span> (test_tmp_001_og_004_1782283809_1.concept_id = test_tmp_001_temp_codelist_cohort_id.concept_id)" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/Rtmpmw3WHb/sql_folder/logged_query_00011_on_2026_06_24_at_06_35_42.txt</span></span>
+<span><span class="co">#&gt; ### /tmp/RtmptX7j8k/sql_folder/logged_query_00011_on_2026_06_24_at_06_50_09.txt</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "type: collect</span></span>
 <span><span class="co">#&gt; schema: results</span></span>
 <span><span class="co">#&gt; prefix: test_</span></span>
-<span><span class="co">#&gt; time_taken: 0.029 seconds</span></span>
+<span><span class="co">#&gt; time_taken: 0.030 seconds</span></span>
 <span><span class="co">#&gt; sql: &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> COUNT(*)<span style="color: #0000BB;"> AS </span>n</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> (</span></span>
 <span><span class="co">#&gt;     <span style="color: #0000BB;">SELECT</span> *</span></span>
-<span><span class="co">#&gt;     <span style="color: #0000BB;">FROM</span> results.test_tmp_001_og_004_1782282942_1</span></span>
+<span><span class="co">#&gt;     <span style="color: #0000BB;">FROM</span> results.test_tmp_001_og_004_1782283809_1</span></span>
 <span><span class="co">#&gt;     <span style="color: #0000BB;">LIMIT</span> 1</span></span>
 <span><span class="co">#&gt;   ) <span style="color: #0000BB;">AS </span>q01" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/Rtmpmw3WHb/sql_folder/logged_query_00012_on_2026_06_24_at_06_35_42.txt</span></span>
+<span><span class="co">#&gt; ### /tmp/RtmptX7j8k/sql_folder/logged_query_00012_on_2026_06_24_at_06_50_09.txt</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "type: compute</span></span>
 <span><span class="co">#&gt; schema: results</span></span>
@@ -308,22 +308,22 @@ database the SQL would be adapted accordingly.</p>
 <span><span class="co">#&gt; temporary: FALSE</span></span>
 <span><span class="co">#&gt; overwrite: TRUE</span></span>
 <span><span class="co">#&gt; log_prefix: CohortConstructor_conceptCohort_reduce_</span></span>
-<span><span class="co">#&gt; time_taken: 0.068 seconds</span></span>
+<span><span class="co">#&gt; time_taken: 0.070 seconds</span></span>
 <span><span class="co">#&gt; sql: &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span></span></span>
 <span><span class="co">#&gt;     cohort_definition_id,</span></span>
 <span><span class="co">#&gt;     subject_id,</span></span>
 <span><span class="co">#&gt;     cohort_start_date,</span></span>
 <span><span class="co">#&gt;     COALESCE(cohort_end_date, cohort_start_date)<span style="color: #0000BB;"> AS </span>cohort_end_date</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> results.test_tmp_001_og_004_1782282942_1" </span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> results.test_tmp_001_og_004_1782283809_1" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/Rtmpmw3WHb/sql_folder/logged_query_00013_on_2026_06_24_at_06_35_42.txt</span></span>
+<span><span class="co">#&gt; ### /tmp/RtmptX7j8k/sql_folder/logged_query_00013_on_2026_06_24_at_06_50_09.txt</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "type: collect</span></span>
 <span><span class="co">#&gt; schema: results</span></span>
 <span><span class="co">#&gt; prefix: test_</span></span>
-<span><span class="co">#&gt; time_taken: 0.029 seconds</span></span>
+<span><span class="co">#&gt; time_taken: 0.030 seconds</span></span>
 <span><span class="co">#&gt; sql: &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> COUNT(*)<span style="color: #0000BB;"> AS </span>n</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> (</span></span>
@@ -333,12 +333,12 @@ database the SQL would be adapted accordingly.</p>
 <span><span class="co">#&gt;   ) <span style="color: #0000BB;">AS </span>q01" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/Rtmpmw3WHb/sql_folder/logged_query_00014_on_2026_06_24_at_06_35_43.txt</span></span>
+<span><span class="co">#&gt; ### /tmp/RtmptX7j8k/sql_folder/logged_query_00014_on_2026_06_24_at_06_50_10.txt</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "type: collect</span></span>
 <span><span class="co">#&gt; schema: results</span></span>
 <span><span class="co">#&gt; prefix: test_</span></span>
-<span><span class="co">#&gt; time_taken: 0.037 seconds</span></span>
+<span><span class="co">#&gt; time_taken: 0.038 seconds</span></span>
 <span><span class="co">#&gt; sql: &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span></span></span>
 <span><span class="co">#&gt;     cohort_definition_id,</span></span>
@@ -348,30 +348,30 @@ database the SQL would be adapted accordingly.</p>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">GROUP BY</span> cohort_definition_id" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/Rtmpmw3WHb/sql_folder/logged_query_00015_on_2026_06_24_at_06_35_43.txt</span></span>
+<span><span class="co">#&gt; ### /tmp/RtmptX7j8k/sql_folder/logged_query_00015_on_2026_06_24_at_06_50_10.txt</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "type: collect</span></span>
 <span><span class="co">#&gt; schema: results</span></span>
 <span><span class="co">#&gt; prefix: test_</span></span>
-<span><span class="co">#&gt; time_taken: 0.019 seconds</span></span>
+<span><span class="co">#&gt; time_taken: 0.020 seconds</span></span>
 <span><span class="co">#&gt; sql: &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> *</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> results.test_drugs</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">LIMIT</span> 1" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/Rtmpmw3WHb/sql_folder/logged_query_00016_on_2026_06_24_at_06_35_43.txt</span></span>
+<span><span class="co">#&gt; ### /tmp/RtmptX7j8k/sql_folder/logged_query_00016_on_2026_06_24_at_06_50_10.txt</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "type: collect</span></span>
 <span><span class="co">#&gt; schema: results</span></span>
 <span><span class="co">#&gt; prefix: test_</span></span>
-<span><span class="co">#&gt; time_taken: 0.023 seconds</span></span>
+<span><span class="co">#&gt; time_taken: 0.024 seconds</span></span>
 <span><span class="co">#&gt; sql: &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT DISTINCT</span> cohort_definition_id</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> results.test_drugs" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/Rtmpmw3WHb/sql_folder/logged_query_00017_on_2026_06_24_at_06_35_43.txt</span></span>
+<span><span class="co">#&gt; ### /tmp/RtmptX7j8k/sql_folder/logged_query_00017_on_2026_06_24_at_06_50_10.txt</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "type: compute</span></span>
 <span><span class="co">#&gt; schema: results</span></span>
@@ -380,7 +380,7 @@ database the SQL would be adapted accordingly.</p>
 <span><span class="co">#&gt; temporary: FALSE</span></span>
 <span><span class="co">#&gt; overwrite: TRUE</span></span>
 <span><span class="co">#&gt; log_prefix: CohortConstructor_fulfillCohortReqs_observationJoin_</span></span>
-<span><span class="co">#&gt; time_taken: 0.105 seconds</span></span>
+<span><span class="co">#&gt; time_taken: 0.108 seconds</span></span>
 <span><span class="co">#&gt; sql: &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span></span></span>
 <span><span class="co">#&gt;     test_drugs.*,</span></span>
@@ -392,7 +392,7 @@ database the SQL would be adapted accordingly.</p>
 <span><span class="co">#&gt;     <span style="color: #0000BB;">ON</span> (test_drugs.subject_id = observation_period.person_id)" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/Rtmpmw3WHb/sql_folder/logged_query_00018_on_2026_06_24_at_06_35_43.txt</span></span>
+<span><span class="co">#&gt; ### /tmp/RtmptX7j8k/sql_folder/logged_query_00018_on_2026_06_24_at_06_50_10.txt</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "type: compute</span></span>
 <span><span class="co">#&gt; schema: results</span></span>
@@ -414,12 +414,12 @@ database the SQL would be adapted accordingly.</p>
 <span><span class="co">#&gt;     (cohort_start_date &lt;= observation_period_end_date)" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/Rtmpmw3WHb/sql_folder/logged_query_00019_on_2026_06_24_at_06_35_43.txt</span></span>
+<span><span class="co">#&gt; ### /tmp/RtmptX7j8k/sql_folder/logged_query_00019_on_2026_06_24_at_06_50_10.txt</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "type: collect</span></span>
 <span><span class="co">#&gt; schema: results</span></span>
 <span><span class="co">#&gt; prefix: test_</span></span>
-<span><span class="co">#&gt; time_taken: 0.045 seconds</span></span>
+<span><span class="co">#&gt; time_taken: 0.048 seconds</span></span>
 <span><span class="co">#&gt; sql: &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span></span></span>
 <span><span class="co">#&gt;     cohort_definition_id,</span></span>
@@ -430,7 +430,7 @@ database the SQL would be adapted accordingly.</p>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">GROUP BY</span> cohort_definition_id" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/Rtmpmw3WHb/sql_folder/logged_query_00020_on_2026_06_24_at_06_35_44.txt</span></span>
+<span><span class="co">#&gt; ### /tmp/RtmptX7j8k/sql_folder/logged_query_00020_on_2026_06_24_at_06_50_10.txt</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "type: collect</span></span>
 <span><span class="co">#&gt; schema: results</span></span>
@@ -442,18 +442,18 @@ database the SQL would be adapted accordingly.</p>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">LIMIT</span> 1" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/Rtmpmw3WHb/sql_folder/logged_query_00021_on_2026_06_24_at_06_35_44.txt</span></span>
+<span><span class="co">#&gt; ### /tmp/RtmptX7j8k/sql_folder/logged_query_00021_on_2026_06_24_at_06_50_11.txt</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "type: collect</span></span>
 <span><span class="co">#&gt; schema: results</span></span>
 <span><span class="co">#&gt; prefix: test_</span></span>
-<span><span class="co">#&gt; time_taken: 0.024 seconds</span></span>
+<span><span class="co">#&gt; time_taken: 0.025 seconds</span></span>
 <span><span class="co">#&gt; sql: &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT DISTINCT</span> cohort_definition_id</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> results.test_drugs" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/Rtmpmw3WHb/sql_folder/logged_query_00022_on_2026_06_24_at_06_35_44.txt</span></span>
+<span><span class="co">#&gt; ### /tmp/RtmptX7j8k/sql_folder/logged_query_00022_on_2026_06_24_at_06_50_11.txt</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "type: compute</span></span>
 <span><span class="co">#&gt; schema: results</span></span>
@@ -462,14 +462,14 @@ database the SQL would be adapted accordingly.</p>
 <span><span class="co">#&gt; temporary: FALSE</span></span>
 <span><span class="co">#&gt; overwrite: TRUE</span></span>
 <span><span class="co">#&gt; log_prefix: CohortConstructor_fulfillCohortReqs_filterStart_</span></span>
-<span><span class="co">#&gt; time_taken: 0.077 seconds</span></span>
+<span><span class="co">#&gt; time_taken: 0.079 seconds</span></span>
 <span><span class="co">#&gt; sql: &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> *</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> results.test_drugs</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">WHERE</span> (NOT((cohort_start_date IS NULL)))" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/Rtmpmw3WHb/sql_folder/logged_query_00023_on_2026_06_24_at_06_35_44.txt</span></span>
+<span><span class="co">#&gt; ### /tmp/RtmptX7j8k/sql_folder/logged_query_00023_on_2026_06_24_at_06_50_11.txt</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "type: collect</span></span>
 <span><span class="co">#&gt; schema: results</span></span>
@@ -485,7 +485,7 @@ database the SQL would be adapted accordingly.</p>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">GROUP BY</span> cohort_definition_id" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/Rtmpmw3WHb/sql_folder/logged_query_00024_on_2026_06_24_at_06_35_44.txt</span></span>
+<span><span class="co">#&gt; ### /tmp/RtmptX7j8k/sql_folder/logged_query_00024_on_2026_06_24_at_06_50_11.txt</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "type: collect</span></span>
 <span><span class="co">#&gt; schema: results</span></span>
@@ -497,18 +497,18 @@ database the SQL would be adapted accordingly.</p>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">LIMIT</span> 1" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/Rtmpmw3WHb/sql_folder/logged_query_00025_on_2026_06_24_at_06_35_44.txt</span></span>
+<span><span class="co">#&gt; ### /tmp/RtmptX7j8k/sql_folder/logged_query_00025_on_2026_06_24_at_06_50_11.txt</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "type: collect</span></span>
 <span><span class="co">#&gt; schema: results</span></span>
 <span><span class="co">#&gt; prefix: test_</span></span>
-<span><span class="co">#&gt; time_taken: 0.028 seconds</span></span>
+<span><span class="co">#&gt; time_taken: 0.029 seconds</span></span>
 <span><span class="co">#&gt; sql: &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT DISTINCT</span> cohort_definition_id</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> results.test_drugs" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/Rtmpmw3WHb/sql_folder/logged_query_00026_on_2026_06_24_at_06_35_44.txt</span></span>
+<span><span class="co">#&gt; ### /tmp/RtmptX7j8k/sql_folder/logged_query_00026_on_2026_06_24_at_06_50_11.txt</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "type: compute</span></span>
 <span><span class="co">#&gt; schema: results</span></span>
@@ -517,7 +517,7 @@ database the SQL would be adapted accordingly.</p>
 <span><span class="co">#&gt; temporary: FALSE</span></span>
 <span><span class="co">#&gt; overwrite: TRUE</span></span>
 <span><span class="co">#&gt; log_prefix: CohortConstructor_fulfillCohortReqs_filterStartEnd_</span></span>
-<span><span class="co">#&gt; time_taken: 0.102 seconds</span></span>
+<span><span class="co">#&gt; time_taken: 0.104 seconds</span></span>
 <span><span class="co">#&gt; sql: &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span></span></span>
 <span><span class="co">#&gt;     cohort_definition_id,</span></span>
@@ -527,27 +527,27 @@ database the SQL would be adapted accordingly.</p>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> results.test_drugs" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/Rtmpmw3WHb/sql_folder/logged_query_00027_on_2026_06_24_at_06_35_44.txt</span></span>
+<span><span class="co">#&gt; ### /tmp/RtmptX7j8k/sql_folder/logged_query_00027_on_2026_06_24_at_06_50_11.txt</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "type: collect</span></span>
 <span><span class="co">#&gt; schema: results</span></span>
 <span><span class="co">#&gt; prefix: test_</span></span>
-<span><span class="co">#&gt; time_taken: 0.021 seconds</span></span>
+<span><span class="co">#&gt; time_taken: 0.022 seconds</span></span>
 <span><span class="co">#&gt; sql: &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> COUNT(*)<span style="color: #0000BB;"> AS </span>n</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> results.test_drugs" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/Rtmpmw3WHb/sql_folder/logged_query_00028_on_2026_06_24_at_06_35_44.txt</span></span>
+<span><span class="co">#&gt; ### /tmp/RtmptX7j8k/sql_folder/logged_query_00028_on_2026_06_24_at_06_50_11.txt</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "type: compute</span></span>
 <span><span class="co">#&gt; schema: results</span></span>
 <span><span class="co">#&gt; prefix: test_</span></span>
-<span><span class="co">#&gt; name: og_009_1782282945</span></span>
+<span><span class="co">#&gt; name: og_009_1782283812</span></span>
 <span><span class="co">#&gt; temporary: FALSE</span></span>
 <span><span class="co">#&gt; overwrite: TRUE</span></span>
 <span><span class="co">#&gt; log_prefix: CohortConstructor_joinOverlap_workingTbl_</span></span>
-<span><span class="co">#&gt; time_taken: 0.120 seconds</span></span>
+<span><span class="co">#&gt; time_taken: 0.122 seconds</span></span>
 <span><span class="co">#&gt; sql: &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> *, -1.0<span style="color: #0000BB;"> AS </span>date_id</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> (</span></span>
@@ -564,16 +564,16 @@ database the SQL would be adapted accordingly.</p>
 <span><span class="co">#&gt;   ) <span style="color: #0000BB;">AS </span>q01" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/Rtmpmw3WHb/sql_folder/logged_query_00029_on_2026_06_24_at_06_35_45.txt</span></span>
+<span><span class="co">#&gt; ### /tmp/RtmptX7j8k/sql_folder/logged_query_00029_on_2026_06_24_at_06_50_12.txt</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "type: compute</span></span>
 <span><span class="co">#&gt; schema: results</span></span>
 <span><span class="co">#&gt; prefix: test_</span></span>
-<span><span class="co">#&gt; name: og_009_1782282945</span></span>
+<span><span class="co">#&gt; name: og_009_1782283812</span></span>
 <span><span class="co">#&gt; temporary: FALSE</span></span>
 <span><span class="co">#&gt; overwrite: TRUE</span></span>
 <span><span class="co">#&gt; log_prefix: CohortConstructor_joinOverlap_ids_</span></span>
-<span><span class="co">#&gt; time_taken: 0.333 seconds</span></span>
+<span><span class="co">#&gt; time_taken: 0.340 seconds</span></span>
 <span><span class="co">#&gt; sql: &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span></span></span>
 <span><span class="co">#&gt;     cohort_definition_id,</span></span>
@@ -587,32 +587,32 @@ database the SQL would be adapted accordingly.</p>
 <span><span class="co">#&gt;       SUM(date_id) OVER (PARTITION BY cohort_definition_id, subject_id ORDER BY date, date_id ROWS UNBOUNDED PRECEDING)<span style="color: #0000BB;"> AS </span>cum_id,</span></span>
 <span><span class="co">#&gt;       CASE WHEN (date_id = -1.0) THEN 'cohort_start_date' WHEN NOT (date_id = -1.0) THEN 'cohort_end_date' END<span style="color: #0000BB;"> AS </span>"name",</span></span>
 <span><span class="co">#&gt;       CASE WHEN (date_id = -1.0) THEN 1.0 WHEN NOT (date_id = -1.0) THEN 0.0 END<span style="color: #0000BB;"> AS </span>era_id</span></span>
-<span><span class="co">#&gt;     <span style="color: #0000BB;">FROM</span> results.test_og_009_1782282945</span></span>
+<span><span class="co">#&gt;     <span style="color: #0000BB;">FROM</span> results.test_og_009_1782283812</span></span>
 <span><span class="co">#&gt;   ) <span style="color: #0000BB;">AS </span>q01</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">WHERE</span> (cum_id = 0.0 OR (cum_id = -1.0 AND date_id = -1.0))" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/Rtmpmw3WHb/sql_folder/logged_query_00030_on_2026_06_24_at_06_35_45.txt</span></span>
+<span><span class="co">#&gt; ### /tmp/RtmptX7j8k/sql_folder/logged_query_00030_on_2026_06_24_at_06_50_12.txt</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "type: compute</span></span>
 <span><span class="co">#&gt; schema: results</span></span>
 <span><span class="co">#&gt; prefix: test_</span></span>
-<span><span class="co">#&gt; name: og_009_1782282945</span></span>
+<span><span class="co">#&gt; name: og_009_1782283812</span></span>
 <span><span class="co">#&gt; temporary: FALSE</span></span>
 <span><span class="co">#&gt; overwrite: TRUE</span></span>
 <span><span class="co">#&gt; log_prefix: CohortConstructor_joinOverlap_pivot_wider_</span></span>
-<span><span class="co">#&gt; time_taken: 0.110 seconds</span></span>
+<span><span class="co">#&gt; time_taken: 0.114 seconds</span></span>
 <span><span class="co">#&gt; sql: &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span></span></span>
 <span><span class="co">#&gt;     cohort_definition_id,</span></span>
 <span><span class="co">#&gt;     subject_id,</span></span>
 <span><span class="co">#&gt;     MAX(CASE WHEN ("name" = 'cohort_end_date') THEN date END)<span style="color: #0000BB;"> AS </span>cohort_end_date,</span></span>
 <span><span class="co">#&gt;     MAX(CASE WHEN ("name" = 'cohort_start_date') THEN date END)<span style="color: #0000BB;"> AS </span>cohort_start_date</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> results.test_og_009_1782282945</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> results.test_og_009_1782283812</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">GROUP BY</span> cohort_definition_id, subject_id, era_id" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/Rtmpmw3WHb/sql_folder/logged_query_00031_on_2026_06_24_at_06_35_45.txt</span></span>
+<span><span class="co">#&gt; ### /tmp/RtmptX7j8k/sql_folder/logged_query_00031_on_2026_06_24_at_06_50_12.txt</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "type: compute</span></span>
 <span><span class="co">#&gt; schema: results</span></span>
@@ -621,22 +621,22 @@ database the SQL would be adapted accordingly.</p>
 <span><span class="co">#&gt; temporary: FALSE</span></span>
 <span><span class="co">#&gt; overwrite: TRUE</span></span>
 <span><span class="co">#&gt; log_prefix: CohortConstructor_joinOverlap_relocate_</span></span>
-<span><span class="co">#&gt; time_taken: 0.063 seconds</span></span>
+<span><span class="co">#&gt; time_taken: 0.066 seconds</span></span>
 <span><span class="co">#&gt; sql: &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT DISTINCT</span></span></span>
 <span><span class="co">#&gt;     cohort_definition_id,</span></span>
 <span><span class="co">#&gt;     subject_id,</span></span>
 <span><span class="co">#&gt;     cohort_start_date,</span></span>
 <span><span class="co">#&gt;     cohort_end_date</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> results.test_og_009_1782282945" </span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> results.test_og_009_1782283812" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/Rtmpmw3WHb/sql_folder/logged_query_00032_on_2026_06_24_at_06_35_45.txt</span></span>
+<span><span class="co">#&gt; ### /tmp/RtmptX7j8k/sql_folder/logged_query_00032_on_2026_06_24_at_06_50_12.txt</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "type: collect</span></span>
 <span><span class="co">#&gt; schema: results</span></span>
 <span><span class="co">#&gt; prefix: test_</span></span>
-<span><span class="co">#&gt; time_taken: 0.041 seconds</span></span>
+<span><span class="co">#&gt; time_taken: 0.043 seconds</span></span>
 <span><span class="co">#&gt; sql: &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span></span></span>
 <span><span class="co">#&gt;     cohort_definition_id,</span></span>
@@ -647,19 +647,19 @@ database the SQL would be adapted accordingly.</p>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">GROUP BY</span> cohort_definition_id" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/Rtmpmw3WHb/sql_folder/logged_query_00033_on_2026_06_24_at_06_35_45.txt</span></span>
+<span><span class="co">#&gt; ### /tmp/RtmptX7j8k/sql_folder/logged_query_00033_on_2026_06_24_at_06_50_12.txt</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "type: collect</span></span>
 <span><span class="co">#&gt; schema: results</span></span>
 <span><span class="co">#&gt; prefix: test_</span></span>
-<span><span class="co">#&gt; time_taken: 0.019 seconds</span></span>
+<span><span class="co">#&gt; time_taken: 0.020 seconds</span></span>
 <span><span class="co">#&gt; sql: &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> *</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> results.test_drugs</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">LIMIT</span> 1" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/Rtmpmw3WHb/sql_folder/logged_query_00034_on_2026_06_24_at_06_35_45.txt</span></span>
+<span><span class="co">#&gt; ### /tmp/RtmptX7j8k/sql_folder/logged_query_00034_on_2026_06_24_at_06_50_12.txt</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "type: collect</span></span>
 <span><span class="co">#&gt; schema: results</span></span>
@@ -670,35 +670,35 @@ database the SQL would be adapted accordingly.</p>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> results.test_drugs" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/Rtmpmw3WHb/sql_folder/logged_query_00035_on_2026_06_24_at_06_35_46.txt</span></span>
+<span><span class="co">#&gt; ### /tmp/RtmptX7j8k/sql_folder/logged_query_00035_on_2026_06_24_at_06_50_13.txt</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "type: collect</span></span>
 <span><span class="co">#&gt; schema: results</span></span>
 <span><span class="co">#&gt; prefix: test_</span></span>
-<span><span class="co">#&gt; time_taken: 0.024 seconds</span></span>
+<span><span class="co">#&gt; time_taken: 0.025 seconds</span></span>
 <span><span class="co">#&gt; sql: &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> *</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> results.test_drugs</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">LIMIT</span> 1" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/Rtmpmw3WHb/sql_folder/logged_query_00036_on_2026_06_24_at_06_35_46.txt</span></span>
+<span><span class="co">#&gt; ### /tmp/RtmptX7j8k/sql_folder/logged_query_00036_on_2026_06_24_at_06_50_13.txt</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "type: collect</span></span>
 <span><span class="co">#&gt; schema: results</span></span>
 <span><span class="co">#&gt; prefix: test_</span></span>
-<span><span class="co">#&gt; time_taken: 0.024 seconds</span></span>
+<span><span class="co">#&gt; time_taken: 0.025 seconds</span></span>
 <span><span class="co">#&gt; sql: &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT DISTINCT</span> cohort_definition_id</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> results.test_drugs" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/Rtmpmw3WHb/sql_folder/logged_query_00037_on_2026_06_24_at_06_35_46.txt</span></span>
+<span><span class="co">#&gt; ### /tmp/RtmptX7j8k/sql_folder/logged_query_00037_on_2026_06_24_at_06_50_13.txt</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "type: collect</span></span>
 <span><span class="co">#&gt; schema: results</span></span>
 <span><span class="co">#&gt; prefix: test_</span></span>
-<span><span class="co">#&gt; time_taken: 0.054 seconds</span></span>
+<span><span class="co">#&gt; time_taken: 0.055 seconds</span></span>
 <span><span class="co">#&gt; sql: &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> *</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> (</span></span>
@@ -710,12 +710,12 @@ database the SQL would be adapted accordingly.</p>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">WHERE</span> (end_before_start = 1)" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/Rtmpmw3WHb/sql_folder/logged_query_00038_on_2026_06_24_at_06_35_46.txt</span></span>
+<span><span class="co">#&gt; ### /tmp/RtmptX7j8k/sql_folder/logged_query_00038_on_2026_06_24_at_06_50_13.txt</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "type: collect</span></span>
 <span><span class="co">#&gt; schema: results</span></span>
 <span><span class="co">#&gt; prefix: test_</span></span>
-<span><span class="co">#&gt; time_taken: 0.102 seconds</span></span>
+<span><span class="co">#&gt; time_taken: 0.105 seconds</span></span>
 <span><span class="co">#&gt; sql: &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> *</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> (</span></span>
@@ -732,12 +732,12 @@ database the SQL would be adapted accordingly.</p>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">WHERE</span> (overlap = 1)" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/Rtmpmw3WHb/sql_folder/logged_query_00039_on_2026_06_24_at_06_35_46.txt</span></span>
+<span><span class="co">#&gt; ### /tmp/RtmptX7j8k/sql_folder/logged_query_00039_on_2026_06_24_at_06_50_13.txt</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "type: collect</span></span>
 <span><span class="co">#&gt; schema: results</span></span>
 <span><span class="co">#&gt; prefix: test_</span></span>
-<span><span class="co">#&gt; time_taken: 0.059 seconds</span></span>
+<span><span class="co">#&gt; time_taken: 0.061 seconds</span></span>
 <span><span class="co">#&gt; sql: &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> *</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> (</span></span>
@@ -749,12 +749,12 @@ database the SQL would be adapted accordingly.</p>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">WHERE</span> (missing = 1)" </span></span>
 <span><span class="co">#&gt; ```</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ### /tmp/Rtmpmw3WHb/sql_folder/logged_query_00040_on_2026_06_24_at_06_35_46.txt</span></span>
+<span><span class="co">#&gt; ### /tmp/RtmptX7j8k/sql_folder/logged_query_00040_on_2026_06_24_at_06_50_13.txt</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; "type: collect</span></span>
 <span><span class="co">#&gt; schema: results</span></span>
 <span><span class="co">#&gt; prefix: test_</span></span>
-<span><span class="co">#&gt; time_taken: 0.123 seconds</span></span>
+<span><span class="co">#&gt; time_taken: 0.126 seconds</span></span>
 <span><span class="co">#&gt; sql: &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> COUNT(*)<span style="color: #0000BB;"> AS </span>n</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> (</span></span>

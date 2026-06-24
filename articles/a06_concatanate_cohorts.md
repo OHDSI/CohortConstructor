@@ -57,22 +57,22 @@ individual.
 cdm$medications |>
   filter(subject_id == 1)
 #> # A query:  ?? x 4
-#> # Database: DuckDB 1.5.4 [unknown@Linux 6.17.0-1018-azure:R 4.6.0//tmp/RtmpqAI4WS/file259f7f62099c.duckdb]
+#> # Database: DuckDB 1.5.4 [unknown@Linux 6.17.0-1018-azure:R 4.6.0//tmp/RtmpFDsxj8/file25bc6af98e08.duckdb]
 #>   cohort_definition_id subject_id cohort_start_date cohort_end_date
 #>                  <int>      <int> <date>            <date>         
 #> 1                    1          1 1982-09-11        1982-10-02     
 #> 2                    1          1 1971-01-04        1971-01-18     
-#> 3                    1          1 1980-03-15        1980-03-29     
-#> 4                    1          1 1976-10-20        1976-11-03
+#> 3                    1          1 1976-10-20        1976-11-03     
+#> 4                    1          1 1980-03-15        1980-03-29
 cdm$medications_collapsed |>
   filter(subject_id == 1)
 #> # A query:  ?? x 4
-#> # Database: DuckDB 1.5.4 [unknown@Linux 6.17.0-1018-azure:R 4.6.0//tmp/RtmpqAI4WS/file259f7f62099c.duckdb]
+#> # Database: DuckDB 1.5.4 [unknown@Linux 6.17.0-1018-azure:R 4.6.0//tmp/RtmpFDsxj8/file25bc6af98e08.duckdb]
 #>   cohort_definition_id subject_id cohort_start_date cohort_end_date
 #>                  <int>      <int> <date>            <date>         
 #> 1                    1          1 1971-01-04        1971-01-18     
-#> 2                    1          1 1976-10-20        1976-11-03     
-#> 3                    1          1 1980-03-15        1982-10-02
+#> 2                    1          1 1980-03-15        1982-10-02     
+#> 3                    1          1 1976-10-20        1976-11-03
 ```
 
 Subject 1 initially had 4 records between 1971 and 1982. After

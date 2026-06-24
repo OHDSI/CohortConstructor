@@ -112,7 +112,7 @@ Cohort table with only those entries satisfying the criteria
 # \donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
-#> Warning: '/tmp/RtmpLZ7KDK/id_boq' already exists
+#> Warning: '/tmp/RtmpCzEXGX/id_boq' already exists
 #> ℹ Reading GiBleed tables.
 cdm$cohort1 |>
   requireCohortIntersect(targetCohortTable = "cohort2",
