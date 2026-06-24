@@ -52,7 +52,7 @@ requireInDateRange <- function(cohort,
   omopgenerics::assertLogical(atFirst, length = 1)
 
   if (length(cohortId) == 0) {
-    cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
+    cli::cli_warn("Returning entry cohort as `cohortId` is not valid.")
     # return entry cohort as cohortId is used to modify not subset
     cdm[[name]] <- cohort |> dplyr::compute(name = name, temporary = FALSE,
                                             logPrefix = "CohortConstructor_requireInDateRange_entry_")
@@ -150,7 +150,8 @@ requireInDateRange <- function(cohort,
     dplyr::compute(name = name, temporary = FALSE,
                    logPrefix = "CohortConstructor_requireDateRange_name_") |>
     omopgenerics::newCohortTable(
-      .softValidation = TRUE, cohortAttritionRef = attrition(newCohort)
+      .softValidation = TRUE,
+      cohortAttritionRef = attr(newCohort, "cohort_attrition")
     )
 
   useIndexes <- getOption("CohortConstructor.use_indexes")
@@ -223,7 +224,7 @@ trimToDateRange <- function(cohort,
   omopgenerics::assertLogical(.softValidation)
 
   if (length(cohortId) == 0) {
-    cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
+    cli::cli_warn("Returning entry cohort as `cohortId` is not valid.")
     # return entry cohort as cohortId is used to modify not subset
     cdm[[name]] <- cohort |>
       dplyr::compute(
