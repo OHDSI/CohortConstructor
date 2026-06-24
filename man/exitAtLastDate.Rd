@@ -10,6 +10,7 @@ exitAtLastDate(
   cohortId = NULL,
   returnReason = FALSE,
   keepDateColumns = TRUE,
+  multipleReasons = FALSE,
   name = tableName(cohort),
   .softValidation = FALSE
 )
@@ -30,6 +31,10 @@ rest will remain unchanged.}
 
 \item{keepDateColumns}{If TRUE the returned cohort will keep columns in
 \code{dateColumns}.}
+
+\item{multipleReasons}{If TRUE multiple reasons can be returned (reasons will
+appear in the order of \code{dateColumns} separated by \verb{; }), if FALSE only the
+first reason based on the order of \code{dateColumns} will be returned.}
 
 \item{name}{Name of the new cohort table created in the cdm object.}
 

@@ -397,7 +397,7 @@ test_that("multiple exit calls", {
   dropCreatedTables(cdm = cdm)
 })
 
-test_that("multiple reasons", {
+test_that("multiple reasons - independent (multipleReasons = FALSE)", {
   skip_on_cran()
 
   uncohort <- function(x) {
@@ -440,6 +440,7 @@ test_that("multiple reasons", {
       dateColumns = c("next_cohort2", "future_observation"),
       cohortId = NULL,
       returnReason = TRUE,
+      multipleReasons = FALSE,
       name = "order1"
     )
   expect_identical(
@@ -471,6 +472,7 @@ test_that("multiple reasons", {
       dateColumns = c("future_observation", "next_cohort2"),
       cohortId = NULL,
       returnReason = TRUE,
+      multipleReasons = FALSE,
       name = "order2"
     )
   expect_identical(
@@ -522,6 +524,90 @@ test_that("multiple reasons", {
       )) |>
       dplyr::distinct(.data$equal) |>
       dplyr::pull() == 1
+  )
+
+  dropCreatedTables(cdm = cdm)
+})
+
+test_that("multiple reasons - joint (multipleReasons = TRUE)", {
+  skip_on_cran()
+
+  uncohort <- function(x) {
+    attr(x, "cohort_attrition") <- NULL
+    attr(x, "cohort_codelist") <- NULL
+    attr(x, "cohort_set") <- NULL
+    dplyr::as_tibble(x)
+  }
+
+  cdm <- omock::mockCdmFromDataset(datasetName = "GiBleed") |>
+    copyCdm()
+
+  codelist <- list(cohort1 = 40481087L, cohort2 = 4112343L)
+  cdm$my_cohort <- conceptCohort(
+    cdm = cdm,
+    conceptSet = codelist,
+    name = "my_cohort",
+    exit = "event_start_date"
+  ) |>
+    PatientProfiles::addCohortIntersectDate(
+      name = "my_cohort",
+      targetCohortTable = "my_cohort",
+      order = "first",
+      nameStyle = "next_{cohort_name}"
+    ) |>
+    PatientProfiles::addFutureObservation(
+      futureObservationType = "date",
+      name = "my_cohort"
+    ) |>
+    requireIsFirstEntry()
+
+  cdm$onlyfirst <- cdm$my_cohort |>
+    subsetCohorts(cohortId = 1, name = "onlyfirst")
+
+
+
+  date_cols <- c("next_cohort2", "future_observation")
+  match_exprs <- lapply(date_cols, function(col) {
+    rlang::expr(dplyr::if_else(!!rlang::sym(col) == earliest_date, !!col, ""))
+  })
+ exit_reasons <- cdm$onlyfirst |>
+    dplyr::mutate(
+      earliest_date = pmin(!!!rlang::syms(date_cols), na.rm = TRUE)
+    ) |>
+    dplyr::mutate(
+      lowest_columns = paste(!!!match_exprs, sep = ";"),
+      across(
+        all_of(date_cols),
+        ~ if_else(.x > earliest_date, as.Date(NA), .x)
+      )
+    ) |>
+    dplyr::mutate(
+      lowest_columns = str_remove_all(
+        str_replace_all(lowest_columns, "(;\\s*)+", ";"),
+        "^;\\s*|;\\s*$")
+    ) |>
+    dplyr::pull("lowest_columns") |>
+    unique()
+
+
+
+  expect_no_error(
+    cdm$multiple <- cdm$onlyfirst |>
+    exitAtFirstDate(
+      dateColumns = c("next_cohort2", "future_observation"),
+      cohortId = NULL,
+      returnReason = TRUE,
+      multipleReasons = TRUE,
+      name = "multiple"
+    )
+  )
+
+  expect_identical(
+    cdm$multiple |>
+      dplyr::distinct(.data$exit_reason) |>
+      dplyr::pull() |>
+      sort(),
+    exit_reasons |> sort()
   )
 
   dropCreatedTables(cdm = cdm)
