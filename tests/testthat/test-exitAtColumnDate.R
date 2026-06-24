@@ -576,14 +576,14 @@ test_that("multiple reasons - joint (multipleReasons = TRUE)", {
     ) |>
     dplyr::mutate(
       lowest_columns = paste(!!!match_exprs, sep = ";"),
-      across(
-        all_of(date_cols),
-        ~ if_else(.x > earliest_date, as.Date(NA), .x)
+      dplyr::across(
+        dplyr::all_of(date_cols),
+        ~ dplyr::if_else(.x > earliest_date, as.Date(NA), .x)
       )
     ) |>
     dplyr::mutate(
-      lowest_columns = str_remove_all(
-        str_replace_all(lowest_columns, "(;\\s*)+", ";"),
+      lowest_columns = stringr::str_remove_all(
+        stringr::str_replace_all(lowest_columns, "(;\\s*)+", ";"),
         "^;\\s*|;\\s*$")
     ) |>
     dplyr::pull("lowest_columns") |>
