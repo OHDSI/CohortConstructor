@@ -54,9 +54,9 @@ copyCohorts <- function(cohort, name, n = 1, cohortId = NULL) {
     cdm[[tmp2]] <- cdm[[tmp2]] |>
       omopgenerics::newCohortTable(
         cohortSetRef = start_set |>
-          dplyr::mutate(original_cohort_id = cohort_definition_id,
-                        original_cohort_name = cohort_name) |>
-          dplyr::mutate(cohort_name = paste0(cohort_name, "_", as.integer(i-1))),
+          dplyr::mutate(original_cohort_id = .data$cohort_definition_id,
+                        original_cohort_name = .data$cohort_name) |>
+          dplyr::mutate(cohort_name = paste0(.data$cohort_name, "_", as.integer(.env$i-1))),
         cohortAttritionRef = attr(newCohort, "cohort_attrition"),
         cohortCodelistRef = attr(newCohort, "cohort_codelist"),
         .softValidation = TRUE
