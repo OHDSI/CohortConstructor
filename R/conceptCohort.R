@@ -670,7 +670,7 @@ getDomainCohort <- function(cdm,
         "cohort_start_date" = dplyr::all_of(.env$start),
         "cohort_end_date" = dplyr::all_of(.env$end),
         dplyr::any_of(extraCols)) |>
-      dplyr::semi_join(
+      dplyr::inner_join(
         cdm[[paste0(tablePrefix, "temp_codelist")]],
         by = "concept_id"
       ) |>
