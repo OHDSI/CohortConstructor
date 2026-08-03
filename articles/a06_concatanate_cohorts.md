@@ -57,21 +57,21 @@ individual.
 cdm$medications |>
   filter(subject_id == 1)
 #> # A query:  ?? x 4
-#> # Database: DuckDB 1.5.4 [unknown@Linux 6.17.0-1018-azure:R 4.6.0//tmp/RtmpFDsxj8/file25bc6af98e08.duckdb]
+#> # Database: DuckDB 1.5.5 [unknown@Linux 6.17.0-1020-azure:R 4.6.1//tmp/Rtmps5nr1x/file23d14e20dc8f.duckdb]
 #>   cohort_definition_id subject_id cohort_start_date cohort_end_date
 #>                  <int>      <int> <date>            <date>         
-#> 1                    1          1 1982-09-11        1982-10-02     
-#> 2                    1          1 1971-01-04        1971-01-18     
+#> 1                    1          1 1971-01-04        1971-01-18     
+#> 2                    1          1 1982-09-11        1982-10-02     
 #> 3                    1          1 1976-10-20        1976-11-03     
 #> 4                    1          1 1980-03-15        1980-03-29
 cdm$medications_collapsed |>
   filter(subject_id == 1)
 #> # A query:  ?? x 4
-#> # Database: DuckDB 1.5.4 [unknown@Linux 6.17.0-1018-azure:R 4.6.0//tmp/RtmpFDsxj8/file25bc6af98e08.duckdb]
+#> # Database: DuckDB 1.5.5 [unknown@Linux 6.17.0-1020-azure:R 4.6.1//tmp/Rtmps5nr1x/file23d14e20dc8f.duckdb]
 #>   cohort_definition_id subject_id cohort_start_date cohort_end_date
 #>                  <int>      <int> <date>            <date>         
-#> 1                    1          1 1971-01-04        1971-01-18     
-#> 2                    1          1 1980-03-15        1982-10-02     
+#> 1                    1          1 1980-03-15        1982-10-02     
+#> 2                    1          1 1971-01-04        1971-01-18     
 #> 3                    1          1 1976-10-20        1976-11-03
 ```
 

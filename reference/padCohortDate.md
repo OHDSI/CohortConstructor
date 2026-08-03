@@ -79,7 +79,7 @@ Cohort table
 # \donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
-#> Warning: '/tmp/RtmpCzEXGX/id_mds' already exists
+#> Warning: '/tmp/RtmpZ9Jh1V/id_mds' already exists
 #> ℹ Reading GiBleed tables.
 cdm$cohort1 |>
   padCohortDate(
@@ -92,16 +92,16 @@ cdm$cohort1 |>
 #> # A tibble: 54 × 4
 #>    cohort_definition_id subject_id cohort_start_date cohort_end_date
 #>  *                <int>      <int> <date>            <date>         
-#>  1                    1         60 1983-07-12        1983-07-22     
-#>  2                    1         33 1986-12-31        1987-01-10     
-#>  3                    1          2 1987-06-29        1987-07-09     
-#>  4                    1         26 1989-01-15        1989-01-25     
-#>  5                    1         38 1989-05-15        1989-05-25     
-#>  6                    1         34 1992-12-23        1993-01-02     
+#>  1                    1          1 2005-05-25        2005-06-04     
+#>  2                    1          2 1987-06-29        1987-07-09     
+#>  3                    1          6 2014-03-30        2014-04-09     
+#>  4                    1          7 2018-04-07        2018-04-17     
+#>  5                    1         10 2008-12-27        2009-01-06     
+#>  6                    1         13 2010-12-10        2010-12-20     
 #>  7                    1         14 1995-02-12        1995-02-22     
-#>  8                    1         51 1995-06-13        1995-06-23     
-#>  9                    1         74 1996-10-14        1996-10-24     
-#> 10                    1         64 1996-12-05        1996-12-15     
+#>  8                    1         15 2009-04-01        2009-04-11     
+#>  9                    1         17 2008-06-28        2008-07-08     
+#> 10                    1         18 2019-08-14        2019-08-15     
 #> # ℹ 44 more rows
 # }
 ```

@@ -40,7 +40,7 @@ Cohort table with only cohorts in cohortId.
 # \donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
-#> Warning: '/tmp/RtmpCzEXGX/id_xtv' already exists
+#> Warning: '/tmp/RtmpZ9Jh1V/id_xtv' already exists
 #> ℹ Reading GiBleed tables.
 
 cdm$cohort1 |>

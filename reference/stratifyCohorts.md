@@ -62,7 +62,7 @@ cdm$my_cohort <- cdm$cohort1 |>
 cdm$my_cohort
 #> # A tibble: 108 × 5
 #>    cohort_definition_id subject_id cohort_start_date cohort_end_date   age
-#>  *                <int>      <int> <date>            <date>          <int>
+#>  *                <int>      <int> <date>            <date>          <dbl>
 #>  1                    1          1 2005-05-25        2006-08-20          7
 #>  2                    2          2 1987-06-29        1990-01-03         24
 #>  3                    1          6 2014-03-30        2015-02-21         53

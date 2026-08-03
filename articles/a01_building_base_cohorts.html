@@ -310,9 +310,9 @@ can set <code>useSourceFields = TRUE</code>.</p>
 <span><span class="co">#&gt; Rows: ??</span></span>
 <span><span class="co">#&gt; Columns: 4</span></span>
 <span><span class="co">#&gt; $ cohort_definition_id <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> 1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1…</span></span>
-<span><span class="co">#&gt; $ subject_id           <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> 1229<span style="color: #949494;">, </span>2060<span style="color: #949494;">, </span>2721<span style="color: #949494;">, </span>2764<span style="color: #949494;">, </span>3092<span style="color: #949494;">, </span>3730<span style="color: #949494;">, </span>5258<span style="color: #949494;">, </span>69<span style="color: #949494;">, </span>691…</span></span>
-<span><span class="co">#&gt; $ cohort_start_date    <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 1990-09-18<span style="color: #949494;">, </span>2009-09-08<span style="color: #949494;">, </span>2010-07-23<span style="color: #949494;">, </span>2009-10-09<span style="color: #949494;">, </span>…</span></span>
-<span><span class="co">#&gt; $ cohort_end_date      <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 1990-09-18<span style="color: #949494;">, </span>2009-09-08<span style="color: #949494;">, </span>2010-07-23<span style="color: #949494;">, </span>2009-10-09<span style="color: #949494;">, </span>…</span></span></code></pre></div>
+<span><span class="co">#&gt; $ subject_id           <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> 404<span style="color: #949494;">, </span>1015<span style="color: #949494;">, </span>2412<span style="color: #949494;">, </span>3423<span style="color: #949494;">, </span>3752<span style="color: #949494;">, </span>4261<span style="color: #949494;">, </span>4506<span style="color: #949494;">, </span>4898<span style="color: #949494;">, </span>21…</span></span>
+<span><span class="co">#&gt; $ cohort_start_date    <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 2001-12-21<span style="color: #949494;">, </span>1988-06-04<span style="color: #949494;">, </span>1994-12-01<span style="color: #949494;">, </span>2012-01-31<span style="color: #949494;">, </span>…</span></span>
+<span><span class="co">#&gt; $ cohort_end_date      <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 2001-12-21<span style="color: #949494;">, </span>1988-06-04<span style="color: #949494;">, </span>1994-12-01<span style="color: #949494;">, </span>2012-01-31<span style="color: #949494;">, </span>…</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="demographic-based-cohort-creation">Demographic based cohort creation<a class="anchor" aria-label="anchor" href="#demographic-based-cohort-creation"></a>
@@ -489,7 +489,7 @@ concept OR has a normal BMI score then it is included in the cohort.</p>
 <span><span class="co">#&gt; <span style="color: #949494;">#   measurement_value_as_concept &lt;chr&gt;</span></span></span>
 <span><span class="va">cdm</span><span class="op">$</span><span class="va">cohort</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A query:  ?? x 4</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB 1.5.4 [unknown@Linux 6.17.0-1018-azure:R 4.6.0/:memory:]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB 1.5.5 [unknown@Linux 6.17.0-1020-azure:R 4.6.1/:memory:]</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 4 variables: cohort_definition_id &lt;int&gt;, subject_id &lt;int&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   cohort_start_date &lt;date&gt;, cohort_end_date &lt;date&gt;</span></span></span></code></pre></div>
 <p>As you can see in the above code, the concept set is the list of BMI
@@ -526,7 +526,7 @@ TRUE.</p>
 <span><span class="co">#&gt; <span style="color: #949494;">#   measurement_value_as_concept &lt;chr&gt;</span></span></span>
 <span><span class="va">cdm</span><span class="op">$</span><span class="va">cohort</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A query:  ?? x 4</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB 1.5.4 [unknown@Linux 6.17.0-1018-azure:R 4.6.0/:memory:]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB 1.5.5 [unknown@Linux 6.17.0-1020-azure:R 4.6.1/:memory:]</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 4 variables: cohort_definition_id &lt;int&gt;, subject_id &lt;int&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   cohort_start_date &lt;date&gt;, cohort_end_date &lt;date&gt;</span></span></span></code></pre></div>
 </div>
@@ -560,7 +560,7 @@ cohort.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>
