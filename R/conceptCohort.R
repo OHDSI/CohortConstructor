@@ -235,7 +235,7 @@ conceptCohort <- function(cdm,
       cli::cli_inform(c("i" = "Merging overlapping records."))
       reason <- "Merge overlapping records"
       cdm[[name]] <- cdm[[name]] |>
-        joinOverlap(name = name, gap = 0)  |>
+        joinOverlap(name = name)  |>
         omopgenerics::recordCohortAttrition(reason = reason)
     } else if (exit == "event_start_date") {
       cli::cli_inform(c("i" = "Dropping duplicated records."))
@@ -670,7 +670,7 @@ getDomainCohort <- function(cdm,
         "cohort_start_date" = dplyr::all_of(.env$start),
         "cohort_end_date" = dplyr::all_of(.env$end),
         dplyr::any_of(extraCols)) |>
-      dplyr::inner_join(
+      dplyr::semi_join(
         cdm[[paste0(tablePrefix, "temp_codelist")]],
         by = "concept_id"
       ) |>

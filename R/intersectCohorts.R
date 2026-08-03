@@ -308,11 +308,10 @@ splitOverlap <- function(x,
                    logPrefix = "CohortConstructor_intersectCohorts_inner_join_")
 }
 
-#' Join overlapping periods in single periods using gap.
+#' Join overlapping records
 #'
 #' @param x Table in the cdm.
 #' @param name Table name
-#' @param gap Distance between exposures to consider that they overlap.
 #' @param startDate Column that indicates the start of periods.
 #' @param endDate Column that indicates the end of periods.
 #' @param by Variables to group by.
@@ -324,12 +323,11 @@ splitOverlap <- function(x,
 #'
 joinOverlap <- function(cohort,
                         name,
-                        gap = 0,
                         startDate = "cohort_start_date",
                         endDate = "cohort_end_date",
                         by = c("cohort_definition_id", "subject_id")) {
 
-  if (cohort |> dplyr::tally() |> dplyr::pull("n") == 0) {
+  if (cohort |> head(5) |> dplyr::tally() |> dplyr::pull("n") == 0) {
     return(
       cohort |>
         dplyr::select(dplyr::all_of(c(by, startDate, endDate))) |>
@@ -338,49 +336,43 @@ joinOverlap <- function(cohort,
     )
   }
 
-  gap <- as.integer(gap)
   cdm <- omopgenerics::cdmReference(cohort)
 
   start <- cohort |>
     dplyr::select(dplyr::all_of(by), "date" := !!startDate) |>
-    dplyr::mutate("date_id" = -1)
+    dplyr::mutate("date_id" = -1L)
   end <- cohort |>
     dplyr::select(dplyr::all_of(by), "date" := !!endDate) |>
-    dplyr::mutate("date_id" = 1)
-  if (gap > 0) {
-    end <- end |>
-      dplyr::mutate("date" = as.Date(clock::add_days(x = .data$date, n = .env$gap)))
-  }
+    dplyr::mutate("date_id" = 1L)
+
   workingTbl <- omopgenerics::uniqueTableName()
   x <- start |>
     dplyr::union_all(end) |>
     dplyr::compute(temporary = FALSE, name = workingTbl,
                    logPrefix = "CohortConstructor_joinOverlap_workingTbl_")
 
+  workingTbl2 <- omopgenerics::uniqueTableName()
   x <- x |>
     dplyr::group_by(dplyr::pick(dplyr::all_of(by))) |>
     dplyr::arrange(.data$date, .data$date_id) |>
     dplyr::mutate(
       "cum_id" = cumsum(.data$date_id),
-      "name" = dplyr::if_else(.data$date_id == -1, .env$startDate, .env$endDate),
-      "era_id" = dplyr::if_else(.data$date_id == -1, 1, 0)
+      "name" = dplyr::if_else(.data$date_id == -1L, .env$startDate, .env$endDate),
+      "era_id" = dplyr::if_else(.data$date_id == -1L, 1L, 0L)
     ) |>
-    dplyr::filter(.data$cum_id == 0 |
-                    (.data$cum_id == -1 & .data$date_id == -1)) |>
+    dplyr::filter(.data$cum_id == 0L |
+                    (.data$cum_id == -1L & .data$date_id == -1L)) |>
     dplyr::mutate("era_id" = cumsum(as.numeric(.data$era_id))) |>
     dplyr::ungroup() |>
-    dplyr::arrange() |>
-    dplyr::select(dplyr::all_of(c(by, "era_id", "name", "date"))) |>
-    dplyr::compute(temporary = FALSE, name = workingTbl,
-                   logPrefix = "CohortConstructor_joinOverlap_ids_") |>
-    tidyr::pivot_wider(names_from = "name", values_from = "date") |>
+    dplyr::group_by(dplyr::pick(dplyr::all_of(c(by, "era_id")))) |>
+    dplyr::summarise(
+      !!startDate := max(dplyr::if_else(.data$date_id == -1L, .data$date, NA), na.rm = TRUE),
+      !!endDate := max(dplyr::if_else(.data$date_id == 1L, .data$date, NA), na.rm = TRUE),
+      .groups = "drop"
+    ) |>
     dplyr::select(-"era_id") |>
-    dplyr::compute(temporary = FALSE, name = workingTbl,
-                   logPrefix = "CohortConstructor_joinOverlap_pivot_wider_")
-  if (gap > 0) {
-    x <- x |>
-      dplyr::mutate(!!endDate := as.Date(clock::add_days(x = .data[[endDate]], n = -gap)))
-  }
+    dplyr::compute(temporary = FALSE, name = workingTbl2,
+                   logPrefix = "CohortConstructor_joinOverlap_colapse_")
 
   x <- x |>
     dplyr::relocate(dplyr::all_of(c(by, startDate, endDate))) |>
@@ -389,6 +381,7 @@ joinOverlap <- function(cohort,
                    logPrefix = "CohortConstructor_joinOverlap_relocate_")
 
   omopgenerics::dropSourceTable(cdm = cdm, name = workingTbl)
+  omopgenerics::dropSourceTable(cdm = cdm, name = workingTbl2)
 
   return(x)
 }
