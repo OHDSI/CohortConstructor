@@ -329,7 +329,7 @@ joinOverlap <- function(cohort,
                         endDate = "cohort_end_date",
                         by = c("cohort_definition_id", "subject_id")) {
 
-  if (cohort |> dplyr::tally() |> dplyr::pull("n") == 0) {
+  if (cohort |> utils::head(5) |> dplyr::tally() |> dplyr::pull("n") == 0) {
     return(
       cohort |>
         dplyr::select(dplyr::all_of(c(by, startDate, endDate))) |>
@@ -343,10 +343,10 @@ joinOverlap <- function(cohort,
 
   start <- cohort |>
     dplyr::select(dplyr::all_of(by), "date" := !!startDate) |>
-    dplyr::mutate("date_id" = -1)
+    dplyr::mutate("date_id" = -1L)
   end <- cohort |>
     dplyr::select(dplyr::all_of(by), "date" := !!endDate) |>
-    dplyr::mutate("date_id" = 1)
+    dplyr::mutate("date_id" = 1L)
   if (gap > 0) {
     end <- end |>
       dplyr::mutate("date" = as.Date(clock::add_days(x = .data$date, n = .env$gap)))
@@ -357,26 +357,28 @@ joinOverlap <- function(cohort,
     dplyr::compute(temporary = FALSE, name = workingTbl,
                    logPrefix = "CohortConstructor_joinOverlap_workingTbl_")
 
+  workingTbl2 <- omopgenerics::uniqueTableName()
   x <- x |>
     dplyr::group_by(dplyr::pick(dplyr::all_of(by))) |>
     dplyr::arrange(.data$date, .data$date_id) |>
     dplyr::mutate(
       "cum_id" = cumsum(.data$date_id),
-      "name" = dplyr::if_else(.data$date_id == -1, .env$startDate, .env$endDate),
-      "era_id" = dplyr::if_else(.data$date_id == -1, 1, 0)
+      "name" = dplyr::if_else(.data$date_id == -1L, .env$startDate, .env$endDate),
+      "era_id" = dplyr::if_else(.data$date_id == -1L, 1L, 0L)
     ) |>
-    dplyr::filter(.data$cum_id == 0 |
-                    (.data$cum_id == -1 & .data$date_id == -1)) |>
+    dplyr::filter(.data$cum_id == 0L |
+                    (.data$cum_id == -1L & .data$date_id == -1L)) |>
     dplyr::mutate("era_id" = cumsum(as.numeric(.data$era_id))) |>
     dplyr::ungroup() |>
-    dplyr::arrange() |>
-    dplyr::select(dplyr::all_of(c(by, "era_id", "name", "date"))) |>
-    dplyr::compute(temporary = FALSE, name = workingTbl,
-                   logPrefix = "CohortConstructor_joinOverlap_ids_") |>
-    tidyr::pivot_wider(names_from = "name", values_from = "date") |>
+    dplyr::group_by(dplyr::pick(dplyr::all_of(c(by, "era_id")))) |>
+    dplyr::summarise(
+      !!startDate := max(dplyr::if_else(.data$date_id == -1L, .data$date, NA), na.rm = TRUE),
+      !!endDate := max(dplyr::if_else(.data$date_id == 1L, .data$date, NA), na.rm = TRUE),
+      .groups = "drop"
+    ) |>
     dplyr::select(-"era_id") |>
-    dplyr::compute(temporary = FALSE, name = workingTbl,
-                   logPrefix = "CohortConstructor_joinOverlap_pivot_wider_")
+    dplyr::compute(temporary = FALSE, name = workingTbl2,
+                   logPrefix = "CohortConstructor_joinOverlap_colapse_")
   if (gap > 0) {
     x <- x |>
       dplyr::mutate(!!endDate := as.Date(clock::add_days(x = .data[[endDate]], n = -gap)))
@@ -389,6 +391,7 @@ joinOverlap <- function(cohort,
                    logPrefix = "CohortConstructor_joinOverlap_relocate_")
 
   omopgenerics::dropSourceTable(cdm = cdm, name = workingTbl)
+  omopgenerics::dropSourceTable(cdm = cdm, name = workingTbl2)
 
   return(x)
 }
