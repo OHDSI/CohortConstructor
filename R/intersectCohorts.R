@@ -329,7 +329,7 @@ joinOverlap <- function(cohort,
                         endDate = "cohort_end_date",
                         by = c("cohort_definition_id", "subject_id")) {
 
-  if (cohort |> head(5) |> dplyr::tally() |> dplyr::pull("n") == 0) {
+  if (cohort |> utils::head(5) |> dplyr::tally() |> dplyr::pull("n") == 0) {
     return(
       cohort |>
         dplyr::select(dplyr::all_of(c(by, startDate, endDate))) |>
