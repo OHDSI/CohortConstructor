@@ -350,10 +350,16 @@ joinOverlap <- function(cohort,
 
   x <- cohort |>
     dplyr::group_by(dplyr::pick(dplyr::all_of(by))) |>
-    dplyr::arrange(.data[[startDate]], .data[[endDate]]) |>
-    dplyr::mutate(
-      running_max = cummax(.data[[endDate]])
-    ) |>
+    dplyr::arrange(.data[[startDate]], .data[[endDate]])
+  if (inherits(x, "tbl_lazy")) {
+    x <- x |> dplyr::mutate(running_max = cummax(.data[[endDate]]))
+  } else {
+    #  to work for local data frames (cast date to integer, get cummax, cast back to date)
+    x <- x |> dplyr::mutate(
+      running_max = as.Date(cummax(as.integer(.data[[endDate]])), origin = "1970-01-01")
+    )
+  }
+  x <- x |>
     dplyr::mutate(
       prev_max = dplyr::lag(.data$running_max)
     ) |>
