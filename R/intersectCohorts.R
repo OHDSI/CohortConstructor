@@ -363,17 +363,16 @@ joinOverlap <- function(cohort,
     dplyr::arrange(.data$date, .data$date_id) |>
     dplyr::mutate(
       "cum_id" = cumsum(.data$date_id),
-      "name" = dplyr::if_else(.data$date_id == -1L, .env$startDate, .env$endDate),
       "era_id" = dplyr::if_else(.data$date_id == -1L, 1L, 0L)
     ) |>
     dplyr::filter(.data$cum_id == 0L |
                     (.data$cum_id == -1L & .data$date_id == -1L)) |>
-    dplyr::mutate("era_id" = cumsum(as.numeric(.data$era_id))) |>
+    dplyr::mutate("era_id" = cumsum(as.integer(.data$era_id))) |>
     dplyr::ungroup() |>
     dplyr::group_by(dplyr::pick(dplyr::all_of(c(by, "era_id")))) |>
     dplyr::summarise(
-      !!startDate := max(dplyr::if_else(.data$date_id == -1L, .data$date, NA), na.rm = TRUE),
-      !!endDate := max(dplyr::if_else(.data$date_id == 1L, .data$date, NA), na.rm = TRUE),
+      !!startDate := min(.data$date, na.rm = TRUE),
+      !!endDate   := max(.data$date, na.rm = TRUE),
       .groups = "drop"
     ) |>
     dplyr::select(-"era_id") |>
