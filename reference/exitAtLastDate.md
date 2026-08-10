@@ -68,7 +68,7 @@ The cohort table.
 library(CohortConstructor)
 library(PatientProfiles)
 cdm <- mockCohortConstructor()
-#> Warning: '/tmp/RtmpTrjJ4I/id_diu' already exists
+#> Warning: '/tmp/RtmpeRbMYX/id_diu' already exists
 #> ℹ Reading GiBleed tables.
 
 cdm$cohort1 <- cdm$cohort1 |>

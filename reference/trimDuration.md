@@ -44,7 +44,7 @@ required duration dropped
 # \donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
-#> Warning: '/tmp/RtmpTrjJ4I/id_boq' already exists
+#> Warning: '/tmp/RtmpeRbMYX/id_boq' already exists
 #> ℹ Reading GiBleed tables.
 
 cdm$cohort1 |>
