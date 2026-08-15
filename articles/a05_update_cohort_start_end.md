@@ -124,7 +124,7 @@ cdm$cohort_entry_first <- cdm$cohort_dates |>
   )
 cdm$cohort_entry_first 
 #> # A query:  ?? x 6
-#> # Database: DuckDB 1.5.5 [unknown@Linux 6.17.0-1020-azure:R 4.6.1//tmp/RtmpzefX5D/file243568cf1bd3.duckdb]
+#> # Database: DuckDB 1.5.5 [unknown@Linux 6.17.0-1022-azure:R 4.6.1//tmp/Rtmp98K6lR/file230a37f666ec.duckdb]
 #>    cohort_definition_id subject_id cohort_start_date cohort_end_date diclofenac
 #>                   <int>      <int> <date>            <date>          <date>    
 #>  1                    1         18 1983-05-31        2018-11-07      2009-03-21
@@ -161,7 +161,7 @@ cdm$cohort_entry_last <- cdm$cohort_dates |>
 
 cdm$cohort_entry_last
 #> # A query:  ?? x 4
-#> # Database: DuckDB 1.5.5 [unknown@Linux 6.17.0-1020-azure:R 4.6.1//tmp/RtmpzefX5D/file243568cf1bd3.duckdb]
+#> # Database: DuckDB 1.5.5 [unknown@Linux 6.17.0-1022-azure:R 4.6.1//tmp/Rtmp98K6lR/file230a37f666ec.duckdb]
 #>    cohort_definition_id subject_id cohort_start_date cohort_end_date
 #>                   <int>      <int> <date>            <date>         
 #>  1                    1         18 2018-11-07        2018-11-07     
@@ -202,7 +202,7 @@ cdm$cohort_exit_first <- cdm$cohort_dates |>
 
 cdm$cohort_exit_first 
 #> # A query:  ?? x 4
-#> # Database: DuckDB 1.5.5 [unknown@Linux 6.17.0-1020-azure:R 4.6.1//tmp/RtmpzefX5D/file243568cf1bd3.duckdb]
+#> # Database: DuckDB 1.5.5 [unknown@Linux 6.17.0-1022-azure:R 4.6.1//tmp/Rtmp98K6lR/file230a37f666ec.duckdb]
 #>    cohort_definition_id subject_id cohort_start_date cohort_end_date
 #>                   <int>      <int> <date>            <date>         
 #>  1                    1         18 1965-11-17        1983-05-31     
@@ -236,7 +236,7 @@ cdm$cohort_exit_last <- cdm$cohort_dates |>
   )
 cdm$cohort_exit_last
 #> # A query:  ?? x 4
-#> # Database: DuckDB 1.5.5 [unknown@Linux 6.17.0-1020-azure:R 4.6.1//tmp/RtmpzefX5D/file243568cf1bd3.duckdb]
+#> # Database: DuckDB 1.5.5 [unknown@Linux 6.17.0-1022-azure:R 4.6.1//tmp/Rtmp98K6lR/file230a37f666ec.duckdb]
 #>    cohort_definition_id subject_id cohort_start_date cohort_end_date
 #>                   <int>      <int> <date>            <date>         
 #>  1                    1         18 1965-11-17        2018-11-07     

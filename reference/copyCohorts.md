@@ -38,7 +38,7 @@ A new cohort table containing cohorts from the original cohort table.
 # \donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
-#> Warning: '/tmp/RtmpeRbMYX/id_mds' already exists
+#> Warning: '/tmp/RtmpET1GQa/id_mds' already exists
 #> ℹ Reading GiBleed tables.
 cdm$cohort3 <- copyCohorts(cdm$cohort1, n = 2, cohortId = 1, name = "cohort3")
 # }

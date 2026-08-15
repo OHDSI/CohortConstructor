@@ -57,22 +57,22 @@ individual.
 cdm$medications |>
   filter(subject_id == 1)
 #> # A query:  ?? x 4
-#> # Database: DuckDB 1.5.5 [unknown@Linux 6.17.0-1020-azure:R 4.6.1//tmp/RtmpBTYe2a/file24793d6f9fde.duckdb]
-#>   cohort_definition_id subject_id cohort_start_date cohort_end_date
-#>                  <int>      <int> <date>            <date>         
-#> 1                    1          1 1982-09-11        1982-10-02     
-#> 2                    1          1 1971-01-04        1971-01-18     
-#> 3                    1          1 1976-10-20        1976-11-03     
-#> 4                    1          1 1980-03-15        1980-03-29
-cdm$medications_collapsed |>
-  filter(subject_id == 1)
-#> # A query:  ?? x 4
-#> # Database: DuckDB 1.5.5 [unknown@Linux 6.17.0-1020-azure:R 4.6.1//tmp/RtmpBTYe2a/file24793d6f9fde.duckdb]
+#> # Database: DuckDB 1.5.5 [unknown@Linux 6.17.0-1022-azure:R 4.6.1//tmp/RtmpmJlpT2/file2352583810f4.duckdb]
 #>   cohort_definition_id subject_id cohort_start_date cohort_end_date
 #>                  <int>      <int> <date>            <date>         
 #> 1                    1          1 1971-01-04        1971-01-18     
 #> 2                    1          1 1976-10-20        1976-11-03     
-#> 3                    1          1 1980-03-15        1982-10-02
+#> 3                    1          1 1980-03-15        1980-03-29     
+#> 4                    1          1 1982-09-11        1982-10-02
+cdm$medications_collapsed |>
+  filter(subject_id == 1)
+#> # A query:  ?? x 4
+#> # Database: DuckDB 1.5.5 [unknown@Linux 6.17.0-1022-azure:R 4.6.1//tmp/RtmpmJlpT2/file2352583810f4.duckdb]
+#>   cohort_definition_id subject_id cohort_start_date cohort_end_date
+#>                  <int>      <int> <date>            <date>         
+#> 1                    1          1 1980-03-15        1982-10-02     
+#> 2                    1          1 1976-10-20        1976-11-03     
+#> 3                    1          1 1971-01-04        1971-01-18
 ```
 
 Subject 1 initially had 4 records between 1971 and 1982. After

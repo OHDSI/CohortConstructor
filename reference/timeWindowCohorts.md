@@ -54,7 +54,7 @@ A cohort table
 # \donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
-#> Warning: '/tmp/RtmpeRbMYX/id_mds' already exists
+#> Warning: '/tmp/RtmpET1GQa/id_mds' already exists
 #> ℹ Reading GiBleed tables.
 # if "cohort1" contained pregnancy episodes, we can generate trimester-specific
 # cohorts with this function

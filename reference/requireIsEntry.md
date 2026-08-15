@@ -40,7 +40,7 @@ A cohort table in a cdm reference.
 # \donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
-#> Warning: '/tmp/RtmpeRbMYX/id_mds' already exists
+#> Warning: '/tmp/RtmpET1GQa/id_mds' already exists
 #> ℹ Reading GiBleed tables.
 cdm$cohort1 <- requireIsEntry(cdm$cohort1, c(1, Inf))
 #> Warning: The `name` argument was not provided.

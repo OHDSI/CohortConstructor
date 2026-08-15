@@ -68,7 +68,7 @@ dropped.
 # \donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
-#> Warning: '/tmp/RtmpeRbMYX/id_mds' already exists
+#> Warning: '/tmp/RtmpET1GQa/id_mds' already exists
 #> ℹ Reading GiBleed tables.
 
 cdm$cohort2 <- cdm$cohort1 |>

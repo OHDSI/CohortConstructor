@@ -67,7 +67,7 @@ A cohort table.
 # \donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
-#> Warning: '/tmp/RtmpeRbMYX/id_mds' already exists
+#> Warning: '/tmp/RtmpET1GQa/id_mds' already exists
 #> ℹ Reading GiBleed tables.
 
 cdm$cohort3 <- intersectCohorts(cohort = cdm$cohort2, name = "cohort3")

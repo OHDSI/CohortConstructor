@@ -63,7 +63,7 @@ The cohort table.
 # \donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
-#> Warning: '/tmp/RtmpeRbMYX/id_diu' already exists
+#> Warning: '/tmp/RtmpET1GQa/id_diu' already exists
 #> ℹ Reading GiBleed tables.
 cdm$cohort1 |> exitAtObservationEnd()
 #> Warning: The `name` argument was not provided.

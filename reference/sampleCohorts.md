@@ -52,7 +52,7 @@ Cohort table with the specified cohorts sampled.
 # \donttest{
 library(CohortConstructor)
 cdm <- mockCohortConstructor()
-#> Warning: '/tmp/RtmpeRbMYX/id_boq' already exists
+#> Warning: '/tmp/RtmpET1GQa/id_boq' already exists
 #> ℹ Reading GiBleed tables.
 
 cdm$cohort2 |> sampleCohorts(cohortId = 1, n = 10)

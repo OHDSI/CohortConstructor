@@ -126,22 +126,22 @@ individual.</p>
 <code class="sourceCode R"><span><span class="va">cdm</span><span class="op">$</span><span class="va">medications</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">subject_id</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A query:  ?? x 4</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB 1.5.5 [unknown@Linux 6.17.0-1020-azure:R 4.6.1//tmp/RtmpBTYe2a/file24793d6f9fde.duckdb]</span></span></span>
-<span><span class="co">#&gt;   cohort_definition_id subject_id cohort_start_date cohort_end_date</span></span>
-<span><span class="co">#&gt;                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>         </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1          1 1982-09-11        1982-10-02     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                    1          1 1971-01-04        1971-01-18     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>                    1          1 1976-10-20        1976-11-03     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>                    1          1 1980-03-15        1980-03-29</span></span>
-<span><span class="va">cdm</span><span class="op">$</span><span class="va">medications_collapsed</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">subject_id</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A query:  ?? x 4</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB 1.5.5 [unknown@Linux 6.17.0-1020-azure:R 4.6.1//tmp/RtmpBTYe2a/file24793d6f9fde.duckdb]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB 1.5.5 [unknown@Linux 6.17.0-1022-azure:R 4.6.1//tmp/RtmpmJlpT2/file2352583810f4.duckdb]</span></span></span>
 <span><span class="co">#&gt;   cohort_definition_id subject_id cohort_start_date cohort_end_date</span></span>
 <span><span class="co">#&gt;                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>         </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1          1 1971-01-04        1971-01-18     </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                    1          1 1976-10-20        1976-11-03     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>                    1          1 1980-03-15        1982-10-02</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>                    1          1 1980-03-15        1980-03-29     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>                    1          1 1982-09-11        1982-10-02</span></span>
+<span><span class="va">cdm</span><span class="op">$</span><span class="va">medications_collapsed</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">subject_id</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A query:  ?? x 4</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB 1.5.5 [unknown@Linux 6.17.0-1022-azure:R 4.6.1//tmp/RtmpmJlpT2/file2352583810f4.duckdb]</span></span></span>
+<span><span class="co">#&gt;   cohort_definition_id subject_id cohort_start_date cohort_end_date</span></span>
+<span><span class="co">#&gt;                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>         </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>                    1          1 1980-03-15        1982-10-02     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>                    1          1 1976-10-20        1976-11-03     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>                    1          1 1971-01-04        1971-01-18</span></span></code></pre></div>
 <p>Subject 1 initially had 4 records between 1971 and 1982. After
 specifying that records within three years of each other are to be
 merged, the number of records decreases to three. The record from
@@ -151,23 +151,23 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">summary_attrition</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/CohortCharacteristics/reference/summariseCohortAttrition.html" class="external-link">summariseCohortAttrition</a></span><span class="op">(</span><span class="va">cdm</span><span class="op">$</span><span class="va">medications_collapsed</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://darwin-eu.github.io/CohortCharacteristics/reference/tableCohortAttrition.html" class="external-link">tableCohortAttrition</a></span><span class="op">(</span><span class="va">summary_attrition</span><span class="op">)</span></span></code></pre></div>
-<div id="mulxtlvmdh" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#mulxtlvmdh table {
+<div id="hovfkigglr" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#hovfkigglr table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#mulxtlvmdh thead, #mulxtlvmdh tbody, #mulxtlvmdh tfoot, #mulxtlvmdh tr, #mulxtlvmdh td, #mulxtlvmdh th {
+#hovfkigglr thead, #hovfkigglr tbody, #hovfkigglr tfoot, #hovfkigglr tr, #hovfkigglr td, #hovfkigglr th {
   border-style: none;
 }
 
-#mulxtlvmdh p {
+#hovfkigglr p {
   margin: 0;
   padding: 0;
 }
 
-#mulxtlvmdh .gt_table {
+#hovfkigglr .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -193,12 +193,12 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   border-left-color: #D9D9D9;
 }
 
-#mulxtlvmdh .gt_caption {
+#hovfkigglr .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#mulxtlvmdh .gt_title {
+#hovfkigglr .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -210,7 +210,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   border-bottom-width: 0;
 }
 
-#mulxtlvmdh .gt_subtitle {
+#hovfkigglr .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -222,7 +222,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   border-top-width: 0;
 }
 
-#mulxtlvmdh .gt_heading {
+#hovfkigglr .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -234,13 +234,13 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   border-right-color: #D3D3D3;
 }
 
-#mulxtlvmdh .gt_bottom_border {
+#hovfkigglr .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#mulxtlvmdh .gt_col_headings {
+#hovfkigglr .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -255,7 +255,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   border-right-color: #D3D3D3;
 }
 
-#mulxtlvmdh .gt_col_heading {
+#hovfkigglr .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -275,7 +275,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   overflow-x: hidden;
 }
 
-#mulxtlvmdh .gt_column_spanner_outer {
+#hovfkigglr .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -287,15 +287,15 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   padding-right: 4px;
 }
 
-#mulxtlvmdh .gt_column_spanner_outer:first-child {
+#hovfkigglr .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#mulxtlvmdh .gt_column_spanner_outer:last-child {
+#hovfkigglr .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#mulxtlvmdh .gt_column_spanner {
+#hovfkigglr .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -307,11 +307,11 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   width: 100%;
 }
 
-#mulxtlvmdh .gt_spanner_row {
+#hovfkigglr .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#mulxtlvmdh .gt_group_heading {
+#hovfkigglr .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -337,7 +337,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   text-align: left;
 }
 
-#mulxtlvmdh .gt_empty_group_heading {
+#hovfkigglr .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -352,15 +352,15 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   vertical-align: middle;
 }
 
-#mulxtlvmdh .gt_from_md > :first-child {
+#hovfkigglr .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#mulxtlvmdh .gt_from_md > :last-child {
+#hovfkigglr .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#mulxtlvmdh .gt_row {
+#hovfkigglr .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -379,7 +379,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   overflow-x: hidden;
 }
 
-#mulxtlvmdh .gt_stub {
+#hovfkigglr .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -392,7 +392,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   padding-right: 5px;
 }
 
-#mulxtlvmdh .gt_stub_row_group {
+#hovfkigglr .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -406,15 +406,15 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   vertical-align: top;
 }
 
-#mulxtlvmdh .gt_row_group_first td {
+#hovfkigglr .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#mulxtlvmdh .gt_row_group_first th {
+#hovfkigglr .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#mulxtlvmdh .gt_summary_row {
+#hovfkigglr .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -424,16 +424,16 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   padding-right: 5px;
 }
 
-#mulxtlvmdh .gt_first_summary_row {
+#hovfkigglr .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#mulxtlvmdh .gt_first_summary_row.thick {
+#hovfkigglr .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#mulxtlvmdh .gt_last_summary_row {
+#hovfkigglr .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -443,7 +443,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   border-bottom-color: #D3D3D3;
 }
 
-#mulxtlvmdh .gt_grand_summary_row {
+#hovfkigglr .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -453,7 +453,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   padding-right: 5px;
 }
 
-#mulxtlvmdh .gt_first_grand_summary_row {
+#hovfkigglr .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -463,7 +463,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   border-top-color: #D3D3D3;
 }
 
-#mulxtlvmdh .gt_last_grand_summary_row_top {
+#hovfkigglr .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -473,11 +473,11 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   border-bottom-color: #D3D3D3;
 }
 
-#mulxtlvmdh .gt_striped {
+#hovfkigglr .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#mulxtlvmdh .gt_table_body {
+#hovfkigglr .gt_table_body {
   border-top-style: solid;
   border-top-width: 3px;
   border-top-color: #D9D9D9;
@@ -486,7 +486,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   border-bottom-color: #D3D3D3;
 }
 
-#mulxtlvmdh .gt_footnotes {
+#hovfkigglr .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -500,7 +500,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   border-right-color: #D3D3D3;
 }
 
-#mulxtlvmdh .gt_footnote {
+#hovfkigglr .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -509,7 +509,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   padding-right: 5px;
 }
 
-#mulxtlvmdh .gt_sourcenotes {
+#hovfkigglr .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -523,7 +523,7 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   border-right-color: #D3D3D3;
 }
 
-#mulxtlvmdh .gt_sourcenote {
+#hovfkigglr .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -531,72 +531,72 @@ are merged to create a new record from 1980-03-15 to 1982-10-02.</p>
   padding-right: 5px;
 }
 
-#mulxtlvmdh .gt_left {
+#hovfkigglr .gt_left {
   text-align: left;
 }
 
-#mulxtlvmdh .gt_center {
+#hovfkigglr .gt_center {
   text-align: center;
 }
 
-#mulxtlvmdh .gt_right {
+#hovfkigglr .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#mulxtlvmdh .gt_font_normal {
+#hovfkigglr .gt_font_normal {
   font-weight: normal;
 }
 
-#mulxtlvmdh .gt_font_bold {
+#hovfkigglr .gt_font_bold {
   font-weight: bold;
 }
 
-#mulxtlvmdh .gt_font_italic {
+#hovfkigglr .gt_font_italic {
   font-style: italic;
 }
 
-#mulxtlvmdh .gt_super {
+#hovfkigglr .gt_super {
   font-size: 65%;
 }
 
-#mulxtlvmdh .gt_footnote_marks {
+#hovfkigglr .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#mulxtlvmdh .gt_asterisk {
+#hovfkigglr .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#mulxtlvmdh .gt_indent_1 {
+#hovfkigglr .gt_indent_1 {
   text-indent: 5px;
 }
 
-#mulxtlvmdh .gt_indent_2 {
+#hovfkigglr .gt_indent_2 {
   text-indent: 10px;
 }
 
-#mulxtlvmdh .gt_indent_3 {
+#hovfkigglr .gt_indent_3 {
   text-indent: 15px;
 }
 
-#mulxtlvmdh .gt_indent_4 {
+#hovfkigglr .gt_indent_4 {
   text-indent: 20px;
 }
 
-#mulxtlvmdh .gt_indent_5 {
+#hovfkigglr .gt_indent_5 {
   text-indent: 25px;
 }
 
-#mulxtlvmdh .katex-display {
+#hovfkigglr .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#mulxtlvmdh div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#hovfkigglr div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
