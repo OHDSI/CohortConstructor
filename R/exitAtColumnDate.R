@@ -32,6 +32,7 @@ exitAtFirstDate <- function(cohort,
                             dateColumns,
                             cohortId = NULL,
                             returnReason = FALSE,
+                            multipleReasons = FALSE,
                             keepDateColumns = TRUE,
                             name = tableName(cohort),
                             .softValidation = FALSE) {
@@ -40,6 +41,7 @@ exitAtFirstDate <- function(cohort,
     dateColumns = dateColumns,
     cohortId = cohortId,
     returnReason = returnReason,
+    multipleReasons = multipleReasons,
     missingName = missing(name),
     name = name,
     order = "first",
@@ -84,6 +86,7 @@ exitAtLastDate <- function(cohort,
                            dateColumns,
                            cohortId = NULL,
                            returnReason = FALSE,
+                           multipleReasons = FALSE,
                            keepDateColumns = TRUE,
                            name = tableName(cohort),
                            .softValidation = FALSE) {
@@ -92,6 +95,7 @@ exitAtLastDate <- function(cohort,
     dateColumns = dateColumns,
     cohortId = {{cohortId}},
     returnReason = returnReason,
+    multipleReasons = multipleReasons,
     missingName = missing(name),
     name = name,
     order = "last",
@@ -105,6 +109,7 @@ exitAtColumnDate <- function(cohort,
                              dateColumns,
                              cohortId,
                              returnReason,
+                             multipleReasons,
                              order,
                              missingName,
                              name,
@@ -179,6 +184,7 @@ exitAtColumnDate <- function(cohort,
   if (returnReason) {
     newCohort <- newCohort |>
       dplyr::select(!dplyr::any_of(reason))
+    if(isFALSE(multipleReasons)){
     q <- paste0(
       "dplyr::case_when(",
       paste0(
@@ -191,6 +197,22 @@ exitAtColumnDate <- function(cohort,
       rlang::set_names(reason)
     newCohort <- newCohort |>
       dplyr::mutate(!!!q)
+    } else {
+      match_exprs <- lapply(dateColumns, function(col) {
+        rlang::expr(dplyr::if_else(!!rlang::sym(col) == .data[[id]], !!col, ""))
+      })
+      newCohort <- newCohort |>
+        dplyr::mutate(
+          !!reason := paste(!!!match_exprs, sep = ";")
+        ) |>
+        dplyr::mutate(
+          !!reason := stringr::str_remove_all(
+            stringr::str_replace_all(.data[[reason]], "(;\\s*)+", ";"),
+            "^;\\s*|;\\s*$"
+          )
+        )
+
+    }
   }
 
   newCohort <- newCohort |>
