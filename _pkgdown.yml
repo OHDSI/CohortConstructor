@@ -19,6 +19,7 @@ reference:
   - deathCohort
   - demographicsCohort
   - measurementCohort
+  - ageCohort
 - subtitle: Apply cohort table related requirements
 - contents:
   - requireMinCohortCount
