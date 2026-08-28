@@ -129,6 +129,7 @@ requireIsEntry <- function(cohort,
 #'
 #' @inheritParams cohortDoc
 #' @inheritParams cohortIdModifyDoc
+#' @inheritParams simpleReasonDoc
 #' @inheritParams nameDoc
 #'
 #' @return A cohort table in a cdm reference.
@@ -142,12 +143,14 @@ requireIsEntry <- function(cohort,
 #' }
 requireIsFirstEntry <- function(cohort,
                                 cohortId = NULL,
+                                reason = "Restricted to first entry",
                                 name = tableName(cohort)) {
   # checks
   name <- validateNameArgumentInternal(missing(name), name, tableName(cohort))
   cohort <- omopgenerics::validateCohortArgument(cohort)
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
+  omopgenerics::assertCharacter(reason, length = 1)
 
   if (length(cohortId) == 0) {
     cli::cli_warn("Returning entry cohort as `cohortId` is not valid.")
@@ -179,8 +182,7 @@ requireIsFirstEntry <- function(cohort,
       logPrefix = "CohortConstructor_requireIsFirstEntry_min_"
     ) |>
     omopgenerics::newCohortTable(.softValidation = TRUE) |>
-    omopgenerics::recordCohortAttrition("Restricted to first entry",
-                                        cohortId = cohortId)
+    omopgenerics::recordCohortAttrition(reason = reason, cohortId = cohortId)
 
   useIndexes <- getOption("CohortConstructor.use_indexes")
   if (!isFALSE(useIndexes)) {

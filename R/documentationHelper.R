@@ -234,3 +234,29 @@ NULL
 #' @name baseCohortDoc
 #' @keywords internal
 NULL
+
+#' Helper for consistent documentation of `reason`.
+#'
+#' @param reason A character vector to populate the reason in the attrition.
+#'
+#' @name simpleReasonDoc
+#' @keywords internal
+NULL
+
+reasonParams <- function(nm) {
+  list(
+    in_date_range = list(
+      opt = c("indexDate", "temporality", "date", "atFirst"),
+      len = 2
+    )
+  )[[nm]]
+}
+reasonDoc <- function(nm) {
+  params <- reasonParams(nm)
+  paste0(
+    "Character string of length ", params$len, " or glue expression. ",
+    "Glue statment can contain: ",
+    paste0("`{", params$opt, "}`", collapse = ", "), ". After gluing it must ",
+    "produce a length ", params$len, " character."
+  )
+}

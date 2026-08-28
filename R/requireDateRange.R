@@ -12,6 +12,7 @@
 #' @param indexDate Name of the column in the cohort that contains the date of
 #' interest.
 #' @inheritParams atFirstDoc
+#' @param reason `r reasonDoc("in_date_range")`
 #'
 #' @return The cohort table with any cohort entries outside of the date range
 #' dropped
@@ -41,6 +42,7 @@ requireInDateRange <- function(cohort,
                                cohortId = NULL,
                                indexDate = "cohort_start_date",
                                atFirst = FALSE,
+                               reason = "{indexDate} {temporality} {date}; {atFirst}",
                                name = tableName(cohort)) {
   # checks
   name <- validateNameArgumentInternal(missing(name), name, tableName(cohort))
@@ -49,6 +51,7 @@ requireInDateRange <- function(cohort,
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
   dateRange <- validateDateRange(dateRange)
+  omopgenerics::assertCharacter(reason)
   omopgenerics::assertLogical(atFirst, length = 1)
 
   if (length(cohortId) == 0) {
@@ -58,6 +61,12 @@ requireInDateRange <- function(cohort,
                                             logPrefix = "CohortConstructor_requireInDateRange_entry_")
     return(cdm[[name]])
   }
+
+  atFirstReason <- ifelse(atFirst, "Requirement applied to the first entry", "")
+  reason <- validateReason(
+    reason = reason, len = 2, indexDate = indexDate, date = dateRange,
+    temporality = c("after", "before"), atFirst = atFirstReason
+  )
 
   # temp tables
   tablePrefix <- omopgenerics::tmpPrefix()
@@ -77,8 +86,8 @@ requireInDateRange <- function(cohort,
       dateRange = dateRange,
       filt1 = rlang::parse_exprs(glue::glue(".data[[indexDate]] >= as.Date('{dateRange[1]}')")),
       filt2 = rlang::parse_exprs(glue::glue(".data[[indexDate]] <= as.Date('{dateRange[2]}')")),
-      reason1 = glue::glue("{indexDate} after {dateRange[1]}"),
-      reason2 = glue::glue("{indexDate} before {dateRange[2]}")
+      reason1 = reason[1],
+      reason2 = reason[2]
     )
 
   } else {
@@ -106,7 +115,7 @@ requireInDateRange <- function(cohort,
         dplyr::compute(name = tmpNewCohort, temporary = FALSE,
                        logPrefix = "CohortConstructor_requireInDateRange_requirement1_first_") |>
         omopgenerics::recordCohortAttrition(
-          reason = "{indexDate} after {dateRange[1]}. Requirement applied to the first entry",
+          reason = reason[1],
           cohortId = cohortId
         )
     }
@@ -127,7 +136,7 @@ requireInDateRange <- function(cohort,
         dplyr::compute(name = tmpNewCohort, temporary = FALSE,
                        logPrefix = "CohortConstructor_requireInDateRange_requirement2_first_") |>
         omopgenerics::recordCohortAttrition(
-          reason = "{indexDate} before {dateRange[2]}. Requirement applied to the first entry",
+          reason = reason[2],
           cohortId = cohortId
         )
     }
