@@ -223,6 +223,7 @@ readCohortDefinitionJson <- function(path) {
     destination <- tempfile(fileext = ".json")
     on.exit(unlink(destination), add = TRUE)
     utils::download.file(path, destination, mode = "wb", quiet = TRUE)
+    path <- destination
   }
-  jsonlite::read_json(path = destination, pretty = TRUE)
+  jsonlite::read_json(path = path, pretty = TRUE)
 }
