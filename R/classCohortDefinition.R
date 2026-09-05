@@ -31,9 +31,11 @@ importCohortDefinition <- function(path, recursive = FALSE) {
     purrr::imap(\(x, nm) {
       content <- jsonlite::read_json(path = x, pretty = TRUE)
       tryCatch({
-
-      }, error = function(e) {
+        newCohortDefinition(content)
+      },
+      error = function(e) {
         cli::cli_inform(c("!" = "", as.character(e)))
+        return(NULL)
       })
     }) |>
     purrr::compact() |>
