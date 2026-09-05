@@ -29,7 +29,7 @@ importCohortDefinition <- function(path, recursive = FALSE) {
   # read content as json
   files |>
     purrr::imap(\(x, nm) {
-      content <- jsonlite::read_json(path = x, pretty = TRUE)
+      content <- readCohortDefinitionJson(x)
       tryCatch({
         newCohortDefinition(content)
       },
@@ -200,7 +200,8 @@ findFiles <- function(path, recursive, call = parent.frame()) {
   assertCharacter(path, call = call)
   assertLogical(recursive, length = 1, call = call)
   path <- as.character(unlist(purrr::map(path, function(x) {
-    if (!stringr::str_starts(string = x, pattern = "https")) {
+    isUrl <- grepl("^https://", x, ignore.case = TRUE)
+    if (!isUrl) {
       if (!file.exists(x)) {
         cli::cli_warn(c(x = "directory {.path {x}} does not exist"))
         return(NULL)
@@ -214,4 +215,14 @@ findFiles <- function(path, recursive, call = parent.frame()) {
   pathClean <- sub("\\?.*$", "", path)
   names(path) <- tools::file_path_sans_ext(basename(pathClean))
   as.list(path)
+}
+
+readCohortDefinitionJson <- function(path) {
+  isUrl <- grepl("^https://", path, ignore.case = TRUE)
+  if (isUrl) {
+    destination <- tempfile(fileext = ".json")
+    on.exit(unlink(destination), add = TRUE)
+    utils::download.file(path, destination, mode = "wb", quiet = TRUE)
+  }
+  jsonlite::read_json(path = destination, pretty = TRUE)
 }
