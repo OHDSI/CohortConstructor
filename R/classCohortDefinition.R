@@ -102,8 +102,7 @@ bind.cohort_definition <- function(...) {
 
 #' @export
 c.cohort_definition <- function(...) {
-  fun <- switch(type, codelist = newCodelist, codelist_with_details = newCodelistWithDetails,
-                concept_set_expression = newConceptSetExpression)
+  x <- list(...)
   x <- purrr::compact(purrr::imap(x, function(element, nm) {
     if (!inherits(element, "cohort_definition")) {
       element <- tryCatch(newCohortDefinition(element), error = function(e) NULL)
