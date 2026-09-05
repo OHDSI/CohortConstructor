@@ -25,7 +25,6 @@ Description: Create and manipulate study cohorts in data mapped to the
 License: Apache License (>= 2)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
 Imports: 
     cli,
     clock,
@@ -72,3 +71,4 @@ Depends:
 URL: https://ohdsi.github.io/CohortConstructor/, https://github.com/OHDSI/CohortConstructor
 BugReports: https://github.com/OHDSI/CohortConstructor/issues
 LazyData: true
+Config/roxygen2/version: 8.0.0
