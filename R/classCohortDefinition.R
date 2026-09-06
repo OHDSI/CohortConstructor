@@ -31,10 +31,13 @@ importCohortDefinition <- function(path, recursive = FALSE) {
   }
 
   # read content as json
-  files |>
+  definitions <- files |>
     purrr::imap(\(x, nm) {
       tryCatch({
         content <- readCohortDefinitionJson(x)
+        if (isSingleCohortDefinition(content)) {
+          content <- stats::setNames(list(content), content$name)
+        }
         newCohortDefinition(content)
       },
       error = function(e) {
@@ -42,8 +45,12 @@ importCohortDefinition <- function(path, recursive = FALSE) {
         return(NULL)
       })
     }) |>
-    purrr::compact() |>
-    omopgenerics::bind()
+    purrr::compact()
+
+  if (length(definitions) == 0) {
+    return(newCohortDefinition(list()))
+  }
+  do.call(omopgenerics::bind, definitions)
 }
 
 #' Title
@@ -84,7 +91,20 @@ exportCohortDefinition <- function(x, path) {
 #'
 #' @examples
 cohortDefinitionFromCode <- function(x) {
+  expression <- parseCohortDefinitionCode(x)
 
+  if (!rlang::is_call(expression, "<-", n = 2)) {
+    cli::cli_abort("Code must contain an assignment of the form `cdm$cohort_name <- ...`.")
+  }
+
+  cohortName <- cohortNameFromAssignment(expression[[2]])
+  steps <- stepsFromPipeline(expression[[3]])
+  definition <- stats::setNames(
+    list(list(name = cohortName, definition = steps)),
+    cohortName
+  )
+
+  newCohortDefinition(definition)
 }
 
 #' Title
@@ -96,12 +116,9 @@ cohortDefinitionFromCode <- function(x) {
 #'
 #' @examples
 codeFromCohortDefinition <- function(x) {
-  code <- x$definition |>
-    purrr::map_chr(\(def) {
-
-    }) |>
-    paste0(collapse = "|>\n")
-  paste0("cdm[[name]] <- ", code)
+  x <- validateCohortDefinition(x)
+  purrr::map_chr(x, codeFromSingleCohortDefinition) |>
+    paste(collapse = "\n\n")
 }
 
 #' @export
@@ -274,7 +291,260 @@ readCohortDefinitionJson <- function(path) {
     utils::download.file(path, destination, mode = "wb", quiet = TRUE)
     path <- destination
   }
-  jsonlite::read_json(path = path, pretty = TRUE)
+  jsonlite::read_json(path = path, pretty = TRUE) |>
+    decodeJsonSpecialValues()
+}
+
+isSingleCohortDefinition <- function(x) {
+  is.list(x) &&
+    all(c("name", "definition") %in% names(x)) &&
+    is.character(x$name) &&
+    length(x$name) == 1
+}
+
+decodeJsonSpecialValues <- function(x) {
+  if (is.list(x)) {
+    if (is.null(names(x)) && length(x) == 0) {
+      return(character())
+    }
+    out <- purrr::map(x, decodeJsonSpecialValues)
+    if (is.null(names(x)) && length(out) > 0 &&
+        all(purrr::map_lgl(out, \(element) {
+          is.atomic(element) && length(element) == 1
+        }))) {
+      return(unlist(out, use.names = FALSE))
+    }
+    return(out)
+  }
+
+  if (is.character(x) && length(x) == 1 && x %in% c("Inf", "-Inf", "NaN")) {
+    return(as.numeric(x))
+  }
+
+  x
+}
+
+parseCohortDefinitionCode <- function(x, call = parent.frame()) {
+  if (is.character(x)) {
+    omopgenerics::assertCharacter(x, length = 1, call = call)
+    return(rlang::parse_expr(x))
+  }
+  if (is.expression(x) && length(x) == 1) {
+    return(x[[1]])
+  }
+  if (rlang::is_call(x)) {
+    return(x)
+  }
+  cli::cli_abort("`x` must be a single character string, expression, or call.", call = call)
+}
+
+cohortNameFromAssignment <- function(x, call = parent.frame()) {
+  if (rlang::is_call(x, "$") && identical(rlang::as_string(x[[2]]), "cdm")) {
+    return(rlang::as_string(x[[3]]))
+  }
+  if (rlang::is_call(x, "[[") && identical(rlang::as_string(x[[2]]), "cdm") &&
+      is.character(x[[3]]) && length(x[[3]]) == 1) {
+    return(x[[3]])
+  }
+  cli::cli_abort("The assignment target must be `cdm$cohort_name` or `cdm[[\"cohort_name\"]]`.", call = call)
+}
+
+cohortFunctionFromCall <- function(x, call = parent.frame()) {
+  if (!rlang::is_call(x)) {
+    cli::cli_abort("Each cohort-definition step must be a function call.", call = call)
+  }
+
+  functionCall <- x[[1]]
+  if (rlang::is_call(functionCall, "::") || rlang::is_call(functionCall, ":::")) {
+    package <- rlang::as_string(functionCall[[2]])
+    fun <- rlang::as_string(functionCall[[3]])
+  } else if (rlang::is_symbol(functionCall)) {
+    package <- "CohortConstructor"
+    fun <- rlang::as_string(functionCall)
+  } else {
+    cli::cli_abort("Cohort-definition functions must be named calls.", call = call)
+  }
+
+  list(package = package, fun = fun)
+}
+
+isNestedCohortCall <- function(x) {
+  if (!rlang::is_call(x)) {
+    return(FALSE)
+  }
+  name <- rlang::call_name(x)
+  !is.null(name) && !name %in% c("[", "[[", "$", "c", "list", "-", "+", "*", "/", "::", ":::")
+}
+
+stepsFromPipeline <- function(x, call = parent.frame()) {
+  info <- cohortFunctionFromCall(x, call = call)
+  args <- rlang::call_args(x)
+  argNames <- names(args)
+
+  nested <- which(purrr::map_lgl(args, isNestedCohortCall))
+  if (length(nested) > 1) {
+    cli::cli_abort("Each pipeline step can have only one input cohort.", call = call)
+  }
+
+  if (length(nested) == 1) {
+    nestedId <- nested[[1]]
+    previous <- stepsFromPipeline(args[[nestedId]], call = call)
+    args <- args[-nestedId]
+    argNames <- argNames[-nestedId]
+    current <- cohortDefinitionStepFromCall(
+      x = x,
+      info = info,
+      args = args,
+      argNames = argNames,
+      root = FALSE,
+      call = call
+    )
+    return(c(previous, list(current)))
+  }
+
+  list(cohortDefinitionStepFromCall(
+    x = x,
+    info = info,
+    args = args,
+    argNames = argNames,
+    root = TRUE,
+    call = call
+  ))
+}
+
+cohortDefinitionStepFromCall <- function(x, info, args, argNames, root, call = parent.frame()) {
+  if (anyDuplicated(argNames[argNames != ""])) {
+    cli::cli_abort("Each cohort-definition function argument must have a unique name.", call = call)
+  }
+
+  if (any(argNames == "")) {
+    formalNames <- tryCatch(
+      names(formals(utils::getExportedValue(info$package, info$fun))),
+      error = function(e) character()
+    )
+    unnamed <- which(argNames == "")
+    if (length(formalNames) < max(unnamed, 0)) {
+      cli::cli_abort("All function arguments must be named or belong to a known exported function.", call = call)
+    }
+    argNames[unnamed] <- formalNames[unnamed]
+  }
+  names(args) <- argNames
+
+  if (root) {
+    if ("cdm" %in% names(args)) {
+      if (!rlang::is_symbol(args$cdm, "cdm")) {
+        cli::cli_abort("The `cdm` argument must be the `cdm` object.", call = call)
+      }
+      args$cdm <- NULL
+    }
+    if ("name" %in% names(args)) {
+      if (!is.character(args$name) || length(args$name) != 1) {
+        cli::cli_abort("The root `name` argument must be a single string.", call = call)
+      }
+      args$name <- NULL
+    }
+  } else {
+    args$cohort <- NULL
+  }
+
+  parameters <- purrr::map(args, codeValueToRValue)
+  names(parameters) <- names(args)
+  list(
+    package = info$package,
+    fun = info$fun,
+    parameters = parameters
+  )
+}
+
+codeValueToRValue <- function(x, call = parent.frame()) {
+  if (rlang::is_null(x) || is.atomic(x)) {
+    return(x)
+  }
+  if (rlang::is_symbol(x)) {
+    value <- rlang::as_string(x)
+    if (value %in% c("Inf", "NA", "NA_real_", "NA_integer_", "NA_character_", "NaN")) {
+      if (value == "Inf") return(Inf)
+      if (value == "NaN") return(NaN)
+      if (value == "NA_real_") return(NA_real_)
+      if (value == "NA_integer_") return(NA_integer_)
+      if (value == "NA_character_") return(NA_character_)
+      return(NA)
+    }
+    cli::cli_abort("Only literal values and codelist references can be parsed; `{value}` is not supported.", call = call)
+  }
+  if (!rlang::is_call(x)) {
+    cli::cli_abort("Unsupported parameter expression.", call = call)
+  }
+
+  functionName <- rlang::call_name(x)
+  args <- rlang::call_args(x)
+  if (functionName %in% c("-", "+") && length(args) == 1 &&
+      is.numeric(args[[1]]) && length(args[[1]]) == 1 && is.infinite(args[[1]])) {
+    return(if (functionName == "-") -Inf else Inf)
+  }
+  if (functionName %in% c("[", "[[") && length(args) == 2 &&
+      rlang::is_symbol(args[[1]], "codelist")) {
+    reference <- codeValueToRValue(args[[2]], call = call)
+    if (!is.character(reference) || length(reference) != 1) {
+      cli::cli_abort("Codelist references must use a single character name.", call = call)
+    }
+    return(reference)
+  }
+  if (functionName == "c") {
+    return(do.call(c, purrr::map(args, codeValueToRValue, call = call)))
+  }
+  if (functionName == "list") {
+    values <- purrr::map(args, codeValueToRValue, call = call)
+    names(values) <- names(args)
+    return(values)
+  }
+
+  cli::cli_abort("Unsupported parameter expression `{functionName}`.", call = call)
+}
+
+codeFromSingleCohortDefinition <- function(x, call = parent.frame()) {
+  if (length(x$definition) == 0) {
+    cli::cli_abort("A cohort definition must contain at least one function call.", call = call)
+  }
+
+  steps <- x$definition
+  root <- steps[[1]]
+  rootParameters <- c(
+    list(cdm = quote(cdm), name = x$name),
+    root$parameters
+  )
+  code <- cohortDefinitionCallText(root, rootParameters)
+
+  if (length(steps) > 1) {
+    for (step in steps[-1]) {
+      code <- paste0(code, " |> ", cohortDefinitionCallText(step, step$parameters))
+    }
+  }
+
+  target <- if (make.names(x$name) == x$name) {
+    paste0("cdm$", x$name)
+  } else {
+    paste0("cdm[[", encodeString(x$name, quote = "\""), "]]")
+  }
+  paste(target, "<-", code)
+}
+
+cohortDefinitionCallText <- function(step, parameters) {
+  functionName <- if (identical(step$package, "CohortConstructor")) {
+    step$fun
+  } else {
+    paste0(step$package, "::", step$fun)
+  }
+  parameterExpressions <- purrr::imap(parameters, \(value, nm) {
+    if (identical(nm, "conceptSet") && is.character(value) && length(value) == 1) {
+      rlang::call2("[", quote(codelist), value)
+    } else {
+      decodeJsonSpecialValues(value)
+    }
+  })
+  names(parameterExpressions) <- names(parameters)
+  call <- rlang::call2(functionName, !!!parameterExpressions)
+  paste(deparse(call, width.cutoff = 500), collapse = " ")
 }
 neededCodelists <- function(x) {
   neededElements(x, c("conceptSet"))
@@ -284,8 +554,12 @@ neededCohorts <- function(x) {
 }
 neededElements <- function(x, key) {
   purrr::map(x$definition, \(def) {
-    unlist(def[key[key %in% names(def)]])
+    parameters <- def$parameters
+    if (is.null(parameters)) {
+      return(NULL)
+    }
+    unlist(parameters[key[key %in% names(parameters)]])
   }) |>
-    unlist() |>
-    as.character()
+  unlist() |>
+  as.character()
 }
