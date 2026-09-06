@@ -59,7 +59,12 @@ exportCohortDefinition <- function(x, path) {
   }
 
   for (nm in names(x)) {
-    jsonlite::write_json(x = x, path = file.path(path, paste0(nm, ".json")), pretty = TRUE)
+    jsonlite::write_json(
+      x = x[[nm]],
+      path = file.path(path, paste0(nm, ".json")),
+      pretty = TRUE,
+      auto_unbox = TRUE
+    )
   }
 
   invisible(x)
