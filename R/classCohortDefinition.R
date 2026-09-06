@@ -52,7 +52,17 @@ importCohortDefinition <- function(path, recursive = FALSE) {
 #'
 #' @examples
 exportCohortDefinition <- function(x, path) {
+  x <- validateCohortDefinition(x)
+  omopgenerics::assertCharacter(path, length = 1)
+  if (!dir.exists(path)) {
+    cli::cli_abort(c(x = "Path {.path {path}} does not exist."))
+  }
 
+  for (nm in names(x)) {
+    jsonlite::write_json(x = x, path = file.path(path, paste0(nm, ".json")), pretty = TRUE)
+  }
+
+  invisible(x)
 }
 
 #' Title
@@ -185,12 +195,13 @@ findNewName <- function (name, usedNames) {
   }
   return(newName)
 }
-validateCohortDefinition <- function(x) {
+validateCohortDefinition <- function(x, call = parent.frame()) {
+  omopgenerics::assertClass(x, "cohort_definition", call = call)
   problems <- purrr::imap_chr(x, \(x, nm) {
 
   })
   if (length(problems) > 0) {
-    cli::cli_abort(c(x = "Cohort definition not well formatted", problems))
+    cli::cli_abort(c(x = "Cohort definition not well formatted", problems), call = call)
   }
   invisible(x)
 }
