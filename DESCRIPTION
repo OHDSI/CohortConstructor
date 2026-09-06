@@ -30,6 +30,7 @@ Imports:
     clock,
     dplyr,
     glue,
+    jsonlite,
     omopgenerics (>= 1.3.2),
     PatientProfiles (>= 1.4.4),
     CodelistGenerator (>= 4.0.0),

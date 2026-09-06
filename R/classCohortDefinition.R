@@ -15,8 +15,9 @@ newCohortDefinition <- function(x) {
 
 #' Title
 #'
-#' @param path
-#' @param recursive
+#' @param path A path, URL, or directory containing JSON cohort definitions.
+#' @param recursive Whether JSON files should be searched for recursively when
+#'   `path` is a directory.
 #'
 #' @returns
 #' @export
@@ -25,12 +26,15 @@ newCohortDefinition <- function(x) {
 importCohortDefinition <- function(path, recursive = FALSE) {
   # files to import
   files <- findFiles(path = path, recursive = recursive)
+  if (length(files) == 0) {
+    return(newCohortDefinition(list()))
+  }
 
   # read content as json
   files |>
     purrr::imap(\(x, nm) {
-      content <- readCohortDefinitionJson(x)
       tryCatch({
+        content <- readCohortDefinitionJson(x)
         newCohortDefinition(content)
       },
       error = function(e) {
@@ -44,8 +48,9 @@ importCohortDefinition <- function(path, recursive = FALSE) {
 
 #' Title
 #'
-#' @param x
-#' @param path
+#' @param x A cohort definition.
+#' @param path An existing directory in which to write one JSON file per
+#'   cohort definition.
 #'
 #' @returns
 #' @export
@@ -220,10 +225,10 @@ validateCohortDefinition <- function(x, call = parent.frame()) {
     }
 
     # populated needed fields
-    if (!"needed_codelists" %in% names(x)) {
+    if (!"needed_codelists" %in% names(xk)) {
       xk$needed_codelists <- neededCodelists(xk)
     }
-    if (!"needed_cohorts" %in% names(x)) {
+    if (!"needed_cohorts" %in% names(xk)) {
       xk$needed_cohorts <- neededCohorts(xk)
     }
 
@@ -237,8 +242,8 @@ validateCohortDefinition <- function(x, call = parent.frame()) {
   invisible(x)
 }
 findFiles <- function(path, recursive, call = parent.frame()) {
-  assertCharacter(path, call = call)
-  assertLogical(recursive, length = 1, call = call)
+  omopgenerics::assertCharacter(path, call = call)
+  omopgenerics::assertLogical(recursive, length = 1, call = call)
   path <- as.character(unlist(purrr::map(path, function(x) {
     isUrl <- grepl("^https://", x, ignore.case = TRUE)
     if (!isUrl) {
