@@ -96,7 +96,12 @@ cohortDefinitionFromCode <- function(x) {
 #'
 #' @examples
 codeFromCohortDefinition <- function(x) {
+  code <- x$definition |>
+    purrr::map_chr(\(def) {
 
+    }) |>
+    paste0(collapse = "|>\n")
+  paste0("cdm[[name]] <- ", code)
 }
 
 #' @export
