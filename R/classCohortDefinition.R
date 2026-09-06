@@ -102,21 +102,20 @@ bind.cohort_definition <- function(...) {
 
 #' @export
 c.cohort_definition <- function(...) {
-  x <- list(...)
-  x <- purrr::compact(purrr::imap(x, function(element, nm) {
-    if (!inherits(element, "cohort_definition")) {
-      element <- tryCatch(newCohortDefinition(element), error = function(e) NULL)
-      if (is.null(element)) {
-        cli::cli_inform(c(`!` = "Element `{nm}` eliminated as could not be converted to {.cls cohort_definition}."))
+  list(...) |>
+    purrr::imap(\(element, nm) {
+      if (!inherits(element, "cohort_definition")) {
+        element <- tryCatch(newCohortDefinition(element), error = function(e) NULL)
+        if (is.null(element)) {
+          cli::cli_inform(c(`!` = "Element `{nm}` eliminated as could not be converted to {.cls cohort_definition}."))
+        } else {
+          cli::cli_inform(c(i = "Element `{nm}` converted to {.cls cohort_definition}."))
+        }
       }
-      else {
-        cli::cli_inform(c(i = "Element `{nm}` converted to {.cls cohort_definition}."))
-      }
-    }
-    element
-  }))
-
-  unlist(x, recursive = FALSE) |>
+      element
+    }) |>
+    purrr::compact() |>
+    unlist(recursive = FALSE) |>
     removeRepeated() |>
     renameCohortDefinitions() |>
     newCohortDefinition()
