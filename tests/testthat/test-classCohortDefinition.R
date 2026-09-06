@@ -90,3 +90,44 @@ test_that("invalid JSON files do not abort an import", {
   expect_s3_class(imported, "cohort_definition")
   expect_length(imported, 0)
 })
+
+test_that("cohort definitions can be instantiated on a CDM", {
+  skip_on_cran()
+
+  cdm <- omock::mockVocabularySet() |>
+    omock::mockCdmFromTables(tables = list(
+      condition_occurrence = dplyr::tibble(
+        condition_occurrence_id = 1:5L,
+        person_id = 1:5L,
+        condition_concept_id = 35208414L,
+        condition_start_date = as.Date("2020-01-01"),
+        condition_end_date = as.Date("2020-01-01"),
+        condition_type_concept_id = 32817L
+      )
+    ))
+  definition <- cohortDefinitionFromCode(exampleCohortDefinitionCode)
+  codelist <- list(t1dm = 35208414L, t2dm = 35208414L)
+
+  expect_warning(
+    cohort <- instantiateCohortDefinition(
+      cohortDefinition = definition,
+      cdm = cdm,
+      name = "instantiated_cohort",
+      conceptSet = codelist
+    ),
+    regexp = "name.*provided"
+  )
+  expect_s3_class(cohort, "cohort_table")
+  expect_identical(omopgenerics::tableName(cohort), "instantiated_cohort")
+  expect_true(omopgenerics::cohortCount(cohort)$number_subjects >= 0)
+
+  expect_error(
+    instantiateCohortDefinition(
+      cohortDefinition = definition,
+      cdm = cdm,
+      name = "missing_codelist",
+      conceptSet = list(t1dm = 35208414L)
+    ),
+    regexp = "t2dm"
+  )
+})

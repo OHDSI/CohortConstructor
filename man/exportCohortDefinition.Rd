@@ -6,6 +6,12 @@
 \usage{
 exportCohortDefinition(x, path)
 }
+\arguments{
+\item{x}{A cohort definition.}
+
+\item{path}{An existing directory in which to write one JSON file per
+cohort definition.}
+}
 \description{
 Title
 }

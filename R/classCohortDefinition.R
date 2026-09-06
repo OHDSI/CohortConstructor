@@ -1,4 +1,57 @@
 
+#' Instantiate a cohort from a cohort definition
+#'
+#' `instantiateCohortDefinition()` evaluates a stored cohort-definition
+#' pipeline against an OMOP CDM and returns the resulting cohort table.
+#'
+#' @param cohortDefinition A `cohort_definition` object containing one or more
+#'   definitions.
+#' @param cdm An OMOP CDM reference.
+#' @param name Name of the output cohort table. If `cohortDefinition` contains
+#'   multiple definitions, this must also identify the definition to use.
+#' @param conceptSet A named list of codelists required by the definition.
+#'
+#' @returns A cohort table containing the instantiated cohort.
+#' @export
+#'
+#' @examples
+instantiateCohortDefinition <- function(cohortDefinition,
+                                        cdm,
+                                        name,
+                                        conceptSet = NULL) {
+  # input validation
+  cohortDefinition <- validateCohortDefinition(cohortDefinition)
+  cdm <- omopgenerics::validateCdmArgument(cdm = cdm)
+  name <- omopgenerics::validateNameArgument(name = name, cdm = cdm)
+
+  if (length(cohortDefinition) == 0) {
+    cli::cli_abort("`cohortDefinition` does not contain any definitions.")
+  }
+
+  # check codelists
+  conceptSet <- conceptSet |>
+    omopgenerics::validateConceptSetArgument(cdm = cdm)
+  neededConcepts <- cohortDefinition$needed_codelists
+  notPresent <- neededConcepts[!neededConcepts %in% names(conceptSet)]
+  if (length(notPresent) > 0) {
+    cli::cli_abort(c(x = "Codelists: {.var {notPresent}} must be provided in `conceptSet`."))
+  }
+
+  # get the code
+  code <- codeFromSingleCohortDefinition(
+    x = cohortDefinition,
+    targetName = name
+  )
+
+  # evaluate the code
+  cdm[[name]] <- rlang::eval_tidy(
+    rlang::parse_expr(code),
+    data = list(cdm = cdm, codelist = conceptSet)
+  )
+
+  return(cdm[[name]])
+}
+
 #' Title
 #'
 #' @param x
@@ -502,7 +555,9 @@ codeValueToRValue <- function(x, call = parent.frame()) {
   cli::cli_abort("Unsupported parameter expression `{functionName}`.", call = call)
 }
 
-codeFromSingleCohortDefinition <- function(x, call = parent.frame()) {
+codeFromSingleCohortDefinition <- function(x,
+                                           targetName = x$name,
+                                           call = parent.frame()) {
   if (length(x$definition) == 0) {
     cli::cli_abort("A cohort definition must contain at least one function call.", call = call)
   }
@@ -510,7 +565,7 @@ codeFromSingleCohortDefinition <- function(x, call = parent.frame()) {
   steps <- x$definition
   root <- steps[[1]]
   rootParameters <- c(
-    list(cdm = quote(cdm), name = x$name),
+    list(cdm = quote(cdm), name = targetName),
     root$parameters
   )
   code <- cohortDefinitionCallText(root, rootParameters)
@@ -521,14 +576,13 @@ codeFromSingleCohortDefinition <- function(x, call = parent.frame()) {
     }
   }
 
-  target <- if (make.names(x$name) == x$name) {
-    paste0("cdm$", x$name)
+  target <- if (make.names(targetName) == targetName) {
+    paste0("cdm$", targetName)
   } else {
-    paste0("cdm[[", encodeString(x$name, quote = "\""), "]]")
+    paste0("cdm[[", encodeString(targetName, quote = "\""), "]]")
   }
   paste(target, "<-", code)
 }
-
 cohortDefinitionCallText <- function(step, parameters) {
   functionName <- if (identical(step$package, "CohortConstructor")) {
     step$fun
@@ -560,6 +614,8 @@ neededElements <- function(x, key) {
     }
     unlist(parameters[key[key %in% names(parameters)]])
   }) |>
-  unlist() |>
-  as.character()
+    unlist() |>
+    as.character() |>
+    unique() |>
+    sort()
 }

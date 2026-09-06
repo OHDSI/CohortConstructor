@@ -6,6 +6,12 @@
 \usage{
 importCohortDefinition(path, recursive = FALSE)
 }
+\arguments{
+\item{path}{A path, URL, or directory containing JSON cohort definitions.}
+
+\item{recursive}{Whether JSON files should be searched for recursively when
+\code{path} is a directory.}
+}
 \description{
 Title
 }
