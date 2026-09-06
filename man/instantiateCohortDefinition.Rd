@@ -12,7 +12,9 @@ cohort definitions.}
 
 \item{cdm}{A cdm reference.}
 
-\item{name}{Name of the new cohort table created in the cdm object.}
+\item{name}{Name of the output cohort table in the \code{cdm}. All cohort
+definitions in \code{cohortDefinition} are instantiated and bound into this
+table.}
 
 \item{conceptSet}{A conceptSet, which can either be a codelist
 or a conceptSetExpression.}
@@ -21,8 +23,9 @@ or a conceptSetExpression.}
 A cohort table containing the instantiated cohort.
 }
 \description{
-\code{instantiateCohortDefinition()} evaluates a stored cohort-definition
-pipeline against an OMOP CDM and returns the resulting cohort table.
+\code{instantiateCohortDefinition()} evaluates all stored cohort-definition
+pipelines against an OMOP CDM, resolves their cohort dependencies, binds
+the resulting cohort tables, and returns the combined cohort table.
 }
 \examples{
 \donttest{

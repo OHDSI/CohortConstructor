@@ -1,13 +1,16 @@
 
 #' Instantiate a cohort from a cohort definition
 #'
-#' `instantiateCohortDefinition()` evaluates a stored cohort-definition
-#' pipeline against an OMOP CDM and returns the resulting cohort table.
+#' `instantiateCohortDefinition()` evaluates all stored cohort-definition
+#' pipelines against an OMOP CDM, resolves their cohort dependencies, binds
+#' the resulting cohort tables, and returns the combined cohort table.
 #'
 #' @inheritParams cohortDefinitionDoc
 #' @inheritParams cdmDoc
-#' @inheritParams nameDoc
 #' @inheritParams conceptSetDoc
+#' @param name Name of the output cohort table in the `cdm`. All cohort
+#'   definitions in `cohortDefinition` are instantiated and bound into this
+#'   table.
 #'
 #' @return A cohort table containing the instantiated cohort.
 #' @export
@@ -40,25 +43,83 @@ instantiateCohortDefinition <- function(cohortDefinition,
     cli::cli_abort("`cohortDefinition` does not contain any definitions.")
   }
 
+  definitionNames <- purrr::map_chr(cohortDefinition, "name")
+  if (anyDuplicated(definitionNames)) {
+    duplicatedNames <- unique(definitionNames[duplicated(definitionNames)])
+    cli::cli_abort(c(
+      x = "Cohort definition names must be unique.",
+      i = "Duplicated names: {.var {duplicatedNames}}."
+    ))
+  }
+
+  neededCohorts <- cohortDefinition |>
+    purrr::map("needed_cohorts") |>
+    unlist() |>
+    unique() |>
+    sort()
+  missingCohorts <- neededCohorts[
+    !neededCohorts %in% c(definitionNames, names(cdm))
+  ]
+  if (length(missingCohorts) > 0) {
+    cli::cli_abort(c(
+      x = "The following required cohort tables were not supplied:",
+      i = "{.var {missingCohorts}}.",
+      i = "Supply them in `cohortDefinition` or `cdm`."
+    ))
+  }
+
   # check codelists
+  neededConcepts <- cohortDefinition |>
+    purrr::map("needed_codelists") |>
+    unlist() |>
+    unique() |>
+    sort()
   conceptSet <- conceptSet |>
     omopgenerics::validateConceptSetArgument(cdm = cdm)
-  neededConcepts <- cohortDefinition$needed_codelists
   notPresent <- neededConcepts[!neededConcepts %in% names(conceptSet)]
   if (length(notPresent) > 0) {
     cli::cli_abort(c(x = "Codelists: {.var {notPresent}} must be provided in `conceptSet`."))
   }
 
-  # get the code
-  code <- codeFromSingleCohortDefinition(
-    x = cohortDefinition,
-    targetName = name
-  )
+  # Instantiate definitions in dependency order. A dependency that is also
+  # defined in `cohortDefinition` must be instantiated before the definition
+  # that uses it, even if a table with the same name already exists in `cdm`.
+  pending <- seq_along(cohortDefinition)
+  instantiated <- character()
+  while (length(pending) > 0) {
+    ready <- purrr::keep(pending, function(i) {
+      dependencies <- cohortDefinition[[i]]$needed_cohorts
+      dependenciesInDefinitions <- intersect(dependencies, definitionNames)
+      all(dependenciesInDefinitions %in% instantiated) &&
+        all(setdiff(dependencies, dependenciesInDefinitions) %in% names(cdm))
+    })
 
-  # evaluate the code
-  cdm[[name]] <- rlang::eval_tidy(
-    rlang::parse_expr(code),
-    data = list(cdm = cdm, codelist = conceptSet)
+    if (length(ready) == 0) {
+      unresolved <- definitionNames[pending]
+      cli::cli_abort(c(
+        x = "Cohort definitions cannot be instantiated because their dependencies form a cycle:",
+        i = "{.var {unresolved}}."
+      ))
+    }
+
+    i <- ready[[1]]
+    definition <- cohortDefinition[[i]]
+    definitionName <- definitionNames[[i]]
+    code <- codeFromSingleCohortDefinition(x = definition)
+    instantiatedCohort <- rlang::eval_tidy(
+      rlang::parse_expr(code),
+      data = list(cdm = cdm, codelist = conceptSet)
+    )
+    cdm[[definitionName]] <- instantiatedCohort
+    instantiated <- c(instantiated, definitionName)
+    pending <- setdiff(pending, i)
+  }
+
+  # The requested name is the name of the final table, not a selector for a
+  # single definition.
+  cdm <- do.call(
+    omopgenerics::bind,
+    c(unname(purrr::map(definitionNames, function(x) cdm[[x]])), list(name = name))
   )
 
   return(cdm[[name]])
