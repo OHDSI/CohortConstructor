@@ -202,12 +202,38 @@ findNewName <- function (name, usedNames) {
 }
 validateCohortDefinition <- function(x, call = parent.frame()) {
   omopgenerics::assertClass(x, "cohort_definition", call = call)
-  problems <- purrr::imap_chr(x, \(x, nm) {
 
-  })
+  problems <- character()
+
+  # validate
+  for (nm in names(x)) {
+    xk <- x[[nm]]
+
+    # fields
+    notPresent <- c("name", "definition") |>
+      purrr::keep(\(field) !field %in% names(xk))
+    if (length(notPresent) > 0) {
+      problems <- c(
+        problems,
+        paste0("fields not present in `", nm,"`: ", paste0(notPresent, collapse = "; "), ".")
+      )
+    }
+
+    # populated needed fields
+    if (!"needed_codelists" %in% names(x)) {
+      xk$needed_codelists <- neededCodelists(xk)
+    }
+    if (!"needed_cohorts" %in% names(x)) {
+      xk$needed_cohorts <- neededCohorts(xk)
+    }
+
+    x[[nm]] <- xk
+  }
+
   if (length(problems) > 0) {
     cli::cli_abort(c(x = "Cohort definition not well formatted", problems), call = call)
   }
+
   invisible(x)
 }
 findFiles <- function(path, recursive, call = parent.frame()) {
@@ -230,7 +256,6 @@ findFiles <- function(path, recursive, call = parent.frame()) {
   names(path) <- tools::file_path_sans_ext(basename(pathClean))
   as.list(path)
 }
-
 readCohortDefinitionJson <- function(path) {
   isUrl <- grepl("^https://", path, ignore.case = TRUE)
   if (isUrl) {
@@ -240,4 +265,17 @@ readCohortDefinitionJson <- function(path) {
     path <- destination
   }
   jsonlite::read_json(path = path, pretty = TRUE)
+}
+neededCodelists <- function(x) {
+  neededElements(x, c("conceptSet"))
+}
+neededCohorts <- function(x) {
+  neededElements(x, c("targetCohortTable"))
+}
+neededElements <- function(x, key) {
+  purrr::map(x$definition, \(def) {
+    unlist(def[key[key %in% names(def)]])
+  }) |>
+    unlist() |>
+    as.character()
 }
