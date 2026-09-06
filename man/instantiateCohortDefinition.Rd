@@ -8,14 +8,14 @@ instantiateCohortDefinition(cohortDefinition, cdm, name, conceptSet = NULL)
 }
 \arguments{
 \item{cohortDefinition}{A \code{cohort_definition} object containing one or more
-definitions.}
+cohort definitions.}
 
-\item{cdm}{An OMOP CDM reference.}
+\item{cdm}{A cdm reference.}
 
-\item{name}{Name of the output cohort table. If \code{cohortDefinition} contains
-multiple definitions, this must also identify the definition to use.}
+\item{name}{Name of the new cohort table created in the cdm object.}
 
-\item{conceptSet}{A named list of codelists required by the definition.}
+\item{conceptSet}{A conceptSet, which can either be a codelist
+or a conceptSetExpression.}
 }
 \value{
 A cohort table containing the instantiated cohort.
@@ -23,4 +23,20 @@ A cohort table containing the instantiated cohort.
 \description{
 \code{instantiateCohortDefinition()} evaluates a stored cohort-definition
 pipeline against an OMOP CDM and returns the resulting cohort table.
+}
+\examples{
+\donttest{
+library(CohortConstructor)
+cdm <- mockCohortConstructor()
+definition <- cohortDefinitionFromCode(
+  'cdm$cohort <- conceptCohort(cdm = cdm, name = "cohort", '
+  'conceptSet = codelist["condition"])'
+)
+instantiateCohortDefinition(
+  cohortDefinition = definition,
+  cdm = cdm,
+  name = "cohort",
+  conceptSet = list(condition = 201826L)
+)
+}
 }

@@ -2,16 +2,25 @@
 % Please edit documentation in R/classCohortDefinition.R
 \name{exportCohortDefinition}
 \alias{exportCohortDefinition}
-\title{Title}
+\title{Export cohort definitions to JSON}
 \usage{
 exportCohortDefinition(x, path)
 }
 \arguments{
-\item{x}{A cohort definition.}
+\item{x}{A \code{cohort_definition} object.}
 
 \item{path}{An existing directory in which to write one JSON file per
 cohort definition.}
 }
+\value{
+The input \code{cohort_definition}, invisibly.
+}
 \description{
-Title
+\code{exportCohortDefinition()} writes one JSON file per cohort definition. The
+output directory must already exist.
+}
+\examples{
+\donttest{
+exportCohortDefinition(definitions, "path/to/definitions")
+}
 }

@@ -2,10 +2,26 @@
 % Please edit documentation in R/classCohortDefinition.R
 \name{cohortDefinitionFromCode}
 \alias{cohortDefinitionFromCode}
-\title{Title}
+\title{Create a cohort definition from R code}
 \usage{
 cohortDefinitionFromCode(x)
 }
+\arguments{
+\item{x}{A single character string, expression, or call containing an
+assignment such as \code{cdm$cohort <- conceptCohort(...) |> requireSex(...)}.}
+}
+\value{
+A \code{cohort_definition} object.
+}
 \description{
-Title
+\code{cohortDefinitionFromCode()} parses a cohort-construction assignment and
+stores its pipeline as structured function calls. Only literal values and
+named codelist references are parsed; the supplied code is not evaluated.
+}
+\examples{
+code <- paste0(
+  'cdm$cohort <- conceptCohort(cdm = cdm, name = "cohort", ',
+  'conceptSet = codelist["condition"])'
+)
+cohortDefinitionFromCode(code)
 }

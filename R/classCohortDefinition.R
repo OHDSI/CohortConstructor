@@ -4,17 +4,29 @@
 #' `instantiateCohortDefinition()` evaluates a stored cohort-definition
 #' pipeline against an OMOP CDM and returns the resulting cohort table.
 #'
-#' @param cohortDefinition A `cohort_definition` object containing one or more
-#'   definitions.
-#' @param cdm An OMOP CDM reference.
-#' @param name Name of the output cohort table. If `cohortDefinition` contains
-#'   multiple definitions, this must also identify the definition to use.
-#' @param conceptSet A named list of codelists required by the definition.
+#' @inheritParams cohortDefinitionDoc
+#' @inheritParams cdmDoc
+#' @inheritParams nameDoc
+#' @inheritParams conceptSetDoc
 #'
-#' @returns A cohort table containing the instantiated cohort.
+#' @return A cohort table containing the instantiated cohort.
 #' @export
 #'
 #' @examples
+#' \donttest{
+#' library(CohortConstructor)
+#' cdm <- mockCohortConstructor()
+#' definition <- cohortDefinitionFromCode(
+#'   'cdm$cohort <- conceptCohort(cdm = cdm, name = "cohort", '
+#'   'conceptSet = codelist["condition"])'
+#' )
+#' instantiateCohortDefinition(
+#'   cohortDefinition = definition,
+#'   cdm = cdm,
+#'   name = "cohort",
+#'   conceptSet = list(condition = 201826L)
+#' )
+#' }
 instantiateCohortDefinition <- function(cohortDefinition,
                                         cdm,
                                         name,
@@ -52,30 +64,56 @@ instantiateCohortDefinition <- function(cohortDefinition,
   return(cdm[[name]])
 }
 
-#' Title
+#' Create a cohort definition
 #'
-#' @param x
+#' @description
+#' `newCohortDefinition()` validates and constructs a collection of cohort
+#' definitions that can be exported, converted to code, or instantiated.
 #'
-#' @returns
+#' @param x A named list of cohort definitions. Each definition must contain a
+#'   `name` and a `definition` list of function calls.
+#'
+#' @return A `cohort_definition` object.
 #' @export
 #'
 #' @examples
+#' \donttest{
+#' newCohortDefinition(list(
+#'   cohort = list(
+#'     name = "cohort",
+#'     definition = list(
+#'       list(
+#'         package = "CohortConstructor",
+#'         fun = "conceptCohort",
+#'         parameters = list(conceptSet = "condition")
+#'       )
+#'     )
+#'   )
+#' ))
+#' }
 newCohortDefinition <- function(x) {
   omopgenerics::assertList(x, named = TRUE)
   x <- constructCohortDefinition(x)
   validateCohortDefinition(x)
 }
 
-#' Title
+#' Import cohort definitions from JSON
+#'
+#' @description
+#' `importCohortDefinition()` reads one or more JSON cohort-definition files.
+#' A directory contributes all files ending in `.json`.
 #'
 #' @param path A path, URL, or directory containing JSON cohort definitions.
-#' @param recursive Whether JSON files should be searched for recursively when
-#'   `path` is a directory.
+#' @param recursive If `TRUE`, search directories recursively for JSON files.
 #'
-#' @returns
+#' @return A `cohort_definition` object. Invalid files are reported and
+#'   skipped.
 #' @export
 #'
 #' @examples
+#' \donttest{
+#' definitions <- importCohortDefinition("path/to/definitions")
+#' }
 importCohortDefinition <- function(path, recursive = FALSE) {
   # files to import
   files <- findFiles(path = path, recursive = recursive)
@@ -106,16 +144,23 @@ importCohortDefinition <- function(path, recursive = FALSE) {
   do.call(omopgenerics::bind, definitions)
 }
 
-#' Title
+#' Export cohort definitions to JSON
 #'
-#' @param x A cohort definition.
+#' @description
+#' `exportCohortDefinition()` writes one JSON file per cohort definition. The
+#' output directory must already exist.
+#'
+#' @param x A `cohort_definition` object.
 #' @param path An existing directory in which to write one JSON file per
 #'   cohort definition.
 #'
-#' @returns
+#' @return The input `cohort_definition`, invisibly.
 #' @export
 #'
 #' @examples
+#' \donttest{
+#' exportCohortDefinition(definitions, "path/to/definitions")
+#' }
 exportCohortDefinition <- function(x, path) {
   x <- validateCohortDefinition(x)
   omopgenerics::assertCharacter(path, length = 1)
@@ -135,14 +180,25 @@ exportCohortDefinition <- function(x, path) {
   invisible(x)
 }
 
-#' Title
+#' Create a cohort definition from R code
 #'
-#' @param x
+#' @description
+#' `cohortDefinitionFromCode()` parses a cohort-construction assignment and
+#' stores its pipeline as structured function calls. Only literal values and
+#' named codelist references are parsed; the supplied code is not evaluated.
 #'
-#' @returns
+#' @param x A single character string, expression, or call containing an
+#'   assignment such as `cdm$cohort <- conceptCohort(...) |> requireSex(...)`.
+#'
+#' @return A `cohort_definition` object.
 #' @export
 #'
 #' @examples
+#' code <- paste0(
+#'   'cdm$cohort <- conceptCohort(cdm = cdm, name = "cohort", ',
+#'   'conceptSet = codelist["condition"])'
+#' )
+#' cohortDefinitionFromCode(code)
 cohortDefinitionFromCode <- function(x) {
   expression <- parseCohortDefinitionCode(x)
 
@@ -160,14 +216,20 @@ cohortDefinitionFromCode <- function(x) {
   newCohortDefinition(definition)
 }
 
-#' Title
+#' Generate R code from a cohort definition
 #'
-#' @param x
+#' @description
+#' `codeFromCohortDefinition()` converts structured cohort definitions into
+#' executable R pipeline code.
 #'
-#' @returns
+#'
+#' @return A character string containing one assignment per cohort definition.
 #' @export
 #'
 #' @examples
+#' code <- 'cdm$cohort <- conceptCohort(cdm = cdm, name = "cohort", conceptSet = codelist["condition"])'
+#' definition <- cohortDefinitionFromCode(code)
+#' codeFromCohortDefinition(definition)
 codeFromCohortDefinition <- function(x) {
   x <- validateCohortDefinition(x)
   purrr::map_chr(x, codeFromSingleCohortDefinition) |>

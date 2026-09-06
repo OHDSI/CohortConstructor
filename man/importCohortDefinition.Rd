@@ -2,16 +2,25 @@
 % Please edit documentation in R/classCohortDefinition.R
 \name{importCohortDefinition}
 \alias{importCohortDefinition}
-\title{Title}
+\title{Import cohort definitions from JSON}
 \usage{
 importCohortDefinition(path, recursive = FALSE)
 }
 \arguments{
 \item{path}{A path, URL, or directory containing JSON cohort definitions.}
 
-\item{recursive}{Whether JSON files should be searched for recursively when
-\code{path} is a directory.}
+\item{recursive}{If \code{TRUE}, search directories recursively for JSON files.}
+}
+\value{
+A \code{cohort_definition} object. Invalid files are reported and
+skipped.
 }
 \description{
-Title
+\code{importCohortDefinition()} reads one or more JSON cohort-definition files.
+A directory contributes all files ending in \code{.json}.
+}
+\examples{
+\donttest{
+definitions <- importCohortDefinition("path/to/definitions")
+}
 }

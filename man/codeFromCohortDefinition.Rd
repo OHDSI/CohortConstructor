@@ -2,10 +2,19 @@
 % Please edit documentation in R/classCohortDefinition.R
 \name{codeFromCohortDefinition}
 \alias{codeFromCohortDefinition}
-\title{Title}
+\title{Generate R code from a cohort definition}
 \usage{
 codeFromCohortDefinition(x)
 }
+\value{
+A character string containing one assignment per cohort definition.
+}
 \description{
-Title
+\code{codeFromCohortDefinition()} converts structured cohort definitions into
+executable R pipeline code.
+}
+\examples{
+code <- 'cdm$cohort <- conceptCohort(cdm = cdm, name = "cohort", conceptSet = codelist["condition"])'
+definition <- cohortDefinitionFromCode(code)
+codeFromCohortDefinition(definition)
 }

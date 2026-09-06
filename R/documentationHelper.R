@@ -9,6 +9,16 @@
 NULL
 
 
+#' Helper for consistent documentation of `cohortDefinition`.
+#'
+#' @param cohortDefinition A `cohort_definition` object containing one or more
+#' cohort definitions.
+#'
+#' @name cohortDefinitionDoc
+#' @keywords internal
+NULL
+
+
 #' Helper for consistent documentation of `cohortId`.
 #'
 #' @param cohortId Vector identifying which cohorts to include

@@ -2,10 +2,34 @@
 % Please edit documentation in R/classCohortDefinition.R
 \name{newCohortDefinition}
 \alias{newCohortDefinition}
-\title{Title}
+\title{Create a cohort definition}
 \usage{
 newCohortDefinition(x)
 }
+\arguments{
+\item{x}{A named list of cohort definitions. Each definition must contain a
+\code{name} and a \code{definition} list of function calls.}
+}
+\value{
+A \code{cohort_definition} object.
+}
 \description{
-Title
+\code{newCohortDefinition()} validates and constructs a collection of cohort
+definitions that can be exported, converted to code, or instantiated.
+}
+\examples{
+\donttest{
+newCohortDefinition(list(
+  cohort = list(
+    name = "cohort",
+    definition = list(
+      list(
+        package = "CohortConstructor",
+        fun = "conceptCohort",
+        parameters = list(conceptSet = "condition")
+      )
+    )
+  )
+))
+}
 }
