@@ -40,7 +40,8 @@ instantiateCohortDefinition <- function(cohortDefinition,
   name <- omopgenerics::validateNameArgument(name = name, cdm = cdm)
 
   if (length(cohortDefinition) == 0) {
-    cli::cli_abort("`cohortDefinition` does not contain any definitions.")
+    cli::cli_warn("`cohortDefinition` does not contain any definitions.")
+    return(cdm)
   }
 
   definitionNames <- purrr::map_chr(cohortDefinition, "name")
@@ -83,7 +84,7 @@ instantiateCohortDefinition <- function(cohortDefinition,
 
   # Instantiate definitions in dependency order. A dependency that is also
   # defined in `cohortDefinition` must be instantiated before the definition
-  # that uses it, even if a table with the same name already exists in `cdm`.
+  # that uses it.
   pending <- seq_along(cohortDefinition)
   instantiated <- character()
   while (length(pending) > 0) {
