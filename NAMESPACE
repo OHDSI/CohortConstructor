@@ -9,6 +9,7 @@ export(cohortCount)
 export(collapseCohorts)
 export(conceptCohort)
 export(copyCohorts)
+export(customCohort)
 export(deathCohort)
 export(demographicsCohort)
 export(endDateColumn)
@@ -52,15 +53,21 @@ export(trimDuration)
 export(trimToDateRange)
 export(unionCohorts)
 export(yearCohorts)
-importFrom(PatientProfiles,endDateColumn)
-importFrom(PatientProfiles,startDateColumn)
-importFrom(omopgenerics,attrition)
-importFrom(omopgenerics,bind)
-importFrom(omopgenerics,cohortCodelist)
-importFrom(omopgenerics,cohortCount)
-importFrom(omopgenerics,settings)
-importFrom(omopgenerics,tableName)
-importFrom(rlang,":=")
-importFrom(rlang,.data)
-importFrom(rlang,.env)
+importFrom(PatientProfiles,
+  endDateColumn,
+  startDateColumn
+)
+importFrom(omopgenerics,
+  attrition,
+  bind,
+  cohortCodelist,
+  cohortCount,
+  settings,
+  tableName
+)
+importFrom(rlang,
+  ":=",
+  .data,
+  .env
+)
 importFrom(utils,data)
