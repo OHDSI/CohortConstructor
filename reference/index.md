@@ -10,6 +10,8 @@
   : Create cohorts based on patient demographics
 - [`measurementCohort()`](https://ohdsi.github.io/CohortConstructor/reference/measurementCohort.md)
   : Create measurement-based cohorts
+- [`customCohort()`](https://ohdsi.github.io/CohortConstructor/reference/customCohort.md)
+  : Create cohorts based on a arbitrary fields in the OMOP CDM
 
 ### Apply cohort table related requirements
 

@@ -245,9 +245,9 @@ cdm$celecoxib |>
 #> Rows: ??
 #> Columns: 4
 #> $ cohort_definition_id <int> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1…
-#> $ subject_id           <int> 61, 149, 153, 209, 318, 340, 348, 369, 539, 673, …
-#> $ cohort_start_date    <date> 2005-08-29, 1982-10-23, 1984-05-15, 1988-07-08, …
-#> $ cohort_end_date      <date> 2005-08-29, 1982-10-23, 1984-05-15, 1988-07-08, …
+#> $ subject_id           <int> 123, 331, 404, 744, 895, 950, 1510, 1670, 1933, 1…
+#> $ cohort_start_date    <date> 1986-03-24, 1974-11-08, 2001-12-21, 1994-07-01, …
+#> $ cohort_end_date      <date> 1986-03-24, 1974-11-08, 2001-12-21, 1994-07-01, …
 ```
 
 ## Demographic based cohort creation
@@ -440,7 +440,7 @@ settings(cdm$cohort)
 #> #   measurement_value_as_concept <chr>
 cdm$cohort
 #> # A query:  ?? x 4
-#> # Database: DuckDB 2.0.0 [unknown@Linux 7.0.0-1017-azure:R 4.6.1/:memory:]
+#> # Database: DuckDB 2.0.0 [unknown@Linux 7.0.0-1017-azure:R 4.6.2/:memory:]
 #> # ℹ 4 variables: cohort_definition_id <int>, subject_id <int>,
 #> #   cohort_start_date <date>, cohort_end_date <date>
 ```
@@ -481,7 +481,7 @@ settings(cdm$cohort)
 #> #   measurement_value_as_concept <chr>
 cdm$cohort
 #> # A query:  ?? x 4
-#> # Database: DuckDB 2.0.0 [unknown@Linux 7.0.0-1017-azure:R 4.6.1/:memory:]
+#> # Database: DuckDB 2.0.0 [unknown@Linux 7.0.0-1017-azure:R 4.6.2/:memory:]
 #> # ℹ 4 variables: cohort_definition_id <int>, subject_id <int>,
 #> #   cohort_start_date <date>, cohort_end_date <date>
 ```

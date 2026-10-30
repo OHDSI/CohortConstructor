@@ -42,26 +42,26 @@ each cohort.
 
 cdm$medications |> sampleCohorts(cohortId = NULL, n = 100)
 #> # A query:  ?? x 4
-#> # Database: DuckDB 2.0.0 [unknown@Linux 7.0.0-1017-azure:R 4.6.1//tmp/RtmpSOe7He/file243016d529fd.duckdb]
+#> # Database: DuckDB 2.0.0 [unknown@Linux 7.0.0-1017-azure:R 4.6.2//tmp/RtmpehxiiA/file243d21fe5521.duckdb]
 #>    cohort_definition_id subject_id cohort_start_date cohort_end_date
 #>                   <int>      <int> <date>            <date>         
-#>  1                    1       1325 1989-12-27        1990-01-10     
-#>  2                    1       4819 1988-01-23        1988-02-06     
-#>  3                    1         67 1980-01-31        1980-02-14     
-#>  4                    1        110 2001-04-06        2001-04-13     
-#>  5                    1        598 2014-01-07        2014-02-04     
-#>  6                    1        867 1984-02-02        1984-02-16     
-#>  7                    1        867 2018-02-26        2018-03-12     
-#>  8                    1       1271 1986-02-10        1986-02-17     
-#>  9                    1       3505 1993-02-16        1993-03-09     
-#> 10                    1       3638 2001-01-17        2001-02-16     
+#>  1                    1       1813 1990-02-02        1990-02-09     
+#>  2                    1       1820 2006-12-02        2006-12-09     
+#>  3                    1       2621 1966-11-03        1966-11-10     
+#>  4                    1       2705 2017-08-19        2017-08-26     
+#>  5                    1       3576 1978-12-26        1979-01-02     
+#>  6                    2       3001 1981-12-26        1981-12-26     
+#>  7                    1        507 1999-07-24        1999-08-07     
+#>  8                    1        709 1961-03-12        1961-03-26     
+#>  9                    1       2574 1976-02-19        1976-03-04     
+#> 10                    1       3784 1979-01-01        1979-01-08     
 #> # ℹ more rows
 
 cohortCount(cdm$medications)
 #> # A tibble: 2 × 3
 #>   cohort_definition_id number_records number_subjects
 #>                  <int>          <int>           <int>
-#> 1                    1            325             100
+#> 1                    1            372             100
 #> 2                    2            100             100
 ```
 
