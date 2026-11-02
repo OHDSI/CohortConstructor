@@ -9,7 +9,8 @@
 #' provided. If NULL, each concept will be search at the assigned domain in
 #' the concept table.
 #' @param field Field within which to search for the specified values
-#' @param values description
+#' @param values Values used for cohort inclusion. Must be a named list, with
+#' items in the list the same type as those of the field being queried.
 #' @inheritParams nameDoc
 #' @inheritParams baseCohortDoc
 #' @param exit How the cohort end date is defined. Can be either
