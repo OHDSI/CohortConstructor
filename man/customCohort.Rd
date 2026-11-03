@@ -26,7 +26,8 @@ the concept table.}
 
 \item{field}{Field within which to search for the specified values}
 
-\item{values}{description}
+\item{values}{Values used for cohort inclusion. Must be a named list, with
+items in the list the same type as those of the field being queried.}
 
 \item{name}{Name of the new cohort table created in the cdm object.}
 
