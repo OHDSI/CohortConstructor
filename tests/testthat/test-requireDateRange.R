@@ -152,6 +152,74 @@ test_that("requireDateRange", {
   dropCreatedTables(cdm = cdm)
 })
 
+test_that("date requirements at first entry preserve later entries and columns", {
+  skip_on_cran()
+  cohort <- dplyr::tibble(
+    cohort_definition_id = c(1L, 1L, 1L, 1L, 2L),
+    subject_id = c(1L, 1L, 2L, 2L, 1L),
+    cohort_start_date = as.Date(c("2000-01-01", "2002-01-01",
+                                  "2000-01-01", "2002-01-01", "2000-01-01")),
+    cohort_end_date = cohort_start_date,
+    other_date = as.Date(c("2001-01-01", "2005-01-01",
+                           "1999-01-01", "2001-01-01", "1999-01-01"))
+  )
+  cdm <- omock::mockCdmFromTables(tables = list(cohort = cohort)) |> copyCdm()
+  result <- requireInDateRange(
+    cdm$cohort, dateRange = as.Date(c("2000-01-01", "2002-01-01")),
+    cohortId = 1, indexDate = "other_date", atFirst = TRUE, name = "filtered"
+  )
+  expect_identical(colnames(result), colnames(cohort))
+  expect_equal(collectCohort(result, 1), collectCohort(cdm$cohort, 1) |>
+                 dplyr::filter(.data$subject_id == 1L))
+  expect_equal(collectCohort(result, 2), collectCohort(cdm$cohort, 2))
+  expect_equal(attrition(result) |> dplyr::filter(.data$cohort_definition_id == 1L) |>
+                 dplyr::pull("reason"),
+               c("Initial qualifying events",
+                 "other_date after 2000-01-01; requirement applied to the first entry",
+                 "other_date before 2002-01-01; requirement applied to the first entry"))
+
+  unchanged <- requireInDateRange(cdm$cohort, as.Date(c(NA, NA)), name = "unchanged")
+  expect_equal(tableName(unchanged), "unchanged")
+  expect_equal(collectCohort(unchanged, 1), collectCohort(cdm$cohort, 1))
+  expect_false(any(grepl("og_", omopgenerics::listSourceTables(cdm))))
+  dropCreatedTables(cdm)
+})
+
+test_that("date range reasons correspond only to supplied bounds", {
+  skip_on_cran()
+  cohort <- dplyr::tibble(
+    cohort_definition_id = 1L,
+    subject_id = 1:3,
+    cohort_start_date = as.Date(c("1999-01-01", "2001-01-01", "2003-01-01")),
+    cohort_end_date = cohort_start_date
+  )
+  cdm <- omock::mockCdmFromTables(tables = list(cohort = cohort)) |> copyCdm()
+  ranges <- list(
+    as.Date(c("2000-01-01", NA)),
+    as.Date(c(NA, "2002-01-01")),
+    as.Date(c("2000-01-01", "2002-01-01"))
+  )
+  reasons <- list("Lower bound", "Upper bound", c("Lower bound", "Upper bound"))
+  subjects <- list(2:3, 1:2, 2L)
+  for (i in seq_along(ranges)) {
+    result <- requireInDateRange(cdm$cohort, ranges[[i]],
+                                reason = reasons[[i]], name = "filtered")
+    expect_equal(attrition(result)$reason, c("Initial qualifying events", reasons[[i]]))
+    expect_equal(sort(dplyr::pull(result, "subject_id")), subjects[[i]])
+  }
+  expect_error(requireInDateRange(cdm$cohort, ranges[[1]],
+                                 reason = c("Lower", "Upper"), name = "filtered"),
+               "length 1")
+  expect_error(requireInDateRange(cdm$cohort, ranges[[3]],
+                                 reason = "Only one", name = "filtered"),
+               "length 2")
+  unchanged <- requireInDateRange(cdm$cohort, as.Date(c(NA, NA)),
+                                 reason = character(), name = "unchanged")
+  expect_equal(attrition(unchanged), attrition(cdm$cohort))
+  expect_equal(collectCohort(unchanged, 1), collectCohort(cdm$cohort, 1))
+  dropCreatedTables(cdm)
+})
+
 test_that("trim cohort dates", {
   skip_on_cran()
 

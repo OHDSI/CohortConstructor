@@ -247,7 +247,12 @@ reasonParams <- function(nm) {
   list(
     in_date_range = list(
       opt = c("indexDate", "temporality", "date", "atFirst"),
-      len = 2
+      len = NULL,
+      description = paste0(
+        "Character vector with one reason per supplied date bound, in ",
+        "lower-then-upper order, or a glue expression producing that many reasons. ",
+        "Unbounded dates do not require a reason."
+      )
     ),
     duration = list(
       opt = c("daysInCohort"),
@@ -257,6 +262,12 @@ reasonParams <- function(nm) {
 }
 reasonDoc <- function(nm) {
   params <- reasonParams(nm)
+  if (is.null(params$len)) {
+    return(paste0(
+      params$description, " Glue expressions can contain: ",
+      paste0("`{", params$opt, "}`", collapse = ", "), "."
+    ))
+  }
   paste0(
     "Character string of length ", params$len, " or glue expression that is ",
     "used to append one line in the attrition table. ",

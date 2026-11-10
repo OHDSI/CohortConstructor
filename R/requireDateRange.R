@@ -42,7 +42,7 @@ requireInDateRange <- function(cohort,
                                cohortId = NULL,
                                indexDate = "cohort_start_date",
                                atFirst = FALSE,
-                               reason = "{indexDate} {temporality} {date}; {atFirst}",
+                               reason = "{indexDate} {temporality} {date}{atFirst}",
                                name = tableName(cohort)) {
   # checks
   name <- validateNameArgumentInternal(missing(name), name, tableName(cohort))
@@ -51,22 +51,34 @@ requireInDateRange <- function(cohort,
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))
   cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
   dateRange <- validateDateRange(dateRange)
-  omopgenerics::assertCharacter(reason)
   omopgenerics::assertLogical(atFirst, length = 1)
 
+  if (length(cohortId) == 0 || all(isUnbound(dateRange))) {
+    if (length(cohortId) == 0) {
+      cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
+    }
+    cohort <- notModified(cohort, name)
+    return(cohort)
+  }
+
   # prepare reason
-  atFirstReason <- ifelse(atFirst, "Requirement applied to the first entry", "")
+  atFirstReason <- ifelse(atFirst, "; requirement applied to the first entry", "")
+  bounded <- !isUnbound(dateRange)
   reason <- validateReason(
     reason = reason,
-    len = 2 - sum(isUnbound(dateRange)),
+    len = sum(bounded),
     indexDate = indexDate,
-    date = dateRange,
-    temporality = c("after", "before")[isUnbound(dateRange)],
+    date = dateRange[bounded],
+    temporality = c("after", "before")[bounded],
     atFirst = atFirstReason
   )
 
-  # apply requirements min date
-  if (!isUnbound(dateRange[1])) {
+  # Match each supplied bound to its reason.
+  bounds <- which(bounded)
+  for (i in seq_along(bounds)) {
+    bound <- bounds[i]
+    range <- as.Date(c(NA, NA))
+    range[bound] <- dateRange[bound]
     cohort <- requireInternal(
       cohort = cohort,
       cohortId = cohortId,
@@ -75,31 +87,15 @@ requireInDateRange <- function(cohort,
         add_type = "none",
         colname = indexDate,
         remove_column = FALSE,
-        filter_type == "range",
-        range_min = dateRange[1],
-        range_max = as.Date(NA)
+        filter_type = "range",
+        range_min = range[1],
+        range_max = range[2]
       ),
-      reason = reason[1],
+      reason = reason[i],
       name = name
     )
   }
-  if (!isUnbound(dateRange[1])) {
-    cohort <- requireInternal(
-      cohort = cohort,
-      cohortId = cohortId,
-      atFirst = atFirst,
-      params = list(
-        add_type = "none",
-        colname = indexDate,
-        remove_column = FALSE,
-        filter_type == "range",
-        range_min = dateRange[1],
-        range_max = dateRange[2]
-      ),
-      reason = reason[2],
-      name = name
-    )
-  }
+
   return(cohort)
 }
 
@@ -294,4 +290,11 @@ requireDateRangeInternal <- function(newCohort, tmpNewCohort, indexDate, cohortI
                                           cohortId = cohortId)
   }
   return(newCohort)
+}
+notModified <- function(cohort, name) {
+  cohort |>
+    dplyr::compute(
+      name = name,
+      logPrefix = "CohortConstructor_intersect_notmodified"
+    )
 }

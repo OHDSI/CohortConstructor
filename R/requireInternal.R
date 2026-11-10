@@ -8,6 +8,10 @@ requireInternal <- function(cohort,
   cdm <- omopgenerics::cdmReference(cohort)
 
   prefix <- omopgenerics::tmpPrefix()
+  on.exit(
+    omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(prefix)),
+    add = TRUE
+  )
 
   # empty cohortId
   if (length(cohortId) == 0) {
@@ -40,12 +44,12 @@ requireInternal <- function(cohort,
   # remove column if needed
   newCohort <- removeColumn(newCohort, params)
 
-  # if atFirst inner join taking into account the decision of the first record
+  # Keep all entries for subjects whose first record meets the requirement.
   if (atFirst) {
     newCohort <- allNewCohort |>
-      dplyr::inner_join(
+      dplyr::semi_join(
         newCohort,
-        by = c("cohort_definition_id", "subject_id", "cohort_start_date")
+        by = c("cohort_definition_id", "subject_id")
       )
   }
 
@@ -126,7 +130,7 @@ filterColumn <- function(cohort, params) {
   return(cohort)
 }
 isUnbound <- function(x) {
-  is.na(x) || is.infinite(x)
+  is.na(x) | is.infinite(x)
 }
 removeColumn <- function(cohort, params) {
   if (isTRUE(params$remove_column)) {

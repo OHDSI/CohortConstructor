@@ -10,7 +10,7 @@ requireInDateRange(
   cohortId = NULL,
   indexDate = "cohort_start_date",
   atFirst = FALSE,
-  reason = "{indexDate} {temporality} {date}; {atFirst}",
+  reason = "{indexDate} {temporality} {date}{atFirst}",
   name = tableName(cohort)
 )
 }
@@ -31,7 +31,7 @@ interest.}
 \item{atFirst}{If FALSE the requirement will be applied to all records, if
 TRUE, it will only be required for the first entry of each subject.}
 
-\item{reason}{Character string of length 2 or glue expression that is used to append one line in the attrition table. Glue statment can contain: \code{{indexDate}}, \code{{temporality}}, \code{{date}}, \code{{atFirst}}. After gluing it must produce a length 2 character.}
+\item{reason}{Character vector with one reason per supplied date bound, in lower-then-upper order, or a glue expression producing that many reasons. Unbounded dates do not require a reason. Glue expressions can contain: \code{{indexDate}}, \code{{temporality}}, \code{{date}}, \code{{atFirst}}.}
 
 \item{name}{Name of the new cohort table created in the cdm object.}
 }

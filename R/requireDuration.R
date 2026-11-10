@@ -56,7 +56,7 @@ requireDuration <- function(cohort,
       add_type = "duration",
       colname = omopgenerics::uniqueId(exclude = colnames(cohort)),
       remove_column = TRUE,
-      filter_type == "range",
+      filter_type = "range",
       range_min = daysInCohort[1] - 1L,
       range_max = daysInCohort[2] - 1L
     ),
