@@ -248,13 +248,18 @@ reasonParams <- function(nm) {
     in_date_range = list(
       opt = c("indexDate", "temporality", "date", "atFirst"),
       len = 2
+    ),
+    duration = list(
+      opt = c("daysInCohort"),
+      len = 1
     )
   )[[nm]]
 }
 reasonDoc <- function(nm) {
   params <- reasonParams(nm)
   paste0(
-    "Character string of length ", params$len, " or glue expression. ",
+    "Character string of length ", params$len, " or glue expression that is ",
+    "used to append one line in the attrition table. ",
     "Glue statment can contain: ",
     paste0("`{", params$opt, "}`", collapse = ", "), ". After gluing it must ",
     "produce a length ", params$len, " character."

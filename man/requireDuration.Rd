@@ -8,6 +8,7 @@ requireDuration(
   cohort,
   daysInCohort,
   cohortId = NULL,
+  reason = "Keep records with duration {daysInCohort[1]} to {daysInCohort[2]} days",
   name = tableName(cohort)
 )
 }
@@ -26,6 +27,8 @@ longer and shorter or equal to 90 days will be kept.}
 (cohort_definition_id or cohort_name). If NULL, all cohorts will be
 used; otherwise, only the specified cohorts will be modified, and the
 rest will remain unchanged.}
+
+\item{reason}{Character string of length 1 or glue expression that is used to append one line in the attrition table. Glue statment can contain: \code{{daysInCohort}}. After gluing it must produce a length 1 character.}
 
 \item{name}{Name of the new cohort table created in the cdm object.}
 }

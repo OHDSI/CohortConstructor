@@ -14,6 +14,7 @@
 #'  if set to c(30, 90) then only cohort entries that are 30 days or more
 #'  longer and shorter or equal to 90 days will be kept.
 #' @inheritParams cohortIdModifyDoc
+#' @param reason `r reasonDoc("duration")`
 #' @inheritParams nameDoc
 #'
 #' @return The cohort table with any cohort entries that last less or more than
@@ -30,6 +31,7 @@
 requireDuration <- function(cohort,
                             daysInCohort,
                             cohortId = NULL,
+                            reason = "Keep records with duration {daysInCohort[1]} to {daysInCohort[2]} days",
                             name = tableName(cohort)) {
 
   name <- validateNameArgumentInternal(missing(name), name, tableName(cohort))
@@ -38,86 +40,29 @@ requireDuration <- function(cohort,
   cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
   daysInCohort <- validateDaysInCohort(daysInCohort)
 
-  newCol <- omopgenerics::uniqueTableName()
+  # prepare reason
+  reason <- validateReason(
+    reason = reason,
+    len = 1,
+    daysInCohort = daysInCohort
+  )
 
-  IdFilter <- needsIdFilter(cohort, cohortId)
-
-  # we consider same day entry and exit to count as one day
-  startDaysInCohort <- daysInCohort
-  daysInCohort[1] <- daysInCohort[1] - 1L
-  if(daysInCohort[2] != Inf){
-    daysInCohort[2] <- daysInCohort[2] - 1L
-  }
-
-  cohort <- cohort |>
-    dplyr::mutate(!!newCol := clock::date_count_between(
-      start = .data$cohort_start_date,
-      end = .data$cohort_end_date,
-      precision = "day"
-    ))
-
-  # only needs lower filter
-  if(daysInCohort[1] > 0 &&
-     daysInCohort[2] == Inf){
-    if(isTRUE(IdFilter)){
-      cohort <- cohort |>
-        dplyr::filter((.data[[newCol]] >= !!daysInCohort[1] &
-                         .data$cohort_definition_id %in% .env$cohortId) |
-                        !.data$cohort_definition_id %in% .env$cohortId)
-    } else {
-      cohort <- cohort |>
-        dplyr::filter(.data[[newCol]] >= !!daysInCohort[1])
-    }
-  }
-  # only needs upper filter
-  if(daysInCohort[1] == 0 &&
-     daysInCohort[2] != Inf){
-    if(isTRUE(IdFilter)){
-      cohort <- cohort |>
-        dplyr::filter((.data[[newCol]] <= !!daysInCohort[2] &
-                         .data$cohort_definition_id %in% .env$cohortId) |
-                        !.data$cohort_definition_id %in% .env$cohortId)
-    } else {
-      cohort <- cohort |>
-        dplyr::filter(.data[[newCol]] <= !!daysInCohort[2])
-    }
-  }
-  # needs lower and upper
-  if(daysInCohort[1] > 0 &&
-     daysInCohort[2] != Inf){
-    if(isTRUE(IdFilter)){
-      cohort <- cohort |>
-        dplyr::filter((.data[[newCol]] >= !!daysInCohort[1] &
-                         .data[[newCol]] <= !!daysInCohort[2] &
-                         .data$cohort_definition_id %in% .env$cohortId) |
-                        !.data$cohort_definition_id %in% .env$cohortId)
-    } else {
-      cohort <- cohort |>
-        dplyr::filter(.data[[newCol]] >= !!daysInCohort[1] &
-                        .data[[newCol]] <= !!daysInCohort[2])
-    }
-  }
-
-  cohort <- cohort |>
-    dplyr::select(!dplyr::all_of(newCol)) |>
-    dplyr::compute(
-      name = name, temporary = FALSE,
-      logPrefix = "CohortConstructor_requireDuration2_"
-    ) |>
-    omopgenerics::recordCohortAttrition(
-      reason = "Keep records with duration {startDaysInCohort[1]} to {startDaysInCohort[2]} days",
-      cohortId = cohortId)
-
-
-  useIndexes <- getOption("CohortConstructor.use_indexes")
-  if (!isFALSE(useIndexes)) {
-    addIndex(
-      cohort = cohort,
-      cols = c("subject_id", "cohort_start_date")
-    )
-  }
-
-  cohort
+  # apply requirements
+  requireInternal(
+    cohort = cohort,
+    cohortId = cohortId,
+    atFirst = FALSE,
+    params = list(
+      add_type = "duration",
+      colname = omopgenerics::uniqueId(exclude = colnames(cohort)),
+      remove_column = TRUE,
+      filter_type == "range",
+      range_min = daysInCohort[1] - 1L,
+      range_max = daysInCohort[2] - 1L
+    ),
+    reason = reason,
+    name = name
+  )
 }
 
 #' Trim cohort dates to be within a certain interval of days

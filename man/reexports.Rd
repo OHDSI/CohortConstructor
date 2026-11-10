@@ -18,8 +18,8 @@ These objects are imported from other packages. Follow the links
 below to see their documentation.
 
 \describe{
-  \item{omopgenerics}{\code{\link[omopgenerics]{attrition}}, \code{\link[omopgenerics]{bind}}, \code{\link[omopgenerics]{cohortCodelist}}, \code{\link[omopgenerics]{cohortCount}}, \code{\link[omopgenerics]{settings}}, \code{\link[omopgenerics]{tableName}}}
+  \item{omopgenerics}{\code{\link[omopgenerics:attrition]{attrition()}}, \code{\link[omopgenerics:bind]{bind()}}, \code{\link[omopgenerics:cohortCodelist]{cohortCodelist()}}, \code{\link[omopgenerics:cohortCount]{cohortCount()}}, \code{\link[omopgenerics:settings]{settings()}}, \code{\link[omopgenerics:tableName]{tableName()}}}
 
-  \item{PatientProfiles}{\code{\link[PatientProfiles]{endDateColumn}}, \code{\link[PatientProfiles]{startDateColumn}}}
+  \item{PatientProfiles}{\code{\link[PatientProfiles:endDateColumn]{endDateColumn()}}, \code{\link[PatientProfiles:startDateColumn]{startDateColumn()}}}
 }}
 
