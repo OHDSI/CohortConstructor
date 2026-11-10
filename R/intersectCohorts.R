@@ -329,7 +329,7 @@ joinOverlap <- function(cohort,
                         endDate = "cohort_end_date",
                         by = c("cohort_definition_id", "subject_id")) {
 
-  if (cohort |> dplyr::tally() |> dplyr::pull("n") == 0) {
+  if ( omopgenerics::isTableEmpty(cohort)) {
     return(
       cohort |>
         dplyr::select(dplyr::all_of(c(by, startDate, endDate))) |>
@@ -339,56 +339,62 @@ joinOverlap <- function(cohort,
   }
 
   gap <- as.integer(gap)
-  cdm <- omopgenerics::cdmReference(cohort)
 
-  start <- cohort |>
-    dplyr::select(dplyr::all_of(by), "date" := !!startDate) |>
-    dplyr::mutate("date_id" = -1)
-  end <- cohort |>
-    dplyr::select(dplyr::all_of(by), "date" := !!endDate) |>
-    dplyr::mutate("date_id" = 1)
   if (gap > 0) {
-    end <- end |>
-      dplyr::mutate("date" = as.Date(clock::add_days(x = .data$date, n = .env$gap)))
+    cohort <- cohort |>
+      dplyr::mutate(!!endDate := as.Date(clock::add_days(x = .data[[endDate]], n = .env$gap)))
   }
-  workingTbl <- omopgenerics::uniqueTableName()
-  x <- start |>
-    dplyr::union_all(end) |>
-    dplyr::compute(temporary = FALSE, name = workingTbl,
-                   logPrefix = "CohortConstructor_joinOverlap_workingTbl_")
+
+  if (inherits(cohort, "tbl_lazy")) {
+    x <- cohort |>
+      dplyr::group_by(dplyr::pick(dplyr::all_of(by))) |>
+      dplyr::arrange(.data[[startDate]], .data[[endDate]]) |>
+      dplyr::mutate(
+        running_max = cummax(.data[[endDate]]),
+        prev_max    = dplyr::lag(.data$running_max),
+        is_new_era  = dplyr::if_else(
+          .data[[startDate]] > .data$prev_max | is.na(.data$prev_max),
+          1L,
+          0L
+        ),
+        era_id      = cumsum(.data$is_new_era)
+      )
+  } else {
+    x <- cohort |>
+      dplyr::group_by(dplyr::pick(dplyr::all_of(by))) |>
+      dplyr::arrange(.data[[startDate]], .data[[endDate]]) |>
+      dplyr::mutate(
+        running_max = as.Date(cummax(as.integer(.data[[endDate]])), origin = "1970-01-01"),
+        prev_max    = dplyr::lag(.data$running_max),
+        is_new_era  = dplyr::if_else(
+          .data[[startDate]] > .data$prev_max | is.na(.data$prev_max),
+          1L,
+          0L
+        ),
+        era_id      = cumsum(.data$is_new_era)
+      )
+  }
 
   x <- x |>
-    dplyr::group_by(dplyr::pick(dplyr::all_of(by))) |>
-    dplyr::arrange(.data$date, .data$date_id) |>
-    dplyr::mutate(
-      "cum_id" = cumsum(.data$date_id),
-      "name" = dplyr::if_else(.data$date_id == -1, .env$startDate, .env$endDate),
-      "era_id" = dplyr::if_else(.data$date_id == -1, 1, 0)
+    dplyr::group_by(dplyr::pick(dplyr::all_of(c(by, "era_id")))) |>
+    dplyr::summarise(
+      !!startDate := min(.data[[startDate]], na.rm = TRUE),
+      !!endDate   := max(.data[[endDate]], na.rm = TRUE),
+      .groups = "drop"
     ) |>
-    dplyr::filter(.data$cum_id == 0 |
-                    (.data$cum_id == -1 & .data$date_id == -1)) |>
-    dplyr::mutate("era_id" = cumsum(as.numeric(.data$era_id))) |>
-    dplyr::ungroup() |>
-    dplyr::arrange() |>
-    dplyr::select(dplyr::all_of(c(by, "era_id", "name", "date"))) |>
-    dplyr::compute(temporary = FALSE, name = workingTbl,
-                   logPrefix = "CohortConstructor_joinOverlap_ids_") |>
-    tidyr::pivot_wider(names_from = "name", values_from = "date") |>
-    dplyr::select(-"era_id") |>
-    dplyr::compute(temporary = FALSE, name = workingTbl,
-                   logPrefix = "CohortConstructor_joinOverlap_pivot_wider_")
+    dplyr::select(dplyr::all_of(c(by, startDate, endDate)))
+
   if (gap > 0) {
     x <- x |>
       dplyr::mutate(!!endDate := as.Date(clock::add_days(x = .data[[endDate]], n = -gap)))
   }
 
   x <- x |>
-    dplyr::relocate(dplyr::all_of(c(by, startDate, endDate))) |>
-    dplyr::distinct() |>
-    dplyr::compute(temporary = FALSE, name = name,
-                   logPrefix = "CohortConstructor_joinOverlap_relocate_")
-
-  omopgenerics::dropSourceTable(cdm = cdm, name = workingTbl)
+    dplyr::compute(
+      name = name,
+      temporary = FALSE,
+      logPrefix = "CohortConstructor_joinOverlap_relocate_"
+    )
 
   return(x)
 }

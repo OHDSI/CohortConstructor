@@ -50,7 +50,7 @@ stratifyCohorts <- function(cohort,
   omopgenerics::assertLogical(removeStrata, length = 1)
 
   if (length(cohortId) == 0) {
-    cli::cli_inform("Returning empty cohort as `cohortId` is not valid.")
+    cli::cli_warn("Returning empty cohort as `cohortId` is not valid.")
     cdm <- omopgenerics::emptyCohortTable(cdm = cdm, name = name)
     return(cdm[[name]])
   }

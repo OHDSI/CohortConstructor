@@ -44,7 +44,7 @@ exitAtObservationEnd <- function(cohort,
   omopgenerics::assertLogical(.softValidation)
 
   if (length(cohortId) == 0) {
-    cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
+    cli::cli_warn("Returning entry cohort as `cohortId` is not valid.")
     # return entry cohort as cohortId is used to modify not subset
     cdm[[name]] <- cohort |>
       dplyr::compute(name = name, temporary = FALSE,
@@ -174,7 +174,7 @@ exitAtDeath <- function(cohort,
   omopgenerics::assertLogical(.softValidation)
 
   if (length(cohortId) == 0) {
-    cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
+    cli::cli_warn("Returning entry cohort as `cohortId` is not valid.")
     # return entry cohort as cohortId is used to modify not subset
     cdm[[name]] <- cohort |>
       dplyr::compute(name = name, temporary = FALSE,

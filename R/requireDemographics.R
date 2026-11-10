@@ -262,7 +262,7 @@ demographicsFilter <- function(cohort,
   omopgenerics::assertLogical(atFirst, length = 1)
 
   if (length(cohortId) == 0) {
-    cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
+    cli::cli_warn("Returning entry cohort as `cohortId` is not valid.")
     # return entry cohort as cohortId is used to modify not subset
     cdm[[name]] <- cohort |>
       dplyr::compute(
@@ -567,11 +567,11 @@ reqDemographicsCohortSet <- function(set,
 }
 
 newAttribute <- function(newSet, att, cohortId) {
-  newSet |>
-    dplyr::select(c("cohort_definition_id", "target_cohort_rand01")) |>
+  att |>
+    dplyr::rename("target_cohort_rand01" = "cohort_definition_id") |>
     dplyr::inner_join(
-      att |>
-        dplyr::rename("target_cohort_rand01" = "cohort_definition_id"),
+      newSet |>
+        dplyr::select(c("cohort_definition_id", "target_cohort_rand01")),
       by = "target_cohort_rand01",
       relationship = "many-to-many"
     ) |>
