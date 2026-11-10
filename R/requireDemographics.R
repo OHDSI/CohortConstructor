@@ -61,6 +61,7 @@ requireDemographics <- function(cohort,
 #' satisfy the specified age criteria.
 #'
 #' @inheritParams requireDemographics
+#' @param reason `r reasonDoc("age")`
 #'
 #' @return The cohort table with only records for individuals satisfying the
 #' age requirement
@@ -72,32 +73,55 @@ requireDemographics <- function(cohort,
 #' cdm <- mockCohortConstructor()
 #' cdm$cohort1 |>
 #'   requireAge(indexDate = "cohort_start_date",
-#'              ageRange = list(c(18, 65)))
+#'              ageRange = c(18, 65))
 #' }
 requireAge <- function(cohort,
                        ageRange,
                        cohortId = NULL,
                        indexDate = "cohort_start_date",
                        atFirst = FALSE,
+                       reason = "Age requirement: {ageRange[1]} to {ageRange[2]}{atFirst}",
                        name = tableName(cohort)) {
-  cohort <- demographicsFilter(
-    cohort = cohort,
-    cohortId = {{cohortId}},
-    indexDate = indexDate,
+  # input validation
+  cohort <- omopgenerics::validateCohortArgument(cohort)
+  name <- validateNameArgumentInternal(missing(name), name, tableName(cohort))
+  cohortId <- omopgenerics::validateCohortIdArgument({{cohortId}}, cohort, validation = "warning")
+  indexDate <- omopgenerics::validateColumn(indexDate, x = cohort, type = "date")
+  omopgenerics::assertLogical(atFirst, length = 1)
+  if (is.list(ageRange)) {
+    ageRange <- unlist(ageRange)
+  }
+  omopgenerics::assertNumeric(ageRange, length = 2, integerish = TRUE, min = 0)
+  if (ageRange[1] > ageRange[2]) {
+    cli::cli_abort(c(x = "ageRange[1] must be smaller or equal than ageRange[2]"))
+  }
+
+  # prepare reason
+  atFirstReason <- ifelse(atFirst, "; requirement applied to the first entry", "")
+  reason <- validateReason(
+    reason = reason,
+    len = 1,
     ageRange = ageRange,
-    sex = "Both",
-    minPriorObservation = 0,
-    minFutureObservation = 0,
-    missingName = missing(name),
-    name = name,
-    reqAge = TRUE,
-    reqSex = FALSE,
-    reqPriorObservation = FALSE,
-    reqFutureObservation = FALSE,
-    atFirst = atFirst
+    atFirst = atFirstReason
   )
 
-  return(cohort)
+  # apply requirements
+  requireInternal(
+    cohort = cohort,
+    cohortId = cohortId,
+    atFirst = atFirst,
+    params = list(
+      add_type = "age",
+      colname = omopgenerics::uniqueId(exclude = colnames(cohort)),
+      remove_column = TRUE,
+      filter_type = "range",
+      index_date = indexDate,
+      range_min = ageRange[1],
+      range_max = ageRange[2]
+    ),
+    reason = reason,
+    name = name
+  )
 }
 
 #' Restrict cohort on sex

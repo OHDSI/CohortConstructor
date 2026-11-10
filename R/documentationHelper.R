@@ -257,6 +257,10 @@ reasonParams <- function(nm) {
     duration = list(
       opt = c("daysInCohort"),
       len = 1
+    ),
+    age = list(
+      opt = c("ageRange", "atFirst"),
+      len = 2
     )
   )[[nm]]
 }

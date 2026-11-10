@@ -16,10 +16,7 @@ requireInternal <- function(cohort,
   # empty cohortId
   if (length(cohortId) == 0) {
     cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
-    # return entry cohort as cohortId is used to modify not subset
-    cohort <- cohort |>
-      dplyr::compute(name = name, logPrefix = "CohortConstructor_requireInternal_empty") |>
-      omopgenerics::newCohortTable(.softValidation = TRUE)
+    cohort <- notModified(cohort, name)
     return(cohort)
   }
 
@@ -100,6 +97,12 @@ addColumn <- function(cohort, params) {
       rlang::set_names(nm = params$colname)
     cohort <- cohort |>
       dplyr::mutate(!!!q)
+  } else if (params$add_type == "age") {
+    cohort <- cohort |>
+      PatientProfiles::addAgeQuery(
+        indexDate = params$index_date,
+        ageName = params$colname
+      )
   }
   return(cohort)
 }
@@ -138,4 +141,12 @@ removeColumn <- function(cohort, params) {
       dplyr::select(!dplyr::all_of(params$colname))
   }
   return(cohort)
+}
+notModified <- function(cohort, name) {
+  cohort |>
+    dplyr::compute(
+      name = name,
+      logPrefix = "CohortConstructor_intersect_notmodified"
+    ) |>
+    omopgenerics::newCohortTable(.softValidation = TRUE)
 }

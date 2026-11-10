@@ -10,6 +10,7 @@ requireAge(
   cohortId = NULL,
   indexDate = "cohort_start_date",
   atFirst = FALSE,
+  reason = "Age requirement: {ageRange[1]} to {ageRange[2]}{atFirst}",
   name = tableName(cohort)
 )
 }
@@ -29,6 +30,8 @@ demographics characteristics on which to restrict on.}
 \item{atFirst}{If FALSE the requirement will be applied to all records, if
 TRUE, it will only be required for the first entry of each subject.}
 
+\item{reason}{Character string of length 2 or glue expression that is used to append one line in the attrition table. Glue statment can contain: \code{{ageRange}}, \code{{atFirst}}. After gluing it must produce a length 2 character.}
+
 \item{name}{Name of the new cohort table created in the cdm object.}
 }
 \value{
@@ -45,6 +48,6 @@ library(CohortConstructor)
 cdm <- mockCohortConstructor()
 cdm$cohort1 |>
   requireAge(indexDate = "cohort_start_date",
-             ageRange = list(c(18, 65)))
+             ageRange = c(18, 65))
 }
 }

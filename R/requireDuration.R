@@ -33,7 +33,7 @@ requireDuration <- function(cohort,
                             cohortId = NULL,
                             reason = "Keep records with duration {daysInCohort[1]} to {daysInCohort[2]} days",
                             name = tableName(cohort)) {
-
+  # input check
   name <- validateNameArgumentInternal(missing(name), name, tableName(cohort))
   cohort <- omopgenerics::validateCohortArgument(cohort)
   cdm <- omopgenerics::validateCdmArgument(omopgenerics::cdmReference(cohort))

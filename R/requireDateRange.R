@@ -53,10 +53,7 @@ requireInDateRange <- function(cohort,
   dateRange <- validateDateRange(dateRange)
   omopgenerics::assertLogical(atFirst, length = 1)
 
-  if (length(cohortId) == 0 || all(isUnbound(dateRange))) {
-    if (length(cohortId) == 0) {
-      cli::cli_inform("Returning entry cohort as `cohortId` is not valid.")
-    }
+  if (all(isUnbound(dateRange))) {
     cohort <- notModified(cohort, name)
     return(cohort)
   }
@@ -290,11 +287,4 @@ requireDateRangeInternal <- function(newCohort, tmpNewCohort, indexDate, cohortI
                                           cohortId = cohortId)
   }
   return(newCohort)
-}
-notModified <- function(cohort, name) {
-  cohort |>
-    dplyr::compute(
-      name = name,
-      logPrefix = "CohortConstructor_intersect_notmodified"
-    )
 }

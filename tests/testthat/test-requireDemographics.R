@@ -47,6 +47,29 @@ test_that("test it works and expected errors", {
     omopgenerics::insertTable(name = "person", table = person) |>
     copyCdm()
 
+  # A combined call must match four individual requirements, including attrition.
+  for (atFirst in c(FALSE, TRUE)) {
+    combined <- requireDemographics(
+      cdm$cohort, ageRange = c(4, 35), sex = "Both",
+      minPriorObservation = 10, minFutureObservation = 40,
+      atFirst = atFirst, name = "combined"
+    )
+    separate <- cdm$cohort |>
+      requireAge(c(4, 35), atFirst = atFirst, name = "separate") |>
+      requireSex("Both", atFirst = atFirst, name = "separate") |>
+      requirePriorObservation(10, atFirst = atFirst, name = "separate") |>
+      requireFutureObservation(40, atFirst = atFirst, name = "separate")
+    expect_equal(collectCohort(combined, 1), collectCohort(separate, 1))
+    expect_equal(settings(combined), settings(separate))
+    expect_equal(attrition(combined), attrition(separate))
+    expect_identical(colnames(combined), colnames(cdm$cohort))
+    if (atFirst) {
+      expect_equal(sort(dplyr::pull(combined, "subject_id")), c(3L, 4L))
+      expect_equal(attrition(combined)$number_records, c(10, 4, 4, 2, 2))
+    }
+    expect_false(any(grepl("og_", omopgenerics::listSourceTables(cdm))))
+  }
+
   cdm$cohort1 <- cdm$cohort |>
     requireDemographics(
       ageRange = c(0, 35),
