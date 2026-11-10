@@ -242,62 +242,6 @@ exportCohortDefinition <- function(x, path) {
   invisible(x)
 }
 
-#' Create a cohort definition from R code
-#'
-#' @description
-#' `cohortDefinitionFromCode()` parses a cohort-construction assignment and
-#' stores its pipeline as structured function calls. Only literal values and
-#' named codelist references are parsed; the supplied code is not evaluated.
-#'
-#' @param x A single character string, expression, or call containing an
-#'   assignment such as `cdm$cohort <- conceptCohort(...) |> requireSex(...)`.
-#'
-#' @return A `cohort_definition` object.
-#' @export
-#'
-#' @examples
-#' code <- paste0(
-#'   'cdm$cohort <- conceptCohort(cdm = cdm, name = "cohort", ',
-#'   'conceptSet = codelist["condition"])'
-#' )
-#' cohortDefinitionFromCode(code)
-cohortDefinitionFromCode <- function(x) {
-  expression <- parseCohortDefinitionCode(x)
-
-  if (!rlang::is_call(expression, "<-", n = 2)) {
-    cli::cli_abort("Code must contain an assignment of the form `cdm$cohort_name <- ...`.")
-  }
-
-  cohortName <- cohortNameFromAssignment(expression[[2]])
-  steps <- stepsFromPipeline(expression[[3]])
-  definition <- stats::setNames(
-    list(list(name = cohortName, definition = steps)),
-    cohortName
-  )
-
-  newCohortDefinition(definition)
-}
-
-#' Generate R code from a cohort definition
-#'
-#' @description
-#' `codeFromCohortDefinition()` converts structured cohort definitions into
-#' executable R pipeline code.
-#'
-#'
-#' @return A character string containing one assignment per cohort definition.
-#' @export
-#'
-#' @examples
-#' code <- 'cdm$cohort <- conceptCohort(cdm = cdm, name = "cohort", conceptSet = codelist["condition"])'
-#' definition <- cohortDefinitionFromCode(code)
-#' codeFromCohortDefinition(definition)
-codeFromCohortDefinition <- function(x) {
-  x <- validateCohortDefinition(x)
-  purrr::map_chr(x, codeFromSingleCohortDefinition) |>
-    paste(collapse = "\n\n")
-}
-
 #' @export
 print.cohort_definition <- function(x, ...) {
   cli::cli_h1("{length(x)} cohort definition{?s}")
@@ -417,10 +361,8 @@ validateCohortDefinition <- function(x, call = parent.frame()) {
     notPresent <- c("name", "definition") |>
       purrr::keep(\(field) !field %in% names(xk))
     if (length(notPresent) > 0) {
-      problems <- c(
-        problems,
-        paste0("fields not present in `", nm,"`: ", paste0(notPresent, collapse = "; "), ".")
-      )
+      msg <- paste0("fields not present in `", nm,"`: ", paste0(notPresent, collapse = "; "), ".")
+      problems <- c(problems, msg)
     }
 
     # populated needed fields
@@ -743,3 +685,4 @@ neededElements <- function(x, key) {
     unique() |>
     sort()
 }
+
